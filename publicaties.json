@@ -168,5 +168,20 @@
     "doi": "10.1016/j.molp.2026.10.016",
     "why": "Geschikt als docentverdieping bij fotosynthese, C4-planten, ATP-vorming en cyclische elektronenstroom. De studie laat zien dat regulatie van fotosynthese niet alleen afhangt van licht en enzymactiviteit, maar ook van celtype-specifieke genexpressie. Gebruik de uitkomsten niet als directe vervanging van het vereenvoudigde schema van cyclische fotofosforylering in de les.",
     "tags": "C4-fotosynthese maïs bundelschedecellen cyclische elektronenstroom NDH ATP genregulatie DOF-transcriptiefactor"
+  },
+  {
+    "id": "e4",
+    "page": "education",
+    "date": "2026-10-14",
+    "title": "Observed Learning Gains During an Inquiry-Based Molecular Visualization Intervention in Secondary Biology",
+    "summary": "In een interventie van vier uur werkten 83 Griekse leerlingen uit de elfde klas met echte molecuulstructuren via iCn3D en de Protein Data Bank. Hun toetsscores waren na afloop hoger dan vooraf. De studie gebruikte echter één groep zonder controlegroep; de gevonden toename bewijst dus niet dat de interventie op zichzelf de oorzaak was.",
+    "theme": "Vakdidactiek biologie",
+    "source": "Praktijkonderzoek",
+    "language": "Engels",
+    "evidence": "Kwantitatieve klasstudie (n=83; pre-post zonder controlegroep)",
+    "article": "https://iubmb.onlinelibrary.wiley.com/doi/10.1002/bmb.70086",
+    "doi": "10.1002/bmb.70086",
+    "why": "Een concreet voorbeeld van het inzetten van authentieke 3D-molecuulvisualisaties in het biologieonderwijs. Leerlingen kunnen eiwitstructuren en andere biomoleculen vanuit verschillende perspectieven onderzoeken in plaats van alleen tweedimensionale afbeeldingen te bekijken. Interessant om te verkennen bij eiwitsynthese, enzymen en structuur-functierelaties. De korte interventie en het ontbreken van een controlegroep maken de effectiviteitsclaim beperkt.",
+    "tags": "molecuulvisualisatie 3D eiwitstructuur iCn3D Protein Data Bank PDB structuur functie inquiry"
   }
 ]
