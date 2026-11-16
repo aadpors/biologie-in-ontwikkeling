@@ -16,9 +16,7 @@ main{max-width:1160px;margin:24px auto;padding:0 20px 55px}.notice,.filters,.que
 <section class="notice"><b>Proefversie: examenvragen havo en vwo · 2025 en 2026</b><p>Open vragen en meerkeuzevragen uit de beschikbare examens, elk op een eigen kaart met de bijbehorende context. Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback. De rubricering blijft bèta.</p></section>
 <section class="filters"><h2>Filter de vragen</h2><div class="filtergrid">
 <div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option>Vwo</option><option>Havo</option></select></div><div class="field"><label for="year">Jaar</label><select id="year"><option value="">Alle jaren</option><option>2025</option><option>2026</option></select></div><div class="field"><label for="period">Tijdvak</label><select id="period"><option value="">Alle tijdvakken</option><option value="1">Tijdvak 1</option><option value="2">Tijdvak 2</option></select></div>
-<div class="field"><label for="questionType">Vraagtype</label><select id="questionType"><option value="">Alle vraagtypen</option><option value="open">Open vraag</option><option value="mcq">Meerkeuzevraag</option></select></div><div class="field"><label for="theme">Thema</label><select id="theme"><option value="">Alle thema's</option></select></div>
-<div class="field"><label for="concept">Concept</label><select id="concept"><option value="">Alle concepten</option></select></div>
-<div class="field"><label for="endterm">Eindterm</label><select id="endterm"><option value="">Alle eindtermen</option></select></div>
+<div class="field"><label for="questionType">Vraagtype</label><select id="questionType"><option value="">Alle vraagtypen</option><option value="open">Open vraag</option><option value="mcq">Meerkeuzevraag</option></select></div><div class="field"><label for="theme">Onderwerp</label><select id="theme"><option value="">Alle onderwerpen</option></select></div>
 </div><div class="filterfoot"><button id="reset" type="button">Wis filters</button><span class="count" id="count" aria-live="polite"></span></div></section>
 <div class="progress-top"><div class="dots" id="questionDots" aria-label="Voortgang van de gefilterde vragen"></div></div><section class="list" id="questions" aria-live="polite"></section><nav class="question-nav" id="questionNav" aria-label="Navigatie door de vragen"><button type="button" id="prevQuestion">← Vorige</button><span class="count">Blader door de vragen</span><button type="button" id="nextQuestion">Volgende →</button></nav>
 <section class="method"><h2>Hoe de rubricering werkt</h2><p><b>Deelvraagniveau:</b> elke vraag krijgt een eigen thema, concept en eindtermkoppeling. De context wordt alleen als achtergrond gebruikt en is geen automatische classificatie.</p><p><b>Contextbehoud:</b> waar mogelijk worden uitsneden uit de originele examenpagina's als afbeeldingen getoond. Zo blijven figuren, grafieken en tabellen intact zonder een volledig PDF-bestand te laden. De link naar het volledige examen blijft beschikbaar.</p><p><b>Formele koppeling:</b> de weergegeven subdomeincodes verwijzen naar de CvTE-syllabus vwo 2027. De koppeling op het niveau van de afzonderlijke specificatie is redactioneel; bij een deelvraag kunnen meerdere specificaties relevant zijn.</p><p><a href="https://www.examenblad.nl/system/files/exam-document/2025-07/syllabus-biologie-vwo-2027_versie-2.pdf" target="_blank" rel="noopener">Open de officiële syllabus biologie vwo 2027 ↗</a></p></section>
@@ -56,15 +54,49 @@ let questions=[
 ];
 const baseQuestions = questions;
 const $=id=>document.getElementById(id);
+const onderwerpCategorieen=["Ademhalingsstelsel","Afweer","Anatomie","Cellen: deling en differentiatie","Cellen: organellen","Cellen: stofwisseling","Cellen: transport","DNA: expressie, transcriptie, translatie en onderzoek","Duurzaamheid & milieu","Ecologie","Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen","Eiwitten & enzymen","Enzymen","Erfelijkheid","Evolutie","Hart en bloedsomloop","Hormonale regulatie","Huid","Organisatieniveaus","Ordening","Planten","Populatiegenetica (hardy-weinberg)","Uitscheiding: lever en nieren","Vaardigheden: grafieken & tabellen","Vaardigheden: rekenen","Vaardigheden: wetenschappelijk onderzoek","Verteringsstelsel","Zenuwstelsel & oog"];
+function onderwerpenVanVraag(q){const t=[q.q,q.theme,q.concept,q.end].filter(Boolean).join(" ").toLowerCase(),h=new Set(),a=x=>h.add(x);
+if(/ademhal|long|gaswisseling|zuurstofopname|ademcentrum|ademhalingsspier/.test(t))a("Ademhalingsstelsel");
+if(/afweer|antistof|antilichaam|immuun|immuniteit|vaccin|virus|bacterie|infect|allerg|fagocyt|lymfocyt|mhc|antigeen|oedeem|ontsteking|afstot/.test(t))a("Afweer");
+if(/anatom|bouw van|ligging|waar bevindt|in welk deel|welk orgaan/.test(t))a("Anatomie");
+if(/stamcel|celdeling|celdifferentiatie|metamorfose|mitose|meiose/.test(t))a("Cellen: deling en differentiatie");
+if(/organel|lysosoom|ribosoom|golgi|endoplasmatisch|mitochondri|chloroplast/.test(t))a("Cellen: organellen");
+if(/dissimil|assimil|stofwisseling|melkzuur|anaeroob|aeroob|atp|energieproduct|elektronendonor|fotosynth|celademhaling/.test(t))a("Cellen: stofwisseling");
+if(/diffus|osmose|transport|membraan|fick|celmembraan|actief transport|passief transport/.test(t))a("Cellen: transport");
+if(/dna|gen |genen|allel|mutatie|chromosoom|stamboom|erfelijk|overerf|genoom|codon|transcript|recombinatie|genexpressie|pcr|aon|genetisch|cisgeen|transgeen/.test(t))a("DNA: expressie, transcriptie, translatie en onderzoek");
+if(/duurzaam|milieu|vervuil|klimaat|insecticid|bestrijdingsmiddel|landbouw/.test(t))a("Duurzaamheid & milieu");
+if(/populatie|ecosysteem|habitat|niche|trofisch|voedselweb|voedselketen|predatie|concurrentie|symbiose|paras|mutual|commens|kringloop|mineralisatie|successie|pionier|climax|biodiversiteit|biotisch|abiotisch|ecologie/.test(t))a("Ecologie");
+if(/eutrofi|algenbloei|fosfaat|nutri[eë]nt|voedselrijk|vermesting/.test(t))a("Ecologie: eutrofiëring");
+if(/kringloop|mineralisatie|afbraak|stofkringloop|koolstofkringloop|stikstofkringloop|fosforkringloop/.test(t))a("Ecologie: kringlopen");
+if(/voedselweb|trofisch|predatie|concurrentie|symbiose|paras|mutual|commens|interactie|relatie tussen/.test(t))a("Ecologie: relaties & energiestromen");
+if(/eiwit|aminozuur|vouwing|enzym|katalys/.test(t))a("Eiwitten & enzymen");
+if(/enzym|katalys|substraat|activeringsenergie/.test(t))a("Enzymen");
+if(/erfelijk|overerf|allel|genotype|fenotype|stamboom|inteelt|recessief|dominant|kruising|genetische variatie/.test(t))a("Erfelijkheid");
+if(/evolu|selectiedruk|natuurlijke selectie|genetic drift|stichtereffect|soortvorming|convergent|divergent|adaptatie|inteelt/.test(t))a("Evolutie");
+if(/hart|bloedvat|slagader|ader|haarvat|bloeddruk|slagvolume|polsslag|bloedsomloop|bloedplaat|bloedcel|lymfe|weefselvloeistof/.test(t))a("Hart en bloedsomloop");
+if(/hormoon|hormon|tpo|histamine|t3|ovulatie|implantaat|terugkoppeling|hypothalamus/.test(t))a("Hormonale regulatie");
+if(/huid|zweet|temperatuur|thermoregul|vitamine d|slijmvlies|verenkleed/.test(t))a("Huid");
+if(/organisatieniveau|orgaan|weefsel|celniveau|organisme/.test(t))a("Organisatieniveaus");
+if(/geslacht|soort|genera|classific|taxon|ordening/.test(t))a("Ordening");
+if(/plant|blad|huidmond|wortel|bastvat|xyleem|flo[eë]m|chloroplast|autotroof|algen|fotosynth|stikstofassimilatie/.test(t))a("Planten");
+if(/hardy.weinberg|populatiegenet|allelfrequent|genfrequent/.test(t))a("Populatiegenetica (hardy-weinberg)");
+if(/nier|urine|nefron|kapsel van bowman|lever|uitscheiding|ureum|kaliumtekort/.test(t))a("Uitscheiding: lever en nieren");
+if(/grafiek|diagram|tabel|afbeelding|gegevens|resultaten|trend|verband tussen/.test(t))a("Vaardigheden: grafieken & tabellen");
+if(/bereken|hoeveel|percentage|kans|verhouding|snelheid|tijd zit|concentratie|volume|oppervlak/.test(t))a("Vaardigheden: rekenen");
+if(/onderzoek|hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|experiment|conclusie|controlegroep|meetwaarden/.test(t))a("Vaardigheden: wetenschappelijk onderzoek");
+if(/verter|maag|darm|alvleesklier|gal|voedsel|voeding|resorpt|darmslijmvlies|dumpingsyndroom/.test(t))a("Verteringsstelsel");
+if(/zenuwstelsel|zenuw|hersenen|hersen|impuls|membraanpotentiaal|pijn|waarnem|oog|smaak|autonome|sympath|parasympath|zintuig/.test(t))a("Zenuwstelsel & oog");
+return onderwerpCategorieen.filter(x=>h.has(x));}
+
 const saved=JSON.parse(localStorage.getItem("bioExamAnswersV2")||"{}");
 const filterState=JSON.parse(localStorage.getItem("bioExamFiltersV1")||"{}");
 function fill(id,values){const existing=new Set([...$(id).options].map(o=>o.value));for(const v of [...new Set(values)].sort()){if(!existing.has(v)){const o=document.createElement("option");o.value=v;o.textContent=v;$(id).append(o)}}}
-fill("theme",questions.map(q=>q.theme));fill("concept",questions.map(q=>q.concept));fill("endterm",questions.map(q=>q.end));
-  ["theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
-["level","year","period","questionType","theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
+fill("theme",questions.flatMap(onderwerpenVanVraag));
+  if(filterState.theme && onderwerpCategorieen.includes(filterState.theme))$("theme").value=filterState.theme;
+["level","year","period","questionType","theme"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
 let currentIndex=0;
 const selfChecks=JSON.parse(localStorage.getItem("bioExamSelfChecksV1")||"{}");
-function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||q.theme===$("theme").value)&&(!$("concept").value||q.concept===$("concept").value)&&(!$("endterm").value||q.end===$("endterm").value))}
+function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||onderwerpenVanVraag(q).includes($("theme").value)))}
 function render(){
  const filtered=getFiltered();
  if(currentIndex>=filtered.length)currentIndex=Math.max(0,filtered.length-1);
@@ -85,7 +117,7 @@ function render(){
   :'<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>';
  const cvMarkup=isMCQ?"":'<section class="cv-reveal"><button class="source" type="button" id="toggleCv" aria-expanded="false">Toon correctievoorschrift bij vraag '+q.n+'</button><figure id="cvSnippet" hidden><img data-src="exam-snippets/cv-'+q.id+'.jpg" alt="Origineel beoordelingsmodel uit het officiële correctievoorschrift, vraag '+q.n+'" loading="lazy"><figcaption>Officieel correctievoorschrift · vraag '+q.n+'</figcaption></figure>'+(q.cvAmendment?'<figure id="cvAmendment" hidden><img data-src="'+q.cvAmendment+'" alt="Officiële aanvulling op het correctievoorschrift bij vraag '+q.n+'" loading="lazy"><figcaption>Officiële aanvulling op het correctievoorschrift · van toepassing op vraag '+q.n+'</figcaption></figure>':"")+'</section>';
  const selfCheckMarkup=isMCQ?"":'<section class="selfcheck"><h3>Zelf beoordelen</h3><p style="font-size:13px;margin:0 0 8px;color:#53616a">Vergelijk je antwoord met de officiële beoordelingscriteria hierboven en vink per scorepunt aan of je het hebt behaald.</p>'+Array.from({length:q.points},(_,i)=>'<label><input type="checkbox" data-point="'+i+'" '+((selfChecks[q.id]||[]).includes(i)?"checked":"")+' > Punt '+(i+1)+' behaald</label>').join("")+'</section>';
- a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Bèta-rubricering")+'</span></div><div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">'+q.end+'</span></div>'+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
+ a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Bèta-rubricering")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+'</div>'+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
  $("questions").append(a);
  if(isMCQ){
   const feedback=a.querySelector("#mcqFeedback");
@@ -107,8 +139,8 @@ function render(){
 $("prevQuestion").addEventListener("click",()=>{if(currentIndex>0){currentIndex--;render()}});
 $("nextQuestion").addEventListener("click",()=>{const f=getFiltered();if(currentIndex<f.length-1){currentIndex++;render()}});
 
-["level","year","period","questionType","theme","concept","endterm"].forEach(id=>$(id).addEventListener("change",()=>{currentIndex=0;const state={};["level","year","period","questionType","theme","concept","endterm"].forEach(k=>state[k]=$(k).value);localStorage.setItem("bioExamFiltersV1",JSON.stringify(state));render()}));
-$("reset").addEventListener("click",()=>{["level","year","period","questionType","theme","concept","endterm"].forEach(id=>$(id).value="");currentIndex=0;localStorage.removeItem("bioExamFiltersV1");render()});
+["level","year","period","questionType","theme"].forEach(id=>$(id).addEventListener("change",()=>{currentIndex=0;const state={};["level","year","period","questionType","theme"].forEach(k=>state[k]=$(k).value);localStorage.setItem("bioExamFiltersV1",JSON.stringify(state));render()}));
+$("reset").addEventListener("click",()=>{["level","year","period","questionType","theme"].forEach(id=>$(id).value="");currentIndex=0;localStorage.removeItem("bioExamFiltersV1");render()});
 async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
