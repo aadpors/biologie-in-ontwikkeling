@@ -103,9 +103,11 @@ function setFeedbackStatus(message,isError=false){
  const el=$('feedback-status');if(!el)return;el.textContent=message;el.classList.toggle('error',!!isError);
 }
 function totalFor(publicationId,group){
- const row=feedbackTotals[publicationId]?.[group];if(!row)return '0 stemmen';
- const n=Number(row.interesting_count||0)+Number(row.not_interesting_count||0);
- return n+' stemmen ('+Number(row.interesting_count||0)+' interessant)';
+  const row=feedbackTotals[publicationId]?.[group];if(!row)return 'Nog geen stemmen';
+  const interesting=Number(row.interesting_count||0);
+  const n=interesting+Number(row.not_interesting_count||0);
+  if(!n)return 'Nog geen stemmen';
+  return Math.round(interesting/n*100)+'% interessant ('+n+' '+(n===1?'stem':'stemmen')+')';
 }
 async function loadFeedbackTotals(){
  const {data,error}=await supabaseClient.rpc('publication_feedback_totals');
