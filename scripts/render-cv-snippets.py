@@ -48,7 +48,8 @@ def render_question(pdf_path, question, output):
             top = max(0, heading["y0"] - 8)
             bottom = min(page.rect.height - 38, min((line["y0"] for line in following), default=page.rect.height - 38) - 5)
             bottom = max(top + 35, bottom)
-            rect = fitz.Rect(42, top, page.rect.width - 42, bottom)
+            # Keep the full page width; crop only vertically around the answer.
+            rect = fitz.Rect(0, top, page.rect.width, bottom)
             page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0), clip=rect, alpha=False).save(OUT / output)
             print(f"Rendered {output} from {pdf_path.name}, page {page_index + 1}, question {question}")
             return
@@ -59,7 +60,8 @@ def render_amendment(pdf_path, output):
         page = doc[0]
         # The amendment is a one-page official letter. Keep its substantive body,
         # but remove the running title at the top and the document code/page footer.
-        rect = fitz.Rect(42, 75, page.rect.width - 42, page.rect.height - 72)
+        # Keep the full page width; trim only the header/footer vertically.
+        rect = fitz.Rect(0, 75, page.rect.width, page.rect.height - 72)
         page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0), clip=rect, alpha=False).save(OUT / output)
         print(f"Rendered amendment {output} from {pdf_path.name}, page 1")
 
