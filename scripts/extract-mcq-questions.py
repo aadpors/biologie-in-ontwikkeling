@@ -277,7 +277,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
                     page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, context_y0, page.rect.width, context_y1), alpha=False).save(OUT / context_image)
-                    contexts.append({"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"})
+                    context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
+                    if (prefix, marker["number"]) in {("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
+                        context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg", f"exam-snippets/{context_image}"]
+                    contexts.append(context_record)
 
                 false_positive_open_questions = {
                     ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
