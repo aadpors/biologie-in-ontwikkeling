@@ -110,6 +110,35 @@ function render(){
 $("prevQuestion").addEventListener("click",()=>{if(currentIndex>0){currentIndex--;render()}});
 $("nextQuestion").addEventListener("click",()=>{const f=getFiltered();if(currentIndex<f.length-1){currentIndex++;render()}});
 
-["level","year","period","theme","concept","endterm"].forEach(id=>$(id).addEventListener("change",()=>{currentIndex=0;const state={};["level","year","period","theme","concept","endterm"].forEach(k=>state[k]=$(k).value);localStorage.setItem("bioExamFiltersV1",JSON.stringify(state));render()}));
-$("reset").addEventListener("click",()=>{["level","year","period","theme","concept","endterm"].forEach(id=>$(id).value="");currentIndex=0;localStorage.removeItem("bioExamFiltersV1");render()});render();
+["level","year","period","questionType","theme","concept","endterm"].forEach(id=>$(id).addEventListener("change",()=>{currentIndex=0;const state={};["level","year","period","questionType","theme","concept","endterm"].forEach(k=>state[k]=$(k).value);localStorage.setItem("bioExamFiltersV1",JSON.stringify(state));render()}));
+$("reset").addEventListener("click",()=>{["level","year","period","questionType","theme","concept","endterm"].forEach(id=>$(id).value="");currentIndex=0;localStorage.removeItem("bioExamFiltersV1");render()});
+async function loadMCQ(){
+ try{
+  const response=await fetch("exam-mcq.json");
+  if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
+  const extra=await response.json();
+  const key=q=>[q.level,q.year,q.period,q.n].join("|");
+  const map=new Map(baseQuestions.map(q=>[key(q),q]));
+  for(const item of extra){
+   const existing=map.get(key(item));
+   if(existing){
+    existing.options=item.options;
+    existing.correct=item.correct;
+    existing.image=item.image;
+    existing.pdf=item.pdf;
+    existing.cv=item.cv;
+    existing.questionType="mcq";
+   }else{
+    item.questionType="mcq";
+    map.set(key(item),item);
+   }
+  }
+  questions=[...map.values()];
+  fill("theme",questions.map(q=>q.theme));
+  fill("concept",questions.map(q=>q.concept));
+  fill("endterm",questions.map(q=>q.end));
+ }catch(error){console.warn(error)}
+ render();
+}
+loadMCQ();
 </script></body></html>
