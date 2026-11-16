@@ -243,6 +243,51 @@ for exam in EXAMS:
     items = extract_exam(*exam)
     all_questions.extend(items)
     print(f"{exam[0]}: {len(items)} meerkeuzevragen")
+# Question 40 in VWO 2025 time slot 2 uses a table layout that PyMuPDF
+# does not expose as ordinary A-D text blocks; add it from the official page.
+if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
+    pdf_rel = "examens/vw-1018-a-25-2-o.pdf"
+    with fitz.open(ROOT / pdf_rel) as doc:
+        page = doc[18]  # printed page 19 of the exam
+        start_hits = page.search_for("Op welk type eiland")
+        end_hits = page.search_for("klein veraf")
+        if not start_hits or not end_hits:
+            raise RuntimeError("Could not locate VWO 2025 time slot 2 question 40 for its image crop")
+        y0 = max(0, min(r.y0 for r in start_hits) - 5)
+        y1 = min(page.rect.height, max(r.y1 for r in end_hits) + 6)
+        image_name = "mcq-vw25t2-mcq-40.jpg"
+        page.get_pixmap(
+            matrix=fitz.Matrix(1.8, 1.8),
+            clip=fitz.Rect(42, y0, page.rect.width - 42, y1),
+            alpha=False,
+        ).save(OUT / image_name)
+    all_questions.append({
+        "id": "vw25t2-mcq-40",
+        "level": "Vwo",
+        "year": "2025",
+        "period": "2",
+        "n": 40,
+        "points": 2,
+        "page": 19,
+        "theme": "Meerkeuzevragen",
+        "concept": "Meerkeuze",
+        "end": "Nog te rubriceren",
+        "focus": "Meerkeuzevraag over de eilandtheorie van McArthur en Wilson.",
+        "source": "De verdwerging van grote zoogdieren op een gekoloniseerd eiland is mede te verklaren met de eilandtheorie van McArthur en Wilson. Een kleiner aantal soorten op een eiland maakt de kans groter dat predatoren afwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.",
+        "q": "Op welk type eiland zal het aantal soorten het kleinst zijn volgens de eilandtheorie van McArthur en Wilson?",
+        "options": [
+            {"key": "A", "text": "groot, dichtbij"},
+            {"key": "B", "text": "groot, veraf"},
+            {"key": "C", "text": "klein, dichtbij"},
+            {"key": "D", "text": "klein, veraf"},
+        ],
+        "correct": "D",
+        "image": "exam-snippets/mcq-vw25t2-mcq-40.jpg",
+        "pdf": pdf_rel,
+        "cv": "examens/vw-1018-a-25-2-c.pdf",
+        "questionType": "mcq",
+    })
+
 missing = [q["id"] for q in all_questions if not q["correct"]]
 print(f"Totaal: {len(all_questions)} meerkeuzevragen; zonder automatisch gevonden antwoord: {len(missing)}")
 if missing:
