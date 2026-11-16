@@ -12,6 +12,27 @@ create table if not exists public.publication_feedback (
 
 alter table public.publication_feedback enable row level security;
 
+-- Alleen ingelogde anonieme gebruikers mogen hun eigen rij beheren.
+revoke all on table public.publication_feedback from anon;
+grant select, insert, update, delete on table public.publication_feedback to authenticated;
+
+-- Houd updated_at automatisch actueel bij het wijzigen van een stem.
+create or replace function public.set_feedback_updated_at()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  new.updated_at = now();
+  return new;
+end;
+$;
+
+drop trigger if exists publication_feedback_updated_at on public.publication_feedback;
+create trigger publication_feedback_updated_at
+before update on public.publication_feedback
+for each row execute function public.set_feedback_updated_at();
+
 drop policy if exists "Users can read their own feedback" on public.publication_feedback;
 create policy "Users can read their own feedback"
 on public.publication_feedback for select to authenticated
