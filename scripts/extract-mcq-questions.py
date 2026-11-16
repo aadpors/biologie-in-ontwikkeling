@@ -276,6 +276,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context = clean_context([lines[j]["text"] for j in context_line_indices])
                         context_y0 = max(0, anchor_y - 5)
 
+                # A question can start very near the top of a PDF page. In
+                # that case the default context margin must not begin below
+                # the question itself, or the resulting image crop is empty.
+                context_y0 = min(context_y0, max(0, lines[start]["bbox"][1] - 5))
+
                 excluded = {marker["number_line"], marker["points_line"]}
                 block_text = []
                 block_indices = []
