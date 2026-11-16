@@ -369,6 +369,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
+                if (prefix in {"ha26t1", "vw26t1", "ha26t2", "vw26t2"} and marker["number"] in {3, 4, 14, 24}):
+                    print("CONTEXT_CHECK", prefix, marker["number"], "page", page_index + 1, "context:", context[:1200])
+                    if page_index > 0 and len(context) < 160:
+                        prior = line_records(doc[page_index - 1])
+                        print("PREVIOUS_PAGE_TAIL", prefix, marker["number"], [x["text"] for x in prior[-18:]])
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
