@@ -47,25 +47,36 @@ def line_records(page):
 
 def find_markers(lines):
     markers = []
-    i = 0
-    while i < len(lines):
-        text = lines[i]["text"]
-        m = MARKER_RE.match(text)
-        if m:
-            markers.append({"line": i, "number": int(m.group(2)), "points": int(m.group(1))})
-            i += 1
+    prompt_starts = re.compile(r"^(wat|welk|welke|waar|wanneer|waarom|hoe|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welke|hoeveel|waardoor|welke|welk)", re.I)
+    point_re = re.compile(r"^\s*(\d+)\s*p\s*$", re.I)
+    for i, record in enumerate(lines):
+        nmatch = NUMBER_RE.fullmatch(record["text"])
+        if not nmatch:
             continue
-        if re.fullmatch(r"\d+\s*p", text, re.I) and i + 1 < len(lines):
-            n = NUMBER_RE.match(lines[i + 1]["text"])
-            if n:
-                markers.append({"line": i, "number": int(n.group(1)), "points": int(re.match(r"\d+", text).group())})
-                i += 2
-                continue
-        i += 1
-    # Keep only one marker per question number on a page.
+        number = int(nmatch.group(1))
+        if not 1 <= number <= 50:
+            continue
+        previous = lines[i - 1]["text"] if i else ""
+        following = lines[i + 1]["text"] if i + 1 < len(lines) else ""
+        # In these PDFs the point marker can appear before or after the question number.
+        if point_re.match(following):
+            pm = point_re.match(following)
+            start = i - 1 if (previous.endswith("?") or prompt_starts.match(previous)) else i
+            markers.append({"line": start, "number_line": i, "points_line": i + 1, "number": number, "points": int(pm.group(1))})
+            continue
+        for offset in range(2, 6):
+            j = i + offset
+            if j >= len(lines):
+                break
+            pm = point_re.match(lines[j]["text"])
+            if pm:
+                prompt = " ".join(x["text"] for x in lines[i + 1:j]).strip()
+                if prompt and (prompt_starts.match(prompt) or "?" in prompt):
+                    markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
+                break
     unique = []
     seen = set()
-    for marker in markers:
+    for marker in sorted(markers, key=lambda x: x["line"]):
         if marker["number"] not in seen:
             unique.append(marker)
             seen.add(marker["number"])
@@ -74,6 +85,8 @@ def find_markers(lines):
 def parse_options(block_lines):
     options = []
     current = None
+    current_lines = 0
+    stop_starts = re.compile(r"^(let op|lees verder|einde|bronvermelding|de volgende|om uit te sluiten|fokkers|afbeelding|tijdens|na afloop|hieronder staat|in het onderzoek|de onderzoekers|vervolgens)", re.I)
     for line in block_lines:
         text = line.strip()
         if not text:
@@ -84,19 +97,26 @@ def parse_options(block_lines):
             if current:
                 options.append(current)
             current = {"key": key, "text": value}
+            current_lines = 1 if value else 0
         elif current:
+            if re.match(r"^\d+\s*p$", text, re.I) or HEADER_RE.match(text):
+                break
+            if len(options) >= 3 and current["text"] and stop_starts.match(text):
+                break
+            if current_lines >= 3:
+                break
             current["text"] = (current["text"] + " " + text).strip()
+            current_lines += 1
     if current:
         options.append(current)
-    # Require a complete consecutive set beginning with A.
     keys = [o["key"] for o in options]
     if len(keys) >= 3 and keys[0] == "A" and keys == list("ABCDEF"[:len(keys)]):
         return options
-    # A/B/C/D labels can be placed on one line above image-based answer options.
+    # Labels for image-based answer options may be separate from their diagrams.
     compact = " ".join(block_lines)
     labels = re.search(r"\bA\s+B\s+C\s+D(?:\s+E)?(?:\s+F)?\b", compact)
     if labels:
-        return [{"key": k, "text": "Afbeelding/keuze " + k} for k in labels.group(0).split()]
+        return [{"key": k, "text": "Bekijk optie " + k + " in de oorspronkelijke afbeelding"} for k in labels.group(0).split()]
     return []
 
 def clean_context(lines):
