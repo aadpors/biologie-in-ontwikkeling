@@ -1482,6 +1482,44 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t2-mcq-40",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 40,
+    "points": 2,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Dwergolifanten op Sicilië\nOp eilanden hebben veel zoogdiersoorten een afwijkende grootte\nvergeleken met verwante soorten op het vasteland. Grote soorten zijn er\nkleiner, kleine soorten zijn er groter. Een team van wetenschappers heeft\naan de hand van fossielen een schatting gemaakt van de snelheid van\n‘verdwerging’ bij olifanten die leefden op Sicilië.\nDe ‘verreuzing’ en ‘verdwerging’ van zoogdiersoorten die eilanden\nkoloniseren, wordt de wet van Foster genoemd (afbeelding 1). Bij de\nontwikkeling richting de afwijkende afmetingen zijn verschillende factoren\nbetrokken. Wetenschappers veronderstellen dat na vestiging eerst een\nsterke populatiegroei plaatsvindt, en daarna de ontwikkeling naar een\noptimale grootte van de individuen.\nafbeelding 1\nDe genetische samenstelling van een nieuw-gevestigde eilandpopulatie is\nanders dan die van de oorspronkelijke populatie van het vasteland.\nHieronder staan uitspraken over dit verschil.\n1 Er is sprake van het foundereffect.\n2 Door de isolatie van de populatie op het eiland treedt gene flow op.\n3 De genenpool van de eilandpopulatie is kleiner dan die van het\nvasteland.\nDe verdwerging van grote zoogdieren op een gekoloniseerd eiland is\nmede te verklaren met de eilandtheorie van McArthur en Wilson. Een\nkleiner aantal soorten op een eiland maakt de kans groter dat predatoren\nafwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.",
+    "q": "Op welk type eiland zal het aantal soorten het kleinst zijn volgens de\neilandtheorie van McArthur en Wilson?\nafmeting\nnabijheid vasteland",
+    "options": [
+      {
+        "key": "A",
+        "text": "groot dichtbij"
+      },
+      {
+        "key": "B",
+        "text": "groot veraf"
+      },
+      {
+        "key": "C",
+        "text": "klein dichtbij"
+      },
+      {
+        "key": "D",
+        "text": "klein veraf De wetenschappers onderzochten fossiele resten van de puntali-olifant"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/mcq-vw25t2-mcq-40.jpg",
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "vw25t2-mcq-42",
     "level": "Vwo",
     "year": "2025",
@@ -1493,7 +1531,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "D klein\nveraf\nDe wetenschappers onderzochten fossiele resten van de puntali-olifant\n(Palaeoloxodon mnaidriensis), een uitgestorven olifantensoort die leefde\nop het Italiaanse eiland Sicilië. Deze dwergolifant is een afstammeling van\nde veel grotere uitgestorven Europese bosolifant (Palaeoloxodon\nantiquus) die 781.000 tot 30.000 jaar geleden leefde. Zie afbeelding 2.\nafbeelding 2\nDe wetenschappers konden mitochondriaal DNA (mtDNA) isoleren uit een\nfossiel bot uit het binnenoor van een puntali-olifant. Dit mtDNA werd\ngebruikt om de lengte van de periode van verdwerging te bepalen.\nVoor het onderzoek moest het mtDNA eerst worden vermenigvuldigd,\nwaarna de basevolgorde ervan kon worden bepaald.\n\nMet behulp van de DNA-gegevens werd een schatting gemaakt van de\nperiode waarin de verdwerging plaatsvond. De gevonden fossielen van de\npuntali-olifant worden als het eindstadium van het verdwergingsproces\nbeschouwd. De ouderdom van deze fossielen ligt tussen 175.500 en\n50.000 jaar. Zie afbeelding 3.\nafbeelding 3\nDe onderzoekers schrijven dat de hoogst mogelijke snelheid van\nverdwerging 41,5 mm per generatie was.\nMet de gegevens in afbeelding 3 is de laagst mogelijke snelheid van\nverdwerging per generatie te berekenen. Ga uit van een generatietijd van\n31 jaar.",
+    "source": "Dwergolifanten op Sicilië\nOp eilanden hebben veel zoogdiersoorten een afwijkende grootte\nvergeleken met verwante soorten op het vasteland. Grote soorten zijn er\nkleiner, kleine soorten zijn er groter. Een team van wetenschappers heeft\naan de hand van fossielen een schatting gemaakt van de snelheid van\n‘verdwerging’ bij olifanten die leefden op Sicilië.\nDe ‘verreuzing’ en ‘verdwerging’ van zoogdiersoorten die eilanden\nkoloniseren, wordt de wet van Foster genoemd (afbeelding 1). Bij de\nontwikkeling richting de afwijkende afmetingen zijn verschillende factoren\nbetrokken. Wetenschappers veronderstellen dat na vestiging eerst een\nsterke populatiegroei plaatsvindt, en daarna de ontwikkeling naar een\noptimale grootte van de individuen.\nafbeelding 1\nDe genetische samenstelling van een nieuw-gevestigde eilandpopulatie is\nanders dan die van de oorspronkelijke populatie van het vasteland.\nHieronder staan uitspraken over dit verschil.\n1 Er is sprake van het foundereffect.\n2 Door de isolatie van de populatie op het eiland treedt gene flow op.\n3 De genenpool van de eilandpopulatie is kleiner dan die van het\nvasteland.\nDe verdwerging van grote zoogdieren op een gekoloniseerd eiland is\nmede te verklaren met de eilandtheorie van McArthur en Wilson. Een\nkleiner aantal soorten op een eiland maakt de kans groter dat predatoren\nafwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.\nMet behulp van de DNA-gegevens werd een schatting gemaakt van de\nperiode waarin de verdwerging plaatsvond. De gevonden fossielen van de\npuntali-olifant worden als het eindstadium van het verdwergingsproces\nbeschouwd. De ouderdom van deze fossielen ligt tussen 175.500 en\n50.000 jaar. Zie afbeelding 3.\nafbeelding 3\nDe onderzoekers schrijven dat de hoogst mogelijke snelheid van\nverdwerging 41,5 mm per generatie was.\nMet de gegevens in afbeelding 3 is de laagst mogelijke snelheid van\nverdwerging per generatie te berekenen. Ga uit van een generatietijd van\n31 jaar.",
     "q": "Wat is deze laagst mogelijke snelheid van verdwerging?",
     "options": [
       {
@@ -3277,44 +3315,6 @@
     "image": "exam-snippets/mcq-vw26t2-mcq-37.jpg",
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-40",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 40,
-    "points": 2,
-    "page": 19,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag over de eilandtheorie van McArthur en Wilson.",
-    "source": "De verdwerging van grote zoogdieren op een gekoloniseerd eiland is mede te verklaren met de eilandtheorie van McArthur en Wilson. Een kleiner aantal soorten op een eiland maakt de kans groter dat predatoren afwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.",
-    "q": "Op welk type eiland zal het aantal soorten het kleinst zijn volgens de eilandtheorie van McArthur en Wilson?",
-    "options": [
-      {
-        "key": "A",
-        "text": "groot, dichtbij"
-      },
-      {
-        "key": "B",
-        "text": "groot, veraf"
-      },
-      {
-        "key": "C",
-        "text": "klein, dichtbij"
-      },
-      {
-        "key": "D",
-        "text": "klein, veraf"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/mcq-vw25t2-mcq-40.jpg",
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
   }
 ]
