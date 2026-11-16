@@ -70,7 +70,7 @@ function render(){
   '<div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">'+q.end+'</span></div>'+
   '<p class="context">'+q.focus+'</p><section class="sourceblock"><h3>Relevante informatie uit de opgave</h3><p>'+q.source+'</p></section>'+
   '<section class="questiontext"><h3>Vraag '+q.n+'</h3><p>'+q.q+'</p></section>'+
-  '<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Bekijk de originele examenpagina (PDF, pagina '+q.page+') ↗</a></div>'+
+  '<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Opgaven: originele examenpagina (PDF, pagina '+q.page+') ↗</a> · <a href="'+pdf.replace("-o.pdf","-c.pdf")+'" target="_blank" rel="noopener">Correctievoorschrift ↗</a></div>'+
   '<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>'+
   '<div class="actions"><button class="reveal" type="button" data-reveal="'+q.id+'">Toon antwoordindicatie</button></div>'+
   '<div class="marking" id="mark-'+q.id+'" hidden><b>Antwoordindicatie volgens correctievoorschrift</b><p>'+q.a+'</p><p>'+q.why+'</p><small>Beknopte weergave; raadpleeg het officiële correctievoorschrift voor de volledige puntentoekenning.</small></div>';
