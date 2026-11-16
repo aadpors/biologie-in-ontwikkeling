@@ -68,7 +68,11 @@ def find_markers(lines):
         for j in range(index - 1, max(index - 16, -1), -1):
             if prompt_starts.match(lines[j]["text"]):
                 return j
-            if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5)) and len(lines[j]["text"]) < 90:
+            if (
+                (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5))
+                and len(lines[j]["text"]) < 90
+                and not re.match(r"^(afbeelding|tabel|grafiek|legenda)(?:\s+\d+)?$", lines[j]["text"], re.I)
+            ):
                 break
         return index
 
