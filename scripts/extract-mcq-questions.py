@@ -155,8 +155,6 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
         for page_index, page in enumerate(doc):
             lines = line_records(page)
             markers = find_markers(lines)
-            if prefix in ("ha25t1", "ha25t2", "ha26t1") and page_index in (1, 4, 18):
-                print("DEBUG", prefix, page_index + 1, [x["text"] for x in lines[:70]])
             if not markers:
                 continue
             previous_ranges = []
@@ -164,10 +162,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 start = marker["line"]
                 end = markers[idx + 1]["line"] if idx + 1 < len(markers) else len(lines)
                 block = lines[start:end]
-                block_text = [x["text"] for x in block]
-                # The question block begins at the point marker. Remove that marker.
-                if block_text:
-                    block_text = block_text[1:] if re.match(r"^\d+\s*p\s+\d+", block_text[0], re.I) else block_text[2:]
+                excluded = {marker["number_line"], marker["points_line"]}
+                block_text = [lines[j]["text"] for j in range(start, end) if j not in excluded and not HEADER_RE.match(lines[j]["text"])]
                 options = parse_options(block_text)
                 if not options:
                     previous_ranges.append((start, end))
