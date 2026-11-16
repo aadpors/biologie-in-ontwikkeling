@@ -32,7 +32,7 @@ for (const [index, item] of publications.entries()) {
     catch { throw new Error(`${where}: ongeldige PDF-URL`); }
     assert.equal(pdfUrl.protocol, 'https:', `${where}: PDF-link moet HTTPS gebruiken`);
   }
-  if (item.doi) assert.ok(/^10\.\d{4,9}\\/.+/.test(item.doi), `${where}: ongeldige DOI ${item.doi}`);
+  if (item.doi) assert.ok(/^10\.\d{4,9}\/.+/.test(item.doi), `${where}: ongeldige DOI ${item.doi}`);
 
   assert.ok(!ids.has(item.id), `Dubbel publicatie-ID: ${item.id}`);
   ids.add(item.id);
