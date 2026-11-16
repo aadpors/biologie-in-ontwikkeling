@@ -1,40 +1,25 @@
-# Examenoefenen – bèta-ontwerp
+# Examenoefenen (bèta)
 
-## Uitgangspunten
+De oefenpagina bevat momenteel 19 geselecteerde deelvragen uit vier centrale examens:
+- havo 2025, tijdvak 1
+- vwo 2025, tijdvak 1
+- havo 2026, tijdvak 1
+- vwo 2026, tijdvak 1
 
-- Rubriceer op het niveau van de afzonderlijke examenvraag/deelvraag, nooit uitsluitend op het niveau van de overkoepelende context.
-- De oefenpagina laadt of embedt **geen examen-PDF**. Een PDF-embed is bewust uitgesloten: die zou steeds de volledige PDF downloaden/weergeven.
-- Toon per deelvraag uitsluitend de relevante contextinformatie (tekst en, waar nodig, een afzonderlijk uitgesneden origineel informatieblok/figuur) plus precies één vraag.
-- Neem geen andere vragen of volledige examenpagina's over. Verwijs desgewenst afzonderlijk naar de originele examenbron, zodat de leerling die bewust zelf kan openen.
-- Bewaar leerlingantwoorden lokaal in de browser; geen account of serveropslag in deze eerste bèta.
-- Antwoordindicaties zijn samenvattingen. Het officiële correctievoorschrift blijft leidend.
-- Conceptuele rubricering en formele syllabus-eindterm zijn twee aparte velden. Toon een eindterm pas als de koppeling inhoudelijk gecontroleerd is.
+## Functionaliteit
+- Filters op niveau, jaar, tijdvak, thema, concept en syllabusonderdeel.
+- Deelvragen worden los getoond met alleen de relevante context en vraagtekst.
+- Antwoorden worden lokaal in de browser bewaard.
+- Antwoordindicaties zijn gebaseerd op de officiële correctievoorschriften.
+- Originele examendocumenten worden alleen geopend na een klik op de bronlink; er wordt geen volledige PDF automatisch ingeladen.
+- Bij vragen met figuren verwijst de link naar de originele PDF-pagina; er worden geen figuren nagemaakt.
 
-## Eerste pilot
+## Rubricering
+De thema's, concepten en syllabusonderdelen zijn redactionele koppelingen op deelvraagniveau. Deze blijven bèta en moeten inhoudelijk worden gereviewd. De antwoordindicaties zijn beknopte samenvattingen en vervangen het officiële correctievoorschrift niet.
 
-Vwo 2025, tijdvak 1, vragen 14–18 uit de context “De nijlpaarden van Pablo Escobar”. De vijf deelvragen demonstreren dat één context vragen bevat uit verschillende thema's en concepten:
-- 14–15: populatiedynamiek en biotische populatieregulatie.
-- 16–17: genetische drift/stichtereffect en allopatrische soortvorming.
-- 18: successie en climaxsoorten.
-
-De thematische en conceptuele rubricering is redactioneel. De formele koppelingen zijn voorlopig uitgewerkt aan de hand van de CvTE-syllabus vwo 2027: vragen 14–15 aan P1.3, vraag 16 aan P4.2, vraag 17 aan P4.4 en vraag 18 aan P2.1. De specificatienummers blijven bèta en verdienen inhoudelijke review.
-
-## Bronnen en hergebruik
-
-- Opgaven: https://www.examenblad.nl/system/files/exam-document/2025-05/vw-1018-a-25-1-o.pdf
-- Correctievoorschrift: https://www.examenblad.nl/system/files/exam-document/2025-05/vw-1018-a-25-1-c.pdf
-- Examenblad copyright: https://www.examenblad.nl/over-examenblad/copyright
-
-De PDF-bronnen worden niet automatisch in de oefenpagina geladen. Eventuele afzonderlijke rechten op bronmateriaal binnen een examen moeten per document worden gerespecteerd.
-
-## Technische controle
-
-Controleer bij wijzigingen aan deze pagina expliciet dat er geen `iframe`, `object`, `embed`, PDF.js-loader of automatische PDF-fetch aanwezig is. Een gewone, expliciete bronlink mag blijven bestaan, maar mag geen PDF-preview of automatische download activeren.
-
-## Volgende uitbreidingen
-
-1. Voeg nauwkeurige afzonderlijke uitsneden uit de originele bron toe voor noodzakelijke figuren. Tot die tijd staat bij vraag 14 alleen een expliciete, handmatige link naar de originele examenpagina; er wordt geen grafiek nagemaakt of PDF automatisch geladen.
-2. Valideer de eindtermkoppelingen per vraag tegen de officiële havo- en vwo-syllabi.
-3. Voeg havo toe en breid de pilot uit met vwo 2024 en 2026.
-4. Voeg een docentredactie-/reviewstatus toe voor twijfelgevallen en meervoudige koppelingen.
-5. Breid filters uit met syllabusjaar/programma en CE/SE-status; houd huidige syllabus en toekomstige SLO-conceptprogramma's gescheiden.
+## Nog uit te breiden
+- Tijdvak 2 van 2025 en 2026.
+- Meer deelvragen uit de vier opgenomen tijdvak-1-examens.
+- Systematische koppeling aan de actuele syllabus per schoolsoort en examenjaar.
+- Vraagtype, beheersingsniveau en eventueel moeilijkheidsgraad als aanvullende filters.
+- Automatische controle van de lokale links naar opgaven en correctievoorschriften.
