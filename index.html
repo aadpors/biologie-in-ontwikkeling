@@ -63,7 +63,8 @@ function syncTooltips(root=document){root.querySelectorAll('[data-tip]').forEach
 const tooltipObserver=new MutationObserver(()=>syncTooltips());
 tooltipObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['data-tip']});
 syncTooltips();
-document.querySelectorAll('select,input[type=search]').forEach(el=>el.addEventListener('input',render));
+document.querySelectorAll('select').forEach(el=>el.addEventListener('change',render));
+document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',render));
 syncTooltips();
 fetch('./publicaties.json')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
