@@ -1,4 +1,4 @@
-import json
+import json  # Generate a static, inspectable inventory of MCQ cards.
 import re
 from pathlib import Path
 import fitz
