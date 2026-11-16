@@ -18,6 +18,17 @@ EXAMS = [
     ("vw26t2", "Vwo", "2026", "2", "examens/vw-1018-a-26-2-o.pdf", "examens/vw-1018-a-26-2-c.pdf"),
 ]
 
+SELECTED_CONTEXTS = {
+    ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18),
+    ("ha25t1", 1), ("ha25t1", 3), ("ha25t1", 5),
+    ("ha26t1", 4), ("ha26t1", 5), ("ha26t1", 7), ("ha26t1", 8), ("ha26t1", 15), ("ha26t1", 16),
+    ("vw26t1", 1), ("vw26t1", 2), ("vw26t1", 12), ("vw26t1", 14), ("vw26t1", 16), ("vw26t1", 20),
+    ("ha25t2", 3), ("ha25t2", 9),
+    ("vw25t2", 6), ("vw25t2", 8),
+    ("ha26t2", 3), ("ha26t2", 9),
+    ("vw26t2", 14), ("vw26t2", 24),
+}
+
 HEADER_RE = re.compile(r"^(?:[HV][AW]-1018-a-\d{2}-\d-o|\d+\s*/\s*\d+|lees verder|einde|vraag\s+antwoord\s+scores|vraag|antwoord|scores)\b", re.I)
 MARKER_RE = re.compile(r"^\s*(\d+)\s*p\s+(\d{1,2})(?:\s+|$)", re.I)
 NUMBER_RE = re.compile(r"^\s*(\d{1,2})\s*$")
@@ -161,6 +172,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     with fitz.open(cv_path) as cv_doc:
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
+    contexts = []
     active_context = []
     heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding|lees verder|einde)$", re.I)
     with fitz.open(exam_path) as doc:
@@ -214,6 +226,17 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     if j not in excluded and not HEADER_RE.match(lines[j]["text"])
                 ]
                 options = parse_options(block_text)
+                if (prefix, marker["number"]) in SELECTED_CONTEXTS:
+                    first_option_index = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
+                    selected_prompt = "\n".join(x for x in block_text[:first_option_index] if x.strip()).strip()
+                    contexts.append({
+                        "level": level,
+                        "year": year,
+                        "period": period,
+                        "n": marker["number"],
+                        "source": context,
+                        "q": selected_prompt,
+                    })
                 false_positive_open_questions = {
                     ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
                     ("vw26t1", 30), ("ha26t2", 40)
@@ -267,14 +290,16 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 })
                 previous_ranges.append((start, end))
                 cursor = end
-    return found
+    return found, contexts
 
 
 all_questions = []
+all_contexts = []
 for exam in EXAMS:
-    items = extract_exam(*exam)
+    items, contexts = extract_exam(*exam)
     all_questions.extend(items)
-    print(f"{exam[0]}: {len(items)} meerkeuzevragen")
+    all_contexts.extend(contexts)
+    print(f"{exam[0]}: {len(items)} meerkeuzevragen; {len(contexts)} geselecteerde contexten")
 # Question 40 in VWO 2025 time slot 2 uses a table layout that PyMuPDF
 # does not expose as ordinary A-D text blocks; add it from the official page.
 if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
@@ -325,4 +350,5 @@ print(f"Totaal: {len(all_questions)} meerkeuzevragen; zonder automatisch gevonde
 if missing:
     print("Controle nodig voor antwoorden:", ", ".join(missing))
 (ROOT / "exam-mcq.json").write_text(json.dumps(all_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print("Geschreven: exam-mcq.json")
+(ROOT / "exam-contexts.json").write_text(json.dumps(all_contexts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+print("Geschreven: exam-mcq.json en exam-contexts.json")
