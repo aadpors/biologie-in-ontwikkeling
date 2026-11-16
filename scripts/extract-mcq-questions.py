@@ -259,6 +259,23 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 context = clean_context(context_lines)
                 context_y0 = max(0, min((lines[j]["bbox"][1] for j in context_line_indices), default=35) - 5)
 
+                # Havo 2025-I question 14 starts a new stem-cell-transplant
+                # context on the same page as questions 12 and 13. The generic
+                # open-question boundary can consume that paragraph as part of
+                # question 13, leaving question 14 without its own context.
+                # Anchor this card to the start of its actual context paragraph;
+                # keep the full page width and stop at question 14 as usual.
+                if (prefix, marker["number"]) == ("ha25t1", 14):
+                    anchor = page.search_for("Eileen komt in aanmerking")
+                    if anchor:
+                        anchor_y = anchor[0].y0
+                        context_line_indices = [
+                            j for j, line in enumerate(lines)
+                            if anchor_y - 1 <= line["bbox"][1] < lines[start]["bbox"][1]
+                        ]
+                        context = clean_context([lines[j]["text"] for j in context_line_indices])
+                        context_y0 = max(0, anchor_y - 5)
+
                 excluded = {marker["number_line"], marker["points_line"]}
                 block_text = []
                 block_indices = []
