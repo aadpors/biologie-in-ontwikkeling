@@ -16,7 +16,7 @@ for (const [index, item] of publications.entries()) {
   }
   assert.ok(['science', 'education'].includes(item.page), `${where}: onbekende pagina "${item.page}"`);
   // Strikte ISO-datumcontrole: Date.parse alleen accepteert soms onmogelijke kalenderdatums.
-  assert.ok(/^\\d{4}-\\d{2}-\\d{2}$/.test(item.date), `${where}: datum moet YYYY-MM-DD zijn`);
+  assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(item.date), `${where}: datum moet YYYY-MM-DD zijn`);
   const parsedDate = new Date(item.date + 'T00:00:00.000Z');
   assert.equal(parsedDate.toISOString().slice(0, 10), item.date, `${where}: ongeldige kalenderdatum ${item.date}`);
 
@@ -32,7 +32,7 @@ for (const [index, item] of publications.entries()) {
     catch { throw new Error(`${where}: ongeldige PDF-URL`); }
     assert.equal(pdfUrl.protocol, 'https:', `${where}: PDF-link moet HTTPS gebruiken`);
   }
-  if (item.doi) assert.ok(/^10\\.\\d{4,9}\\/.+/.test(item.doi), `${where}: ongeldige DOI ${item.doi}`);
+  if (item.doi) assert.ok(/^10\.\d{4,9}\\/.+/.test(item.doi), `${where}: ongeldige DOI ${item.doi}`);
 
   assert.ok(!ids.has(item.id), `Dubbel publicatie-ID: ${item.id}`);
   ids.add(item.id);
