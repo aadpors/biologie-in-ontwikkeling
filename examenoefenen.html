@@ -175,10 +175,8 @@ async function loadMCQ(){
    }
   }
   questions=[...map.values()];
-  fill("theme",questions.map(q=>q.theme));
-  fill("concept",questions.map(q=>q.concept));
-  fill("endterm",questions.map(q=>q.end));
-  ["theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
+  fill("theme",questions.flatMap(onderwerpenVanVraag));
+  if(filterState.theme && onderwerpCategorieen.includes(filterState.theme))$("theme").value=filterState.theme;
  }catch(error){console.warn(error)}
  render();
 }
