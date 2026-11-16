@@ -16,7 +16,10 @@ for item in items:
         scale = item.get("scale", 1.8)
         for clip in item["clips"]:
             page = doc[clip["page"] - 1]
-            rect = fitz.Rect(*clip["rect"])
+            configured = fitz.Rect(*clip["rect"])
+            # Always preserve the full horizontal page width; only the vertical
+            # bounds are question-specific.
+            rect = fitz.Rect(0, configured.y0, page.rect.width, configured.y1)
             pix = page.get_pixmap(
                 matrix=fitz.Matrix(scale, scale),
                 clip=rect,
