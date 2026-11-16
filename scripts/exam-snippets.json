@@ -12,36 +12,6 @@
           745
         ],
         "output": "vw25-t1-hippo-context.jpg"
-      },
-      {
-        "page": 9,
-        "rect": [
-          0,
-          45,
-          595,
-          195
-        ],
-        "output": "vw25-t1-v14.jpg"
-      },
-      {
-        "page": 9,
-        "rect": [
-          0,
-          205,
-          595,
-          305
-        ],
-        "output": "vw25-t1-v15.jpg"
-      },
-      {
-        "page": 9,
-        "rect": [
-          0,
-          35,
-          595,
-          370
-        ],
-        "output": "ha26-t1-v16.jpg"
       }
     ]
   }
