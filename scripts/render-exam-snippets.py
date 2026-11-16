@@ -25,6 +25,11 @@ def question_marker_words(page, number):
         # same baseline by a score marker such as "1p" or "2p". This avoids
         # confusing numbered lists/figure labels with question numbers.
         previous = words[index - 1] if index else None
+        following = words[index + 1] if index + 1 < len(words) else None
+        # PyMuPDF can split a printed number such as "36" into adjacent
+        # character tokens "3" and "6". Reject a partial numeric token.
+        if following and following[4].isdigit() and abs(following[1] - word[1]) < 4 and following[0] <= word[2] + 3:
+            continue
         if previous and re.fullmatch(r"\d+p", previous[4].strip().lower()) and abs(previous[1] - word[1]) < 4:
             found.append(word)
     return found
