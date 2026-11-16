@@ -127,6 +127,14 @@ def find_markers(lines):
                 break
             pm = point_re.match(lines[j]["text"])
             if pm:
+                # A question number and its points marker are printed on the
+                # same baseline. A figure/list label can otherwise be mistaken
+                # for a question number when an unrelated "1p" occurs a few
+                # extracted lines later (e.g. figure label 3 before question 37).
+                number_y = lines[i]["bbox"][1]
+                points_y = lines[j]["bbox"][1]
+                if abs(points_y - number_y) > 8:
+                    break
                 prompt = " ".join(x["text"] for x in lines[i + 1:j]).strip()
                 if prompt and (prompt_starts.match(prompt) or "?" in prompt):
                     markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
@@ -361,10 +369,6 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
-                if (prefix == "ha25t1" and marker["number"] == 3):
-                    print("DIAGNOSTIC ha25t1 q3 page", page_index + 1, "marker", marker)
-                    print("DIAGNOSTIC nearby lines", [(j, lines[j]["text"], [round(v, 1) for v in lines[j]["bbox"]]) for j in range(max(0, start - 5), min(len(lines), end + 3))])
-                    print("DIAGNOSTIC selected crop y", context_y0, lines[question_end_line]["bbox"][3] + 7)
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
