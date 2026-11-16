@@ -151,6 +151,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     with fitz.open(cv_path) as cv_doc:
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
+    if prefix == "ha25t1":
+        print("CVDEBUG", repr(cv_text[:2600]))
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             lines = line_records(page)
