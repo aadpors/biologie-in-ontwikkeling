@@ -5,7 +5,7 @@ import fitz
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "scripts" / "exam-snippets.json"
 OUT = ROOT / "exam-snippets"
-OUT.mkdir(exist_ok=True)
+OUT.mkdir(exist_ok=True)  # Generated source crops are committed for static-site delivery.
 
 items = json.loads(MANIFEST.read_text(encoding="utf-8"))
 for item in items:
