@@ -441,11 +441,25 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
 
 all_questions = []
 all_contexts = []
+selected_contexts_seen = set()
 for exam in EXAMS:
     items, contexts = extract_exam(*exam)
     all_questions.extend(items)
     all_contexts.extend(contexts)
+    for context in contexts:
+        key = (exam[0], context["n"])
+        if key in selected_contexts_seen:
+            raise RuntimeError(f"Selected open-question context generated more than once: {key}")
+        selected_contexts_seen.add(key)
     print(f"{exam[0]}: {len(items)} meerkeuzevragen; {len(contexts)} geselecteerde contexten")
+
+missing_contexts = SELECTED_CONTEXTS - selected_contexts_seen
+unexpected_contexts = selected_contexts_seen - SELECTED_CONTEXTS
+if missing_contexts or unexpected_contexts:
+    raise RuntimeError(
+        f"Open-question context inventory mismatch; missing={sorted(missing_contexts)}, "
+        f"unexpected={sorted(unexpected_contexts)}"
+    )
 # Question 40 in VWO 2025 time slot 2 uses a table layout that PyMuPDF
 # does not expose as ordinary A-D text blocks; add it from the official page.
 if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
