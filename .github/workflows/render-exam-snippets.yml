@@ -7,6 +7,7 @@ on:
       - 'examens/*.pdf'
       - 'scripts/render-exam-snippets.py'
       - 'scripts/render-cv-snippets.py'
+      - 'scripts/extract-mcq-questions.py'
       - 'scripts/exam-snippets.json'
       - 'scripts/cv-snippets.json'
       - 'site-version.json'
@@ -26,12 +27,14 @@ jobs:
         run: python scripts/render-exam-snippets.py
       - name: Render official marking-scheme snippets
         run: python scripts/render-cv-snippets.py
+      - name: Extract multiple-choice questions from all available exams
+        run: python scripts/extract-mcq-questions.py
       - name: Commit generated image snippets
         run: |
-          if [[ -n "$(git status --porcelain exam-snippets)" ]]; then
+          if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add exam-snippets/
+            git add exam-snippets/ exam-mcq.json
             git commit -m "Add original exam image snippets"
             git push
           else
