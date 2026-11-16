@@ -7,6 +7,7 @@ on:
       - 'examens/*.pdf'
       - 'scripts/render-exam-snippets.py'
       - 'scripts/exam-snippets.json'
+      - 'scripts/cv-snippets.json'
       - 'site-version.json'
 permissions:
   contents: write
@@ -22,6 +23,8 @@ jobs:
         run: pip install PyMuPDF
       - name: Render selected original exam fragments
         run: python scripts/render-exam-snippets.py
+      - name: Render official marking-scheme snippets
+        run: python scripts/render-cv-snippets.py
       - name: Commit generated image snippets
         run: |
           if [[ -n "$(git status --porcelain exam-snippets)" ]]; then
