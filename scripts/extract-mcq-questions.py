@@ -218,7 +218,6 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
             for idx, marker in enumerate(markers):
                 start = marker["line"]
                 end = markers[idx + 1]["line"] if idx + 1 < len(markers) else len(lines)
-                # A new prominent heading marks the start of a new case/context.
                 headings = [
                     j for j in range(cursor, start)
                     if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5))
@@ -230,24 +229,48 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if headings:
                     cursor = headings[-1]
                     active_context = []
-                context_lines = []
-                for j in range(cursor, start):
-                    if any(a <= j < b for a, b in previous_ranges):
-                        continue
-                    context_lines.append(lines[j]["text"])
+                context_lines = [
+                    lines[j]["text"] for j in range(cursor, start)
+                    if not any(a <= j < b for a, b in previous_ranges)
+                ]
                 active_context.extend(context_lines)
                 context = clean_context(active_context)
 
-                block = lines[start:end]
                 excluded = {marker["number_line"], marker["points_line"]}
-                block_text = ([marker["inline_prompt"]] if marker.get("inline_prompt") else []) + [
-                    lines[j]["text"] for j in range(start, end)
-                    if j not in excluded and not HEADER_RE.match(lines[j]["text"])
-                ]
+                block_text = []
+                block_indices = []
+                if marker.get("inline_prompt"):
+                    block_text.append(marker["inline_prompt"])
+                    block_indices.append(marker["number_line"])
+                for j in range(start, end):
+                    if j not in excluded and not HEADER_RE.match(lines[j]["text"]):
+                        block_text.append(lines[j]["text"])
+                        block_indices.append(j)
+
                 options = parse_options(block_text)
+                first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
+                selected_prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
+                if not selected_prompt:
+                    selected_prompt = "\n".join(x for x in block_text if x.strip()).strip()
+
+                # Determine where the question itself ends so later context can be
+                # carried forward without carrying the previous question into the next card.
+                if options and first_option < len(block_text):
+                    option_positions = [i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())]
+                    last_option = option_positions[-1]
+                    end_pos = last_option
+                    for j in range(last_option + 1, min(len(block_text), last_option + 4)):
+                        if re.match(r"^\d+\s*p$", block_text[j].strip(), re.I) or HEADER_RE.match(block_text[j].strip()):
+                            break
+                        end_pos = j
+                    question_end_line = block_indices[end_pos]
+                elif start < marker["number_line"]:
+                    question_end_line = marker["points_line"]
+                else:
+                    question_end_line = end - 1
+                question_end_line = max(start, min(question_end_line, end - 1))
+
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
-                    first_option_index = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
-                    selected_prompt = "\n".join(x for x in block_text[:first_option_index] if x.strip()).strip()
                     contexts.append({
                         "level": level,
                         "year": year,
@@ -256,13 +279,14 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         "source": context,
                         "q": selected_prompt,
                     })
+
                 false_positive_open_questions = {
                     ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
                     ("vw26t1", 30), ("ha26t2", 40)
                 }
                 if (prefix, marker["number"]) in false_positive_open_questions or not options:
-                    previous_ranges.append((start, end))
-                    cursor = end
+                    previous_ranges.append((start, question_end_line + 1))
+                    cursor = question_end_line + 1
                     continue
 
                 correct = answer_from_cv(cv_text, marker["number"])
@@ -273,16 +297,14 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 options_by_key = {o["key"]: o for o in options}
                 options = [{"key": key, "text": options_by_key.get(key, {}).get("text", "")} for key in required_keys]
 
-                # The crop keeps the question and its choices together; the preceding
-                # context is shown as text above it in the card.
-                y0 = max(0, block[0]["bbox"][1] - 4) if block else 0
-                y1 = min(page.rect.height, block[-1]["bbox"][3] + 5) if block else page.rect.height
+                # Crop only the question and its choices; context is shown separately above.
+                y0 = max(0, lines[start]["bbox"][1] - 4)
+                y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 5)
                 crop = fitz.Rect(35, y0, page.rect.width - 35, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
                 page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=crop, alpha=False).save(OUT / image_name)
 
-                first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
                 prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
                 if not prompt:
                     prompt = "\n".join(x for x in block_text if x.strip()).strip()
@@ -307,8 +329,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     "cv": cv_rel,
                     "questionType": "mcq",
                 })
-                previous_ranges.append((start, end))
-                cursor = end
+                previous_ranges.append((start, question_end_line + 1))
+                cursor = question_end_line + 1
     return found, contexts
 
 
