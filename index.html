@@ -174,7 +174,7 @@ syncTooltips();
 document.querySelectorAll('select').forEach(el=>el.addEventListener('change',render));
 document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',render));
 syncTooltips();
-fetch('./publicaties.json?v=3bfa68958c36e7e794940f3a041a097f73967d23')
+fetch('./publicaties.json?v=dbe2d0768b04c608baa97e561dd387f349b53fec')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
   .then(publications=>{if(!Array.isArray(publications))throw new Error('Ongeldig databaseformaat');data=publications;render();})
   .then(()=>initFeedback())
