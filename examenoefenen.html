@@ -78,7 +78,7 @@ function render(){
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
- let snippet=q.image?'<section class="exam-snippets"><figure><img src="'+q.image+'" alt="Originele examenopgave met context en vraag '+q.n+'" loading="lazy"><figcaption>Originele examenopgave · context en vraag '+q.n+'</figcaption></figure></section>':'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
+ let snippet=(q.images?.length?q.images:(q.image?[q.image]:[])).map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'" alt="Originele examenopgave met context en vraag '+q.n+'" loading="lazy"><figcaption>'+(i===0&&q.images?.length>1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
   ?'<fieldset class="mcq-options"><legend>Kies één antwoord</legend>'+q.options.map(o=>'<label><input type="radio" name="answer-'+q.id+'" value="'+o.key+'" '+(saved[q.id]===o.key?'checked':'')+'><span><b>'+o.key+'.</b>'+(q.image?"":(o.text?" "+o.text:""))+'</span></label>').join("")+'</fieldset><div class="mcq-feedback" id="mcqFeedback" hidden></div>'
   :'<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>';
@@ -123,6 +123,7 @@ async function loadMCQ(){
   for(const item of extra){
    const existing=map.get(key(item));
    if(existing){
+    existing.images=item.images;
     existing.options=item.options;
     existing.correct=item.correct;
     existing.image=item.image;
