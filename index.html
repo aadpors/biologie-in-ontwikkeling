@@ -66,7 +66,7 @@ syncTooltips();
 document.querySelectorAll('select').forEach(el=>el.addEventListener('change',render));
 document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',render));
 syncTooltips();
-fetch('./publicaties.json?v=71bd33885a95ffacec113fcc708f6eff2d9b8714')
+fetch('./publicaties.json?v=a7e44a02f01d841aeba52e534022ad2377a82940')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
   .then(publications=>{if(!Array.isArray(publications))throw new Error('Ongeldig databaseformaat');data=publications;render();})
   .catch(error=>{$('cards').innerHTML='<div class="empty"><b>De publicatiedatabase kon niet worden geladen.</b><br>Ververs de pagina later of controleer of publicaties.json in de hoofdmap van de website staat.</div>';console.error(error);});
