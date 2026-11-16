@@ -40,7 +40,7 @@ create policy "Users can read their own feedback"
 on public.publication_feedback for select to authenticated
 using (
   (select auth.uid()) = user_id
-  and (select auth.jwt() ->> 'is_anonymous') = 'true'
+  and ((select auth.jwt()) ->> 'is_anonymous') = 'true'
 );
 
 drop policy if exists "Users can insert their own feedback" on public.publication_feedback;
@@ -48,7 +48,7 @@ create policy "Users can insert their own feedback"
 on public.publication_feedback for insert to authenticated
 with check (
   (select auth.uid()) = user_id
-  and (select auth.jwt() ->> 'is_anonymous') = 'true'
+  and ((select auth.jwt()) ->> 'is_anonymous') = 'true'
 );
 
 drop policy if exists "Users can update their own feedback" on public.publication_feedback;
@@ -56,11 +56,11 @@ create policy "Users can update their own feedback"
 on public.publication_feedback for update to authenticated
 using (
   (select auth.uid()) = user_id
-  and (select auth.jwt() ->> 'is_anonymous') = 'true'
+  and ((select auth.jwt()) ->> 'is_anonymous') = 'true'
 )
 with check (
   (select auth.uid()) = user_id
-  and (select auth.jwt() ->> 'is_anonymous') = 'true'
+  and ((select auth.jwt()) ->> 'is_anonymous') = 'true'
 );
 
 drop policy if exists "Users can delete their own feedback" on public.publication_feedback;
@@ -68,7 +68,7 @@ create policy "Users can delete their own feedback"
 on public.publication_feedback for delete to authenticated
 using (
   (select auth.uid()) = user_id
-  and (select auth.jwt() ->> 'is_anonymous') = 'true'
+  and ((select auth.jwt()) ->> 'is_anonymous') = 'true'
 );
 
 -- De aggregatefunctie draait met beperkte elevated privileges in een niet-
@@ -118,3 +118,26 @@ $$;
 
 revoke all on function public.publication_feedback_totals() from public, anon, authenticated;
 grant execute on function public.publication_feedback_totals() to authenticated;
+
+
+-- Supabase performance: evaluate the JWT claim once per statement, not per row.
+drop policy if exists "Users can read their own feedback" on public.publication_feedback;
+create policy "Users can read their own feedback"
+on public.publication_feedback for select to authenticated
+using ((select auth.uid()) = user_id and ((select auth.jwt()) ->> 'is_anonymous') = 'true');
+
+drop policy if exists "Users can insert their own feedback" on public.publication_feedback;
+create policy "Users can insert their own feedback"
+on public.publication_feedback for insert to authenticated
+with check ((select auth.uid()) = user_id and ((select auth.jwt()) ->> 'is_anonymous') = 'true');
+
+drop policy if exists "Users can update their own feedback" on public.publication_feedback;
+create policy "Users can update their own feedback"
+on public.publication_feedback for update to authenticated
+using ((select auth.uid()) = user_id and ((select auth.jwt()) ->> 'is_anonymous') = 'true')
+with check ((select auth.uid()) = user_id and ((select auth.jwt()) ->> 'is_anonymous') = 'true');
+
+drop policy if exists "Users can delete their own feedback" on public.publication_feedback;
+create policy "Users can delete their own feedback"
+on public.publication_feedback for delete to authenticated
+using ((select auth.uid()) = user_id and ((select auth.jwt()) ->> 'is_anonymous') = 'true');
