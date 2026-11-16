@@ -174,7 +174,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     found = []
     contexts = []
     active_context = []
-    heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding|lees verder|einde)$", re.I)
+    heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding(?:\\s+\\d+)?|tabel(?:\\s+\\d+)?|grafiek(?:\\s+\\d+)?|legenda|lees verder|einde)$", re.I)
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             lines = line_records(page)
@@ -350,5 +350,9 @@ print(f"Totaal: {len(all_questions)} meerkeuzevragen; zonder automatisch gevonde
 if missing:
     print("Controle nodig voor antwoorden:", ", ".join(missing))
 (ROOT / "exam-mcq.json").write_text(json.dumps(all_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+context_by_key = {}
+for item in all_contexts:
+    context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
+all_contexts = list(context_by_key.values())
 (ROOT / "exam-contexts.json").write_text(json.dumps(all_contexts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print("Geschreven: exam-mcq.json en exam-contexts.json")
