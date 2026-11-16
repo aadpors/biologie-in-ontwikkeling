@@ -31,10 +31,10 @@ jobs:
         run: python scripts/extract-mcq-questions.py
       - name: Commit generated image snippets
         run: |
-          if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json)" ]]; then
+          if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json exam-contexts.json)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add exam-snippets/ exam-mcq.json
+            git add exam-snippets/ exam-mcq.json exam-contexts.json
             git commit -m "Add original exam image snippets"
             git push
           else
