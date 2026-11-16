@@ -123,7 +123,7 @@ async function loadMCQ(){
   for(const item of extra){
    const existing=map.get(key(item));
    if(existing){
-    existing.images=item.images;
+    if(item.images)existing.images=item.images;
     existing.options=item.options;
     existing.correct=item.correct;
     existing.image=item.image;
