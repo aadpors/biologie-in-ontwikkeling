@@ -135,6 +135,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
         for page_index, page in enumerate(doc):
             lines = line_records(page)
             markers = find_markers(lines)
+            if prefix in ("ha25t1", "ha25t2", "ha26t1") and page_index in (1, 4, 18):
+                print("DEBUG", prefix, page_index + 1, [x["text"] for x in lines[:70]])
             if not markers:
                 continue
             previous_ranges = []
