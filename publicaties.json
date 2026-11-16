@@ -15,7 +15,11 @@
     "doi": "10.1038/s41564-026-02480-7",
     "pdf": "https://www.nature.com/articles/s41564-026-02480-7.pdf",
     "why": "Sterke actuele casus om CRISPR-Cas niet alleen als biotechnologische techniek te behandelen, maar ook als natuurlijk afweermechanisme en onderdeel van interacties tussen micro-organismen en virussen. Goed bruikbaar bij DNA, moleculaire herkenning, microbiomen en ecologie.",
-    "tags": "CRISPR Cas metagenoom bacteriën archaea virus plasmide microbiome"
+    "tags": "CRISPR Cas metagenoom bacteriën archaea virus plasmide microbiome",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Grote metagenomische dataset en brede bio-informatische analyse; patronen tonen vooral samenhang en geen experimenteel bewijs voor elk mechanisme.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "Raakt aan moleculaire interactie en biodiversiteit, maar de grootschalige CRISPR-analyses in microbiële gemeenschappen gaan duidelijk verder dan de examenstof."
   },
   {
     "id": "s2",
@@ -32,7 +36,11 @@
     "article": "https://www.sciencedirect.com/science/article/pii/S1931312826003847",
     "doi": "10.1016/j.chom.2026.09.002",
     "why": "Maakt natuurlijke selectie concreet op een korte tijdschaal en laat zien dat selectie niet losstaat van interacties en de omgeving. Een mooie verdieping op mutatie, variatie, fitness, microbiota en kolonisatie; de studie is uitgevoerd bij muizen, dus niet rechtstreeks te vertalen naar menselijke gezondheid.",
-    "tags": "microbioom symbiose mutatie selectie genetische variatie evolutie"
+    "tags": "microbioom symbiose mutatie selectie genetische variatie evolutie",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Een omvangrijk primair onderzoek met genetisch gemarkeerde bacterielijnen en een experimenteel muismodel; generalisatie naar andere gastheren vraagt voorzichtigheid.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Sluit rechtstreeks aan bij genetische variatie, mutatie en selectie; de overdracht tussen muizen is een concrete evolutionaire context."
   },
   {
     "id": "s3",
@@ -49,7 +57,11 @@
     "article": "https://www.sciencedirect.com/science/article/pii/S0169534726002466",
     "doi": "10.1016/j.tree.2026.09.008",
     "why": "Nuttig om leerlingen verder te laten kijken dan soorten tellen. Bespreek hoe het verdwijnen of veranderen van één soort doorwerkt in interactienetwerken, ecosysteemfuncties en de gevolgen van biodiversiteitsverlies.",
-    "tags": "biodiversiteit voedselweb interactienetwerk ecosysteem soortenrijkdom"
+    "tags": "biodiversiteit voedselweb interactienetwerk ecosysteem soortenrijkdom",
+    "evidenceLevel": "Achtergrondbron",
+    "evidenceNote": "Mini-review met een conceptuele synthese; bruikbaar voor begripsvorming, maar geen systematische effect- of bewijssynthese.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "De interactiestructuur van ecosystemen sluit direct aan bij voedselrelaties, biodiversiteit en ecosysteemwerking."
   },
   {
     "id": "s4",
@@ -66,7 +78,11 @@
     "article": "https://www.nature.com/articles/s41586-026-11038-w",
     "doi": "10.1038/s41586-026-11038-w",
     "why": "Geeft verdieping bij de vraag hoe meercelligheid kan ontstaan en behouden blijven. Bruikbaar voor evolutionair denken en het verbinden van cel-, organisme- en populatieniveau. Het is een review: geschikt als overzicht, niet als verslag van één nieuw experiment.",
-    "tags": "multicellulariteit evolutie cellen samenwerking taakverdeling"
+    "tags": "multicellulariteit evolutie cellen samenwerking taakverdeling",
+    "evidenceLevel": "Achtergrondbron",
+    "evidenceNote": "Reviewartikel dat bestaand onderzoek samenbrengt; de kwaliteit van de onderliggende studies is niet als één nieuw experiment beoordeeld.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "Geeft verdieping bij het ontstaan van meercelligheid en taakverdeling tussen cellen; de evolutionaire details gaan verder dan de vereiste examenstof."
   },
   {
     "id": "e1",
@@ -82,7 +98,11 @@
     "doi": "10.1007/s10648-026-10225-5",
     "pdf": "https://link.springer.com/content/pdf/10.1007/s10648-026-10225-5.pdf",
     "why": "Onderbouwt het inzetten van korte ophaalvragen, gespreide herhaling en afwisseling van verwante vraagtypen. Belangrijke nuance: de effecten zijn niet automatisch voor elk type kennis of elke toetsvorm gelijk; laat de oefenvorm aansluiten bij wat leerlingen uiteindelijk moeten kunnen.",
-    "tags": "retrieval practice gespreid oefenen interleaving toetsing geheugen"
+    "tags": "retrieval practice gespreid oefenen interleaving toetsing geheugen",
+    "evidenceLevel": "Breed onderbouwd",
+    "evidenceNote": "Meta-analyse van 53 studies en 7.303 leerlingen in echte schoolklassen; effecten verschillen wel per leerstof, toetsvorm en feedback.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "De bevindingen zijn direct bruikbaar bij het ontwerpen van herhaling, ophaalvragen en afwisselend oefenen in de biologieles."
   },
   {
     "id": "e2",
@@ -98,7 +118,11 @@
     "doi": "10.3390/encyclopedia6110242",
     "pdf": "https://www.mdpi.com/2673-8392/6/11/242/pdf",
     "why": "Direct toepasbaar bij biologische verschijnselen en practica: laat leerlingen eerst een voorspelling mét reden noteren, verzamel vervolgens waarneembaar bewijs en laat hen ten slotte hun verklaring expliciet herzien. De review signaleert heterogene onderzoeksresultaten; POE is geen garantie op conceptuele verandering.",
-    "tags": "predict observe explain POE misconcepties conceptuele verandering practica"
+    "tags": "predict observe explain POE misconcepties conceptuele verandering practica",
+    "evidenceLevel": "Achtergrondbron",
+    "evidenceNote": "Narratieve review: waardevol voor mechanismen en ontwerpideeën, maar geen systematische meta-analyse van effectgroottes.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "POE is direct toepasbaar bij biologische demonstraties, practica en het expliciet laten herzien van leerlingverklaringen."
   },
   {
     "id": "e3",
@@ -114,7 +138,11 @@
     "doi": "10.1080/09500693.2026.2742395",
     "pdf": "https://www.tandfonline.com/doi/pdf/10.1080/09500693.2026.2742395",
     "why": "Een bruikbare aanwijzing voor diagnostische vragen: laat leerlingen niet alleen antwoorden, maar ook hun zekerheid aangeven. Bespreek vooral zelfverzekerde misconcepties. Let op de beperkingen: kleine steekproef, negende klas en een specifieke botanische-tuininterventie; de resultaten zijn niet zonder meer generaliseerbaar naar havo/vwo-bovenbouw.",
-    "tags": "fotosynthese celademhaling misconcepties zekerheid metacognitie conceptuele verandering"
+    "tags": "fotosynthese celademhaling misconcepties zekerheid metacognitie conceptuele verandering",
+    "evidenceLevel": "Voorlopig bewijs",
+    "evidenceNote": "Een onderzoek met 73 leerlingen en herhaalde metingen; de gevonden samenhang tussen zekerheid en begrip bewijst geen oorzakelijk effect van een didactische aanpak.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Biologie-specifiek onderzoek naar misconcepties over fotosynthese en celademhaling, bruikbaar voor diagnostiek en conceptuele verandering."
   },
   {
     "id": "s5",
@@ -132,7 +160,11 @@
     "doi": "10.1038/s41564-026-02494-1",
     "pdf": "https://www.nature.com/articles/s41564-026-02494-1.pdf",
     "why": "Een aansprekend voorbeeld van de invloed van het microbioom op de fysiologie van een gastheer: bacteriën leveren niet alleen voedingsstoffen, maar kunnen ook signaalstoffen produceren die de immuunrespons beïnvloeden. Verbind microbiële symbiose, hormonen, cellulaire communicatie en aangeboren afweer. De resultaten zijn gebaseerd op koralen en kleine aantallen biologische replicaten (3–5); vertaal ze dus niet rechtstreeks naar de menselijke afweer.",
-    "tags": "koraal Endozoicomonas microbioom symbiose steroidhormonen testosteron progesteron aangeboren afweer immuunrespons hittestress"
+    "tags": "koraal Endozoicomonas microbioom symbiose steroidhormonen testosteron progesteron aangeboren afweer immuunrespons hittestress",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair onderzoek combineert multi-omics met laboratoriumexperimenten; het betreft één onderzoekssysteem en koraalsoorten.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Verbindt afweer met microbiële interacties en stress, maar de specifieke koraal-bacteriesymbiose is vooral een contextuele uitbreiding."
   },
   {
     "id": "s6",
@@ -150,7 +182,11 @@
     "doi": "10.1038/s41586-026-11243-7",
     "pdf": "https://www.nature.com/articles/s41586-026-11243-7.pdf",
     "why": "Een sterke actuele casus over interacties tussen drie groepen organismen en de gevolgen daarvan op ecosysteemniveau. Leerlingen kunnen verklaren hoe virusinfectie, bacteriële groei, populatieverandering en koolstofkringlopen samenhangen. De laboratoriumopzet maakt mechanismen toetsbaar, maar extrapolatie naar wereldwijde koolstofstromen vraagt voorzichtigheid.",
-    "tags": "algenbloei microalgen virus bacteriën Alteromonas microbiële interacties voedselweb koolstofkringloop ecosysteem"
+    "tags": "algenbloei microalgen virus bacteriën Alteromonas microbiële interacties voedselweb koolstofkringloop ecosysteem",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Experimenteel onderzoek in laboratoriumgemeenschappen; sterke mechanistische aanwijzingen binnen dit modelsysteem, maar niet automatisch representatief voor alle algenbloei.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Laat voedselrelaties en interacties tussen soorten zien en sluit aan bij de regulatie en dynamiek van ecosystemen."
   },
   {
     "id": "s7",
@@ -167,7 +203,11 @@
     "article": "https://www.sciencedirect.com/science/article/pii/S1674205226003552",
     "doi": "10.1016/j.molp.2026.10.016",
     "why": "Geschikt als docentverdieping bij fotosynthese, C4-planten, ATP-vorming en cyclische elektronenstroom. De studie laat zien dat regulatie van fotosynthese niet alleen afhangt van licht en enzymactiviteit, maar ook van celtype-specifieke genexpressie. Gebruik de uitkomsten niet als directe vervanging van het vereenvoudigde schema van cyclische fotofosforylering in de les.",
-    "tags": "C4-fotosynthese maïs bundelschedecellen cyclische elektronenstroom NDH ATP genregulatie DOF-transcriptiefactor"
+    "tags": "C4-fotosynthese maïs bundelschedecellen cyclische elektronenstroom NDH ATP genregulatie DOF-transcriptiefactor",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair onderzoek met meerdere omics-technieken, functionele experimenten en veldproeven; de specifieke C4-maïsmechanismen zijn contextgebonden.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Sluit aan bij fotosynthese en stofwisseling van het organisme; C4-specialisatie en de moleculaire regulatie zijn verdieping."
   },
   {
     "id": "e4",
@@ -182,7 +222,11 @@
     "article": "https://iubmb.onlinelibrary.wiley.com/doi/10.1002/bmb.70086",
     "doi": "10.1002/bmb.70086",
     "why": "Een concreet voorbeeld van het inzetten van authentieke 3D-molecuulvisualisaties in het biologieonderwijs. Leerlingen kunnen eiwitstructuren en andere biomoleculen vanuit verschillende perspectieven onderzoeken in plaats van alleen tweedimensionale afbeeldingen te bekijken. Interessant om te verkennen bij eiwitsynthese, enzymen en structuur-functierelaties. De korte interventie en het ontbreken van een controlegroep maken de effectiviteitsclaim beperkt.",
-    "tags": "molecuulvisualisatie 3D eiwitstructuur iCn3D Protein Data Bank PDB structuur functie inquiry"
+    "tags": "molecuulvisualisatie 3D eiwitstructuur iCn3D Protein Data Bank PDB structuur functie inquiry",
+    "evidenceLevel": "Voorlopig bewijs",
+    "evidenceNote": "Een groep van 83 leerlingen is vóór en na de interventie gemeten, maar er was geen controlegroep; andere verklaringen voor de vooruitgang zijn niet uitgesloten.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "De interventie gebruikt echte molecuulstructuren in het voortgezet biologieonderwijs en is daardoor direct relevant voor de lespraktijk."
   },
   {
     "id": "e5",
@@ -198,7 +242,11 @@
     "pdf": "https://www.nro.nl/sites/nro/files/media-files/Uitbeelddidactiek-in-de-biologieles-deel-C-uitbeeldpractica_0.pdf",
     "why": "Zeer direct bruikbaar bij processen die leerlingen moeilijk kunnen visualiseren, zoals DNA-replicatie, impulsoverdracht, evolutie en populatiedynamica. De 51 practica bieden kant-en-klare ideeën en kunnen als uitgangspunt dienen voor eigen lessen. Belangrijke nuance: de ontwikkelaars beschrijven veelbelovende didactische mechanismen en positieve ervaringen, maar de omvang van het daadwerkelijke leereffect is niet overtuigend vastgesteld; gebruik de publicatie dus vooral als onderbouwde ontwerp- en praktijkbron, niet als hard bewijs dat uitbeelden altijd beter werkt.",
     "tags": "uitbeelddidactiek uitbeeldpractica biologieles vakdidactiek abstracte processen DNA replicatie impulsoverdracht evolutie populatiedynamica",
-    "dateLabel": "2021"
+    "dateLabel": "2021",
+    "evidenceLevel": "Praktijkbron",
+    "evidenceNote": "NRO-ontwikkeltraject met literatuur, interviews en docentontwikkeling; levert uitgewerkte activiteiten, maar is geen gecontroleerde effectstudie.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Specifiek ontwikkeld voor biologielessen, met 51 uitgewerkte uitbeeldpractica en ontwerpprincipes voor abstracte processen."
   },
   {
     "id": "e6",
@@ -212,7 +260,11 @@
     "evidence": "Kennisoverzicht, geactualiseerd 1 juli 2025",
     "article": "https://www.onderwijskennis.nl/kennisbank/formatief-handelen-als-kans-voor-leren-in-het-vo",
     "why": "Een bruikbare Nederlandse basis voor formatief handelen in havo/vwo. Vooral relevant is het onderscheid tussen een instrument (zoals een quiz) en het didactische proces waarin je leerlingreacties interpreteert en gebruikt om instructie of leeractiviteiten bij te stellen. De voorbeelden zijn vakoverstijgend; vertaling naar biologische leerdoelen en misconcepties vraagt een eigen vakdidactische stap.",
-    "tags": "formatief handelen voortgezet onderwijs diagnostische vragen voorkennis misconcepties leerlingreacties toetsing instructie"
+    "tags": "formatief handelen voortgezet onderwijs diagnostische vragen voorkennis misconcepties leerlingreacties toetsing instructie",
+    "evidenceLevel": "Kennisoverzicht",
+    "evidenceNote": "Een redactioneel kennisoverzicht van Onderwijskennis, geen nieuwe primaire studie; bruikbaar als toegankelijke synthese van onderzoek en praktijkinzichten.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Geeft concrete handvatten voor formatief handelen, het achterhalen van misconcepties en het bijstellen van biologielessen."
   },
   {
     "id": "e7",
@@ -226,7 +278,11 @@
     "evidence": "Kennisoverzicht, geactualiseerd 9 april 2026",
     "article": "https://www.onderwijskennis.nl/themas/feedback-in-het-po-en-vo",
     "why": "Relevant voor het ontwerpen van feedback op biologische verklaringen, practicumverslagen en open examenvragen. Het helpt de vakgroep om feedback niet te verwarren met alleen een beoordeling of correctie, maar te koppelen aan concrete vervolgstappen. De bron is vakoverstijgend en de effecten hangen af van inhoud, timing en de manier waarop leerlingen feedback benutten.",
-    "tags": "feedback feedup feedforward voortgezet onderwijs formatief evalueren leerdoelen vervolgstappen"
+    "tags": "feedback feedup feedforward voortgezet onderwijs formatief evalueren leerdoelen vervolgstappen",
+    "evidenceLevel": "Kennisoverzicht",
+    "evidenceNote": "Een redactioneel kennisoverzicht van Onderwijskennis; het is een samenvattende kennisbron en geen zelfstandige effectstudie.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Feedback is breed toepasbaar in de biologieles, mits leerlingen de informatie kunnen gebruiken om hun volgende leerstap te zetten."
   },
   {
     "id": "s8",
@@ -244,7 +300,11 @@
     "doi": "10.1038/s41586-026-11240-w",
     "pdf": "https://www.nature.com/articles/s41586-026-11240-w.pdf",
     "why": "Een bijzondere verdieping bij bevruchting en embryonale ontwikkeling. De studie maakt duidelijk dat genexpressie niet alleen afhangt van DNA-sequenties en transcriptiefactoren, maar ook van de fysieke eigenschappen en organisatie van de celkern. Goed bruikbaar om leerlingen te laten nadenken over de relatie tussen celstructuur, genregulatie en ontwikkeling. Het betreft fundamenteel onderzoek bij muizen; vertaling naar menselijke embryonale ontwikkeling vraagt voorzichtigheid.",
-    "tags": "embryonale ontwikkeling zygote genexpressie transcriptie celkern lamin B1 RNA polymerase II epigenetica muis"
+    "tags": "embryonale ontwikkeling zygote genexpressie transcriptie celkern lamin B1 RNA polymerase II epigenetica muis",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair experimenteel onderzoek in muizenembryo's met manipulatie van eiwitten en kernmechanica; bevindingen zijn modelsysteemgebonden.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "Verheldert embryonale ontwikkeling en zelforganisatie, maar de rol van lamin B1, autofagie en kernmechanica is geen vereiste examenstof."
   },
   {
     "id": "s9",
@@ -261,7 +321,11 @@
     "article": "https://www.nature.com/articles/s41586-026-10979-6",
     "doi": "10.1038/s41586-026-10979-6",
     "why": "Een sterke casus om homeostase en neurale regulatie als geïntegreerde processen te bespreken. Het onderzoek laat zien dat fysiologische processen niet los van elkaar verlopen: hersenen, spieren, nieren en bloedvaten reageren op elkaar. Ook is de methode zelf interessant als voorbeeld van hoe nieuwe technologie biologisch onderzoek mogelijk maakt. De bevindingen zijn gedaan bij vissen; menselijke fysiologie is niet rechtstreeks onderzocht.",
-    "tags": "homeostase neurale regulatie hersenstam fysiologie nier spieren bloedstroom zebravis beeldvorming optogenetica"
+    "tags": "homeostase neurale regulatie hersenstam fysiologie nier spieren bloedstroom zebravis beeldvorming optogenetica",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Nieuwe beeldvormingstechniek gecombineerd met optogenetische beïnvloeding levert experimentele aanwijzingen; het onderzoek is uitgevoerd in vissen en met een specifieke methode.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Geeft een brede illustratie van samenwerking tussen organen en regulatie, maar de gevonden circuits en meetmethode zijn vooral verdieping bij O2."
   },
   {
     "id": "e8",
@@ -277,7 +341,11 @@
     "article": "https://www.sciencedirect.com/science/article/abs/pii/S1871187125002810",
     "doi": "10.1016/j.tsc.2025.102033",
     "why": "De studie is relevant voor het begeleiden van leerlingen bij lastige biologische concepten. De aanpak maakt metacognitie concreet: leerlingen plannen hun aanpak, monitoren hun begrip en reflecteren op de uitkomst. De voorbeelden en instrumenten kunnen ideeën opleveren voor lessen over bijvoorbeeld fotosynthese, erfelijkheid of homeostase. De methodologische beperking is belangrijk: een een-groep-voor- en nameting sluit alternatieve verklaringen voor de gevonden verbeteringen niet uit.",
-    "tags": "metacognitie zelfregulatie probleemoplossen conceptueel begrip misconcepties biologieles reflectie concept maps"
+    "tags": "metacognitie zelfregulatie probleemoplossen conceptueel begrip misconcepties biologieles reflectie concept maps",
+    "evidenceLevel": "Voorlopig bewijs",
+    "evidenceNote": "Mixed-methods onderzoek met 98 leerlingen en 12 docenten, maar een een-groep-voor- en nameting zonder controlegroep beperkt causale conclusies.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "De interventie gaat over probleemoplossen en metacognitie in biologie, maar de onderwijscontext in Ethiopië vraagt vertaling naar de Nederlandse praktijk."
   },
   {
     "id": "s10",
@@ -294,7 +362,11 @@
     "article": "https://www.sciencedirect.com/science/article/pii/S1097276526005514",
     "doi": "10.1016/j.molcel.2026.08.004",
     "why": "Een mooie aanvulling op het onderwerp DNA-replicatie: RNA blijkt niet alleen een boodschapper bij eiwitsynthese, maar kan ook als structureel en functioneel molecuul bijdragen aan de organisatie van DNA-replicatie. De koppeling met zusterchromatiden maakt bovendien de overgang naar celdeling zichtbaar. Gebruik dit als verdieping; de moleculaire details zijn niet allemaal examenstof.",
-    "tags": "DNA-replicatie celcyclus RNA lncRNA CONCR helicase DDX11 zusterchromatiden chromatine RNA-structuur"
+    "tags": "DNA-replicatie celcyclus RNA lncRNA CONCR helicase DDX11 zusterchromatiden chromatine RNA-structuur",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair moleculair onderzoek naar interacties en functieverlies; één studie en een specifiek cellulair mechanisme.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "Haakt aan bij DNA-replicatie en de celcyclus, maar de rol van lncRNA, DDX11 en RNA-vouwing gaat ruim voorbij de kern van de examenstof."
   },
   {
     "id": "s11",
@@ -311,7 +383,11 @@
     "article": "https://www.sciencedirect.com/science/article/pii/S1097276526006544",
     "doi": "10.1016/j.molcel.2026.09.011",
     "why": "Een actuele, fundamentele studie die een populaire verklaring voor transcriptiefactorclusters nuanceert. De clusters zetten genen niet zelfstandig aan, maar versterken transcriptie die al gestart is. Dat is een mooie casus bij transcriptie, transcriptiefactoren, genregulatie en de relatie tussen moleculaire processen en embryonale ontwikkeling. Het onderzoek is uitgevoerd bij fruitvliegen; de specifieke regulatie-eiwitten en clusters zijn niet zonder meer gelijk aan die bij mensen.",
-    "tags": "genexpressie transcriptie transcriptiefactor Dorsal RNA polymerase II enhancer embryonale ontwikkeling Drosophila genregulatie"
+    "tags": "genexpressie transcriptie transcriptiefactor Dorsal RNA polymerase II enhancer embryonale ontwikkeling Drosophila genregulatie",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair onderzoek in levende fruitvliegembryo's; de experimentele bevindingen zijn sterk binnen dit modelsysteem, maar de specifieke regulatie is niet zonder meer universeel.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Sluit rechtstreeks aan bij transcriptie en regulatie van genexpressie; de clusters van transcriptiefactoren zijn een verdiepende casus."
   },
   {
     "id": "s12",
@@ -329,7 +405,11 @@
     "doi": "10.1038/s41586-026-11209-9",
     "pdf": "https://www.nature.com/articles/s41586-026-11209-9.pdf",
     "why": "Een mooie casus om gedrag niet als een losstaande reactie op één prikkel te behandelen. Voedselgeur, visuele informatie, groepsgedrag en seksuele motivatie beïnvloeden elkaar. De vergelijking tussen Drosophila-soorten laat bovendien zien hoe gedrag en zintuiglijke gevoeligheid evolutionair kunnen verschillen. De resultaten gelden voor fruitvliegen; pas ze niet rechtstreeks toe op menselijk seksueel gedrag.",
-    "tags": "gedrag voortplanting balts seksualiteit geur zintuigen visuele prikkels sociale interactie Drosophila evolutie"
+    "tags": "gedrag voortplanting balts seksualiteit geur zintuigen visuele prikkels sociale interactie Drosophila evolutie",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair gedragsonderzoek bij Drosophila; bevindingen zijn experimenteel onderbouwd, maar soortspecifieke signalen kunnen niet rechtstreeks naar mensen worden vertaald.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Past direct bij gedrag, interactie, seksualiteit en voortplanting; gebruik de fruitvlieg als vergelijkend biologisch voorbeeld."
   },
   {
     "id": "s13",
@@ -346,6 +426,113 @@
     "article": "https://www.nature.com/articles/s41559-026-03200-4",
     "doi": "10.1038/s41559-026-03200-4",
     "why": "Sterke onderbouwing voor het bespreken van biodiversiteit als meer dan alleen het aantal soorten. De studie verbindt biodiversiteit met ecosysteemfuncties en diensten zoals productiviteit, nutriëntenkringlopen en maatschappelijke baten. Geschikt voor discussies over natuurbeheer, ecosysteemdiensten en de gevolgen van biodiversiteitsverlies. Benadruk dat een mondiale synthese geen garantie geeft dat elk lokaal ecosysteem op dezelfde manier reageert.",
-    "tags": "biodiversiteit ecosysteemfuncties ecosysteemdiensten mondiale synthese natuurbeheer productiviteit nutriëntenkringloop"
+    "tags": "biodiversiteit ecosysteemfuncties ecosysteemdiensten mondiale synthese natuurbeheer productiviteit nutriëntenkringloop",
+    "evidenceLevel": "Breed onderbouwd",
+    "evidenceNote": "Mondiale synthese van 423 studies en meer dan 200.000 datapunten; omvangrijk bewijs, met verschillen tussen ecosystemen en onderzochte functies.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Verbindt biodiversiteit met ecosysteemfuncties, energiestromen en diensten en sluit direct aan bij P1, P3 en P5."
+  },
+  {
+    "id": "s14",
+    "page": "science",
+    "date": "2026-09-08",
+    "title": "Regulation of ultradian pulsatility and stress responses in the human hypothalamic–pituitary–adrenal axis",
+    "summary": "Onderzoekers analyseerden bestaande 24-uurs meetreeksen van ACTH en cortisol bij tien gezonde volwassenen, met bloedafnames om de 10 of 20 minuten. Op basis daarvan ontwikkelden zij een wiskundig model van de hypothalamus-hypofyse-bijnieras (HPA-as). Het model verklaart zowel het dagelijkse ritme als kortere hormonale pulsen vanuit vertraagde negatieve terugkoppeling tussen hypofyse en bijnieren. Simulaties laten zien hoe stressoren die ritmes kunnen verstoren.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Zelfregulatie van het organisme",
+    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met nadruk op homeostase en hormonale regulatie. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
+    "alignment": "Huidig examenprogramma havo/vwo: O2 Zelfregulatie van het organisme (CE), in het bijzonder hormonale regulatie en homeostase. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen. De HPA-as is een concrete context voor negatieve terugkoppeling; ultradiane pulsen en de wiskundige modellering zijn verdieping.",
+    "evidence": "Primair onderzoek en wiskundige modellering (n=10)",
+    "article": "https://onlinelibrary.wiley.com/doi/10.1111/jne.70264",
+    "doi": "10.1111/jne.70264",
+    "why": "Een bruikbare menselijke casus bij hormonale regulatie: cortisol remt via negatieve terugkoppeling de ACTH-afgifte en de hormoonspiegels vertonen zowel dagritmes als kortere pulsen. Belangrijke beperking: het model is gekalibreerd op eerder verzamelde gegevens van slechts tien gezonde volwassenen; stressreacties zijn deels gesimuleerd. Gebruik de studie dus vooral om regulatieprincipes te illustreren, niet als definitief klinisch model.",
+    "tags": "hormonen hormonale regulatie homeostase HPA-as hypothalamus hypofyse bijnieren cortisol ACTH negatieve terugkoppeling stress circadiaan ritme",
+    "evidenceLevel": "Voorlopig bewijs",
+    "evidenceNote": "Het model is gekalibreerd op eerder verzamelde 24-uursgegevens van slechts tien gezonde volwassenen; stressreacties zijn deels gesimuleerd en vormen geen directe interventietest.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "De HPA-as is een concrete illustratie van hormonale regulatie en negatieve terugkoppeling binnen homeostase; ultradiane ritmes en modellering zijn verdieping."
+  },
+  {
+    "id": "s15",
+    "page": "science",
+    "date": "2026-10-20",
+    "title": "MAKR6 integrates TMK and CAMEL/CANAR signalling for auxin canalization in Arabidopsis",
+    "summary": "Bij de ontwikkeling van planten wordt de groeiregulator auxine gericht tussen cellen vervoerd. Onderzoekers identificeren MAKR6 als een schakel in de terugkoppeling tussen auxinesignalering en het transporteiwit PIN1. Met onder meer genetisch gemodificeerde Arabidopsis-planten, mutanten en eiwitinteractie-experimenten laten zij zien dat MAKR6 nodig is voor een goede aanleg en regeneratie van vaatweefsel en voor de vorming van bladnerven.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Zelforganisatie van het organisme",
+    "subdomain": "Huidig havo/vwo: O6 Zelforganisatie van het organisme (SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
+    "alignment": "Huidig examenprogramma havo/vwo: O6 Zelforganisatie van het organisme (SE), met de ontwikkeling en organisatie van plantenweefsels als context. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen. De specifieke signaalroutes en eiwitcomplexen zijn verdieping.",
+    "evidence": "Primair onderzoek (genetische en moleculaire experimenten)",
+    "article": "https://www.nature.com/articles/s41477-026-02435-0",
+    "doi": "10.1038/s41477-026-02435-0",
+    "pdf": "https://www.nature.com/articles/s41477-026-02435-0.pdf",
+    "why": "Een inhoudelijk sterke aanvulling op plantengroei en -ontwikkeling. De studie laat zien hoe een plantenhormoon, gericht transport tussen cellen en terugkoppeling samen de aanleg van vaatbundels en bladnerven organiseren. De resultaten zijn verkregen bij zandraket (Arabidopsis); de moleculaire details zijn vooral geschikt als docentverdieping.",
+    "tags": "plant planten auxine plantenhormoon groei ontwikkeling zelforganisatie vaatbundels bladnerven PIN1 Arabidopsis",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Meerdere complementaire genetische, moleculaire en microscopische experimenten ondersteunen de conclusie; het onderzoek betreft vooral Arabidopsis en één onderzoeksgroep.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "Sluit aan bij plantontwikkeling en zelforganisatie, maar de precieze auxine-signaalroutes en eiwitcomplexen zijn vooral docentverdieping."
+  },
+  {
+    "id": "s16",
+    "page": "science",
+    "date": "2026-10-06",
+    "title": "Climatic rainfall regime shapes energy flow, trophic structure, and secondary production in streams",
+    "summary": "In een driejarige vergelijking van negen rivieren langs een sterke gradiënt in jaarlijkse neerslag onderzochten onderzoekers de productie en biomassa van ongewervelde en gewervelde dieren. Met toenemende droogte veranderden de voedselwebstructuur en de overdracht van energie. In de drogere beken waren voedselwebben eenvoudiger en werd een hogere secundaire productie en biomassaverversing gemeten, met een grotere rol voor gewervelde planteneters.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Biodiversiteit en ecosystemen",
+    "subdomain": "Huidig havo/vwo: P1 Regulatie van ecosystemen (CE; energiestroom en dynamiek) en P3 Interactie in ecosystemen (CE; voedselrelaties). Conceptprogramma v2: B1 Biodiversiteit en verbondenheid van leven.",
+    "alignment": "Huidig examenprogramma havo/vwo: P1 Regulatie van ecosystemen, met name energiestroom, en P3 Interactie in ecosystemen, met name voedselrelaties (beide CE). Conceptprogramma v2: B1 Biodiversiteit en verbondenheid van leven. De studie verbindt klimaatfactoren met voedselwebstructuur en productie.",
+    "evidence": "Veldonderzoek (9 rivieren, 3 jaar)",
+    "article": "https://onlinelibrary.wiley.com/doi/10.1002/ecy.70501",
+    "doi": "10.1002/ecy.70501",
+    "why": "Een concrete casus om energiestromen, trofische niveaus, biomassa en ecosysteemstructuur aan klimaatverandering te koppelen. De meerjarige vergelijking van negen rivieren maakt verschillen tussen ecosystemen zichtbaar. Het is observationeel veldonderzoek langs een neerslaggradiënt: de gevonden patronen tonen samenhang, maar bewijzen niet dat neerslag alleen alle verschillen veroorzaakt.",
+    "tags": "ecosysteem energiestroom voedselweb trofische structuur biomassa secundaire productie neerslag klimaatverandering rivier",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Meerjarig veldonderzoek in negen rivieren levert een brede vergelijking; de observationele neerslaggradiënt laat samenhang zien, geen geïsoleerd causaal effect.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Sluit direct aan bij energiestromen, biomassa, trofische relaties en de dynamiek van ecosystemen."
+  },
+  {
+    "id": "e9",
+    "page": "education",
+    "date": "2026-10-02",
+    "title": "Pedagogical Interventions That Support Self-Regulated Learning in Secondary School Students: A Systematic Literature Review",
+    "summary": "Deze systematische review selecteerde twaalf empirische studies naar interventies die zelfregulerend leren in het voortgezet onderwijs ondersteunen. De interventies omvatten onder meer metacognitieve instructie, reflectie, feedback, peer review en onderzoekend leren. De studies verschilden sterk in aanpak en meetinstrumenten; twee onderzochten expliciet biologielessen. De review maakt bovendien onderscheid tussen rechtstreeks gemeten zelfregulatie en verwante uitkomsten zoals motivatie of leerprestaties.",
+    "theme": "Metacognitie en zelfregulatie",
+    "source": "Wetenschappelijk onderzoek",
+    "language": "Engels",
+    "evidence": "Systematische review (12 studies)",
+    "article": "https://www.mdpi.com/2227-7102/16/10/1638",
+    "doi": "10.3390/educsci16101638",
+    "pdf": "https://www.mdpi.com/2227-7102/16/10/1638/pdf",
+    "why": "Geeft een bruikbaar overzicht van manieren waarop docenten leerlingen expliciet kunnen leren plannen, monitoren en reflecteren. Interessant is dat de auteurs uitkomsten van zelfregulatie onderscheiden van bijvoorbeeld motivatie en cijfers. De review omvat slechts twaalf uiteenlopende studies, waarvan twee in biologie; zie de bevindingen daarom als een beredeneerd overzicht en niet als een definitief bewijs voor één beste aanpak.",
+    "tags": "zelfregulatie metacognitie voortgezet onderwijs plannen monitoren reflecteren feedback peer review interventies",
+    "evidenceLevel": "Voorzichtig interpreteren",
+    "evidenceNote": "Systematische selectie met expliciete kwaliteitscriteria, maar slechts twaalf heterogene studies; twee studies betroffen biologie en de uitkomsten zijn niet allemaal directe SRL-metingen.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Biedt bruikbare strategieën voor voortgezet onderwijs; slechts twee van de twaalf studies betroffen biologie, dus de vakinhoudelijke overdraagbaarheid is beperkt."
+  },
+  {
+    "id": "e10",
+    "page": "education",
+    "date": "2026-06-23",
+    "title": "Design and effectiveness of professional development programmes to support teachers in promoting students’ scientific inquiry competencies: a critical and systematic review of empirical studies",
+    "summary": "Deze kritische systematische review analyseert 33 empirische studies naar professionalisering van docenten die de onderzoeksvaardigheden van leerlingen willen versterken. De auteurs onderscheiden 21 ontwerpkenmerken, gegroepeerd rond inhoud, activiteiten, samenwerking en structuur. Veel programma’s combineren lesontwikkeling, toepassing in de eigen klas en reflectie. De review rapporteert positieve aanwijzingen voor docentkennis, lespraktijk en onderzoekscompetenties van leerlingen, maar wijst ook op methodologische zwaktes in een deel van de onderliggende studies.",
+    "theme": "Professionalisering en onderzoekend leren",
+    "source": "Wetenschappelijk onderzoek",
+    "language": "Engels",
+    "evidence": "Kritische systematische review (33 studies)",
+    "article": "https://doi.org/10.1080/03057267.2026.2688670",
+    "doi": "10.1080/03057267.2026.2688670",
+    "why": "Relevant voor vakgroepen die onderzoekend leren en natuurwetenschappelijke vaardigheden doelgericht willen versterken. De review benadrukt dat effectieve professionalisering niet alleen uit kennisoverdracht bestaat: docenten moeten ook lessen ontwerpen, het geleerde toepassen en samen reflecteren. De auteurs signaleren methodologische beperkingen in het onderliggende onderzoek; de review levert dus vooral ontwerpprincipes en aandachtspunten op, geen gegarandeerd recept.",
+    "tags": "professionalisering docentontwikkeling onderzoekend leren scientific inquiry natuurwetenschappelijke vaardigheden vakgroep lesontwerp reflectie",
+    "evidenceLevel": "Voorzichtig interpreteren",
+    "evidenceNote": "Systematische synthese van 33 empirische studies, maar de auteurs signaleren methodologische zwaktes en kunnen de effecten van afzonderlijke ontwerpkenmerken niet stevig vaststellen.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Gaat over onderzoekend leren in natuurwetenschappelijk onderwijs en professionalisering van docenten; relevant voor biologie, maar niet uitsluitend op biologie gericht."
   }
 ]
