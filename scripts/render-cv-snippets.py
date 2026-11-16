@@ -24,17 +24,30 @@ def page_lines(page):
                 lines.append({"text": text, "x0": x0, "y0": y0, "y1": y1})
     return sorted(lines, key=lambda line: (round(line["y0"], 1), line["x0"]))
 
-def is_question_heading(line, number):
-    text = re.sub(r"\s+", " ", line["text"]).strip()
-    if line["x0"] > 125:
+def heading_at(lines, index, number=None):
+    line = lines[index]
+    text = re.sub(r"\\s+", " ", line["text"]).strip()
+    if number is not None:
+        if re.match(rf"^{number}\\s+(?:maximumscore\\b|[A-D]\\s+\\d\\b)", text, re.I):
+            return True
+        if text == str(number):
+            for nxt in lines[index + 1:index + 4]:
+                if nxt["y0"] - line["y0"] > 38:
+                    break
+                next_text = re.sub(r"\\s+", " ", nxt["text"]).strip()
+                if re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", next_text, re.I):
+                    return True
         return False
-    return bool(re.match(rf"^{number}\s+(?:maximumscore\b|[A-D]\s+\d\b)", text, re.I))
-
-def is_any_question_heading(line):
-    text = re.sub(r"\s+", " ", line["text"]).strip()
-    if line["x0"] > 125:
-        return False
-    return bool(re.match(r"^\d{1,2}\s+(?:maximumscore\b|[A-D]\s+\d\b)", text, re.I))
+    if re.match(r"^\\d{1,2}\\s+(?:maximumscore\\b|[A-D]\\s+\\d\\b)", text, re.I):
+        return True
+    if re.fullmatch(r"\\d{1,2}", text):
+        for nxt in lines[index + 1:index + 4]:
+            if nxt["y0"] - line["y0"] > 38:
+                break
+            next_text = re.sub(r"\\s+", " ", nxt["text"]).strip()
+            if re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", next_text, re.I):
+                return True
+    return False
 
 for item in items:
     source = ROOT / item["pdf"]
@@ -44,11 +57,11 @@ for item in items:
     with fitz.open(source) as doc:
         for page_index, page in enumerate(doc):
             lines = page_lines(page)
-            matches = [i for i, line in enumerate(lines) if is_question_heading(line, item["question"])]
+            matches = [i for i, line in enumerate(lines) if heading_at(lines, i, item["question"])]
             if not matches:
                 continue
             heading = lines[matches[0]]
-            following = [line for line in lines if line["y0"] > heading["y0"] + 3 and is_any_question_heading(line)]
+            following = [line for i, line in enumerate(lines) if line["y0"] > heading["y0"] + 3 and heading_at(lines, i)]
             bottom = min((line["y0"] for line in following), default=page.rect.height - 38)
             top = max(0, heading["y0"] - 9)
             bottom = min(page.rect.height, max(top + 35, bottom - 5))
