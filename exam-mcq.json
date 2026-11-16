@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ha25t2-mcq-1",
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 1,
+    "points": 2,
+    "page": 5,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
+    "q": "4",
+    "options": [
+      {
+        "key": "A",
+        "text": "1 3"
+      },
+      {
+        "key": "B",
+        "text": "1 2"
+      },
+      {
+        "key": "C",
+        "text": "2 3"
+      },
+      {
+        "key": "D",
+        "text": "3 4"
+      },
+      {
+        "key": "E",
+        "text": "Om uit te sluiten dat haan II-5 heterozygoot is voor de eigenschap fibromelanose, kruist Freek hem met het lichtbruine hennetje.  8 Noteer de mogelijke fenotypen van de nakomelingen van deze 2p kruising als haan II-5 heterozygoot is.  Noteer de verhouding waarin deze fenotypen dan aanwezig zijn. Fokkers kruisen vaker broers en zussen onderling om bepaalde gewenste eigenschappen te behouden. Dit heet inteelt. Hierbij is de kans echter ook groot dat recessieve erfelijke afwijkingen tot uiting komen. 9 Verklaar hoe inteelt leidt tot erfelijke afwijkingen bij de nakomelingen. 1p lees verder ►►► 5 / 19 HA-1018-a-25-2-o"
+      }
+    ],
+    "correct": "",
+    "image": "exam-snippets/mcq-ha25t2-mcq-1.jpg",
+    "pdf": "examens/ha-1018-a-25-2-o.pdf",
+    "cv": "examens/ha-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha26t1-mcq-40",
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 40,
+    "points": 1,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Noteer welke cellen van het afweersysteem antistoffen produceren.",
+    "q": "Welk type immuniteit ontstaat doordat de koeien antistoffen krijgen\n2p\ntoegediend? En leidt dit tot de vorming van geheugencellen?\nimmuniteit\nvorming geheugencellen",
+    "options": [
+      {
+        "key": "A",
+        "text": "actief ja"
+      },
+      {
+        "key": "B",
+        "text": "actief nee"
+      },
+      {
+        "key": "C",
+        "text": "passief ja"
+      },
+      {
+        "key": "D",
+        "text": "passief nee Let op: de laatste vragen van dit examen staan op de volgende pagina. 19 / 20 lees verder ►►► HA-1018-a-26-1-o"
+      }
+    ],
+    "correct": "",
+    "image": "exam-snippets/mcq-ha26t1-mcq-40.jpg",
+    "pdf": "examens/ha-1018-a-26-1-o.pdf",
+    "cv": "examens/ha-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  }
+]
