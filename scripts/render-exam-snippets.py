@@ -15,37 +15,41 @@ def question_number_from_filename(filename):
     return int(match.group(1)) if match else None
 
 
+def question_marker_words(page, number):
+    words = page.get_text("words", sort=True)
+    found = []
+    for index, word in enumerate(words):
+        if word[4].strip(".,:") != str(number) or word[0] > 125:
+            continue
+        # In these exam PDFs the printed question number is preceded on the
+        # same baseline by a score marker such as "1p" or "2p". This avoids
+        # confusing numbered lists/figure labels with question numbers.
+        previous = words[index - 1] if index else None
+        if previous and re.fullmatch(r"\d+p", previous[4].strip().lower()) and abs(previous[1] - word[1]) < 4:
+            found.append(word)
+    return found
+
+
 def find_question_page(doc, number, preferred_page):
-    # Locate the printed question number in the PDF text itself. Manifest page
-    # numbers are only hints: PDFs can contain cover pages or shifted numbering.
-    marker = re.compile(
-        rf"^\s*(?:(?:\d+\s*p)\s*)?{number}\s+(?=[A-ZÀ-Ý(])",
-        re.MULTILINE,
-    )
     matches = []
     for page_index, page in enumerate(doc):
-        text = page.get_text("text", sort=True)
-        if marker.search(text):
+        if question_marker_words(page, number):
             matches.append((page_index, page))
     if not matches:
         raise ValueError(
-            f"Question {number} not found in PDF text for any page; "
+            f"Scored question marker {number} not found in PDF; "
             "refusing to publish a potentially mislabelled crop."
         )
-    if len(matches) == 1:
-        return matches[0]
-    # Prefer the configured page only when it is one of the pages containing
-    # the exact printed marker. Otherwise stop rather than guessing.
     preferred = preferred_page - 1
     for page_index, page in matches:
         if page_index == preferred:
             return page_index, page
+    if len(matches) == 1:
+        return matches[0]
     raise ValueError(
         f"Question {number} appears on multiple pages "
-        f"{[i + 1 for i, _ in matches]}; manifest page {preferred_page} "
-        "does not disambiguate them."
+        f"{[i + 1 for i, _ in matches]}; refusing ambiguous crop."
     )
-
 
 def render_question(doc, clip, scale):
     number = question_number_from_filename(clip["output"])
@@ -61,11 +65,7 @@ def render_question(doc, clip, scale):
     # Find the question-number token and the question's final line. The crop
     # retains full page width and all material above the question (its context,
     # tables and figures), but ends before the next numbered question marker.
-    number_words = [
-        word for word in words
-        if word[4].strip(".,:") == str(number)
-        and word[1] > 20
-    ]
+    number_words = question_marker_words(page, number)
     if not number_words:
         raise ValueError(f"Question {number}: text marker found but no word bbox")
     # Use the first occurrence after the configured page preference when unique.
