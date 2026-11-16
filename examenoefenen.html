@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Examenoefenen (bèta) | Biologie in ontwikkeling</title>
+<style>
+:root{--wine:#741d3b;--teal:#168b8b;--ink:#24313b;--muted:#63717b;--line:#dce3e6;--paper:#f5f7f7}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Arial,sans-serif}
+header{background:white;border-bottom:1px solid var(--line)}.top{max-width:1160px;margin:auto;padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{font-weight:bold;color:var(--wine);text-decoration:none}.back{color:#087b80;font-weight:bold;text-decoration:none;font-size:14px}
+.hero{background:linear-gradient(115deg,var(--wine),#552039);color:white;padding:34px 22px}.hero>div{max-width:1116px;margin:auto}.eyebrow{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:#f3c9d5}.hero h1{font-size:clamp(29px,4vw,42px);margin:7px 0;line-height:1.15}.hero p{max-width:780px;margin:0;color:#f8eaf0}
+main{max-width:1160px;margin:24px auto;padding:0 20px 55px}.notice,.filters,.question,.method{background:white;border:1px solid var(--line);border-radius:10px}.notice{padding:14px 17px;border-left:5px solid var(--teal);margin-bottom:16px}.notice p{margin:3px 0;color:#53616a;font-size:14px}.filters{padding:16px;margin-bottom:17px}.filters h2{font-size:17px;color:var(--wine);margin:0 0 10px}.filtergrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field label{display:block;font-size:12px;font-weight:bold;color:var(--muted);margin-bottom:4px}.field select{width:100%;padding:9px;border:1px solid #cbd5d9;border-radius:7px;background:white;font:inherit;font-size:14px}.filterfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}.filterfoot button{border:1px solid var(--line);background:#eef2f3;padding:8px 11px;border-radius:7px;cursor:pointer;font-weight:bold}.count{font-size:13px;color:var(--muted)}
+.list{display:grid;gap:16px}.question{padding:17px}.qhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}.qhead h2{font-size:19px;color:var(--wine);margin:0}.tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.tag{font-size:11px;font-weight:bold;padding:3px 8px;border-radius:18px;background:#edf4f4;color:#246d70}.tag.gold{background:#fff3e3;color:#89500c}.tag.muted{background:#f0eef3;color:#66536d}.context{font-size:13px;color:var(--muted);margin:5px 0 10px}.preview{width:100%;height:420px;border:1px solid #d7dfe2;border-radius:7px;background:#f6f7f7}.preview-note{font-size:11px;color:var(--muted);margin:5px 0 12px}.response label{font-size:13px;font-weight:bold;display:block;margin-bottom:5px}.response textarea{width:100%;min-height:90px;resize:vertical;border:1px solid #cbd5d9;border-radius:7px;padding:10px;font:14px/1.5 Arial,sans-serif}.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}.actions button,.actions a{border:0;border-radius:7px;padding:8px 11px;font-size:13px;font-weight:bold;text-decoration:none;cursor:pointer}.reveal{background:var(--teal);color:white}.source{background:#eef2f3;color:#34434c;border:1px solid var(--line)!important}.marking{margin-top:11px;padding:12px;background:#f3f7f6;border-radius:7px;font-size:14px}.marking[hidden]{display:none}.marking b{color:var(--wine)}.marking p{margin:4px 0}.empty{background:white;border:1px dashed #b9c6cb;border-radius:10px;padding:24px;text-align:center;color:var(--muted)}.method{padding:16px;margin-top:20px}.method h2{font-size:17px;color:var(--wine);margin:0 0 5px}.method p{font-size:13px;color:#53616a;margin:5px 0}.method a{color:#087b80}footer{text-align:center;padding:18px;background:white;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+@media(max-width:760px){.filtergrid{grid-template-columns:repeat(2,minmax(0,1fr))}.preview{height:370px}}@media(max-width:480px){.filtergrid{grid-template-columns:1fr}.preview{height:320px}main{padding:0 12px 40px}.hero{padding:27px 17px}}
+</style></head><body>
+<header><div class="top"><a class="brand" href="./index.html">Biologie in ontwikkeling</a><a class="back" href="./index.html">← Terug naar actualiteiten</a></div></header>
+<section class="hero"><div><div class="eyebrow">Oefenomgeving · bèta</div><h1>Examenoefenen biologie</h1><p>Oefen met echte examenvragen, geselecteerd op wat de deelvraag daadwerkelijk toetst. Een gedeelde context betekent niet dat alle vragen onder hetzelfde thema vallen.</p></div></section>
+<main>
+<section class="notice"><b>Proefversie: eerste voorbeeld uit vwo 2025, tijdvak 1</b><p>De eerste set laat zien hoe één examencontext wordt opgesplitst in afzonderlijk te filteren deelvragen. De thematische en conceptuele rubricering is redactioneel en voorlopig. De koppeling aan de actuele syllabus-eindtermen wordt per vraag gecontroleerd voordat die als definitief wordt getoond.</p></section>
+<section class="filters"><h2>Filter de deelvragen</h2><div class="filtergrid">
+<div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option>Vwo</option><option>Havo</option></select></div>
+<div class="field"><label for="theme">Thema</label><select id="theme"><option value="">Alle thema's</option></select></div>
+<div class="field"><label for="concept">Concept</label><select id="concept"><option value="">Alle concepten</option></select></div>
+<div class="field"><label for="endterm">Eindterm</label><select id="endterm"><option value="">Alle eindtermen</option><option value="pending">Nog te valideren</option></select></div>
+</div><div class="filterfoot"><button id="reset" type="button">Wis filters</button><span class="count" id="count" aria-live="polite"></span></div></section>
+<section class="list" id="questions" aria-live="polite"></section>
+<section class="method"><h2>Hoe de rubricering werkt</h2><p><b>Deelvraagniveau:</b> elke vraag krijgt een eigen thema, concept en eindtermkoppeling. De context wordt alleen als achtergrond gebruikt en is geen automatische classificatie.</p><p><b>Contextbehoud:</b> de originele examenpagina wordt als PDF-fragment getoond. Zo blijven figuren, tabellen en broninformatie in hun oorspronkelijke vorm behouden. De volledige opgave en het correctievoorschrift zijn daarnaast rechtstreeks te openen.</p><p><b>Voorzichtig met koppelingen:</b> een conceptuele match is niet automatisch een formele syllabus-eindterm. Onzekere of nog niet gecontroleerde koppelingen worden daarom niet als definitief gepresenteerd.</p></section>
+</main><footer>Biologie in ontwikkeling · Examenoefenen bèta · Bronnen: College voor Toetsen en Examens / Examenblad.nl</footer>
+<script>
+const examPdf='https://www.examenblad.nl/system/files/exam-document/2025-05/vw-1018-a-25-1-o.pdf';
+const correctionPdf='https://www.examenblad.nl/system/files/exam-document/2025-05/vw-1018-a-25-1-c.pdf';
+const context='De nijlpaarden van Pablo Escobar · vwo 2025, tijdvak 1 · opgavenpagina 8';
+const questions=[
+{id:'vw25t1-14',number:14,theme:'Ecologie en ecosystemen',concept:'Populatiedynamiek en draagkracht',endterm:'pending',page:8,points:2,focus:'Populatiegroei, dichtheidsafhankelijke factoren en niche.',feedback:'Beoordeel de drie uitspraken afzonderlijk. Let op het verschil tussen dichtheidsafhankelijke regulatie en de aanwezigheid van een passende niche.',answer:'De uitspraken zijn: 1 onjuist, 2 juist, 3 onjuist.'},
+{id:'vw25t1-15',number:15,theme:'Ecologie en ecosystemen',concept:'Populatieregulatie door biotische factoren',endterm:'pending',page:8,points:1,focus:'Biotische factoren die populatiegroei kunnen beperken.',feedback:'Noem een concrete biotische factor en leg uit hoe deze de populatiegroei beperkt, bijvoorbeeld via sterfte, voedselbeschikbaarheid of voortplantingssucces.',answer:'Een voorbeeld is ziekte, predatie of concurrentie om voedsel, met een toelichting op het effect op overleving of voortplanting.'},
+{id:'vw25t1-16',number:16,theme:'Evolutie en erfelijkheid',concept:'Genetische drift: stichtereffect',endterm:'pending',page:8,points:1,focus:'Verandering in de genenpool door een klein aantal koloniserende individuen.',feedback:'Maak onderscheid tussen het stichtereffect en het flessenhalseffect.',answer:'Het stichtereffect (founder effect).'},
+{id:'vw25t1-17',number:17,theme:'Evolutie en erfelijkheid',concept:'Soortvorming: allopatrische soortvorming',endterm:'pending',page:8,points:1,focus:'Soortvorming in samenhang met geografische isolatie.',feedback:'Onderbouw de keuze met de ruimtelijke scheiding tussen de oorspronkelijke en de nieuwe populatie.',answer:'Allopatrische soortvorming: de populaties zijn ruimtelijk van elkaar gescheiden.'},
+{id:'vw25t1-18',number:18,theme:'Ecologie en ecosystemen',concept:'Successie en climaxsoorten',endterm:'pending',page:8,points:2,focus:'Invloed van grote grazers op successie en de vestiging, groei of overleving van climaxsoorten.',feedback:'Geef een concreet voorbeeld van hoe nijlpaarden successie tegengaan en benoem expliciet het negatieve effect op climaxsoorten.',answer:'Bijvoorbeeld: nijlpaarden eten jonge boompjes, waardoor climaxsoorten niet groot worden. Ook bodemverdichting, vertrapping of nutriëntenafvoer kan vestiging of groei van climaxsoorten beperken.'}
+];
+const $=id=>document.getElementById(id);
+const saved=JSON.parse(localStorage.getItem('bioExamAnswersV1')||'{}');
+function fillFilter(id,values){const el=$(id);for(const value of [...new Set(values)].sort()){const o=document.createElement('option');o.value=value;o.textContent=value;el.append(o)}}
+fillFilter('theme',questions.map(q=>q.theme));fillFilter('concept',questions.map(q=>q.concept));
+function render(){
+ const level=$('level').value,theme=$('theme').value,concept=$('concept').value,endterm=$('endterm').value;
+ const filtered=questions.filter(q=>(!level||level==='Vwo')&&(!theme||q.theme===theme)&&(!concept||q.concept===concept)&&(!endterm||q.endterm===endterm));
+ $('count').textContent=filtered.length+' van '+questions.length+' deelvragen';
+ $('questions').innerHTML='';
+ if(!filtered.length){$('questions').innerHTML='<div class="empty">Geen deelvragen gevonden met deze combinatie. Wis een of meer filters.</div>';return}
+ for(const q of filtered){
+  const article=document.createElement('article');article.className='question';
+  article.innerHTML='<div class="qhead"><h2>Vraag '+q.number+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+' punt'+(q.points===1?'':'en')+'</span></h2><span class="tag gold">Voorlopige rubricering</span></div>'+
+  '<div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">Eindterm: nog te valideren</span></div>'+
+  '<p class="context">'+context+'<br>'+q.focus+'</p>'+
+  '<iframe class="preview" loading="lazy" title="Originele examenpagina met vraag '+q.number+'" src="'+examPdf+'#page='+q.page+'&zoom=page-width&toolbar=0&navpanes=0"></iframe>'+
+  '<p class="preview-note">Originele PDF-pagina '+q.page+' (volledige contextpagina; vraag '+q.number+' is hierboven geselecteerd). Gebruik de PDF-weergave om in te zoomen.</p>'+
+  '<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>'+
+  '<div class="actions"><button class="reveal" type="button" data-reveal="'+q.id+'">Toon antwoordindicatie</button><a class="source" href="'+examPdf+'" target="_blank" rel="noopener">Volledige opgave ↗</a><a class="source" href="'+correctionPdf+'" target="_blank" rel="noopener">Correctievoorschrift ↗</a></div>'+
+  '<div class="marking" id="mark-'+q.id+'" hidden><b>Antwoordindicatie (samengevat)</b><p>'+q.answer+'</p><p>'+q.feedback+'</p><small>Dit is een beknopte uitleg, geen automatische beoordeling van je eigen antwoord. Raadpleeg het officiële correctievoorschrift voor de volledige puntentoekenning.</small></div>';
+  $('questions').append(article);
+  const textarea=article.querySelector('textarea');textarea.value=saved[q.id]||'';textarea.addEventListener('input',()=>{saved[q.id]=textarea.value;localStorage.setItem('bioExamAnswersV1',JSON.stringify(saved))});
+  article.querySelector('[data-reveal]').addEventListener('click',e=>{const box=$('mark-'+q.id);box.hidden=!box.hidden;e.currentTarget.textContent=box.hidden?'Toon antwoordindicatie':'Verberg antwoordindicatie'});
+ }
+}
+['level','theme','concept','endterm'].forEach(id=>$(id).addEventListener('change',render));
+$('reset').addEventListener('click',()=>{['level','theme','concept','endterm'].forEach(id=>$(id).value='');render()});
+render();
+</script></body></html>
