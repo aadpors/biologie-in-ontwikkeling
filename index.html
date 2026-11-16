@@ -44,7 +44,7 @@ button[data-tip]{cursor:pointer}.pill[data-tip]{cursor:help}.empty{background:wh
 <div class="filters" id="science-filters">
 <div class="field"><label for="period">Publicatieperiode</label><select id="period"><option value="30">Afgelopen maand</option><option value="90">Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365" selected>Afgelopen jaar</option><option value="1095">Afgelopen 3 jaar</option><option value="all">Alle perioden</option></select></div>
 
-<div class="field"><label for="programme">Examenprogramma</label><select id="programme"><option value="all">Huidig en toekomstig</option><option>Huidig</option><option>Toekomstig</option><option>Beide</option></select></div>
+<div class="field"><label for="programme">Examenprogramma</label><select id="programme"><option value="all">Huidig en toekomstig</option><option>Huidig</option><option>Toekomstig</option></select></div>
 <div class="field"><label for="concept">Syllabusonderwerp</label><select id="concept"><option value="all">Alle syllabusonderwerpen</option><option>Moleculaire interactie</option><option>Selectie en genetische variatie</option><option>Biodiversiteit en ecosystemen</option><option>Ontstaan en evolutie van meercellig leven</option><option>Afweer van het organisme</option><option>Stofwisseling van het organisme</option><option>Zelforganisatie van het organisme</option><option>Zelfregulatie van het organisme</option><option>DNA-replicatie en celcyclus</option><option>Eiwitsynthese en genexpressie</option><option>Gedrag en voortplanting</option></select></div></div>
 <div class="filters" id="education-filters" hidden>
 <div class="field"><label for="ed-period">Publicatieperiode</label><select id="ed-period"><option value="30">Afgelopen maand</option><option value="90">Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365">Afgelopen jaar</option><option value="1095">Afgelopen 3 jaar</option><option value="all" selected>Alle perioden</option></select></div>
@@ -208,7 +208,7 @@ fetch('./publicaties.json?v=a7028e9133ebae1b8624a47a0971195a424efd6a')
   .then(()=>initFeedback())
   .catch(error=>{$('cards').innerHTML='<div class="empty"><b>De publicatiedatabase kon niet worden geladen.</b><br>Ververs de pagina later of controleer of publicaties.json in de hoofdmap van de website staat.</div>';console.error(error);});
 
-const currentSiteVersion='2026-11-16T15:53:29.394Z';
+const currentSiteVersion='2026-11-16T16:45:00.000Z';
 async function checkSiteVersion(){
  try{
   const response=await fetch('./site-version.json?check='+Date.now(),{cache:'no-store'});
