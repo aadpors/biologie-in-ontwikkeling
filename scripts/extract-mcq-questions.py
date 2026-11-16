@@ -18,7 +18,7 @@ EXAMS = [
     ("vw26t2", "Vwo", "2026", "2", "examens/vw-1018-a-26-2-o.pdf", "examens/vw-1018-a-26-2-c.pdf"),
 ]
 
-HEADER_RE = re.compile(r"^(?:[HV][AW]-1018-a-\d{2}-\d-o|\d+\s*/\s*\d+|lees verder|einde)\b", re.I)
+HEADER_RE = re.compile(r"^(?:[HV][AW]-1018-a-\d{2}-\d-o|\d+\s*/\s*\d+|lees verder|einde|vraag\s+antwoord\s+scores|vraag|antwoord|scores)\b", re.I)
 MARKER_RE = re.compile(r"^\s*(\d+)\s*p\s+(\d{1,2})(?:\s+|$)", re.I)
 NUMBER_RE = re.compile(r"^\s*(\d{1,2})\s*$")
 OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
@@ -161,16 +161,52 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     with fitz.open(cv_path) as cv_doc:
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
+    active_context = []
+    heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding|lees verder|einde)$", re.I)
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             lines = line_records(page)
             markers = find_markers(lines)
             if not markers:
+                headings = [
+                    j for j, line in enumerate(lines)
+                    if (line["size"] >= 13 or (line["bold"] and line["size"] >= 10.5))
+                    and len(line["text"]) < 90
+                    and not HEADER_RE.match(line["text"])
+                    and not heading_re.match(line["text"])
+                    and not re.match(r"^\d+\s*p", line["text"], re.I)
+                ]
+                if headings:
+                    active_context = [lines[j]["text"] for j in range(headings[-1], len(lines)) if not HEADER_RE.match(lines[j]["text"])]
+                else:
+                    active_context.extend(line["text"] for line in lines if not HEADER_RE.match(line["text"]))
                 continue
+
             previous_ranges = []
+            cursor = 0
             for idx, marker in enumerate(markers):
                 start = marker["line"]
                 end = markers[idx + 1]["line"] if idx + 1 < len(markers) else len(lines)
+                # A new prominent heading marks the start of a new case/context.
+                headings = [
+                    j for j in range(cursor, start)
+                    if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5))
+                    and len(lines[j]["text"]) < 90
+                    and not HEADER_RE.match(lines[j]["text"])
+                    and not heading_re.match(lines[j]["text"])
+                    and not re.match(r"^\d+\s*p", lines[j]["text"], re.I)
+                ]
+                if headings:
+                    cursor = headings[-1]
+                    active_context = []
+                context_lines = []
+                for j in range(cursor, start):
+                    if any(a <= j < b for a, b in previous_ranges):
+                        continue
+                    context_lines.append(lines[j]["text"])
+                active_context.extend(context_lines)
+                context = clean_context(active_context)
+
                 block = lines[start:end]
                 excluded = {marker["number_line"], marker["points_line"]}
                 block_text = ([marker["inline_prompt"]] if marker.get("inline_prompt") else []) + [
@@ -178,40 +214,34 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     if j not in excluded and not HEADER_RE.match(lines[j]["text"])
                 ]
                 options = parse_options(block_text)
-                if (prefix, marker["number"]) in {("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14), ("vw26t1", 30), ("ha26t2", 40)}:
+                false_positive_open_questions = {
+                    ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
+                    ("vw26t1", 30), ("ha26t2", 40)
+                }
+                if (prefix, marker["number"]) in false_positive_open_questions or not options:
                     previous_ranges.append((start, end))
+                    cursor = end
                     continue
-                if not options:
-                    previous_ranges.append((start, end))
-                    continue
-                # Context starts at the last prominent case heading on this page.
-                heading_candidates = [
-                    j for j in range(start)
-                    if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 11))
-                    and len(lines[j]["text"]) < 90
-                    and not HEADER_RE.match(lines[j]["text"])
-                    and not re.match(r"^\d+\s*p", lines[j]["text"], re.I)
-                ]
-                context_start = heading_candidates[-1] if heading_candidates else 0
-                context_lines = []
-                for j in range(context_start, start):
-                    if any(a <= j < b for a, b in previous_ranges):
-                        continue
-                    context_lines.append(lines[j]["text"])
-                context = clean_context(context_lines)
-                # The original question crop preserves diagrams and any graphical answer options.
+
+                correct = answer_from_cv(cv_text, marker["number"])
+                option_keys = [o["key"] for o in options]
+                required_keys = "ABCDEF"[:max(len(option_keys), "ABCDEF".find(correct) + 1 if correct else len(option_keys))]
+                if (prefix, marker["number"]) == ("vw25t2", 22):
+                    required_keys = "ABCDEF"
+                options_by_key = {o["key"]: o for o in options}
+                options = [{"key": key, "text": options_by_key.get(key, {}).get("text", "")} for key in required_keys]
+
+                # The crop keeps the question and its choices together; the preceding
+                # context is shown as text above it in the card.
                 y0 = max(0, block[0]["bbox"][1] - 4) if block else 0
                 y1 = min(page.rect.height, block[-1]["bbox"][3] + 5) if block else page.rect.height
-                # Include a little more vertical context when options are graphical.
                 crop = fitz.Rect(35, y0, page.rect.width - 35, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
-                pix = page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=crop, alpha=False)
-                pix.save(OUT / image_name)
-                prompt_lines = []
+                page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=crop, alpha=False).save(OUT / image_name)
+
                 first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
-                prompt_lines = block_text[:first_option]
-                prompt = "\n".join(x for x in prompt_lines if x.strip()).strip()
+                prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
                 if not prompt:
                     prompt = "\n".join(x for x in block_text if x.strip()).strip()
                 found.append({
@@ -229,14 +259,16 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     "source": context or "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
                     "q": prompt,
                     "options": options,
-                    "correct": answer_from_cv(cv_text, marker["number"]),
+                    "correct": correct,
                     "image": f"exam-snippets/{image_name}",
                     "pdf": exam_rel,
                     "cv": cv_rel,
                     "questionType": "mcq",
                 })
                 previous_ranges.append((start, end))
+                cursor = end
     return found
+
 
 all_questions = []
 for exam in EXAMS:
