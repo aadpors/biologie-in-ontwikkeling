@@ -15,6 +15,25 @@ for (const [index, item] of publications.entries()) {
     assert.ok(item[field].trim(), `${where}: veld "${field}" is leeg`);
   }
   assert.ok(['science', 'education'].includes(item.page), `${where}: onbekende pagina "${item.page}"`);
+  // Strikte ISO-datumcontrole: Date.parse alleen accepteert soms onmogelijke kalenderdatums.
+  assert.ok(/^\\d{4}-\\d{2}-\\d{2}$/.test(item.date), `${where}: datum moet YYYY-MM-DD zijn`);
+  const parsedDate = new Date(item.date + 'T00:00:00.000Z');
+  assert.equal(parsedDate.toISOString().slice(0, 10), item.date, `${where}: ongeldige kalenderdatum ${item.date}`);
+
+  for (const field of ['article']) {
+    let url;
+    try { url = new URL(item[field]); }
+    catch { throw new Error(`${where}: ongeldige URL in veld "${field}"`); }
+    assert.equal(url.protocol, 'https:', `${where}: veld "${field}" moet HTTPS gebruiken`);
+  }
+  if (item.pdf) {
+    let pdfUrl;
+    try { pdfUrl = new URL(item.pdf); }
+    catch { throw new Error(`${where}: ongeldige PDF-URL`); }
+    assert.equal(pdfUrl.protocol, 'https:', `${where}: PDF-link moet HTTPS gebruiken`);
+  }
+  if (item.doi) assert.ok(/^10\\.\\d{4,9}\\/.+/.test(item.doi), `${where}: ongeldige DOI ${item.doi}`);
+
   assert.ok(!ids.has(item.id), `Dubbel publicatie-ID: ${item.id}`);
   ids.add(item.id);
   assert.ok(!Number.isNaN(Date.parse(item.date)), `${where}: ongeldige datum ${item.date}`);
@@ -22,10 +41,15 @@ for (const [index, item] of publications.entries()) {
   if (item.doi) assert.ok(/^10\.\d{4,9}\//.test(item.doi), `${where}: ongeldige DOI ${item.doi}`);
   if (item.pdf) assert.ok(/^https:\/\//.test(item.pdf), `${where}: PDF-link moet HTTPS gebruiken`);
   if (item.page === 'science') {
+    assert.ok(['Havo', 'Vwo', 'Havo/vwo'].includes(item.level), `${where}: onbekend niveau "${item.level}"`);
+    assert.ok(['Huidig', 'Toekomstig', 'Beide'].includes(item.programme), `${where}: onbekend programma "${item.programme}"`);
+    assert.ok(['Direct', 'Aansluitend', 'Verdieping'].includes(item.relevanceLevel), `${where}: onbekende relevantie-indicatie "${item.relevanceLevel}"`);
     for (const field of ['level', 'programme', 'concept', 'alignment', 'evidence', 'evidenceNote', 'relevanceNote']) {
       assert.equal(typeof item[field], 'string', `${where}: vakinhoudelijk veld "${field}" ontbreekt`);
     }
   } else {
+    assert.ok(['Nederlands', 'Engels'].includes(item.language), `${where}: onbekende taal "${item.language}"`);
+    assert.ok(['Wetenschappelijk onderzoek', 'Vakdidactiek', 'Praktijkonderzoek', 'Kennisplatform'].includes(item.source), `${where}: onbekend brontype "${item.source}"`);
     for (const field of ['language', 'source', 'theme']) {
       assert.equal(typeof item[field], 'string', `${where}: didactisch veld "${field}" ontbreekt`);
     }
