@@ -6,6 +6,7 @@ on:
     paths:
       - 'examens/*.pdf'
       - 'scripts/render-exam-snippets.py'
+      - 'scripts/render-cv-snippets.py'
       - 'scripts/exam-snippets.json'
       - 'scripts/cv-snippets.json'
       - 'site-version.json'
