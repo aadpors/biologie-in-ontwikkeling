@@ -183,5 +183,20 @@
     "doi": "10.1002/bmb.70086",
     "why": "Een concreet voorbeeld van het inzetten van authentieke 3D-molecuulvisualisaties in het biologieonderwijs. Leerlingen kunnen eiwitstructuren en andere biomoleculen vanuit verschillende perspectieven onderzoeken in plaats van alleen tweedimensionale afbeeldingen te bekijken. Interessant om te verkennen bij eiwitsynthese, enzymen en structuur-functierelaties. De korte interventie en het ontbreken van een controlegroep maken de effectiviteitsclaim beperkt.",
     "tags": "molecuulvisualisatie 3D eiwitstructuur iCn3D Protein Data Bank PDB structuur functie inquiry"
+  },
+  {
+    "id": "e5",
+    "page": "education",
+    "date": "2021-01-01",
+    "title": "Uitbeelddidactiek in de biologieles: van good practice naar ontwerpprincipes",
+    "summary": "NRO-project van Caspar Geraedts en collega's waarin literatuuronderzoek, interviews met docenten en een docentontwikkelteam zijn gecombineerd om ontwerpprincipes voor uitbeeldpractica te formuleren. Deel C bevat 51 uitgewerkte practica voor biologie in onder- en bovenbouw, waarbij leerlingen abstracte of moeilijk waarneembare processen uitbeelden met bewegingen en/of materialen.",
+    "theme": "Vakdidactiek biologie",
+    "source": "Vakdidactiek",
+    "language": "Nederlands",
+    "evidence": "NRO-praktijkgericht onderzoek en ontwikkeltraject; 51 lesactiviteiten",
+    "article": "https://www.leraar24.nl/2628659/biologie-uitbeelden-in-de-klas/",
+    "pdf": "https://www.nro.nl/sites/nro/files/media-files/Uitbeelddidactiek-in-de-biologieles-deel-C-uitbeeldpractica_0.pdf",
+    "why": "Zeer direct bruikbaar bij processen die leerlingen moeilijk kunnen visualiseren, zoals DNA-replicatie, impulsoverdracht, evolutie en populatiedynamica. De 51 practica bieden kant-en-klare ideeën en kunnen als uitgangspunt dienen voor eigen lessen. Belangrijke nuance: de ontwikkelaars beschrijven veelbelovende didactische mechanismen en positieve ervaringen, maar de omvang van het daadwerkelijke leereffect is niet overtuigend vastgesteld; gebruik de publicatie dus vooral als onderbouwde ontwerp- en praktijkbron, niet als hard bewijs dat uitbeelden altijd beter werkt.",
+    "tags": "uitbeelddidactiek uitbeeldpractica biologieles vakdidactiek abstracte processen DNA replicatie impulsoverdracht evolutie populatiedynamica"
   }
 ]
