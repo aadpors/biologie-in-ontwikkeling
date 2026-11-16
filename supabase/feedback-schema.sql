@@ -8,7 +8,8 @@ create table if not exists public.publication_feedback (
   rating text not null check (rating in ('interesting','not')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  primary key (user_id, publication_id)
+  -- Eén afzonderlijke stem per gebruiker, publicatie én onderwijsniveau.
+  primary key (user_id, publication_id, audience)
 );
 
 alter table public.publication_feedback enable row level security;
