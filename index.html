@@ -26,7 +26,7 @@ button[data-tip]{cursor:pointer}.pill[data-tip]{cursor:help}.empty{background:wh
 <div class="field"><label for="period">Publicatieperiode</label><select id="period"><option value="30">Afgelopen maand</option><option value="90" selected>Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365">Afgelopen jaar</option><option value="1095">Afgelopen 3 jaar</option><option value="all">Alle perioden</option></select></div>
 <div class="field"><label for="level">Niveau</label><select id="level"><option value="all">Havo en vwo</option><option>Havo</option><option>Vwo</option><option>Havo/vwo</option></select></div>
 <div class="field"><label for="programme">Examenprogramma</label><select id="programme"><option value="all">Huidig en toekomstig</option><option>Huidig</option><option>Toekomstig</option><option>Beide</option></select></div>
-<div class="field"><label for="concept">Syllabusonderwerp</label><select id="concept"><option value="all">Alle syllabusonderwerpen</option><option>Moleculaire interactie</option><option>Selectie en genetische variatie</option><option>Biodiversiteit en ecosystemen</option><option>Ontstaan en evolutie van meercellig leven</option><option>Afweer van het organisme</option><option>Stofwisseling van het organisme</option><option>Zelforganisatie van het organisme</option><option>Zelfregulatie van het organisme</option></select></div></div>
+<div class="field"><label for="concept">Syllabusonderwerp</label><select id="concept"><option value="all">Alle syllabusonderwerpen</option><option>Moleculaire interactie</option><option>Selectie en genetische variatie</option><option>Biodiversiteit en ecosystemen</option><option>Ontstaan en evolutie van meercellig leven</option><option>Afweer van het organisme</option><option>Stofwisseling van het organisme</option><option>Zelforganisatie van het organisme</option><option>Zelfregulatie van het organisme</option><option>DNA-replicatie en celcyclus</option></select></div></div>
 <div class="filters" id="education-filters" hidden>
 <div class="field"><label for="ed-period">Publicatieperiode</label><select id="ed-period"><option value="30">Afgelopen maand</option><option value="90" selected>Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365">Afgelopen jaar</option><option value="1095">Afgelopen 3 jaar</option><option value="all">Alle perioden</option></select></div>
 <div class="field"><label for="language">Taal</label><select id="language"><option value="all">Nederlands en Engels</option><option>Nederlands</option><option>Engels</option></select></div>
@@ -66,7 +66,7 @@ syncTooltips();
 document.querySelectorAll('select').forEach(el=>el.addEventListener('change',render));
 document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',render));
 syncTooltips();
-fetch('./publicaties.json?v=5875baf094f9a1a310479db6395c63bf060f5832')
+fetch('./publicaties.json?v=4013dd245c9a917ea2c2b362da6265b9c0ca6826')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
   .then(publications=>{if(!Array.isArray(publications))throw new Error('Ongeldig databaseformaat');data=publications;render();})
   .catch(error=>{$('cards').innerHTML='<div class="empty"><b>De publicatiedatabase kon niet worden geladen.</b><br>Ververs de pagina later of controleer of publicaties.json in de hoofdmap van de website staat.</div>';console.error(error);});
