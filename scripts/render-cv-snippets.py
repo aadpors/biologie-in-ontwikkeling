@@ -26,23 +26,23 @@ def page_lines(page):
 
 def heading_at(lines, index, number=None):
     line = lines[index]
-    text = re.sub(r"\\s+", " ", line["text"]).strip()
+    text = re.sub(r"\s+", " ", line["text"]).strip()
     if number is not None:
-        if re.match(rf"^{number}\\s+(?:maximumscore\\b|[A-D]\\s+\\d\\b)", text, re.I):
+        if re.match(rf"^{number}\s+(?:maximumscore\b|[A-D]\s+\d\b)", text, re.I):
             return True
         if text == str(number):
             return any(
                 abs(other["y0"] - line["y0"]) < 14
-                and re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", re.sub(r"\\s+", " ", other["text"]).strip(), re.I)
+                and re.match(r"^(?:maximumscore\b|[A-D]\s+\d\b)", re.sub(r"\s+", " ", other["text"]).strip(), re.I)
                 for other in lines if other is not line
             )
         return False
-    if re.match(r"^\\d{1,2}\\s+(?:maximumscore\\b|[A-D]\\s+\\d\\b)", text, re.I):
+    if re.match(r"^\d{1,2}\s+(?:maximumscore\b|[A-D]\s+\d\b)", text, re.I):
         return True
-    if re.fullmatch(r"\\d{1,2}", text):
+    if re.fullmatch(r"\d{1,2}", text):
         return any(
             abs(other["y0"] - line["y0"]) < 14
-            and re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", re.sub(r"\\s+", " ", other["text"]).strip(), re.I)
+            and re.match(r"^(?:maximumscore\b|[A-D]\s+\d\b)", re.sub(r"\s+", " ", other["text"]).strip(), re.I)
             for other in lines if other is not line
         )
     return False
@@ -55,8 +55,6 @@ for item in items:
     with fitz.open(source) as doc:
         for page_index, page in enumerate(doc):
             lines = page_lines(page)
-            if item["question"] == 14 and "vw-1018-a-25-1-c.pdf" in item["pdf"] and page_index == 6:
-                print("PAGE7 LINES", [(round(line["y0"],1), round(line["x0"],1), line["text"]) for line in lines])
             matches = [i for i, line in enumerate(lines) if heading_at(lines, i, item["question"])]
             if not matches:
                 continue
