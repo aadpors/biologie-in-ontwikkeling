@@ -19,7 +19,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Grote metagenomische dataset en brede bio-informatische analyse; patronen tonen vooral samenhang en geen experimenteel bewijs voor elk mechanisme.",
     "relevanceLevel": "Verdieping",
-    "relevanceNote": "Raakt aan moleculaire interactie en biodiversiteit, maar de grootschalige CRISPR-analyses in microbiële gemeenschappen gaan duidelijk verder dan de examenstof."
+    "relevanceNote": "Raakt aan moleculaire interactie en biodiversiteit, maar de grootschalige CRISPR-analyses in microbiële gemeenschappen gaan duidelijk verder dan de examenstof.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s2",
@@ -40,7 +42,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Een omvangrijk primair onderzoek met genetisch gemarkeerde bacterielijnen en een experimenteel muismodel; generalisatie naar andere gastheren vraagt voorzichtigheid.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit rechtstreeks aan bij genetische variatie, mutatie en selectie; de overdracht tussen muizen is een concrete evolutionaire context."
+    "relevanceNote": "Sluit rechtstreeks aan bij genetische variatie, mutatie en selectie; de overdracht tussen muizen is een concrete evolutionaire context.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s3",
@@ -61,7 +65,9 @@
     "evidenceLevel": "Achtergrondbron",
     "evidenceNote": "Mini-review met een conceptuele synthese; bruikbaar voor begripsvorming, maar geen systematische effect- of bewijssynthese.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "De interactiestructuur van ecosystemen sluit direct aan bij voedselrelaties, biodiversiteit en ecosysteemwerking."
+    "relevanceNote": "De interactiestructuur van ecosystemen sluit direct aan bij voedselrelaties, biodiversiteit en ecosysteemwerking.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s4",
@@ -82,7 +88,9 @@
     "evidenceLevel": "Achtergrondbron",
     "evidenceNote": "Reviewartikel dat bestaand onderzoek samenbrengt; de kwaliteit van de onderliggende studies is niet als één nieuw experiment beoordeeld.",
     "relevanceLevel": "Verdieping",
-    "relevanceNote": "Geeft verdieping bij het ontstaan van meercelligheid en taakverdeling tussen cellen; de evolutionaire details gaan verder dan de vereiste examenstof."
+    "relevanceNote": "Geeft verdieping bij het ontstaan van meercelligheid en taakverdeling tussen cellen; de evolutionaire details gaan verder dan de vereiste examenstof.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e1",
@@ -102,7 +110,9 @@
     "evidenceLevel": "Breed onderbouwd",
     "evidenceNote": "Meta-analyse van 53 studies en 7.303 leerlingen in echte schoolklassen; effecten verschillen wel per leerstof, toetsvorm en feedback.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "De bevindingen zijn direct bruikbaar bij het ontwerpen van herhaling, ophaalvragen en afwisselend oefenen in de biologieles."
+    "relevanceNote": "De bevindingen zijn direct bruikbaar bij het ontwerpen van herhaling, ophaalvragen en afwisselend oefenen in de biologieles.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e2",
@@ -122,7 +132,9 @@
     "evidenceLevel": "Achtergrondbron",
     "evidenceNote": "Narratieve review: waardevol voor mechanismen en ontwerpideeën, maar geen systematische meta-analyse van effectgroottes.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "POE is direct toepasbaar bij biologische demonstraties, practica en het expliciet laten herzien van leerlingverklaringen."
+    "relevanceNote": "POE is direct toepasbaar bij biologische demonstraties, practica en het expliciet laten herzien van leerlingverklaringen.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e3",
@@ -142,7 +154,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Drie meetmomenten inclusief uitgestelde toets na drie maanden; kleine steekproef en geen controlegroep, dus voorzichtig met causale interpretatie.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Zeer direct toepasbaar bij het opsporen en duurzaam veranderen van misconcepties over fotosynthese en celademhaling."
+    "relevanceNote": "Zeer direct toepasbaar bij het opsporen en duurzaam veranderen van misconcepties over fotosynthese en celademhaling.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s5",
@@ -164,7 +178,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair onderzoek combineert multi-omics met laboratoriumexperimenten; het betreft één onderzoekssysteem en koraalsoorten.",
     "relevanceLevel": "Aansluitend",
-    "relevanceNote": "Verbindt afweer met microbiële interacties en stress, maar de specifieke koraal-bacteriesymbiose is vooral een contextuele uitbreiding."
+    "relevanceNote": "Verbindt afweer met microbiële interacties en stress, maar de specifieke koraal-bacteriesymbiose is vooral een contextuele uitbreiding.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s6",
@@ -186,7 +202,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Experimenteel onderzoek in laboratoriumgemeenschappen; sterke mechanistische aanwijzingen binnen dit modelsysteem, maar niet automatisch representatief voor alle algenbloei.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Laat voedselrelaties en interacties tussen soorten zien en sluit aan bij de regulatie en dynamiek van ecosystemen."
+    "relevanceNote": "Laat voedselrelaties en interacties tussen soorten zien en sluit aan bij de regulatie en dynamiek van ecosystemen.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s7",
@@ -207,7 +225,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair onderzoek met meerdere omics-technieken, functionele experimenten en veldproeven; de specifieke C4-maïsmechanismen zijn contextgebonden.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit aan bij fotosynthese en stofwisseling van het organisme; C4-specialisatie en de moleculaire regulatie zijn verdieping."
+    "relevanceNote": "Sluit aan bij fotosynthese en stofwisseling van het organisme; C4-specialisatie en de moleculaire regulatie zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e4",
@@ -226,7 +246,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Klasstudie met 83 leerlingen en duidelijke voor-na-verschillen, maar zonder controlegroep; effecten kunnen niet causaal aan de interventie worden toegeschreven.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Concreet toepasbaar bij moleculaire biologie en het leren interpreteren van 3D-structuren; de onderzoeksopzet is ook geschikt voor kritische bespreking."
+    "relevanceNote": "Concreet toepasbaar bij moleculaire biologie en het leren interpreteren van 3D-structuren; de onderzoeksopzet is ook geschikt voor kritische bespreking.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e5",
@@ -246,7 +268,9 @@
     "evidenceLevel": "Praktijkbron",
     "evidenceNote": "NRO-ontwikkeltraject met literatuur, interviews en docentontwikkeling; levert uitgewerkte activiteiten, maar is geen gecontroleerde effectstudie.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Specifiek ontwikkeld voor biologielessen, met 51 uitgewerkte uitbeeldpractica en ontwerpprincipes voor abstracte processen."
+    "relevanceNote": "Specifiek ontwikkeld voor biologielessen, met 51 uitgewerkte uitbeeldpractica en ontwerpprincipes voor abstracte processen.",
+    "sourceQualityLevel": "Professionele praktijkbron",
+    "sourceQualityNote": "Gepubliceerd via Leraar24 en gebaseerd op een NRO-ontwikkeltraject. Praktijkgerichte herkomst en concrete lesmaterialen zijn waardevol; het is geen peer-reviewed effectstudie."
   },
   {
     "id": "e6",
@@ -264,7 +288,9 @@
     "evidenceLevel": "Kennisoverzicht",
     "evidenceNote": "Een redactioneel kennisoverzicht van Onderwijskennis, geen nieuwe primaire studie; bruikbaar als toegankelijke synthese van onderzoek en praktijkinzichten.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Geeft concrete handvatten voor formatief handelen, het achterhalen van misconcepties en het bijstellen van biologielessen."
+    "relevanceNote": "Geeft concrete handvatten voor formatief handelen, het achterhalen van misconcepties en het bijstellen van biologielessen.",
+    "sourceQualityLevel": "Institutionele kennisbron",
+    "sourceQualityNote": "Kennisoverzicht van Onderwijskennis, een kennisplatform dat onderzoek en praktijkkennis ontsluit. Het is een secundaire bron; controleer bij belangrijke claims de achterliggende studies."
   },
   {
     "id": "e7",
@@ -282,7 +308,9 @@
     "evidenceLevel": "Kennisoverzicht",
     "evidenceNote": "Een redactioneel kennisoverzicht van Onderwijskennis; het is een samenvattende kennisbron en geen zelfstandige effectstudie.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Feedback is breed toepasbaar in de biologieles, mits leerlingen de informatie kunnen gebruiken om hun volgende leerstap te zetten."
+    "relevanceNote": "Feedback is breed toepasbaar in de biologieles, mits leerlingen de informatie kunnen gebruiken om hun volgende leerstap te zetten.",
+    "sourceQualityLevel": "Institutionele kennisbron",
+    "sourceQualityNote": "Kennisoverzicht van Onderwijskennis, een kennisplatform dat onderzoek en praktijkkennis ontsluit. Het is een secundaire bron; controleer bij belangrijke claims de achterliggende studies."
   },
   {
     "id": "s8",
@@ -304,7 +332,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair experimenteel onderzoek in muizenembryo's met manipulatie van eiwitten en kernmechanica; bevindingen zijn modelsysteemgebonden.",
     "relevanceLevel": "Verdieping",
-    "relevanceNote": "Verheldert embryonale ontwikkeling en zelforganisatie, maar de rol van lamin B1, autofagie en kernmechanica is geen vereiste examenstof."
+    "relevanceNote": "Verheldert embryonale ontwikkeling en zelforganisatie, maar de rol van lamin B1, autofagie en kernmechanica is geen vereiste examenstof.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s9",
@@ -325,7 +355,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Nieuwe beeldvormingstechniek gecombineerd met optogenetische beïnvloeding levert experimentele aanwijzingen; het onderzoek is uitgevoerd in vissen en met een specifieke methode.",
     "relevanceLevel": "Aansluitend",
-    "relevanceNote": "Geeft een brede illustratie van samenwerking tussen organen en regulatie, maar de gevonden circuits en meetmethode zijn vooral verdieping bij O2."
+    "relevanceNote": "Geeft een brede illustratie van samenwerking tussen organen en regulatie, maar de gevonden circuits en meetmethode zijn vooral verdieping bij O2.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e8",
@@ -345,7 +377,9 @@
     "evidenceLevel": "Voorlopig bewijs",
     "evidenceNote": "Mixed-methods onderzoek met 98 leerlingen en 12 docenten, maar een een-groep-voor- en nameting zonder controlegroep beperkt causale conclusies.",
     "relevanceLevel": "Aansluitend",
-    "relevanceNote": "De interventie gaat over probleemoplossen en metacognitie in biologie, maar de onderwijscontext in Ethiopië vraagt vertaling naar de Nederlandse praktijk."
+    "relevanceNote": "De interventie gaat over probleemoplossen en metacognitie in biologie, maar de onderwijscontext in Ethiopië vraagt vertaling naar de Nederlandse praktijk.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s10",
@@ -366,7 +400,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair moleculair onderzoek naar interacties en functieverlies; één studie en een specifiek cellulair mechanisme.",
     "relevanceLevel": "Verdieping",
-    "relevanceNote": "Haakt aan bij DNA-replicatie en de celcyclus, maar de rol van lncRNA, DDX11 en RNA-vouwing gaat ruim voorbij de kern van de examenstof."
+    "relevanceNote": "Haakt aan bij DNA-replicatie en de celcyclus, maar de rol van lncRNA, DDX11 en RNA-vouwing gaat ruim voorbij de kern van de examenstof.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s11",
@@ -387,7 +423,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair onderzoek in levende fruitvliegembryo's; de experimentele bevindingen zijn sterk binnen dit modelsysteem, maar de specifieke regulatie is niet zonder meer universeel.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit rechtstreeks aan bij transcriptie en regulatie van genexpressie; de clusters van transcriptiefactoren zijn een verdiepende casus."
+    "relevanceNote": "Sluit rechtstreeks aan bij transcriptie en regulatie van genexpressie; de clusters van transcriptiefactoren zijn een verdiepende casus.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s12",
@@ -409,7 +447,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair gedragsonderzoek bij Drosophila; bevindingen zijn experimenteel onderbouwd, maar soortspecifieke signalen kunnen niet rechtstreeks naar mensen worden vertaald.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Past direct bij gedrag, interactie, seksualiteit en voortplanting; gebruik de fruitvlieg als vergelijkend biologisch voorbeeld."
+    "relevanceNote": "Past direct bij gedrag, interactie, seksualiteit en voortplanting; gebruik de fruitvlieg als vergelijkend biologisch voorbeeld.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s13",
@@ -430,7 +470,9 @@
     "evidenceLevel": "Breed onderbouwd",
     "evidenceNote": "Mondiale synthese van 423 studies en meer dan 200.000 datapunten; omvangrijk bewijs, met verschillen tussen ecosystemen en onderzochte functies.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt biodiversiteit met ecosysteemfuncties, energiestromen en diensten en sluit direct aan bij P1, P3 en P5."
+    "relevanceNote": "Verbindt biodiversiteit met ecosysteemfuncties, energiestromen en diensten en sluit direct aan bij P1, P3 en P5.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s14",
@@ -451,7 +493,9 @@
     "evidenceLevel": "Voorlopig bewijs",
     "evidenceNote": "Het model is gekalibreerd op eerder verzamelde 24-uursgegevens van slechts tien gezonde volwassenen; stressreacties zijn deels gesimuleerd en vormen geen directe interventietest.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "De HPA-as is een concrete illustratie van hormonale regulatie en negatieve terugkoppeling binnen homeostase; ultradiane ritmes en modellering zijn verdieping."
+    "relevanceNote": "De HPA-as is een concrete illustratie van hormonale regulatie en negatieve terugkoppeling binnen homeostase; ultradiane ritmes en modellering zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s15",
@@ -473,7 +517,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Meerdere complementaire genetische, moleculaire en microscopische experimenten ondersteunen de conclusie; het onderzoek betreft vooral Arabidopsis en één onderzoeksgroep.",
     "relevanceLevel": "Verdieping",
-    "relevanceNote": "Sluit aan bij plantontwikkeling en zelforganisatie, maar de precieze auxine-signaalroutes en eiwitcomplexen zijn vooral docentverdieping."
+    "relevanceNote": "Sluit aan bij plantontwikkeling en zelforganisatie, maar de precieze auxine-signaalroutes en eiwitcomplexen zijn vooral docentverdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s16",
@@ -494,7 +540,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Meerjarig veldonderzoek in negen rivieren levert een brede vergelijking; de observationele neerslaggradiënt laat samenhang zien, geen geïsoleerd causaal effect.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit direct aan bij energiestromen, biomassa, trofische relaties en de dynamiek van ecosystemen."
+    "relevanceNote": "Sluit direct aan bij energiestromen, biomassa, trofische relaties en de dynamiek van ecosystemen.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e9",
@@ -514,7 +562,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Systematische selectie met expliciete kwaliteitscriteria, maar slechts twaalf heterogene studies; twee studies betroffen biologie en de uitkomsten zijn niet allemaal directe SRL-metingen.",
     "relevanceLevel": "Aansluitend",
-    "relevanceNote": "Biedt bruikbare strategieën voor voortgezet onderwijs; slechts twee van de twaalf studies betroffen biologie, dus de vakinhoudelijke overdraagbaarheid is beperkt."
+    "relevanceNote": "Biedt bruikbare strategieën voor voortgezet onderwijs; slechts twee van de twaalf studies betroffen biologie, dus de vakinhoudelijke overdraagbaarheid is beperkt.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e10",
@@ -533,7 +583,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Systematische synthese van 33 empirische studies, maar de auteurs signaleren methodologische zwaktes en kunnen de effecten van afzonderlijke ontwerpkenmerken niet stevig vaststellen.",
     "relevanceLevel": "Aansluitend",
-    "relevanceNote": "Gaat over onderzoekend leren in natuurwetenschappelijk onderwijs en professionalisering van docenten; relevant voor biologie, maar niet uitsluitend op biologie gericht."
+    "relevanceNote": "Gaat over onderzoekend leren in natuurwetenschappelijk onderwijs en professionalisering van docenten; relevant voor biologie, maar niet uitsluitend op biologie gericht.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s17",
@@ -554,7 +606,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair onderzoek met verschillende complementaire methoden en genetische analyses; de resultaten zijn experimenteel onderbouwd, maar komen uit Arabidopsis en een specifiek temperatuur- en lichtregime.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt plantenhormonen, omgevingssignalen en plantontwikkeling; de specifieke signaalroutes zijn verdieping."
+    "relevanceNote": "Verbindt plantenhormonen, omgevingssignalen en plantontwikkeling; de specifieke signaalroutes zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s18",
@@ -575,7 +629,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair veldonderzoek naar plantsterfte in een specifieke savanne; het vergelijkt verklarende mechanismen, maar de context beperkt generalisatie naar andere ecosystemen en soorten.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Huidmondjesregulatie, gaswisseling en waterverlies sluiten direct aan bij plantfysiologie en zelfregulatie; de hydraulische hypothesen zijn verdieping."
+    "relevanceNote": "Huidmondjesregulatie, gaswisseling en waterverlies sluiten direct aan bij plantfysiologie en zelfregulatie; de hydraulische hypothesen zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s19",
@@ -596,7 +652,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Actueel primair veldonderzoek met analyse van microbiële netwerken en bodemenzymen; de gerapporteerde verbanden zijn grotendeels correlatief en tonen niet zonder meer causaliteit.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt stikstofbeschikbaarheid, bodemorganismen, kringlopen en primaire productie in een grasland. De specifieke netwerkanalyse is verdieping."
+    "relevanceNote": "Verbindt stikstofbeschikbaarheid, bodemorganismen, kringlopen en primaire productie in een grasland. De specifieke netwerkanalyse is verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s20",
@@ -617,7 +675,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair veldexperiment met wederzijdse ¹⁵N-isotopenlabeling en metingen gedurende 1,5 jaar; de overdracht wordt rechtstreeks gevolgd, maar de studie betreft specifieke boomsoorten en een subtropisch bos.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit aan bij afbraak, reducenten en de stikstofkringloop; de isotopenmethode is een goede verdieping in onderzoekstechnieken."
+    "relevanceNote": "Sluit aan bij afbraak, reducenten en de stikstofkringloop; de isotopenmethode is een goede verdieping in onderzoekstechnieken.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s21",
@@ -638,7 +698,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Grootschalig primair onderzoek met functionele assays en hybride cellen; sterk voor het identificeren en testen van regulatoire verschillen, maar de evolutionaire ontstaansgeschiedenis van afzonderlijke kenmerken blijft complex.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt genetische variatie, genregulatie, fenotype en menselijke evolutie; vooral geschikt voor vwo-verdieping."
+    "relevanceNote": "Verbindt genetische variatie, genregulatie, fenotype en menselijke evolutie; vooral geschikt voor vwo-verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s22",
@@ -659,7 +721,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Langjarig observationeel onderzoek met satellietgegevens en individuele broedgegevens; grote dataset en sterke temporele analyse, maar geen experimentele manipulatie van de voedselpiek.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt voortplanting, gedrag, voedselbeschikbaarheid en ecosysteemverandering; ook bruikbaar om correlatie en causaliteit te bespreken."
+    "relevanceNote": "Verbindt voortplanting, gedrag, voedselbeschikbaarheid en ecosysteemverandering; ook bruikbaar om correlatie en causaliteit te bespreken.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s23",
@@ -680,7 +744,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Experimenteel onderzoek bij C. elegans gecombineerd met evolutionaire modellering; de manipulatie test een voorspelling van de resource-allocationtheorie, maar extrapolatie naar andere soorten vraagt voorzichtigheid.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Geeft verdieping bij natuurlijke selectie, fitness en de relatie tussen voortplanting en overleving; geschikt om evolutionaire verklaringen kritisch te vergelijken."
+    "relevanceNote": "Geeft verdieping bij natuurlijke selectie, fitness en de relatie tussen voortplanting en overleving; geschikt om evolutionaire verklaringen kritisch te vergelijken.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s24",
@@ -701,7 +767,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair mechanistisch onderzoek met een conditioneel knock-outmodel bij muizen en moleculaire analyses; sterke experimentele aanwijzingen voor de rol van LRH-1, maar soortspecifieke beperkingen.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit aan bij hormonale regulatie en voortplanting; de koppeling tussen celstofwisseling en progesteronproductie is een verdiepende moleculaire casus."
+    "relevanceNote": "Sluit aan bij hormonale regulatie en voortplanting; de koppeling tussen celstofwisseling en progesteronproductie is een verdiepende moleculaire casus.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s25",
@@ -722,7 +790,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Zeer grote observationele dataset en twee onafhankelijke cohorten, maar de tijdsverlopen zijn statistisch gereconstrueerd uit cross-sectionele gegevens en niet rechtstreeks longitudinaal gemeten bij dezelfde personen.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt hormonale regulatie, voortplanting en de invloed van een fysiologische overgang op meerdere orgaanstelsels; ook geschikt om onderzoeksmethoden kritisch te bespreken."
+    "relevanceNote": "Verbindt hormonale regulatie, voortplanting en de invloed van een fysiologische overgang op meerdere orgaanstelsels; ook geschikt om onderzoeksmethoden kritisch te bespreken.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s26",
@@ -743,7 +813,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Combinatie van clamp-metingen, plasma-proteomics, interventiegegevens en externe validatie in grote cohorten; het voorspelmodel toont associaties en voorspelling, geen causale rol voor de gevonden eiwitten.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit direct aan bij insuline, glucosehuishouding, stofwisseling en homeostase; de proteomics en voorspelmodellen zijn verdieping."
+    "relevanceNote": "Sluit direct aan bij insuline, glucosehuishouding, stofwisseling en homeostase; de proteomics en voorspelmodellen zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s27",
@@ -764,7 +836,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair mechanistisch onderzoek met genetische muismodellen, dieetmanipulatie en celmodellen; de rol van GLUT4 en de contextafhankelijkheid zijn experimenteel onderbouwd, maar vertaling naar menselijke thermoregulatie vraagt aanvullend onderzoek.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt glucoseverbruik, energieomzetting en temperatuurregulatie; geschikt als context bij stofwisseling en homeostase."
+    "relevanceNote": "Verbindt glucoseverbruik, energieomzetting en temperatuurregulatie; geschikt als context bij stofwisseling en homeostase.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s28",
@@ -785,7 +859,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Grote cohortstudie met 6.803 deelnemers en aanvullende metaboliet- en cytokinemetingen; cross-sectionele observationele gegevens en mediationanalyses bewijzen geen causaliteit.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt micro-organismen, afweer, ontsteking en stofwisseling; geschikt om microbiële functies en de beperkingen van observationeel onderzoek te bespreken."
+    "relevanceNote": "Verbindt micro-organismen, afweer, ontsteking en stofwisseling; geschikt om microbiële functies en de beperkingen van observationeel onderzoek te bespreken.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s29",
@@ -806,7 +882,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Experimentele CRISPR-screening en functionele tests in preklinische tumormodellen; sterke mechanistische aanwijzingen, maar nog geen klinisch bewijs voor werkzaamheid en veiligheid bij patiënten.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt cellulaire afweer, T-lymfocyten en genregulatie met een actuele medische toepassing; vooral geschikt voor vwo-verdieping."
+    "relevanceNote": "Verbindt cellulaire afweer, T-lymfocyten en genregulatie met een actuele medische toepassing; vooral geschikt voor vwo-verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s30",
@@ -827,7 +905,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Directe single-neuronregistraties bij mensen leveren sterke temporele en cellulaire informatie, maar de klinische steekproef en taakcontext beperken generalisatie; voorspellende samenhang is geen volledige causale verklaring.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit aan bij zenuwstelsel, informatieverwerking en geheugen; bijzonder geschikt als vwo-verdieping in onderzoeksmethoden."
+    "relevanceNote": "Sluit aan bij zenuwstelsel, informatieverwerking en geheugen; bijzonder geschikt als vwo-verdieping in onderzoeksmethoden.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e13",
@@ -847,7 +927,9 @@
     "evidenceNote": "Analyse van plannen van 51 leerlingen bij zes taken; geeft gedetailleerd inzicht in denkstappen, maar is geen interventiestudie en meet geen leerwinst door een aanpak.",
     "relevanceLevel": "Direct",
     "relevanceNote": "Direct bruikbaar voor het begeleiden en beoordelen van practica, onderzoeksvragen en profielwerkstukken.",
-    "dateLabel": "2026 (jaargang 17, nr. 1)"
+    "dateLabel": "2026 (jaargang 17, nr. 1)",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e14",
@@ -866,7 +948,9 @@
     "evidenceLevel": "Voorzichtig interpreteren",
     "evidenceNote": "Kwalitatief onderzoek in drie klassen; bruikbaar voor inzicht in docenthandelen en gespreksprocessen, maar geen grootschalige effectstudie.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Direct toepasbaar bij biologiediscussies waarin leerlingen claims, bewijs en redeneringen moeten verbinden."
+    "relevanceNote": "Direct toepasbaar bij biologiediscussies waarin leerlingen claims, bewijs en redeneringen moeten verbinden.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e15",
@@ -885,7 +969,9 @@
     "evidenceLevel": "Breed onderbouwd",
     "evidenceNote": "Meta-analyse van 98 studies en 13.538 leerlingen; de omvang is sterk, maar de studies bestrijken uiteenlopende vakken, interventies en uitkomstmaten.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Relevant voor het ontwerpen van biologielessen waarin leerlingen onderzoeksvragen formuleren, bewijs interpreteren en wetenschappelijke verklaringen beoordelen."
+    "relevanceNote": "Relevant voor het ontwerpen van biologielessen waarin leerlingen onderzoeksvragen formuleren, bewijs interpreteren en wetenschappelijke verklaringen beoordelen.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "e16",
@@ -904,7 +990,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Quasi-experimentele vergelijking met controlegroep en kwalitatieve aanvulling; kleine steekproef (75 leerlingen) uit twee doelgericht gekozen scholen, dus beperkte generaliseerbaarheid.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Direct relevant voor de inrichting van biologielessen en practica; laat zien hoe expliciete begeleiding bij onderzoekend leren kan worden vormgegeven."
+    "relevanceNote": "Direct relevant voor de inrichting van biologielessen en practica; laat zien hoe expliciete begeleiding bij onderzoekend leren kan worden vormgegeven.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s31",
@@ -926,7 +1014,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Meerdere complementaire experimentele methoden, waaronder genome-wide CRISPR-screening en DNA-fibermetingen, ondersteunen een mechanistische rol voor CDK8; het onderzoek is uitgevoerd in cellulaire modellen.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit direct aan bij DNA-replicatie en de regulatie van de celcyclus; vooral geschikt voor verdieping in de moleculaire start van replicatie."
+    "relevanceNote": "Sluit direct aan bij DNA-replicatie en de regulatie van de celcyclus; vooral geschikt voor verdieping in de moleculaire start van replicatie.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s32",
@@ -947,7 +1037,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Live-cell imaging van een specifieke locus maakt de dynamiek rechtstreeks zichtbaar; de studie betreft gist en een afgebakend modelsysteem.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt transcriptie, RNA-DNA-hybriden en DNA-replicatie; een goede vwo-verdieping bij genexpressie."
+    "relevanceNote": "Verbindt transcriptie, RNA-DNA-hybriden en DNA-replicatie; een goede vwo-verdieping bij genexpressie.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s33",
@@ -968,7 +1060,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Online-first, peer-reviewed methodologisch onderzoek met orthogonale validatie van interactiepartners in primair menselijk weefsel; de methode is veelbelovend, maar de biologische betekenis van afzonderlijke interacties vraagt vervolgonderzoek.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit direct aan bij moleculaire interactie en signaaltransductie; vooral geschikt voor vwo-verdieping in onderzoeksmethoden."
+    "relevanceNote": "Sluit direct aan bij moleculaire interactie en signaaltransductie; vooral geschikt voor vwo-verdieping in onderzoeksmethoden.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s34",
@@ -989,7 +1083,9 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Methodologisch onderzoek met toepassing in meerdere weefsels en validatie van bekende interacties; nieuwe associaties tussen celcontact en genexpressie vragen nog functionele vervolgexperimenten.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Verbindt celtypen, weefselorganisatie, differentiatie en afweer; geschikt voor vwo-verdieping in meercellige organismen."
+    "relevanceNote": "Verbindt celtypen, weefselorganisatie, differentiatie en afweer; geschikt voor vwo-verdieping in meercellige organismen.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   },
   {
     "id": "s35",
@@ -1010,6 +1106,8 @@
     "evidenceLevel": "Ondersteunend bewijs",
     "evidenceNote": "Primair isolatie- en karakteriseringsonderzoek van nieuwe archaeale stammen; de evolutionaire verwantschap is informatief, maar reconstructie van eukaryogenese blijft indirect.",
     "relevanceLevel": "Direct",
-    "relevanceNote": "Sluit aan bij de oorsprong van eukaryote cellen en de evolutionaire overgang naar complexe cellen; vooral vwo-verdieping."
+    "relevanceNote": "Sluit aan bij de oorsprong van eukaryote cellen en de evolutionaire overgang naar complexe cellen; vooral vwo-verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
   }
 ]
