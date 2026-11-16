@@ -241,7 +241,7 @@ fetch('./publicaties.json?v=a7028e9133ebae1b8624a47a0971195a424efd6a')
   .then(()=>initFeedback())
   .catch(error=>{$('cards').innerHTML='<div class="empty"><b>De publicatiedatabase kon niet worden geladen.</b><br>Ververs de pagina later of controleer of publicaties.json in de hoofdmap van de website staat.</div>';console.error(error);});
 
-const currentSiteVersion='2026-11-17T20:00:00.000Z';
+const currentSiteVersion='2026-11-17T19:25:00.000Z';
 async function checkSiteVersion(){
  try{
   const response=await fetch('./site-version.json?check='+Date.now(),{cache:'no-store'});

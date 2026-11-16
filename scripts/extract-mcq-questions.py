@@ -375,27 +375,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, context_y0, page.rect.width, context_y1), alpha=False).save(OUT / context_image)
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
                     if (prefix, marker["number"]) in {("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
-                        shared_context = "exam-snippets/vw25-t1-hippo-context.jpg"
-                        if marker["number"] == 14:
-                            # Split the shared introductory context from question 14 itself.
-                            # Questions 15-18 already have their own incremental context
-                            # segment because previous_ranges excludes earlier questions.
-                            question_y0 = max(context_y0, lines[start]["bbox"][1] - 5)
-                            shared_y1 = max(context_y0 + 2, question_y0)
-                            page.get_pixmap(
-                                matrix=fitz.Matrix(1.8, 1.8),
-                                clip=fitz.Rect(0, context_y0, page.rect.width, shared_y1),
-                                alpha=False,
-                            ).save(OUT / "vw25-t1-hippo-context.jpg")
-                            detail_image = "question-vw25t1-14-detail.jpg"
-                            page.get_pixmap(
-                                matrix=fitz.Matrix(1.8, 1.8),
-                                clip=fitz.Rect(0, question_y0, page.rect.width, context_y1),
-                                alpha=False,
-                            ).save(OUT / detail_image)
-                            context_record["images"] = [shared_context, f"exam-snippets/{detail_image}"]
-                        else:
-                            context_record["images"] = [shared_context, f"exam-snippets/{context_image}"]
+                        context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg", f"exam-snippets/{context_image}"]
                     contexts.append(context_record)
 
                 false_positive_open_questions = {

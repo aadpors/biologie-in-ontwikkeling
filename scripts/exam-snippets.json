@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "scale": 1.8,
+    "clips": [
+      {
+        "page": 8,
+        "rect": [
+          0,
+          45,
+          595,
+          745
+        ],
+        "output": "vw25-t1-hippo-context.jpg"
+      }
+    ]
+  }
+]
