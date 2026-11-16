@@ -57,6 +57,9 @@ for item in items:
     with fitz.open(source) as doc:
         for page_index, page in enumerate(doc):
             lines = page_lines(page)
+            if item["question"] == 14 and "vw-1018-a-25-1-c.pdf" in item["pdf"]:
+                diagnostic = [line for line in lines if "14" in line["text"] or "maximumscore" in line["text"].lower()]
+                print("DIAGNOSTIC page", page_index + 1, [line["text"] for line in diagnostic[:35]])
             matches = [i for i, line in enumerate(lines) if heading_at(lines, i, item["question"])]
             if not matches:
                 continue
