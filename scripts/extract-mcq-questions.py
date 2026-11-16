@@ -303,7 +303,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     for j in range(last_option + 1, min(len(block_text), last_option + 4)):
                         current_line = lines[block_indices[j]]
                         paragraph_gap = current_line["bbox"][1] - previous_bottom
-                        if paragraph_gap > 18:
+                        if paragraph_gap > 10:
                             break
                         if re.match(r"^\d+\s*p$", block_text[j].strip(), re.I) or HEADER_RE.match(block_text[j].strip()):
                             break
@@ -324,7 +324,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     prompt_seen = False
                     for j in range(start + 1, end):
                         gap = lines[j]["bbox"][1] - previous_bottom
-                        if prompt_seen and gap > 18:
+                        if prompt_seen and gap > 10:
                             question_end_line = j - 1
                             break
                         if j not in {marker["number_line"], marker["points_line"]}:
