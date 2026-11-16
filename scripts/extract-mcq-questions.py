@@ -53,7 +53,23 @@ def line_records(page):
                 "size": size,
                 "bold": bold,
             })
-    records.sort(key=lambda x: (round(x["bbox"][1], 1), x["bbox"][0]))
+    # Detect a genuine two-column page before sorting. A simple top-to-bottom
+    # sort interleaves the columns, which can attach an unrelated context or even
+    # another question's answer options to the current question.
+    if len(records) >= 8:
+        xs = sorted(r["bbox"][0] for r in records)
+        gaps = [(xs[i + 1] - xs[i], i) for i in range(len(xs) - 1)]
+        gap, split = max(gaps, default=(0, 0))
+        left_count, right_count = split + 1, len(xs) - split - 1
+        if gap >= page.rect.width * 0.12 and left_count >= 4 and right_count >= 4:
+            split_x = (xs[split] + xs[split + 1]) / 2
+            for record in records:
+                record["column"] = 0 if record["bbox"][0] < split_x else 1
+            records.sort(key=lambda x: (x["column"], round(x["bbox"][1], 1), x["bbox"][0]))
+        else:
+            records.sort(key=lambda x: (round(x["bbox"][1], 1), x["bbox"][0]))
+    else:
+        records.sort(key=lambda x: (round(x["bbox"][1], 1), x["bbox"][0]))
     return records
 
 def find_markers(lines):
