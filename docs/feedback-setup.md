@@ -9,7 +9,8 @@ De website is een statische GitHub Pages-site. Supabase bewaart anonieme stemmen
 - De totalen worden via een afgeschermde databasefunctie beschikbaar gemaakt.
 - De Supabase Project URL en publieke publishable key zijn inmiddels in `index.html` gezet.
 - De JavaScript is syntactisch gecontroleerd.
-- **Nog handmatig nodig:** Anonymous Sign-Ins inschakelen in Supabase Auth en daarna de live website testen.
+- Anonymous Sign-Ins zijn ingeschakeld en de stemfunctie is door de eigenaar getest.
+- Stemmen worden per combinatie van gebruiker, publicatie en doelgroep opgeslagen.
 
 ## Eenmalige handeling die nog nodig is
 
@@ -22,8 +23,9 @@ De website is een statische GitHub Pages-site. Supabase bewaart anonieme stemmen
 ## Gegevens en privacy
 
 - Een bezoeker krijgt een anonieme Supabase Auth-identiteit; er is geen naam, e-mailadres of school nodig.
-- Per anonieme bezoeker kan per publicatie één actuele stem bestaan. Een wijziging vervangt de eerdere stem.
-- De doelgroepkeuze (Havo, Vwo of Beide) wordt bij de stem opgeslagen.
+- Per anonieme bezoeker kan per publicatie én doelgroep (Havo, Vwo of Beide) één actuele stem bestaan. Een wijziging vervangt alleen de stem binnen die doelgroep.
+- Wisselen tussen Havo en Vwo verandert of verwijdert geen eerder uitgebrachte stemmen; terugschakelen toont de eerder opgeslagen stem opnieuw.
+- De gekozen doelgroep wordt bij iedere stem opgeslagen.
 - Ruwe stemmen zijn alleen voor de betreffende anonieme gebruiker leesbaar.
 - De website kan alleen totalen per publicatie en doelgroep opvragen via de SQL-functie.
 - Dit is geen waterdichte bescherming tegen misbruik: bezoekers kunnen meerdere browsers of apparaten gebruiken. Het is een laagdrempelige indicatie, geen representatieve enquête.
@@ -31,4 +33,4 @@ De website is een statische GitHub Pages-site. Supabase bewaart anonieme stemmen
 
 ## Interpretatie
 
-Toon aantallen naast percentages en laat aantallen zien, bijvoorbeeld “7 van 9 havo-stemmen”. Gebruik bij weinig stemmen geen harde rangorde. Maak onderscheid tussen Havo, Vwo en Beide; een gecombineerde beoordeling mag niet automatisch aan beide niveaus worden toegeschreven.
+Toon aantallen naast percentages en laat aantallen zien, bijvoorbeeld “7 van 9 havo-stemmen”. Gebruik bij weinig stemmen geen harde rangorde. Maak onderscheid tussen Havo, Vwo en Beide; een stem in de categorie Beide wordt niet automatisch als twee afzonderlijke stemmen bij Havo en Vwo geteld.
