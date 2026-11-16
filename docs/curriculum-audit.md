@@ -54,6 +54,11 @@ De volgende publicaties zijn opnieuw geformuleerd om schoolsoortspecifieke codes
 - s26, s27: celstofwisseling onderscheiden van hormonale/homeostatische regulatie; havo B2/B8 en vwo B3/B9.
 - s28, s29: afweer en cellulaire/genetische aspecten schoolsoortspecifiek gemaakt.
 - s32: vwo M4 (genregulatie) toegevoegd naast de relevante huidige M-codes.
+- s11: vwo M4 (genregulatie) toegevoegd; havo/vwo-koppeling aan SLO v2 apart gemaakt.
+- s18: onjuiste directe koppeling aan B6/B7 verwijderd; voor stomatale regulatie bestaat geen één-op-één-subdomein. De indirecte relatie met cel-/organismeprocessen is als zodanig benoemd.
+- s22: gedrag (havo B7/vwo B8) en reproductie (havo B4/vwo B5) onderscheiden.
+- s23: vwo-specifieke koppeling aan B6 gebruikt in plaats van het havo-nummer B5.
+- s33: de te brede koppeling aan afweer verwijderd; de publicatie is primair methodologisch en cellulaire interactie is als inhoudelijke aansluiting beschreven.
 
 ## Nog uit te voeren
 
