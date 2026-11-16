@@ -233,12 +233,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if headings:
                     cursor = headings[-1]
                     active_context = []
-                context_lines = [
-                    lines[j]["text"] for j in range(cursor, start)
-                    if not any(a <= j < b for a, b in previous_ranges)
-                ]
+                context_line_indices = [j for j in range(cursor, start) if not any(a <= j < b for a, b in previous_ranges)]
+                context_lines = [lines[j]["text"] for j in context_line_indices]
                 active_context.extend(context_lines)
                 context = clean_context(active_context)
+                context_y0 = max(0, min((lines[j]["bbox"][1] for j in context_line_indices), default=35) - 5)
 
                 excluded = {marker["number_line"], marker["points_line"]}
                 block_text = []
@@ -275,14 +274,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 question_end_line = max(start, min(question_end_line, end - 1))
 
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
-                    contexts.append({
-                        "level": level,
-                        "year": year,
-                        "period": period,
-                        "n": marker["number"],
-                        "source": context,
-                        "q": selected_prompt,
-                    })
+                    context_image = f"question-{prefix}-{marker['number']}.jpg"
+                    context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                    page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, context_y0, page.rect.width, context_y1), alpha=False).save(OUT / context_image)
+                    contexts.append({"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"})
 
                 false_positive_open_questions = {
                     ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
@@ -301,10 +296,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 options_by_key = {o["key"]: o for o in options}
                 options = [{"key": key, "text": options_by_key.get(key, {}).get("text", "")} for key in required_keys]
 
-                # Crop only the question and its choices; context is shown separately above.
-                y0 = max(0, lines[start]["bbox"][1] - 4)
-                y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 5)
-                crop = fitz.Rect(35, y0, page.rect.width - 35, y1)
+                # Full-width page strip containing context and question.
+                y0 = context_y0
+                y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                crop = fitz.Rect(0, y0, page.rect.width, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
                 page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=crop, alpha=False).save(OUT / image_name)
@@ -360,7 +355,7 @@ if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
         image_name = "mcq-vw25t2-mcq-40.jpg"
         page.get_pixmap(
             matrix=fitz.Matrix(1.8, 1.8),
-            clip=fitz.Rect(42, y0, page.rect.width - 42, y1),
+            clip=fitz.Rect(0, y0, page.rect.width, y1),
             alpha=False,
         ).save(OUT / image_name)
     all_questions.append({
