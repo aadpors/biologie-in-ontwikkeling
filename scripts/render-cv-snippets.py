@@ -31,22 +31,20 @@ def heading_at(lines, index, number=None):
         if re.match(rf"^{number}\\s+(?:maximumscore\\b|[A-D]\\s+\\d\\b)", text, re.I):
             return True
         if text == str(number):
-            for nxt in lines[index + 1:index + 4]:
-                if nxt["y0"] - line["y0"] > 38:
-                    break
-                next_text = re.sub(r"\\s+", " ", nxt["text"]).strip()
-                if re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", next_text, re.I):
-                    return True
+            return any(
+                abs(other["y0"] - line["y0"]) < 14
+                and re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", re.sub(r"\\s+", " ", other["text"]).strip(), re.I)
+                for other in lines if other is not line
+            )
         return False
     if re.match(r"^\\d{1,2}\\s+(?:maximumscore\\b|[A-D]\\s+\\d\\b)", text, re.I):
         return True
     if re.fullmatch(r"\\d{1,2}", text):
-        for nxt in lines[index + 1:index + 4]:
-            if nxt["y0"] - line["y0"] > 38:
-                break
-            next_text = re.sub(r"\\s+", " ", nxt["text"]).strip()
-            if re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", next_text, re.I):
-                return True
+        return any(
+            abs(other["y0"] - line["y0"]) < 14
+            and re.match(r"^(?:maximumscore\\b|[A-D]\\s+\\d\\b)", re.sub(r"\\s+", " ", other["text"]).strip(), re.I)
+            for other in lines if other is not line
+        )
     return False
 
 for item in items:
@@ -57,9 +55,6 @@ for item in items:
     with fitz.open(source) as doc:
         for page_index, page in enumerate(doc):
             lines = page_lines(page)
-            if item["question"] == 14 and "vw-1018-a-25-1-c.pdf" in item["pdf"]:
-                diagnostic = [line for line in lines if "14" in line["text"] or "maximumscore" in line["text"].lower()]
-                print("DIAGNOSTIC page", page_index + 1, [line["text"] for line in diagnostic[:35]])
             matches = [i for i, line in enumerate(lines) if heading_at(lines, i, item["question"])]
             if not matches:
                 continue
