@@ -12,17 +12,16 @@ for item in items:
     source = ROOT / item["pdf"]
     if not source.exists():
         raise FileNotFoundError(source)
-    doc = fitz.open(source)
-    scale = item.get("scale", 1.8)
-    page = doc[item["page"] - 1]
-    pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), alpha=False)
-    pix.save(OUT / item["output"])
-    if "clip" in item:
-        page = doc[item["clip"]["page"] - 1]
-        rect = fitz.Rect(*item["clip"]["rect"])
-        pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=False)
-        pix.save(OUT / item["clip"]["output"])
-    doc.close()
-    print(f"Rendered {item['output']} from {item['pdf']}")
-    if "clip" in item:
-        print(f"Rendered {item['clip']['output']} from {item['pdf']}")
+    with fitz.open(source) as doc:
+        scale = item.get("scale", 1.8)
+        for clip in item["clips"]:
+            page = doc[clip["page"] - 1]
+            rect = fitz.Rect(*clip["rect"])
+            pix = page.get_pixmap(
+                matrix=fitz.Matrix(scale, scale),
+                clip=rect,
+                alpha=False,
+            )
+            output = OUT / clip["output"]
+            pix.save(output)
+            print(f"Rendered {clip['output']} from {item['pdf']} page {clip['page']}")
