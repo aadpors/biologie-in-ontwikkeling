@@ -299,10 +299,16 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     option_positions = [i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())]
                     last_option = option_positions[-1]
                     end_pos = last_option
+                    previous_bottom = lines[block_indices[last_option]]["bbox"][3]
                     for j in range(last_option + 1, min(len(block_text), last_option + 4)):
+                        current_line = lines[block_indices[j]]
+                        paragraph_gap = current_line["bbox"][1] - previous_bottom
+                        if paragraph_gap > 18:
+                            break
                         if re.match(r"^\d+\s*p$", block_text[j].strip(), re.I) or HEADER_RE.match(block_text[j].strip()):
                             break
                         end_pos = j
+                        previous_bottom = max(previous_bottom, current_line["bbox"][3])
                     question_end_line = block_indices[end_pos]
                 elif start < marker["number_line"]:
                     question_end_line = marker["points_line"]
