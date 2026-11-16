@@ -278,5 +278,22 @@
     "doi": "10.1016/j.tsc.2025.102033",
     "why": "De studie is relevant voor het begeleiden van leerlingen bij lastige biologische concepten. De aanpak maakt metacognitie concreet: leerlingen plannen hun aanpak, monitoren hun begrip en reflecteren op de uitkomst. De voorbeelden en instrumenten kunnen ideeën opleveren voor lessen over bijvoorbeeld fotosynthese, erfelijkheid of homeostase. De methodologische beperking is belangrijk: een een-groep-voor- en nameting sluit alternatieve verklaringen voor de gevonden verbeteringen niet uit.",
     "tags": "metacognitie zelfregulatie probleemoplossen conceptueel begrip misconcepties biologieles reflectie concept maps"
+  },
+  {
+    "id": "s10",
+    "page": "science",
+    "date": "2026-09-17",
+    "title": "CONCR lncRNA organizes a 3′-end structural domain that engages DDX11 for DNA replication and sister chromatid cohesion",
+    "summary": "Onderzoekers brengen de driedimensionale structuur van het lange niet-coderende RNA CONCR in kaart. Een specifiek domein aan het 3′-uiteinde bindt aan de helicase DDX11 en stimuleert diens ATPase-activiteit. Veranderingen in dit RNA-domein verstoren DNA-replicatie en de cohesie tussen zusterchromatiden. De studie laat zien dat niet alleen de RNA-sequentie, maar ook de ruimtelijke vouwing van RNA bepalend kan zijn voor de functie.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "DNA-replicatie en celcyclus",
+    "subdomain": "Huidig havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
+    "alignment": "Huidig examenprogramma havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen. De studie gaat verder dan de vereiste examenstof en is vooral geschikt als docentverdieping over RNA-structuur, helicasen en de samenhang tussen replicatie en chromatidecohesie.",
+    "evidence": "Primair onderzoek",
+    "article": "https://www.sciencedirect.com/science/article/pii/S1097276526005514",
+    "doi": "10.1016/j.molcel.2026.08.004",
+    "why": "Een mooie aanvulling op het onderwerp DNA-replicatie: RNA blijkt niet alleen een boodschapper bij eiwitsynthese, maar kan ook als structureel en functioneel molecuul bijdragen aan de organisatie van DNA-replicatie. De koppeling met zusterchromatiden maakt bovendien de overgang naar celdeling zichtbaar. Gebruik dit als verdieping; de moleculaire details zijn niet allemaal examenstof.",
+    "tags": "DNA-replicatie celcyclus RNA lncRNA CONCR helicase DDX11 zusterchromatiden chromatine RNA-structuur"
   }
 ]
