@@ -10,11 +10,12 @@ assert.ok(publications.length > 0, 'publicatiedatabase mag niet leeg zijn');
 const ids = new Set();
 for (const [index, item] of publications.entries()) {
   const where = `publicaties.json item ${index + 1}`;
-  for (const field of ['id', 'page', 'date', 'title', 'summary', 'article', 'why', 'evidenceLevel', 'relevanceLevel']) {
+  for (const field of ['id', 'page', 'date', 'title', 'summary', 'article', 'why', 'evidenceLevel', 'evidenceNote', 'relevanceLevel', 'relevanceNote', 'sourceQualityLevel', 'sourceQualityNote']) {
     assert.equal(typeof item[field], 'string', `${where}: veld "${field}" ontbreekt of is geen tekst`);
     assert.ok(item[field].trim(), `${where}: veld "${field}" is leeg`);
   }
   assert.ok(['science', 'education'].includes(item.page), `${where}: onbekende pagina "${item.page}"`);
+  assert.ok(['Peer-reviewed tijdschrift', 'Institutionele kennisbron', 'Professionele praktijkbron'].includes(item.sourceQualityLevel), `${where}: onbekende bronkwaliteitsindicatie "${item.sourceQualityLevel}"`);
   // Strikte ISO-datumcontrole: Date.parse alleen accepteert soms onmogelijke kalenderdatums.
   assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(item.date), `${where}: datum moet YYYY-MM-DD zijn`);
   const parsedDate = new Date(item.date + 'T00:00:00.000Z');
