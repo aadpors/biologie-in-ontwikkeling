@@ -196,10 +196,12 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
     contexts = []
-    active_context = []
     heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding(?:\s+\d+)?|tabel(?:\s+\d+)?|grafiek(?:\s+\d+)?|legenda|lees verder|einde)$", re.I)
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
+            # Context is page-local. Never carry text from the preceding PDF page:
+            # a new topic can begin at the top of every page, and stale context
+            # was the cause of unrelated introductions appearing on later questions.
             lines = line_records(page)
             markers = find_markers(lines)
             if not markers:
@@ -211,10 +213,9 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     and not heading_re.match(line["text"])
                     and not re.match(r"^\d+\s*p", line["text"], re.I)
                 ]
-                if headings:
-                    active_context = [lines[j]["text"] for j in range(headings[-1], len(lines)) if not HEADER_RE.match(lines[j]["text"])]
-                else:
-                    active_context.extend(line["text"] for line in lines if not HEADER_RE.match(line["text"]))
+                # Pages without questions can contain the start or continuation
+                # of a context. It is deliberately not reused on another page:
+                # the next page is segmented independently to avoid stale context.
                 continue
 
             previous_ranges = []
@@ -235,8 +236,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     active_context = []
                 context_line_indices = [j for j in range(cursor, start) if not any(a <= j < b for a, b in previous_ranges)]
                 context_lines = [lines[j]["text"] for j in context_line_indices]
-                active_context.extend(context_lines)
-                context = clean_context(active_context)
+                # Each question gets only the context physically preceding it on
+                # this page (plus context continued between questions on this page).
+                # Do not append prior-page context: that silently associates unrelated
+                # topics with the current question.
+                context = clean_context(context_lines)
                 context_y0 = max(0, min((lines[j]["bbox"][1] for j in context_line_indices), default=35) - 5)
 
                 excluded = {marker["number_line"], marker["points_line"]}
