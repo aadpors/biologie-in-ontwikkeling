@@ -3258,5 +3258,43 @@
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-40",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 40,
+    "points": 2,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag over de eilandtheorie van McArthur en Wilson.",
+    "source": "De verdwerging van grote zoogdieren op een gekoloniseerd eiland is mede te verklaren met de eilandtheorie van McArthur en Wilson. Een kleiner aantal soorten op een eiland maakt de kans groter dat predatoren afwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.",
+    "q": "Op welk type eiland zal het aantal soorten het kleinst zijn volgens de eilandtheorie van McArthur en Wilson?",
+    "options": [
+      {
+        "key": "A",
+        "text": "groot, dichtbij"
+      },
+      {
+        "key": "B",
+        "text": "groot, veraf"
+      },
+      {
+        "key": "C",
+        "text": "klein, dichtbij"
+      },
+      {
+        "key": "D",
+        "text": "klein, veraf"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/mcq-vw25t2-mcq-40.jpg",
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
   }
 ]
