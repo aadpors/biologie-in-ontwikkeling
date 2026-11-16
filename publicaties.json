@@ -702,5 +702,26 @@
     "evidenceNote": "Primair mechanistisch onderzoek met een conditioneel knock-outmodel bij muizen en moleculaire analyses; sterke experimentele aanwijzingen voor de rol van LRH-1, maar soortspecifieke beperkingen.",
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij hormonale regulatie en voortplanting; de koppeling tussen celstofwisseling en progesteronproductie is een verdiepende moleculaire casus."
+  },
+  {
+    "id": "s25",
+    "page": "science",
+    "date": "2026-10-12",
+    "title": "Population-scale reconstruction of menopause dynamics reveals a physiological cliff at the final menstrual period",
+    "summary": "Onderzoekers ontwikkelden een rekenmethode om veranderingen rond de laatste menstruatie te reconstrueren uit grote verzamelingen laboratoriumuitslagen. In twee onafhankelijke cohorten met samen ongeveer 300 miljoen tests vonden zij rond de laatste menstruatie duidelijke veranderingen in meerdere orgaansystemen, waaronder het hormonale, skeletale, lever-, nier- en vetsysteem. Sommige veranderingen begonnen al meer dan tien jaar eerder. De studie laat zien dat de menopauze niet alleen een verandering in de voortplantingsfunctie is, maar samenhangt met bredere fysiologische veranderingen.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Zelfregulatie van het organisme",
+    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met hormonale regulatie en homeostase als context; O9 Voortplanting van het organisme (SE). Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
+    "alignment": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE) en O9 Voortplanting van het organisme (SE). De menopauze vormt de context om hormonale veranderingen en hun samenhang met andere orgaanstelsels te bespreken. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
+    "evidence": "Grootschalige observationele analyse van laboratoriumgegevens (reconstructie uit cross-sectionele cohorten)",
+    "article": "https://www.nature.com/articles/s41591-026-04614-0",
+    "doi": "10.1038/s41591-026-04614-0",
+    "why": "Een sterke brug tussen voortplanting, endocriene regulatie en homeostase. De enorme dataset maakt patronen zichtbaar die in kleinere cohorten moeilijk te onderscheiden zijn. Belangrijke nuance: de onderzoekers reconstrueren tijdsverlopen uit cross-sectionele laboratoriumgegevens; dit is geen prospectieve studie waarin dezelfde personen jarenlang zijn gevolgd en het bewijst niet dat elk waargenomen verschil rechtstreeks door de menopauze wordt veroorzaakt.",
+    "tags": "menopauze hormonen endocrien oestrogeen voortplanting homeostase veroudering skelet nieren lever vetstofwisseling fysiologie",
+    "evidenceLevel": "Voorzichtig interpreteren",
+    "evidenceNote": "Zeer grote observationele dataset en twee onafhankelijke cohorten, maar de tijdsverlopen zijn statistisch gereconstrueerd uit cross-sectionele gegevens en niet rechtstreeks longitudinaal gemeten bij dezelfde personen.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "Verbindt hormonale regulatie, voortplanting en de invloed van een fysiologische overgang op meerdere orgaanstelsels; ook geschikt om onderzoeksmethoden kritisch te bespreken."
   }
 ]
