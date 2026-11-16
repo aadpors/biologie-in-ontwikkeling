@@ -197,6 +197,35 @@
     "article": "https://www.leraar24.nl/2628659/biologie-uitbeelden-in-de-klas/",
     "pdf": "https://www.nro.nl/sites/nro/files/media-files/Uitbeelddidactiek-in-de-biologieles-deel-C-uitbeeldpractica_0.pdf",
     "why": "Zeer direct bruikbaar bij processen die leerlingen moeilijk kunnen visualiseren, zoals DNA-replicatie, impulsoverdracht, evolutie en populatiedynamica. De 51 practica bieden kant-en-klare ideeën en kunnen als uitgangspunt dienen voor eigen lessen. Belangrijke nuance: de ontwikkelaars beschrijven veelbelovende didactische mechanismen en positieve ervaringen, maar de omvang van het daadwerkelijke leereffect is niet overtuigend vastgesteld; gebruik de publicatie dus vooral als onderbouwde ontwerp- en praktijkbron, niet als hard bewijs dat uitbeelden altijd beter werkt.",
-    "tags": "uitbeelddidactiek uitbeeldpractica biologieles vakdidactiek abstracte processen DNA replicatie impulsoverdracht evolutie populatiedynamica"
+    "tags": "uitbeelddidactiek uitbeeldpractica biologieles vakdidactiek abstracte processen DNA replicatie impulsoverdracht evolutie populatiedynamica",
+    "dateLabel": "2021"
+  },
+  {
+    "id": "e6",
+    "page": "education",
+    "date": "2025-07-01",
+    "title": "Formatief handelen als kans voor leren in het voortgezet onderwijs",
+    "summary": "Dit overzichtsartikel van Onderwijskennis beschrijft formatief handelen als een doelgericht, kleinschalig onderzoeksproces: docenten verzamelen tijdens en tussen lessen informatie over het leren, interpreteren die en bepalen passende vervolgstappen. Het artikel bespreekt onder meer voorkennis en misconcepties achterhalen, vragen stellen, leerlingreacties analyseren en onderwijs bijstellen.",
+    "theme": "Toetsing en feedback",
+    "source": "Kennisplatform",
+    "language": "Nederlands",
+    "evidence": "Kennisoverzicht, geactualiseerd 1 juli 2025",
+    "article": "https://www.onderwijskennis.nl/kennisbank/formatief-handelen-als-kans-voor-leren-in-het-vo",
+    "why": "Een bruikbare Nederlandse basis voor formatief handelen in havo/vwo. Vooral relevant is het onderscheid tussen een instrument (zoals een quiz) en het didactische proces waarin je leerlingreacties interpreteert en gebruikt om instructie of leeractiviteiten bij te stellen. De voorbeelden zijn vakoverstijgend; vertaling naar biologische leerdoelen en misconcepties vraagt een eigen vakdidactische stap.",
+    "tags": "formatief handelen voortgezet onderwijs diagnostische vragen voorkennis misconcepties leerlingreacties toetsing instructie"
+  },
+  {
+    "id": "e7",
+    "page": "education",
+    "date": "2026-04-09",
+    "title": "Feedback",
+    "summary": "Onderwijskennis beschrijft feedback als informatie die leerlingen helpt de afstand tussen hun huidige prestatie en het leerdoel te verkleinen. De uitwerking benadrukt de samenhang tussen feed-up, feedback en feed-forward en waarschuwt dat feedback niet vanzelf effectief is: de leerling moet begrijpen wat de volgende stap is en gelegenheid krijgen die uit te voeren.",
+    "theme": "Toetsing en feedback",
+    "source": "Kennisplatform",
+    "language": "Nederlands",
+    "evidence": "Kennisoverzicht, geactualiseerd 9 april 2026",
+    "article": "https://www.onderwijskennis.nl/themas/feedback-in-het-po-en-vo",
+    "why": "Relevant voor het ontwerpen van feedback op biologische verklaringen, practicumverslagen en open examenvragen. Het helpt de vakgroep om feedback niet te verwarren met alleen een beoordeling of correctie, maar te koppelen aan concrete vervolgstappen. De bron is vakoverstijgend en de effecten hangen af van inhoud, timing en de manier waarop leerlingen feedback benutten.",
+    "tags": "feedback feedup feedforward voortgezet onderwijs formatief evalueren leerdoelen vervolgstappen"
   }
 ]
