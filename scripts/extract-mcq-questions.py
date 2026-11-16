@@ -131,17 +131,19 @@ def clean_context(lines):
     return "\n".join(cleaned).strip()
 
 def answer_from_cv(cv_text, qnum):
-    # In the official marking schemes, a multiple-choice answer is normally
-    # a single letter immediately after the maximum-score line.
-    matches = list(re.finditer(rf"(?m)^\s*{qnum}\s*$", cv_text))
-    for match in matches:
-        chunk = cv_text[match.end():match.end() + 450]
-        m = re.search(r"maximumscore\s+\d+\s+([A-F])(?:\s|$)", chunk, re.I)
-        if m:
-            return m.group(1).upper()
-        m = re.search(r"maximumscore\s+\d+\s*\n\s*([A-F])\s*(?:\n|$)", chunk, re.I)
-        if m:
-            return m.group(1).upper()
+    # The official CV stores MCQ answers as e.g. "11  B  2".
+    line_pattern = re.compile(rf"^\s*{qnum}\s+([A-F])\s+\d+\s*$")
+    for line in cv_text.splitlines():
+        match = line_pattern.match(line)
+        if match:
+            return match.group(1).upper()
+    # Some layouts put the letter on the line immediately after the number.
+    lines = cv_text.splitlines()
+    for i, line in enumerate(lines[:-1]):
+        if line.strip() == str(qnum):
+            match = re.match(r"^\s*([A-F])\s+\d+\s*$", lines[i + 1])
+            if match:
+                return match.group(1).upper()
     return ""
 
 def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
@@ -151,8 +153,6 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     with fitz.open(cv_path) as cv_doc:
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
-    if prefix == "ha25t1":
-        print("CVMODEL", repr(cv_text[cv_text.lower().find("maximumscore")-120:cv_text.lower().find("maximumscore")+4500]))
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             lines = line_records(page)
