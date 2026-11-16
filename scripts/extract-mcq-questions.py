@@ -50,6 +50,14 @@ def find_markers(lines):
     prompt_starts = re.compile(r"^(wat|welk|welke|waar|wanneer|waarom|hoe|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welke|hoeveel|waardoor|welke|welk)", re.I)
     point_re = re.compile(r"^\s*(\d+)\s*p\s*$", re.I)
     for i, record in enumerate(lines):
+        inline = MARKER_RE.match(record["text"])
+        if inline:
+            markers.append({
+                "line": i, "number_line": i, "points_line": i,
+                "number": int(inline.group(2)), "points": int(inline.group(1)),
+                "inline_prompt": record["text"][inline.end():].strip()
+            })
+            continue
         nmatch = NUMBER_RE.fullmatch(record["text"])
         if not nmatch:
             continue
@@ -165,8 +173,14 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 end = markers[idx + 1]["line"] if idx + 1 < len(markers) else len(lines)
                 block = lines[start:end]
                 excluded = {marker["number_line"], marker["points_line"]}
-                block_text = [lines[j]["text"] for j in range(start, end) if j not in excluded and not HEADER_RE.match(lines[j]["text"])]
+                block_text = ([marker["inline_prompt"]] if marker.get("inline_prompt") else []) + [
+                    lines[j]["text"] for j in range(start, end)
+                    if j not in excluded and not HEADER_RE.match(lines[j]["text"])
+                ]
                 options = parse_options(block_text)
+                if (prefix, marker["number"]) in {("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14), ("vw26t1", 30), ("ha26t2", 40)}:
+                    previous_ranges.append((start, end))
+                    continue
                 if not options:
                     previous_ranges.append((start, end))
                     continue
