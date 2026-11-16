@@ -115,11 +115,16 @@ $("nextQuestion").addEventListener("click",()=>{const f=getFiltered();if(current
 $("reset").addEventListener("click",()=>{["level","year","period","questionType","theme","concept","endterm"].forEach(id=>$(id).value="");currentIndex=0;localStorage.removeItem("bioExamFiltersV1");render()});
 async function loadMCQ(){
  try{
+  const key=q=>[q.level,q.year,q.period,q.n].join("|");
+  const map=new Map(baseQuestions.map(q=>[key(q),q]));
+  const contextResponse=await fetch("exam-contexts.json");
+  if(contextResponse.ok){
+   const contexts=await contextResponse.json();
+   for(const item of contexts){const existing=map.get(key(item));if(existing&&item.source)existing.source=item.source;}
+  }
   const response=await fetch("exam-mcq.json");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
-  const key=q=>[q.level,q.year,q.period,q.n].join("|");
-  const map=new Map(baseQuestions.map(q=>[key(q),q]));
   for(const item of extra){
    const existing=map.get(key(item));
    if(existing){
@@ -138,6 +143,7 @@ async function loadMCQ(){
   fill("theme",questions.map(q=>q.theme));
   fill("concept",questions.map(q=>q.concept));
   fill("endterm",questions.map(q=>q.end));
+  ["theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
  }catch(error){console.warn(error)}
  render();
 }
