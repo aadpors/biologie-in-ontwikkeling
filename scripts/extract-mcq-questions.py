@@ -293,6 +293,30 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         block_indices.append(j)
 
                 options = parse_options(block_text)
+
+                # Exam PDFs often place the next context paragraph immediately
+                # after the final answer option. The old parser treated that
+                # paragraph as a continuation of option D/E/F. Detect the first
+                # clear vertical paragraph break after the final option and cut
+                # the question block there. This applies to every exam/question,
+                # not to a hand-picked question number.
+                option_positions = [
+                    i for i, value in enumerate(block_text)
+                    if OPTION_RE.match(value.strip())
+                ]
+                if len(option_positions) >= 3:
+                    last_option_pos = option_positions[-1]
+                    previous_bottom = lines[block_indices[last_option_pos]]["bbox"][3]
+                    for j in range(last_option_pos + 1, len(block_text)):
+                        current_line = lines[block_indices[j]]
+                        paragraph_gap = current_line["bbox"][1] - previous_bottom
+                        if paragraph_gap > 8:
+                            block_text = block_text[:j]
+                            block_indices = block_indices[:j]
+                            break
+                        previous_bottom = max(previous_bottom, current_line["bbox"][3])
+                    options = parse_options(block_text)
+
                 first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
                 selected_prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
                 if not selected_prompt:
