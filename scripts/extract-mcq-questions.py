@@ -152,7 +152,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
     if prefix == "ha25t1":
-        print("CVDEBUG", repr(cv_text[:2600]))
+        print("CVMODEL", repr(cv_text[cv_text.lower().find("maximumscore")-120:cv_text.lower().find("maximumscore")+4500]))
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             lines = line_records(page)
