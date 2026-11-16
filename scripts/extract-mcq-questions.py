@@ -58,17 +58,32 @@ def line_records(page):
 
 def find_markers(lines):
     markers = []
-    prompt_starts = re.compile(r"^(wat|welk|welke|waar|wanneer|waarom|hoe|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welke|hoeveel|waardoor|welke|welk)", re.I)
+    prompt_starts = re.compile(
+        r"^(hieronder|wat|welk|welke|waar|wanneer|waarom|hoe|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welk|op welke|hoeveel|waardoor)",
+        re.I,
+    )
     point_re = re.compile(r"^\s*(\d+)\s*p\s*$", re.I)
+
+    def prompt_start_before(index):
+        for j in range(index - 1, max(index - 16, -1), -1):
+            if prompt_starts.match(lines[j]["text"]):
+                return j
+            if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5)) and len(lines[j]["text"]) < 90:
+                break
+        return index
+
     for i, record in enumerate(lines):
         inline = MARKER_RE.match(record["text"])
         if inline:
+            inline_prompt = record["text"][inline.end():].strip()
+            start = i if inline_prompt else prompt_start_before(i)
             markers.append({
-                "line": i, "number_line": i, "points_line": i,
+                "line": start, "number_line": i, "points_line": i,
                 "number": int(inline.group(2)), "points": int(inline.group(1)),
-                "inline_prompt": record["text"][inline.end():].strip()
+                "inline_prompt": inline_prompt
             })
             continue
+
         nmatch = NUMBER_RE.fullmatch(record["text"])
         if not nmatch:
             continue
@@ -77,13 +92,16 @@ def find_markers(lines):
             continue
         previous = lines[i - 1]["text"] if i else ""
         following = lines[i + 1]["text"] if i + 1 < len(lines) else ""
-        # In these PDFs the point marker can appear before or after the question number.
+
+        # Sometimes the question text comes first, followed by its number and point marker.
         if point_re.match(following):
             pm = point_re.match(following)
-            start = i - 1 if (previous.endswith("?") or prompt_starts.match(previous)) else i
+            start = i - 1 if (previous.endswith("?") or prompt_starts.match(previous)) else prompt_start_before(i)
             markers.append({"line": start, "number_line": i, "points_line": i + 1, "number": number, "points": int(pm.group(1))})
             continue
-        for offset in range(2, 6):
+
+        # In other layouts the number precedes the prompt and point marker.
+        for offset in range(2, 7):
             j = i + offset
             if j >= len(lines):
                 break
@@ -93,6 +111,7 @@ def find_markers(lines):
                 if prompt and (prompt_starts.match(prompt) or "?" in prompt):
                     markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
                 break
+
     unique = []
     seen = set()
     for marker in sorted(markers, key=lambda x: x["line"]):
