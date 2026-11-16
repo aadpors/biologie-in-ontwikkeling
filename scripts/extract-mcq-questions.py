@@ -174,7 +174,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     found = []
     contexts = []
     active_context = []
-    heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding(?:\\s+\\d+)?|tabel(?:\\s+\\d+)?|grafiek(?:\\s+\\d+)?|legenda|lees verder|einde)$", re.I)
+    heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding(?:\s+\d+)?|tabel(?:\s+\d+)?|grafiek(?:\s+\d+)?|legenda|lees verder|einde)$", re.I)
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             lines = line_records(page)
