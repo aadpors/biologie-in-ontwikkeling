@@ -1,13 +1,23 @@
 [
   {
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "page": 8,
-    "output": "vw25-t1-p08.jpg",
     "scale": 1.8,
-    "clip": {
-      "page": 9,
-      "rect": [0, 0, 595, 300],
-      "output": "vw25-t1-v14.jpg"
-    }
+    "clips": [
+      {
+        "page": 8,
+        "rect": [45, 45, 550, 745],
+        "output": "vw25-t1-hippo-context.jpg"
+      },
+      {
+        "page": 9,
+        "rect": [90, 45, 520, 195],
+        "output": "vw25-t1-v14.jpg"
+      },
+      {
+        "page": 9,
+        "rect": [90, 205, 520, 305],
+        "output": "vw25-t1-v15.jpg"
+      }
+    ]
   }
 ]
