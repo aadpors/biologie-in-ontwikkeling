@@ -16,7 +16,7 @@ Vwo 2025, tijdvak 1, vragen 14–18 uit de context “De nijlpaarden van Pablo E
 - 16–17: genetische drift/stichtereffect en allopatrische soortvorming.
 - 18: successie en climaxsoorten.
 
-De thematische en conceptuele rubricering is voorlopig. De exacte eindtermkoppeling aan de actuele CvTE-syllabus 2027 moet per deelvraag nog worden gecontroleerd; daarom toont de bèta “nog te valideren” in plaats van een gegokte code.
+De thematische en conceptuele rubricering is redactioneel. De formele koppelingen zijn voorlopig uitgewerkt aan de hand van de CvTE-syllabus vwo 2027: vragen 14–15 aan P1.3, vraag 16 aan P4.2, vraag 17 aan P4.4 en vraag 18 aan P2.1. De specificatienummers staan op de pagina. Deze koppelingen blijven bèta en verdienen inhoudelijke review.
 
 ## Bronnen en hergebruik
 
