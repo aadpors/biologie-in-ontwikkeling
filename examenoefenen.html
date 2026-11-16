@@ -13,15 +13,15 @@ main{max-width:1160px;margin:24px auto;padding:0 20px 55px}.notice,.filters,.que
 <header><div class="top"><a class="brand" href="./index.html">Biologie in ontwikkeling</a><a class="back" href="./index.html">← Terug naar actualiteiten</a></div></header>
 <section class="hero"><div><div class="eyebrow">Oefenomgeving · bèta</div><h1>Examenoefenen biologie</h1><p>Oefen met echte examenvragen, geselecteerd op wat de deelvraag daadwerkelijk toetst. Een gedeelde context betekent niet dat alle vragen onder hetzelfde thema vallen.</p></div></section>
 <main>
-<section class="notice"><b>Proefversie: eerste voorbeeld uit vwo 2025, tijdvak 1</b><p>De eerste set laat zien hoe één examencontext wordt opgesplitst in afzonderlijk te filteren deelvragen. De thematische en conceptuele rubricering is redactioneel en voorlopig. De koppeling aan de actuele syllabus-eindtermen wordt per vraag gecontroleerd voordat die als definitief wordt getoond.</p></section>
+<section class="notice"><b>Proefversie: eerste voorbeeld uit vwo 2025, tijdvak 1</b><p>De eerste set laat zien hoe één examencontext wordt opgesplitst in afzonderlijk te filteren deelvragen. De thema's en concepten zijn redactioneel ingedeeld. De koppeling aan de CvTE-syllabus vwo 2027 is per deelvraag uitgewerkt op basis van de specificaties; de rubricering blijft bèta en kan na vakinhoudelijke review worden aangescherpt.</p></section>
 <section class="filters"><h2>Filter de deelvragen</h2><div class="filtergrid">
 <div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option>Vwo</option><option>Havo</option></select></div>
 <div class="field"><label for="theme">Thema</label><select id="theme"><option value="">Alle thema's</option></select></div>
 <div class="field"><label for="concept">Concept</label><select id="concept"><option value="">Alle concepten</option></select></div>
-<div class="field"><label for="endterm">Eindterm</label><select id="endterm"><option value="">Alle eindtermen</option><option value="pending">Nog te valideren</option></select></div>
+<div class="field"><label for="endterm">Eindterm</label><select id="endterm"><option value="">Alle eindtermen</option></select></div>
 </div><div class="filterfoot"><button id="reset" type="button">Wis filters</button><span class="count" id="count" aria-live="polite"></span></div></section>
 <section class="list" id="questions" aria-live="polite"></section>
-<section class="method"><h2>Hoe de rubricering werkt</h2><p><b>Deelvraagniveau:</b> elke vraag krijgt een eigen thema, concept en eindtermkoppeling. De context wordt alleen als achtergrond gebruikt en is geen automatische classificatie.</p><p><b>Contextbehoud:</b> de originele examenpagina wordt als PDF-fragment getoond. Zo blijven figuren, tabellen en broninformatie in hun oorspronkelijke vorm behouden. De volledige opgave en het correctievoorschrift zijn daarnaast rechtstreeks te openen.</p><p><b>Voorzichtig met koppelingen:</b> een conceptuele match is niet automatisch een formele syllabus-eindterm. Onzekere of nog niet gecontroleerde koppelingen worden daarom niet als definitief gepresenteerd.</p></section>
+<section class="method"><h2>Hoe de rubricering werkt</h2><p><b>Deelvraagniveau:</b> elke vraag krijgt een eigen thema, concept en eindtermkoppeling. De context wordt alleen als achtergrond gebruikt en is geen automatische classificatie.</p><p><b>Contextbehoud:</b> de originele examenpagina wordt als PDF-fragment getoond. Zo blijven figuren, tabellen en broninformatie in hun oorspronkelijke vorm behouden. De volledige opgave en het correctievoorschrift zijn daarnaast rechtstreeks te openen.</p><p><b>Formele koppeling:</b> de weergegeven subdomeincodes verwijzen naar de CvTE-syllabus vwo 2027. De koppeling op het niveau van de afzonderlijke specificatie is redactioneel; bij een deelvraag kunnen meerdere specificaties relevant zijn.</p><p><a href="https://www.examenblad.nl/system/files/exam-document/2025-07/syllabus-biologie-vwo-2027_versie-2.pdf" target="_blank" rel="noopener">Open de officiële syllabus biologie vwo 2027 ↗</a></p></section>
 </main><footer>Biologie in ontwikkeling · Examenoefenen bèta · Bronnen: College voor Toetsen en Examens / Examenblad.nl</footer>
 <script>
 const examPdf='https://www.examenblad.nl/system/files/exam-document/2025-05/vw-1018-a-25-1-o.pdf';
@@ -37,7 +37,7 @@ const questions=[
 const $=id=>document.getElementById(id);
 const saved=JSON.parse(localStorage.getItem('bioExamAnswersV1')||'{}');
 function fillFilter(id,values){const el=$(id);for(const value of [...new Set(values)].sort()){const o=document.createElement('option');o.value=value;o.textContent=value;el.append(o)}}
-fillFilter('theme',questions.map(q=>q.theme));fillFilter('concept',questions.map(q=>q.concept));
+fillFilter('theme',questions.map(q=>q.theme));fillFilter('concept',questions.map(q=>q.concept));fillFilter('endterm',questions.map(q=>q.endterm));
 function render(){
  const level=$('level').value,theme=$('theme').value,concept=$('concept').value,endterm=$('endterm').value;
  const filtered=questions.filter(q=>(!level||level==='Vwo')&&(!theme||q.theme===theme)&&(!concept||q.concept===concept)&&(!endterm||q.endterm===endterm));
@@ -47,7 +47,7 @@ function render(){
  for(const q of filtered){
   const article=document.createElement('article');article.className='question';
   article.innerHTML='<div class="qhead"><h2>Vraag '+q.number+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+' punt'+(q.points===1?'':'en')+'</span></h2><span class="tag gold">Voorlopige rubricering</span></div>'+
-  '<div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">Eindterm: nog te valideren</span></div>'+
+  '<div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">{q.endterm}</span></div>'+
   '<p class="context">'+context+'<br>'+q.focus+'</p>'+
   '<iframe class="preview" loading="lazy" title="Originele examenpagina met vraag '+q.number+'" src="'+examPdf+'#page='+q.page+'&zoom=page-width&toolbar=0&navpanes=0"></iframe>'+
   '<p class="preview-note">Originele PDF-pagina '+q.page+' (volledige contextpagina; vraag '+q.number+' is hierboven geselecteerd). Gebruik de PDF-weergave om in te zoomen.</p>'+
