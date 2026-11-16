@@ -33,7 +33,7 @@ Controleer bij wijzigingen aan deze pagina expliciet dat er geen `iframe`, `obje
 
 ## Volgende uitbreidingen
 
-1. Vervang eventuele schematische vervangingen van examengrafieken door nauwkeurige afzonderlijke uitsneden uit de bron, wanneer de figuur noodzakelijk is voor de vraag.
+1. Voeg nauwkeurige afzonderlijke uitsneden uit de originele bron toe voor noodzakelijke figuren. Tot die tijd staat bij vraag 14 alleen een expliciete, handmatige link naar de originele examenpagina; er wordt geen grafiek nagemaakt of PDF automatisch geladen.
 2. Valideer de eindtermkoppelingen per vraag tegen de officiële havo- en vwo-syllabi.
 3. Voeg havo toe en breid de pilot uit met vwo 2024 en 2026.
 4. Voeg een docentredactie-/reviewstatus toe voor twijfelgevallen en meervoudige koppelingen.
