@@ -61,8 +61,8 @@ def render_amendment(pdf_path, output):
         start = next((line["y0"] for line in lines if re.search(r"Op pagina\s+\d+", line["text"], re.I)), None)
         if start is None:
             raise RuntimeError(f"Could not locate amendment text in {pdf_path}")
-        end = next((line["y0"] for line in reversed(lines) if re.search(r"voorzitter|namens het college", line["text"], re.I)), page.rect.height - 70)
-        rect = fitz.Rect(42, max(0, start - 18), page.rect.width - 42, min(page.rect.height - 55, end + 28))
+        end = next((line["y0"] for line in lines if re.search(r"Ik verzoek u dit bericht", line["text"], re.I)), page.rect.height - 70)
+        rect = fitz.Rect(42, max(0, start - 18), page.rect.width - 42, min(page.rect.height - 55, end - 8))
         page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0), clip=rect, alpha=False).save(OUT / output)
         print(f"Rendered amendment {output} from {pdf_path.name}, page 1")
 
