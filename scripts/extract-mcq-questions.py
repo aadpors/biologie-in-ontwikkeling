@@ -290,7 +290,23 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 elif start < marker["number_line"]:
                     question_end_line = marker["points_line"]
                 else:
+                    # Open questions do not have A-D options to delimit them.
+                    # Do not consume every line up to the next question marker:
+                    # a new boxed/context paragraph can begin in between (e.g.
+                    # Havo 2025-I question 13 followed by the transplant context
+                    # for question 14). Stop at the first clear paragraph break
+                    # after the question prompt has begun.
                     question_end_line = end - 1
+                    previous_bottom = lines[start]["bbox"][3]
+                    prompt_seen = False
+                    for j in range(start + 1, end):
+                        gap = lines[j]["bbox"][1] - previous_bottom
+                        if prompt_seen and gap > 18:
+                            question_end_line = j - 1
+                            break
+                        if j not in {marker["number_line"], marker["points_line"]}:
+                            prompt_seen = True
+                        previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
