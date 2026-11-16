@@ -47,8 +47,10 @@ const questions=[
 ];
 const $=id=>document.getElementById(id);
 const saved=JSON.parse(localStorage.getItem("bioExamAnswersV2")||"{}");
+const filterState=JSON.parse(localStorage.getItem("bioExamFiltersV1")||"{}");
 function fill(id,values){for(const v of [...new Set(values)].sort()){const o=document.createElement("option");o.value=v;o.textContent=v;$(id).append(o)}}
 fill("theme",questions.map(q=>q.theme));fill("concept",questions.map(q=>q.concept));fill("endterm",questions.map(q=>q.end));
+["level","year","period","theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
 function render(){
  const filtered=questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("theme").value||q.theme===$("theme").value)&&(!$("concept").value||q.concept===$("concept").value)&&(!$("endterm").value||q.end===$("endterm").value));
  $("count").textContent=filtered.length+" van "+questions.length+" deelvragen";$("questions").innerHTML="";
@@ -68,6 +70,6 @@ function render(){
   a.querySelector("[data-reveal]").addEventListener("click",e=>{const box=$("mark-"+q.id);box.hidden=!box.hidden;e.currentTarget.textContent=box.hidden?"Toon antwoordindicatie":"Verberg antwoordindicatie"});
  }
 }
-["level","year","period","theme","concept","endterm"].forEach(id=>$(id).addEventListener("change",render));
-$("reset").addEventListener("click",()=>{["level","year","period","theme","concept","endterm"].forEach(id=>$(id).value="");render()});render();
+["level","year","period","theme","concept","endterm"].forEach(id=>$(id).addEventListener("change",()=>{const state={};["level","year","period","theme","concept","endterm"].forEach(k=>state[k]=$(k).value);localStorage.setItem("bioExamFiltersV1",JSON.stringify(state));render()}));
+$("reset").addEventListener("click",()=>{["level","year","period","theme","concept","endterm"].forEach(id=>$(id).value="");localStorage.removeItem("bioExamFiltersV1");render()});render();
 </script></body></html>
