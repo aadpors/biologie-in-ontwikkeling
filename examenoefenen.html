@@ -47,7 +47,7 @@ function render(){
  for(const q of filtered){
   const article=document.createElement('article');article.className='question';
   article.innerHTML='<div class="qhead"><h2>Vraag '+q.number+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+' punt'+(q.points===1?'':'en')+'</span></h2><span class="tag gold">Voorlopige rubricering</span></div>'+
-  '<div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">{q.endterm}</span></div>'+
+  '<div class="tags"><span class="tag">'+q.theme+'</span><span class="tag">'+q.concept+'</span><span class="tag muted">'+q.endterm+'</span></div>'+
   '<p class="context">'+context+'<br>'+q.focus+'</p>'+
   '<iframe class="preview" loading="lazy" title="Originele examenpagina met vraag '+q.number+'" src="'+examPdf+'#page='+q.page+'&zoom=page-width&toolbar=0&navpanes=0"></iframe>'+
   '<p class="preview-note">Originele PDF-pagina '+q.page+' (volledige contextpagina; vraag '+q.number+' is hierboven geselecteerd). Gebruik de PDF-weergave om in te zoomen.</p>'+
