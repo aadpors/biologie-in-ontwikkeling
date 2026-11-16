@@ -54,7 +54,7 @@ let questions=[
 ];
 const baseQuestions = questions;
 const $=id=>document.getElementById(id);
-const onderwerpCategorieen=["Ademhalingsstelsel","Afweer","Anatomie","Cellen: deling en differentiatie","Cellen: organellen","Cellen: stofwisseling","Cellen: transport","DNA: expressie, transcriptie, translatie en onderzoek","Duurzaamheid & milieu","Ecologie","Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen","Eiwitten & enzymen","Enzymen","Erfelijkheid","Evolutie","Hart en bloedsomloop","Hormonale regulatie","Huid","Organisatieniveaus","Ordening","Planten","Populatiegenetica (hardy-weinberg)","Uitscheiding: lever en nieren","Vaardigheden: grafieken & tabellen","Vaardigheden: rekenen","Vaardigheden: wetenschappelijk onderzoek","Verteringsstelsel","Zenuwstelsel & oog"];
+const onderwerpCategorieen=["Ademhalingsstelsel","Afweer","Anatomie","Cellen: deling en differentiatie","Cellen: organellen","Cellen: stofwisseling","Cellen: transport","Dna: expressie, transcriptie, translatie en onderzoek","Duurzaamheid & milieu","Ecologie","Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen","Eiwitten & enzymen","Enzymen","Erfelijkheid","Evolutie","Hart en bloedsomloop","Hormonale regulatie","Huid","Organisatieniveaus","Ordening","Planten","Populatiegenetica (hardy-weinberg)","Uitscheiding: lever en nieren","Vaardigheden: grafieken & tabellen","Vaardigheden: rekenen","Vaardigheden: wetenschappelijk onderzoek","Verteringsstelsel","Zenuwstelsel & oog","Zwangerschap"];
 function onderwerpenVanVraag(q){const t=[q.q,q.theme,q.concept,q.end].filter(Boolean).join(" ").toLowerCase(),h=new Set(),a=x=>h.add(x);
 if(/ademhal|long|gaswisseling|zuurstofopname|ademcentrum|ademhalingsspier/.test(t))a("Ademhalingsstelsel");
 if(/afweer|antistof|antilichaam|immuun|immuniteit|vaccin|virus|bacterie|infect|allerg|fagocyt|lymfocyt|mhc|antigeen|oedeem|ontsteking|afstot/.test(t))a("Afweer");
@@ -63,7 +63,7 @@ if(/stamcel|celdeling|celdifferentiatie|metamorfose|mitose|meiose/.test(t))a("Ce
 if(/organel|lysosoom|ribosoom|golgi|endoplasmatisch|mitochondri|chloroplast/.test(t))a("Cellen: organellen");
 if(/dissimil|assimil|stofwisseling|melkzuur|anaeroob|aeroob|atp|energieproduct|elektronendonor|fotosynth|celademhaling/.test(t))a("Cellen: stofwisseling");
 if(/diffus|osmose|transport|membraan|fick|celmembraan|actief transport|passief transport/.test(t))a("Cellen: transport");
-if(/dna|gen |genen|allel|mutatie|chromosoom|stamboom|erfelijk|overerf|genoom|codon|transcript|recombinatie|genexpressie|pcr|aon|genetisch|cisgeen|transgeen/.test(t))a("DNA: expressie, transcriptie, translatie en onderzoek");
+if(/dna|gen |genen|allel|mutatie|chromosoom|stamboom|erfelijk|overerf|genoom|codon|transcript|recombinatie|genexpressie|pcr|aon|genetisch|cisgeen|transgeen/.test(t))a("Dna: expressie, transcriptie, translatie en onderzoek");
 if(/duurzaam|milieu|vervuil|klimaat|insecticid|bestrijdingsmiddel|landbouw/.test(t))a("Duurzaamheid & milieu");
 if(/populatie|ecosysteem|habitat|niche|trofisch|voedselweb|voedselketen|predatie|concurrentie|symbiose|paras|mutual|commens|kringloop|mineralisatie|successie|pionier|climax|biodiversiteit|biotisch|abiotisch|ecologie/.test(t))a("Ecologie");
 if(/eutrofi|algenbloei|fosfaat|nutri[eë]nt|voedselrijk|vermesting/.test(t))a("Ecologie: eutrofiëring");
@@ -81,12 +81,12 @@ if(/geslacht|soort|genera|classific|taxon|ordening/.test(t))a("Ordening");
 if(/plant|blad|huidmond|wortel|bastvat|xyleem|flo[eë]m|chloroplast|autotroof|algen|fotosynth|stikstofassimilatie/.test(t))a("Planten");
 if(/hardy.weinberg|populatiegenet|allelfrequent|genfrequent/.test(t))a("Populatiegenetica (hardy-weinberg)");
 if(/nier|urine|nefron|kapsel van bowman|lever|uitscheiding|ureum|kaliumtekort/.test(t))a("Uitscheiding: lever en nieren");
-if(/grafiek|diagram|tabel|afbeelding|gegevens|resultaten|trend|verband tussen/.test(t))a("Vaardigheden: grafieken & tabellen");
+if(/grafiek|diagram|tabel|gegevens|resultaten|trend|verband tussen/.test(t))a("Vaardigheden: grafieken & tabellen");
 if(/bereken|hoeveel|percentage|kans|verhouding|snelheid|tijd zit|concentratie|volume|oppervlak/.test(t))a("Vaardigheden: rekenen");
 if(/onderzoek|hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|experiment|conclusie|controlegroep|meetwaarden/.test(t))a("Vaardigheden: wetenschappelijk onderzoek");
 if(/verter|maag|darm|alvleesklier|gal|voedsel|voeding|resorpt|darmslijmvlies|dumpingsyndroom/.test(t))a("Verteringsstelsel");
 if(/zenuwstelsel|zenuw|hersenen|hersen|impuls|membraanpotentiaal|pijn|waarnem|oog|smaak|autonome|sympath|parasympath|zintuig/.test(t))a("Zenuwstelsel & oog");
-return onderwerpCategorieen.filter(x=>h.has(x));}
+if(!h.size){const m={"ecologie en ecosystemen":["Ecologie"],"ecologie en interacties":["Ecologie: relaties & energiestromen"],"evolutie en erfelijkheid":["Erfelijkheid","Evolutie"],"stofwisseling en energie":["Cellen: stofwisseling"],"stofwisseling en transport":["Cellen: stofwisseling","Cellen: transport"],"transport en homeostase":["Hart en bloedsomloop","Cellen: transport"],"regeling en homeostase":["Hormonale regulatie"],"afweer en bescherming":["Afweer"],"genetische modificatie":["Dna: expressie, transcriptie, translatie en onderzoek","Erfelijkheid"]};(m[(q.theme||"").toLowerCase()]||[]).forEach(a);}return onderwerpCategorieen.filter(x=>h.has(x));}
 
 const saved=JSON.parse(localStorage.getItem("bioExamAnswersV2")||"{}");
 const filterState=JSON.parse(localStorage.getItem("bioExamFiltersV1")||"{}");
