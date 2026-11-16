@@ -113,12 +113,18 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-2");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-3");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
-   for(const item of contexts){const existing=map.get(key(item));if(existing&&item.image)existing.image=item.image;}
+   for(const item of contexts){
+    const existing=map.get(key(item));
+    if(existing){
+     if(item.images?.length)existing.images=item.images;
+     if(item.image)existing.image=item.image;
+    }
+   }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-17-2");
+  const response=await fetch("exam-mcq.json?v=2026-11-17-3");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
