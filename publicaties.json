@@ -312,5 +312,40 @@
     "doi": "10.1016/j.molcel.2026.09.011",
     "why": "Een actuele, fundamentele studie die een populaire verklaring voor transcriptiefactorclusters nuanceert. De clusters zetten genen niet zelfstandig aan, maar versterken transcriptie die al gestart is. Dat is een mooie casus bij transcriptie, transcriptiefactoren, genregulatie en de relatie tussen moleculaire processen en embryonale ontwikkeling. Het onderzoek is uitgevoerd bij fruitvliegen; de specifieke regulatie-eiwitten en clusters zijn niet zonder meer gelijk aan die bij mensen.",
     "tags": "genexpressie transcriptie transcriptiefactor Dorsal RNA polymerase II enhancer embryonale ontwikkeling Drosophila genregulatie"
+  },
+  {
+    "id": "s12",
+    "page": "science",
+    "date": "2026-11-04",
+    "title": "Ecological and social cues orchestrate concerted courtship in Drosophila",
+    "summary": "Bij fruitvliegen blijkt baltsgedrag niet alleen afhankelijk van signalen tussen potentiële partners. Geuren van voedsel trekken vliegen naar een voedselplek en verhogen de seksuele opwinding van mannetjes. De bewegingen en interacties van groepsgenoten versterken vervolgens de visuele prikkels. Bij Drosophila erecta ontstaat zo een multisensorische terugkoppeling die balts en paring op een geschikte plek coördineert.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Gedrag en voortplanting",
+    "subdomain": "Huidig havo/vwo: O7 Gedrag en interactie, O8 Seksualiteit en O9 Voortplanting van het organisme (SE). Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen; de koppeling met voortplantingsgedrag is contextueel.",
+    "alignment": "Huidig examenprogramma havo/vwo: O7 Gedrag en interactie, O8 Seksualiteit en O9 Voortplanting van het organisme (alle SE). Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen. De studie laat zien hoe geur, zicht, groepsinteracties en voortplantingsgedrag samenhangen; de specifieke circuits van Drosophila zijn verdiepende context.",
+    "evidence": "Primair onderzoek",
+    "article": "https://www.nature.com/articles/s41586-026-11209-9",
+    "doi": "10.1038/s41586-026-11209-9",
+    "pdf": "https://www.nature.com/articles/s41586-026-11209-9.pdf",
+    "why": "Een mooie casus om gedrag niet als een losstaande reactie op één prikkel te behandelen. Voedselgeur, visuele informatie, groepsgedrag en seksuele motivatie beïnvloeden elkaar. De vergelijking tussen Drosophila-soorten laat bovendien zien hoe gedrag en zintuiglijke gevoeligheid evolutionair kunnen verschillen. De resultaten gelden voor fruitvliegen; pas ze niet rechtstreeks toe op menselijk seksueel gedrag.",
+    "tags": "gedrag voortplanting balts seksualiteit geur zintuigen visuele prikkels sociale interactie Drosophila evolutie"
+  },
+  {
+    "id": "s13",
+    "page": "science",
+    "date": "2026-10-06",
+    "title": "Biodiversity safeguards ecosystem services and functions worldwide",
+    "summary": "Deze mondiale synthese analyseert gegevens uit 423 studies en meer dan 200.000 datapunten om de relatie tussen biodiversiteit, ecosysteemfuncties en ecosysteemdiensten te onderzoeken. De resultaten laten zien dat biodiversiteit op wereldschaal samenhangt met het functioneren van ecosystemen en de diensten die mensen daarvan ontvangen. Daarmee biedt de studie een brede empirische basis voor het belang van biodiversiteitsbehoud.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Biodiversiteit en ecosystemen",
+    "subdomain": "Huidig havo/vwo: P1 Regulatie van ecosystemen, P3 Interactie in ecosystemen en P5 Biodiversiteit. Conceptprogramma v2: havo en vwo B1 Biodiversiteit en verbondenheid van leven.",
+    "alignment": "Huidig examenprogramma havo/vwo: P1 Regulatie van ecosystemen, P3 Interactie in ecosystemen en P5 Biodiversiteit. Conceptprogramma v2: havo en vwo B1 Biodiversiteit en verbondenheid van leven. Dit is een mondiale synthese van veel studies, geen experiment in één ecosysteem; de sterkte en aard van verbanden kunnen per ecosysteem en functie verschillen.",
+    "evidence": "Mondiale synthese van 423 studies (>200.000 datapunten)",
+    "article": "https://www.nature.com/articles/s41559-026-03200-4",
+    "doi": "10.1038/s41559-026-03200-4",
+    "why": "Sterke onderbouwing voor het bespreken van biodiversiteit als meer dan alleen het aantal soorten. De studie verbindt biodiversiteit met ecosysteemfuncties en diensten zoals productiviteit, nutriëntenkringlopen en maatschappelijke baten. Geschikt voor discussies over natuurbeheer, ecosysteemdiensten en de gevolgen van biodiversiteitsverlies. Benadruk dat een mondiale synthese geen garantie geeft dat elk lokaal ecosysteem op dezelfde manier reageert.",
+    "tags": "biodiversiteit ecosysteemfuncties ecosysteemdiensten mondiale synthese natuurbeheer productiviteit nutriëntenkringloop"
   }
 ]
