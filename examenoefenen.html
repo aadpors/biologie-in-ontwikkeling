@@ -11,10 +11,10 @@ main{max-width:1160px;margin:24px auto;padding:0 20px 55px}.notice,.filters,.que
 @media(max-width:760px){.filtergrid{grid-template-columns:repeat(2,minmax(0,1fr))}.preview{height:370px}}@media(max-width:480px){.filtergrid{grid-template-columns:1fr}.preview{height:320px}main{padding:0 12px 40px}.hero{padding:27px 17px}}
 </style></head><body>
 <header><div class="top"><a class="brand" href="./index.html">Biologie in ontwikkeling</a><a class="back" href="./index.html">← Terug naar actualiteiten</a></div></header>
-<section class="hero"><div><div class="eyebrow">Oefenomgeving · bèta</div><h1>Examenoefenen biologie</h1><p>Oefen met echte examenvragen, geselecteerd op wat de deelvraag daadwerkelijk toetst. Een gedeelde context betekent niet dat alle vragen onder hetzelfde thema vallen.</p></div></section>
+<section class="hero"><div><div class="eyebrow">Oefenomgeving · bèta</div><h1>Examenoefenen biologie</h1><p>Oefen met echte examenvragen, geselecteerd op wat de vraag daadwerkelijk toetst. Een gedeelde context betekent niet dat alle vragen onder hetzelfde thema vallen.</p></div></section>
 <main>
-<section class="notice"><b>Proefversie: examenvragen havo en vwo · 2025 en 2026</b><p>Deelvragen uit de beschikbare examens, afzonderlijk ingedeeld op niveau, jaar, tijdvak, thema, concept en syllabusonderdeel. Antwoordindicaties zijn gecontroleerd aan de hand van de officiële correctievoorschriften. De rubricering blijft bèta.</p></section>
-<section class="filters"><h2>Filter de deelvragen</h2><div class="filtergrid">
+<section class="notice"><b>Proefversie: examenvragen havo en vwo · 2025 en 2026</b><p>Open vragen en meerkeuzevragen uit de beschikbare examens, elk op een eigen kaart met de bijbehorende context. Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback. De rubricering blijft bèta.</p></section>
+<section class="filters"><h2>Filter de vragen</h2><div class="filtergrid">
 <div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option>Vwo</option><option>Havo</option></select></div><div class="field"><label for="year">Jaar</label><select id="year"><option value="">Alle jaren</option><option>2025</option><option>2026</option></select></div><div class="field"><label for="period">Tijdvak</label><select id="period"><option value="">Alle tijdvakken</option><option value="1">Tijdvak 1</option><option value="2">Tijdvak 2</option></select></div>
 <div class="field"><label for="questionType">Vraagtype</label><select id="questionType"><option value="">Alle vraagtypen</option><option value="open">Open vraag</option><option value="mcq">Meerkeuzevraag</option></select></div><div class="field"><label for="theme">Thema</label><select id="theme"><option value="">Alle thema's</option></select></div>
 <div class="field"><label for="concept">Concept</label><select id="concept"><option value="">Alle concepten</option></select></div>
@@ -60,6 +60,7 @@ const saved=JSON.parse(localStorage.getItem("bioExamAnswersV2")||"{}");
 const filterState=JSON.parse(localStorage.getItem("bioExamFiltersV1")||"{}");
 function fill(id,values){const existing=new Set([...$(id).options].map(o=>o.value));for(const v of [...new Set(values)].sort()){if(!existing.has(v)){const o=document.createElement("option");o.value=v;o.textContent=v;$(id).append(o)}}}
 fill("theme",questions.map(q=>q.theme));fill("concept",questions.map(q=>q.concept));fill("endterm",questions.map(q=>q.end));
+  ["theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
 ["level","year","period","questionType","theme","concept","endterm"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
 let currentIndex=0;
 const selfChecks=JSON.parse(localStorage.getItem("bioExamSelfChecksV1")||"{}");
@@ -72,7 +73,7 @@ function render(){
  $("prevQuestion").disabled=currentIndex===0;$("nextQuestion").disabled=currentIndex>=filtered.length-1;
  if(!filtered.length){$("questions").innerHTML='<div class="empty">Geen vragen gevonden. Wis een of meer filters.</div>';$("questionNav").hidden=true;return}
  $("questionNav").hidden=false;
- filtered.forEach((q,i)=>{const d=document.createElement("button");d.type="button";d.className="dot"+(i===currentIndex?" active":"")+((selfChecks[q.id]?.length||saved[q.id])?" done":"");d.title="Vraag "+q.n+" ("+(i+1)+" van "+filtered.length+")";d.setAttribute("aria-label",d.title);d.addEventListener("click",()=>{currentIndex=i;render()});$("questionDots").append(d)});
+ filtered.forEach((q,i)=>{const d=document.createElement("button");d.type="button";d.className="dot"+(i===currentIndex?" active":"")+((q.options?.length?saved[q.id]:selfChecks[q.id]?.length)?" done":"");d.title="Vraag "+q.n+" ("+(i+1)+" van "+filtered.length+")";d.setAttribute("aria-label",d.title);d.addEventListener("click",()=>{currentIndex=i;render()});$("questionDots").append(d)});
  const q=filtered[currentIndex],a=document.createElement("article");a.className="question";
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
@@ -96,7 +97,7 @@ function render(){
    saved[q.id]=value;localStorage.setItem("bioExamAnswersV2",JSON.stringify(saved));
    if(q.correct){const ok=value===q.correct;feedback.className="mcq-feedback "+(ok?"correct":"incorrect");feedback.hidden=false;feedback.textContent=ok?"Goed! Je hebt het juiste antwoord gekozen.":"Niet juist. Het correcte antwoord is "+q.correct+".";}
    else{feedback.className="mcq-feedback";feedback.hidden=false;feedback.textContent="Je keuze is opgeslagen. Het antwoordmodel is nog niet beschikbaar.";}
-   [...$("questionDots").children].forEach((d,i)=>{d.className="dot"+(i===currentIndex?" active":"")+(saved[filtered[i].id]||selfChecks[filtered[i].id]?.length?" done":"")});
+   [...$("questionDots").children].forEach((d,i)=>{d.className="dot"+(i===currentIndex?" active":"")+((filtered[i].options?.length?saved[filtered[i].id]:selfChecks[filtered[i].id]?.length)?" done":"")});
   };
   a.querySelectorAll('input[type="radio"]').forEach(input=>input.addEventListener("change",()=>selectAnswer(input.value)));
   if(saved[q.id]){const chosen=a.querySelector('input[type="radio"][value="'+saved[q.id]+'"]');if(chosen)selectAnswer(saved[q.id]);}
