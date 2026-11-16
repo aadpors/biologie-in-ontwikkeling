@@ -364,8 +364,15 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 options = [{"key": key, "text": options_by_key.get(key, {}).get("text", "")} for key in required_keys]
 
                 # Full-width page strip containing context and question.
-                y0 = context_y0
-                y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                y0 = min(context_y0, max(0, lines[start]["bbox"][1] - 5))
+                y1 = min(
+                    page.rect.height,
+                    max(
+                        lines[question_end_line]["bbox"][3] + 7,
+                        lines[start]["bbox"][3] + 7,
+                        y0 + 2,
+                    ),
+                )
                 crop = fitz.Rect(0, y0, page.rect.width, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
