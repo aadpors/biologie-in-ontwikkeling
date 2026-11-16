@@ -399,5 +399,14 @@ context_by_key = {}
 for item in all_contexts:
     context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
 all_contexts = list(context_by_key.values())
+for item in all_contexts:
+    key = (item["level"], item["year"], item["period"], item["n"])
+    if key[0:3] == ("Vwo", "2025", "1") and key[3] in {14, 15, 16, 17, 18}:
+        item["source"] = item["source"].split("Hieronder staan uitspraken over de populatiegroei", 1)[0].strip()
+    if key == ("Havo", "2026", "1", 15):
+        before, separator, rest = item["source"].partition("Hieronder staan uitspraken over de resultaten van dit experiment.")
+        if separator and "Een andere bedreiging voor de beekprik" in rest:
+            after = rest.split("Een andere bedreiging voor de beekprik", 1)[1]
+            item["source"] = before.rstrip() + "\nEen andere bedreiging voor de beekprik" + after
 (ROOT / "exam-contexts.json").write_text(json.dumps(all_contexts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print("Geschreven: exam-mcq.json en exam-contexts.json")
