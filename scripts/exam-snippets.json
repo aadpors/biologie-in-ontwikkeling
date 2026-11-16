@@ -1,0 +1,13 @@
+[
+  {
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "page": 8,
+    "output": "vw25-t1-p08.jpg",
+    "scale": 1.8,
+    "clip": {
+      "page": 9,
+      "rect": [0, 0, 595, 300],
+      "output": "vw25-t1-v14.jpg"
+    }
+  }
+]
