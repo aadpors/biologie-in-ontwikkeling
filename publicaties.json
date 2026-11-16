@@ -295,5 +295,22 @@
     "doi": "10.1016/j.molcel.2026.08.004",
     "why": "Een mooie aanvulling op het onderwerp DNA-replicatie: RNA blijkt niet alleen een boodschapper bij eiwitsynthese, maar kan ook als structureel en functioneel molecuul bijdragen aan de organisatie van DNA-replicatie. De koppeling met zusterchromatiden maakt bovendien de overgang naar celdeling zichtbaar. Gebruik dit als verdieping; de moleculaire details zijn niet allemaal examenstof.",
     "tags": "DNA-replicatie celcyclus RNA lncRNA CONCR helicase DDX11 zusterchromatiden chromatine RNA-structuur"
+  },
+  {
+    "id": "s11",
+    "page": "science",
+    "date": "2026-10-15",
+    "title": "Transcription factor clusters enhance gene expression in vivo without modulating bursting dynamics",
+    "summary": "In levende embryo's van de fruitvlieg Drosophila onderzochten onderzoekers hoe clusters van de transcriptiefactor Dorsal genexpressie beïnvloeden. De clusters versterken de transcriptie van bepaalde doelgenen, maar starten die niet zelfstandig en houden transcriptie ook niet zelf gaande. Vrij Dorsal is nodig om transcriptie te initiëren; de clusters verhogen vervolgens de hoeveelheid RNA-polymerase II die tijdens een actieve transcriptiepuls wordt geladen.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Eiwitsynthese en genexpressie",
+    "subdomain": "Huidig havo: M1 Eiwitsynthese (SE); huidig vwo: M1 Eiwitsynthese (CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
+    "alignment": "Huidig examenprogramma: M1 Eiwitsynthese (havo SE, vwo CE), in het bijzonder transcriptie en regulatie van genexpressie. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen. De studie onderzoekt genregulatie tijdens de embryonale ontwikkeling van fruitvliegen; de specifieke moleculaire mechanismen zijn verdieping en niet allemaal vereiste examenstof.",
+    "evidence": "Primair onderzoek",
+    "article": "https://www.sciencedirect.com/science/article/pii/S1097276526006544",
+    "doi": "10.1016/j.molcel.2026.09.011",
+    "why": "Een actuele, fundamentele studie die een populaire verklaring voor transcriptiefactorclusters nuanceert. De clusters zetten genen niet zelfstandig aan, maar versterken transcriptie die al gestart is. Dat is een mooie casus bij transcriptie, transcriptiefactoren, genregulatie en de relatie tussen moleculaire processen en embryonale ontwikkeling. Het onderzoek is uitgevoerd bij fruitvliegen; de specifieke regulatie-eiwitten en clusters zijn niet zonder meer gelijk aan die bij mensen.",
+    "tags": "genexpressie transcriptie transcriptiefactor Dorsal RNA polymerase II enhancer embryonale ontwikkeling Drosophila genregulatie"
   }
 ]
