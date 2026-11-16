@@ -11,6 +11,7 @@ on:
       - 'scripts/exam-snippets.json'
       - 'scripts/cv-snippets.json'
       - 'site-version.json'
+      - '.github/workflows/render-exam-snippets.yml'
 permissions:
   contents: write
 jobs:
