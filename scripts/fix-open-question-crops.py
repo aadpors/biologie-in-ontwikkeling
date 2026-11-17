@@ -46,6 +46,13 @@ def main():
         for record in open_records:
             if record.get("id") == question_id:
                 record["image"] = image_path
+                # The frontend renders record['images'] when present. Replace
+                # its final question image too, or the restored source image
+                # is silently ignored in the old exam route.
+                if record.get("images"):
+                    record["images"][-1] = image_path
+                else:
+                    record["images"] = [image_path]
         for record in context_records:
             if (
                 (question_id == "ha26t2-open-12" and record.get("level") == "Havo"
