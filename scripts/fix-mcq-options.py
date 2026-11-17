@@ -260,6 +260,9 @@ def main():
         "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
         "ha26t2-mcq-4": "pneumokokbacteriën",
         "ha25t2-mcq-17": "Als in de longblaasjes meer slijm aanwezig is",
+        "vw24t1-mcq-22": "Welke functie heeft de geactiveerde MR",
+        "vw24t2-mcq-40": "Op welk type bodem hebben witte-klaverplanten",
+        "ha26t1-mcq-40": "Welk type immuniteit ontstaat doordat de koeien",
     }
 
     for record in records:
