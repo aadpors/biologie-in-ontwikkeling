@@ -16,9 +16,22 @@ function assertSnippetExists(path, where) {
 assert.ok(Array.isArray(examQuestions) && examQuestions.length > 0, 'exam-mcq.json moet examenvragen bevatten');
 assert.ok(Array.isArray(examContexts) && examContexts.length > 0, 'exam-contexts.json moet contexten bevatten');
 const examYears = new Set(examQuestions.map(question => question.year));
-for (const year of ['2024', '2025', '2026']) {
-  assert.ok(examYears.has(year), `Meerkeuzevragen voor ${year} ontbreken`);
+const sourceExamFiles = fs.readdirSync('examens');
+const discoveredExamYears = new Set(
+  sourceExamFiles
+    .map(name => name.match(/^(?:ha|vw)-1018-a-(\\d{2})-\\d-o(?:-[a-z0-9]+)?\\.pdf$/i))
+    .filter(Boolean)
+    .map(match => `20${match[1]}`)
+);
+assert.ok(discoveredExamYears.size > 0, 'Geen examen-PDF’s gevonden');
+for (const year of discoveredExamYears) {
+  assert.ok(examYears.has(year), `Meerkeuzevragen voor beschikbaar examenjaar ${year} ontbreken`);
 }
+assert.ok(examPage.includes('(o.text?" "+o.text:"")'), 'Frontend verbergt de antwoordtekst bij vragen met een afbeelding');
+assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
+assert.ok(examPage.includes('antwoordteksten (A t/m F)'), 'De toelichting over zichtbare antwoordopties ontbreekt');
+const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
+assert.ok(open2024.length > 0, 'Geselecteerde open vragen uit 2024 ontbreken');
 assert.ok(examPage.includes('<option>2024</option>'), 'Examenoefenen-filter bevat 2024 niet');
 assert.ok(examPage.includes('id:"ha24-1"') && examPage.includes('id:"ha24-8"'), 'Geselecteerde open vragen uit Havo 2024-I ontbreken');
 for (const number of [1, 8]) {
@@ -34,6 +47,12 @@ for (const [index, question] of examQuestions.entries()) {
   assert.ok(Array.isArray(question.options) && question.options.length >= 3, `${where}: antwoordopties ontbreken`);
   const keys = question.options.map(option => option.key);
   assert.equal(new Set(keys).size, keys.length, `${where}: dubbele antwoordletter`);
+  assert.deepEqual(keys, [...'ABCDEF'].slice(0, keys.length), `${where}: antwoordletters moeten aaneengesloten van A t/m F lopen`);
+  for (const option of question.options) {
+    assert.equal(typeof option.text, 'string', `${where}: antwoordtekst ${option.key} ontbreekt`);
+    assert.ok(option.text.trim(), `${where}: antwoordtekst ${option.key} is leeg`);
+  }
+  assert.ok(question.options.length <= 6, `${where}: meer dan zes antwoordopties`);
   assert.ok(keys.includes(question.correct), `${where}: correct antwoord ${question.correct} ontbreekt bij de opties`);
 }
 for (const [index, context] of examContexts.entries()) {
