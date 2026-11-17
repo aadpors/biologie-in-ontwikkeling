@@ -45,10 +45,10 @@ jobs:
         run: python scripts/validate-exam-snippets.py
       - name: Commit generated image snippets
         run: |
-          if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json exam-contexts.json)" ]]; then
+          if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json exam-open.json exam-contexts.json)" ]]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add exam-snippets/ exam-mcq.json exam-contexts.json
+            git add exam-snippets/ exam-mcq.json exam-open.json exam-contexts.json
             git commit -m "Add original exam image snippets"
             # Bewaar de gegenereerde boom en zet bij iedere poging eerst
             # main recht. Een rebase kan bij opnieuw gegenereerde JPG/PNG-
@@ -60,7 +60,7 @@ jobs:
             for attempt in 1 2 3 4 5; do
               git fetch origin main
               git reset --hard origin/main
-              git checkout "$generated_commit" -- exam-snippets/ exam-mcq.json exam-contexts.json
+              git checkout "$generated_commit" -- exam-snippets/ exam-mcq.json exam-open.json exam-contexts.json
               git add exam-snippets/ exam-mcq.json exam-contexts.json
               if git diff --cached --quiet; then
                 echo "Generated snippets are already current."
