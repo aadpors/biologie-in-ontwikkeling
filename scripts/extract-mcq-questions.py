@@ -98,8 +98,32 @@ def footer_boundary(page, lines):
     return max(1, min(hits, default=page.rect.height - 18) - 3)
 
 
-def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8, end_anchor=None):
+def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8, end_anchor=None, start_anchor=None):
     """Render one complete, full-width context crop, preserving figures and tables."""
+    if start_anchor and end_anchor:
+        start_hits = page.search_for(start_anchor)
+        end_hits = page.search_for(end_anchor)
+        if not start_hits or not end_hits:
+            raise RuntimeError(
+                f"Could not locate anchored context for {prefix} question {number}: "
+                f"start={start_anchor!r}, end={end_anchor!r}"
+            )
+        top = max(0, min(rect.y0 for rect in start_hits) - 5)
+        bottom = min(bottom_limit, max(rect.y1 for rect in end_hits) + 1)
+        if bottom <= top:
+            raise RuntimeError(f"Invalid anchored context bounds for {prefix} question {number}")
+        pix = page.get_pixmap(
+            matrix=fitz.Matrix(scale, scale),
+            clip=fitz.Rect(0, top, page.rect.width, bottom),
+            alpha=False,
+        )
+        crop = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+        padded = Image.new("RGB", (crop.width, crop.height + 14), "white")
+        padded.paste(crop, (0, 0))
+        name = f"context-{prefix}-q{number}-complete.jpg"
+        padded.save(OUT / name, quality=94)
+        return [f"exam-snippets/{name}"]
+
     ordered = sorted({i for i in indices if 0 <= i < len(lines) and lines[i]["bbox"][1] < question_top},
                      key=lambda i: (round(lines[i]["bbox"][1], 1), lines[i]["bbox"][0]))
     if not ordered:
@@ -624,6 +648,12 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context_question_top = max(
                             0, lines[marker["number_line"]]["bbox"][1]
                         )
+                        context_start_anchors = {
+                            15: "In Afrika veroorzaken droge perioden",
+                            16: "Doordat de nijlpaardenpopulatie",
+                            17: "Sommige wetenschappers denken",
+                            18: "Nijlpaarden worden",
+                        }
                         context_end_anchors = {
                             15: "biotische factoren.",
                             16: "populaties in Afrika.",
@@ -635,6 +665,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             context_question_top, footer_y, previous_ranges,
                             end_anchor=(
                                 context_end_anchors.get(marker["number"])
+                                if prefix == "vw25t1" else None
+                            ),
+                            start_anchor=(
+                                context_start_anchors.get(marker["number"])
                                 if prefix == "vw25t1" else None
                             ),
                         )
