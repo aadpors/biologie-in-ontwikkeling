@@ -180,5 +180,23 @@
     "output": "cv-ha26-16.jpg",
     "amendment_pdf": "examens/ha-1018-a-26-1-c-a1_0.pdf",
     "amendment_output": "cv-ha26-16-a1.jpg"
+  },
+  {
+    "id": "ha24t1-10",
+    "question": 10,
+    "pdf": "examens/ha-1018-a-24-1-c.pdf",
+    "output": "cv-ha24t1-10.jpg"
+  },
+  {
+    "id": "vw24-1",
+    "question": 1,
+    "pdf": "examens/vw-1018-a-24-1-c.pdf",
+    "output": "cv-vw24-1.jpg"
+  },
+  {
+    "id": "vw24t2-1",
+    "question": 1,
+    "pdf": "examens/vw-1018-a-24-2-c.pdf",
+    "output": "cv-vw24t2-1.jpg"
   }
 ]
