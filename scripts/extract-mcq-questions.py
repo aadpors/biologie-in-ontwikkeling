@@ -295,6 +295,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     ("vw26t1", 2): "Bloedplaatjes ontstaan in het rode beenmerg",
                     ("vw26t2", 14): "De waterspreeuw is de enige zangvogel",
                     ("vw26t2", 24): "Als het darmslijmvlies is opgezwollen",
+                    ("ha26t1", 23): "Bij monocultuur verbouwt een boer één gewas",
+                    ("ha26t1", 43): "Door antistoffen te gebruiken in de behandeling van mastitis",
+                    ("ha26t2", 10): "Destiny laat zien dat de zwarte mangrove",
+                    ("vw26t2", 3): "Voor de aanmaak van de nepetalactonen",
                 }
                 anchored_context = False
                 anchor_text = manual_context_anchors.get((prefix, marker["number"]))
@@ -466,6 +470,25 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
                 page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=crop, alpha=False).save(OUT / image_name)
+                mcq_images = None
+                if (prefix, marker["number"]) == ("vw26t2", 37):
+                    # The model and introductory context belong to question 37;
+                    # questions 36's statements must not be repeated in its card.
+                    intro_hits = page.search_for("Onderzoekers wilden weten")
+                    context_end_hits = page.search_for("Hieronder staan gegevens van de flamingosoort")
+                    q37_hits = page.search_for("Hoe groot is volgens het model")
+                    if not intro_hits or not context_end_hits or not q37_hits:
+                        raise RuntimeError("Could not isolate VWO 2026-II question 37 context")
+                    context_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
+                    context_y1 = min(page.rect.height, min(rect.y0 for rect in context_end_hits) - 5)
+                    question_y0 = max(0, min(rect.y0 for rect in q37_hits) - 0.5)
+                    question_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                    context_name = "context-vw26t2-q37-model.jpg"
+                    question_name = "question-vw26t2-37.jpg"
+                    page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, context_y0, page.rect.width, context_y1), alpha=False).save(OUT / context_name)
+                    page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, question_y0, page.rect.width, question_y1), alpha=False).save(OUT / question_name)
+                    image_name = question_name
+                    mcq_images = [f"exam-snippets/{context_name}", f"exam-snippets/{question_name}"]
 
                 prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
                 if not prompt:
@@ -487,6 +510,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     "options": options,
                     "correct": correct,
                     "image": f"exam-snippets/{image_name}",
+                    **({"images": mcq_images} if mcq_images else {}),
                     "pdf": exam_rel,
                     "cv": cv_rel,
                     "questionType": "mcq",
