@@ -33,6 +33,24 @@ assert.ok(examPage.includes('antwoordteksten (A t/m F)'), 'De toelichting over z
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
 assert.ok(open2024.length > 0, 'Geselecteerde open vragen uit 2024 ontbreken');
 assert.ok(examQuestions.some(question => question.year === '2024' && question.options.length === 6), 'Meerkeuzevragen met zes antwoordopties (A-F) uit 2024 ontbreken');
+
+const selected2024OpenQuestions = [
+  { id: 'ha24t1-10', level: 'Havo', period: '1', n: 10, cv: 'exam-snippets/cv-ha24t1-10.jpg' },
+  { id: 'vw24-1', level: 'Vwo', period: '1', n: 1, cv: 'exam-snippets/cv-vw24-1.jpg' },
+  { id: 'vw24t2-1', level: 'Vwo', period: '2', n: 1, cv: 'exam-snippets/cv-vw24t2-1.jpg' },
+];
+for (const question of selected2024OpenQuestions) {
+  assert.ok(examPage.includes(`id:"${question.id}"`), `Geselecteerde open vraag ${question.id} ontbreekt in examenoefenen.html`);
+  const context = examContexts.find(item =>
+    item.level === question.level && item.year === '2024' &&
+    item.period === question.period && item.n === question.n
+  );
+  assert.ok(context, `Bronafbeeldingen voor open vraag ${question.id} ontbreken`);
+  assertSnippetExists(context.image, `open vraag ${question.id}`);
+  for (const path of context.images || []) assertSnippetExists(path, `open vraag ${question.id}`);
+  assertSnippetExists(question.cv, `correctievoorschrift open vraag ${question.id}`);
+}
+
 assert.ok(examPage.includes('<option>2024</option>'), 'Examenoefenen-filter bevat 2024 niet');
 assert.ok(examPage.includes('id:"ha24-1"') && examPage.includes('id:"ha24-8"'), 'Geselecteerde open vragen uit Havo 2024-I ontbreken');
 for (const number of [1, 8]) {
