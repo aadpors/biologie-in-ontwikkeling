@@ -37,6 +37,42 @@
   },
   {
     "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t2-q3.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q3-complete.jpg",
+      "exam-snippets/question-ha24t2-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2024-t2-q6.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q6-complete.jpg",
+      "exam-snippets/question-ha24t2-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 7,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2024-t2-q7.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q7-complete.jpg",
+      "exam-snippets/question-ha24t2-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
     "year": "2025",
     "period": "1",
     "n": 1,
@@ -214,6 +250,18 @@
     "images": [
       "exam-snippets/context-vw24t2-q1-complete.jpg",
       "exam-snippets/question-vw24t2-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 2,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2024-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q2-complete.jpg",
+      "exam-snippets/question-vw24t2-2-only.jpg"
     ]
   },
   {
