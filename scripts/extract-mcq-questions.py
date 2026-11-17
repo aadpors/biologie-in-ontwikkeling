@@ -589,7 +589,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             f"exam-snippets/{context_image}",
                         ]
                     if (prefix, marker["number"]) in {("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
-                        context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg", f"exam-snippets/{context_image}"]
+                        context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg"]
+                        if marker["number"] == 14:
+                            context_record["images"].append("exam-snippets/vw25-t1-hippo-q14-context.jpg")
+                        context_record["images"].append(f"exam-snippets/{context_image}")
                     contexts.append(context_record)
 
                 false_positive_open_questions = {
