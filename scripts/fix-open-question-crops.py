@@ -25,6 +25,12 @@ def render_region(page, top, bottom):
 def main():
     open_records = json.loads(OPEN_PATH.read_text(encoding="utf-8"))
     context_records = json.loads(CONTEXT_PATH.read_text(encoding="utf-8"))
+    question_text_overrides = {
+        "ha24t1-open-40": "In welke volgorde vinden deze processen plaats op de akker zodat uiteindelijk NO3− beschikbaar is voor quinoa? Noteer de vier nummers in de juiste volgorde."
+    }
+    for record in open_records:
+        if record.get("id") in question_text_overrides:
+            record["q"] = question_text_overrides[record["id"]]
     docs = {}
 
     def get_page(filename, page_index):
