@@ -29,7 +29,7 @@ assert.ok(discoveredExamYears.size > 0, 'Geen examen-PDF’s gevonden');
 for (const year of discoveredExamYears) {
   assert.ok(examYears.has(year), `Meerkeuzevragen voor beschikbaar examenjaar ${year} ontbreken`);
 }
-assert.ok(examPage.includes('(o.text?" "+o.text:"")'), 'Frontend verbergt de antwoordtekst bij vragen met een afbeelding');
+assert.ok(examPage.includes('De antwoordteksten staan in de oorspronkelijke opgave hierboven'), 'Meerkeuzevragen verwijzen niet naar de originele antwoordteksten');
 assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
 assert.ok(examPage.includes('Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback.'), 'De toelichting over de meerkeuze-interactie ontbreekt');
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
