@@ -725,7 +725,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Het onderzoeksteam concludeerde na onderzoek aan huismuizen waarbij\nde Marsili-mutatie was aangebracht, dat de puntmutatie inderdaad het\nafwijkende fenotype veroorzaakt.",
+    "source": "In tabel 2 is de aminozuurvolgorde van het ZFHX2-eiwit rondom de\nMarsili-mutatie bij de mens en bij verschillende diersoorten weergegeven.\ntabel 2\nmens met Marsili-mutatie\nQVWFQNTRAREKKGQFRSTP\nmens zonder de mutatie\nQVWFQNTRARERKGQFRSTP\nchimpansee\nQVWFQNTRARERKGQFRSTP\nhond\nQVWFQNTRARERKGQFRSTP\nhuismuis\nQVWFQNTRARERKGQFRSTP\nDe Marsili-mutatie bevindt zich in een deel van het gen waarin normaal\ngeen genetische variatie aanwezig is.\nBeredeneer waardoor dit deel van het ZFHX2-gen in de loop van de\nevolutie hetzelfde is gebleven.\nHet onderzoeksteam concludeerde na onderzoek aan huismuizen waarbij\nde Marsili-mutatie was aangebracht, dat de puntmutatie inderdaad het\nafwijkende fenotype veroorzaakt.",
     "q": "Welke puntmutatie is bij de huismuizen aangebracht in de coderende\nstreng van het ZFHX2-gen?",
     "options": [
       {
@@ -2329,6 +2329,10 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-9.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q9-table.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-9.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
