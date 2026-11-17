@@ -89,6 +89,21 @@ const assert = require("node:assert/strict");
     assert.equal(appendixResponse.status(), 200, "Uitwerkbijlage is niet bereikbaar");
     assert.match(appendixResponse.headers()["content-type"] || "", /pdf/i);
 
+    // The second appendix PDF is also linked from the vwo 2026 time-window questions.
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("2");
+    await page.locator("#questionType").selectOption("open");
+    let vwoAppendix = page.locator('a[href="examens/vw-1018-a-26-2-u.pdf"]');
+    for (let i = 0; i < 35 && await vwoAppendix.count() === 0; i++) {
+      await page.locator("#nextQuestion").click();
+      vwoAppendix = page.locator('a[href="examens/vw-1018-a-26-2-u.pdf"]');
+    }
+    assert.ok(await vwoAppendix.count() > 0, "Geen vwo 2026 tijdvak 2-uitwerkbijlage-link gevonden");
+    const vwoAppendixResponse = await page.request.get(new URL(await vwoAppendix.first().getAttribute("href"), page.url()).toString());
+    assert.equal(vwoAppendixResponse.status(), 200, "Vwo-uitwerkbijlage is niet bereikbaar");
+    assert.match(vwoAppendixResponse.headers()["content-type"] || "", /pdf/i);
+
     assert.deepEqual(pageErrors, [], "Browserconsole bevat fouten: " + pageErrors.join(" | "));
     console.log(JSON.stringify({
       result: "PASS",
@@ -99,7 +114,7 @@ const assert = require("node:assert/strict");
       openAnswerPersistence: "PASS",
       selfAssessmentPersistence: "PASS",
       imageLoading: imageState,
-      appendix: { href: appendixHref, status: appendixResponse.status() },
+      appendices: [{ href: appendixHref, status: appendixResponse.status() }, { href: "examens/vw-1018-a-26-2-u.pdf", status: vwoAppendixResponse.status() }],
       pageErrors
     }, null, 2));
   } finally {
