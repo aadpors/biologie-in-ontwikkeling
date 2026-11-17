@@ -1099,7 +1099,7 @@ for exam in EXAMS:
     exam_key, level, year, period, exam_rel, cv_rel = exam
     with fitz.open(ROOT / exam_rel) as source_doc:
         detected = set()
-        for page in source_doc:
+        for page_index, page in enumerate(source_doc):
             detected.update(
                 marker["number"] for marker in find_markers(
                     line_records(page), allow_multiline_number_first=(exam_key == "ha24t1" and page_index != 15)
