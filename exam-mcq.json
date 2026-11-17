@@ -1,18 +1,18 @@
 [
   {
-    "id": "ha24t1-mcq-1",
+    "id": "ha24t1-mcq-2",
     "level": "Havo",
     "year": "2024",
     "period": "1",
-    "n": 1,
-    "points": 1,
+    "n": 2,
+    "points": 2,
     "page": 2,
     "theme": "Meerkeuzevragen",
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een nieuwe hartklep, door het lichaam zelf gemaakt\nIn Nederland worden jaarlijks ongeveer vijfduizend hartkleppen vervangen\ndoor kunsthartkleppen. Bij kinderen met een kunsthartklep, moet de klep\nmeerdere keren worden vervangen, omdat een kunsthartklep niet\nmeegroeit. Biomedisch ingenieur Carlijn Bouten werkt aan een oplossing\nvoor dit probleem.\nIn het hart zijn vier kleppen aanwezig:\n\ntwee slagaderkleppen (afbeelding 1, Q en R)\n\ntwee kleppen tussen de boezems en kamers (afbeelding 1, P en S)\nafbeelding 1",
-    "q": "Noteer de letter die de klep aangeeft waarlangs zuurstofarm bloed vanuit\nde kamer richting de longen gaat.\nTwee mogelijke hartafwijkingen zijn:\n1 De aortaklep is te stug en opent daardoor niet goed.\n2 De aortaklep is te slap en sluit daardoor niet goed.\n2\nBij welke afwijking stroomt er per minuut minder bloed door de aorta naar\n2p\nde organen in het lichaam, in vergelijking met een normaal functionerend\nhart bij een gelijke inspanning van de hartspier?",
+    "source": "Twee mogelijke hartafwijkingen zijn:\n1 De aortaklep is te stug en opent daardoor niet goed.\n2 De aortaklep is te slap en sluit daardoor niet goed.",
+    "q": "Bij welke afwijking stroomt er per minuut minder bloed door de aorta naar\nde organen in het lichaam, in vergelijking met een normaal functionerend\nhart bij een gelijke inspanning van de hartspier?",
     "options": [
       {
         "key": "A",
@@ -31,11 +31,11 @@
         "text": "zowel bij 1 als bij 2"
       }
     ],
-    "correct": "",
-    "image": "exam-snippets/complete-ha24t1-mcq-1.jpg",
+    "correct": "D",
+    "image": "exam-snippets/complete-ha24t1-mcq-2.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q1-complete.jpg",
-      "exam-snippets/question-ha24t1-1-only.jpg"
+      "exam-snippets/context-ha24t1-q2-complete.jpg",
+      "exam-snippets/question-ha24t1-2-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-1-c.pdf",
@@ -122,19 +122,19 @@
     "questionType": "mcq"
   },
   {
-    "id": "ha24t1-mcq-8",
+    "id": "ha24t1-mcq-9",
     "level": "Havo",
     "year": "2024",
     "period": "1",
-    "n": 8,
-    "points": 2,
+    "n": 9,
+    "points": 1,
     "page": 5,
     "theme": "Meerkeuzevragen",
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Tijdens de groeifase komen verschillende stamcellen het\nkunstvezelnetwerk binnen vanuit het bloed en het omringende hartweefsel\nvan het schaap. Gestimuleerd door de ontsteking gaan deze stamcellen\nzich delen om nieuwe cellen (bindweefsel- en endotheelcellen) te vormen.\nOver de groeifase worden de volgende uitspraken gedaan:\n1 Uit één stamcel ontstaat na mitose één endotheelcel en één\nbindweefselcel.\n2 Een endotheelcel krijgt zijn vorm en functie door celdifferentiatie.\n3 Celdifferentiatie wordt bepaald door veranderingen in genexpressie.",
-    "q": "Schrijf de nummers 1, 2 en 3 onder elkaar en noteer erachter of de\nbetreffende uitspraak juist of onjuist is.\nTijdens de ontwikkelingsfase worden de kunstvezels afgebroken, zodat\nuiteindelijk alleen hartklepcellen overblijven in een netwerk van stevige en\nelastische eiwitten. De restanten van de kunstvezels worden opgeruimd\ndoor witte bloedcellen die deze restanten opnemen in een blaasje. Dit\nblaasje versmelt vervolgens met een bepaald celorganel, zodat de\nkunststofrestanten verteerd kunnen worden.\n9\nMet welk celorganel versmelt het blaasje zodat de kunststofrestanten\n1p\nverteerd kunnen worden?",
+    "source": "Tijdens de ontwikkelingsfase worden de kunstvezels afgebroken, zodat\nuiteindelijk alleen hartklepcellen overblijven in een netwerk van stevige en\nelastische eiwitten. De restanten van de kunstvezels worden opgeruimd\ndoor witte bloedcellen die deze restanten opnemen in een blaasje. Dit\nblaasje versmelt vervolgens met een bepaald celorganel, zodat de\nkunststofrestanten verteerd kunnen worden.",
+    "q": "Met welk celorganel versmelt het blaasje zodat de kunststofrestanten\nverteerd kunnen worden?",
     "options": [
       {
         "key": "A",
@@ -151,17 +151,13 @@
       {
         "key": "D",
         "text": "met het endoplasmatisch reticulum met het golgi-systeem"
-      },
-      {
-        "key": "E",
-        "text": ""
       }
     ],
-    "correct": "",
-    "image": "exam-snippets/complete-ha24t1-mcq-8.jpg",
+    "correct": "A",
+    "image": "exam-snippets/complete-ha24t1-mcq-9.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q8-complete.jpg",
-      "exam-snippets/question-ha24t1-8-only.jpg"
+      "exam-snippets/context-ha24t1-q9-complete.jpg",
+      "exam-snippets/question-ha24t1-9-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-1-c.pdf",
