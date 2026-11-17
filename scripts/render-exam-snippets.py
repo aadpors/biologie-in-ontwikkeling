@@ -113,7 +113,7 @@ def render_question(doc, clip, scale):
         and word[0] < page.rect.width * 0.35
     ]
     y_end = min((word[1] - 2 for word in following), default=page.rect.height - 25)
-    y_end = max(y_end, marker_word[3] + 35)
+    y_end = max(y_end, marker_word[3] + 9)
     # A generous context window from the top of this page prevents clipping
     # introductory text and full-width diagrams. Never narrow the page width.
     rect = fitz.Rect(0, 25, page.rect.width, min(page.rect.height, y_end))
