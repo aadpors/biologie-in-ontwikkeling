@@ -151,9 +151,13 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         # Exact final phrase is more reliable than inferred line ordering for
         # the multi-question hippopotamus passage, whose text blocks share a
         # page with several question markers.
+        # Crop exactly after the final phrase's glyph box. Adding PDF
+        # points here can capture the first pixels of the next paragraph
+        # (visible as dotted fragments in the stitched cards). Add white
+        # breathing room after rasterization instead of extending the PDF crop.
         context_bottom = min(
             bottom_limit,
-            max(rect.y1 for rect in end_hits) + 4,
+            max(rect.y1 for rect in end_hits) + 1,
         )
     # A very shallow fragment is not a usable context card. Let the
     # bounded page-local fallback preserve the preceding context instead.
@@ -161,14 +165,22 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         return []
 
     name = f"context-{prefix}-q{number}-complete.jpg"
+    output_path = OUT / name
     save_page_crop(
         page,
         fitz.Rect(0, context_top, page.rect.width, context_bottom),
-        OUT / name,
+        output_path,
         lines,
         previous_ranges,
         scale=scale,
     )
+    if end_anchor:
+        # Keep a clean lower margin without pulling the next paragraph into
+        # the crop. The glyphs are already fully rendered above this padding.
+        with Image.open(output_path) as crop:
+            padded = Image.new("RGB", (crop.width, crop.height + 14), "white")
+            padded.paste(crop, (0, 0))
+            padded.save(output_path, quality=94)
     return [f"exam-snippets/{name}"]
 
 def fallback_context_fragment(page, lines, prefix, number, question_top, previous_ranges=(), scale=1.8):
