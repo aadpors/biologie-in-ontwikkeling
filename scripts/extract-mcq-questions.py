@@ -710,7 +710,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if selected_context_page is None or page_index + 1 == selected_context_page:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     question_top = max(0, lines[start]["bbox"][1] - 1)
-                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
+                    question_y1 = max(
+                        question_top + 40,
+                        min(page.rect.height - 15, footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING),
+                    )
                     try:
                         save_page_crop(
                             page,
