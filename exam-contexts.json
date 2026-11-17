@@ -25,6 +25,18 @@
   },
   {
     "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 10,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2024-t1-q10.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q10-complete.jpg",
+      "exam-snippets/question-ha24t1-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
     "year": "2025",
     "period": "1",
     "n": 1,
@@ -178,6 +190,30 @@
     "images": [
       "exam-snippets/context-ha26t2-q9-complete.jpg",
       "exam-snippets/question-ha26t2-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2024-t1-q1.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q1-complete.jpg",
+      "exam-snippets/question-vw24t1-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2024-t2-q1.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q1-complete.jpg",
+      "exam-snippets/question-vw24t2-1-only.jpg"
     ]
   },
   {
