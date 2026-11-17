@@ -351,7 +351,7 @@ def find_markers(lines, allow_multiline_number_first=False):
                 continue
             prompt_lines = [x["text"] for x in lines[i + 1:j]]
             prompt = " ".join(prompt_lines).strip()
-            has_question_prompt = any(prompt_starts.match(x) or (allow_multiline_number_first and re.match(r"^(?:bij\\s+(?:welke|welk|wat|wie|hoe)|met\\s+welk)", x, re.I)) or "?" in x for x in prompt_lines)
+            has_question_prompt = any(prompt_starts.match(x) or (allow_multiline_number_first and re.match(r"^(?:bij\s+(?:welke|welk|wat|wie|hoe)|met\s+welk)", x, re.I)) or "?" in x for x in prompt_lines)
             same_baseline = abs(lines[j]["bbox"][1] - lines[i]["bbox"][1]) <= 8
             if prompt and has_question_prompt and (same_baseline or (allow_multiline_number_first and len(prompt_lines) >= 2)):
                 markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
