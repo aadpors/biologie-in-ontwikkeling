@@ -198,5 +198,11 @@
     "question": 1,
     "pdf": "examens/vw-1018-a-24-2-c.pdf",
     "output": "cv-vw24t2-1.jpg"
+  },
+  {
+    "id": "ha24t2-2",
+    "question": 2,
+    "pdf": "examens/ha-1018-a-24-2-c.pdf",
+    "output": "cv-ha24t2-2.jpg"
   }
 ]
