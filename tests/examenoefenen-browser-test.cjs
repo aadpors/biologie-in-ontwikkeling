@@ -50,28 +50,14 @@ const assert = require("node:assert/strict");
     assert.deepEqual(topicAudit.overTagged, [], "Er zijn vragen met meer dan drie onderwerpstags; controleer op overmatige rubricering");
 
     // Context words must not create unrelated subjects on two known edge cases.
-    await page.locator("#level").selectOption("Havo");
-    await page.locator("#year").selectOption("2024");
-    await page.locator("#period").selectOption("2");
-    await page.locator("#questionType").selectOption("open");
-    await page.waitForFunction(() => document.querySelector(".qhead")?.textContent.includes("vraag 3"));
-    const beetleTopics = (await page.locator(".tags .tag").allTextContents()).filter(tag => !tag.startsWith("Eindterm"));
-    assert.deepEqual(beetleTopics, ["Ecologie: kringlopen"],
+    const edgeTopicAudit = await page.evaluate(() => ({
+      beetle: onderwerpenVanVraag(questions.find(q => q.id === "ha24t2-3")),
+      vitamin: onderwerpenVanVraag(questions.find(q => q.id === "vw26t2-mcq-17"))
+    }));
+    assert.deepEqual(edgeTopicAudit.beetle, ["Ecologie: kringlopen"],
       "Havo 2024 tijdvak 2 vraag 3 mag geen onterechte labels voor eutrofiëring, planten of uitscheiding krijgen");
-
-    await page.locator("#level").selectOption("Vwo");
-    await page.locator("#year").selectOption("2026");
-    await page.locator("#period").selectOption("2");
-    await page.locator("#questionType").selectOption("mcq");
-    for (let i = 0; i < 30 && !(await page.locator(".qhead").innerText()).includes("vraag 17"); i++) {
-      await page.locator("#nextQuestion").click();
-    }
-    assert.match(await page.locator(".qhead").innerText(), /vraag 17/);
-    const vitaminTopics = (await page.locator(".tags .tag").allTextContents()).filter(tag => !tag.startsWith("Eindterm"));
-    assert.deepEqual(vitaminTopics, ["Hart en bloedsomloop"],
+    assert.deepEqual(edgeTopicAudit.vitamin, ["Hart en bloedsomloop"],
       "Vwo 2026 tijdvak 2 vraag 17 toetst de bloedroute, niet huid, uitscheiding of vertering");
-
-    await page.locator("#reset").click();
 
     // Previous/next and question dots move through the filtered sequence.
     const firstHeading = await page.locator(".qhead").innerText();
