@@ -745,7 +745,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     # line itself and let the top of the question leak into the
                     # context card. Keep a visible lower margin as well.
                     context_question_top = max(
-                        0, lines[marker["number_line"]]["bbox"][1] - 8
+                        0, lines[marker["number_line"]]["bbox"][1]
                     )
                     context_paths = context_image_fragments(
                         page, lines, context_line_indices, prefix,
