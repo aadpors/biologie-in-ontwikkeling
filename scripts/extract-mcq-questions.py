@@ -45,7 +45,7 @@ EXAMS = discover_exams()
 
 SELECTED_CONTEXTS = {
     ("ha24t1", 1), ("ha24t1", 8),
-    ("ha24t1", 10), ("vw24t1", 1), ("vw24t2", 1),
+    ("ha24t1", 10), ("ha24t2", 3), ("ha24t2", 6), ("ha24t2", 7), ("vw24t1", 1), ("vw24t2", 1), ("vw24t2", 2),
     ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18),
     ("ha25t1", 1), ("ha25t1", 3), ("ha25t1", 5),
     ("ha26t1", 4), ("ha26t1", 5), ("ha26t1", 7), ("ha26t1", 8), ("ha26t1", 15), ("ha26t1", 16),
@@ -544,6 +544,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # block. Anchor these cards to the actual context paragraph for
                 # that question so earlier question prompts are not repeated.
                 manual_context_anchors = {
+                    ("ha24t2", 3): "De aanwezigheid van mestkevers in de mest",
+                    ("ha24t2", 6): "Hoewel ivermectine ongevaarlijk is voor egels",
+                    ("ha24t2", 7): "Helmer gaat in gesprek met veehouders",
+                    ("vw24t2", 2): "Over afbeelding 2 worden de volgende uitspraken gedaan",
                     ("ha25t1", 14): "Eileen komt in aanmerking",
                     ("ha25t1", 27): "Uit onderzoek bij zeehonden",
                     ("ha26t1", 5): "Een kwartier na afloop van de inspanning",
