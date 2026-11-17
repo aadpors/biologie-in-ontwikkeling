@@ -711,13 +711,24 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     question_top = max(0, lines[start]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
-                    save_page_crop(
-                        page,
-                        fitz.Rect(0, context_y0, page.rect.width, question_y1),
-                        OUT / context_image,
-                        lines,
-                        previous_ranges,
-                    )
+                    try:
+                        save_page_crop(
+                            page,
+                            fitz.Rect(0, context_y0, page.rect.width, question_y1),
+                            OUT / context_image,
+                            lines,
+                            previous_ranges,
+                        )
+                    except RuntimeError:
+                        # A page can contain only the current question after
+                        # earlier blocks have been removed. Preserve this
+                        # question-only image; its separate context fragment
+                        # is rendered below and remains independently linked.
+                        page.get_pixmap(
+                            matrix=fitz.Matrix(1.8, 1.8),
+                            clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
+                            alpha=False,
+                        ).save(OUT / context_image)
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
                     if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14)}:
                         # Use the printed score/question marker as the
