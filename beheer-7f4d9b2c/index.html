@@ -75,7 +75,14 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
   let selected = [];
   let jobs = [];
 
-  async function ensureAnonymousSession() {\n    const {data:{session}}=await client.auth.getSession();\n    if(session) return true;\n    const {error}=await client.auth.signInAnonymously();\n    if(error){toast('Beheersessie kon niet worden gestart: '+error.message,true);return false;}\n    return true;\n  }\n  function toast(message, error=false) {
+  async function ensureAnonymousSession() {
+    const {data:{session}}=await client.auth.getSession();
+    if(session) return true;
+    const {error}=await client.auth.signInAnonymously();
+    if(error){toast('Beheersessie kon niet worden gestart: '+error.message,true);return false;}
+    return true;
+  }
+  function toast(message, error=false) {
     const el=$('toast'); el.textContent=message; el.style.display='block';
     el.style.background=error?'#8f263b':'#24313b';
     clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.style.display='none',4200);
