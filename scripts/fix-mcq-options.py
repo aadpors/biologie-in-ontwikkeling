@@ -227,6 +227,26 @@ def main():
             {"key": "B", "text": "Stamboomafbeelding (zie volledige vraagafbeelding)"},
             {"key": "C", "text": "Stamboomafbeelding (zie volledige vraagafbeelding)"},
         ],
+        # The PDF text extractor can run into the next question/page after the final option.
+        # These three answer blocks are transcribed from their complete original question images.
+        "vw24t1-mcq-22": [
+            {"key": "A", "text": "activator"},
+            {"key": "B", "text": "enhancer (versterker)"},
+            {"key": "C", "text": "promotor"},
+            {"key": "D", "text": "repressor"},
+        ],
+        "vw24t2-mcq-40": [
+            {"key": "A", "text": "op fosfaatarme bodems"},
+            {"key": "B", "text": "op fosfaatrijke bodems"},
+            {"key": "C", "text": "op nitraatarme bodems"},
+            {"key": "D", "text": "op nitraatrijke bodems"},
+        ],
+        "ha26t1-mcq-40": [
+            {"key": "A", "text": "actief | ja"},
+            {"key": "B", "text": "actief | nee"},
+            {"key": "C", "text": "passief | ja"},
+            {"key": "D", "text": "passief | nee"},
+        ],
     }
     manual_question_text = {
         "vw24t1-mcq-34": "Hoe groot is de kans dat de baby het gemuteerde G6PD-allel erft?",
