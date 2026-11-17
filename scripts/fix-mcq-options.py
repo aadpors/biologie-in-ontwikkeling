@@ -216,6 +216,12 @@ def main():
             {"key": "C", "text": "letter Q | plaats 1"}, {"key": "D", "text": "letter Q | plaats 2"},
         ],
     }
+    manual_question_text = {
+        "vw24t1-mcq-34": "Hoe groot is de kans dat de baby het gemuteerde G6PD-allel erft?",
+        "ha25t2-mcq-7": "Wat is de kans dat haan II-5 homozygoot is?",
+        "vw26t1-mcq-26": "Welke verandering van de membraanpotentiaal kan leiden tot een impuls? En is dit het gevolg van een Ca2+-instroom of van een Ca2+-uitstroom?",
+        "vw26t2-mcq-21": "Welk type cel is cel P? En welk type MHC-molecuul van de APC bindt met een T-helpercel?",
+    }
     full_page_anchors = {
         "ha25t1-mcq-31": "De milt is onderdeel van het lymfevatenstelsel",
         "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
@@ -242,6 +248,8 @@ def main():
         if old != new:
             changed.append((record["id"], old, new))
         record["options"] = new
+        if record["id"] in manual_question_text:
+            record["q"] = manual_question_text[record["id"]]
 
         anchor = full_page_anchors.get(record["id"])
         if anchor:
