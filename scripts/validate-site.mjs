@@ -38,6 +38,10 @@ const selected2024OpenQuestions = [
   { id: 'ha24t1-10', level: 'Havo', period: '1', n: 10, cv: 'exam-snippets/cv-ha24t1-10.jpg' },
   { id: 'vw24-1', level: 'Vwo', period: '1', n: 1, cv: 'exam-snippets/cv-vw24-1.jpg' },
   { id: 'vw24t2-1', level: 'Vwo', period: '2', n: 1, cv: 'exam-snippets/cv-vw24t2-1.jpg' },
+  { id: 'ha24t2-3', level: 'Havo', period: '2', n: 3, cv: 'exam-snippets/cv-ha24t2-3.jpg' },
+  { id: 'ha24t2-6', level: 'Havo', period: '2', n: 6, cv: 'exam-snippets/cv-ha24t2-6.jpg' },
+  { id: 'ha24t2-7', level: 'Havo', period: '2', n: 7, cv: 'exam-snippets/cv-ha24t2-7.jpg' },
+  { id: 'vw24t2-2', level: 'Vwo', period: '2', n: 2, cv: 'exam-snippets/cv-vw24t2-2.jpg' },
 ];
 for (const question of selected2024OpenQuestions) {
   assert.ok(examPage.includes(`id:"${question.id}"`), `Geselecteerde open vraag ${question.id} ontbreekt in examenoefenen.html`);
