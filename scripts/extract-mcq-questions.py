@@ -590,9 +590,14 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     )
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
                     if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14)}:
+                        # Use the printed score/question marker as the
+                        # lower boundary for open-question context fragments too.
+                        context_question_top = max(
+                            0, lines[marker["number_line"]]["bbox"][1]
+                        )
                         context_paths = context_image_fragments(
                             page, lines, context_line_indices, prefix, marker["number"],
-                            question_top, footer_y, previous_ranges,
+                            context_question_top, footer_y, previous_ranges,
                         )
                         if not context_paths:
                             context_paths = fallback_context_fragment(
