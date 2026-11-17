@@ -721,6 +721,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             alpha=False,
                         ).save(OUT / question_name)
                         context_paths.append(f"exam-snippets/{question_name}")
+                    else:
+                        # If text-line segmentation cannot isolate the question
+                        # (e.g. a compact prompt or table), retain the original
+                        # full question crop instead of publishing context alone.
+                        context_paths.append(f"exam-snippets/{image_name}")
                     mcq_images = context_paths or [f"exam-snippets/{image_name}"]
 
                 prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
