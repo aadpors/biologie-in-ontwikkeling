@@ -88,9 +88,7 @@ function onderwerpenVanVraag(q){
   "cellen: deling en differentiatie":["Cellen: deling en differentiatie"],
   "zenuwstelsel & oog":["Zenuwstelsel & oog"],
   "erfelijkheid":["Erfelijkheid"],
-  "ecologie en ecosystemen":["Ecologie"],
   "ecologie en interacties":["Ecologie: relaties & energiestromen"],
-  "evolutie en erfelijkheid":["Evolutie"],
   "stofwisseling en energie":["Cellen: stofwisseling"],
   "afweer en bescherming":["Afweer"],
   "genetische modificatie":["Dna: expressie, transcriptie, translatie en onderzoek"]
@@ -110,8 +108,8 @@ function onderwerpenVanVraag(q){
  if(/eutrofiëring|algenbloei|fosfaat|nutri[eë]nt|vermesting/.test(t))add("Ecologie: eutrofiëring");
  if(/kringloop|mineralisatie|afbraak van organisch materiaal|stofkringloop|koolstofkringloop|stikstofkringloop|fosforkringloop/.test(t))add("Ecologie: kringlopen");
  if(/voedselweb|trofisch|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|interactie tussen soorten|voedselketen/.test(t))add("Ecologie: relaties & energiestromen");
- if(/eiwit|aminozuur|eiwitvouwing|enzym|katalys/.test(t))add("Eiwitten & enzymen");
- if(/enzym|katalys|substraat|activeringsenergie/.test(t))add("Enzymen");
+ if(/eiwit|aminozuur|eiwitvouwing/.test(t))add("Eiwitten & enzymen");
+ if(/enzym|katalys|substraat|activeringsenergie/.test(t)){hits.delete("Eiwitten & enzymen");add("Enzymen");}
  if(/erfelijk|overerving|allel|genotype|fenotype|stamboom|inteelt|recessief|dominant|kruising|genetische variatie/.test(t))add("Erfelijkheid");
  if(/evolutie|selectiedruk|natuurlijke selectie|genetic drift|stichtereffect|soortvorming|convergente evolutie|divergente evolutie|adaptatie/.test(t))add("Evolutie");
  if(/hart|bloedvat|slagader|ader|haarvat|bloeddruk|slagvolume|polsslag|bloedsomloop|bloedplaat|bloedcel|lymfe|weefselvloeistof|hartklep/.test(t))add("Hart en bloedsomloop");
