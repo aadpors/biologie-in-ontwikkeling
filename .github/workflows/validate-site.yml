@@ -42,10 +42,22 @@ jobs:
           node <<'NODE'
           const fs = require('node:fs');
           const html = fs.readFileSync('beheer-7f4d9b2c/index.html', 'utf8');
-          const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+          const openTag = '<script>';
+          const closeTag = '</script>';
+          const scripts = [];
+          let cursor = 0;
+          while (true) {
+            const start = html.indexOf(openTag, cursor);
+            if (start === -1) break;
+            const bodyStart = start + openTag.length;
+            const end = html.indexOf(closeTag, bodyStart);
+            if (end === -1) throw new Error('Niet-afgesloten script-tag');
+            scripts.push(html.slice(bodyStart, end));
+            cursor = end + closeTag.length;
+          }
           if (!scripts.length) throw new Error('Geen inline beheerscript gevonden');
-          for (const [index, match] of scripts.entries()) {
-            new Function(match[1]);
+          for (const [index, source] of scripts.entries()) {
+            new Function(source);
             console.log(`Beheerscript ${index + 1}: syntaxis OK`);
           }
           for (const required of ['exam-inbox', 'exam_ingest_jobs', 'exam_ingest_events']) {
