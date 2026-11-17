@@ -14,11 +14,11 @@ De beheeromgeving staat voorlopig op een niet-gelinkte URL:
 - De worker controleert PDF's, haalt per pagina tekst en paginagrootte op, herkent waar mogelijk niveau/jaar/tijdvak/documenttype uit de bestandsnaam en bewaart een `inventory.json` in de private bucket.
 - ZIP-bestanden worden geïnventariseerd en de gevonden PDF's worden afzonderlijk in de private bucket opgeslagen.
 - Inventarisatie-uitkomsten worden als `review_required` gemarkeerd; dit betekent nadrukkelijk nog niet dat vragen/contexten zijn gekoppeld of dat afbeeldingen zijn goedgekeurd.
-- Er wordt niets gepubliceerd naar de openbare website.
+- De knop AI-analyse starten verschijnt bij geïnventariseerde opgaven-PDF's; de eerste analyse is handmatig per bestand te starten.\n- Voor AI is de Supabase Edge Function secret OPENAI_API_KEY nodig. Optioneel kan OPENAI_EXAM_MODEL worden ingesteld; standaard is gpt-4.1.\n- Er wordt niets gepubliceerd naar de openbare website.
 
 ## Belangrijk: volgende verwerkingsfasen
 
-De eerste technische worker voert alleen bestands- en pagina-inventarisatie uit. AI-gestuurde vraagherkenning, semantische koppeling van algemene contexten en vraagintroducties, segmentselectie over meerdere pagina's, originele fragmentcompositie per vraag en visuele menselijke beoordeling zijn nog niet aangesloten. De bestaande regex-/anker-gebaseerde renderers worden niet als inhoudelijke waarheid gebruikt. Publicatie blijft uitgeschakeld totdat de volledige vraagset (open én meerkeuze) inhoudelijk en visueel is gecontroleerd.
+De eerste technische worker voert alleen bestands- en pagina-inventarisatie uit. De Edge Function analyze-exam-questions is aangesloten als eerste AI-stap. Per opgaven-PDF kan deze met een ingestelde OPENAI_API_KEY een conceptinventaris maken van alle open en meerkeuzevragen, gedeelde contexten en paginabrede fragmenten. Het resultaat wordt als JSON in de private bucket opgeslagen. Deze stap vereist handmatige start per opgaven-PDF en is begrensd tot 24 MB per PDF. Correctievoorschriften en uitwerkbijlagen worden niet als vraagbron gebruikt. De segmenten en vraagherkenning zijn AI-voorstellen en moeten inhoudelijk worden gevalideerd. De originele beeldfragmenten worden nog niet gerenderd en visuele menselijke beoordeling is nog niet aangesloten. De bestaande regex-/anker-gebaseerde renderers worden niet als inhoudelijke waarheid gebruikt. Publicatie blijft uitgeschakeld totdat de volledige vraagset (open én meerkeuze) inhoudelijk en visueel is gecontroleerd.
 
 ## Tijdelijke toegang
 
