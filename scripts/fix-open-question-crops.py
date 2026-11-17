@@ -40,7 +40,6 @@ def main():
         for record in open_records:
             if record.get("id") == question_id:
                 record["image"] = image_path
-                record["images"] = [image_path]
         for record in context_records:
             if (
                 (question_id == "ha26t2-open-12" and record.get("level") == "Havo"
