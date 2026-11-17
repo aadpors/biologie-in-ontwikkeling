@@ -4,17 +4,21 @@ De beheeromgeving staat voorlopig op een niet-gelinkte URL:
 
 `/beheer-7f4d9b2c/`
 
-## Eerste versie
+## Huidige werking
 
 - Upload van meerdere PDF- en ZIP-bestanden tegelijk.
 - Bestanden worden opgeslagen in de private Supabase Storage-bucket `exam-inbox`.
 - Uploadmetadata, status en gebeurtenissen worden bijgehouden in `public.exam_ingest_jobs` en `public.exam_ingest_events`.
 - Uploadgeschiedenis, details, verwijderen en opnieuw aanbieden zijn beschikbaar.
+- De knop **Inventariseer wachtende uploads** start een Supabase Edge Function per bestand.
+- De worker controleert PDF's, haalt per pagina tekst en paginagrootte op, herkent waar mogelijk niveau/jaar/tijdvak/documenttype uit de bestandsnaam en bewaart een `inventory.json` in de private bucket.
+- ZIP-bestanden worden geïnventariseerd en de gevonden PDF's worden afzonderlijk in de private bucket opgeslagen.
+- Inventarisatie-uitkomsten worden als `review_required` gemarkeerd; dit betekent nadrukkelijk nog niet dat vragen/contexten zijn gekoppeld of dat afbeeldingen zijn goedgekeurd.
 - Er wordt niets gepubliceerd naar de openbare website.
 
-## Belangrijk: huidige grens
+## Belangrijk: volgende verwerkingsfasen
 
-Dit is de eerste werkende beheerbasis. De AI-analyse, PDF-inventarisatie, vraag-/contextsegmentatie, beeldsamenstelling en visuele beoordelingsworkflow zijn nog niet gekoppeld. Een upload wordt dus opgeslagen en geregistreerd, maar niet ten onrechte als verwerkt gemarkeerd. De volgende fase bouwt een verwerkingsworker die de bestaande PDF-renderers vervangt/uitbreidt en elke vraag inhoudelijk én visueel controleert.
+De eerste technische worker voert alleen bestands- en pagina-inventarisatie uit. AI-gestuurde vraagherkenning, semantische koppeling van algemene contexten en vraagintroducties, segmentselectie over meerdere pagina's, originele fragmentcompositie per vraag en visuele menselijke beoordeling zijn nog niet aangesloten. De bestaande regex-/anker-gebaseerde renderers worden niet als inhoudelijke waarheid gebruikt. Publicatie blijft uitgeschakeld totdat de volledige vraagset (open én meerkeuze) inhoudelijk en visueel is gecontroleerd.
 
 ## Tijdelijke toegang
 
