@@ -153,7 +153,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         # page with several question markers.
         context_bottom = min(
             bottom_limit,
-            max(rect.y1 for rect in end_hits) + 12,
+            max(rect.y1 for rect in end_hits) + 4,
         )
     # A very shallow fragment is not a usable context card. Let the
     # bounded page-local fallback preserve the preceding context instead.
