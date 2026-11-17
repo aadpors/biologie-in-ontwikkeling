@@ -4696,44 +4696,6 @@
     "questionType": "mcq"
   },
   {
-    "id": "vw25t1-mcq-38",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 38,
-    "points": 1,
-    "page": 19,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In de gladde spiercellen rond de slagadertjes is een ander type\nhistaminereceptoren aanwezig: de H2-receptoren. Binding van histamine\naan H2-receptoren laat deze gladde spiercellen ontspannen.\nBij histamine-intoxicatie wordt de bloeddruk van de patiënt bepaald.",
-    "q": "Welke bloeddruk is passend bij dit effect van histamine?",
-    "options": [
-      {
-        "key": "A",
-        "text": "80/40 mmHg (11/5 kPa)"
-      },
-      {
-        "key": "B",
-        "text": "120/80 mmHg (16/11 kPa)"
-      },
-      {
-        "key": "C",
-        "text": "160/120 mmHg (21/16 kPa)"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw25t1-mcq-38.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q38-complete.jpg",
-      "exam-snippets/question-vw25t1-38-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
     "id": "vw25t1-mcq-40",
     "level": "Vwo",
     "year": "2025",
