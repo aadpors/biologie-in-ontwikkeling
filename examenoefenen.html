@@ -128,7 +128,7 @@ function render(){
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
- const assetVersion="2026-11-17-25";
+ const assetVersion="2026-11-17-26";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  let snippet=snippetImages.map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'?v='+assetVersion+'" alt="'+(i<snippetImages.length-1?'Context bij vraag ':'Originele examenopgave bij vraag ')+q.n+'" loading="lazy"><figcaption>'+(i<snippetImages.length-1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
@@ -136,7 +136,7 @@ function render(){
   :'<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>';
  const cvMarkup=isMCQ?"":q.cvImage?'<section class="cv-reveal"><button class="source" type="button" id="toggleCv" aria-expanded="false">Toon correctievoorschrift bij vraag '+q.n+'</button><figure id="cvSnippet" hidden><img data-src="'+q.cvImage+'" alt="Origineel beoordelingsmodel uit het officiële correctievoorschrift, vraag '+q.n+'" loading="lazy"><figcaption>Officieel correctievoorschrift · vraag '+q.n+'</figcaption></figure>'+(q.cvAmendment?'<figure id="cvAmendment" hidden><img data-src="'+q.cvAmendment+'" alt="Officiële aanvulling op het correctievoorschrift bij vraag '+q.n+'" loading="lazy"><figcaption>Officiële aanvulling op het correctievoorschrift · van toepassing op vraag '+q.n+'</figcaption></figure>':"")+'</section>':'<p class="sourcehint">Het volledige officiële correctievoorschrift is beschikbaar via de PDF-link hierboven.</p>';
  const selfCheckMarkup=isMCQ?"":'<section class="selfcheck"><h3>Zelf beoordelen</h3><p style="font-size:13px;margin:0 0 8px;color:#53616a">Vergelijk je antwoord met de officiële beoordelingscriteria hierboven en vink per scorepunt aan of je het hebt behaald.</p>'+Array.from({length:q.points},(_,i)=>'<label><input type="checkbox" data-point="'+i+'" '+((selfChecks[q.id]||[]).includes(i)?"checked":"")+' > Punt '+(i+1)+' behaald</label>').join("")+'</section>';
- a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Bèta-rubricering")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+q.end+'</span>':"")+'</div>'+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
+ a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Open vraag")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+q.end+'</span>':"")+'</div>'+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
  $("questions").append(a);
  if(isMCQ){
   const feedback=a.querySelector("#mcqFeedback");
@@ -164,7 +164,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-25");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-26");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
