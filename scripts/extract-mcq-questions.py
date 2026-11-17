@@ -722,10 +722,24 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         ).save(OUT / question_name)
                         context_paths.append(f"exam-snippets/{question_name}")
                     else:
-                        # If text-line segmentation cannot isolate the question
-                        # (e.g. a compact prompt or table), retain the original
-                        # full question crop instead of publishing context alone.
-                        context_paths.append(f"exam-snippets/{image_name}")
+                        # Compact prompts and table-style questions can defeat
+                        # line-end detection. Keep a bounded question-only crop
+                        # so context is not duplicated and the prompt is not cut.
+                        fallback_question_bottom = min(
+                            footer_y,
+                            max(question_y1, question_top + 65),
+                        )
+                        if fallback_question_bottom > question_top + 2:
+                            page.get_pixmap(
+                                matrix=fitz.Matrix(1.8, 1.8),
+                                clip=fitz.Rect(0, question_top, page.rect.width, fallback_question_bottom),
+                                alpha=False,
+                            ).save(OUT / question_name)
+                            context_paths.append(f"exam-snippets/{question_name}")
+                        else:
+                            # Last-resort: preserve the original crop rather
+                            # than silently dropping the question altogether.
+                            context_paths.append(f"exam-snippets/{image_name}")
                     mcq_images = context_paths or [f"exam-snippets/{image_name}"]
 
                 prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
