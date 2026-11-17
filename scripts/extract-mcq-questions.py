@@ -8,16 +8,40 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "exam-snippets"
 OUT.mkdir(exist_ok=True)
 
-EXAMS = [
-    ("ha25t1", "Havo", "2025", "1", "examens/ha-1018-a-25-1-o.pdf", "examens/ha-1018-a-25-1-c.pdf"),
-    ("vw25t1", "Vwo", "2025", "1", "examens/vw-1018-a-25-1-o.pdf", "examens/vw-1018-a-25-1-c.pdf"),
-    ("ha25t2", "Havo", "2025", "2", "examens/ha-1018-a-25-2-o.pdf", "examens/ha-1018-a-25-2-c.pdf"),
-    ("vw25t2", "Vwo", "2025", "2", "examens/vw-1018-a-25-2-o.pdf", "examens/vw-1018-a-25-2-c.pdf"),
-    ("ha26t1", "Havo", "2026", "1", "examens/ha-1018-a-26-1-o.pdf", "examens/ha-1018-a-26-1-c.pdf"),
-    ("vw26t1", "Vwo", "2026", "1", "examens/vw-1018-a-26-1-o.pdf", "examens/vw-1018-a-26-1-c.pdf"),
-    ("ha26t2", "Havo", "2026", "2", "examens/ha-1018-a-26-2-o.pdf", "examens/ha-1018-a-26-2-c.pdf"),
-    ("vw26t2", "Vwo", "2026", "2", "examens/vw-1018-a-26-2-o.pdf", "examens/vw-1018-a-26-2-c.pdf"),
-]
+def discover_exams():
+    """Discover every available Havo/Vwo exam PDF and its matching marking scheme.
+
+    Accept both ordinary opgaven PDFs (*-o.pdf) and supplement-named
+    opgaven PDFs (*-o-spr.pdf). New exam years/periods are included
+    automatically; an unmatched exam or marking scheme is a hard error.
+    """
+    exam_dir = ROOT / "examens"
+    pattern = re.compile(r"^(ha|vw)-1018-a-(\\d{2})-(\\d)-o(?:-[a-z0-9]+)?\\.pdf$", re.I)
+    discovered = []
+    for source in sorted(exam_dir.glob("*.pdf")):
+        match = pattern.match(source.name)
+        if not match:
+            continue
+        level_code, short_year, period = match.groups()
+        cv = exam_dir / f"{level_code}-1018-a-{short_year}-{period}-c.pdf"
+        if not cv.is_file():
+            raise FileNotFoundError(
+                f"Exam {source.name} has no matching correction scheme: {cv.name}"
+            )
+        year = f"20{short_year}"
+        level = "Havo" if level_code.lower() == "ha" else "Vwo"
+        exam_id = f"{level_code.lower()}{short_year}t{period}"
+        discovered.append((exam_id, level, year, period,
+                           str(source.relative_to(ROOT)), str(cv.relative_to(ROOT))))
+    if not discovered:
+        raise RuntimeError(f"No Havo/Vwo exam PDFs found in {exam_dir}")
+    keys = [(item[0], item[1], item[2], item[3]) for item in discovered]
+    if len(keys) != len(set(keys)):
+        raise RuntimeError(f"Multiple opgaven PDFs found for the same exam: {keys}")
+    return discovered
+
+
+EXAMS = discover_exams()
 
 SELECTED_CONTEXTS = {
     ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18),
