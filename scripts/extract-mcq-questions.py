@@ -335,25 +335,26 @@ def find_markers(lines):
             markers.append({"line": start, "number_line": i, "points_line": i + 1, "number": number, "points": int(pm.group(1))})
             continue
 
-        # In other layouts the number precedes the prompt and point marker.
-        for offset in range(2, 7):
+        # In some exam layouts the printed question number precedes a
+        # multi-line prompt, while its score marker follows that prompt.
+        # Accept that structure as well as the same-baseline layout. Requiring
+        # a recognisable prompt between the number and score marker prevents
+        # numbered statements, figure labels and list items from becoming
+        # question markers.
+        for offset in range(2, 13):
             j = i + offset
             if j >= len(lines):
                 break
             pm = point_re.match(lines[j]["text"])
-            if pm:
-                # A question number and its points marker are printed on the
-                # same baseline. A figure/list label can otherwise be mistaken
-                # for a question number when an unrelated "1p" occurs a few
-                # extracted lines later (e.g. figure label 3 before question 37).
-                number_y = lines[i]["bbox"][1]
-                points_y = lines[j]["bbox"][1]
-                if abs(points_y - number_y) > 8:
-                    break
-                prompt = " ".join(x["text"] for x in lines[i + 1:j]).strip()
-                if prompt and (prompt_starts.match(prompt) or "?" in prompt):
-                    markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
-                break
+            if not pm:
+                continue
+            prompt_lines = [x["text"] for x in lines[i + 1:j]]
+            prompt = " ".join(prompt_lines).strip()
+            has_question_prompt = any(prompt_starts.match(x) or "?" in x for x in prompt_lines)
+            same_baseline = abs(lines[j]["bbox"][1] - lines[i]["bbox"][1]) <= 8
+            if prompt and has_question_prompt and (same_baseline or len(prompt_lines) >= 2):
+                markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
+            break
 
     unique = []
     seen = set()
