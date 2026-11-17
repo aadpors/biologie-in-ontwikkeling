@@ -2,7 +2,6 @@ import json  # Generate a static, inspectable inventory of MCQ cards.
 import re
 from pathlib import Path
 import fitz
-from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "exam-snippets"
@@ -34,23 +33,6 @@ HEADER_RE = re.compile(r"^(?:[HV][AW]-1018-a-\d{2}-\d-o|\d+\s*/\s*\d+|lees verde
 MARKER_RE = re.compile(r"^\s*(\d+)\s*p\s+(\d{1,2})(?:\s+|$)", re.I)
 NUMBER_RE = re.compile(r"^\s*(\d{1,2})\s*$")
 OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
-
-def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
-    """Render a full-width crop while masking earlier question text, not shared figures/context."""
-    pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=False)
-    image = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
-    draw = ImageDraw.Draw(image)
-    for start, end in excluded_ranges:
-        for index in range(start, min(end, len(lines))):
-            x0, y0, x1, y1 = lines[index]["bbox"]
-            left = max(0, int((x0 - rect.x0) * scale) - 2)
-            top = max(0, int((y0 - rect.y0) * scale) - 2)
-            right = min(image.width, int((x1 - rect.x0) * scale) + 2)
-            bottom = min(image.height, int((y1 - rect.y0) * scale) + 2)
-            if right > left and bottom > top:
-                draw.rectangle((left, top, right, bottom), fill="white")
-    image.save(output, quality=94)
-
 
 def line_records(page):
     records = []
@@ -288,15 +270,19 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # Do not append prior-page context: that silently associates unrelated
                 # topics with the current question.
                 context = clean_context(context_lines)
+                # Images and vector figures from an earlier question must not
+                # pull this card's crop back to the top of the page. The context
+                # for this question begins after the previous question's end.
+                context_start_y = lines[cursor]["bbox"][1] if cursor < len(lines) else lines[start]["bbox"][1]
                 page_image_rects = [
                     rect for image_info in page.get_images(full=True)
                     for rect in page.get_image_rects(image_info[0])
-                    if rect.y0 < lines[start]["bbox"][1]
+                    if context_start_y - 1 <= rect.y0 < lines[start]["bbox"][1]
                 ]
                 page_drawing_rects = [
                     drawing["rect"] for drawing in page.get_drawings()
                     if drawing["rect"].width > 8 and drawing["rect"].height > 8
-                    and drawing["rect"].y0 < lines[start]["bbox"][1]
+                    and context_start_y - 1 <= drawing["rect"].y0 < lines[start]["bbox"][1]
                 ]
                 context_y_candidates = [lines[j]["bbox"][1] for j in context_line_indices] + [rect.y0 for rect in page_image_rects + page_drawing_rects]
                 context_y0 = (
@@ -428,13 +414,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
-                    save_page_crop(
-                        page,
-                        fitz.Rect(0, context_y0, page.rect.width, context_y1),
-                        OUT / context_image,
-                        lines,
-                        previous_ranges,
-                    )
+                    page.get_pixmap(
+                        matrix=fitz.Matrix(1.8, 1.8),
+                        clip=fitz.Rect(0, context_y0, page.rect.width, context_y1),
+                        alpha=False,
+                    ).save(OUT / context_image)
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
                     if (prefix, marker["number"]) == ("ha25t2", 9):
                         # Keep the initial pedigree context and the later inbreeding
@@ -494,7 +478,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 crop = fitz.Rect(0, y0, page.rect.width, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
-                save_page_crop(page, crop, OUT / image_name, lines, previous_ranges)
+                page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=crop, alpha=False).save(OUT / image_name)
                 mcq_images = None
                 if (prefix, marker["number"]) == ("vw26t2", 37):
                     # The model and introductory context belong to question 37;
