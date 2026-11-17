@@ -23,8 +23,13 @@ for filename, label in DATASETS:
                 errors.append(f"{label} {qid}: ontbrekende volledige uitwerkbijlage {attachment}")
         if not primary:
             errors.append(f"{label} {qid}: geen primaire samengestelde afbeelding")
-        if len(paths) < 2:
-            errors.append(f"{label} {qid}: verwacht aparte context- en vraagafbeelding, kreeg {len(paths)}")
+        complete_single_page = (
+            len(paths) == 1
+            and paths[0] == primary
+            and "question-complete-" in paths[0].lower()
+        )
+        if len(paths) < 2 and not complete_single_page:
+            errors.append(f"{label} {qid}: verwacht aparte context- en vraagafbeelding of één volledige bronpagina, kreeg {len(paths)}")
         if len(paths) != len(set(paths)):
             errors.append(f"{label} {qid}: dubbele afbeelding in images-array")
         if not paths:
