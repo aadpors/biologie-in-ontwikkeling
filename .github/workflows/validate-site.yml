@@ -5,6 +5,12 @@ on:
     paths:
       - 'index.html'
       - 'publicaties.json'
+      - 'examenoefenen.html'
+      - 'exam-mcq.json'
+      - 'exam-open.json'
+      - 'exam-contexts.json'
+      - 'scripts/extract-mcq-questions.py'
+      - 'scripts/validate-exam-snippets.py'
       - 'scripts/validate-site.mjs'
   pull_request:
     branches: [main]
