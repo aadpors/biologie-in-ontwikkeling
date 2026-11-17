@@ -8,6 +8,7 @@ on:
       - 'scripts/render-exam-snippets.py'
       - 'scripts/render-cv-snippets.py'
       - 'scripts/extract-mcq-questions.py'
+      - 'scripts/validate-exam-snippets.py'
       - 'scripts/exam-snippets.json'
       - 'scripts/cv-snippets.json'
       - 'site-version.json'
@@ -39,6 +40,8 @@ jobs:
         run: python scripts/render-cv-snippets.py
       - name: Extract multiple-choice questions from all available exams
         run: python scripts/extract-mcq-questions.py
+      - name: Validate every generated question and image
+        run: python scripts/validate-exam-snippets.py
       - name: Commit generated image snippets
         run: |
           if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json exam-contexts.json)" ]]; then
