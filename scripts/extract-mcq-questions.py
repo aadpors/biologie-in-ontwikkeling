@@ -287,7 +287,7 @@ def line_records(page):
         records.sort(key=lambda x: (round(x["bbox"][1], 1), x["bbox"][0]))
     return records
 
-def find_markers(lines):
+def find_markers(lines, allow_multiline_number_first=False):
     markers = []
     prompt_starts = re.compile(
         r"^(hieronder|wat|welk|welke|waar|wanneer|waarom|hoe|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welk|op welke|hoeveel|waardoor)",
@@ -335,13 +335,13 @@ def find_markers(lines):
             markers.append({"line": start, "number_line": i, "points_line": i + 1, "number": number, "points": int(pm.group(1))})
             continue
 
-        # In some exam layouts the printed question number precedes a
-        # multi-line prompt, while its score marker follows that prompt.
-        # Accept that structure as well as the same-baseline layout. Requiring
-        # a recognisable prompt between the number and score marker prevents
-        # numbered statements, figure labels and list items from becoming
+        # A small number of source PDFs place the question number before
+        # a multi-line prompt and the score marker after it. Enable this
+        # layout only for the exam known to use it; elsewhere retain the
+        # stricter same-baseline rule to avoid treating numbered lists as
         # question markers.
-        for offset in range(2, 13):
+        search_offsets = range(2, 13) if allow_multiline_number_first else range(2, 7)
+        for offset in search_offsets:
             j = i + offset
             if j >= len(lines):
                 break
@@ -352,7 +352,7 @@ def find_markers(lines):
             prompt = " ".join(prompt_lines).strip()
             has_question_prompt = any(prompt_starts.match(x) or "?" in x for x in prompt_lines)
             same_baseline = abs(lines[j]["bbox"][1] - lines[i]["bbox"][1]) <= 8
-            if prompt and has_question_prompt and (same_baseline or len(prompt_lines) >= 2):
+            if prompt and has_question_prompt and (same_baseline or (allow_multiline_number_first and len(prompt_lines) >= 2)):
                 markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
             break
 
@@ -448,7 +448,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
             # a new topic can begin at the top of every page, and stale context
             # was the cause of unrelated introductions appearing on later questions.
             lines = line_records(page)
-            markers = find_markers(lines)
+            markers = find_markers(lines, allow_multiline_number_first=(prefix == "ha24t1"))
             if not markers:
                 headings = [
                     j for j, line in enumerate(lines)
