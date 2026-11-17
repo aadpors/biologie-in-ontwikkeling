@@ -1,0 +1,126 @@
+const { chromium } = require("playwright");
+const assert = require("node:assert/strict");
+
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const pageErrors = [];
+  page.on("pageerror", error => pageErrors.push(error.message));
+  page.on("console", message => {
+    if (message.type() === "error") pageErrors.push(message.text());
+  });
+
+  try {
+    await page.goto("http://127.0.0.1:8000/examenoefenen.html", { waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+    assert.match(await page.locator("#count").innerText(), /519 vragen/);
+
+    // Filters combine correctly and reset restores the full question set.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#questionType").selectOption("mcq");
+    await page.waitForTimeout(150);
+    const filteredCount = await page.locator("#count").innerText();
+    assert.match(filteredCount, /van [1-9]\d* vragen/);
+    assert.match(await page.locator(".qhead").innerText(), /Havo 2026/);
+    assert.match(await page.locator(".qhead").innerText(), /vraagtype|vraag/i);
+    await page.locator("#reset").click();
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+
+    // Previous/next and question dots move through the filtered sequence.
+    const firstHeading = await page.locator(".qhead").innerText();
+    await page.locator("#nextQuestion").click();
+    const secondHeading = await page.locator(".qhead").innerText();
+    assert.notEqual(secondHeading, firstHeading);
+    await page.locator("#prevQuestion").click();
+    assert.equal(await page.locator(".qhead").innerText(), firstHeading);
+    await page.locator("#questionDots button").nth(2).click();
+    assert.notEqual(await page.locator(".qhead").innerText(), firstHeading);
+
+    // MCQ choice is stored and restored after a reload.
+    await page.locator("#questionType").selectOption("mcq");
+    await page.locator('input[type="radio"]').first().check();
+    const mcqSaved = await page.evaluate(() => JSON.parse(localStorage.getItem("bioExamAnswersV2") || "{}"));
+    assert.ok(Object.keys(mcqSaved).length > 0);
+    const selectedValue = await page.locator('input[type="radio"]:checked').getAttribute("value");
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+    await page.locator("#questionType").selectOption("mcq");
+    await page.waitForSelector('input[type="radio"]');
+    assert.equal(await page.locator('input[type="radio"]:checked').getAttribute("value"), selectedValue);
+
+    // Open-answer text and self-assessment survive reload.
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForSelector("textarea");
+    const answer = "Browserpraktijktest: opgeslagen antwoord.";
+    await page.locator("textarea").fill(answer);
+    const scoreBox = page.locator("[data-point]").first();
+    await scoreBox.check();
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForSelector("textarea");
+    assert.equal(await page.locator("textarea").inputValue(), answer);
+    assert.equal(await page.locator("[data-point]").first().isChecked(), true);
+
+    // A question image must load at its natural dimensions.
+    const imageState = await page.locator(".exam-snippets img").first().evaluate(img => ({
+      complete: img.complete,
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight
+    }));
+    assert.ok(imageState.complete && imageState.naturalWidth > 0 && imageState.naturalHeight > 0, JSON.stringify(imageState));
+
+    // Appendix links must resolve to actual PDFs.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2025");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    let appendix = page.locator('a[href$="-u.pdf"]');
+    for (let i = 0; i < 60 && await appendix.count() === 0; i++) {
+      const heading = await page.locator(".qhead").innerText();
+      if (/vraag 12\b/.test(heading)) break;
+      await page.locator("#nextQuestion").click();
+      appendix = page.locator('a[href$="-u.pdf"]');
+    }
+    assert.ok(await appendix.count() > 0, "Geen uitwerkbijlage-link gevonden bij de betreffende havo 2025-vraag");
+    const appendixHref = await appendix.first().getAttribute("href");
+    const appendixResponse = await page.request.get(new URL(appendixHref, page.url()).toString());
+    assert.equal(appendixResponse.status(), 200, "Uitwerkbijlage is niet bereikbaar");
+    assert.match(appendixResponse.headers()["content-type"] || "", /pdf/i);
+
+    // The second appendix PDF is also linked from the vwo 2026 time-window questions.
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("2");
+    await page.locator("#questionType").selectOption("open");
+    let vwoAppendix = page.locator('a[href="examens/vw-1018-a-26-2-u.pdf"]');
+    for (let i = 0; i < 35 && await vwoAppendix.count() === 0; i++) {
+      await page.locator("#nextQuestion").click();
+      vwoAppendix = page.locator('a[href="examens/vw-1018-a-26-2-u.pdf"]');
+    }
+    assert.ok(await vwoAppendix.count() > 0, "Geen vwo 2026 tijdvak 2-uitwerkbijlage-link gevonden");
+    const vwoAppendixResponse = await page.request.get(new URL(await vwoAppendix.first().getAttribute("href"), page.url()).toString());
+    assert.equal(vwoAppendixResponse.status(), 200, "Vwo-uitwerkbijlage is niet bereikbaar");
+    assert.match(vwoAppendixResponse.headers()["content-type"] || "", /pdf/i);
+
+    assert.deepEqual(pageErrors, [], "Browserconsole bevat fouten: " + pageErrors.join(" | "));
+    console.log(JSON.stringify({
+      result: "PASS",
+      totalQuestions: 519,
+      filters: "PASS",
+      navigation: "PASS",
+      mcqPersistence: "PASS",
+      openAnswerPersistence: "PASS",
+      selfAssessmentPersistence: "PASS",
+      imageLoading: imageState,
+      appendices: [{ href: appendixHref, status: appendixResponse.status() }, { href: "examens/vw-1018-a-26-2-u.pdf", status: vwoAppendixResponse.status() }],
+      pageErrors
+    }, null, 2));
+  } finally {
+    await browser.close();
+  }
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

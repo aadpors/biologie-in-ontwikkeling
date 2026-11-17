@@ -85,12 +85,30 @@ for (const [index, question] of openExamQuestions.entries()) {
   assert.ok(typeof question.q === 'string' && question.q.trim(), `${where}: vraagtekst ontbreekt`);
   assertSnippetExists(question.image, where);
   for (const path of question.images || []) assertSnippetExists(path, where);
-  assert.ok((question.images || []).length >= 2, `${where}: aparte context- en vraagafbeeldingen ontbreken`);
+  const questionImages = question.images || [];
+  const hasSeparateContextAndQuestionImages = questionImages.length >= 2;
+  const hasSingleCompleteSourcePage =
+    questionImages.length === 1 &&
+    questionImages[0] === question.image &&
+    questionImages[0].endsWith(`question-complete-${question.id}.jpg`);
+  assert.ok(
+    hasSeparateContextAndQuestionImages || hasSingleCompleteSourcePage,
+    `${where}: aparte context-/vraagafbeeldingen of één volledige bronpagina ontbreken`
+  );
   assert.ok(question.pdf && question.cv, `${where}: originele opgave of correctievoorschrift ontbreekt`);
 }
 const allQuestionKeys = [...examQuestions, ...openExamQuestions].map(q => [q.level, q.year, q.period, q.n].join('|'));
 assert.equal(new Set(allQuestionKeys).size, allQuestionKeys.length, 'Een examenvraag staat dubbel als open en/of meerkeuzevraag');
 assert.ok(openExamQuestions.length > 0, 'Geen open vragen uit de volledige examenextractie gevonden');
+
+assert.ok(examPage.includes('Volledige uitwerkbijlage'), 'Frontend biedt geen link naar de volledige uitwerkbijlage');
+for (const [index, question] of [...examQuestions, ...openExamQuestions].entries()) {
+  for (const attachment of question.attachmentPdfs || []) {
+    assert.equal(typeof attachment, 'string', `examenvraag ${index + 1}: ongeldige uitwerkbijlageverwijzing`);
+    assert.ok(attachment.startsWith('examens/'), `examenvraag ${index + 1}: uitwerkbijlage moet uit examens komen`);
+    assert.ok(fs.existsSync(attachment), `examenvraag ${index + 1}: volledige uitwerkbijlage ontbreekt: ${attachment}`);
+  }
+}
 
 const examIds = new Set();
 for (const [index, question] of examQuestions.entries()) {

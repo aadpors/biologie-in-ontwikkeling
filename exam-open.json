@@ -3332,7 +3332,10 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
-    "questionType": "open"
+    "questionType": "open",
+    "attachmentPdfs": [
+      "examens/ha-1018-a-25-1-u.pdf"
+    ]
   },
   {
     "id": "vw25t1-open-12",
@@ -4188,7 +4191,10 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
-    "questionType": "open"
+    "questionType": "open",
+    "attachmentPdfs": [
+      "examens/ha-1018-a-25-1-u.pdf"
+    ]
   },
   {
     "id": "vw25t1-open-38",
@@ -4326,7 +4332,10 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
-    "questionType": "open"
+    "questionType": "open",
+    "attachmentPdfs": [
+      "examens/ha-1018-a-25-1-u.pdf"
+    ]
   },
   {
     "id": "ha25t1-open-48",
@@ -7271,7 +7280,10 @@
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
-    "questionType": "open"
+    "questionType": "open",
+    "attachmentPdfs": [
+      "examens/vw-1018-a-26-2-u.pdf"
+    ]
   },
   {
     "id": "ha26t2-open-6",
@@ -8030,7 +8042,10 @@
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
-    "questionType": "open"
+    "questionType": "open",
+    "attachmentPdfs": [
+      "examens/vw-1018-a-26-2-u.pdf"
+    ]
   },
   {
     "id": "ha26t2-open-28",

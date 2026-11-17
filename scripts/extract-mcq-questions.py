@@ -43,6 +43,53 @@ def discover_exams():
 
 EXAMS = discover_exams()
 
+def appendix_pdfs_for_exam(exam_pdf):
+    """Find separately published printable answer/work appendices for an exam."""
+    source = Path(exam_pdf)
+    stem = source.stem
+    # The exam identifier is stable across opgaven, correction and appendix files.
+    base = re.sub(r"-o(?:-[a-z0-9]+)?$", "", stem, flags=re.I)
+    appendix_suffix = re.compile(
+        r"^(?:-u|-ub|-b|-bijlage|-bijlagen|-uitwerkbijlage|-uitwerkblad"
+        r"|-antwoordblad|-werkblad|-tekenblad|-bijl"
+        r"|-o-(?:bijlage|bijlagen|uitwerkbijlage|uitwerkblad|antwoordblad|werkblad))"
+        r"(?:[-_][a-z0-9]+)?$",
+        re.I,
+    )
+    found = []
+    for candidate in sorted((ROOT / "examens").glob("*.pdf")):
+        candidate_stem = candidate.stem
+        candidate_lower = candidate_stem.lower()
+        base_lower = base.lower()
+        if base_lower not in candidate_lower:
+            continue
+        suffix = candidate_stem[candidate_lower.index(base_lower) + len(base):]
+        named_as_appendix = re.search(
+            r"uitwerk|bijlage|antwoordblad|werkblad|tekenblad",
+            candidate_stem,
+            re.I,
+        )
+        if appendix_suffix.fullmatch(suffix) or named_as_appendix:
+            found.append(candidate.relative_to(ROOT).as_posix())
+    return found
+
+
+def attach_appendix_links(records):
+    # Only expose the appendix on cards whose own prompt/context refers to it.
+    # This avoids showing an unrelated worksheet on every question in an exam.
+    appendix_reference = re.compile(
+        r"uitwerkbijlage|uitwerkblad|antwoordblad|tekenblad|werkblad|"
+        r"bijlage(?:\s+(?:invullen|gebruiken|raadplegen))?",
+        re.I,
+    )
+    for record in records:
+        attachments = appendix_pdfs_for_exam(record["pdf"])
+        question_text = " ".join(
+            str(record.get(field, "")) for field in ("q", "source")
+        )
+        if attachments and appendix_reference.search(question_text):
+            record["attachmentPdfs"] = attachments
+
 SELECTED_CONTEXTS = {
     ("ha24t1", 1), ("ha24t1", 8),
     ("ha24t1", 10), ("ha24t2", 3), ("ha24t2", 6), ("ha24t2", 7), ("vw24t1", 1), ("vw24t2", 1), ("vw24t2", 2),
@@ -1164,6 +1211,9 @@ for exam in EXAMS:
         )
 if len(EXAMS) != 12:
     raise RuntimeError(f"Expected all 12 Havo/Vwo exams from 2024-2026, found {len(EXAMS)}")
+
+attach_appendix_links(all_questions)
+attach_appendix_links(all_open_questions)
 
 all_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 all_open_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
