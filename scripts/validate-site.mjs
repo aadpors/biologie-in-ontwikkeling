@@ -31,7 +31,7 @@ for (const year of discoveredExamYears) {
 }
 assert.ok(examPage.includes('(o.text?" "+o.text:"")'), 'Frontend verbergt de antwoordtekst bij vragen met een afbeelding');
 assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
-assert.ok(examPage.includes('antwoordteksten (A t/m F)'), 'De toelichting over zichtbare antwoordopties ontbreekt');
+assert.ok(examPage.includes('Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback.'), 'De toelichting over de meerkeuze-interactie ontbreekt');
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
 assert.ok(open2024.length >= 3, 'Te weinig geselecteerde open vragen uit 2024');
 assert.ok(examQuestions.some(question => question.year === '2024' && question.options.length === 6), 'Meerkeuzevragen met zes antwoordopties (A-F) uit 2024 ontbreken');
