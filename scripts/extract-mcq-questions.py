@@ -478,6 +478,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     with fitz.open(cv_path) as cv_doc:
         cv_text = "\n".join(page.get_text("text", sort=True) for page in cv_doc)
     found = []
+    open_found = []
     contexts = []
     heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding(?:\s+\d+)?|tabel(?:\s+\d+)?|grafiek(?:\s+\d+)?|legenda|lees verder|einde)$", re.I)
     with fitz.open(exam_path) as doc:
@@ -705,8 +706,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 question_end_line = max(start, min(question_end_line, end - 1))
 
                 selected_context_page = SELECTED_CONTEXT_PAGES.get((prefix, marker["number"]))
-                if ( (prefix, marker["number"]) in SELECTED_CONTEXTS
-                     and (selected_context_page is None or page_index + 1 == selected_context_page) ):
+                context_record = None
+                if selected_context_page is None or page_index + 1 == selected_context_page:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     question_top = max(0, lines[start]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
@@ -815,7 +816,27 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
                     ("vw26t1", 30), ("ha26t2", 40)
                 }
-                if (prefix, marker["number"]) in false_positive_open_questions or not options:
+                if (prefix, marker["number"]) in false_positive_open_questions:
+                    previous_ranges.append((start, question_end_line + 1))
+                    cursor = question_end_line + 1
+                    continue
+                if not options:
+                    if context_record is None:
+                        raise RuntimeError(f"No image/context record for open question {prefix} {marker['number']}")
+                    open_found.append({
+                        "id": f"{prefix}-open-{marker['number']}",
+                        "level": level, "year": year, "period": period,
+                        "n": marker["number"], "points": marker["points"],
+                        "page": page_index + 1,
+                        "theme": "Nog te rubriceren", "concept": "Open vraag",
+                        "end": "Nog te rubriceren",
+                        "focus": "Open vraag uit het officiële centraal examen.",
+                        "source": context or "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
+                        "q": selected_prompt,
+                        "image": context_record["image"],
+                        "images": context_record.get("images", []),
+                        "pdf": exam_rel, "cv": cv_rel, "questionType": "open"
+                    })
                     previous_ranges.append((start, question_end_line + 1))
                     cursor = question_end_line + 1
                     continue
@@ -979,30 +1000,18 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 })
                 previous_ranges.append((start, question_end_line + 1))
                 cursor = question_end_line + 1
-    return found, contexts
+    return found, contexts, open_found
 
 
 all_questions = []
+all_open_questions = []
 all_contexts = []
-selected_contexts_seen = set()
 for exam in EXAMS:
-    items, contexts = extract_exam(*exam)
+    items, contexts, open_items = extract_exam(*exam)
     all_questions.extend(items)
+    all_open_questions.extend(open_items)
     all_contexts.extend(contexts)
-    for context in contexts:
-        key = (exam[0], context["n"])
-        if key in selected_contexts_seen:
-            raise RuntimeError(f"Selected open-question context generated more than once: {key}")
-        selected_contexts_seen.add(key)
-    print(f"{exam[0]}: {len(items)} meerkeuzevragen; {len(contexts)} geselecteerde contexten")
-
-missing_contexts = SELECTED_CONTEXTS - selected_contexts_seen
-unexpected_contexts = selected_contexts_seen - SELECTED_CONTEXTS
-if missing_contexts or unexpected_contexts:
-    raise RuntimeError(
-        f"Open-question context inventory mismatch; missing={sorted(missing_contexts)}, "
-        f"unexpected={sorted(unexpected_contexts)}"
-    )
+    print(f"{exam[0]}: {len(items)} meerkeuzevragen, {len(open_items)} open vragen, {len(contexts)} vraagcontexten)
 # Question 40 in VWO 2025 time slot 2 uses a table layout that PyMuPDF
 # does not expose as ordinary A-D text blocks; add it from the official page.
 if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
@@ -1049,12 +1058,14 @@ if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
     })
 
 all_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
+all_open_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 
 missing = [q["id"] for q in all_questions if not q["correct"]]
 print(f"Totaal: {len(all_questions)} meerkeuzevragen; zonder automatisch gevonden antwoord: {len(missing)}")
 if missing:
     print("Controle nodig voor antwoorden:", ", ".join(missing))
 (ROOT / "exam-mcq.json").write_text(json.dumps(all_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+(ROOT / "exam-open.json").write_text(json.dumps(all_open_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 context_by_key = {}
 for item in all_contexts:
     context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
@@ -1093,6 +1104,9 @@ for record in all_questions:
 for record in all_contexts:
     if record.get("images"):
         stitch_question_images(record, "complete")
+for record in all_open_questions:
+    if record.get("images"):
+        stitch_question_images(record, "complete")
 
 # Context records retain their separate image list for clients that support it;
 # the primary image now always contains the full context followed by the question.
@@ -1102,4 +1116,4 @@ for item in all_contexts:
     context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
 all_contexts = list(context_by_key.values())
 (ROOT / "exam-contexts.json").write_text(json.dumps(all_contexts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print("Geschreven: exam-mcq.json en exam-contexts.json met complete context+vraag-previewafbeeldingen")
+print(f"Geschreven: {len(all_questions)} meerkeuzevragen en {len(all_open_questions)} open vragen uit {len(EXAMS)} examens.")
