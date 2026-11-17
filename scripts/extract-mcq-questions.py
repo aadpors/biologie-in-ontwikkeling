@@ -68,9 +68,19 @@ def appendix_pdfs_for_exam(exam_pdf):
 
 
 def attach_appendix_links(records):
+    # Only expose the appendix on cards whose own prompt/context refers to it.
+    # This avoids showing an unrelated worksheet on every question in an exam.
+    appendix_reference = re.compile(
+        r"uitwerkbijlage|uitwerkblad|antwoordblad|tekenblad|werkblad|"
+        r"bijlage(?:\s+(?:invullen|gebruiken|raadplegen))?",
+        re.I,
+    )
     for record in records:
         attachments = appendix_pdfs_for_exam(record["pdf"])
-        if attachments:
+        question_text = " ".join(
+            str(record.get(field, "")) for field in ("q", "source")
+        )
+        if attachments and appendix_reference.search(question_text):
             record["attachmentPdfs"] = attachments
 
 SELECTED_CONTEXTS = {
