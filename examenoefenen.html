@@ -126,6 +126,7 @@ function onderwerpenVanVraag(q){
  if(/vertering|maag|alvleesklier|gal|resorptie|darmslijmvlies|dumpingsyndroom|verteringsenzym/.test(t))add("Verteringsstelsel");
  if(/zenuwstelsel|zenuwcel|zenuwimpuls|hersenen|hersenstam|synaps|neurotransmitter|membraanpotentiaal|reflexboog|oogzenuw|netvlies|zintuig/.test(t))add("Zenuwstelsel & oog");
  if(/zwangerschap|embryo|foetus|placenta|baarmoeder|eierstok|zaadcel|eicel|bevruchting|menstruatiecyclus/.test(t))add("Zwangerschap");
+ if(["Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen"].some(x=>hits.has(x)))hits.delete("Ecologie");
  return onderwerpCategorieen.filter(x=>hits.has(x));
 }
 
