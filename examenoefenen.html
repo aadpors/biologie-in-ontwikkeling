@@ -55,6 +55,13 @@ let questions=[
 {id:"ha24-1",level:"Havo",year:"2024",period:"1",n:1,points:1,theme:"Hart en bloedsomloop",concept:"Hartkleppen en bloedsomloop",end:"B · Stofwisseling van het organisme",page:2,focus:"Herkennen van de hartklep waardoor zuurstofarm bloed naar de longen stroomt.",source:"In het hart zijn vier kleppen aanwezig: twee slagaderkleppen en twee kleppen tussen de boezems en kamers. Gebruik afbeelding 1 uit de oorspronkelijke examenopgave.",q:"Noteer de letter die de klep aangeeft waarlangs zuurstofarm bloed vanuit de kamer richting de longen gaat.",a:"Q — de longslagaderklep.",why:"De rechterkamer pompt zuurstofarm bloed via de longslagaderklep naar de longen.",pdf:"examens/ha-1018-a-24-1-o-spr.pdf",cv:"examens/ha-1018-a-24-1-c.pdf"},
 {id:"ha24-8",level:"Havo",year:"2024",period:"1",n:8,points:2,theme:"Cellen: deling en differentiatie",concept:"Mitose, celdifferentiatie en genexpressie",end:"M · Molecuul- en celniveau",page:5,focus:"Beoordelen van uitspraken over mitose, celdifferentiatie en genexpressie.",source:"Tijdens de groeifase komen verschillende stamcellen het kunstvezelnetwerk binnen. Gestimuleerd door de ontsteking gaan deze stamcellen zich delen om nieuwe cellen te vormen. De vraag bevat drie uitspraken over de groeifase.",q:"Schrijf de nummers 1, 2 en 3 onder elkaar en noteer erachter of de betreffende uitspraak juist of onjuist is.",a:"1 onjuist; 2 juist; 3 juist.",why:"Bij mitose ontstaan genetisch gelijke dochtercellen; celdifferentiatie bepaalt de vorm en functie van cellen en hangt samen met veranderingen in genexpressie.",pdf:"examens/ha-1018-a-24-1-o-spr.pdf",cv:"examens/ha-1018-a-24-1-c.pdf"}
 ];
+
+questions.push(
+{id:"vw24-1",level:"Vwo",year:"2024",period:"1",n:1,points:2,theme:"Zenuwstelsel & oog",concept:"Synapsen en neurotransmitters",end:"M · Molecuul- en celniveau",focus:"Farmacologische beïnvloeding van synaptische signaaloverdracht.",source:"Nicotine bindt aan acetylcholinereceptoren op axonen van dopamineproducerende neuronen. Na binding neemt de afgifte van dopamine in de synaps toe. Dopamine wordt vervolgens heropgenomen in het presynaptische neuron.",q:"Over afbeelding 1 worden de volgende uitspraken gedaan: 1. Nicotine is een antagonist van acetylcholine. 2. Dopamine komt via endocytose in de synapsspleet terecht. 3. Heropname van dopamine vindt plaats door dopaminereceptoren. Schrijf de nummers 1, 2 en 3 onder elkaar en noteer erachter of de betreffende uitspraak juist of onjuist is.",a:"1 onjuist; 2 onjuist; 3 onjuist.",why:"Nicotine werkt als agonist op de acetylcholinereceptor. Neurotransmitters worden via exocytose afgegeven; heropname verloopt via transporteiwitten en niet via dopaminereceptoren.",pdf:"examens/vw-1018-a-24-1-o-spr.pdf",cv:"examens/vw-1018-a-24-1-c.pdf",cvImage:"exam-snippets/cv-vw24-1.jpg"},
+{id:"vw24t2-1",level:"Vwo",year:"2024",period:"2",n:1,points:1,theme:"Evolutie en erfelijkheid",concept:"Soortbegrip en voortplantingsisolatie",end:"E · Evolutie",focus:"Het biologische soortbegrip toegepast op chromosoomaantallen en vruchtbare nakomelingen.",source:"Het przewalskipaard heeft 66 chromosomen en het gedomesticeerde paard 64. Een kruising tussen beide levert vruchtbare nakomelingen op met 65 chromosomen.",q:"Stel dat jij mag bepalen welke van de twee wetenschappelijke namen het przewalskipaard krijgt. Noteer welke naam je kiest en geef een biologisch argument dat jouw keuze ondersteunt.",a:"Twee redeneringen zijn mogelijk: Equus przewalskii, omdat het chromosoomaantal verschilt en je de dieren als aparte soort beschouwt; of Equus ferus przewalskii, omdat kruising vruchtbare nakomelingen oplevert en je ze als ondersoorten van één soort beschouwt.",why:"De keuze moet passen bij het biologische argument. Het officiële correctievoorschrift accepteert beide keuzes met een passende toelichting.",pdf:"examens/vw-1018-a-24-2-o-spr.pdf",cv:"examens/vw-1018-a-24-2-c.pdf",cvImage:"exam-snippets/cv-vw24t2-1.jpg"},
+{id:"ha24t1-10",level:"Havo",year:"2024",period:"1",n:10,points:2,theme:"Erfelijkheid",concept:"Multipele allelen en kruisingsschema",end:"E · Evolutie",focus:"Dominantieverhoudingen en het voorspellen van genotypen en fenotypen.",source:"De kleur van het huisje van de gewone tuinslak wordt bepaald door één gen met drie allelen. Het bruine allel Cᵇ is dominant over het roze allel Cʳ; beide zijn dominant over het gele allel cᵍ.",q:"Licht toe dat uit een kruising van een bruine slak en een roze slak gele nakomelingen (F1) kunnen voortkomen. Geef hierbij een kruisingstabel.",a:"De bruine ouder moet genotype Cᵇcᵍ hebben en de roze ouder Cʳcᵍ. Een nakomeling cᵍcᵍ is geel. De kruising levert dus 25% gele nakomelingen op.",why:"Laat met een kruisingstabel zien dat beide ouders het recessieve gele allel kunnen doorgeven.",pdf:"examens/ha-1018-a-24-1-o-spr.pdf",cv:"examens/ha-1018-a-24-1-c.pdf",cvImage:"exam-snippets/cv-ha24t1-10.jpg"}
+);
+
 const baseQuestions = questions;
 const $=id=>document.getElementById(id);
 const onderwerpCategorieen=["Ademhalingsstelsel","Afweer","Anatomie","Cellen: deling en differentiatie","Cellen: organellen","Cellen: stofwisseling","Cellen: transport","Dna: expressie, transcriptie, translatie en onderzoek","Duurzaamheid & milieu","Ecologie","Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen","Eiwitten & enzymen","Enzymen","Erfelijkheid","Evolutie","Hart en bloedsomloop","Hormonale regulatie","Huid","Organisatieniveaus","Ordening","Planten","Populatiegenetica (hardy-weinberg)","Uitscheiding: lever en nieren","Vaardigheden: grafieken & tabellen","Vaardigheden: rekenen","Vaardigheden: wetenschappelijk onderzoek","Verteringsstelsel","Zenuwstelsel & oog","Zwangerschap"];
@@ -113,7 +120,7 @@ function render(){
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
- const assetVersion="2026-11-17-22";
+ const assetVersion="2026-11-17-23";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  let snippet=snippetImages.map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'?v='+assetVersion+'" alt="'+(i<snippetImages.length-1?'Context bij vraag ':'Originele examenopgave bij vraag ')+q.n+'" loading="lazy"><figcaption>'+(i<snippetImages.length-1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
@@ -149,7 +156,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-22");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-23");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
@@ -157,10 +164,11 @@ async function loadMCQ(){
     if(existing){
      if(item.images?.length)existing.images=item.images;
      if(item.image)existing.image=item.image;
+     if(item.page)existing.page=item.page;
     }
    }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-17-22");
+  const response=await fetch("exam-mcq.json?v=2026-11-17-23");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
