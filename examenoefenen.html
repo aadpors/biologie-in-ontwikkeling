@@ -83,6 +83,8 @@ function onderwerpenVanVraag(q){
  const theme=String(q.theme||"").toLowerCase();
  const t=[stem,concept,focus].join(" ");
  const hits=new Set(),add=x=>hits.add(x);
+ const manualQuestionTopics={"vw26t2-open-39":["Ecologie"]};
+ (manualQuestionTopics[q.id]||[]).forEach(add);
  const exactTheme={
   "hart en bloedsomloop":["Hart en bloedsomloop"],
   "cellen: deling en differentiatie":["Cellen: deling en differentiatie"],
