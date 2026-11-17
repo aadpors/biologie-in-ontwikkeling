@@ -395,18 +395,6 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         block_indices.append(j)
 
                 options = parse_options(block_text)
-                if (prefix, marker["number"]) == ("vw26t1", 9):
-                    # The six percentage choices are split across columns in
-                    # the source PDF; keep each alternative separate.
-                    options = [
-                        {"key": "A", "text": "2,6%"},
-                        {"key": "B", "text": "4,0%"},
-                        {"key": "C", "text": "16%"},
-                        {"key": "D", "text": "27%"},
-                        {"key": "E", "text": "71%"},
-                        {"key": "F", "text": "84%"},
-                    ]
-
                 # Exam PDFs often place the next context paragraph immediately
                 # after the final answer option. The old parser treated that
                 # paragraph as a continuation of option D/E/F. Detect the first
@@ -429,6 +417,18 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             break
                         previous_bottom = max(previous_bottom, current_line["bbox"][3])
                     options = parse_options(block_text)
+
+                if (prefix, marker["number"]) == ("vw26t1", 9):
+                    # The six percentage choices are split across columns in
+                    # the source PDF; keep each alternative separate.
+                    options = [
+                        {"key": "A", "text": "2,6%"},
+                        {"key": "B", "text": "4,0%"},
+                        {"key": "C", "text": "16%"},
+                        {"key": "D", "text": "27%"},
+                        {"key": "E", "text": "71%"},
+                        {"key": "F", "text": "84%"},
+                    ]
 
                 first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
                 selected_prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
