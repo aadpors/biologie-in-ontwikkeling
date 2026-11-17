@@ -373,68 +373,78 @@ def find_markers(lines, allow_multiline_number_first=False):
     return unique
 
 def parse_options(block_lines):
-    """Parse A-F options even when PDF extraction puts several options on one line.
+    """Parse sequential A-F choices, including multiple choices on one PDF line.
 
-    Some exam PDFs expose e.g. "D ... E ..." as one text line. Treating the
-    second label as continuation text silently loses E/F. Split only on the
-    next expected letter, which avoids splitting ordinary capital letters in
-    option wording.
+    PDF extraction sometimes joins the end of D with the E label (or E with F).
+    Once an A option has been identified at the start of a line, split only on
+    the next expected standalone letter. This avoids interpreting ordinary
+    capital letters in the question stem as answer labels.
     """
-    raw = " ".join(line.strip() for line in block_lines if line.strip())
     options = []
-    current_key = None
-    current_text = []
-
-    # A label starts an option only when it is the next letter in sequence.
-    # The same rule handles labels at the start of a line and labels embedded
-    # in a line by the PDF text extractor.
-    token_re = re.compile(r"(?<!\\S)([A-F])(?=\\s|$)")
-    position = 0
+    current = None
     expected = "A"
-    for match in token_re.finditer(raw):
-        key = match.group(1)
-        if key != expected:
-            continue
-        if current_key is not None:
-            options.append({"key": current_key, "text": " ".join(current_text).strip()})
-        current_key = key
-        current_text = []
-        expected = chr(ord(expected) + 1) if expected < "F" else None
-        position = match.end()
-        if expected is None:
-            break
-    if current_key is not None:
-        options.append({"key": current_key, "text": " ".join(current_text).strip()})
+    stop_starts = re.compile(
+        r"^(let op|lees verder|einde|bronvermelding|de volgende|om uit te sluiten|"
+        r"fokkers|afbeelding|tijdens|na afloop|hieronder staat|in het onderzoek|"
+        r"de onderzoekers|vervolgens)", re.I
+    )
 
-    # Rebuild option text from the spans between sequential labels. This
-    # second pass preserves all text, including labels that shared a PDF line.
-    labels = list(token_re.finditer(raw))
-    sequential = []
-    expected = "A"
-    for match in labels:
-        if match.group(1) != expected:
-            continue
-        sequential.append(match)
-        expected = chr(ord(expected) + 1) if expected < "F" else None
-        if expected is None:
-            break
-    if len(sequential) < 3:
-        return []
-    parsed = []
-    for i, match in enumerate(sequential):
-        end = sequential[i + 1].start() if i + 1 < len(sequential) else len(raw)
-        text = raw[match.end():end].strip()
-        # A final empty option is valid for image-based answer alternatives.
-        if not text:
-            text = "Bekijk optie " + match.group(1) + " in de oorspronkelijke afbeelding"
-        parsed.append({"key": match.group(1), "text": text})
+    def begin_option(key, value):
+        nonlocal current, expected
+        if current is not None:
+            options.append(current)
+        current = {"key": key, "text": value.strip()}
+        expected = chr(ord(key) + 1) if key < "F" else None
 
-    # Remove trailing exam instructions accidentally captured after the last
-    # option, but never discard a genuine E/F alternative.
-    stop = re.search(r"\\s+(?:Let op|Lees verder|Einde|Bronvermelding)\\b", parsed[-1]["text"], re.I)
-    if stop:
-        parsed[-1]["text"] = parsed[-1]["text"][:stop.start()].strip()
-    return parsed
+    for raw_line in block_lines:
+        line = raw_line.strip()
+        if not line:
+            continue
+        start_match = OPTION_RE.match(line)
+        if start_match and start_match.group(1) == expected:
+            begin_option(start_match.group(1), start_match.group(2) or "")
+            continue
+        if current is None:
+            continue
+        if re.match(r"^\\d+\\s*p$", line, re.I) or HEADER_RE.match(line):
+            break
+        if len(options) >= 3 and current["text"] and stop_starts.match(line):
+            break
+
+        # Some PDF text layers put the next option on the same line as the
+        # current one. Split at the next expected isolated A-F label only.
+        remainder = line
+        while expected and expected <= "F":
+            inline = re.search(r"\\s(" + re.escape(expected) + r")(?:\\s+|$)", remainder)
+            if not inline:
+                break
+            before = remainder[:inline.start()].strip()
+            if before:
+                current["text"] = (current["text"] + " " + before).strip()
+            key = inline.group(1)
+            remainder = remainder[inline.end():].strip()
+            begin_option(key, "")
+        if remainder:
+            current["text"] = (current["text"] + " " + remainder).strip()
+
+    if current is not None:
+        options.append(current)
+
+    keys = [option["key"] for option in options]
+    if len(keys) < 3 or keys != list("ABCDEF"[:len(keys)]):
+        # Keep support for diagram-based answer options whose letters are
+        # extracted as a compact A B C D E F sequence on a single line.
+        compact = " ".join(block_lines)
+        labels = re.search(r"\\bA\\s+B\\s+C\\s+D(?:\\s+E)?(?:\\s+F)?\\b", compact)
+        if not labels:
+            return []
+        keys = labels.group(0).split()
+        return [{"key": key, "text": "Bekijk optie " + key + " in de oorspronkelijke afbeelding"} for key in keys]
+
+    for option in options:
+        if not option["text"]:
+            option["text"] = "Bekijk optie " + option["key"] + " in de oorspronkelijke afbeelding"
+    return options
 
 def clean_context(lines):
     cleaned = []
