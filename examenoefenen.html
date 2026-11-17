@@ -97,33 +97,33 @@ function onderwerpenVanVraag(q){
  // Alleen onderscheidende begrippen; woorden als 'long', 'transport',
  // 'orgaan', 'organisme', 'plant' of 'onderzoek' zijn op zichzelf te breed.
  if(/ademhaling|gaswisseling|longblaasjes|luchtpijp|bronchi(?:ën)?|ventilatie|inademing|uitademing|hyperventil|diepe ademhaling|ondiepe ademhaling|dode ruimte|restvolume/.test(t))add("Ademhalingsstelsel");
- if(/afweer|antistof|antilichaam|immuun|immuniteit|vaccin|fagocyt|lymfocyt|mhc|antigeen|allerg(?:ie|isch)|ontstekingsreactie|ziekteverwekker|pathogeen|antiserum|slangengif|gifklier/.test(t))add("Afweer");
+ if(/afweer|antistof|antilichaam|immuun|immuniteit|vaccin|fagocyt|lymfocyt|mhc|antigeen|allerg(?:ie|isch)|ontstekingsreactie|ziekteverwekker|pathogeen|antiserum|slangengif|gifklier|b-cel|t-cel|cytokin|igg|immunosuppress|antibiotic|infectieziekte/.test(t))add("Afweer");
  if(/stamcel|celdeling|celdifferentiatie|mitose|meiose|celcyclus/.test(t))add("Cellen: deling en differentiatie");
  if(/organel|lysosoom|ribosoom|golgi(?:-systeem)?|endoplasmatisch reticulum|mitochondri(?:um|ën)|chloroplast/.test(t))add("Cellen: organellen");
- if(/dissimilatie|assimilatie|stofwisseling|melkzuur|anaeroob|aeroob|atp-productie|fotosynthese|celademhaling/.test(t))add("Cellen: stofwisseling");
- if(/diffusie|osmose|celmembraan|membraantransport|actief transport|passief transport|wet van fick/.test(t))add("Cellen: transport");
- if(/dna|chromosoom|genotype|fenotype|allel|mutatie|genoom|codon|transcriptie|translatie|genexpressie|pcr|transgeen|cisgeen|genetische modificatie/.test(t))add("Dna: expressie, transcriptie, translatie en onderzoek");
+ if(/dissimilatie|assimilatie|stofwisseling|melkzuur|anaeroob|aeroob|atp-productie|fotosynthese|celademhaling|gistcel|ethanol|fermentatie|elektronendonor|elektronenacceptor|g6pd|vetzuur|fructaan|celprocessen|oxidatieve fosforylering/.test(t))add("Cellen: stofwisseling");
+ if(/diffusie|osmose|osmotische waarde|celmembraan|membraantransport|actief transport|passief transport|wet van fick|wateropname|verzilting/.test(t))add("Cellen: transport");
+ if(/dna|chromosoom|genotype|fenotype|allel|mutatie|genoom|codon|transcriptie|translatie|genexpressie|pcr|transgeen|cisgeen|genetische modificatie|chromatine|h2ax|dsb|crispr|aon|intron|exon|promotor|locus|lpl-gen|functioneel gen|gen wordt ingebracht|genetisch verschil|genetische verschillen/.test(t))add("Dna: expressie, transcriptie, translatie en onderzoek");
  if(/duurzaamheid|milieuvervuiling|klimaatverandering|bestrijdingsmiddel|insecticide|persistent/.test(t))add("Duurzaamheid & milieu");
- if(/populatie|ecosysteem|habitat|niche|trofisch|voedselweb|voedselketen|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|kringloop|mineralisatie|successie|pioniersoort|climaxsoort|biodiversiteit|biotische factor|abiotische factor/.test(t))add("Ecologie");
+ if(/populatie|ecosysteem|habitat|niche|trofisch|voedselweb|voedselketen|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|kringloop|mineralisatie|successie|pioniersoort|climaxsoort|biodiversiteit|biotische factor|abiotische factor|slak|zeearend|koolmees|eikels|eikenprocessierups|broedpaar|herbicide|insecticide|pesticide|ambrosia|bladhaantje|exoot|invasief|nematod|gifkikker|driekleurige gifkikker|kustecosysteem|zegras|slijkgras|duurzame bestrijding|biomassa/.test(t))add("Ecologie");
  if(/eutrofiëring|algenbloei|fosfaat|vermesting/.test(t))add("Ecologie: eutrofiëring");
  if(/kringloop|mineralisatie|afbraak van organisch materiaal|stofkringloop|koolstofkringloop|stikstofkringloop|fosforkringloop/.test(t))add("Ecologie: kringlopen");
  if(/voedselweb|trofisch|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|interactie tussen soorten|voedselketen/.test(t))add("Ecologie: relaties & energiestromen");
  if(/eiwit|aminozuur|eiwitvouwing/.test(t))add("Eiwitten & enzymen");
  if(/enzym|katalys|substraat|activeringsenergie/.test(t)){hits.delete("Eiwitten & enzymen");add("Enzymen");}
  if(/erfelijk|overerving|allel|genotype|fenotype|stamboom|inteelt|recessief|dominant|kruising|genetische variatie/.test(t))add("Erfelijkheid");
- if(/evolutie|selectiedruk|natuurlijke selectie|genetic drift|stichtereffect|soortvorming|convergente evolutie|divergente evolutie|adaptatie/.test(t))add("Evolutie");
- if(/hart|bloedvat|slagader|ader|haarvat|bloeddruk|slagvolume|polsslag|bloedsomloop|bloedplaat|bloedcel|lymfe|weefselvloeistof|hartklep|bloedtoevoer|doorbloeding|bloed naar de organen|hartslagfrequentie/.test(t))add("Hart en bloedsomloop");
- if(/hormoon|hormonale regulatie|tpo|histamine|ovulatie|terugkoppeling|hypothalamus|insuline|glucagon/.test(t))add("Hormonale regulatie");
- if(/zweetproductie|zweetklier|thermoregulatie|huidbarrière|hoornlaag|verenkleed/.test(t))add("Huid");
+ if(/evolutie|evolutionaire|selectiedruk|natuurlijke selectie|genetic drift|stichtereffect|soortvorming|convergente evolutie|divergente evolutie|adaptatie|vruchtbare nakomelingen|haploïd|diploïd/.test(t))add("Evolutie");
+ if(/hart|bloedvat|slagader|ader|haarvat|bloeddruk|slagvolume|polsslag|bloedsomloop|bloedplaat|bloedcel|lymfe|weefselvloeistof|hartklep|bloedtoevoer|doorbloeding|bloed naar de organen|hartslagfrequentie|hemoglobine|hemolyse|bloedgroep|zuurstofverzadiging|oedeem/.test(t))add("Hart en bloedsomloop");
+ if(/hormoon|hormonale regulatie|tpo|histamine|ovulatie|terugkoppeling|hypothalamus|insuline|glucagon|oestradiol|oestrogeen|calcitriol|schildklierhormoon|hormonale|groeihormoon/.test(t))add("Hormonale regulatie");
+ if(/zweetproductie|zweetklier|thermoregulatie|huidbarrière|hoornlaag|verenkleed|littekenweefsel|bindweefsel|pigment|melanine|opperhuid|huidkleur/.test(t))add("Huid");
  if(/organisatieniveau|celniveau|weefselniveau|orgaanniveau/.test(t))add("Organisatieniveaus");
  if(/soortbegrip|geslacht|classificatie|taxonomie|taxon|systematiek|ordening/.test(t))add("Ordening");
- if(/plantencel|bladgroenkorrel|huidmondje|wortelhaar|bastvat|xyleem|flo[eë]em|autotroof|stikstofassimilatie/.test(t))add("Planten");
+ if(/plantencel|bladgroenkorrel|huidmondje|wortelhaar|bastvat|xyleem|flo[eë]em|autotroof|stikstofassimilatie|plantengroei|plantenvoer|plantaardig voer|plantaardige olie|wateropname door een plant|wortelstelsel|biomassa van planten|putrescine|zonnedauw|zetmeelmat|bruine vetcellen/.test(t))add("Planten");
  if(/hardy.?weinberg|populatiegenetica|allelfrequentie|genfrequentie/.test(t))add("Populatiegenetica (hardy-weinberg)");
  if(/\bnieren?\b|\burine\b|\bnefron\b|kapsel van bowman|leverontgifting|ontgifting in de lever|ureumvorming|uitscheiding/.test(t))add("Uitscheiding: lever en nieren");
  if(/grafiek|diagram|tabel|gegevens aflezen|trend|verband in de gegevens/.test(stem))add("Vaardigheden: grafieken & tabellen");
  if(/bereken|berekening|percentage|kans|verhouding|snelheid|concentratie|volume|oppervlak/.test(stem))add("Vaardigheden: rekenen");
- if(/hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|controlegroep|experimentele groep|onderzoeksopzet|opzet van het experiment|welke metingen|beschrijf.*experiment/.test(stem))add("Vaardigheden: wetenschappelijk onderzoek");
- if(/vertering|maag|alvleesklier|gal|resorptie|darmslijmvlies|dumpingsyndroom|verteringsenzym/.test(t))add("Verteringsstelsel");
+ if(/hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|controlegroep|experimentele groep|onderzoeksopzet|opzet van het experiment|welke metingen|beschrijf.*experiment|positieve controle|negatieve controle|betrouwbaarheid|validiteit|conclusie|infographic|gegevens in afbeelding|ondersteund door de gegevens/.test(stem))add("Vaardigheden: wetenschappelijk onderzoek");
+ if(/vertering|maag|alvleesklier|gal|resorptie|darmslijmvlies|dumpingsyndroom|verteringsenzym|darmvlok|darmkanaal|darmwand|emulgeren|vetten|koolhydraatarm dieet|monosacharid|dikke darm|diarree|b12-voedingssupplement|voedingssupplement|voedingstoffen/.test(t))add("Verteringsstelsel");
  if(/zenuwstelsel|zenuwcel|zenuwimpuls|hersenen|hersenstam|synaps|neurotransmitter|membraanpotentiaal|reflexboog|oogzenuw|netvlies|zintuig/.test(t))add("Zenuwstelsel & oog");
  if(/zwangerschap|embryo|foetus|placenta|baarmoeder|eierstok|zaadcel|eicel|bevruchting|menstruatiecyclus/.test(t))add("Zwangerschap");
  if(["Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen"].some(x=>hits.has(x)))hits.delete("Ecologie");
