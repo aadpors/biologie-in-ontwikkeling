@@ -56,6 +56,16 @@ assert.ok(examPage.includes('id:"ha24-1"') && examPage.includes('id:"ha24-8"'), 
 for (const number of [1, 8]) {
   assert.ok(examContexts.some(context => context.level === 'Havo' && context.year === '2024' && context.period === '1' && context.n === number), `Contextafbeeldingen Havo 2024-I vraag ${number} ontbreken`);
 }
+const sortKey = question => [Number(question.year), Number(question.period), Number(question.n), question.level].join("|");
+const sortedExamQuestions = [...examQuestions].sort((a, b) =>
+  Number(a.year) - Number(b.year) ||
+  Number(a.period) - Number(b.period) ||
+  Number(a.n) - Number(b.n) ||
+  a.level.localeCompare(b.level, 'nl')
+);
+assert.deepEqual(examQuestions.map(sortKey), sortedExamQuestions.map(sortKey),
+  'Meerkeuzevragen moeten oplopend op examenjaar, tijdvak en vraagnummer staan');
+
 const examIds = new Set();
 for (const [index, question] of examQuestions.entries()) {
   const where = `exam-mcq.json vraag ${index + 1}`;
