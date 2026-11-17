@@ -46,7 +46,7 @@ def render_question(pdf_path, question, output):
             heading = lines[matches[0]]
             following = [line for i, line in enumerate(lines) if line["y0"] > heading["y0"] + 3 and heading_at(lines, i)]
             top = max(0, heading["y0"] - 8)
-            bottom = min(page.rect.height - 38, min((line["y0"] for line in following), default=page.rect.height - 38) - 5)
+            bottom = min(page.rect.height - 80, min((line["y0"] for line in following), default=page.rect.height - 80) - 5)
             bottom = max(top + 35, bottom)
             # Keep the full page width; crop only vertically around the answer.
             rect = fitz.Rect(0, top, page.rect.width, bottom)
