@@ -37,6 +37,18 @@
   },
   {
     "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 2,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q2-complete.jpg",
+      "exam-snippets/question-ha24t2-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
     "year": "2025",
     "period": "1",
     "n": 1,
