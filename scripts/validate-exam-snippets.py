@@ -55,11 +55,6 @@ for filename, label in DATASETS:
             except Exception as exc:
                 errors.append(f"{label} {qid}: ongeldige afbeelding {rel}: {exc}")
 
-if errors:
-    print("\n".join(errors))
-    raise SystemExit(f"Controle mislukt: {len(errors)} fouten in {total} vragen.")
-print(f"Controle geslaagd: {total} vragen; alle primaire, context- en vraagafbeeldingen bestaan en zijn leesbare afbeeldingen.")
-
 # Every official correction-scheme manifest entry must resolve to a readable generated image.
 cv_manifest = json.loads((ROOT / "scripts" / "cv-snippets.json").read_text(encoding="utf-8"))
 for item in cv_manifest:
@@ -79,3 +74,8 @@ for item in cv_manifest:
                     errors.append(f"correctievoorschrift {item.get('id')}: onwaarschijnlijk kleine afbeelding {rel} ({image.size})")
         except Exception as exc:
             errors.append(f"correctievoorschrift {item.get('id')}: ongeldige afbeelding {rel}: {exc}")
+
+if errors:
+    print("\n".join(errors))
+    raise SystemExit(f"Controle mislukt: {len(errors)} fouten in {total} vragen.")
+print(f"Controle geslaagd: {total} vragen; alle primaire, context- en vraagafbeeldingen bestaan en zijn leesbare afbeeldingen.")
