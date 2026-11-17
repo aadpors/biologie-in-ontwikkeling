@@ -10,19 +10,34 @@ De beheeromgeving staat voorlopig op een niet-gelinkte URL:
 - Bestanden worden opgeslagen in de private Supabase Storage-bucket `exam-inbox`.
 - Uploadmetadata, status en gebeurtenissen worden bijgehouden in `public.exam_ingest_jobs` en `public.exam_ingest_events`.
 - Uploadgeschiedenis, details, verwijderen en opnieuw aanbieden zijn beschikbaar.
-- De knop **Inventariseer wachtende uploads** start een Supabase Edge Function per bestand.
+- De knop **Inventariseer wachtende uploads** start de Supabase Edge Function per bestand.
 - De worker controleert PDF's, haalt per pagina tekst en paginagrootte op, herkent waar mogelijk niveau/jaar/tijdvak/documenttype uit de bestandsnaam en bewaart een `inventory.json` in de private bucket.
 - ZIP-bestanden worden geïnventariseerd en de gevonden PDF's worden afzonderlijk in de private bucket opgeslagen.
 - Inventarisatie-uitkomsten worden als `review_required` gemarkeerd; dit betekent nadrukkelijk nog niet dat vragen/contexten zijn gekoppeld of dat afbeeldingen zijn goedgekeurd.
-- De knop AI-analyse starten verschijnt bij geïnventariseerde opgaven-PDF's; de eerste analyse is handmatig per bestand te starten.\n- Voor AI is de Supabase Edge Function secret OPENAI_API_KEY nodig. Optioneel kan OPENAI_EXAM_MODEL worden ingesteld; standaard is gpt-4.1.\n- Er wordt niets gepubliceerd naar de openbare website.
+- **Download ChatGPT-verwerkingspakket** maakt in de browser een ZIP met de originele opgaven-PDF's, bijbehorende uitwerkbijlagen en hun pagina-inventarisaties. Correctievoorschriften worden bewust uitgesloten.
+- Het pakket bevat ook verwerkingsinstructies en een manifest met documentmetadata. Er wordt geen externe AI-API aangeroepen.
 
-## Belangrijk: volgende verwerkingsfasen
+## Gratis verwerkingsroute
 
-De eerste technische worker voert alleen bestands- en pagina-inventarisatie uit. De Edge Function analyze-exam-questions is aangesloten als eerste AI-stap. Per opgaven-PDF kan deze met een ingestelde OPENAI_API_KEY een conceptinventaris maken van alle open en meerkeuzevragen, gedeelde contexten en paginabrede fragmenten. Het resultaat wordt als JSON in de private bucket opgeslagen. Deze stap vereist handmatige start per opgaven-PDF en is begrensd tot 24 MB per PDF. Correctievoorschriften en uitwerkbijlagen worden niet als vraagbron gebruikt. De segmenten en vraagherkenning zijn AI-voorstellen en moeten inhoudelijk worden gevalideerd. De originele beeldfragmenten worden nog niet gerenderd en visuele menselijke beoordeling is nog niet aangesloten. De bestaande regex-/anker-gebaseerde renderers worden niet als inhoudelijke waarheid gebruikt. Publicatie blijft uitgeschakeld totdat de volledige vraagset (open én meerkeuze) inhoudelijk en visueel is gecontroleerd.
+De inhoudelijke AI-analyse wordt vanuit de ChatGPT-conversatie uitgevoerd, niet vanuit Supabase. De gebruiker downloadt het verwerkingspakket uit de beheeromgeving en voegt het hier toe. Analyse, selectie van contexten en vraagfragmenten en inhoudelijke controle gebeuren in ChatGPT. Resultaten blijven concept totdat de volledige set vragen inhoudelijk en visueel is gecontroleerd.
+
+De Edge Function `analyze-exam-questions` is bewust gedeactiveerd op functieniveau: hij retourneert HTTP 410 en voert geen externe verzoeken uit. Een eventuele oude `OPENAI_API_KEY`-secret wordt niet gelezen of gebruikt. Er kunnen dus via deze functie geen OpenAI API-kosten ontstaan.
+
+## Kwaliteitsregels
+
+- Verwerk alle vragen, open én meerkeuze, zonder uitzonderingen.
+- De originele PDF is leidend voor vraagtekst, figuren, tabellen, onderschriften en beeldmateriaal.
+- Koppel gedeelde contexten ook als die op eerdere pagina's of tussen vragen van dezelfde groep staan.
+- Behoud leesvolgorde, kolommen, labels, legenda's en volledige figuren; kies bij twijfel een ruimere uitsnede.
+- Reconstructeer, herschrijf of genereer geen exameninhoud of beeldmateriaal.
+- Leg onzekerheden vast met vraagnummer, bronpagina, reden en voorgestelde uitsnede.
+- Controleer aantallen en nummering tegen de volledige PDF.
+- Correctievoorschriften en addenda mogen voor latere antwoord-/scoreverwerking worden gebruikt, maar niet als bron voor vraagbeelden.
+- Publiceer niets voordat de volledige vraagset inhoudelijk en visueel is gecontroleerd en expliciet is goedgekeurd.
 
 ## Tijdelijke toegang
 
-De route is niet gelinkt en heeft `noindex,nofollow`, maar is niet beveiligd met authenticatie. De tijdelijke Supabase RLS- en Storage-policies laten anonieme toegang toe tot de beheerwachtrij. Iedereen die de URL of publieke API-configuratie kent, kan deze data benaderen. Gebruik dit alleen als tijdelijke tussenstap; voeg vóór productiegebruik een echte toegangscontrole toe.
+De route is niet gelinkt en heeft `noindex,nofollow`, maar is niet beveiligd met volwaardige toegangscontrole. De tijdelijke Supabase RLS- en Storage-policies laten anonieme toegang toe tot de beheerwachtrij. Iedereen die de URL of publieke API-configuratie kent, kan deze data mogelijk benaderen. Gebruik dit alleen als tijdelijke tussenstap; voeg vóór productiegebruik echte toegangscontrole toe.
 
 ## Datamodel
 
