@@ -23,10 +23,15 @@ for filename, label in DATASETS:
             errors.append(f"{label} {qid}: verwacht aparte context- en vraagafbeelding, kreeg {len(paths)}")
         if len(paths) != len(set(paths)):
             errors.append(f"{label} {qid}: dubbele afbeelding in images-array")
-        if not any("context" in p.lower() for p in paths):
-            errors.append(f"{label} {qid}: geen contextafbeelding gekoppeld")
-        if not any(("question" in p.lower() or "mcq-" in p.lower()) for p in paths):
-            errors.append(f"{label} {qid}: geen vraagafbeelding gekoppeld")
+        if not paths:
+            errors.append(f"{label} {qid}: geen losse context-/vraagafbeeldingen gekoppeld")
+        else:
+            # The frontend labels every image before the final one as context;
+            # the final image must therefore be the question crop itself.
+            if not all("context" in p.lower() for p in paths[:-1]):
+                errors.append(f"{label} {qid}: een tussenafbeelding is geen contextafbeelding: {paths[:-1]}")
+            if not any(("question" in paths[-1].lower() or "mcq-" in paths[-1].lower()) for _ in [0]):
+                errors.append(f"{label} {qid}: laatste afbeelding is geen vraagafbeelding: {paths[-1]}")
         for rel in ([primary] if primary else []) + paths:
             path = ROOT / rel
             if not path.is_file():
