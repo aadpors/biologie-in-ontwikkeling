@@ -717,6 +717,11 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t1-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q3-p2-1.jpg",
+      "exam-snippets/context-vw25t1-q3-p3-2.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-3.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -841,7 +846,10 @@
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t1-mcq-30.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q30-p15-1.jpg",
+      "exam-snippets/context-vw25t1-q30-p14-1.jpg",
+      "exam-snippets/context-vw25t1-q30-p14-2.jpg",
+      "exam-snippets/context-vw25t1-q30-p15-3.jpg",
+      "exam-snippets/context-vw25t1-q30-p15-4.jpg",
       "exam-snippets/mcq-vw25t1-mcq-30.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -883,8 +891,11 @@
     "correct": "D",
     "image": "exam-snippets/mcq-vw25t1-mcq-31.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q31-p15-1.jpg",
-      "exam-snippets/context-vw25t1-q31-p15-2.jpg",
+      "exam-snippets/context-vw25t1-q31-p14-1.jpg",
+      "exam-snippets/context-vw25t1-q31-p14-2.jpg",
+      "exam-snippets/context-vw25t1-q31-p15-3.jpg",
+      "exam-snippets/context-vw25t1-q31-p15-4.jpg",
+      "exam-snippets/context-vw25t1-q31-p15-5.jpg",
       "exam-snippets/mcq-vw25t1-mcq-31.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -926,9 +937,12 @@
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t1-mcq-32.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q32-p15-1.jpg",
-      "exam-snippets/context-vw25t1-q32-p15-2.jpg",
-      "exam-snippets/context-vw25t1-q32-p16-3.jpg",
+      "exam-snippets/context-vw25t1-q32-p14-1.jpg",
+      "exam-snippets/context-vw25t1-q32-p14-2.jpg",
+      "exam-snippets/context-vw25t1-q32-p15-3.jpg",
+      "exam-snippets/context-vw25t1-q32-p15-4.jpg",
+      "exam-snippets/context-vw25t1-q32-p15-5.jpg",
+      "exam-snippets/context-vw25t1-q32-p16-6.jpg",
       "exam-snippets/mcq-vw25t1-mcq-32.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -966,10 +980,13 @@
     "correct": "B",
     "image": "exam-snippets/mcq-vw25t1-mcq-33.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q33-p15-1.jpg",
-      "exam-snippets/context-vw25t1-q33-p15-2.jpg",
-      "exam-snippets/context-vw25t1-q33-p16-3.jpg",
-      "exam-snippets/context-vw25t1-q33-p16-4.jpg",
+      "exam-snippets/context-vw25t1-q33-p14-1.jpg",
+      "exam-snippets/context-vw25t1-q33-p14-2.jpg",
+      "exam-snippets/context-vw25t1-q33-p15-3.jpg",
+      "exam-snippets/context-vw25t1-q33-p15-4.jpg",
+      "exam-snippets/context-vw25t1-q33-p15-5.jpg",
+      "exam-snippets/context-vw25t1-q33-p16-6.jpg",
+      "exam-snippets/context-vw25t1-q33-p16-7.jpg",
       "exam-snippets/mcq-vw25t1-mcq-33.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -1336,7 +1353,15 @@
     "correct": "C",
     "image": "exam-snippets/mcq-ha25t2-mcq-26.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q26-p11-1.jpg",
+      "exam-snippets/context-ha25t2-q26-p8-1.jpg",
+      "exam-snippets/context-ha25t2-q26-p9-2.jpg",
+      "exam-snippets/context-ha25t2-q26-p9-3.jpg",
+      "exam-snippets/context-ha25t2-q26-p9-4.jpg",
+      "exam-snippets/context-ha25t2-q26-p9-5.jpg",
+      "exam-snippets/context-ha25t2-q26-p9-6.jpg",
+      "exam-snippets/context-ha25t2-q26-p10-7.jpg",
+      "exam-snippets/context-ha25t2-q26-p11-8.jpg",
+      "exam-snippets/context-ha25t2-q26-p11-9.jpg",
       "exam-snippets/mcq-ha25t2-mcq-26.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
@@ -1525,7 +1550,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Heterozygote bevruchte eicellen (Gpr54+Gpr54–) werden\nstap 3\ningebracht bij draagmoedermuizen.\nstap 4\nToen de nakomelingen die hieruit ontstonden (F1) volwassen\nwaren, werden ze onderling gekruist. Hieruit ontstond een F2.",
+    "source": "Om een groep van 30 homozygote Gpr54-knock-out muizen\n(Gpr54– Gpr54–) te verkrijgen werd de volgende werkwijze gevolgd:\nstap 1\nUit enkele (wildtype) vrouwtjesmuizen werden bevruchte\neicellen weggenomen.\nstap 2\nDe bevruchte eicellen kregen de crispr-behandeling.\nHeterozygote bevruchte eicellen (Gpr54+Gpr54–) werden\nstap 3\ningebracht bij draagmoedermuizen.\nstap 4\nToen de nakomelingen die hieruit ontstonden (F1) volwassen\nwaren, werden ze onderling gekruist. Hieruit ontstond een F2.",
     "q": "Hoeveel nakomelingen (F2) werden naar verwachting geboren totdat er in\ntotaal 30 muizen waren die volledig Gpr54-knock-out waren?",
     "options": [
       {
@@ -1551,6 +1576,13 @@
     ],
     "correct": "E",
     "image": "exam-snippets/mcq-vw25t2-mcq-19.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q19-p7-1.jpg",
+      "exam-snippets/context-vw25t2-q19-p8-2.jpg",
+      "exam-snippets/context-vw25t2-q19-p8-3.jpg",
+      "exam-snippets/context-vw25t2-q19-p8-4.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-19.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1598,8 +1630,13 @@
     "correct": "E",
     "image": "exam-snippets/mcq-vw25t2-mcq-22.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q22-p9-1.jpg",
-      "exam-snippets/context-vw25t2-q22-p9-2.jpg",
+      "exam-snippets/context-vw25t2-q22-p7-1.jpg",
+      "exam-snippets/context-vw25t2-q22-p8-2.jpg",
+      "exam-snippets/context-vw25t2-q22-p8-3.jpg",
+      "exam-snippets/context-vw25t2-q22-p8-4.jpg",
+      "exam-snippets/context-vw25t2-q22-p9-5.jpg",
+      "exam-snippets/context-vw25t2-q22-p9-6.jpg",
+      "exam-snippets/context-vw25t2-q22-p9-7.jpg",
       "exam-snippets/mcq-vw25t2-mcq-22.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
@@ -2584,7 +2621,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "gen\nHPA1-gen\nHPA5-gen",
+    "source": "Nadat andere oorzaken werden uitgesloten, vermoedden de artsen dat bij\nRosie sprake was van een afweerreactie tegen de antigenen op haar\nbloedplaatjes. Deze antigenen worden HPA’s (human platelet antigens)\ngenoemd.\nElk bloedplaatje heeft een aantal verschillende HPA’s. Van de genen die\ncoderen voor deze HPA’s, komen alle aanwezige allelen tot expressie.\nIn tabel 1 zie je gegevens van twee van deze genen.\ntabel 1\ngen\nHPA1-gen\nHPA5-gen",
     "q": "Waarvan is sprake bij het HPA1-gen en het HPA5-gen op basis van de\ninformatie?",
     "options": [
       {
@@ -2606,6 +2643,13 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q5-p2-1.jpg",
+      "exam-snippets/context-vw26t1-q5-p2-2.jpg",
+      "exam-snippets/context-vw26t1-q5-p3-3.jpg",
+      "exam-snippets/context-vw26t1-q5-p3-4.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-5.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2653,10 +2697,14 @@
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-9.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q9-p4-1.jpg",
-      "exam-snippets/context-vw26t1-q9-p4-2.jpg",
-      "exam-snippets/context-vw26t1-q9-p4-3.jpg",
-      "exam-snippets/context-vw26t1-q9-p5-4.jpg",
+      "exam-snippets/context-vw26t1-q9-p2-1.jpg",
+      "exam-snippets/context-vw26t1-q9-p2-2.jpg",
+      "exam-snippets/context-vw26t1-q9-p3-3.jpg",
+      "exam-snippets/context-vw26t1-q9-p3-4.jpg",
+      "exam-snippets/context-vw26t1-q9-p4-5.jpg",
+      "exam-snippets/context-vw26t1-q9-p4-6.jpg",
+      "exam-snippets/context-vw26t1-q9-p4-7.jpg",
+      "exam-snippets/context-vw26t1-q9-p5-8.jpg",
       "exam-snippets/mcq-vw26t1-mcq-9.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -2698,11 +2746,15 @@
     "correct": "D",
     "image": "exam-snippets/mcq-vw26t1-mcq-10.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q10-p4-1.jpg",
-      "exam-snippets/context-vw26t1-q10-p4-2.jpg",
-      "exam-snippets/context-vw26t1-q10-p4-3.jpg",
-      "exam-snippets/context-vw26t1-q10-p5-4.jpg",
-      "exam-snippets/context-vw26t1-q10-p5-5.jpg",
+      "exam-snippets/context-vw26t1-q10-p2-1.jpg",
+      "exam-snippets/context-vw26t1-q10-p2-2.jpg",
+      "exam-snippets/context-vw26t1-q10-p3-3.jpg",
+      "exam-snippets/context-vw26t1-q10-p3-4.jpg",
+      "exam-snippets/context-vw26t1-q10-p4-5.jpg",
+      "exam-snippets/context-vw26t1-q10-p4-6.jpg",
+      "exam-snippets/context-vw26t1-q10-p4-7.jpg",
+      "exam-snippets/context-vw26t1-q10-p5-8.jpg",
+      "exam-snippets/context-vw26t1-q10-p5-9.jpg",
       "exam-snippets/mcq-vw26t1-mcq-10.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -2827,8 +2879,11 @@
     "correct": "D",
     "image": "exam-snippets/mcq-vw26t1-mcq-25.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q25-p10-1.jpg",
-      "exam-snippets/context-vw26t1-q25-p10-2.jpg",
+      "exam-snippets/context-vw26t1-q25-p9-1.jpg",
+      "exam-snippets/context-vw26t1-q25-p9-2.jpg",
+      "exam-snippets/context-vw26t1-q25-p9-3.jpg",
+      "exam-snippets/context-vw26t1-q25-p10-4.jpg",
+      "exam-snippets/context-vw26t1-q25-p10-5.jpg",
       "exam-snippets/mcq-vw26t1-mcq-25.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -2870,9 +2925,12 @@
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-26.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q26-p10-1.jpg",
-      "exam-snippets/context-vw26t1-q26-p10-2.jpg",
-      "exam-snippets/context-vw26t1-q26-p11-3.jpg",
+      "exam-snippets/context-vw26t1-q26-p9-1.jpg",
+      "exam-snippets/context-vw26t1-q26-p9-2.jpg",
+      "exam-snippets/context-vw26t1-q26-p9-3.jpg",
+      "exam-snippets/context-vw26t1-q26-p10-4.jpg",
+      "exam-snippets/context-vw26t1-q26-p10-5.jpg",
+      "exam-snippets/context-vw26t1-q26-p11-6.jpg",
       "exam-snippets/mcq-vw26t1-mcq-26.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -3251,8 +3309,11 @@
     "correct": "A",
     "image": "exam-snippets/mcq-ha26t2-mcq-26.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q26-p12-1.jpg",
-      "exam-snippets/context-ha26t2-q26-p12-2.jpg",
+      "exam-snippets/context-ha26t2-q26-p11-1.jpg",
+      "exam-snippets/context-ha26t2-q26-p11-2.jpg",
+      "exam-snippets/context-ha26t2-q26-p11-3.jpg",
+      "exam-snippets/context-ha26t2-q26-p12-4.jpg",
+      "exam-snippets/context-ha26t2-q26-p12-5.jpg",
       "exam-snippets/mcq-ha26t2-mcq-26.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
@@ -3294,9 +3355,12 @@
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t2-mcq-27.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q27-p12-1.jpg",
-      "exam-snippets/context-ha26t2-q27-p12-2.jpg",
-      "exam-snippets/context-ha26t2-q27-p12-3.jpg",
+      "exam-snippets/context-ha26t2-q27-p11-1.jpg",
+      "exam-snippets/context-ha26t2-q27-p11-2.jpg",
+      "exam-snippets/context-ha26t2-q27-p11-3.jpg",
+      "exam-snippets/context-ha26t2-q27-p12-4.jpg",
+      "exam-snippets/context-ha26t2-q27-p12-5.jpg",
+      "exam-snippets/context-ha26t2-q27-p12-6.jpg",
       "exam-snippets/mcq-ha26t2-mcq-27.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
@@ -3358,7 +3422,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Latijnse naam\nEngels raaigras\nLolium perenne\nrood zwenkgras\nFestuca rubra\nstraatgras\nPoa annua\ntimotheegras\nPhleum pratense\nveldbeemdgras\nPoa pratensis",
+    "source": "Koen kiest een mengsel van de volgende grassen:\nNederlandse naam\nLatijnse naam\nEngels raaigras\nLolium perenne\nrood zwenkgras\nFestuca rubra\nstraatgras\nPoa annua\ntimotheegras\nPhleum pratense\nveldbeemdgras\nPoa pratensis",
     "q": "Hoeveel verschillende geslachten (genera) bevat het mengsel? En\nhoeveel verschillende soorten?\naantal geslachten\naantal soorten",
     "options": [
       {
@@ -3380,6 +3444,14 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha26t2-mcq-46.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q46-p18-1.jpg",
+      "exam-snippets/context-ha26t2-q46-p18-2.jpg",
+      "exam-snippets/context-ha26t2-q46-p19-3.jpg",
+      "exam-snippets/context-ha26t2-q46-p19-4.jpg",
+      "exam-snippets/context-ha26t2-q46-p19-5.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-46.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3396,7 +3468,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "D 26\nVoor de aanmaak van de nepetalactonen heeft kattenkruid verschillende\nenzymen. Afbeelding 3 geeft de laatste stappen weer van de aanmaak\nvan nepetalactonen met de daarbij betrokken enzymen ISY en NEPS.\nafbeelding 3\nBij de omzetting die door ISY wordt gekatalyseerd, is NADPH de\nelektronendonor.",
+    "source": "Het gen voor de gevoeligheid voor kattenkruid ligt op een autosoom.\nUit het fenotype van welke nakomeling (afbeelding 2) blijkt dat het gen\nniet op het X-chromosoom ligt?\nA 9\nB 19\nC 24\nD 26\nVoor de aanmaak van de nepetalactonen heeft kattenkruid verschillende\nenzymen. Afbeelding 3 geeft de laatste stappen weer van de aanmaak\nvan nepetalactonen met de daarbij betrokken enzymen ISY en NEPS.\nafbeelding 3\nBij de omzetting die door ISY wordt gekatalyseerd, is NADPH de\nelektronendonor.",
     "q": "Bij welk stofwisselingsproces in de plant wordt NADPH geproduceerd?",
     "options": [
       {
@@ -3418,6 +3490,10 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw26t2-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q3-p2-1.jpg",
+      "exam-snippets/mcq-vw26t2-mcq-3.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3533,9 +3609,11 @@
     "correct": "B",
     "image": "exam-snippets/mcq-vw26t2-mcq-21.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q21-p10-1.jpg",
-      "exam-snippets/context-vw26t2-q21-p11-2.jpg",
-      "exam-snippets/context-vw26t2-q21-p11-3.jpg",
+      "exam-snippets/context-vw26t2-q21-p9-1.jpg",
+      "exam-snippets/context-vw26t2-q21-p9-2.jpg",
+      "exam-snippets/context-vw26t2-q21-p10-3.jpg",
+      "exam-snippets/context-vw26t2-q21-p11-4.jpg",
+      "exam-snippets/context-vw26t2-q21-p11-5.jpg",
       "exam-snippets/mcq-vw26t2-mcq-21.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
