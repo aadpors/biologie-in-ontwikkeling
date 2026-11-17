@@ -67,11 +67,11 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 (() => {
-  const URL = 'https://xhlkjruauimxrjyvqiac.supabase.co';
+  const SUPABASE_URL = 'https://xhlkjruauimxrjyvqiac.supabase.co';
   const KEY = 'sb_publishable_JMTRtNzb0FY30ukrmpvdRg_z2B9oRgt';
   const BUCKET = 'exam-inbox';
   const MAX_BYTES = 500 * 1024 * 1024;
-  const client = window.supabase.createClient(URL, KEY);
+  const client = window.supabase.createClient(SUPABASE_URL, KEY);
   const $ = id => document.getElementById(id);
   let selected = [];
   let jobs = [];
