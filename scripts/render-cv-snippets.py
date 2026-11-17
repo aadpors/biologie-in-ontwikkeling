@@ -58,8 +58,8 @@ def render_question(pdf_path, question, output):
             next_topic = [
                 line for line in lines
                 if line["y0"] > heading["y0"] + 3
-                and line["bold"]
-                and line["size"] >= 14
+                and (line["bold"] or line["size"] >= 16)
+                and line["size"] >= 11
                 and len(line["text"]) < 100
                 and not re.match(r"^\d{1,2}\s+", line["text"])
                 and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
