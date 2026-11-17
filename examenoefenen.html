@@ -119,7 +119,7 @@ function onderwerpenVanVraag(q){
  if(/soortbegrip|geslacht|classificatie|taxonomie|taxon|systematiek|ordening/.test(t))add("Ordening");
  if(/plantencel|bladgroenkorrel|huidmondje|wortelhaar|bastvat|xyleem|flo[eë]em|autotroof|stikstofassimilatie/.test(t))add("Planten");
  if(/hardy.?weinberg|populatiegenetica|allelfrequentie|genfrequentie/.test(t))add("Populatiegenetica (hardy-weinberg)");
- if(/\\bnieren?\\b|\\burine\\b|\\bnefron\\b|kapsel van bowman|leverontgifting|ontgifting in de lever|ureumvorming|uitscheiding/.test(t))add("Uitscheiding: lever en nieren");
+ if(/\bnieren?\b|\burine\b|\bnefron\b|kapsel van bowman|leverontgifting|ontgifting in de lever|ureumvorming|uitscheiding/.test(t))add("Uitscheiding: lever en nieren");
  if(/grafiek|diagram|tabel|gegevens aflezen|trend|verband in de gegevens/.test(stem))add("Vaardigheden: grafieken & tabellen");
  if(/bereken|berekening|percentage|kans|verhouding|snelheid|concentratie|volume|oppervlak/.test(stem))add("Vaardigheden: rekenen");
  if(/hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|controlegroep|experimentele groep|onderzoeksopzet/.test(stem))add("Vaardigheden: wetenschappelijk onderzoek");
