@@ -63,7 +63,7 @@ def appendix_pdfs_for_exam(exam_pdf):
             continue
         suffix = candidate_stem[len(base):]
         if appendix_suffix.fullmatch(suffix):
-            found.append(str(candidate.relative_to(ROOT)).replace("\\\\", "/"))
+            found.append(candidate.relative_to(ROOT).as_posix())
     return found
 
 
@@ -1195,7 +1195,10 @@ for exam in EXAMS:
 if len(EXAMS) != 12:
     raise RuntimeError(f"Expected all 12 Havo/Vwo exams from 2024-2026, found {len(EXAMS)}")
 
-attach_appendix_links(all_questions)\nattach_appendix_links(all_open_questions)\n\nall_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
+attach_appendix_links(all_questions)
+attach_appendix_links(all_open_questions)
+
+all_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 all_open_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 
 missing = [q["id"] for q in all_questions if not q["correct"]]
