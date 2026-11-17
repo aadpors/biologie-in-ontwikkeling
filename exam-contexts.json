@@ -83,7 +83,7 @@
     "image": "exam-snippets/complete-vwo-2025-t1-q17.jpg",
     "images": [
       "exam-snippets/vw25-t1-hippo-context.jpg",
-      "exam-snippets/context-vw25t1-q17-complete.jpg",
+      "exam-snippets/context-vw25t1-q17-fallback.jpg",
       "exam-snippets/question-vw25t1-17-only.jpg"
     ]
   },
