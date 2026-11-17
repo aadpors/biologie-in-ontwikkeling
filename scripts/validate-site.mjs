@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
 const html = fs.readFileSync('index.html', 'utf8');
+const examPage = fs.readFileSync('examenoefenen.html', 'utf8');
 const publications = JSON.parse(fs.readFileSync('publicaties.json', 'utf8'));
 const examQuestions = JSON.parse(fs.readFileSync('exam-mcq.json', 'utf8'));
 const examContexts = JSON.parse(fs.readFileSync('exam-contexts.json', 'utf8'));
@@ -14,6 +15,15 @@ function assertSnippetExists(path, where) {
 
 assert.ok(Array.isArray(examQuestions) && examQuestions.length > 0, 'exam-mcq.json moet examenvragen bevatten');
 assert.ok(Array.isArray(examContexts) && examContexts.length > 0, 'exam-contexts.json moet contexten bevatten');
+const examYears = new Set(examQuestions.map(question => question.year));
+for (const year of ['2024', '2025', '2026']) {
+  assert.ok(examYears.has(year), `Meerkeuzevragen voor ${year} ontbreken`);
+}
+assert.ok(examPage.includes('<option>2024</option>'), 'Examenoefenen-filter bevat 2024 niet');
+assert.ok(examPage.includes('id:"ha24-1"') && examPage.includes('id:"ha24-8"'), 'Geselecteerde open vragen uit Havo 2024-I ontbreken');
+for (const number of [1, 8]) {
+  assert.ok(examContexts.some(context => context.level === 'Havo' && context.year === '2024' && context.period === '1' && context.n === number), `Contextafbeeldingen Havo 2024-I vraag ${number} ontbreken`);
+}
 const examIds = new Set();
 for (const [index, question] of examQuestions.entries()) {
   const where = `exam-mcq.json vraag ${index + 1}`;
@@ -85,8 +95,8 @@ for (const [index, item] of publications.entries()) {
   }
 }
 
-const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)]
-  .map(match => match[1])
+const inlineScripts = [html, examPage]
+  .flatMap(page => [...page.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(match => match[1]))
   .filter(source => source.trim());
 assert.ok(inlineScripts.length, 'Geen inline JavaScript gevonden');
 for (const [index, source] of inlineScripts.entries()) {
