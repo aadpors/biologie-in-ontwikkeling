@@ -2431,7 +2431,8 @@
       "exam-snippets/context-ha26t1-q42-p19-2.jpg",
       "exam-snippets/context-ha26t1-q42-p19-3.jpg",
       "exam-snippets/context-ha26t1-q42-p19-4.jpg",
-      "exam-snippets/context-ha26t1-q42-p20-5.jpg",
+      "exam-snippets/context-ha26t1-q42-p19-5.jpg",
+      "exam-snippets/context-ha26t1-q42-p20-6.jpg",
       "exam-snippets/mcq-ha26t1-mcq-42.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -2473,7 +2474,9 @@
       "exam-snippets/context-ha26t1-q43-p19-2.jpg",
       "exam-snippets/context-ha26t1-q43-p19-3.jpg",
       "exam-snippets/context-ha26t1-q43-p19-4.jpg",
-      "exam-snippets/context-ha26t1-q43-p20-5.jpg",
+      "exam-snippets/context-ha26t1-q43-p19-5.jpg",
+      "exam-snippets/context-ha26t1-q43-p20-6.jpg",
+      "exam-snippets/context-ha26t1-q43-p20-7.jpg",
       "exam-snippets/mcq-ha26t1-mcq-43.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -3336,6 +3339,7 @@
     "image": "exam-snippets/mcq-ha26t2-mcq-43.jpg",
     "images": [
       "exam-snippets/context-ha26t2-q43-p18-1.jpg",
+      "exam-snippets/context-ha26t2-q43-p18-2.jpg",
       "exam-snippets/mcq-ha26t2-mcq-43.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
