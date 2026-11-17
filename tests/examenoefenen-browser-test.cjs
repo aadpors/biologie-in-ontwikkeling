@@ -77,11 +77,13 @@ const assert = require("node:assert/strict");
     await page.locator("#period").selectOption("1");
     await page.locator("#questionType").selectOption("open");
     let appendix = page.locator('a[href$="-u.pdf"]');
-    for (let i = 0; i < 20 && await appendix.count() === 0; i++) {
+    for (let i = 0; i < 60 && await appendix.count() === 0; i++) {
+      const heading = await page.locator(".qhead").innerText();
+      if (/vraag 12\\b/.test(heading)) break;
       await page.locator("#nextQuestion").click();
       appendix = page.locator('a[href$="-u.pdf"]');
     }
-    assert.ok(await appendix.count() > 0, "Geen uitwerkbijlage-link gevonden binnen de havo 2025 tijdvak 1 open vragen");
+    assert.ok(await appendix.count() > 0, "Geen uitwerkbijlage-link gevonden bij de betreffende havo 2025-vraag");
     const appendixHref = await appendix.first().getAttribute("href");
     const appendixResponse = await page.request.get(new URL(appendixHref, page.url()).toString());
     assert.equal(appendixResponse.status(), 200, "Uitwerkbijlage is niet bereikbaar");
