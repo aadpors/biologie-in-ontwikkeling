@@ -5,6 +5,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 DATASETS = [
     ("exam-mcq.json", "meerkeuzevragen"),
+    ("exam-open.json", "open vragen"),
     ("exam-contexts.json", "open vragen"),
 ]
 
