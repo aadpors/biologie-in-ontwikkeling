@@ -34,7 +34,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
 <body>
 <header><div class="eyebrow">Biologie in ontwikkeling · privébeheer</div><h1>Examenbeheer</h1><p>Upload examens, volg de verwerking en beoordeel straks alleen de twijfelgevallen.</p></header>
 <main>
-<div class="notice"><b>Voorlopige beheeromgeving.</b> Upload en opslag zijn aangesloten. Met ‘Inventariseer wachtende uploads’ wordt nu ook per PDF de pagina-inventarisatie uitgevoerd. AI-vraagherkenning, contextkoppeling, beeldsamenstelling en visuele beoordeling volgen nog. Er wordt nog niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
+<div class="notice"><b>Voorlopige beheeromgeving.</b> Upload en opslag zijn aangesloten. Met ‘Inventariseer wachtende uploads’ wordt nu ook per PDF de pagina-inventarisatie uitgevoerd. De eerste AI-vraag- en contextanalyse is nu aangesloten. Daarvoor is een OPENAI_API_KEY nodig in Supabase Secrets. De analyse maakt een conceptinventaris per vraag; beeldsamenstelling en visuele beoordeling volgen daarna. Er wordt nog niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
 <div class="grid">
 <section class="panel">
 <h2>Nieuwe examens toevoegen</h2>
@@ -120,9 +120,10 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
     if(!jobs.length){$('jobs-list').innerHTML='<div class="empty">Nog geen examens geüpload. Voeg hierboven je eerste PDF of ZIP toe.</div>';return;}
     $('jobs-list').innerHTML=jobs.map(j=>{
       const date=new Date(j.created_at).toLocaleString('nl-NL',{dateStyle:'medium',timeStyle:'short'});
-      return '<article class="job"><div class="job-top"><div><div class="job-name">'+escapeHtml(j.original_filename)+'</div><div class="job-meta">'+date+' · '+formatBytes(j.file_size_bytes)+'</div></div><span class="status '+escapeHtml(j.status)+'">'+statusLabel(j.status)+'</span></div><div class="progress"><i style="width:'+Math.max(0,Math.min(100,j.progress||0))+'%"></i></div><div class="job-message"><b>'+escapeHtml(j.stage||'')+'</b>'+(j.message?' · '+escapeHtml(j.message):'')+'</div><div class="job-actions"><button class="btn soft" data-details="'+j.id+'">Details</button>'+(j.status==='failed'?'<button class="btn soft" data-retry="'+j.id+'">Opnieuw proberen</button>':'')+'<button class="btn danger" data-delete="'+j.id+'">Verwijderen</button></div><div id="events-'+j.id+'" hidden class="job-message" style="margin-top:10px"></div></article>';
+      return '<article class="job"><div class="job-top"><div><div class="job-name">'+escapeHtml(j.original_filename)+'</div><div class="job-meta">'+date+' · '+formatBytes(j.file_size_bytes)+'</div></div><span class="status '+escapeHtml(j.status)+'">'+statusLabel(j.status)+'</span></div><div class="progress"><i style="width:'+Math.max(0,Math.min(100,j.progress||0))+'%"></i></div><div class="job-message"><b>'+escapeHtml(j.stage||'')+'</b>'+(j.message?' · '+escapeHtml(j.message):'')+'</div><div class="job-actions"><button class="btn soft" data-details="'+j.id+'">Details</button>'+(j.status==='review_required' && j.stage==='Inventarisatie afgerond' && j.detected_metadata?.documentType==='opgaven'?'<button class="btn primary" data-ai="'+j.id+'">AI-analyse starten</button>':'')+(j.status==='failed'?'<button class="btn soft" data-retry="'+j.id+'">Opnieuw proberen</button>':'')+'<button class="btn danger" data-delete="'+j.id+'">Verwijderen</button></div><div id="events-'+j.id+'" hidden class="job-message" style="margin-top:10px"></div></article>';
     }).join('');
     $('jobs-list').querySelectorAll('[data-details]').forEach(b=>b.addEventListener('click',()=>toggleDetails(b.dataset.details)));
+    $('jobs-list').querySelectorAll('[data-ai]').forEach(b=>b.addEventListener('click',()=>analyzeJob(b.dataset.ai)));
     $('jobs-list').querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryJob(b.dataset.retry)));
     $('jobs-list').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteJob(b.dataset.delete)));
   }
@@ -138,6 +139,18 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
       await loadJobs();
     }
     button.disabled=false;toast('Inventarisatie afgerond: '+done+' geslaagd, '+failed+' mislukt.');
+  }
+  async function analyzeJob(id) {
+    const job=jobs.find(j=>j.id===id); if(!job)return;
+    const button=$('jobs-list').querySelector('[data-ai="'+id+'"]');
+    if(button){button.disabled=true;button.textContent='AI analyseert…';}
+    toast('AI-analyse gestart voor '+job.original_filename+'. Dit kan even duren.');
+    const {data,error}=await client.functions.invoke('analyze-exam-questions',{body:{job_id:id}});
+    await loadJobs();
+    if(error || !data?.ok){const message=data?.error||error?.message||'Onbekende fout';toast('AI-analyse niet afgerond: '+message,true);return;}
+    if(data.skipped){toast(data.message||'Bestand overgeslagen.');return;}
+    const s=data.summary||{};
+    toast('AI vond '+(s.questionCount??'?')+' vragen: '+(s.openCount??'?')+' open en '+(s.mcqCount??'?')+' meerkeuze. Controle blijft nodig.');
   }
   async function loadJobs() {
     const {data,error}=await client.from('exam_ingest_jobs').select('*').order('created_at',{ascending:false}).limit(50);
