@@ -187,4 +187,4 @@ const counts = publications.reduce((result, item) => {
   result[item.page] = (result[item.page] || 0) + 1;
   return result;
 }, {});
-console.log(`Validatie geslaagd: ${publications.length} publicaties (${counts.science || 0} vakinhoudelijk, ${counts.education || 0} pedagogisch-didactisch), ${examQuestions.length} examenvragen, ${examContexts.length} contexten en alle bijbehorende afbeeldingen aanwezig; ${inlineScripts.length} JavaScript-blok(ken) syntactisch geldig.`);
+console.log(`Validatie geslaagd: ${publications.length} publicaties (${counts.science || 0} vakinhoudelijk, ${counts.education || 0} pedagogisch-didactisch), ${examQuestions.length + openExamQuestions.length} examenvragen (${examQuestions.length} meerkeuze, ${openExamQuestions.length} open), ${examContexts.length} contexten en alle bijbehorende afbeeldingen aanwezig; ${inlineScripts.length} JavaScript-blok(ken) syntactisch geldig.`);
