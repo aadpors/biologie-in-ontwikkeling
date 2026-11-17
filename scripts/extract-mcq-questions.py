@@ -115,11 +115,12 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     for part, group in enumerate(groups, 1):
         top = max(0, min(lines[i]["bbox"][1] for i in group) - 5)
         bottom = min(bottom_limit, max(lines[i]["bbox"][3] for i in group) + 5, question_top - 2)
+        # Only attach a compact raster figure to one paragraph. Large
+        # drawing rectangles are often the border/background of an entire
+        # shared-context box; extending every paragraph to that border would
+        # merge the introduction back into the question-specific passage.
         nearby = [rect for info in page.get_images(full=True) for rect in page.get_image_rects(info[0])
-                  if rect.y1 >= top - 10 and rect.y0 <= bottom + 10]
-        nearby += [d["rect"] for d in page.get_drawings()
-                   if d["rect"].width > 8 and d["rect"].height > 8
-                   and d["rect"].y1 >= top - 10 and d["rect"].y0 <= bottom + 10]
+                  if rect.height <= 80 and rect.y1 >= top - 10 and rect.y0 <= bottom + 10]
         if nearby:
             top = max(0, min(top, min(r.y0 for r in nearby)))
             bottom = min(bottom_limit, max(bottom, max(r.y1 for r in nearby)), question_top - 2)
