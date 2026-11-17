@@ -215,6 +215,18 @@ def main():
             {"key": "A", "text": "letter P | plaats 1"}, {"key": "B", "text": "letter P | plaats 2"},
             {"key": "C", "text": "letter Q | plaats 1"}, {"key": "D", "text": "letter Q | plaats 2"},
         ],
+        # These visual models/trees are present in the complete original question image.
+        "vw24t2-mcq-36": [
+            {"key": "A", "text": "chromosoomdynamiek → slaap (+)"},
+            {"key": "B", "text": "chromosoomdynamiek → slaap (−)"},
+            {"key": "C", "text": "slaap → chromosoomdynamiek (+)"},
+            {"key": "D", "text": "slaap → chromosoomdynamiek (−)"},
+        ],
+        "ha26t1-mcq-35": [
+            {"key": "A", "text": "Stamboom A (zie volledige vraagafbeelding)"},
+            {"key": "B", "text": "Stamboom B (zie volledige vraagafbeelding)"},
+            {"key": "C", "text": "Stamboom C (zie volledige vraagafbeelding)"},
+        ],
     }
     manual_question_text = {
         "vw24t1-mcq-34": "Hoe groot is de kans dat de baby het gemuteerde G6PD-allel erft?",
@@ -226,6 +238,7 @@ def main():
         "ha25t1-mcq-31": "De milt is onderdeel van het lymfevatenstelsel",
         "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
         "vw24t2-mcq-36": "Om te bepalen hoe slaap en chromosoomdynamiek samenhangen",
+        "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
     }
 
     for record in records:
@@ -273,7 +286,11 @@ def main():
         keys = [option["key"] for option in record.get("options", [])]
         if keys != list("ABCDEF"[:len(keys)]) or len(keys) < 3:
             raise ValueError(f"{record['id']}: invalid option sequence {keys}")
-        if any("Bekijk optie" in option.get("text", "") for option in record["options"]):
+        if any(
+            marker in option.get("text", "")
+            for option in record["options"]
+            for marker in ("Bekijk optie", "Afbeelding bij optie")
+        ):
             raise ValueError(f"{record['id']}: temporary option placeholder remains")
         if record.get("correct") and record["correct"] not in keys:
             raise ValueError(f"{record['id']}: correct key {record['correct']} is not an available option")
