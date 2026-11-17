@@ -262,18 +262,22 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     rect for image_info in page.get_images(full=True)
                     for rect in page.get_image_rects(image_info[0])
                 ]
+                page_drawing_rects = [
+                    drawing["rect"] for drawing in page.get_drawings()
+                    if drawing["rect"].width > 8 and drawing["rect"].height > 8
+                ]
                 if headings:
                     start_line = headings[-1]
                     active_context_fragments = [{
                         "page_index": page_index,
                         "y0": max(0, min(
                             [lines[start_line]["bbox"][1]]
-                            + [rect.y0 for rect in page_image_rects if rect.y0 >= lines[start_line]["bbox"][1]]
+                            + [rect.y0 for rect in page_image_rects + page_drawing_rects if rect.y0 >= lines[start_line]["bbox"][1]]
                         ) - 5),
                         "y1": page.rect.height - 25,
                     }]
-                elif content_indices or page_image_rects:
-                    y_candidates = [lines[j]["bbox"][1] for j in content_indices] + [rect.y0 for rect in page_image_rects]
+                elif content_indices or page_image_rects or page_drawing_rects:
+                    y_candidates = [lines[j]["bbox"][1] for j in content_indices] + [rect.y0 for rect in page_image_rects + page_drawing_rects]
                     active_context_fragments.append({
                         "page_index": page_index,
                         "y0": max(0, min(y_candidates) - 5),
@@ -310,7 +314,12 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     for rect in page.get_image_rects(image_info[0])
                     if rect.y0 < lines[start]["bbox"][1]
                 ]
-                context_y_candidates = [lines[j]["bbox"][1] for j in context_line_indices] + [rect.y0 for rect in page_image_rects]
+                page_drawing_rects = [
+                    drawing["rect"] for drawing in page.get_drawings()
+                    if drawing["rect"].width > 8 and drawing["rect"].height > 8
+                    and drawing["rect"].y0 < lines[start]["bbox"][1]
+                ]
+                context_y_candidates = [lines[j]["bbox"][1] for j in context_line_indices] + [rect.y0 for rect in page_image_rects + page_drawing_rects]
                 context_y0 = (
                     max(0, min(context_y_candidates) - 5)
                     if context_y_candidates else max(0, lines[start]["bbox"][1] - 0.5)
@@ -426,7 +435,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
-                if context_line_indices or page_image_rects:
+                if context_line_indices or page_image_rects or page_drawing_rects:
                     active_context_fragments.append({
                         "page_index": page_index,
                         "y0": context_y0,
