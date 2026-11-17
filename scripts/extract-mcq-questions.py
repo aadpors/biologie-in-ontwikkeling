@@ -373,41 +373,68 @@ def find_markers(lines, allow_multiline_number_first=False):
     return unique
 
 def parse_options(block_lines):
+    """Parse A-F options even when PDF extraction puts several options on one line.
+
+    Some exam PDFs expose e.g. "D ... E ..." as one text line. Treating the
+    second label as continuation text silently loses E/F. Split only on the
+    next expected letter, which avoids splitting ordinary capital letters in
+    option wording.
+    """
+    raw = " ".join(line.strip() for line in block_lines if line.strip())
     options = []
-    current = None
-    current_lines = 0
-    stop_starts = re.compile(r"^(let op|lees verder|einde|bronvermelding|de volgende|om uit te sluiten|fokkers|afbeelding|tijdens|na afloop|hieronder staat|in het onderzoek|de onderzoekers|vervolgens)", re.I)
-    for line in block_lines:
-        text = line.strip()
-        if not text:
+    current_key = None
+    current_text = []
+
+    # A label starts an option only when it is the next letter in sequence.
+    # The same rule handles labels at the start of a line and labels embedded
+    # in a line by the PDF text extractor.
+    token_re = re.compile(r"(?<!\\S)([A-F])(?=\\s|$)")
+    position = 0
+    expected = "A"
+    for match in token_re.finditer(raw):
+        key = match.group(1)
+        if key != expected:
             continue
-        m = OPTION_RE.match(text)
-        if m and m.group(1) in "ABCDEF":
-            key, value = m.group(1), (m.group(2) or "").strip()
-            if current:
-                options.append(current)
-            current = {"key": key, "text": value}
-            current_lines = 1 if value else 0
-        elif current:
-            if re.match(r"^\d+\s*p$", text, re.I) or HEADER_RE.match(text):
-                break
-            if len(options) >= 3 and current["text"] and stop_starts.match(text):
-                break
-            if current_lines >= 3:
-                break
-            current["text"] = (current["text"] + " " + text).strip()
-            current_lines += 1
-    if current:
-        options.append(current)
-    keys = [o["key"] for o in options]
-    if len(keys) >= 3 and keys[0] == "A" and keys == list("ABCDEF"[:len(keys)]):
-        return options
-    # Labels for image-based answer options may be separate from their diagrams.
-    compact = " ".join(block_lines)
-    labels = re.search(r"\bA\s+B\s+C\s+D(?:\s+E)?(?:\s+F)?\b", compact)
-    if labels:
-        return [{"key": k, "text": "Bekijk optie " + k + " in de oorspronkelijke afbeelding"} for k in labels.group(0).split()]
-    return []
+        if current_key is not None:
+            options.append({"key": current_key, "text": " ".join(current_text).strip()})
+        current_key = key
+        current_text = []
+        expected = chr(ord(expected) + 1) if expected < "F" else None
+        position = match.end()
+        if expected is None:
+            break
+    if current_key is not None:
+        options.append({"key": current_key, "text": " ".join(current_text).strip()})
+
+    # Rebuild option text from the spans between sequential labels. This
+    # second pass preserves all text, including labels that shared a PDF line.
+    labels = list(token_re.finditer(raw))
+    sequential = []
+    expected = "A"
+    for match in labels:
+        if match.group(1) != expected:
+            continue
+        sequential.append(match)
+        expected = chr(ord(expected) + 1) if expected < "F" else None
+        if expected is None:
+            break
+    if len(sequential) < 3:
+        return []
+    parsed = []
+    for i, match in enumerate(sequential):
+        end = sequential[i + 1].start() if i + 1 < len(sequential) else len(raw)
+        text = raw[match.end():end].strip()
+        # A final empty option is valid for image-based answer alternatives.
+        if not text:
+            text = "Bekijk optie " + match.group(1) + " in de oorspronkelijke afbeelding"
+        parsed.append({"key": match.group(1), "text": text})
+
+    # Remove trailing exam instructions accidentally captured after the last
+    # option, but never discard a genuine E/F alternative.
+    stop = re.search(r"\\s+(?:Let op|Lees verder|Einde|Bronvermelding)\\b", parsed[-1]["text"], re.I)
+    if stop:
+        parsed[-1]["text"] = parsed[-1]["text"][:stop.start()].strip()
+    return parsed
 
 def clean_context(lines):
     cleaned = []
