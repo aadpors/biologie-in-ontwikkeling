@@ -18,6 +18,9 @@ for filename, label in DATASETS:
         qid = record.get("id") or f'{record.get("level")} {record.get("year")}-{record.get("period")} vraag {record.get("n")}'
         paths = record.get("images") or []
         primary = record.get("image")
+        for attachment in record.get("attachmentPdfs", []):
+            if not (ROOT / attachment).is_file():
+                errors.append(f"{label} {qid}: ontbrekende volledige uitwerkbijlage {attachment}")
         if not primary:
             errors.append(f"{label} {qid}: geen primaire samengestelde afbeelding")
         if len(paths) < 2:
