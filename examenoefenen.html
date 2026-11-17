@@ -13,9 +13,9 @@ main{max-width:1160px;margin:24px auto;padding:0 20px 55px}.notice,.filters,.que
 <header><div class="top"><a class="brand" href="./index.html">Biologie in ontwikkeling</a><a class="back" href="./index.html">← Terug naar actualiteiten</a></div></header>
 <section class="hero"><div><div class="eyebrow">Oefenomgeving · bèta</div><h1>Examenoefenen biologie</h1><p>Oefen met echte examenvragen, geselecteerd op wat de vraag daadwerkelijk toetst. Een gedeelde context betekent niet dat alle vragen onder hetzelfde thema vallen.</p></div></section>
 <main>
-<section class="notice"><b>Proefversie: examenvragen havo en vwo · 2025 en 2026</b><p>Open vragen en meerkeuzevragen uit de beschikbare examens, elk op een eigen kaart met de bijbehorende context. Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback. De rubricering blijft bèta.</p></section>
+<section class="notice"><b>Proefversie: geselecteerde examenvragen havo en vwo · 2024, 2025 en 2026</b><p>Een selectie open vragen en de herkende meerkeuzevragen uit de beschikbare examens, elk op een eigen kaart met de bijbehorende context. Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback. De rubricering blijft bèta.</p></section>
 <section class="filters"><h2>Filter de vragen</h2><div class="filtergrid">
-<div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option>Vwo</option><option>Havo</option></select></div><div class="field"><label for="year">Jaar</label><select id="year"><option value="">Alle jaren</option><option>2025</option><option>2026</option></select></div><div class="field"><label for="period">Tijdvak</label><select id="period"><option value="">Alle tijdvakken</option><option value="1">Tijdvak 1</option><option value="2">Tijdvak 2</option></select></div>
+<div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option>Vwo</option><option>Havo</option></select></div><div class="field"><label for="year">Jaar</label><select id="year"><option value="">Alle jaren</option><option>2024</option><option>2025</option><option>2026</option></select></div><div class="field"><label for="period">Tijdvak</label><select id="period"><option value="">Alle tijdvakken</option><option value="1">Tijdvak 1</option><option value="2">Tijdvak 2</option></select></div>
 <div class="field"><label for="questionType">Vraagtype</label><select id="questionType"><option value="">Alle vraagtypen</option><option value="open">Open vraag</option><option value="mcq">Meerkeuzevraag</option></select></div><div class="field"><label for="theme">Onderwerp</label><select id="theme"><option value="">Alle onderwerpen</option></select></div>
 </div><div class="filterfoot"><button id="reset" type="button">Wis filters</button><span class="count" id="count" aria-live="polite"></span></div></section>
 <div class="progress-top"><div class="dots" id="questionDots" aria-label="Voortgang van de gefilterde vragen"></div></div><section class="list" id="questions" aria-live="polite"></section><nav class="question-nav" id="questionNav" aria-label="Navigatie door de vragen"><button type="button" id="prevQuestion">← Vorige</button><span class="count">Blader door de vragen</span><button type="button" id="nextQuestion">Volgende →</button></nav>
@@ -110,7 +110,7 @@ function render(){
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
- const assetVersion="2026-11-17-19";
+ const assetVersion="2026-11-17-20";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  let snippet=snippetImages.map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'?v='+assetVersion+'" alt="'+(i<snippetImages.length-1?'Context bij vraag ':'Originele examenopgave bij vraag ')+q.n+'" loading="lazy"><figcaption>'+(i<snippetImages.length-1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
@@ -146,7 +146,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-19");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-20");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
@@ -157,7 +157,7 @@ async function loadMCQ(){
     }
    }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-17-19");
+  const response=await fetch("exam-mcq.json?v=2026-11-17-20");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
