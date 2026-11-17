@@ -6,7 +6,6 @@ on:
       - 'index.html'
       - 'publicaties.json'
       - 'scripts/validate-site.mjs'
-      - '.github/workflows/validate-site.yml'
   pull_request:
     branches: [main]
   workflow_run:
