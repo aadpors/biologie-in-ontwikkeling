@@ -2991,7 +2991,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Het gen voor de gevoeligheid voor kattenkruid ligt op een autosoom.\nUit het fenotype van welke nakomeling (afbeelding 2) blijkt dat het gen\nniet op het X-chromosoom ligt?\nA 9\nB 19\nC 24\nD 26\nVoor de aanmaak van de nepetalactonen heeft kattenkruid verschillende\nenzymen. Afbeelding 3 geeft de laatste stappen weer van de aanmaak\nvan nepetalactonen met de daarbij betrokken enzymen ISY en NEPS.\nafbeelding 3\nBij de omzetting die door ISY wordt gekatalyseerd, is NADPH de\nelektronendonor.",
+    "source": "Voor de aanmaak van de nepetalactonen heeft kattenkruid verschillende\nenzymen. Afbeelding 3 geeft de laatste stappen weer van de aanmaak\nvan nepetalactonen met de daarbij betrokken enzymen ISY en NEPS.\nafbeelding 3\nBij de omzetting die door ISY wordt gekatalyseerd, is NADPH de\nelektronendonor.",
     "q": "Bij welk stofwisselingsproces in de plant wordt NADPH geproduceerd?",
     "options": [
       {
@@ -3282,7 +3282,11 @@
       }
     ],
     "correct": "B",
-    "image": "exam-snippets/mcq-vw26t2-mcq-37.jpg",
+    "image": "exam-snippets/question-vw26t2-37.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q37-model.jpg",
+      "exam-snippets/question-vw26t2-37.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
