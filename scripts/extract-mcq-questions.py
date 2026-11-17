@@ -407,6 +407,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     ("ha26t2", 10): "Destiny laat zien dat de zwarte mangrove",
                     ("vw26t2", 3): "Voor de aanmaak van de nepetalactonen",
                 }
+                base_context_line_indices = context_line_indices[:]
                 anchored_context = False
                 anchor_text = manual_context_anchors.get((prefix, marker["number"]))
                 if anchor_text:
@@ -534,7 +535,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
 
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
-                    question_top = max(0, lines[marker["number_line"]]["bbox"][1] - 1)
+                    question_top = max(0, lines[start]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
                     save_page_crop(
                         page,
@@ -546,7 +547,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
                     if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
                         context_paths = context_image_fragments(
-                            page, lines, context_line_indices, prefix, marker["number"],
+                            page, lines, base_context_line_indices, prefix, marker["number"],
                             question_top, footer_y,
                         )
                         question_name = f"question-{prefix}-{marker['number']}-only.jpg"
