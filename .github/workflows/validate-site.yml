@@ -66,3 +66,43 @@ jobs:
             if (!html.includes(required)) throw new Error(`Ontbrekende koppeling: ${required}`);
           }
           NODE
+
+  reprocess:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out exam data under review
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install free PDF processing dependencies
+        run: python -m pip install --disable-pip-version-check PyMuPDF Pillow
+      - name: Regenerate all original exam material
+        run: |
+          rm -rf exam-snippets
+          mkdir -p exam-snippets
+          python scripts/render-exam-snippets.py
+          python scripts/render-cv-snippets.py
+          python scripts/extract-mcq-questions.py
+      - name: Validate every generated question, image and appendix link
+        run: python scripts/validate-exam-snippets.py
+      - name: Validate complete website data
+        run: |
+          node scripts/validate-site.mjs
+      - name: Upload generated material for full visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: complete-exam-reprocessing-review
+          path: |
+            exam-mcq.json
+            exam-open.json
+            exam-contexts.json
+            exam-snippets/
+          if-no-files-found: warn
+          retention-days: 14
