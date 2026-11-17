@@ -32,6 +32,7 @@ assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend b
 assert.ok(examPage.includes('antwoordteksten (A t/m F)'), 'De toelichting over zichtbare antwoordopties ontbreekt');
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
 assert.ok(open2024.length > 0, 'Geselecteerde open vragen uit 2024 ontbreken');
+assert.ok(examQuestions.some(question => question.year === '2024' && question.options.length === 6), 'Meerkeuzevragen met zes antwoordopties (A-F) uit 2024 ontbreken');
 assert.ok(examPage.includes('<option>2024</option>'), 'Examenoefenen-filter bevat 2024 niet');
 assert.ok(examPage.includes('id:"ha24-1"') && examPage.includes('id:"ha24-8"'), 'Geselecteerde open vragen uit Havo 2024-I ontbreken');
 for (const number of [1, 8]) {
