@@ -46,6 +46,9 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add exam-snippets/ exam-mcq.json exam-contexts.json
             git commit -m "Add original exam image snippets"
+            # Code changes can land while a render is running. Rebase the
+            # generated-file commit onto the latest main before pushing.
+            git pull --rebase origin main
             git push
           else
             echo "Exam snippets are already up to date."
