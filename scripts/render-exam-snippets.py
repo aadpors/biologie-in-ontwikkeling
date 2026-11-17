@@ -91,6 +91,21 @@ def render_question(doc, clip, scale):
         if clip.get("through_question"):
             return render_shared_context(doc, clip, scale)
         page = doc[clip["page"] - 1]
+        if clip.get("from_anchor") and clip.get("before_question"):
+            anchor_hits = page.search_for(clip["from_anchor"])
+            markers = question_marker_words(page, clip["before_question"])
+            if not anchor_hits or not markers:
+                raise ValueError(
+                    f"Could not isolate question-specific context for question "
+                    f"{clip['before_question']}: {clip['from_anchor']!r}"
+                )
+            top = max(0, min(rect.y0 for rect in anchor_hits) - 5)
+            marker = min(markers, key=lambda word: word[1])
+            bottom = marker[1] - 2
+            if bottom <= top + 2:
+                raise ValueError(f"Empty context crop before question {clip['before_question']}")
+            rect = fitz.Rect(0, top, page.rect.width, bottom)
+            return page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=False), clip["page"]
         configured = fitz.Rect(*clip["rect"])
         rect = fitz.Rect(0, configured.y0, page.rect.width, configured.y1)
         return page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=rect, alpha=False), clip["page"]
