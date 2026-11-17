@@ -42,6 +42,56 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t1-mcq-5",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 5,
+    "points": 2,
+    "page": 3,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De Amerikaanse wetenschappers wilden onderzoeken hoe nicotine de\nverschillende celtypen in een embryo beïnvloedt. Onderzoek doen aan\nmenselijke embryo’s is in veel landen niet toegestaan of mag alleen onder\nzeer strikte voorwaarden. Daarom gebruikten de wetenschappers\nstamcellen afkomstig uit een menselijk embryo van vijf dagen oud\n(blastula). Een kweek van deze stamcellen vormt spontaan bolletjes die\n‘embryoid bodies’ (EB’s) worden genoemd. Om het effect van nicotine op\nde ontwikkeling van deze stamcellen te onderzoeken, voegden de\nwetenschappers nicotine toe aan het kweekmedium. De opzet van het\nonderzoek is in afbeelding 2 weergegeven.\nafbeelding 2\nStamcellen hebben een bepaalde potentie.",
+    "q": "Welke potentie hebben de stamcellen bij de start van het onderzoek? En\nwelke potentie hebben ze na 21 dagen ontwikkeling?\nstart onderzoek\nna 21 dagen",
+    "options": [
+      {
+        "key": "A",
+        "text": "multipotent pluripotent"
+      },
+      {
+        "key": "B",
+        "text": "multipotent totipotent"
+      },
+      {
+        "key": "C",
+        "text": "pluripotent multipotent"
+      },
+      {
+        "key": "D",
+        "text": "pluripotent totipotent totipotent multipotent"
+      },
+      {
+        "key": "E",
+        "text": "totipotent pluripotent"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw24t1-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q5-complete.jpg",
+      "exam-snippets/question-vw24t1-5-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t1-mcq-6",
     "level": "Havo",
     "year": "2024",
@@ -81,6 +131,48 @@
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t1-mcq-6",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 6,
+    "points": 2,
+    "page": 4,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De concentratie nicotine van het kweekmedium was gelijk aan de\ngemiddelde concentratie in het bloed van embryo’s waarvan de moeder\nrookt. Na 21 dagen incubatie werd de diameter van de EB’s bepaald. De\ndiameter is een maat voor het aantal cellen in de EB’s.\nAfbeelding 3 toont een microscopisch beeld van EB’s die aan nicotine zijn\nblootgesteld en van controle-EB’s. De EB’s zijn als donkere vlekken\nzichtbaar. In afbeelding 4 zijn de metingen van de diameter van de EB’s in\nde twee groepen weergegeven.\nafbeelding 3\nOver het resultaat worden de volgende uitspraken gedaan:\n1 Het aantal cellen in een controle-EB is gemiddeld groter dan in een EB\ndie aan nicotine is blootgesteld.\n2 Het verschil in gemiddelde diameter tussen de twee groepen EB’s\nberust op toeval.",
+    "q": "Welke uitspraak wordt ondersteund door de gegevens?",
+    "options": [
+      {
+        "key": "A",
+        "text": "geen van beide"
+      },
+      {
+        "key": "B",
+        "text": "alleen 1"
+      },
+      {
+        "key": "C",
+        "text": "alleen 2"
+      },
+      {
+        "key": "D",
+        "text": "zowel 1 als 2"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw24t1-mcq-6.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q6-complete.jpg",
+      "exam-snippets/question-vw24t1-6-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -332,6 +424,128 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t1-mcq-22",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 22,
+    "points": 1,
+    "page": 13,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "afbeelding 2\nDe geactiveerde MR is als transcriptiefactor betrokken bij de synthese van\nNa+-kanalen.",
+    "q": "Welke functie heeft de geactiveerde MR bij de transcriptie? Gebruik je\ninformatieboek.",
+    "options": [
+      {
+        "key": "A",
+        "text": "activator"
+      },
+      {
+        "key": "B",
+        "text": "enhancer (versterker)"
+      },
+      {
+        "key": "C",
+        "text": "promotor"
+      },
+      {
+        "key": "D",
+        "text": "repressor"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw24t1-mcq-22.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q22-complete.jpg",
+      "exam-snippets/question-vw24t1-22-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t1-mcq-26",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 26,
+    "points": 2,
+    "page": 14,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Bonenziekte\nDe burgemeester van een Italiaans dorp heeft het verbouwen van\ntuinbonen verboden vanwege Fabio, een jongen uit het dorp die lijdt aan\nbonenziekte (favisme). Het eten van tuinbonen of het inademen van\npollen van tuinboonplanten leidt bij Fabio tot een versnelde afbraak van\nrode bloedcellen, waardoor een levensbedreigende situatie kan ontstaan.\nBonenziekte is het gevolg van een mutatie in het gen dat codeert voor het\nenzym glucose-6-fosfaatdehydrogenase (G6PD). Hierdoor is bij Fabio dit\nenzym minder goed werkzaam. G6PD katalyseert de eerste reactie in de\npentose-fosfaatweg (‘pentose phosphate pathway’ of PPP).\nDe PPP (afbeelding 1) is een stofwisselingsroute waarbij glucose-\nmoleculen worden omgezet in pentosemoleculen (C5-moleculen). Hierbij\nworden ook NADPH-moleculen gevormd.\nNADPH (bekend van de fotosynthese bij planten) is in menselijke cellen\nnodig bij de productie van bepaalde organische stoffen zoals glutathion.\n–\nGlutathion kan schadelijke reactieve zuurstofmoleculen zoals O2\nonschadelijk maken (afbeelding 1).\nafbeelding 1\nIn de PPP wordt NADPH gevormd.",
+    "q": "Kan NADPH energierijke elektronen afstaan of opnemen? En bij welk type\nstofwisselingsproces wordt NADPH dan verbruikt?\nenergierijke elektronen\ntype stofwisselingsproces",
+    "options": [
+      {
+        "key": "A",
+        "text": "afstaan assimilatie"
+      },
+      {
+        "key": "B",
+        "text": "afstaan dissimilatie"
+      },
+      {
+        "key": "C",
+        "text": "opnemen assimilatie"
+      },
+      {
+        "key": "D",
+        "text": "opnemen dissimilatie"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw24t1-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q26-complete.jpg",
+      "exam-snippets/question-vw24t1-26-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t1-mcq-27",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 27,
+    "points": 1,
+    "page": 15,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De PPP is betrokken bij de productie van vetzuren. Met behulp van\nafbeelding 1 kan worden afgeleid wat het gevolg is voor de productie van\nvetzuren als G6PD onwerkzaam is.",
+    "q": "Wat gebeurt er met de productie van vetzuren als G6PD onwerkzaam is?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Die neemt toe."
+      },
+      {
+        "key": "B",
+        "text": "Die neemt af."
+      },
+      {
+        "key": "C",
+        "text": "Die verandert niet."
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw24t1-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q27-complete.jpg",
+      "exam-snippets/question-vw24t1-27-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t1-mcq-28",
     "level": "Havo",
     "year": "2024",
@@ -416,6 +630,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t1-mcq-30",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 30,
+    "points": 2,
+    "page": 15,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Nadat Fabio een keer tuinbonen had gegeten, veranderden zijn\nademhaling en hartslag.",
+    "q": "Zal zijn ademhalingsfrequentie zijn verhoogd of verlaagd? En zijn\nhartslagfrequentie?\nademhalingsfrequentie\nhartslagfrequentie",
+    "options": [
+      {
+        "key": "A",
+        "text": "verhoogd verhoogd"
+      },
+      {
+        "key": "B",
+        "text": "verhoogd verlaagd"
+      },
+      {
+        "key": "C",
+        "text": "verlaagd verhoogd"
+      },
+      {
+        "key": "D",
+        "text": "verlaagd verlaagd"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw24t1-mcq-30.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q30-fallback.jpg",
+      "exam-snippets/question-vw24t1-30-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t1-mcq-33",
     "level": "Havo",
     "year": "2024",
@@ -451,6 +707,52 @@
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t1-mcq-34",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 34,
+    "points": 2,
+    "page": 17,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Fabio’s nicht Stella is in verwachting van een jongen.",
+    "q": "Hoe groot is de kans dat de baby het gemuteerde G6PD-allel erft?\n0",
+    "options": [
+      {
+        "key": "A",
+        "text": "1 16"
+      },
+      {
+        "key": "B",
+        "text": "1 8"
+      },
+      {
+        "key": "C",
+        "text": "1 4"
+      },
+      {
+        "key": "D",
+        "text": "1 2"
+      },
+      {
+        "key": "E",
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw24t1-mcq-34.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q34-fallback.jpg",
+      "exam-snippets/question-vw24t1-34-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -542,6 +844,94 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t1-mcq-36",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 36,
+    "points": 1,
+    "page": 17,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Met name op plaatsen waar malaria heerst, blijkt het G6PD-allel een hoge\nfrequentie te hebben. Dat komt waarschijnlijk doordat rode bloedcellen die\neen kleinere hoeveelheid werkzaam G6PD hebben, minder gevoelig zijn\nvoor infectie door de malariaparasiet.",
+    "q": "Hoe kan de hogere frequentie van het gemuteerde G6PD-allel in\nmalariagebieden het best worden verklaard?",
+    "options": [
+      {
+        "key": "A",
+        "text": "door gene-flow"
+      },
+      {
+        "key": "B",
+        "text": "door het flessenhalseffect (bottleneckeffect)"
+      },
+      {
+        "key": "C",
+        "text": "door het stichtereffect (foundereffect)"
+      },
+      {
+        "key": "D",
+        "text": "door migratie door natuurlijke selectie"
+      },
+      {
+        "key": "E",
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "E",
+    "image": "exam-snippets/complete-vw24t1-mcq-36.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q36-complete.jpg",
+      "exam-snippets/question-vw24t1-36-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t1-mcq-38",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 38,
+    "points": 2,
+    "page": 18,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "PFAS in groentetuintjes\nIn Nederland ontstond grote ophef toen PFAS (poly- en\nperfluoralkylstoffen) werden aangetroffen in afvalwater, oppervlaktewater\nen zelfs drinkwater. PFAS leveren namelijk risico’s op voor de\nvolksgezondheid en het milieu. Wetenschappers van het RIVM\n(Rijksinstituut voor Volksgezondheid en Milieu) onderzochten of PFAS via\nbesmette groentetuintjes terecht kunnen komen in voedsel voor mensen.\nPFAS zijn synthetische stoffen die\nafbeelding 1\nonder andere worden gebruikt voor de\nproductie van waterafstotende kleding\nen verpakkingsfolies. Een van deze\nstoffen is PFOA (perfluoroctaanzuur,\nafbeelding 1).\nOnderzoek bij proefdieren heeft aangetoond dat PFOA onder andere\nlever- en niertumoren kan veroorzaken. Ook tast de stof het\nimmuunsysteem aan. Het gebruik van PFOA is daarom nu verboden.\nPFOA wordt nauwelijks afgebroken of uitgescheiden door het lichaam van\nde mens. Voor PFOA is de grenswaarde een dagelijkse inname van\n0,63 ng/kg lichaamsgewicht per dag. Deze waarde is afgeleid van de\nwaarde van 750 ng/kg lichaamsgewicht per dag die uit onderzoek bij\nratten kwam.",
+    "q": "Waarom is deze waarde voor mensen lager dan voor ratten?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Mensen behoren tot een ander trofisch niveau dan ratten."
+      },
+      {
+        "key": "B",
+        "text": "Mensen hebben relatief meer vetweefsel dan ratten."
+      },
+      {
+        "key": "C",
+        "text": "Mensen leven langer dan ratten."
+      },
+      {
+        "key": "D",
+        "text": "Mensen zijn groter dan ratten."
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw24t1-mcq-38.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q38-complete.jpg",
+      "exam-snippets/question-vw24t1-38-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t1-mcq-39",
     "level": "Havo",
     "year": "2024",
@@ -622,6 +1012,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t1-mcq-41",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 41,
+    "points": 2,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Wordt een kankercel herkend aan MHC-I of aan MHC-II? En worden",
+    "q": "kankercellen gedood door fagocytose of door lysis?\nherkenning aan\ndoding door",
+    "options": [
+      {
+        "key": "A",
+        "text": "MHC-I fagocytose"
+      },
+      {
+        "key": "B",
+        "text": "MHC-I lysis"
+      },
+      {
+        "key": "C",
+        "text": "MHC-II fagocytose"
+      },
+      {
+        "key": "D",
+        "text": "MHC-II lysis"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw24t1-mcq-41.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q41-fallback.jpg",
+      "exam-snippets/question-vw24t1-41-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t2-mcq-1",
     "level": "Havo",
     "year": "2024",
@@ -661,6 +1093,48 @@
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-3",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 3,
+    "points": 1,
+    "page": 4,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "In de eerste helft van de vorige eeuw werden tientallen przewalskipaarden\ngevangen om in dierentuinen te houden. Uiteindelijk hebben slechts\ntwaalf dieren zich daar succesvol voortgeplant. Alle nu levende\nprzewalskipaarden stammen af van deze dieren.\nDoor de enorme afname van het aantal przewalskipaarden is de\ngenenpool afgenomen.",
+    "q": "Wat is de naam voor de afname van de genenpool als gevolg van een\nenorme afname van de populatiegrootte?",
+    "options": [
+      {
+        "key": "A",
+        "text": "gene flow"
+      },
+      {
+        "key": "B",
+        "text": "het flessenhalseffect (bottleneckeffect)"
+      },
+      {
+        "key": "C",
+        "text": "het stichtereffect (foundereffect)"
+      },
+      {
+        "key": "D",
+        "text": "natuurlijke selectie"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw24t2-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q3-complete.jpg",
+      "exam-snippets/question-vw24t2-3-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -706,6 +1180,56 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t2-mcq-5",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 5,
+    "points": 2,
+    "page": 4,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De Nederlandse biologen Annette Groeneveld en Inge en Jan Bouman\nmaakten in 1977 een plan voor de herintroductie van przewalskipaarden\nin Mongolië. Zij haalden przewalskipaarden uit dierentuinen en bereidden\nde dieren in een natuurgebied in Flevoland voor op herintroductie. Tussen\n1992 en 2000 zijn 82 ‘Flevolandse’ przewalskipaarden uitgezet in de\nGobi-woestijn in Mongolië.\nDe tekst hieronder beschrijft het verblijf van de przewalskipaarden in het\nnatuurgebied in Flevoland. Op de plaatsen 1 en 2 ontbreekt een woord.\nDoor de przewalskipaarden te plaatsen in het natuurgebied in Flevoland,\nkonden de dieren wennen aan de omstandigheden in het wild. Omdat er\ngeen andere paarden voorkwamen in het gebied, was ...(1)... van de\nprezwalskipaarden nog niet bezet. Door de przewalskipaarden werd de\nsuccessie in het gebied ...(2)... .",
+    "q": "Wat moet worden ingevuld bij 1 en bij 2?\nbij 1\nbij 2",
+    "options": [
+      {
+        "key": "A",
+        "text": "de habitat versneld"
+      },
+      {
+        "key": "B",
+        "text": "de habitat vertraagd"
+      },
+      {
+        "key": "C",
+        "text": "de niche versneld"
+      },
+      {
+        "key": "D",
+        "text": "de niche vertraagd het ecosysteem versneld"
+      },
+      {
+        "key": "E",
+        "text": "het ecosysteem vertraagd"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw24t2-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q5-complete.jpg",
+      "exam-snippets/question-vw24t2-5-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t2-mcq-11",
     "level": "Havo",
     "year": "2024",
@@ -745,6 +1269,86 @@
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-14",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 14,
+    "points": 1,
+    "page": 7,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Het samentrekken van spieren in de wand van de bronchiolen wordt\nveroorzaakt door activiteit in een deel van het zenuwstelsel.",
+    "q": "Welk deel van het zenuwstelsel laat de spieren in de wand van de\nbronchiolen samentrekken?",
+    "options": [
+      {
+        "key": "A",
+        "text": "het animaal zenuwstelsel"
+      },
+      {
+        "key": "B",
+        "text": "het orthosympatisch zenuwstelsel"
+      },
+      {
+        "key": "C",
+        "text": "het parasympatisch zenuwstelsel"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw24t2-mcq-14.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q14-fallback.jpg",
+      "exam-snippets/question-vw24t2-14-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-17",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 17,
+    "points": 2,
+    "page": 9,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Wetenschappers onderzochten met behulp van een ecologisch model of\nO. communa ook in andere delen van Europa ingezet kan worden. Met\nhet model zijn de tolerantiecurven van ambrosia en van het bladhaantje\nberekend (afbeelding 4).\nafbeelding 4\nOver de tolerantiecurven worden de volgende uitspraken gedaan:\n1 De tolerantie van ambrosia voor de minimumtemperatuur in de\nkoudste maand is groter dan die van O. communa.\n2 De maximum-tolerantiewaarden voor de jaarlijkse hoeveelheid\nneerslag van ambrosia en van O. communa zijn gelijk.",
+    "q": "Welk van deze uitspraken is juist?",
+    "options": [
+      {
+        "key": "A",
+        "text": "geen van beide"
+      },
+      {
+        "key": "B",
+        "text": "alleen 1"
+      },
+      {
+        "key": "C",
+        "text": "alleen 2"
+      },
+      {
+        "key": "D",
+        "text": "zowel 1 als 2"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw24t2-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q17-complete.jpg",
+      "exam-snippets/question-vw24t2-17-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -924,6 +1528,90 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t2-mcq-29",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 29,
+    "points": 2,
+    "page": 15,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Slaap herstelt DNA\nAlle organismen met een zenuwstelsel blijken slaap nodig te hebben.\nIsraëlische wetenschappers toonden aan dat slaap een belangrijke rol\nspeelt bij het herstel van DNA-schade in neuronen.\nBij gewervelden wordt het slaap-waakritme geregeld door het peptide-\nhormoon melatonine. Melatonine wordt geproduceerd door de epifyse,\neen klier in de hersenen. De aanmaak doorloopt een 24 uurs-ritme én\nwordt beïnvloed door de hoeveelheid licht die door bepaalde receptoren in\nhet netvlies wordt opgevangen. Om in te kunnen slapen moet de\nmelatonineconcentratie boven een bepaalde drempelwaarde komen.",
+    "q": "Is de epifyse een endocriene of een exocriene klier? En wordt de\nmelatonineproductie door licht geremd of gestimuleerd?\nepifyse is\nmelatonineproductie wordt door licht",
+    "options": [
+      {
+        "key": "A",
+        "text": "endocrien geremd"
+      },
+      {
+        "key": "B",
+        "text": "endocrien gestimuleerd"
+      },
+      {
+        "key": "C",
+        "text": "exocrien geremd"
+      },
+      {
+        "key": "D",
+        "text": "exocrien gestimuleerd"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw24t2-mcq-29.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q29-complete.jpg",
+      "exam-snippets/question-vw24t2-29-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-31",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 31,
+    "points": 1,
+    "page": 15,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Doordat neuronen voornamelijk overdag actief zijn, lopen ze voornamelijk\noverdag DNA-schade op.\nDNA-schade wordt veelal veroorzaakt door zuurstofradicalen. Deze\nstoffen ontstaan bij processen waarbij zuurstof wordt gebruikt.",
+    "q": "Bij welk proces wordt zuurstof gebruikt?",
+    "options": [
+      {
+        "key": "A",
+        "text": "bij de citroenzuurcyclus"
+      },
+      {
+        "key": "B",
+        "text": "bij de glycolyse"
+      },
+      {
+        "key": "C",
+        "text": "bij de melkzuurgisting"
+      },
+      {
+        "key": "D",
+        "text": "bij de oxidatieve fosforylering"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw24t2-mcq-31.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q31-complete.jpg",
+      "exam-snippets/question-vw24t2-31-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t2-mcq-32",
     "level": "Havo",
     "year": "2024",
@@ -974,6 +1662,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw24t2-mcq-33",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 33,
+    "points": 2,
+    "page": 16,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Een voorbeeld van DNA-schade is een dubbelstrengsbreuk (dsb). Bij een\ndsb zijn beide strengen van een DNA-molecuul gebroken. Bij de reparatie\nvan dsb’s kunnen soms inserties of deleties optreden.\nOver inserties en deleties worden de volgende uitspraken gedaan:\n1 Een insertie kan leiden tot een leesraamverschuiving.\n2 Een deletie kan leiden tot de synthese van een langer eiwit.",
+    "q": "Welke uitspraak is juist?",
+    "options": [
+      {
+        "key": "A",
+        "text": "geen van beide"
+      },
+      {
+        "key": "B",
+        "text": "alleen 1"
+      },
+      {
+        "key": "C",
+        "text": "alleen 2"
+      },
+      {
+        "key": "D",
+        "text": "zowel 1 als 2"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw24t2-mcq-33.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q33-complete.jpg",
+      "exam-snippets/question-vw24t2-33-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha24t2-mcq-34",
     "level": "Havo",
     "year": "2024",
@@ -1021,6 +1751,90 @@
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-35",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 35,
+    "points": 2,
+    "page": 17,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Wordt het aantal plaatsen met γH2AX per kern weergegeven door lijn P of",
+    "q": "door lijn Q? En waarom?",
+    "options": [
+      {
+        "key": "A",
+        "text": "door lijn P, want dsb’s ontstaan vooral overdag"
+      },
+      {
+        "key": "B",
+        "text": "door lijn P, want dsb’s worden vooral overdag hersteld"
+      },
+      {
+        "key": "C",
+        "text": "door lijn Q, want dsb’s ontstaan vooral overdag"
+      },
+      {
+        "key": "D",
+        "text": "door lijn Q, want dsb’s worden vooral overdag hersteld"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw24t2-mcq-35.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q35-fallback.jpg",
+      "exam-snippets/question-vw24t2-35-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-36",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 36,
+    "points": 2,
+    "page": 18,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Om te bepalen hoe slaap en chromosoomdynamiek samenhangen, deden\nde onderzoekers een experiment waarbij een groep zebravis-larven\noverdag melatonine in een oplosmiddel toegediend kreeg. Een andere\ngroep zebravis-larven kreeg alleen het oplosmiddel toegediend (controle).\nAfbeelding 4 toont de slaapduur vlak voor en na toediening. Afbeelding 5\ntoont de chromosoomdynamiek drie uur na toediening.\nafbeelding 4\nafbeelding 5",
+    "q": "Welk model wordt ondersteund door de resultaten van het onderzoek?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Bekijk optie A in de oorspronkelijke afbeelding"
+      },
+      {
+        "key": "B",
+        "text": "Bekijk optie B in de oorspronkelijke afbeelding"
+      },
+      {
+        "key": "C",
+        "text": "Bekijk optie C in de oorspronkelijke afbeelding"
+      },
+      {
+        "key": "D",
+        "text": "Bekijk optie D in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw24t2-mcq-36.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q36-complete.jpg",
+      "exam-snippets/question-vw24t2-36-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -1113,6 +1927,90 @@
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
     "cv": "examens/ha-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-39",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 39,
+    "points": 2,
+    "page": 20,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De afname van het gehalte chlorofyl b bij Engels raaigras heeft invloed op\nde fotosynthese.",
+    "q": "Welk effect heeft een afname in het gehalte chlorofyl b?",
+    "options": [
+      {
+        "key": "A",
+        "text": "Er worden minder elektronen aangeslagen bij licht met een golflengte van 450 nm."
+      },
+      {
+        "key": "B",
+        "text": "Er worden minder elektronen aangeslagen bij licht met een golflengte van 700 nm."
+      },
+      {
+        "key": "C",
+        "text": "Fotosysteem II draagt meer bij aan de NADPH-productie dan fotosysteem I."
+      },
+      {
+        "key": "D",
+        "text": "Fotosysteem II draagt meer bij aan de ATP-productie dan fotosysteem I."
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw24t2-mcq-39.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q39-fallback.jpg",
+      "exam-snippets/question-vw24t2-39-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw24t2-mcq-40",
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 40,
+    "points": 1,
+    "page": 20,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "In het onderzoek werden Engels raaigras en witte klaver gekweekt op\nbodems waarin de omstandigheden voor plantengroei optimaal zijn. Witte\nklaver behoort tot de vlinderbloemigen, die een symbiose kunnen\naangaan met knolletjes-bacteriën. In de natuurlijke situatie beïnvloedt de\nsymbiose het succes van witte klaver.",
+    "q": "Op welk type bodem hebben witte-klaverplanten door symbiose met\nknolletjesbacteriën het grootste voordeel ten opzichte van\nniet-vlinderbloemigen?",
+    "options": [
+      {
+        "key": "A",
+        "text": "op fosfaatarme bodems"
+      },
+      {
+        "key": "B",
+        "text": "op fosfaatrijke bodems"
+      },
+      {
+        "key": "C",
+        "text": "op nitraatarme bodems"
+      },
+      {
+        "key": "D",
+        "text": "op nitraatrijke bodems"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw24t2-mcq-40.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q40-complete.jpg",
+      "exam-snippets/question-vw24t2-40-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
+    "cv": "examens/vw-1018-a-24-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -1327,6 +2225,48 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t1-mcq-3",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 3,
+    "points": 1,
+    "page": 3,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Na een beet van een giftige slang is het afbeelding 2\nheel belangrijk dat een antiserum wordt\ntoegediend. Voor het maken van zo’n\nantiserum worden slangen gemolken\n(afbeelding 2). Het verkregen gif wordt\nsterk verdund en vervolgens ingespoten\nbij ‘productiedieren’, bijvoorbeeld\npaarden of schapen. Bij die dieren komt\ndan een immuunreactie op gang,\nwaarna de antistoffen uit het\nbloedplasma geïsoleerd kunnen\nworden.",
+    "q": "Door welke afweercellen worden deze antistoffen geproduceerd?",
+    "options": [
+      {
+        "key": "A",
+        "text": "door macrofagen"
+      },
+      {
+        "key": "B",
+        "text": "door ‘natural killer’-cellen (NK-cellen)"
+      },
+      {
+        "key": "C",
+        "text": "door plasmacellen"
+      },
+      {
+        "key": "D",
+        "text": "door T-helpercellen"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw25t1-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q3-complete.jpg",
+      "exam-snippets/question-vw25t1-3-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -1594,6 +2534,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t1-mcq-20",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 20,
+    "points": 2,
+    "page": 11,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Organismen die hoger in de voedselketen staan, bevatten relatief meer\n15N.",
+    "q": "Welk van de volgende processen kan dit verklaren?\nAminozuren met 14N worden relatief …",
+    "options": [
+      {
+        "key": "A",
+        "text": "vaker afgebroken."
+      },
+      {
+        "key": "B",
+        "text": "vaker omgezet in andere aminozuren."
+      },
+      {
+        "key": "C",
+        "text": "minder vaak uitgescheiden."
+      },
+      {
+        "key": "D",
+        "text": "minder vaak gevormd bij de stikstofassimilatie."
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw25t1-mcq-20.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q20-fallback.jpg",
+      "exam-snippets/question-vw25t1-20-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha25t1-mcq-27",
     "level": "Havo",
     "year": "2025",
@@ -1632,6 +2614,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t1-mcq-27",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 27,
+    "points": 2,
+    "page": 14,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Maria brak eens haar enkel bij een val. Ze voelde wel een steek, maar ze\nhad er verder geen last van. Alleen vanwege de zwelling bezocht ze haar\nhuisarts.",
+    "q": "Hoeveel tijd zit er bij mensen met een normale pijnbeleving minimaal\ntussen het begin van de stekende pijn van een enkelbreuk, en het begin\nvan de zeurende pijn erna? Ga uit van een lengte van de sensorische\nuitlopers van 1,0 meter.",
+    "options": [
+      {
+        "key": "A",
+        "text": "ongeveer 0,3 seconden"
+      },
+      {
+        "key": "B",
+        "text": "ongeveer 0,5 seconden"
+      },
+      {
+        "key": "C",
+        "text": "ongeveer 1,8 seconden"
+      },
+      {
+        "key": "D",
+        "text": "ongeveer 2,0 seconden"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw25t1-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q27-complete.jpg",
+      "exam-snippets/question-vw25t1-27-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha25t1-mcq-28",
     "level": "Havo",
     "year": "2025",
@@ -1667,6 +2691,48 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t1-mcq-30",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 30,
+    "points": 2,
+    "page": 15,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "In tabel 2 is de aminozuurvolgorde van het ZFHX2-eiwit rondom de\nMarsili-mutatie bij de mens en bij verschillende diersoorten weergegeven.\ntabel 2\nmens met Marsili-mutatie\nQVWFQNTRAREKKGQFRSTP\nmens zonder de mutatie\nQVWFQNTRARERKGQFRSTP\nchimpansee\nQVWFQNTRARERKGQFRSTP\nhond\nQVWFQNTRARERKGQFRSTP\nhuismuis\nQVWFQNTRARERKGQFRSTP\nDe Marsili-mutatie bevindt zich in een deel van het gen waarin normaal\ngeen genetische variatie aanwezig is.\nBeredeneer waardoor dit deel van het ZFHX2-gen in de loop van de\nevolutie hetzelfde is gebleven.\nHet onderzoeksteam concludeerde na onderzoek aan huismuizen waarbij\nde Marsili-mutatie was aangebracht, dat de puntmutatie inderdaad het\nafwijkende fenotype veroorzaakt.",
+    "q": "Welke puntmutatie is bij de huismuizen aangebracht in de coderende\nstreng van het ZFHX2-gen?",
+    "options": [
+      {
+        "key": "A",
+        "text": "C → A"
+      },
+      {
+        "key": "B",
+        "text": "C → T"
+      },
+      {
+        "key": "C",
+        "text": "G → A"
+      },
+      {
+        "key": "D",
+        "text": "G → T"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw25t1-mcq-30.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q30-complete.jpg",
+      "exam-snippets/question-vw25t1-30-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -1713,6 +2779,128 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t1-mcq-31",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 31,
+    "points": 2,
+    "page": 16,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "John Wood heeft meer families opgespoord waarin een afwijkende\npijnbeleving voorkomt. Hij vond families met leden die bij de geringste\nwarmte extreme pijn ervaren; deze aandoening heet IEM (inherited\nerythromelalgia). Ook vond hij families met leden die juist helemaal geen\npijn ervaren; deze aandoening wordt CIP genoemd (congenital\ninsensitivity to pain).\nBeide aandoeningen worden veroorzaakt door een puntmutatie in het\nSCN9A-gen dat codeert voor een bepaald type Na+-kanaaltje dat\naanwezig is in C-sensorische neuronen. Toen bekend was hoe een\nmutatie de pijn bij IEM veroorzaakt, kon naar een stof gezocht worden die\nhet Na+-kanaaltje zo beïnvloedt dat het CIP-fenotype wordt nagebootst.\nBij leden van één van de hierboven beschreven families openen de\nNa+-kanaaltjes in de C-sensorische neuronen zich bij een kleinere stijging\nvan de membraanpotentiaal dan normaal.",
+    "q": "Is de drempelpotentiaal van deze Na+-kanaaltjes hoger of lager dan\nnormaal? En hebben deze personen de aandoening CIP of IEM?\ndrempelpotentiaal\naandoening",
+    "options": [
+      {
+        "key": "A",
+        "text": "hoger CIP"
+      },
+      {
+        "key": "B",
+        "text": "hoger IEM"
+      },
+      {
+        "key": "C",
+        "text": "lager CIP"
+      },
+      {
+        "key": "D",
+        "text": "lager IEM"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw25t1-mcq-31.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q31-complete.jpg",
+      "exam-snippets/question-vw25t1-31-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t1-mcq-32",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 32,
+    "points": 2,
+    "page": 16,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Als een mutatie tot gevolg heeft dat een eiwit niet meer goed functioneert,\nheet dit functieverlies, zoals bij CIP. Er is sprake van functiewinst als door\neen mutatie een eiwit zodanig verandert dat het een nieuwe of versterkte\nwerking heeft, zoals bij IEM. Bij heterozygote genotypen wordt het type\novererving van deze mutaties duidelijk.",
+    "q": "Erft een functieverlies-mutatie gewoonlijk dominant of recessief over? En\neen functiewinst-mutatie?\nfunctieverlies-mutatie\nfunctiewinst-mutatie",
+    "options": [
+      {
+        "key": "A",
+        "text": "dominant dominant"
+      },
+      {
+        "key": "B",
+        "text": "dominant recessief"
+      },
+      {
+        "key": "C",
+        "text": "recessief dominant"
+      },
+      {
+        "key": "D",
+        "text": "recessief recessief"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw25t1-mcq-32.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q32-complete.jpg",
+      "exam-snippets/question-vw25t1-32-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t1-mcq-33",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 33,
+    "points": 1,
+    "page": 16,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Een stof die Na+-kanaaltjes in C-sensorische neuronen blokkeert, zou een\npijnstillend medicijn zijn voor mensen met IEM en voor mensen met\nandere vormen van chronische pijn. Het is relatief eenvoudig om een stof\nte ontwerpen die de porie van het Na+-kanaaltje blokkeert. Het probleem\nis echter dat deze porie gelijk is aan de poriën van andere typen\nNa+-kanaaltjes, zoals de Na+-kanaaltjes in het hart.",
+    "q": "Welke aandoening zou dan door deze stof veroorzaakt kunnen worden?",
+    "options": [
+      {
+        "key": "A",
+        "text": "een hartinfarct"
+      },
+      {
+        "key": "B",
+        "text": "een hartritmestoornis"
+      },
+      {
+        "key": "C",
+        "text": "een lekkende hartklep"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw25t1-mcq-33.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q33-complete.jpg",
+      "exam-snippets/question-vw25t1-33-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -1789,6 +2977,48 @@
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t1-mcq-40",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 40,
+    "points": 2,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De personeelsleden met de histamine-intoxicatie kregen clemastine-\ntabletten. Clemastine blokkeert de H1-receptoren. In de tabel staan\nenkele farmacologische eigenschappen van dit medicijn.\nmaximale werking\nbinnen 5 tot 7 uur na inname\nwerkingsduur\ntot 12 uur na inname\nresorptie\nvolledig\ntijdsduur tot maximale\n2 tot 4 uur na inname\nconcentratie in het bloed\nopname uit de darmen\nvanaf 30 minuten na inname\nafbraak\nin sterke mate in de lever",
+    "q": "Is anderhalf uur na inname de clemastine-concentratie in de leverader\nhoger of lager dan die in de poortader? En is de clemastine-concentratie\nin de leverslagader dan hoger of lager dan die in de poortader?\nin leverader\nin leverslagader",
+    "options": [
+      {
+        "key": "A",
+        "text": "hoger hoger"
+      },
+      {
+        "key": "B",
+        "text": "hoger lager"
+      },
+      {
+        "key": "C",
+        "text": "lager hoger"
+      },
+      {
+        "key": "D",
+        "text": "lager lager"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw25t1-mcq-40.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q40-complete.jpg",
+      "exam-snippets/question-vw25t1-40-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-1-o.pdf",
+    "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2006,6 +3236,86 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t2-mcq-11",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 11,
+    "points": 1,
+    "page": 6,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Om jakobskruiskruid op een duurzame manier te bestrijden, zou een\nvraatinsect kunnen worden ingezet dat zich gespecialiseerd heeft op\njakobskruiskruid. Voorbeelden hiervan zijn de zebrarups (de geel-zwarte\nlarve van de sint-jakobsvlinder Tyria jacobaeae, afbeelding 3), die\nalgemeen in Nederland voorkomt, en de jakobskruid-aardvlo (Longitarsus\njacobaeae, afbeelding 4), die voorkomt in duingebieden in het westen van\nNederland.\nafbeelding 3\nafbeelding 4\nBeide soorten zijn ongevoelig voor PA’s. Ze slaan PA’s op in hun lichaam,\nwaardoor ze beschermd zijn tegen natuurlijke vijanden.\nDe sint-jakobsvlinder is zodanig aangepast dat hij als rups alleen nog leeft\nop jakobskruiskruid.",
+    "q": "Van welk biologisch begrip is dit een voorbeeld?",
+    "options": [
+      {
+        "key": "A",
+        "text": "van co-evolutie"
+      },
+      {
+        "key": "B",
+        "text": "van convergentie"
+      },
+      {
+        "key": "C",
+        "text": "van het bottleneck effect"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw25t2-mcq-11.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q11-complete.jpg",
+      "exam-snippets/question-vw25t2-11-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-12",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 12,
+    "points": 2,
+    "page": 6,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Door de inzet van deze specialistische vraatinsecten verandert de\nconcurrentie tussen planten.",
+    "q": "Welke planten zijn dan in het voordeel? En wat zal dan vervolgens het\neffect zijn op het aantal niet-specialistische vraatinsecten?\nvoordeel voor\nhet aantal niet-specialistische\nplanten met\nvraatinsecten",
+    "options": [
+      {
+        "key": "A",
+        "text": "een hoge PA-productie neemt af"
+      },
+      {
+        "key": "B",
+        "text": "een hoge PA-productie neemt toe"
+      },
+      {
+        "key": "C",
+        "text": "een lage PA-productie neemt af"
+      },
+      {
+        "key": "D",
+        "text": "een lage PA-productie neemt toe"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw25t2-mcq-12.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q12-fallback.jpg",
+      "exam-snippets/question-vw25t2-12-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha25t2-mcq-16",
     "level": "Havo",
     "year": "2025",
@@ -2090,6 +3400,90 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t2-mcq-17",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 17,
+    "points": 1,
+    "page": 8,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De wetenschappers stelden de volgende hypothese op: de ovulatie-\nfrequentie bepaalt het aantal chromosomale afwijkingen in eicellen.\nZij toetsten dit bij drie groepen vrouwtjesmuizen:\n1 muizen die voortdurend zwanger waren, doordat er mannetjes\naanwezig waren\n2 muizen waarbij de ovulaties onderdrukt werden met een hormoon-\nimplantaat\n3 muizen waarbij de puberteit geblokkeerd werd met behulp van een\ncrispr-cas-behandeling\nDe muizen in groep 2 kregen een implantaat met een hormoon dat\novulaties onderdrukt.",
+    "q": "Welk hormoon is in het implantaat aanwezig?",
+    "options": [
+      {
+        "key": "A",
+        "text": "FSH"
+      },
+      {
+        "key": "B",
+        "text": "LH"
+      },
+      {
+        "key": "C",
+        "text": "progesteron"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw25t2-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q17-complete.jpg",
+      "exam-snippets/question-vw25t2-17-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-19",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 19,
+    "points": 2,
+    "page": 9,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Om een groep van 30 homozygote Gpr54-knock-out muizen\n(Gpr54– Gpr54–) te verkrijgen werd de volgende werkwijze gevolgd:\nstap 1\nUit enkele (wildtype) vrouwtjesmuizen werden bevruchte\neicellen weggenomen.\nstap 2\nDe bevruchte eicellen kregen de crispr-behandeling.\nHeterozygote bevruchte eicellen (Gpr54+Gpr54–) werden\nstap 3\ningebracht bij draagmoedermuizen.\nstap 4\nToen de nakomelingen die hieruit ontstonden (F1) volwassen\nwaren, werden ze onderling gekruist. Hieruit ontstond een F2.",
+    "q": "Hoeveel nakomelingen (F2) werden naar verwachting geboren totdat er in\ntotaal 30 muizen waren die volledig Gpr54-knock-out waren?",
+    "options": [
+      {
+        "key": "A",
+        "text": "30"
+      },
+      {
+        "key": "B",
+        "text": "40"
+      },
+      {
+        "key": "C",
+        "text": "60"
+      },
+      {
+        "key": "D",
+        "text": "90 120"
+      },
+      {
+        "key": "E",
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "E",
+    "image": "exam-snippets/complete-vw25t2-mcq-19.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q19-complete.jpg",
+      "exam-snippets/question-vw25t2-19-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha25t2-mcq-22",
     "level": "Havo",
     "year": "2025",
@@ -2129,6 +3523,56 @@
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-22",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 22,
+    "points": 2,
+    "page": 10,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De onderzoeksresultaten wijzen erop dat een verminderd aantal ovulaties\nbij de muizenmoeder het aantal chromosomale afwijkingen in de eicellen\nvermindert. Als dit bij mensen ook geldt, zou dat voor vrouwen die op\nlatere leeftijd kinderen willen, een reden kunnen zijn om hun ovulaties te\nonderdrukken.\nHieronder zijn drie vrouwen van 38 jaar beschreven.\n\nAzra, gebruikt sinds haar puberteit een anticonceptiepil.\n\nBernadien, heeft zes kinderen gekregen en gebruikte nooit een\nanticonceptiepil.\n\nClaire, heeft een verstopping van de eileiders, is voor het eerst\nzwanger na een ivf-behandeling en gebruikte nooit een\nanticonceptiepil.",
+    "q": "Welke vrouw zal de meeste ovulaties gehad hebben? En welke vrouw de\nminste?\nmeeste ovulaties\nminste ovulaties",
+    "options": [
+      {
+        "key": "A",
+        "text": "Azra Bernadien"
+      },
+      {
+        "key": "B",
+        "text": "Azra Claire"
+      },
+      {
+        "key": "C",
+        "text": "Bernadien Azra"
+      },
+      {
+        "key": "D",
+        "text": "Bernadien Claire Claire Azra"
+      },
+      {
+        "key": "E",
+        "text": "Claire Bernadien"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "E",
+    "image": "exam-snippets/complete-vw25t2-mcq-22.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q22-complete.jpg",
+      "exam-snippets/question-vw25t2-22-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2232,6 +3676,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t2-mcq-25",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 25,
+    "points": 2,
+    "page": 12,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "In de lichaamscellen wordt T4 door een enzym omgezet in T3. Genen die\ngevoelig zijn voor regulatie door T3 bevatten een korte sequentie: het\nT3-responsief element (TRE). T3 bindt aan een receptor-co-repressor-\ncomplex dat is gebonden aan het TRE, waardoor de vorm van dit complex\nverandert en de repressor loslaat. Daarna wordt, door binding van een\nactivator, het co-activator-complex gevormd, waarna de genexpressie\nbegint (afbeelding 2). De binding van T3 aan het TRE verandert ook de\nmethylering en acetylering van de door T3 gereguleerde genen.\nafbeelding 2",
+    "q": "Welk effect heeft methylering van histonstaarten op de genen die gevoelig\nzijn voor regulatie door T3?",
+    "options": [
+      {
+        "key": "A",
+        "text": "remming replicatie"
+      },
+      {
+        "key": "B",
+        "text": "remming transcriptie"
+      },
+      {
+        "key": "C",
+        "text": "stimulering replicatie"
+      },
+      {
+        "key": "D",
+        "text": "stimulering transcriptie"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw25t2-mcq-25.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q25-complete.jpg",
+      "exam-snippets/question-vw25t2-25-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha25t2-mcq-26",
     "level": "Havo",
     "year": "2025",
@@ -2271,6 +3757,132 @@
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-27",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 27,
+    "points": 2,
+    "page": 13,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De huisarts vertelt Ellen dat ze tijdens haar zwangerschap vaker haar T4-\nconcentratie zal controleren. Door de veranderingen in haar lichaam als\ngevolg van de zwangerschap zal Ellen steeds minder medicijnen hoeven\nslikken. De hoeveelheid ‘verstorende’ IgG in het bloed van Ellen zal\nafnemen doordat de vouwing van de nieuw gevormde IgG-eiwitten\nverandert als gevolg van de zwangerschap. Zodra Ellen bevallen is, zullen\nde symptomen van de ziekte van Graves terugkomen en zal Ellen wel\nweer de hogere dosis medicijnen moeten gebruiken.",
+    "q": "In welk organel ontstaat de secundaire en tertiaire structuur van IgG-\neiwitten? En welk organel regelt het transport van IgG-eiwitten naar buiten\nde cel?\nvouwing",
+    "options": [
+      {
+        "key": "A",
+        "text": "endoplasmatisch reticulum"
+      },
+      {
+        "key": "B",
+        "text": "endoplasmatisch reticulum"
+      },
+      {
+        "key": "C",
+        "text": "golgi-systeem"
+      },
+      {
+        "key": "D",
+        "text": "golgi-systeem"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw25t2-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q27-complete.jpg",
+      "exam-snippets/question-vw25t2-27-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-40",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 40,
+    "points": 2,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De verdwerging van grote zoogdieren op een gekoloniseerd eiland is\nmede te verklaren met de eilandtheorie van McArthur en Wilson. Een\nkleiner aantal soorten op een eiland maakt de kans groter dat predatoren\nafwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.",
+    "q": "Op welk type eiland zal het aantal soorten het kleinst zijn volgens de\neilandtheorie van McArthur en Wilson?\nafmeting\nnabijheid vasteland",
+    "options": [
+      {
+        "key": "A",
+        "text": "groot dichtbij"
+      },
+      {
+        "key": "B",
+        "text": "groot veraf"
+      },
+      {
+        "key": "C",
+        "text": "klein dichtbij"
+      },
+      {
+        "key": "D",
+        "text": "klein veraf"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw25t2-mcq-40.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q40-complete.jpg",
+      "exam-snippets/question-vw25t2-40-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw25t2-mcq-42",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 42,
+    "points": 1,
+    "page": 20,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Met behulp van de DNA-gegevens werd een schatting gemaakt van de\nperiode waarin de verdwerging plaatsvond. De gevonden fossielen van de\npuntali-olifant worden als het eindstadium van het verdwergingsproces\nbeschouwd. De ouderdom van deze fossielen ligt tussen 175.500 en\n50.000 jaar. Zie afbeelding 3.\nafbeelding 3\nDe onderzoekers schrijven dat de hoogst mogelijke snelheid van\nverdwerging 41,5 mm per generatie was.\nMet de gegevens in afbeelding 3 is de laagst mogelijke snelheid van\nverdwerging per generatie te berekenen. Ga uit van een generatietijd van\n31 jaar.",
+    "q": "Wat is deze laagst mogelijke snelheid van verdwerging?",
+    "options": [
+      {
+        "key": "A",
+        "text": "0,0049 mm per generatie"
+      },
+      {
+        "key": "B",
+        "text": "0,0093 mm per generatie"
+      },
+      {
+        "key": "C",
+        "text": "0,15 mm per generatie"
+      },
+      {
+        "key": "D",
+        "text": "0,29 mm per generatie"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-vw25t2-mcq-42.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q42-complete.jpg",
+      "exam-snippets/question-vw25t2-42-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2316,6 +3928,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t1-mcq-2",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 2,
+    "points": 2,
+    "page": 2,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Bloedplaatjes ontstaan in het rode beenmerg. Bij de differentiatie van\nmegakaryoblasten ontstaan grote cellen die uiteindelijk uiteenvallen in\nkleine blaasjes zonder celkern: de bloedplaatjes. De rijping van de\nmegakaryoblasten wordt gestimuleerd door het signaaleiwit TPO. Een\nterugkoppelingsmechanisme met het aantal bloedplaatjes zorgt ervoor dat\nin een gezonde situatie de concentratie bloedplaatjes in het bloed stabiel\nblijft.",
+    "q": "Neemt door een toename van het aantal bloedplaatjes de TPO-\nconcentratie af of toe? En is deze regulatie van de concentratie\nbloedplaatjes een voorbeeld van negatieve terugkoppeling of van\npositieve terugkoppeling?\nTPO-concentratie\nterugkoppeling",
+    "options": [
+      {
+        "key": "A",
+        "text": "neemt af negatief"
+      },
+      {
+        "key": "B",
+        "text": "neemt af positief"
+      },
+      {
+        "key": "C",
+        "text": "neemt toe negatief"
+      },
+      {
+        "key": "D",
+        "text": "neemt toe positief"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw26t1-mcq-2.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q2-complete.jpg",
+      "exam-snippets/question-vw26t1-2-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha26t1-mcq-3",
     "level": "Havo",
     "year": "2026",
@@ -2355,6 +4009,52 @@
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t1-mcq-3",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 3,
+    "points": 2,
+    "page": 3,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Om de trombocytopenie bij Rosie vast te stellen, is het aantal\nbloedplaatjes in het bloed bepaald. Door toevoeging van een kleurstof\naan een microscopisch preparaat van bloed, worden bloedplaatjes\nzichtbaar als donkere vlekken.\nIn de afbeelding zijn een microscopisch preparaat van normaal bloed en\neen microscopisch preparaat van het bloed van Rosie weergegeven.\nnormaal bloed\nbloed Rosie",
+    "q": "Hoeveel bloedplaatjes zijn ongeveer aanwezig in een mm3 bloed van\nRosie? Gebruik je informatieboek.",
+    "options": [
+      {
+        "key": "A",
+        "text": "3"
+      },
+      {
+        "key": "B",
+        "text": "30"
+      },
+      {
+        "key": "C",
+        "text": "300"
+      },
+      {
+        "key": "D",
+        "text": "3.000 30.000"
+      },
+      {
+        "key": "E",
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "E",
+    "image": "exam-snippets/complete-vw26t1-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q3-complete.jpg",
+      "exam-snippets/question-vw26t1-3-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2400,6 +4100,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t1-mcq-5",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 5,
+    "points": 1,
+    "page": 4,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Nadat andere oorzaken werden uitgesloten, vermoedden de artsen dat bij\nRosie sprake was van een afweerreactie tegen de antigenen op haar\nbloedplaatjes. Deze antigenen worden HPA’s (human platelet antigens)\ngenoemd.\nElk bloedplaatje heeft een aantal verschillende HPA’s. Van de genen die\ncoderen voor deze HPA’s, komen alle aanwezige allelen tot expressie.\nIn tabel 1 zie je gegevens van twee van deze genen.\ntabel 1\ngen\nHPA1-gen\nHPA5-gen",
+    "q": "Waarvan is sprake bij het HPA1-gen en het HPA5-gen op basis van de\ninformatie?",
+    "options": [
+      {
+        "key": "A",
+        "text": "van co-dominante overerving"
+      },
+      {
+        "key": "B",
+        "text": "van gekoppelde overerving"
+      },
+      {
+        "key": "C",
+        "text": "van intermediaire overerving"
+      },
+      {
+        "key": "D",
+        "text": "van multipele allelen"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw26t1-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q5-complete.jpg",
+      "exam-snippets/question-vw26t1-5-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha26t1-mcq-6",
     "level": "Havo",
     "year": "2026",
@@ -2439,6 +4181,98 @@
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t1-mcq-9",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 9,
+    "points": 2,
+    "page": 5,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Om het tekort aan bloedplaatjes op te vangen, kreeg Rosie een infuus\nmet bloedplaatjes. Omdat nog niet bekend was welke antistoffen bij Rosie\naanwezig waren, werd gekozen voor bloedplaatjes zonder HPA-1a. De\nkans is namelijk het grootst dat de trombocytopenie wordt veroorzaakt\ndoor antistoffen tegen HPA-1a.",
+    "q": "Hoeveel procent van de Noordwest-Europese populatie heeft bloedplaatjes\nzonder HPA-1a? Neem aan dat de wet van Hardy-Weinberg geldt.",
+    "options": [
+      {
+        "key": "A",
+        "text": "2,6%"
+      },
+      {
+        "key": "B",
+        "text": "4,0%"
+      },
+      {
+        "key": "C",
+        "text": "16%"
+      },
+      {
+        "key": "D",
+        "text": "27%"
+      },
+      {
+        "key": "E",
+        "text": "71%"
+      },
+      {
+        "key": "F",
+        "text": "84%"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw26t1-mcq-9.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q9-table.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-9.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t1-mcq-10",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 10,
+    "points": 2,
+    "page": 5,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Uit het bloedonderzoek bleek dat Rosies bloed antistoffen bevat tegen\nHPA-1a en tegen HPA-5b. Ook werd haar genotype en dat van haar\nouders bepaald. Rosie bleek een ander genotype voor HPA-1 en HPA-5\nte hebben dan haar moeder. Daaruit concludeerden de artsen dat de\ntrombocytopenie bij Rosie werd veroorzaakt door antistoffen die ze van\nhaar moeder had gekregen tijdens de zwangerschap.\nDe afweerreactie die door de antistoffen wordt veroorzaakt in het lichaam\nvan Rosie wordt allo-immuniteit genoemd.",
+    "q": "Is de allo-immuniteit bij Rosie een vorm van actieve immuniteit of van\npassieve immuniteit? En welk type antistof tegen HPA-1a en HPA-5b\nwordt bij haar aangetroffen?\nimmuniteit\ntype antistof",
+    "options": [
+      {
+        "key": "A",
+        "text": "actief IgE"
+      },
+      {
+        "key": "B",
+        "text": "actief IgG"
+      },
+      {
+        "key": "C",
+        "text": "passief IgE"
+      },
+      {
+        "key": "D",
+        "text": "passief IgG"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw26t1-mcq-10.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q10-complete.jpg",
+      "exam-snippets/question-vw26t1-10-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2523,6 +4357,44 @@
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t1-mcq-15",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 15,
+    "points": 1,
+    "page": 7,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Bij de gemodificeerde E. coli is methaanzuur de donor van elektronen\nvoor het verloop van de calvincyclus.",
+    "q": "Wat is de elektronendonor bij foto-autotrofe organismen?",
+    "options": [
+      {
+        "key": "A",
+        "text": "licht"
+      },
+      {
+        "key": "B",
+        "text": "H2O"
+      },
+      {
+        "key": "C",
+        "text": "O2"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw26t1-mcq-15.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q15-fallback.jpg",
+      "exam-snippets/question-vw26t1-15-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2656,6 +4528,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t1-mcq-22",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 22,
+    "points": 2,
+    "page": 9,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Na een bijensteek kan de bloeddruk zo ver dalen dat er geen polsslag te\nvoelen is. In de ambulance werden Berts hartslag en bloeddruk gemeten.\nZijn bloeddruk was heel laag.",
+    "q": "Welke verandering in de slagader van de pols is normaal voelbaar als de\npolsslag? En welke druk heerst op dat moment in die slagader?\npolsslag voelbaar door",
+    "options": [
+      {
+        "key": "A",
+        "text": "samentrekken van de slagaderwand; diastolische druk"
+      },
+      {
+        "key": "B",
+        "text": "samentrekken van de slagaderwand; systolische druk"
+      },
+      {
+        "key": "C",
+        "text": "uitrekken van de slagaderwand; diastolische druk"
+      },
+      {
+        "key": "D",
+        "text": "uitrekken van de slagaderwand; systolische druk"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw26t1-mcq-22.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q22-complete.jpg",
+      "exam-snippets/question-vw26t1-22-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha26t1-mcq-23",
     "level": "Havo",
     "year": "2026",
@@ -2695,6 +4609,48 @@
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t1-mcq-25",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 25,
+    "points": 1,
+    "page": 11,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De onderstaande afbeelding toont hoe na binding van mellitine het signaal\nwordt doorgegeven zodat de calciumkanaaltjes opengaan.\nDe stoffen P en Q in de afbeelding vervullen een bepaalde functie in de\nsignaaloverdracht.",
+    "q": "Wat is de biologische term voor stoffen met deze functie?",
+    "options": [
+      {
+        "key": "A",
+        "text": "enhancers"
+      },
+      {
+        "key": "B",
+        "text": "cascades"
+      },
+      {
+        "key": "C",
+        "text": "receptoren"
+      },
+      {
+        "key": "D",
+        "text": "second messengers"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw26t1-mcq-25.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q25-complete.jpg",
+      "exam-snippets/question-vw26t1-25-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -2745,6 +4701,48 @@
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t1-mcq-26",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 26,
+    "points": 2,
+    "page": 11,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De diffusie van Ca2+ door de calciumkanaaltjes leidt tot een verandering\nvan de membraanpotentiaal.",
+    "q": "Welke verandering van de membraanpotentiaal kan leiden tot een impuls?\nEn is dit het gevolg van een Ca2+-instroom of van een Ca2+-uitstroom?\nkan leiden tot impuls\ngevolg van\nCa2+-instroom",
+    "options": [
+      {
+        "key": "A",
+        "text": "depolarisatie Ca2+-uitstroom"
+      },
+      {
+        "key": "B",
+        "text": "depolarisatie Ca2+-instroom"
+      },
+      {
+        "key": "C",
+        "text": "hyperpolarisatie Ca2+-uitstroom"
+      },
+      {
+        "key": "D",
+        "text": "hyperpolarisatie"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw26t1-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q26-fallback.jpg",
+      "exam-snippets/question-vw26t1-26-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -3084,6 +5082,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t2-mcq-3",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 3,
+    "points": 1,
+    "page": 3,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Voor de aanmaak van de nepetalactonen heeft kattenkruid verschillende\nenzymen. Afbeelding 3 geeft de laatste stappen weer van de aanmaak\nvan nepetalactonen met de daarbij betrokken enzymen ISY en NEPS.\nafbeelding 3\nBij de omzetting die door ISY wordt gekatalyseerd, is NADPH de\nelektronendonor.",
+    "q": "Bij welk stofwisselingsproces in de plant wordt NADPH geproduceerd?",
+    "options": [
+      {
+        "key": "A",
+        "text": "bij de donkerreactie"
+      },
+      {
+        "key": "B",
+        "text": "bij de lichtreactie"
+      },
+      {
+        "key": "C",
+        "text": "bij de citroenzuurcyclus"
+      },
+      {
+        "key": "D",
+        "text": "bij de glycolyse"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw26t2-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q3-complete.jpg",
+      "exam-snippets/question-vw26t2-3-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-2-o.pdf",
+    "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha26t2-mcq-4",
     "level": "Havo",
     "year": "2026",
@@ -3169,6 +5209,48 @@
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t2-mcq-5",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 5,
+    "points": 2,
+    "page": 5,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De verdubbeling die rond 20 miljoen jaar geleden optrad in de P5βR-locus\nis een ...(1)... .\nDe verplaatsing die rond 8 miljoen jaar geleden optrad in de NEPS-locus\nis een ...(2)... .",
+    "q": "Wat moet worden ingevuld bij 1 en bij 2?\nbij 1\nbij 2",
+    "options": [
+      {
+        "key": "A",
+        "text": "chromosoommutatie insertie"
+      },
+      {
+        "key": "B",
+        "text": "chromosoommutatie leesraamverschuiving"
+      },
+      {
+        "key": "C",
+        "text": "genoommutatie insertie"
+      },
+      {
+        "key": "D",
+        "text": "genoommutatie leesraamverschuiving"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw26t2-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q5-complete.jpg",
+      "exam-snippets/question-vw26t2-5-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-2-o.pdf",
+    "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -3294,6 +5376,44 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t2-mcq-16",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 16,
+    "points": 1,
+    "page": 9,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "In de levende cellen van de opperhuid is provitamine D3 aanwezig. Onder\ninvloed van uv-straling wordt deze stof omgezet in vitamine D3.",
+    "q": "In welke laag van de huid (afbeelding 1) wordt het meeste vitamine D3\ngeproduceerd?",
+    "options": [
+      {
+        "key": "A",
+        "text": "in laag P"
+      },
+      {
+        "key": "B",
+        "text": "in laag Q"
+      },
+      {
+        "key": "C",
+        "text": "in laag R"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw26t2-mcq-16.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q16-fallback.jpg",
+      "exam-snippets/question-vw26t2-16-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-2-o.pdf",
+    "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha26t2-mcq-18",
     "level": "Havo",
     "year": "2026",
@@ -3341,2290 +5461,6 @@
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "ha26t2-mcq-26",
-    "level": "Havo",
-    "year": "2026",
-    "period": "2",
-    "n": 26,
-    "points": 1,
-    "page": 12,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Michael leest op een forum dat vegan eten beter is voor je nieren. Een\nvegan dieet bevat vaak meer kalium en minder natrium. Dit heeft een\nbloeddrukverlagend effect. Een hoge bloeddruk is een van de oorzaken\nvan nierproblemen.",
-    "q": "In welk deel van de nieren is de bloeddruk het hoogst?",
-    "options": [
-      {
-        "key": "A",
-        "text": "in de glomerulus"
-      },
-      {
-        "key": "B",
-        "text": "in de haarvaten rond het eerste gekronkelde buisje"
-      },
-      {
-        "key": "C",
-        "text": "in de haarvaten rond het tweede gekronkelde buisje witte bonen rundvlees 9,73 26,29 28 61 percentage van de aanwezige aminozuren 12,7 9,4 16,0 15,1 8,0 7,8 6,9 8,3"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-ha26t2-mcq-26.jpg",
-    "images": [
-      "exam-snippets/context-ha26t2-q26-complete.jpg",
-      "exam-snippets/question-ha26t2-26-only.jpg"
-    ],
-    "pdf": "examens/ha-1018-a-26-2-o.pdf",
-    "cv": "examens/ha-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "ha26t2-mcq-27",
-    "level": "Havo",
-    "year": "2026",
-    "period": "2",
-    "n": 27,
-    "points": 2,
-    "page": 13,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Veganisten kunnen ook een tekort krijgen aan vitamine B12. De meeste\nveganisten gebruiken voedingssupplementen met vitamine B12. Michael\nwil weten of die voedingssupplementen wel echt veganistisch zijn.\nOp internet leest hij:\nVitamine B12 in supplementen wordt gemaakt door bacteriën in een\nlaboratorium. Hiervoor worden vaak bacteriestammen gebruikt waarin\ngenetische veranderingen zijn opgewekt door blootstelling aan straling of\nchemicaliën. Soms ontstaat daardoor bij één bacterie toevallig een kleine\ngenetische verandering in een gen waardoor die bacterie meer B12 gaat\nproduceren. Na selectie wordt deze mutante bacterie vermenigvuldigd tot\ngrote aantallen.",
-    "q": "Is de mutatie een genoommutatie of een puntmutatie? En is er bij de\nselectie van de mutante bacterie sprake van kunstmatige of natuurlijke\nselectie?\ntype mutatie\nvorm van selectie",
-    "options": [
-      {
-        "key": "A",
-        "text": "genoommutatie kunstmatige selectie"
-      },
-      {
-        "key": "B",
-        "text": "genoommutatie natuurlijke selectie"
-      },
-      {
-        "key": "C",
-        "text": "puntmutatie kunstmatige selectie"
-      },
-      {
-        "key": "D",
-        "text": "puntmutatie natuurlijke selectie"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-ha26t2-mcq-27.jpg",
-    "images": [
-      "exam-snippets/context-ha26t2-q27-complete.jpg",
-      "exam-snippets/question-ha26t2-27-only.jpg"
-    ],
-    "pdf": "examens/ha-1018-a-26-2-o.pdf",
-    "cv": "examens/ha-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "ha26t2-mcq-43",
-    "level": "Havo",
-    "year": "2026",
-    "period": "2",
-    "n": 43,
-    "points": 2,
-    "page": 19,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een paard maakt geen enzymen aan voor de vertering van fructaan. De\nfructaanmoleculen kunnen wel worden omgezet tot monosachariden door\nbacteriën in de dikke darm. Hierbij komen gassen vrij die zich ophopen en\ndaardoor darmproblemen veroorzaken.",
-    "q": "Welk gas komt vrij bij de bacteriële omzetting van fructaan? En gebeurt dit\nonder aerobe of anaerobe omstandigheden?\ngevormd gas",
-    "options": [
-      {
-        "key": "A",
-        "text": "ammoniak (NH3)"
-      },
-      {
-        "key": "B",
-        "text": "ammoniak (NH3)"
-      },
-      {
-        "key": "C",
-        "text": "methaan (CH4)"
-      },
-      {
-        "key": "D",
-        "text": "methaan (CH4)"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-ha26t2-mcq-43.jpg",
-    "images": [
-      "exam-snippets/context-ha26t2-q43-complete.jpg",
-      "exam-snippets/question-ha26t2-43-only.jpg"
-    ],
-    "pdf": "examens/ha-1018-a-26-2-o.pdf",
-    "cv": "examens/ha-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "ha26t2-mcq-46",
-    "level": "Havo",
-    "year": "2026",
-    "period": "2",
-    "n": 46,
-    "points": 2,
-    "page": 20,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Koen kiest een mengsel van de volgende grassen:\nNederlandse naam\nLatijnse naam\nEngels raaigras\nLolium perenne\nrood zwenkgras\nFestuca rubra\nstraatgras\nPoa annua\ntimotheegras\nPhleum pratense\nveldbeemdgras\nPoa pratensis",
-    "q": "Hoeveel verschillende geslachten (genera) bevat het mengsel? En\nhoeveel verschillende soorten?\naantal geslachten\naantal soorten",
-    "options": [
-      {
-        "key": "A",
-        "text": "4 4"
-      },
-      {
-        "key": "B",
-        "text": "4 5"
-      },
-      {
-        "key": "C",
-        "text": "5 4"
-      },
-      {
-        "key": "D",
-        "text": "5 5"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-ha26t2-mcq-46.jpg",
-    "images": [
-      "exam-snippets/context-ha26t2-q46-complete.jpg",
-      "exam-snippets/question-ha26t2-46-only.jpg"
-    ],
-    "pdf": "examens/ha-1018-a-26-2-o.pdf",
-    "cv": "examens/ha-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-5",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 5,
-    "points": 2,
-    "page": 3,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De Amerikaanse wetenschappers wilden onderzoeken hoe nicotine de\nverschillende celtypen in een embryo beïnvloedt. Onderzoek doen aan\nmenselijke embryo’s is in veel landen niet toegestaan of mag alleen onder\nzeer strikte voorwaarden. Daarom gebruikten de wetenschappers\nstamcellen afkomstig uit een menselijk embryo van vijf dagen oud\n(blastula). Een kweek van deze stamcellen vormt spontaan bolletjes die\n‘embryoid bodies’ (EB’s) worden genoemd. Om het effect van nicotine op\nde ontwikkeling van deze stamcellen te onderzoeken, voegden de\nwetenschappers nicotine toe aan het kweekmedium. De opzet van het\nonderzoek is in afbeelding 2 weergegeven.\nafbeelding 2\nStamcellen hebben een bepaalde potentie.",
-    "q": "Welke potentie hebben de stamcellen bij de start van het onderzoek? En\nwelke potentie hebben ze na 21 dagen ontwikkeling?\nstart onderzoek\nna 21 dagen",
-    "options": [
-      {
-        "key": "A",
-        "text": "multipotent pluripotent"
-      },
-      {
-        "key": "B",
-        "text": "multipotent totipotent"
-      },
-      {
-        "key": "C",
-        "text": "pluripotent multipotent"
-      },
-      {
-        "key": "D",
-        "text": "pluripotent totipotent totipotent multipotent"
-      },
-      {
-        "key": "E",
-        "text": "totipotent pluripotent"
-      },
-      {
-        "key": "F",
-        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw24t1-mcq-5.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q5-complete.jpg",
-      "exam-snippets/question-vw24t1-5-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-6",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 6,
-    "points": 2,
-    "page": 4,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De concentratie nicotine van het kweekmedium was gelijk aan de\ngemiddelde concentratie in het bloed van embryo’s waarvan de moeder\nrookt. Na 21 dagen incubatie werd de diameter van de EB’s bepaald. De\ndiameter is een maat voor het aantal cellen in de EB’s.\nAfbeelding 3 toont een microscopisch beeld van EB’s die aan nicotine zijn\nblootgesteld en van controle-EB’s. De EB’s zijn als donkere vlekken\nzichtbaar. In afbeelding 4 zijn de metingen van de diameter van de EB’s in\nde twee groepen weergegeven.\nafbeelding 3\nOver het resultaat worden de volgende uitspraken gedaan:\n1 Het aantal cellen in een controle-EB is gemiddeld groter dan in een EB\ndie aan nicotine is blootgesteld.\n2 Het verschil in gemiddelde diameter tussen de twee groepen EB’s\nberust op toeval.",
-    "q": "Welke uitspraak wordt ondersteund door de gegevens?",
-    "options": [
-      {
-        "key": "A",
-        "text": "geen van beide"
-      },
-      {
-        "key": "B",
-        "text": "alleen 1"
-      },
-      {
-        "key": "C",
-        "text": "alleen 2"
-      },
-      {
-        "key": "D",
-        "text": "zowel 1 als 2"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw24t1-mcq-6.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q6-complete.jpg",
-      "exam-snippets/question-vw24t1-6-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-22",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 22,
-    "points": 1,
-    "page": 13,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "afbeelding 2\nDe geactiveerde MR is als transcriptiefactor betrokken bij de synthese van\nNa+-kanalen.",
-    "q": "Welke functie heeft de geactiveerde MR bij de transcriptie? Gebruik je\ninformatieboek.",
-    "options": [
-      {
-        "key": "A",
-        "text": "activator"
-      },
-      {
-        "key": "B",
-        "text": "enhancer (versterker)"
-      },
-      {
-        "key": "C",
-        "text": "promotor"
-      },
-      {
-        "key": "D",
-        "text": "repressor"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw24t1-mcq-22.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q22-complete.jpg",
-      "exam-snippets/question-vw24t1-22-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-26",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 26,
-    "points": 2,
-    "page": 14,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Bonenziekte\nDe burgemeester van een Italiaans dorp heeft het verbouwen van\ntuinbonen verboden vanwege Fabio, een jongen uit het dorp die lijdt aan\nbonenziekte (favisme). Het eten van tuinbonen of het inademen van\npollen van tuinboonplanten leidt bij Fabio tot een versnelde afbraak van\nrode bloedcellen, waardoor een levensbedreigende situatie kan ontstaan.\nBonenziekte is het gevolg van een mutatie in het gen dat codeert voor het\nenzym glucose-6-fosfaatdehydrogenase (G6PD). Hierdoor is bij Fabio dit\nenzym minder goed werkzaam. G6PD katalyseert de eerste reactie in de\npentose-fosfaatweg (‘pentose phosphate pathway’ of PPP).\nDe PPP (afbeelding 1) is een stofwisselingsroute waarbij glucose-\nmoleculen worden omgezet in pentosemoleculen (C5-moleculen). Hierbij\nworden ook NADPH-moleculen gevormd.\nNADPH (bekend van de fotosynthese bij planten) is in menselijke cellen\nnodig bij de productie van bepaalde organische stoffen zoals glutathion.\n–\nGlutathion kan schadelijke reactieve zuurstofmoleculen zoals O2\nonschadelijk maken (afbeelding 1).\nafbeelding 1\nIn de PPP wordt NADPH gevormd.",
-    "q": "Kan NADPH energierijke elektronen afstaan of opnemen? En bij welk type\nstofwisselingsproces wordt NADPH dan verbruikt?\nenergierijke elektronen\ntype stofwisselingsproces",
-    "options": [
-      {
-        "key": "A",
-        "text": "afstaan assimilatie"
-      },
-      {
-        "key": "B",
-        "text": "afstaan dissimilatie"
-      },
-      {
-        "key": "C",
-        "text": "opnemen assimilatie"
-      },
-      {
-        "key": "D",
-        "text": "opnemen dissimilatie"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw24t1-mcq-26.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q26-complete.jpg",
-      "exam-snippets/question-vw24t1-26-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-27",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 27,
-    "points": 1,
-    "page": 15,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De PPP is betrokken bij de productie van vetzuren. Met behulp van\nafbeelding 1 kan worden afgeleid wat het gevolg is voor de productie van\nvetzuren als G6PD onwerkzaam is.",
-    "q": "Wat gebeurt er met de productie van vetzuren als G6PD onwerkzaam is?",
-    "options": [
-      {
-        "key": "A",
-        "text": "Die neemt toe."
-      },
-      {
-        "key": "B",
-        "text": "Die neemt af."
-      },
-      {
-        "key": "C",
-        "text": "Die verandert niet."
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw24t1-mcq-27.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q27-complete.jpg",
-      "exam-snippets/question-vw24t1-27-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-30",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 30,
-    "points": 2,
-    "page": 15,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Nadat Fabio een keer tuinbonen had gegeten, veranderden zijn\nademhaling en hartslag.",
-    "q": "Zal zijn ademhalingsfrequentie zijn verhoogd of verlaagd? En zijn\nhartslagfrequentie?\nademhalingsfrequentie\nhartslagfrequentie",
-    "options": [
-      {
-        "key": "A",
-        "text": "verhoogd verhoogd"
-      },
-      {
-        "key": "B",
-        "text": "verhoogd verlaagd"
-      },
-      {
-        "key": "C",
-        "text": "verlaagd verhoogd"
-      },
-      {
-        "key": "D",
-        "text": "verlaagd verlaagd"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw24t1-mcq-30.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q30-fallback.jpg",
-      "exam-snippets/question-vw24t1-30-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-34",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 34,
-    "points": 2,
-    "page": 17,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Fabio’s nicht Stella is in verwachting van een jongen.",
-    "q": "Hoe groot is de kans dat de baby het gemuteerde G6PD-allel erft?\n0",
-    "options": [
-      {
-        "key": "A",
-        "text": "1 16"
-      },
-      {
-        "key": "B",
-        "text": "1 8"
-      },
-      {
-        "key": "C",
-        "text": "1 4"
-      },
-      {
-        "key": "D",
-        "text": "1 2"
-      },
-      {
-        "key": "E",
-        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw24t1-mcq-34.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q34-fallback.jpg",
-      "exam-snippets/question-vw24t1-34-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-36",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 36,
-    "points": 1,
-    "page": 17,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Met name op plaatsen waar malaria heerst, blijkt het G6PD-allel een hoge\nfrequentie te hebben. Dat komt waarschijnlijk doordat rode bloedcellen die\neen kleinere hoeveelheid werkzaam G6PD hebben, minder gevoelig zijn\nvoor infectie door de malariaparasiet.",
-    "q": "Hoe kan de hogere frequentie van het gemuteerde G6PD-allel in\nmalariagebieden het best worden verklaard?",
-    "options": [
-      {
-        "key": "A",
-        "text": "door gene-flow"
-      },
-      {
-        "key": "B",
-        "text": "door het flessenhalseffect (bottleneckeffect)"
-      },
-      {
-        "key": "C",
-        "text": "door het stichtereffect (foundereffect)"
-      },
-      {
-        "key": "D",
-        "text": "door migratie door natuurlijke selectie"
-      },
-      {
-        "key": "E",
-        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "E",
-    "image": "exam-snippets/complete-vw24t1-mcq-36.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q36-complete.jpg",
-      "exam-snippets/question-vw24t1-36-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-38",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 38,
-    "points": 2,
-    "page": 18,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "PFAS in groentetuintjes\nIn Nederland ontstond grote ophef toen PFAS (poly- en\nperfluoralkylstoffen) werden aangetroffen in afvalwater, oppervlaktewater\nen zelfs drinkwater. PFAS leveren namelijk risico’s op voor de\nvolksgezondheid en het milieu. Wetenschappers van het RIVM\n(Rijksinstituut voor Volksgezondheid en Milieu) onderzochten of PFAS via\nbesmette groentetuintjes terecht kunnen komen in voedsel voor mensen.\nPFAS zijn synthetische stoffen die\nafbeelding 1\nonder andere worden gebruikt voor de\nproductie van waterafstotende kleding\nen verpakkingsfolies. Een van deze\nstoffen is PFOA (perfluoroctaanzuur,\nafbeelding 1).\nOnderzoek bij proefdieren heeft aangetoond dat PFOA onder andere\nlever- en niertumoren kan veroorzaken. Ook tast de stof het\nimmuunsysteem aan. Het gebruik van PFOA is daarom nu verboden.\nPFOA wordt nauwelijks afgebroken of uitgescheiden door het lichaam van\nde mens. Voor PFOA is de grenswaarde een dagelijkse inname van\n0,63 ng/kg lichaamsgewicht per dag. Deze waarde is afgeleid van de\nwaarde van 750 ng/kg lichaamsgewicht per dag die uit onderzoek bij\nratten kwam.",
-    "q": "Waarom is deze waarde voor mensen lager dan voor ratten?",
-    "options": [
-      {
-        "key": "A",
-        "text": "Mensen behoren tot een ander trofisch niveau dan ratten."
-      },
-      {
-        "key": "B",
-        "text": "Mensen hebben relatief meer vetweefsel dan ratten."
-      },
-      {
-        "key": "C",
-        "text": "Mensen leven langer dan ratten."
-      },
-      {
-        "key": "D",
-        "text": "Mensen zijn groter dan ratten."
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw24t1-mcq-38.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q38-complete.jpg",
-      "exam-snippets/question-vw24t1-38-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t1-mcq-41",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "1",
-    "n": 41,
-    "points": 2,
-    "page": 19,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wordt een kankercel herkend aan MHC-I of aan MHC-II? En worden",
-    "q": "kankercellen gedood door fagocytose of door lysis?\nherkenning aan\ndoding door",
-    "options": [
-      {
-        "key": "A",
-        "text": "MHC-I fagocytose"
-      },
-      {
-        "key": "B",
-        "text": "MHC-I lysis"
-      },
-      {
-        "key": "C",
-        "text": "MHC-II fagocytose"
-      },
-      {
-        "key": "D",
-        "text": "MHC-II lysis"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw24t1-mcq-41.jpg",
-    "images": [
-      "exam-snippets/context-vw24t1-q41-fallback.jpg",
-      "exam-snippets/question-vw24t1-41-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-3",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 3,
-    "points": 1,
-    "page": 4,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In de eerste helft van de vorige eeuw werden tientallen przewalskipaarden\ngevangen om in dierentuinen te houden. Uiteindelijk hebben slechts\ntwaalf dieren zich daar succesvol voortgeplant. Alle nu levende\nprzewalskipaarden stammen af van deze dieren.\nDoor de enorme afname van het aantal przewalskipaarden is de\ngenenpool afgenomen.",
-    "q": "Wat is de naam voor de afname van de genenpool als gevolg van een\nenorme afname van de populatiegrootte?",
-    "options": [
-      {
-        "key": "A",
-        "text": "gene flow"
-      },
-      {
-        "key": "B",
-        "text": "het flessenhalseffect (bottleneckeffect)"
-      },
-      {
-        "key": "C",
-        "text": "het stichtereffect (foundereffect)"
-      },
-      {
-        "key": "D",
-        "text": "natuurlijke selectie"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw24t2-mcq-3.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q3-complete.jpg",
-      "exam-snippets/question-vw24t2-3-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-5",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 5,
-    "points": 2,
-    "page": 4,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De Nederlandse biologen Annette Groeneveld en Inge en Jan Bouman\nmaakten in 1977 een plan voor de herintroductie van przewalskipaarden\nin Mongolië. Zij haalden przewalskipaarden uit dierentuinen en bereidden\nde dieren in een natuurgebied in Flevoland voor op herintroductie. Tussen\n1992 en 2000 zijn 82 ‘Flevolandse’ przewalskipaarden uitgezet in de\nGobi-woestijn in Mongolië.\nDe tekst hieronder beschrijft het verblijf van de przewalskipaarden in het\nnatuurgebied in Flevoland. Op de plaatsen 1 en 2 ontbreekt een woord.\nDoor de przewalskipaarden te plaatsen in het natuurgebied in Flevoland,\nkonden de dieren wennen aan de omstandigheden in het wild. Omdat er\ngeen andere paarden voorkwamen in het gebied, was ...(1)... van de\nprezwalskipaarden nog niet bezet. Door de przewalskipaarden werd de\nsuccessie in het gebied ...(2)... .",
-    "q": "Wat moet worden ingevuld bij 1 en bij 2?\nbij 1\nbij 2",
-    "options": [
-      {
-        "key": "A",
-        "text": "de habitat versneld"
-      },
-      {
-        "key": "B",
-        "text": "de habitat vertraagd"
-      },
-      {
-        "key": "C",
-        "text": "de niche versneld"
-      },
-      {
-        "key": "D",
-        "text": "de niche vertraagd het ecosysteem versneld"
-      },
-      {
-        "key": "E",
-        "text": "het ecosysteem vertraagd"
-      },
-      {
-        "key": "F",
-        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw24t2-mcq-5.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q5-complete.jpg",
-      "exam-snippets/question-vw24t2-5-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-14",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 14,
-    "points": 1,
-    "page": 7,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Het samentrekken van spieren in de wand van de bronchiolen wordt\nveroorzaakt door activiteit in een deel van het zenuwstelsel.",
-    "q": "Welk deel van het zenuwstelsel laat de spieren in de wand van de\nbronchiolen samentrekken?",
-    "options": [
-      {
-        "key": "A",
-        "text": "het animaal zenuwstelsel"
-      },
-      {
-        "key": "B",
-        "text": "het orthosympatisch zenuwstelsel"
-      },
-      {
-        "key": "C",
-        "text": "het parasympatisch zenuwstelsel"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw24t2-mcq-14.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q14-fallback.jpg",
-      "exam-snippets/question-vw24t2-14-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-17",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 17,
-    "points": 2,
-    "page": 9,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wetenschappers onderzochten met behulp van een ecologisch model of\nO. communa ook in andere delen van Europa ingezet kan worden. Met\nhet model zijn de tolerantiecurven van ambrosia en van het bladhaantje\nberekend (afbeelding 4).\nafbeelding 4\nOver de tolerantiecurven worden de volgende uitspraken gedaan:\n1 De tolerantie van ambrosia voor de minimumtemperatuur in de\nkoudste maand is groter dan die van O. communa.\n2 De maximum-tolerantiewaarden voor de jaarlijkse hoeveelheid\nneerslag van ambrosia en van O. communa zijn gelijk.",
-    "q": "Welk van deze uitspraken is juist?",
-    "options": [
-      {
-        "key": "A",
-        "text": "geen van beide"
-      },
-      {
-        "key": "B",
-        "text": "alleen 1"
-      },
-      {
-        "key": "C",
-        "text": "alleen 2"
-      },
-      {
-        "key": "D",
-        "text": "zowel 1 als 2"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw24t2-mcq-17.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q17-complete.jpg",
-      "exam-snippets/question-vw24t2-17-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-29",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 29,
-    "points": 2,
-    "page": 15,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Slaap herstelt DNA\nAlle organismen met een zenuwstelsel blijken slaap nodig te hebben.\nIsraëlische wetenschappers toonden aan dat slaap een belangrijke rol\nspeelt bij het herstel van DNA-schade in neuronen.\nBij gewervelden wordt het slaap-waakritme geregeld door het peptide-\nhormoon melatonine. Melatonine wordt geproduceerd door de epifyse,\neen klier in de hersenen. De aanmaak doorloopt een 24 uurs-ritme én\nwordt beïnvloed door de hoeveelheid licht die door bepaalde receptoren in\nhet netvlies wordt opgevangen. Om in te kunnen slapen moet de\nmelatonineconcentratie boven een bepaalde drempelwaarde komen.",
-    "q": "Is de epifyse een endocriene of een exocriene klier? En wordt de\nmelatonineproductie door licht geremd of gestimuleerd?\nepifyse is\nmelatonineproductie wordt door licht",
-    "options": [
-      {
-        "key": "A",
-        "text": "endocrien geremd"
-      },
-      {
-        "key": "B",
-        "text": "endocrien gestimuleerd"
-      },
-      {
-        "key": "C",
-        "text": "exocrien geremd"
-      },
-      {
-        "key": "D",
-        "text": "exocrien gestimuleerd"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw24t2-mcq-29.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q29-complete.jpg",
-      "exam-snippets/question-vw24t2-29-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-31",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 31,
-    "points": 1,
-    "page": 15,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Doordat neuronen voornamelijk overdag actief zijn, lopen ze voornamelijk\noverdag DNA-schade op.\nDNA-schade wordt veelal veroorzaakt door zuurstofradicalen. Deze\nstoffen ontstaan bij processen waarbij zuurstof wordt gebruikt.",
-    "q": "Bij welk proces wordt zuurstof gebruikt?",
-    "options": [
-      {
-        "key": "A",
-        "text": "bij de citroenzuurcyclus"
-      },
-      {
-        "key": "B",
-        "text": "bij de glycolyse"
-      },
-      {
-        "key": "C",
-        "text": "bij de melkzuurgisting"
-      },
-      {
-        "key": "D",
-        "text": "bij de oxidatieve fosforylering"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw24t2-mcq-31.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q31-complete.jpg",
-      "exam-snippets/question-vw24t2-31-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-33",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 33,
-    "points": 2,
-    "page": 16,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een voorbeeld van DNA-schade is een dubbelstrengsbreuk (dsb). Bij een\ndsb zijn beide strengen van een DNA-molecuul gebroken. Bij de reparatie\nvan dsb’s kunnen soms inserties of deleties optreden.\nOver inserties en deleties worden de volgende uitspraken gedaan:\n1 Een insertie kan leiden tot een leesraamverschuiving.\n2 Een deletie kan leiden tot de synthese van een langer eiwit.",
-    "q": "Welke uitspraak is juist?",
-    "options": [
-      {
-        "key": "A",
-        "text": "geen van beide"
-      },
-      {
-        "key": "B",
-        "text": "alleen 1"
-      },
-      {
-        "key": "C",
-        "text": "alleen 2"
-      },
-      {
-        "key": "D",
-        "text": "zowel 1 als 2"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw24t2-mcq-33.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q33-complete.jpg",
-      "exam-snippets/question-vw24t2-33-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-35",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 35,
-    "points": 2,
-    "page": 17,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wordt het aantal plaatsen met γH2AX per kern weergegeven door lijn P of",
-    "q": "door lijn Q? En waarom?",
-    "options": [
-      {
-        "key": "A",
-        "text": "door lijn P, want dsb’s ontstaan vooral overdag"
-      },
-      {
-        "key": "B",
-        "text": "door lijn P, want dsb’s worden vooral overdag hersteld"
-      },
-      {
-        "key": "C",
-        "text": "door lijn Q, want dsb’s ontstaan vooral overdag"
-      },
-      {
-        "key": "D",
-        "text": "door lijn Q, want dsb’s worden vooral overdag hersteld"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw24t2-mcq-35.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q35-fallback.jpg",
-      "exam-snippets/question-vw24t2-35-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-36",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 36,
-    "points": 2,
-    "page": 18,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Om te bepalen hoe slaap en chromosoomdynamiek samenhangen, deden\nde onderzoekers een experiment waarbij een groep zebravis-larven\noverdag melatonine in een oplosmiddel toegediend kreeg. Een andere\ngroep zebravis-larven kreeg alleen het oplosmiddel toegediend (controle).\nAfbeelding 4 toont de slaapduur vlak voor en na toediening. Afbeelding 5\ntoont de chromosoomdynamiek drie uur na toediening.\nafbeelding 4\nafbeelding 5",
-    "q": "Welk model wordt ondersteund door de resultaten van het onderzoek?",
-    "options": [
-      {
-        "key": "A",
-        "text": "Bekijk optie A in de oorspronkelijke afbeelding"
-      },
-      {
-        "key": "B",
-        "text": "Bekijk optie B in de oorspronkelijke afbeelding"
-      },
-      {
-        "key": "C",
-        "text": "Bekijk optie C in de oorspronkelijke afbeelding"
-      },
-      {
-        "key": "D",
-        "text": "Bekijk optie D in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw24t2-mcq-36.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q36-complete.jpg",
-      "exam-snippets/question-vw24t2-36-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-39",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 39,
-    "points": 2,
-    "page": 20,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De afname van het gehalte chlorofyl b bij Engels raaigras heeft invloed op\nde fotosynthese.",
-    "q": "Welk effect heeft een afname in het gehalte chlorofyl b?",
-    "options": [
-      {
-        "key": "A",
-        "text": "Er worden minder elektronen aangeslagen bij licht met een golflengte van 450 nm."
-      },
-      {
-        "key": "B",
-        "text": "Er worden minder elektronen aangeslagen bij licht met een golflengte van 700 nm."
-      },
-      {
-        "key": "C",
-        "text": "Fotosysteem II draagt meer bij aan de NADPH-productie dan fotosysteem I."
-      },
-      {
-        "key": "D",
-        "text": "Fotosysteem II draagt meer bij aan de ATP-productie dan fotosysteem I."
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw24t2-mcq-39.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q39-fallback.jpg",
-      "exam-snippets/question-vw24t2-39-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw24t2-mcq-40",
-    "level": "Vwo",
-    "year": "2024",
-    "period": "2",
-    "n": 40,
-    "points": 1,
-    "page": 20,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In het onderzoek werden Engels raaigras en witte klaver gekweekt op\nbodems waarin de omstandigheden voor plantengroei optimaal zijn. Witte\nklaver behoort tot de vlinderbloemigen, die een symbiose kunnen\naangaan met knolletjes-bacteriën. In de natuurlijke situatie beïnvloedt de\nsymbiose het succes van witte klaver.",
-    "q": "Op welk type bodem hebben witte-klaverplanten door symbiose met\nknolletjesbacteriën het grootste voordeel ten opzichte van\nniet-vlinderbloemigen?",
-    "options": [
-      {
-        "key": "A",
-        "text": "op fosfaatarme bodems"
-      },
-      {
-        "key": "B",
-        "text": "op fosfaatrijke bodems"
-      },
-      {
-        "key": "C",
-        "text": "op nitraatarme bodems"
-      },
-      {
-        "key": "D",
-        "text": "op nitraatrijke bodems"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw24t2-mcq-40.jpg",
-    "images": [
-      "exam-snippets/context-vw24t2-q40-complete.jpg",
-      "exam-snippets/question-vw24t2-40-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
-    "cv": "examens/vw-1018-a-24-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-3",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 3,
-    "points": 1,
-    "page": 3,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Na een beet van een giftige slang is het afbeelding 2\nheel belangrijk dat een antiserum wordt\ntoegediend. Voor het maken van zo’n\nantiserum worden slangen gemolken\n(afbeelding 2). Het verkregen gif wordt\nsterk verdund en vervolgens ingespoten\nbij ‘productiedieren’, bijvoorbeeld\npaarden of schapen. Bij die dieren komt\ndan een immuunreactie op gang,\nwaarna de antistoffen uit het\nbloedplasma geïsoleerd kunnen\nworden.",
-    "q": "Door welke afweercellen worden deze antistoffen geproduceerd?",
-    "options": [
-      {
-        "key": "A",
-        "text": "door macrofagen"
-      },
-      {
-        "key": "B",
-        "text": "door ‘natural killer’-cellen (NK-cellen)"
-      },
-      {
-        "key": "C",
-        "text": "door plasmacellen"
-      },
-      {
-        "key": "D",
-        "text": "door T-helpercellen"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw25t1-mcq-3.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q3-complete.jpg",
-      "exam-snippets/question-vw25t1-3-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-20",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 20,
-    "points": 2,
-    "page": 11,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Organismen die hoger in de voedselketen staan, bevatten relatief meer\n15N.",
-    "q": "Welk van de volgende processen kan dit verklaren?\nAminozuren met 14N worden relatief …",
-    "options": [
-      {
-        "key": "A",
-        "text": "vaker afgebroken."
-      },
-      {
-        "key": "B",
-        "text": "vaker omgezet in andere aminozuren."
-      },
-      {
-        "key": "C",
-        "text": "minder vaak uitgescheiden."
-      },
-      {
-        "key": "D",
-        "text": "minder vaak gevormd bij de stikstofassimilatie."
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw25t1-mcq-20.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q20-fallback.jpg",
-      "exam-snippets/question-vw25t1-20-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-27",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 27,
-    "points": 2,
-    "page": 14,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Maria brak eens haar enkel bij een val. Ze voelde wel een steek, maar ze\nhad er verder geen last van. Alleen vanwege de zwelling bezocht ze haar\nhuisarts.",
-    "q": "Hoeveel tijd zit er bij mensen met een normale pijnbeleving minimaal\ntussen het begin van de stekende pijn van een enkelbreuk, en het begin\nvan de zeurende pijn erna? Ga uit van een lengte van de sensorische\nuitlopers van 1,0 meter.",
-    "options": [
-      {
-        "key": "A",
-        "text": "ongeveer 0,3 seconden"
-      },
-      {
-        "key": "B",
-        "text": "ongeveer 0,5 seconden"
-      },
-      {
-        "key": "C",
-        "text": "ongeveer 1,8 seconden"
-      },
-      {
-        "key": "D",
-        "text": "ongeveer 2,0 seconden"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw25t1-mcq-27.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q27-complete.jpg",
-      "exam-snippets/question-vw25t1-27-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-30",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 30,
-    "points": 2,
-    "page": 15,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In tabel 2 is de aminozuurvolgorde van het ZFHX2-eiwit rondom de\nMarsili-mutatie bij de mens en bij verschillende diersoorten weergegeven.\ntabel 2\nmens met Marsili-mutatie\nQVWFQNTRAREKKGQFRSTP\nmens zonder de mutatie\nQVWFQNTRARERKGQFRSTP\nchimpansee\nQVWFQNTRARERKGQFRSTP\nhond\nQVWFQNTRARERKGQFRSTP\nhuismuis\nQVWFQNTRARERKGQFRSTP\nDe Marsili-mutatie bevindt zich in een deel van het gen waarin normaal\ngeen genetische variatie aanwezig is.\nBeredeneer waardoor dit deel van het ZFHX2-gen in de loop van de\nevolutie hetzelfde is gebleven.\nHet onderzoeksteam concludeerde na onderzoek aan huismuizen waarbij\nde Marsili-mutatie was aangebracht, dat de puntmutatie inderdaad het\nafwijkende fenotype veroorzaakt.",
-    "q": "Welke puntmutatie is bij de huismuizen aangebracht in de coderende\nstreng van het ZFHX2-gen?",
-    "options": [
-      {
-        "key": "A",
-        "text": "C → A"
-      },
-      {
-        "key": "B",
-        "text": "C → T"
-      },
-      {
-        "key": "C",
-        "text": "G → A"
-      },
-      {
-        "key": "D",
-        "text": "G → T"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw25t1-mcq-30.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q30-complete.jpg",
-      "exam-snippets/question-vw25t1-30-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-31",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 31,
-    "points": 2,
-    "page": 16,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "John Wood heeft meer families opgespoord waarin een afwijkende\npijnbeleving voorkomt. Hij vond families met leden die bij de geringste\nwarmte extreme pijn ervaren; deze aandoening heet IEM (inherited\nerythromelalgia). Ook vond hij families met leden die juist helemaal geen\npijn ervaren; deze aandoening wordt CIP genoemd (congenital\ninsensitivity to pain).\nBeide aandoeningen worden veroorzaakt door een puntmutatie in het\nSCN9A-gen dat codeert voor een bepaald type Na+-kanaaltje dat\naanwezig is in C-sensorische neuronen. Toen bekend was hoe een\nmutatie de pijn bij IEM veroorzaakt, kon naar een stof gezocht worden die\nhet Na+-kanaaltje zo beïnvloedt dat het CIP-fenotype wordt nagebootst.\nBij leden van één van de hierboven beschreven families openen de\nNa+-kanaaltjes in de C-sensorische neuronen zich bij een kleinere stijging\nvan de membraanpotentiaal dan normaal.",
-    "q": "Is de drempelpotentiaal van deze Na+-kanaaltjes hoger of lager dan\nnormaal? En hebben deze personen de aandoening CIP of IEM?\ndrempelpotentiaal\naandoening",
-    "options": [
-      {
-        "key": "A",
-        "text": "hoger CIP"
-      },
-      {
-        "key": "B",
-        "text": "hoger IEM"
-      },
-      {
-        "key": "C",
-        "text": "lager CIP"
-      },
-      {
-        "key": "D",
-        "text": "lager IEM"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw25t1-mcq-31.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q31-complete.jpg",
-      "exam-snippets/question-vw25t1-31-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-32",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 32,
-    "points": 2,
-    "page": 16,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Als een mutatie tot gevolg heeft dat een eiwit niet meer goed functioneert,\nheet dit functieverlies, zoals bij CIP. Er is sprake van functiewinst als door\neen mutatie een eiwit zodanig verandert dat het een nieuwe of versterkte\nwerking heeft, zoals bij IEM. Bij heterozygote genotypen wordt het type\novererving van deze mutaties duidelijk.",
-    "q": "Erft een functieverlies-mutatie gewoonlijk dominant of recessief over? En\neen functiewinst-mutatie?\nfunctieverlies-mutatie\nfunctiewinst-mutatie",
-    "options": [
-      {
-        "key": "A",
-        "text": "dominant dominant"
-      },
-      {
-        "key": "B",
-        "text": "dominant recessief"
-      },
-      {
-        "key": "C",
-        "text": "recessief dominant"
-      },
-      {
-        "key": "D",
-        "text": "recessief recessief"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw25t1-mcq-32.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q32-complete.jpg",
-      "exam-snippets/question-vw25t1-32-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-33",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 33,
-    "points": 1,
-    "page": 16,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een stof die Na+-kanaaltjes in C-sensorische neuronen blokkeert, zou een\npijnstillend medicijn zijn voor mensen met IEM en voor mensen met\nandere vormen van chronische pijn. Het is relatief eenvoudig om een stof\nte ontwerpen die de porie van het Na+-kanaaltje blokkeert. Het probleem\nis echter dat deze porie gelijk is aan de poriën van andere typen\nNa+-kanaaltjes, zoals de Na+-kanaaltjes in het hart.",
-    "q": "Welke aandoening zou dan door deze stof veroorzaakt kunnen worden?",
-    "options": [
-      {
-        "key": "A",
-        "text": "een hartinfarct"
-      },
-      {
-        "key": "B",
-        "text": "een hartritmestoornis"
-      },
-      {
-        "key": "C",
-        "text": "een lekkende hartklep"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw25t1-mcq-33.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q33-complete.jpg",
-      "exam-snippets/question-vw25t1-33-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t1-mcq-40",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "1",
-    "n": 40,
-    "points": 2,
-    "page": 19,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De personeelsleden met de histamine-intoxicatie kregen clemastine-\ntabletten. Clemastine blokkeert de H1-receptoren. In de tabel staan\nenkele farmacologische eigenschappen van dit medicijn.\nmaximale werking\nbinnen 5 tot 7 uur na inname\nwerkingsduur\ntot 12 uur na inname\nresorptie\nvolledig\ntijdsduur tot maximale\n2 tot 4 uur na inname\nconcentratie in het bloed\nopname uit de darmen\nvanaf 30 minuten na inname\nafbraak\nin sterke mate in de lever",
-    "q": "Is anderhalf uur na inname de clemastine-concentratie in de leverader\nhoger of lager dan die in de poortader? En is de clemastine-concentratie\nin de leverslagader dan hoger of lager dan die in de poortader?\nin leverader\nin leverslagader",
-    "options": [
-      {
-        "key": "A",
-        "text": "hoger hoger"
-      },
-      {
-        "key": "B",
-        "text": "hoger lager"
-      },
-      {
-        "key": "C",
-        "text": "lager hoger"
-      },
-      {
-        "key": "D",
-        "text": "lager lager"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw25t1-mcq-40.jpg",
-    "images": [
-      "exam-snippets/context-vw25t1-q40-complete.jpg",
-      "exam-snippets/question-vw25t1-40-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-1-o.pdf",
-    "cv": "examens/vw-1018-a-25-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-11",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 11,
-    "points": 1,
-    "page": 6,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Om jakobskruiskruid op een duurzame manier te bestrijden, zou een\nvraatinsect kunnen worden ingezet dat zich gespecialiseerd heeft op\njakobskruiskruid. Voorbeelden hiervan zijn de zebrarups (de geel-zwarte\nlarve van de sint-jakobsvlinder Tyria jacobaeae, afbeelding 3), die\nalgemeen in Nederland voorkomt, en de jakobskruid-aardvlo (Longitarsus\njacobaeae, afbeelding 4), die voorkomt in duingebieden in het westen van\nNederland.\nafbeelding 3\nafbeelding 4\nBeide soorten zijn ongevoelig voor PA’s. Ze slaan PA’s op in hun lichaam,\nwaardoor ze beschermd zijn tegen natuurlijke vijanden.\nDe sint-jakobsvlinder is zodanig aangepast dat hij als rups alleen nog leeft\nop jakobskruiskruid.",
-    "q": "Van welk biologisch begrip is dit een voorbeeld?",
-    "options": [
-      {
-        "key": "A",
-        "text": "van co-evolutie"
-      },
-      {
-        "key": "B",
-        "text": "van convergentie"
-      },
-      {
-        "key": "C",
-        "text": "van het bottleneck effect"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw25t2-mcq-11.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q11-complete.jpg",
-      "exam-snippets/question-vw25t2-11-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-12",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 12,
-    "points": 2,
-    "page": 6,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Door de inzet van deze specialistische vraatinsecten verandert de\nconcurrentie tussen planten.",
-    "q": "Welke planten zijn dan in het voordeel? En wat zal dan vervolgens het\neffect zijn op het aantal niet-specialistische vraatinsecten?\nvoordeel voor\nhet aantal niet-specialistische\nplanten met\nvraatinsecten",
-    "options": [
-      {
-        "key": "A",
-        "text": "een hoge PA-productie neemt af"
-      },
-      {
-        "key": "B",
-        "text": "een hoge PA-productie neemt toe"
-      },
-      {
-        "key": "C",
-        "text": "een lage PA-productie neemt af"
-      },
-      {
-        "key": "D",
-        "text": "een lage PA-productie neemt toe"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw25t2-mcq-12.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q12-fallback.jpg",
-      "exam-snippets/question-vw25t2-12-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-17",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 17,
-    "points": 1,
-    "page": 8,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De wetenschappers stelden de volgende hypothese op: de ovulatie-\nfrequentie bepaalt het aantal chromosomale afwijkingen in eicellen.\nZij toetsten dit bij drie groepen vrouwtjesmuizen:\n1 muizen die voortdurend zwanger waren, doordat er mannetjes\naanwezig waren\n2 muizen waarbij de ovulaties onderdrukt werden met een hormoon-\nimplantaat\n3 muizen waarbij de puberteit geblokkeerd werd met behulp van een\ncrispr-cas-behandeling\nDe muizen in groep 2 kregen een implantaat met een hormoon dat\novulaties onderdrukt.",
-    "q": "Welk hormoon is in het implantaat aanwezig?",
-    "options": [
-      {
-        "key": "A",
-        "text": "FSH"
-      },
-      {
-        "key": "B",
-        "text": "LH"
-      },
-      {
-        "key": "C",
-        "text": "progesteron"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw25t2-mcq-17.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q17-complete.jpg",
-      "exam-snippets/question-vw25t2-17-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-19",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 19,
-    "points": 2,
-    "page": 9,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Om een groep van 30 homozygote Gpr54-knock-out muizen\n(Gpr54– Gpr54–) te verkrijgen werd de volgende werkwijze gevolgd:\nstap 1\nUit enkele (wildtype) vrouwtjesmuizen werden bevruchte\neicellen weggenomen.\nstap 2\nDe bevruchte eicellen kregen de crispr-behandeling.\nHeterozygote bevruchte eicellen (Gpr54+Gpr54–) werden\nstap 3\ningebracht bij draagmoedermuizen.\nstap 4\nToen de nakomelingen die hieruit ontstonden (F1) volwassen\nwaren, werden ze onderling gekruist. Hieruit ontstond een F2.",
-    "q": "Hoeveel nakomelingen (F2) werden naar verwachting geboren totdat er in\ntotaal 30 muizen waren die volledig Gpr54-knock-out waren?",
-    "options": [
-      {
-        "key": "A",
-        "text": "30"
-      },
-      {
-        "key": "B",
-        "text": "40"
-      },
-      {
-        "key": "C",
-        "text": "60"
-      },
-      {
-        "key": "D",
-        "text": "90 120"
-      },
-      {
-        "key": "E",
-        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "E",
-    "image": "exam-snippets/complete-vw25t2-mcq-19.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q19-complete.jpg",
-      "exam-snippets/question-vw25t2-19-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-22",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 22,
-    "points": 2,
-    "page": 10,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De onderzoeksresultaten wijzen erop dat een verminderd aantal ovulaties\nbij de muizenmoeder het aantal chromosomale afwijkingen in de eicellen\nvermindert. Als dit bij mensen ook geldt, zou dat voor vrouwen die op\nlatere leeftijd kinderen willen, een reden kunnen zijn om hun ovulaties te\nonderdrukken.\nHieronder zijn drie vrouwen van 38 jaar beschreven.\n\nAzra, gebruikt sinds haar puberteit een anticonceptiepil.\n\nBernadien, heeft zes kinderen gekregen en gebruikte nooit een\nanticonceptiepil.\n\nClaire, heeft een verstopping van de eileiders, is voor het eerst\nzwanger na een ivf-behandeling en gebruikte nooit een\nanticonceptiepil.",
-    "q": "Welke vrouw zal de meeste ovulaties gehad hebben? En welke vrouw de\nminste?\nmeeste ovulaties\nminste ovulaties",
-    "options": [
-      {
-        "key": "A",
-        "text": "Azra Bernadien"
-      },
-      {
-        "key": "B",
-        "text": "Azra Claire"
-      },
-      {
-        "key": "C",
-        "text": "Bernadien Azra"
-      },
-      {
-        "key": "D",
-        "text": "Bernadien Claire Claire Azra"
-      },
-      {
-        "key": "E",
-        "text": "Claire Bernadien"
-      },
-      {
-        "key": "F",
-        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "E",
-    "image": "exam-snippets/complete-vw25t2-mcq-22.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q22-complete.jpg",
-      "exam-snippets/question-vw25t2-22-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-25",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 25,
-    "points": 2,
-    "page": 12,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In de lichaamscellen wordt T4 door een enzym omgezet in T3. Genen die\ngevoelig zijn voor regulatie door T3 bevatten een korte sequentie: het\nT3-responsief element (TRE). T3 bindt aan een receptor-co-repressor-\ncomplex dat is gebonden aan het TRE, waardoor de vorm van dit complex\nverandert en de repressor loslaat. Daarna wordt, door binding van een\nactivator, het co-activator-complex gevormd, waarna de genexpressie\nbegint (afbeelding 2). De binding van T3 aan het TRE verandert ook de\nmethylering en acetylering van de door T3 gereguleerde genen.\nafbeelding 2",
-    "q": "Welk effect heeft methylering van histonstaarten op de genen die gevoelig\nzijn voor regulatie door T3?",
-    "options": [
-      {
-        "key": "A",
-        "text": "remming replicatie"
-      },
-      {
-        "key": "B",
-        "text": "remming transcriptie"
-      },
-      {
-        "key": "C",
-        "text": "stimulering replicatie"
-      },
-      {
-        "key": "D",
-        "text": "stimulering transcriptie"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw25t2-mcq-25.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q25-complete.jpg",
-      "exam-snippets/question-vw25t2-25-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-27",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 27,
-    "points": 2,
-    "page": 13,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De huisarts vertelt Ellen dat ze tijdens haar zwangerschap vaker haar T4-\nconcentratie zal controleren. Door de veranderingen in haar lichaam als\ngevolg van de zwangerschap zal Ellen steeds minder medicijnen hoeven\nslikken. De hoeveelheid ‘verstorende’ IgG in het bloed van Ellen zal\nafnemen doordat de vouwing van de nieuw gevormde IgG-eiwitten\nverandert als gevolg van de zwangerschap. Zodra Ellen bevallen is, zullen\nde symptomen van de ziekte van Graves terugkomen en zal Ellen wel\nweer de hogere dosis medicijnen moeten gebruiken.",
-    "q": "In welk organel ontstaat de secundaire en tertiaire structuur van IgG-\neiwitten? En welk organel regelt het transport van IgG-eiwitten naar buiten\nde cel?\nvouwing",
-    "options": [
-      {
-        "key": "A",
-        "text": "endoplasmatisch reticulum"
-      },
-      {
-        "key": "B",
-        "text": "endoplasmatisch reticulum"
-      },
-      {
-        "key": "C",
-        "text": "golgi-systeem"
-      },
-      {
-        "key": "D",
-        "text": "golgi-systeem"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw25t2-mcq-27.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q27-complete.jpg",
-      "exam-snippets/question-vw25t2-27-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-40",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 40,
-    "points": 2,
-    "page": 19,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De verdwerging van grote zoogdieren op een gekoloniseerd eiland is\nmede te verklaren met de eilandtheorie van McArthur en Wilson. Een\nkleiner aantal soorten op een eiland maakt de kans groter dat predatoren\nafwezig zijn. Grote zoogdiersoorten kunnen dan verdwergen.",
-    "q": "Op welk type eiland zal het aantal soorten het kleinst zijn volgens de\neilandtheorie van McArthur en Wilson?\nafmeting\nnabijheid vasteland",
-    "options": [
-      {
-        "key": "A",
-        "text": "groot dichtbij"
-      },
-      {
-        "key": "B",
-        "text": "groot veraf"
-      },
-      {
-        "key": "C",
-        "text": "klein dichtbij"
-      },
-      {
-        "key": "D",
-        "text": "klein veraf"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw25t2-mcq-40.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q40-complete.jpg",
-      "exam-snippets/question-vw25t2-40-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw25t2-mcq-42",
-    "level": "Vwo",
-    "year": "2025",
-    "period": "2",
-    "n": 42,
-    "points": 1,
-    "page": 20,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Met behulp van de DNA-gegevens werd een schatting gemaakt van de\nperiode waarin de verdwerging plaatsvond. De gevonden fossielen van de\npuntali-olifant worden als het eindstadium van het verdwergingsproces\nbeschouwd. De ouderdom van deze fossielen ligt tussen 175.500 en\n50.000 jaar. Zie afbeelding 3.\nafbeelding 3\nDe onderzoekers schrijven dat de hoogst mogelijke snelheid van\nverdwerging 41,5 mm per generatie was.\nMet de gegevens in afbeelding 3 is de laagst mogelijke snelheid van\nverdwerging per generatie te berekenen. Ga uit van een generatietijd van\n31 jaar.",
-    "q": "Wat is deze laagst mogelijke snelheid van verdwerging?",
-    "options": [
-      {
-        "key": "A",
-        "text": "0,0049 mm per generatie"
-      },
-      {
-        "key": "B",
-        "text": "0,0093 mm per generatie"
-      },
-      {
-        "key": "C",
-        "text": "0,15 mm per generatie"
-      },
-      {
-        "key": "D",
-        "text": "0,29 mm per generatie"
-      }
-    ],
-    "correct": "C",
-    "image": "exam-snippets/complete-vw25t2-mcq-42.jpg",
-    "images": [
-      "exam-snippets/context-vw25t2-q42-complete.jpg",
-      "exam-snippets/question-vw25t2-42-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-25-2-o.pdf",
-    "cv": "examens/vw-1018-a-25-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-2",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 2,
-    "points": 2,
-    "page": 2,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Bloedplaatjes ontstaan in het rode beenmerg. Bij de differentiatie van\nmegakaryoblasten ontstaan grote cellen die uiteindelijk uiteenvallen in\nkleine blaasjes zonder celkern: de bloedplaatjes. De rijping van de\nmegakaryoblasten wordt gestimuleerd door het signaaleiwit TPO. Een\nterugkoppelingsmechanisme met het aantal bloedplaatjes zorgt ervoor dat\nin een gezonde situatie de concentratie bloedplaatjes in het bloed stabiel\nblijft.",
-    "q": "Neemt door een toename van het aantal bloedplaatjes de TPO-\nconcentratie af of toe? En is deze regulatie van de concentratie\nbloedplaatjes een voorbeeld van negatieve terugkoppeling of van\npositieve terugkoppeling?\nTPO-concentratie\nterugkoppeling",
-    "options": [
-      {
-        "key": "A",
-        "text": "neemt af negatief"
-      },
-      {
-        "key": "B",
-        "text": "neemt af positief"
-      },
-      {
-        "key": "C",
-        "text": "neemt toe negatief"
-      },
-      {
-        "key": "D",
-        "text": "neemt toe positief"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw26t1-mcq-2.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q2-complete.jpg",
-      "exam-snippets/question-vw26t1-2-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-3",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 3,
-    "points": 2,
-    "page": 3,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Om de trombocytopenie bij Rosie vast te stellen, is het aantal\nbloedplaatjes in het bloed bepaald. Door toevoeging van een kleurstof\naan een microscopisch preparaat van bloed, worden bloedplaatjes\nzichtbaar als donkere vlekken.\nIn de afbeelding zijn een microscopisch preparaat van normaal bloed en\neen microscopisch preparaat van het bloed van Rosie weergegeven.\nnormaal bloed\nbloed Rosie",
-    "q": "Hoeveel bloedplaatjes zijn ongeveer aanwezig in een mm3 bloed van\nRosie? Gebruik je informatieboek.",
-    "options": [
-      {
-        "key": "A",
-        "text": "3"
-      },
-      {
-        "key": "B",
-        "text": "30"
-      },
-      {
-        "key": "C",
-        "text": "300"
-      },
-      {
-        "key": "D",
-        "text": "3.000 30.000"
-      },
-      {
-        "key": "E",
-        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
-      }
-    ],
-    "correct": "E",
-    "image": "exam-snippets/complete-vw26t1-mcq-3.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q3-complete.jpg",
-      "exam-snippets/question-vw26t1-3-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-5",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 5,
-    "points": 1,
-    "page": 4,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Nadat andere oorzaken werden uitgesloten, vermoedden de artsen dat bij\nRosie sprake was van een afweerreactie tegen de antigenen op haar\nbloedplaatjes. Deze antigenen worden HPA’s (human platelet antigens)\ngenoemd.\nElk bloedplaatje heeft een aantal verschillende HPA’s. Van de genen die\ncoderen voor deze HPA’s, komen alle aanwezige allelen tot expressie.\nIn tabel 1 zie je gegevens van twee van deze genen.\ntabel 1\ngen\nHPA1-gen\nHPA5-gen",
-    "q": "Waarvan is sprake bij het HPA1-gen en het HPA5-gen op basis van de\ninformatie?",
-    "options": [
-      {
-        "key": "A",
-        "text": "van co-dominante overerving"
-      },
-      {
-        "key": "B",
-        "text": "van gekoppelde overerving"
-      },
-      {
-        "key": "C",
-        "text": "van intermediaire overerving"
-      },
-      {
-        "key": "D",
-        "text": "van multipele allelen"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw26t1-mcq-5.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q5-complete.jpg",
-      "exam-snippets/question-vw26t1-5-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-9",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 9,
-    "points": 2,
-    "page": 5,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Om het tekort aan bloedplaatjes op te vangen, kreeg Rosie een infuus\nmet bloedplaatjes. Omdat nog niet bekend was welke antistoffen bij Rosie\naanwezig waren, werd gekozen voor bloedplaatjes zonder HPA-1a. De\nkans is namelijk het grootst dat de trombocytopenie wordt veroorzaakt\ndoor antistoffen tegen HPA-1a.",
-    "q": "Hoeveel procent van de Noordwest-Europese populatie heeft bloedplaatjes\nzonder HPA-1a? Neem aan dat de wet van Hardy-Weinberg geldt.",
-    "options": [
-      {
-        "key": "A",
-        "text": "2,6%"
-      },
-      {
-        "key": "B",
-        "text": "4,0%"
-      },
-      {
-        "key": "C",
-        "text": "16%"
-      },
-      {
-        "key": "D",
-        "text": "27%"
-      },
-      {
-        "key": "E",
-        "text": "71%"
-      },
-      {
-        "key": "F",
-        "text": "84%"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw26t1-mcq-9.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q9-table.jpg",
-      "exam-snippets/mcq-vw26t1-mcq-9.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-10",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 10,
-    "points": 2,
-    "page": 5,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Uit het bloedonderzoek bleek dat Rosies bloed antistoffen bevat tegen\nHPA-1a en tegen HPA-5b. Ook werd haar genotype en dat van haar\nouders bepaald. Rosie bleek een ander genotype voor HPA-1 en HPA-5\nte hebben dan haar moeder. Daaruit concludeerden de artsen dat de\ntrombocytopenie bij Rosie werd veroorzaakt door antistoffen die ze van\nhaar moeder had gekregen tijdens de zwangerschap.\nDe afweerreactie die door de antistoffen wordt veroorzaakt in het lichaam\nvan Rosie wordt allo-immuniteit genoemd.",
-    "q": "Is de allo-immuniteit bij Rosie een vorm van actieve immuniteit of van\npassieve immuniteit? En welk type antistof tegen HPA-1a en HPA-5b\nwordt bij haar aangetroffen?\nimmuniteit\ntype antistof",
-    "options": [
-      {
-        "key": "A",
-        "text": "actief IgE"
-      },
-      {
-        "key": "B",
-        "text": "actief IgG"
-      },
-      {
-        "key": "C",
-        "text": "passief IgE"
-      },
-      {
-        "key": "D",
-        "text": "passief IgG"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw26t1-mcq-10.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q10-complete.jpg",
-      "exam-snippets/question-vw26t1-10-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-15",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 15,
-    "points": 1,
-    "page": 7,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Bij de gemodificeerde E. coli is methaanzuur de donor van elektronen\nvoor het verloop van de calvincyclus.",
-    "q": "Wat is de elektronendonor bij foto-autotrofe organismen?",
-    "options": [
-      {
-        "key": "A",
-        "text": "licht"
-      },
-      {
-        "key": "B",
-        "text": "H2O"
-      },
-      {
-        "key": "C",
-        "text": "O2"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw26t1-mcq-15.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q15-fallback.jpg",
-      "exam-snippets/question-vw26t1-15-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-22",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 22,
-    "points": 2,
-    "page": 9,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Na een bijensteek kan de bloeddruk zo ver dalen dat er geen polsslag te\nvoelen is. In de ambulance werden Berts hartslag en bloeddruk gemeten.\nZijn bloeddruk was heel laag.",
-    "q": "Welke verandering in de slagader van de pols is normaal voelbaar als de\npolsslag? En welke druk heerst op dat moment in die slagader?\npolsslag voelbaar door",
-    "options": [
-      {
-        "key": "A",
-        "text": "samentrekken van de slagaderwand; diastolische druk"
-      },
-      {
-        "key": "B",
-        "text": "samentrekken van de slagaderwand; systolische druk"
-      },
-      {
-        "key": "C",
-        "text": "uitrekken van de slagaderwand; diastolische druk"
-      },
-      {
-        "key": "D",
-        "text": "uitrekken van de slagaderwand; systolische druk"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw26t1-mcq-22.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q22-complete.jpg",
-      "exam-snippets/question-vw26t1-22-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-25",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 25,
-    "points": 1,
-    "page": 11,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De onderstaande afbeelding toont hoe na binding van mellitine het signaal\nwordt doorgegeven zodat de calciumkanaaltjes opengaan.\nDe stoffen P en Q in de afbeelding vervullen een bepaalde functie in de\nsignaaloverdracht.",
-    "q": "Wat is de biologische term voor stoffen met deze functie?",
-    "options": [
-      {
-        "key": "A",
-        "text": "enhancers"
-      },
-      {
-        "key": "B",
-        "text": "cascades"
-      },
-      {
-        "key": "C",
-        "text": "receptoren"
-      },
-      {
-        "key": "D",
-        "text": "second messengers"
-      }
-    ],
-    "correct": "D",
-    "image": "exam-snippets/complete-vw26t1-mcq-25.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q25-complete.jpg",
-      "exam-snippets/question-vw26t1-25-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t1-mcq-26",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "1",
-    "n": 26,
-    "points": 2,
-    "page": 11,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De diffusie van Ca2+ door de calciumkanaaltjes leidt tot een verandering\nvan de membraanpotentiaal.",
-    "q": "Welke verandering van de membraanpotentiaal kan leiden tot een impuls?\nEn is dit het gevolg van een Ca2+-instroom of van een Ca2+-uitstroom?\nkan leiden tot impuls\ngevolg van\nCa2+-instroom",
-    "options": [
-      {
-        "key": "A",
-        "text": "depolarisatie Ca2+-uitstroom"
-      },
-      {
-        "key": "B",
-        "text": "depolarisatie Ca2+-instroom"
-      },
-      {
-        "key": "C",
-        "text": "hyperpolarisatie Ca2+-uitstroom"
-      },
-      {
-        "key": "D",
-        "text": "hyperpolarisatie"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw26t1-mcq-26.jpg",
-    "images": [
-      "exam-snippets/context-vw26t1-q26-fallback.jpg",
-      "exam-snippets/question-vw26t1-26-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-1-o.pdf",
-    "cv": "examens/vw-1018-a-26-1-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t2-mcq-3",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "2",
-    "n": 3,
-    "points": 1,
-    "page": 3,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Voor de aanmaak van de nepetalactonen heeft kattenkruid verschillende\nenzymen. Afbeelding 3 geeft de laatste stappen weer van de aanmaak\nvan nepetalactonen met de daarbij betrokken enzymen ISY en NEPS.\nafbeelding 3\nBij de omzetting die door ISY wordt gekatalyseerd, is NADPH de\nelektronendonor.",
-    "q": "Bij welk stofwisselingsproces in de plant wordt NADPH geproduceerd?",
-    "options": [
-      {
-        "key": "A",
-        "text": "bij de donkerreactie"
-      },
-      {
-        "key": "B",
-        "text": "bij de lichtreactie"
-      },
-      {
-        "key": "C",
-        "text": "bij de citroenzuurcyclus"
-      },
-      {
-        "key": "D",
-        "text": "bij de glycolyse"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw26t2-mcq-3.jpg",
-    "images": [
-      "exam-snippets/context-vw26t2-q3-complete.jpg",
-      "exam-snippets/question-vw26t2-3-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-2-o.pdf",
-    "cv": "examens/vw-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t2-mcq-5",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "2",
-    "n": 5,
-    "points": 2,
-    "page": 5,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De verdubbeling die rond 20 miljoen jaar geleden optrad in de P5βR-locus\nis een ...(1)... .\nDe verplaatsing die rond 8 miljoen jaar geleden optrad in de NEPS-locus\nis een ...(2)... .",
-    "q": "Wat moet worden ingevuld bij 1 en bij 2?\nbij 1\nbij 2",
-    "options": [
-      {
-        "key": "A",
-        "text": "chromosoommutatie insertie"
-      },
-      {
-        "key": "B",
-        "text": "chromosoommutatie leesraamverschuiving"
-      },
-      {
-        "key": "C",
-        "text": "genoommutatie insertie"
-      },
-      {
-        "key": "D",
-        "text": "genoommutatie leesraamverschuiving"
-      }
-    ],
-    "correct": "A",
-    "image": "exam-snippets/complete-vw26t2-mcq-5.jpg",
-    "images": [
-      "exam-snippets/context-vw26t2-q5-complete.jpg",
-      "exam-snippets/question-vw26t2-5-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-2-o.pdf",
-    "cv": "examens/vw-1018-a-26-2-c.pdf",
-    "questionType": "mcq"
-  },
-  {
-    "id": "vw26t2-mcq-16",
-    "level": "Vwo",
-    "year": "2026",
-    "period": "2",
-    "n": 16,
-    "points": 1,
-    "page": 9,
-    "theme": "Meerkeuzevragen",
-    "concept": "Meerkeuze",
-    "end": "Nog te rubriceren",
-    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In de levende cellen van de opperhuid is provitamine D3 aanwezig. Onder\ninvloed van uv-straling wordt deze stof omgezet in vitamine D3.",
-    "q": "In welke laag van de huid (afbeelding 1) wordt het meeste vitamine D3\ngeproduceerd?",
-    "options": [
-      {
-        "key": "A",
-        "text": "in laag P"
-      },
-      {
-        "key": "B",
-        "text": "in laag Q"
-      },
-      {
-        "key": "C",
-        "text": "in laag R"
-      }
-    ],
-    "correct": "B",
-    "image": "exam-snippets/complete-vw26t2-mcq-16.jpg",
-    "images": [
-      "exam-snippets/context-vw26t2-q16-fallback.jpg",
-      "exam-snippets/question-vw26t2-16-only.jpg"
-    ],
-    "pdf": "examens/vw-1018-a-26-2-o.pdf",
-    "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -5713,6 +5549,86 @@
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha26t2-mcq-26",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 26,
+    "points": 1,
+    "page": 12,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Michael leest op een forum dat vegan eten beter is voor je nieren. Een\nvegan dieet bevat vaak meer kalium en minder natrium. Dit heeft een\nbloeddrukverlagend effect. Een hoge bloeddruk is een van de oorzaken\nvan nierproblemen.",
+    "q": "In welk deel van de nieren is de bloeddruk het hoogst?",
+    "options": [
+      {
+        "key": "A",
+        "text": "in de glomerulus"
+      },
+      {
+        "key": "B",
+        "text": "in de haarvaten rond het eerste gekronkelde buisje"
+      },
+      {
+        "key": "C",
+        "text": "in de haarvaten rond het tweede gekronkelde buisje witte bonen rundvlees 9,73 26,29 28 61 percentage van de aanwezige aminozuren 12,7 9,4 16,0 15,1 8,0 7,8 6,9 8,3"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-ha26t2-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q26-complete.jpg",
+      "exam-snippets/question-ha26t2-26-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha26t2-mcq-27",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 27,
+    "points": 2,
+    "page": 13,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Veganisten kunnen ook een tekort krijgen aan vitamine B12. De meeste\nveganisten gebruiken voedingssupplementen met vitamine B12. Michael\nwil weten of die voedingssupplementen wel echt veganistisch zijn.\nOp internet leest hij:\nVitamine B12 in supplementen wordt gemaakt door bacteriën in een\nlaboratorium. Hiervoor worden vaak bacteriestammen gebruikt waarin\ngenetische veranderingen zijn opgewekt door blootstelling aan straling of\nchemicaliën. Soms ontstaat daardoor bij één bacterie toevallig een kleine\ngenetische verandering in een gen waardoor die bacterie meer B12 gaat\nproduceren. Na selectie wordt deze mutante bacterie vermenigvuldigd tot\ngrote aantallen.",
+    "q": "Is de mutatie een genoommutatie of een puntmutatie? En is er bij de\nselectie van de mutante bacterie sprake van kunstmatige of natuurlijke\nselectie?\ntype mutatie\nvorm van selectie",
+    "options": [
+      {
+        "key": "A",
+        "text": "genoommutatie kunstmatige selectie"
+      },
+      {
+        "key": "B",
+        "text": "genoommutatie natuurlijke selectie"
+      },
+      {
+        "key": "C",
+        "text": "puntmutatie kunstmatige selectie"
+      },
+      {
+        "key": "D",
+        "text": "puntmutatie natuurlijke selectie"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-ha26t2-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q27-complete.jpg",
+      "exam-snippets/question-ha26t2-27-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -5843,6 +5759,90 @@
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha26t2-mcq-43",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 43,
+    "points": 2,
+    "page": 19,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Een paard maakt geen enzymen aan voor de vertering van fructaan. De\nfructaanmoleculen kunnen wel worden omgezet tot monosachariden door\nbacteriën in de dikke darm. Hierbij komen gassen vrij die zich ophopen en\ndaardoor darmproblemen veroorzaken.",
+    "q": "Welk gas komt vrij bij de bacteriële omzetting van fructaan? En gebeurt dit\nonder aerobe of anaerobe omstandigheden?\ngevormd gas",
+    "options": [
+      {
+        "key": "A",
+        "text": "ammoniak (NH3)"
+      },
+      {
+        "key": "B",
+        "text": "ammoniak (NH3)"
+      },
+      {
+        "key": "C",
+        "text": "methaan (CH4)"
+      },
+      {
+        "key": "D",
+        "text": "methaan (CH4)"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-ha26t2-mcq-43.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q43-complete.jpg",
+      "exam-snippets/question-ha26t2-43-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha26t2-mcq-46",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 46,
+    "points": 2,
+    "page": 20,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Koen kiest een mengsel van de volgende grassen:\nNederlandse naam\nLatijnse naam\nEngels raaigras\nLolium perenne\nrood zwenkgras\nFestuca rubra\nstraatgras\nPoa annua\ntimotheegras\nPhleum pratense\nveldbeemdgras\nPoa pratensis",
+    "q": "Hoeveel verschillende geslachten (genera) bevat het mengsel? En\nhoeveel verschillende soorten?\naantal geslachten\naantal soorten",
+    "options": [
+      {
+        "key": "A",
+        "text": "4 4"
+      },
+      {
+        "key": "B",
+        "text": "4 5"
+      },
+      {
+        "key": "C",
+        "text": "5 4"
+      },
+      {
+        "key": "D",
+        "text": "5 5"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-ha26t2-mcq-46.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q46-complete.jpg",
+      "exam-snippets/question-ha26t2-46-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
   }
 ]
