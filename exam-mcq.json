@@ -109,6 +109,12 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha25t1-mcq-14.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q14-p6-1.jpg",
+      "exam-snippets/context-ha25t1-q14-p7-2.jpg",
+      "exam-snippets/context-ha25t1-q14-p7-3.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-14.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -147,6 +153,13 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha25t1-mcq-15.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q15-p6-1.jpg",
+      "exam-snippets/context-ha25t1-q15-p7-2.jpg",
+      "exam-snippets/context-ha25t1-q15-p7-3.jpg",
+      "exam-snippets/context-ha25t1-q15-p7-4.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-15.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -185,6 +198,14 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha25t1-mcq-16.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q16-p6-1.jpg",
+      "exam-snippets/context-ha25t1-q16-p7-2.jpg",
+      "exam-snippets/context-ha25t1-q16-p7-3.jpg",
+      "exam-snippets/context-ha25t1-q16-p7-4.jpg",
+      "exam-snippets/context-ha25t1-q16-p8-5.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-16.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -227,6 +248,15 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha25t1-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q17-p6-1.jpg",
+      "exam-snippets/context-ha25t1-q17-p7-2.jpg",
+      "exam-snippets/context-ha25t1-q17-p7-3.jpg",
+      "exam-snippets/context-ha25t1-q17-p7-4.jpg",
+      "exam-snippets/context-ha25t1-q17-p8-5.jpg",
+      "exam-snippets/context-ha25t1-q17-p8-6.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-17.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -299,6 +329,10 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha25t1-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q27-p12-1.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-27.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -333,6 +367,11 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha25t1-mcq-28.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q28-p12-1.jpg",
+      "exam-snippets/context-ha25t1-q28-p12-2.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-28.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -375,6 +414,14 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha25t1-mcq-31.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q31-p12-1.jpg",
+      "exam-snippets/context-ha25t1-q31-p12-2.jpg",
+      "exam-snippets/context-ha25t1-q31-p13-3.jpg",
+      "exam-snippets/context-ha25t1-q31-p13-4.jpg",
+      "exam-snippets/context-ha25t1-q31-p13-5.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-31.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -409,6 +456,11 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha25t1-mcq-37.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q37-p15-1.jpg",
+      "exam-snippets/context-ha25t1-q37-p16-2.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-37.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -443,6 +495,13 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha25t1-mcq-39.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q39-p15-1.jpg",
+      "exam-snippets/context-ha25t1-q39-p16-2.jpg",
+      "exam-snippets/context-ha25t1-q39-p16-3.jpg",
+      "exam-snippets/context-ha25t1-q39-p17-4.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-39.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -481,6 +540,15 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha25t1-mcq-41.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q41-p15-1.jpg",
+      "exam-snippets/context-ha25t1-q41-p16-2.jpg",
+      "exam-snippets/context-ha25t1-q41-p16-3.jpg",
+      "exam-snippets/context-ha25t1-q41-p17-4.jpg",
+      "exam-snippets/context-ha25t1-q41-p17-5.jpg",
+      "exam-snippets/context-ha25t1-q41-p17-6.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-41.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -515,6 +583,17 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha25t1-mcq-43.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q43-p15-1.jpg",
+      "exam-snippets/context-ha25t1-q43-p16-2.jpg",
+      "exam-snippets/context-ha25t1-q43-p16-3.jpg",
+      "exam-snippets/context-ha25t1-q43-p17-4.jpg",
+      "exam-snippets/context-ha25t1-q43-p17-5.jpg",
+      "exam-snippets/context-ha25t1-q43-p17-6.jpg",
+      "exam-snippets/context-ha25t1-q43-p18-7.jpg",
+      "exam-snippets/context-ha25t1-q43-p18-8.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-43.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -595,6 +674,11 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha25t1-mcq-46.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q46-p19-1.jpg",
+      "exam-snippets/context-ha25t1-q46-p19-2.jpg",
+      "exam-snippets/mcq-ha25t1-mcq-46.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
     "cv": "examens/ha-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -671,6 +755,11 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw25t1-mcq-20.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q20-p10-1.jpg",
+      "exam-snippets/context-vw25t1-q20-p11-2.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-20.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -709,6 +798,10 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw25t1-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q27-p14-1.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-27.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -747,6 +840,10 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t1-mcq-30.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q30-p15-1.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-30.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -785,6 +882,11 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw25t1-mcq-31.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q31-p15-1.jpg",
+      "exam-snippets/context-vw25t1-q31-p15-2.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-31.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -823,6 +925,12 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t1-mcq-32.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q32-p15-1.jpg",
+      "exam-snippets/context-vw25t1-q32-p15-2.jpg",
+      "exam-snippets/context-vw25t1-q32-p16-3.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-32.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -857,6 +965,13 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw25t1-mcq-33.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q33-p15-1.jpg",
+      "exam-snippets/context-vw25t1-q33-p15-2.jpg",
+      "exam-snippets/context-vw25t1-q33-p16-3.jpg",
+      "exam-snippets/context-vw25t1-q33-p16-4.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-33.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -891,6 +1006,13 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw25t1-mcq-38.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q38-p17-1.jpg",
+      "exam-snippets/context-vw25t1-q38-p17-2.jpg",
+      "exam-snippets/context-vw25t1-q38-p18-3.jpg",
+      "exam-snippets/context-vw25t1-q38-p18-4.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-38.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -929,6 +1051,15 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw25t1-mcq-40.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q40-p17-1.jpg",
+      "exam-snippets/context-vw25t1-q40-p17-2.jpg",
+      "exam-snippets/context-vw25t1-q40-p18-3.jpg",
+      "exam-snippets/context-vw25t1-q40-p18-4.jpg",
+      "exam-snippets/context-vw25t1-q40-p19-5.jpg",
+      "exam-snippets/context-vw25t1-q40-p19-6.jpg",
+      "exam-snippets/mcq-vw25t1-mcq-40.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
     "cv": "examens/vw-1018-a-25-1-c.pdf",
     "questionType": "mcq"
@@ -1047,6 +1178,14 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha25t2-mcq-22.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q22-p8-1.jpg",
+      "exam-snippets/context-ha25t2-q22-p9-2.jpg",
+      "exam-snippets/context-ha25t2-q22-p9-3.jpg",
+      "exam-snippets/context-ha25t2-q22-p9-4.jpg",
+      "exam-snippets/context-ha25t2-q22-p9-5.jpg",
+      "exam-snippets/mcq-ha25t2-mcq-22.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1093,6 +1232,15 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha25t2-mcq-23.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q23-p8-1.jpg",
+      "exam-snippets/context-ha25t2-q23-p9-2.jpg",
+      "exam-snippets/context-ha25t2-q23-p9-3.jpg",
+      "exam-snippets/context-ha25t2-q23-p9-4.jpg",
+      "exam-snippets/context-ha25t2-q23-p9-5.jpg",
+      "exam-snippets/context-ha25t2-q23-p9-6.jpg",
+      "exam-snippets/mcq-ha25t2-mcq-23.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1139,6 +1287,16 @@
     ],
     "correct": "F",
     "image": "exam-snippets/mcq-ha25t2-mcq-24.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q24-p8-1.jpg",
+      "exam-snippets/context-ha25t2-q24-p9-2.jpg",
+      "exam-snippets/context-ha25t2-q24-p9-3.jpg",
+      "exam-snippets/context-ha25t2-q24-p9-4.jpg",
+      "exam-snippets/context-ha25t2-q24-p9-5.jpg",
+      "exam-snippets/context-ha25t2-q24-p9-6.jpg",
+      "exam-snippets/context-ha25t2-q24-p10-7.jpg",
+      "exam-snippets/mcq-ha25t2-mcq-24.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1177,6 +1335,10 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha25t2-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q26-p11-1.jpg",
+      "exam-snippets/mcq-ha25t2-mcq-26.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1215,6 +1377,10 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha25t2-mcq-43.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q43-p18-1.jpg",
+      "exam-snippets/mcq-ha25t2-mcq-43.jpg"
+    ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1249,6 +1415,14 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw25t2-mcq-11.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q11-p4-1.jpg",
+      "exam-snippets/context-vw25t2-q11-p5-2.jpg",
+      "exam-snippets/context-vw25t2-q11-p5-3.jpg",
+      "exam-snippets/context-vw25t2-q11-p5-4.jpg",
+      "exam-snippets/context-vw25t2-q11-p5-5.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-11.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1287,6 +1461,15 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw25t2-mcq-12.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q12-p4-1.jpg",
+      "exam-snippets/context-vw25t2-q12-p5-2.jpg",
+      "exam-snippets/context-vw25t2-q12-p5-3.jpg",
+      "exam-snippets/context-vw25t2-q12-p5-4.jpg",
+      "exam-snippets/context-vw25t2-q12-p5-5.jpg",
+      "exam-snippets/context-vw25t2-q12-p6-6.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-12.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1321,6 +1504,11 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t2-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q17-p7-1.jpg",
+      "exam-snippets/context-vw25t2-q17-p8-2.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-17.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1409,6 +1597,11 @@
     ],
     "correct": "E",
     "image": "exam-snippets/mcq-vw25t2-mcq-22.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q22-p9-1.jpg",
+      "exam-snippets/context-vw25t2-q22-p9-2.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-22.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1447,6 +1640,10 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw25t2-mcq-25.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q25-p11-1.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-25.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1485,6 +1682,12 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw25t2-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q27-p11-1.jpg",
+      "exam-snippets/context-vw25t2-q27-p12-2.jpg",
+      "exam-snippets/context-vw25t2-q27-p12-3.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-27.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1523,6 +1726,11 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw25t2-mcq-40.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q40-p18-1.jpg",
+      "exam-snippets/context-vw25t2-q40-p18-2.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-40.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1561,6 +1769,13 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw25t2-mcq-42.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q42-p18-1.jpg",
+      "exam-snippets/context-vw25t2-q42-p18-2.jpg",
+      "exam-snippets/context-vw25t2-q42-p19-3.jpg",
+      "exam-snippets/context-vw25t2-q42-p19-4.jpg",
+      "exam-snippets/mcq-vw25t2-mcq-42.jpg"
+    ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
     "questionType": "mcq"
@@ -1599,6 +1814,12 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha26t1-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q3-p2-1.jpg",
+      "exam-snippets/context-ha26t1-q3-p3-2.jpg",
+      "exam-snippets/context-ha26t1-q3-p3-3.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-3.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1637,6 +1858,14 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha26t1-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q5-p2-1.jpg",
+      "exam-snippets/context-ha26t1-q5-p3-2.jpg",
+      "exam-snippets/context-ha26t1-q5-p3-3.jpg",
+      "exam-snippets/context-ha26t1-q5-p4-4.jpg",
+      "exam-snippets/context-ha26t1-q5-p4-5.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-5.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1675,6 +1904,15 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha26t1-mcq-6.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q6-p2-1.jpg",
+      "exam-snippets/context-ha26t1-q6-p3-2.jpg",
+      "exam-snippets/context-ha26t1-q6-p3-3.jpg",
+      "exam-snippets/context-ha26t1-q6-p4-4.jpg",
+      "exam-snippets/context-ha26t1-q6-p4-5.jpg",
+      "exam-snippets/context-ha26t1-q6-p4-6.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-6.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1713,6 +1951,12 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t1-mcq-11.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q11-p5-1.jpg",
+      "exam-snippets/context-ha26t1-q11-p5-2.jpg",
+      "exam-snippets/context-ha26t1-q11-p5-3.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-11.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1751,6 +1995,14 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha26t1-mcq-13.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q13-p5-1.jpg",
+      "exam-snippets/context-ha26t1-q13-p5-2.jpg",
+      "exam-snippets/context-ha26t1-q13-p5-3.jpg",
+      "exam-snippets/context-ha26t1-q13-p6-4.jpg",
+      "exam-snippets/context-ha26t1-q13-p7-5.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-13.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1789,6 +2041,10 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t1-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q17-p9-1.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-17.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1831,6 +2087,11 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t1-mcq-18.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q18-p9-1.jpg",
+      "exam-snippets/context-ha26t1-q18-p9-2.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-18.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1869,6 +2130,12 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha26t1-mcq-19.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q19-p9-1.jpg",
+      "exam-snippets/context-ha26t1-q19-p9-2.jpg",
+      "exam-snippets/context-ha26t1-q19-p10-3.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-19.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1907,6 +2174,10 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha26t1-mcq-23.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q23-p11-1.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-23.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1945,6 +2216,13 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha26t1-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q26-p11-1.jpg",
+      "exam-snippets/context-ha26t1-q26-p11-2.jpg",
+      "exam-snippets/context-ha26t1-q26-p12-3.jpg",
+      "exam-snippets/context-ha26t1-q26-p12-4.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-26.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -1983,6 +2261,11 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t1-mcq-32.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q32-p14-1.jpg",
+      "exam-snippets/context-ha26t1-q32-p15-2.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-32.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2051,6 +2334,11 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha26t1-mcq-35.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q35-p16-1.jpg",
+      "exam-snippets/context-ha26t1-q35-p16-2.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-35.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2089,6 +2377,13 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha26t1-mcq-40.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q40-p18-1.jpg",
+      "exam-snippets/context-ha26t1-q40-p19-2.jpg",
+      "exam-snippets/context-ha26t1-q40-p19-3.jpg",
+      "exam-snippets/context-ha26t1-q40-p19-4.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-40.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2131,6 +2426,14 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha26t1-mcq-42.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q42-p18-1.jpg",
+      "exam-snippets/context-ha26t1-q42-p19-2.jpg",
+      "exam-snippets/context-ha26t1-q42-p19-3.jpg",
+      "exam-snippets/context-ha26t1-q42-p19-4.jpg",
+      "exam-snippets/context-ha26t1-q42-p20-5.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-42.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2165,6 +2468,14 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t1-mcq-43.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q43-p18-1.jpg",
+      "exam-snippets/context-ha26t1-q43-p19-2.jpg",
+      "exam-snippets/context-ha26t1-q43-p19-3.jpg",
+      "exam-snippets/context-ha26t1-q43-p19-4.jpg",
+      "exam-snippets/context-ha26t1-q43-p20-5.jpg",
+      "exam-snippets/mcq-ha26t1-mcq-43.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
     "cv": "examens/ha-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2203,6 +2514,10 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-2.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q2-p2-1.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-2.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2245,6 +2560,11 @@
     ],
     "correct": "E",
     "image": "exam-snippets/mcq-vw26t1-mcq-3.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q3-p2-1.jpg",
+      "exam-snippets/context-vw26t1-q3-p2-2.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-3.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2329,6 +2649,13 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-9.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q9-p4-1.jpg",
+      "exam-snippets/context-vw26t1-q9-p4-2.jpg",
+      "exam-snippets/context-vw26t1-q9-p4-3.jpg",
+      "exam-snippets/context-vw26t1-q9-p5-4.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-9.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2367,6 +2694,14 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw26t1-mcq-10.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q10-p4-1.jpg",
+      "exam-snippets/context-vw26t1-q10-p4-2.jpg",
+      "exam-snippets/context-vw26t1-q10-p4-3.jpg",
+      "exam-snippets/context-vw26t1-q10-p5-4.jpg",
+      "exam-snippets/context-vw26t1-q10-p5-5.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-10.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2401,6 +2736,12 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw26t1-mcq-15.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q15-p6-1.jpg",
+      "exam-snippets/context-vw26t1-q15-p6-2.jpg",
+      "exam-snippets/context-vw26t1-q15-p7-3.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-15.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2439,6 +2780,11 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw26t1-mcq-22.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q22-p9-1.jpg",
+      "exam-snippets/context-vw26t1-q22-p9-2.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-22.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2477,6 +2823,11 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-vw26t1-mcq-25.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q25-p10-1.jpg",
+      "exam-snippets/context-vw26t1-q25-p10-2.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-25.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2515,6 +2866,12 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-vw26t1-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q26-p10-1.jpg",
+      "exam-snippets/context-vw26t1-q26-p10-2.jpg",
+      "exam-snippets/context-vw26t1-q26-p11-3.jpg",
+      "exam-snippets/mcq-vw26t1-mcq-26.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
     "cv": "examens/vw-1018-a-26-1-c.pdf",
     "questionType": "mcq"
@@ -2591,6 +2948,10 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-ha26t2-mcq-2.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q2-p2-1.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-2.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2671,6 +3032,10 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha26t2-mcq-5.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q5-p3-1.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-5.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2705,6 +3070,12 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t2-mcq-7.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q7-p3-1.jpg",
+      "exam-snippets/context-ha26t2-q7-p3-2.jpg",
+      "exam-snippets/context-ha26t2-q7-p4-3.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-7.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2747,6 +3118,13 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha26t2-mcq-8.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q8-p3-1.jpg",
+      "exam-snippets/context-ha26t2-q8-p3-2.jpg",
+      "exam-snippets/context-ha26t2-q8-p4-3.jpg",
+      "exam-snippets/context-ha26t2-q8-p4-4.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-8.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2781,6 +3159,10 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t2-mcq-10.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q10-p5-1.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-10.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2827,6 +3209,10 @@
     ],
     "correct": "E",
     "image": "exam-snippets/mcq-ha26t2-mcq-18.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q18-p8-1.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-18.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2861,6 +3247,11 @@
     ],
     "correct": "A",
     "image": "exam-snippets/mcq-ha26t2-mcq-26.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q26-p12-1.jpg",
+      "exam-snippets/context-ha26t2-q26-p12-2.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-26.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2899,6 +3290,12 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-ha26t2-mcq-27.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q27-p12-1.jpg",
+      "exam-snippets/context-ha26t2-q27-p12-2.jpg",
+      "exam-snippets/context-ha26t2-q27-p12-3.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-27.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -2937,6 +3334,10 @@
     ],
     "correct": "D",
     "image": "exam-snippets/mcq-ha26t2-mcq-43.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q43-p18-1.jpg",
+      "exam-snippets/mcq-ha26t2-mcq-43.jpg"
+    ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
     "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3085,6 +3486,10 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw26t2-mcq-16.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q16-p9-1.jpg",
+      "exam-snippets/mcq-vw26t2-mcq-16.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3123,6 +3528,12 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw26t2-mcq-21.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q21-p10-1.jpg",
+      "exam-snippets/context-vw26t2-q21-p11-2.jpg",
+      "exam-snippets/context-vw26t2-q21-p11-3.jpg",
+      "exam-snippets/mcq-vw26t2-mcq-21.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3165,6 +3576,11 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw26t2-mcq-25.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q25-p13-1.jpg",
+      "exam-snippets/context-vw26t2-q25-p13-2.jpg",
+      "exam-snippets/mcq-vw26t2-mcq-25.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3245,6 +3661,10 @@
     ],
     "correct": "C",
     "image": "exam-snippets/mcq-vw26t2-mcq-34.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q34-p17-1.jpg",
+      "exam-snippets/mcq-vw26t2-mcq-34.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
@@ -3283,6 +3703,13 @@
     ],
     "correct": "B",
     "image": "exam-snippets/mcq-vw26t2-mcq-37.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q37-p17-1.jpg",
+      "exam-snippets/context-vw26t2-q37-p17-2.jpg",
+      "exam-snippets/context-vw26t2-q37-p18-3.jpg",
+      "exam-snippets/context-vw26t2-q37-p18-4.jpg",
+      "exam-snippets/mcq-vw26t2-mcq-37.jpg"
+    ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
     "questionType": "mcq"
