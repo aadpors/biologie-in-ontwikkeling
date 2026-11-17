@@ -50,8 +50,7 @@ def main():
                     and record.get("year") == "2024" and record.get("period") == "2" and record.get("n") == 11)
             ):
                 record["image"] = image_path
-                record["images"] = [image_path]
-        print(f"Volledige bronuitsnede hersteld: {question_id}")
+                        print(f"Volledige bronuitsnede hersteld: {question_id}")
 
     # Havo 2026-II q12: include the complete sea-grass photograph, caption and prompt.
     page = get_page("ha-1018-a-26-2-o.pdf", 5)
