@@ -1048,6 +1048,8 @@ if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
         "questionType": "mcq",
     })
 
+all_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
+
 missing = [q["id"] for q in all_questions if not q["correct"]]
 print(f"Totaal: {len(all_questions)} meerkeuzevragen; zonder automatisch gevonden antwoord: {len(missing)}")
 if missing:
