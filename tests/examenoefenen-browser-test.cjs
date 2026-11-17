@@ -47,18 +47,21 @@ const assert = require("node:assert/strict");
       };
     });
     assert.equal(topicAudit.total, 519, "De volledige vragenset moet zijn meegenomen in de onderwerpaudit");
-    assert.deepEqual(topicAudit.unclassified, ["vw26t2-open-39"], "Alleen de vraag zonder geëxtraheerde context mag zonder automatisch onderwerp blijven");
+    assert.deepEqual(topicAudit.unclassified, [], "Alle 519 vragen moeten een passende onderwerpclassificatie hebben");
     assert.deepEqual(topicAudit.overTagged, [], "Er zijn vragen met meer dan drie onderwerpstags; controleer op overmatige rubricering");
 
     // Context words must not create unrelated subjects on two known edge cases.
     const edgeTopicAudit = await page.evaluate(() => ({
       beetle: onderwerpenVanVraag(questions.find(q => q.id === "ha24t2-3")),
-      vitamin: onderwerpenVanVraag(questions.find(q => q.id === "vw26t2-mcq-17"))
+      vitamin: onderwerpenVanVraag(questions.find(q => q.id === "vw26t2-mcq-17")),
+      flamingo: onderwerpenVanVraag(questions.find(q => q.id === "vw26t2-open-39"))
     }));
     assert.deepEqual(edgeTopicAudit.beetle, ["Ecologie: kringlopen"],
       "Havo 2024 tijdvak 2 vraag 3 mag geen onterechte labels voor eutrofiëring, planten of uitscheiding krijgen");
     assert.deepEqual(edgeTopicAudit.vitamin, ["Hart en bloedsomloop"],
       "Vwo 2026 tijdvak 2 vraag 17 toetst de bloedroute, niet huid, uitscheiding of vertering");
+    assert.deepEqual(edgeTopicAudit.flamingo, ["Ecologie"],
+      "Vwo 2026 tijdvak 2 vraag 39 gaat over populatiegroei en draagkracht");
 
     // Previous/next and question dots move through the filtered sequence.
     const firstHeading = await page.locator(".qhead").innerText();
