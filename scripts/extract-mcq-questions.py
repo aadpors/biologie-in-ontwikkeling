@@ -94,44 +94,45 @@ def footer_boundary(page, lines):
     return max(1, min(hits, default=page.rect.height - 18) - 3)
 
 
-def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, scale=1.8):
-    """Render each distinct preceding context paragraph separately."""
+def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8):
+    """Render one complete, full-width context crop, preserving figures and tables."""
     ordered = sorted({i for i in indices if 0 <= i < len(lines) and lines[i]["bbox"][1] < question_top},
                      key=lambda i: (round(lines[i]["bbox"][1], 1), lines[i]["bbox"][0]))
     if not ordered:
         return []
-    groups, current = [], [ordered[0]]
-    previous_bottom = lines[ordered[0]]["bbox"][3]
-    for index in ordered[1:]:
-        line = lines[index]
-        if line["bbox"][1] - previous_bottom > 11:
-            groups.append(current)
-            current = [index]
-        else:
-            current.append(index)
-        previous_bottom = max(previous_bottom, line["bbox"][3])
-    groups.append(current)
-    paths = []
-    for part, group in enumerate(groups, 1):
-        top = max(0, min(lines[i]["bbox"][1] for i in group) - 5)
-        bottom = min(bottom_limit, max(lines[i]["bbox"][3] for i in group) + 5, question_top - 2)
-        # Only attach a compact raster figure to one paragraph. Large
-        # drawing rectangles are often the border/background of an entire
-        # shared-context box; extending every paragraph to that border would
-        # merge the introduction back into the question-specific passage.
-        nearby = [rect for info in page.get_images(full=True) for rect in page.get_image_rects(info[0])
-                  if rect.height <= 80 and rect.y1 >= top - 10 and rect.y0 <= bottom + 10]
-        if nearby:
-            top = max(0, min(top, min(r.y0 for r in nearby)))
-            bottom = min(bottom_limit, max(bottom, max(r.y1 for r in nearby)), question_top - 2)
-        if bottom <= top + 2:
-            continue
-        name = f"context-{prefix}-q{number}-part-{part}.jpg"
-        page.get_pixmap(matrix=fitz.Matrix(scale, scale),
-                        clip=fitz.Rect(0, top, page.rect.width, bottom), alpha=False).save(OUT / name)
-        paths.append(f"exam-snippets/{name}")
-    return paths
 
+    # Start at the first line belonging to this question's context. Include
+    # figures/drawings that overlap that context, but do not pull in artwork
+    # from earlier question blocks on the same page.
+    context_top = min(lines[i]["bbox"][1] for i in ordered)
+    visual_rects = [
+        rect for info in page.get_images(full=True)
+        for rect in page.get_image_rects(info[0])
+        if rect.y0 < question_top and rect.y1 > context_top
+    ]
+    visual_rects.extend(
+        drawing["rect"] for drawing in page.get_drawings()
+        if drawing["rect"].width > 8 and drawing["rect"].height > 8
+        and drawing["rect"].y0 < question_top and drawing["rect"].y1 > context_top
+    )
+    if visual_rects:
+        context_top = min(context_top, min(rect.y0 for rect in visual_rects))
+
+    context_top = max(0, context_top - 5)
+    context_bottom = min(bottom_limit, question_top - 2)
+    if context_bottom <= context_top + 2:
+        return []
+
+    name = f"context-{prefix}-q{number}-complete.jpg"
+    save_page_crop(
+        page,
+        fitz.Rect(0, context_top, page.rect.width, context_bottom),
+        OUT / name,
+        lines,
+        previous_ranges,
+        scale=scale,
+    )
+    return [f"exam-snippets/{name}"]
 
 def line_records(page):
     records = []
@@ -548,8 +549,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
                     if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
                         context_paths = context_image_fragments(
-                            page, lines, base_context_line_indices, prefix, marker["number"],
-                            question_top, footer_y,
+                            page, lines, context_line_indices, prefix, marker["number"],
+                            question_top, footer_y, previous_ranges,
                         )
                         question_name = f"question-{prefix}-{marker['number']}-only.jpg"
                         if question_y1 > question_top + 2:
@@ -676,8 +677,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     question_top = max(0, lines[start]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
                     context_paths = context_image_fragments(
-                        page, lines, base_context_line_indices, prefix,
-                        marker["number"], question_top, footer_y,
+                        page, lines, context_line_indices, prefix,
+                        marker["number"], question_top, footer_y, previous_ranges,
                     )
                     question_name = f"question-{prefix}-{marker['number']}-only.jpg"
                     if question_y1 > question_top + 2:
