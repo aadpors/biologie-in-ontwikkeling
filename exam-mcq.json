@@ -1931,6 +1931,7 @@
     "correct": "A",
     "image": "exam-snippets/complete-ha26t1-mcq-13.jpg",
     "images": [
+      "exam-snippets/context-ha26t1-q13-fallback.jpg",
       "exam-snippets/question-ha26t1-13-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -2304,6 +2305,7 @@
     "correct": "D",
     "image": "exam-snippets/complete-ha26t1-mcq-40.jpg",
     "images": [
+      "exam-snippets/context-ha26t1-q40-fallback.jpg",
       "exam-snippets/question-ha26t1-40-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -2349,6 +2351,7 @@
     "correct": "B",
     "image": "exam-snippets/complete-ha26t1-mcq-42.jpg",
     "images": [
+      "exam-snippets/context-ha26t1-q42-fallback.jpg",
       "exam-snippets/question-ha26t1-42-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
