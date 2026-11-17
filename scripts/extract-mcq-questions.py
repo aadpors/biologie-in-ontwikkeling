@@ -213,6 +213,7 @@ def answer_from_cv(cv_text, qnum):
     return ""
 
 def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
+    # Keep each card's crop local to its context and question; never include prior question text.
     exam_path, cv_path = ROOT / exam_rel, ROOT / cv_rel
     if not exam_path.exists() or not cv_path.exists():
         raise FileNotFoundError(f"Missing source file: {exam_path if not exam_path.exists() else cv_path}")
