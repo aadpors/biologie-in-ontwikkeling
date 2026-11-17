@@ -300,7 +300,7 @@ def line_records(page):
 def find_markers(lines, allow_multiline_number_first=False):
     markers = []
     prompt_starts = re.compile(
-        r"^(hieronder|wat|welk|welke|waar|wanneer|waarom|hoe|door|kruis|vul|teken|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welk|op welke|hoeveel|waardoor)",
+        r"^(hieronder|wat|welk|welke|waar|wanneer|waarom|hoe|door|stroomt|vindt|behoort|kruis|vul|teken|leg|verklaar|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|tot welke|in welk|op welk|op welke|hoeveel|waardoor)",
         re.I,
     )
     point_re = re.compile(r"^\s*(\d+)\s*p\s*$", re.I)
@@ -373,7 +373,7 @@ def find_markers(lines, allow_multiline_number_first=False):
             prompt = " ".join(prompt_lines).strip()
             has_question_prompt = any(prompt_starts.match(x) or (allow_multiline_number_first and re.match(r"^(?:bij\s+(?:welke|welk|wat|wie|hoe)|met\s+welk)", x, re.I)) or "?" in x for x in prompt_lines)
             same_baseline = abs(lines[j]["bbox"][1] - lines[i]["bbox"][1]) <= 8
-            if prompt and has_question_prompt and (same_baseline or (allow_multiline_number_first and len(prompt_lines) >= 2)):
+            if prompt and has_question_prompt:
                 markers.append({"line": i, "number_line": i, "points_line": j, "number": number, "points": int(pm.group(1))})
             break
 
@@ -841,7 +841,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     contexts.append(context_record)
 
                 false_positive_open_questions = {
-                    ("ha25t2", 30), ("ha25t2", 40), ("vw25t2", 14),
+                    ("vw25t2", 14),
                     ("vw26t1", 30), ("ha26t2", 40)
                 }
                 if (prefix, marker["number"]) in false_positive_open_questions:
