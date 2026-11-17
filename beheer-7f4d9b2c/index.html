@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Examenbeheer | Biologie in ontwikkeling</title>
+<style>
+:root{--wine:#741d3b;--teal:#168b8b;--ink:#24313b;--muted:#65737c;--line:#dce3e6;--paper:#f3f6f6;--white:#fff;--green:#24764d;--amber:#99600c;--red:#a42d42}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 Arial,sans-serif}
+header{background:linear-gradient(115deg,var(--wine),#552039);color:white;padding:25px max(20px,calc((100% - 1120px)/2))}
+header .eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#f2c9d5;font-weight:bold}
+header h1{margin:5px 0;font-size:clamp(27px,4vw,38px)}header p{margin:0;color:#f7eaf0}
+main{max-width:1120px;margin:25px auto;padding:0 18px 55px}
+.notice{border:1px solid #ead6a8;background:#fff8e9;color:#72500f;padding:13px 15px;border-radius:10px;margin-bottom:18px;font-size:13px}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px}
+.panel{background:white;border:1px solid var(--line);border-radius:12px;padding:19px;box-shadow:0 2px 8px #24313b08}
+h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
+.drop{border:2px dashed #aebfc3;border-radius:10px;background:#f8fbfb;padding:28px 18px;text-align:center;cursor:pointer;transition:.15s}
+.drop.over{border-color:var(--teal);background:#edf8f7}.drop strong{display:block;font-size:17px;margin:7px 0}.drop p{margin:4px 0;color:var(--muted);font-size:13px}
+.btn{border:0;border-radius:7px;padding:10px 14px;font-weight:bold;cursor:pointer;font-size:13px}.btn:disabled{opacity:.5;cursor:wait}.primary{background:var(--teal);color:white}.soft{background:#edf2f3;color:#34434c;border:1px solid var(--line)}.danger{background:#fff0f1;color:var(--red);border:1px solid #f0cbd1}
+.toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:13px}.toolbar .muted{font-size:12px}
+.file-list{margin:14px 0 0;padding:0;list-style:none}.file-list li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #edf0f1;font-size:13px}.file-list li:last-child{border:0}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:16px}.kpi{background:#f6f8f8;border:1px solid var(--line);border-radius:9px;padding:11px}.kpi b{display:block;font-size:22px;color:var(--wine)}.kpi span{font-size:11px;color:var(--muted)}
+.jobs{margin-top:18px}.jobs-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.jobs-head h2{margin:0}
+.job{background:white;border:1px solid var(--line);border-radius:10px;padding:14px 15px;margin:9px 0}.job-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.job-name{font-weight:bold;overflow-wrap:anywhere}.job-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.status{display:inline-block;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:bold;white-space:nowrap;background:#edf1f3;color:#46545c}.status.uploaded,.status.queued{background:#e6f3f1;color:#176c68}.status.processing{background:#fff3df;color:#85520b}.status.review_required{background:#fff0d8;color:#85520b}.status.ready{background:#e6f3e9;color:#23633d}.status.failed{background:#fdebed;color:#a42d42}
+.progress{height:6px;background:#edf1f2;border-radius:10px;overflow:hidden;margin:10px 0 6px}.progress i{display:block;height:100%;background:var(--teal);width:0}
+.job-message{font-size:12px;color:var(--muted)}.job-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.job-actions button{font-size:11px;padding:7px 9px}
+.empty{border:1px dashed #c7d1d4;border-radius:9px;padding:22px;text-align:center;color:var(--muted);font-size:13px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#24313b;color:white;padding:11px 16px;border-radius:8px;box-shadow:0 5px 20px #0003;display:none;max-width:90vw;z-index:9}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.job-top{display:block}.job-top .status{margin-top:8px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">Biologie in ontwikkeling · privébeheer</div><h1>Examenbeheer</h1><p>Upload examens, volg de verwerking en beoordeel straks alleen de twijfelgevallen.</p></header>
+<main>
+<div class="notice"><b>Voorlopige beheeromgeving.</b> De upload en veilige opslag zijn aangesloten. De automatische inhoudelijke analyse, beeldsamenstelling en visuele beoordelingsstappen worden hierna aangesloten. Er wordt nog niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
+<div class="grid">
+<section class="panel">
+<h2>Nieuwe examens toevoegen</h2>
+<div class="drop" id="drop" tabindex="0" role="button" aria-label="Selecteer PDF- of ZIP-bestanden">
+<div style="font-size:30px">⇧</div><strong>Sleep PDF's of een ZIP hierheen</strong><p>Of klik om bestanden te selecteren</p><p>Meerdere bestanden tegelijk · maximaal 500 MB per bestand</p>
+</div>
+<input id="files" type="file" accept=".pdf,.zip,application/pdf,application/zip,application/x-zip-compressed" multiple hidden>
+<ul class="file-list" id="file-list"></ul>
+<div class="toolbar"><button class="btn primary" id="upload" disabled>Upload geselecteerde bestanden</button><button class="btn soft" id="clear" disabled>Wissen</button><span class="muted" id="selection-note">Nog geen bestanden geselecteerd</span></div>
+</section>
+<section class="panel">
+<h2>Wat gebeurt er na upload?</h2>
+<div class="kpis"><div class="kpi"><b id="count-total">—</b><span>Uploads</span></div><div class="kpi"><b id="count-review">—</b><span>Controle nodig</span></div><div class="kpi"><b id="count-ready">—</b><span>Goedgekeurd</span></div></div>
+<ol style="padding-left:20px;margin:0;font-size:13px">
+<li style="margin:8px 0"><b>Inventariseren</b><br><span class="muted">Documenten herkennen en koppelen aan niveau, jaar en tijdvak.</span></li>
+<li style="margin:8px 0"><b>Vragen en contexten analyseren</b><br><span class="muted">Alle open en meerkeuzevragen, deelvragen en gedeelde contexten in kaart brengen.</span></li>
+<li style="margin:8px 0"><b>Afbeeldingen samenstellen</b><br><span class="muted">Originele PDF-fragmenten combineren tot één leesbare afbeelding per vraag.</span></li>
+<li style="margin:8px 0"><b>Visueel beoordelen</b><br><span class="muted">Twijfelgevallen met bronpagina, uitsnede en voorstel aan jou voorleggen.</span></li>
+<li style="margin:8px 0"><b>Publiceren</b><br><span class="muted">Uitsluitend na jouw akkoord.</span></li>
+</ol>
+</section>
+</div>
+<section class="jobs">
+<div class="jobs-head"><h2>Uploadgeschiedenis</h2><button class="btn soft" id="refresh">Vernieuwen</button></div>
+<div id="jobs-list"><div class="empty">Uploads worden geladen…</div></div>
+</section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(() => {
+  const URL = 'https://xhlkjruauimxrjyvqiac.supabase.co';
+  const KEY = 'sb_publishable_JMTRtNzb0FY30ukrmpvdRg_z2B9oRgt';
+  const BUCKET = 'exam-inbox';
+  const MAX_BYTES = 500 * 1024 * 1024;
+  const client = window.supabase.createClient(URL, KEY);
+  const $ = id => document.getElementById(id);
+  let selected = [];
+  let jobs = [];
+
+  function toast(message, error=false) {
+    const el=$('toast'); el.textContent=message; el.style.display='block';
+    el.style.background=error?'#8f263b':'#24313b';
+    clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.style.display='none',4200);
+  }
+  function formatBytes(bytes) {
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(0)+' KB';
+    return (bytes/1024/1024).toFixed(bytes<100*1024*1024?1:0)+' MB';
+  }
+  function safeName(name) { return name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g,'-').replace(/^-+|-+$/g,'').slice(-120) || 'upload'; }
+  function isAllowed(file) {
+    const ext=file.name.toLowerCase().split('.').pop();
+    return ['pdf','zip'].includes(ext) && file.size>0 && file.size<=MAX_BYTES;
+  }
+  function addFiles(files) {
+    const existing=new Set(selected.map(f=>f.name+'|'+f.size+'|'+f.lastModified));
+    for(const file of files) {
+      if(!isAllowed(file)){toast('Overgeslagen: '+file.name+' (alleen PDF/ZIP tot 500 MB).',true);continue;}
+      const key=file.name+'|'+file.size+'|'+file.lastModified;
+      if(!existing.has(key)){selected.push(file);existing.add(key);}
+    }
+    renderSelected();
+  }
+  function renderSelected() {
+    $('file-list').innerHTML=selected.map((f,i)=>'<li><span>'+escapeHtml(f.name)+'</span><span class="muted">'+formatBytes(f.size)+' · <button class="btn soft" data-remove="'+i+'" style="padding:2px 7px">×</button></span></li>').join('');
+    $('upload').disabled=!selected.length; $('clear').disabled=!selected.length;
+    $('selection-note').textContent=selected.length?selected.length+' bestand(en) geselecteerd':'Nog geen bestanden geselecteerd';
+    $('file-list').querySelectorAll('[data-remove]').forEach(b=>b.addEventListener('click',()=>{selected.splice(Number(b.dataset.remove),1);renderSelected();}));
+  }
+  function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function statusLabel(status){return ({uploaded:'Geüpload',queued:'In wachtrij',processing:'Wordt verwerkt',review_required:'Controle nodig',ready:'Goedgekeurd',failed:'Mislukt'})[status]||status;}
+  function renderJobs() {
+    $('count-total').textContent=jobs.length;
+    $('count-review').textContent=jobs.filter(j=>j.status==='review_required').length;
+    $('count-ready').textContent=jobs.filter(j=>j.status==='ready').length;
+    if(!jobs.length){$('jobs-list').innerHTML='<div class="empty">Nog geen examens geüpload. Voeg hierboven je eerste PDF of ZIP toe.</div>';return;}
+    $('jobs-list').innerHTML=jobs.map(j=>{
+      const date=new Date(j.created_at).toLocaleString('nl-NL',{dateStyle:'medium',timeStyle:'short'});
+      return '<article class="job"><div class="job-top"><div><div class="job-name">'+escapeHtml(j.original_filename)+'</div><div class="job-meta">'+date+' · '+formatBytes(j.file_size_bytes)+'</div></div><span class="status '+escapeHtml(j.status)+'">'+statusLabel(j.status)+'</span></div><div class="progress"><i style="width:'+Math.max(0,Math.min(100,j.progress||0))+'%"></i></div><div class="job-message"><b>'+escapeHtml(j.stage||'')+'</b>'+(j.message?' · '+escapeHtml(j.message):'')+'</div><div class="job-actions"><button class="btn soft" data-details="'+j.id+'">Details</button>'+(j.status==='failed'?'<button class="btn soft" data-retry="'+j.id+'">Opnieuw proberen</button>':'')+'<button class="btn danger" data-delete="'+j.id+'">Verwijderen</button></div><div id="events-'+j.id+'" hidden class="job-message" style="margin-top:10px"></div></article>';
+    }).join('');
+    $('jobs-list').querySelectorAll('[data-details]').forEach(b=>b.addEventListener('click',()=>toggleDetails(b.dataset.details)));
+    $('jobs-list').querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryJob(b.dataset.retry)));
+    $('jobs-list').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteJob(b.dataset.delete)));
+  }
+  async function loadJobs() {
+    const {data,error}=await client.from('exam_ingest_jobs').select('*').order('created_at',{ascending:false}).limit(50);
+    if(error){$('jobs-list').innerHTML='<div class="empty">Kon de uploadgeschiedenis niet laden: '+escapeHtml(error.message)+'</div>';return;}
+    jobs=data||[];renderJobs();
+  }
+  async function toggleDetails(id) {
+    const box=$('events-'+id); if(!box)return;
+    if(!box.hidden){box.hidden=true;return;}
+    box.hidden=false;box.textContent='Gebeurtenissen laden…';
+    const {data,error}=await client.from('exam_ingest_events').select('level,stage,message,created_at').eq('job_id',id).order('created_at',{ascending:true});
+    if(error){box.textContent='Details niet beschikbaar: '+error.message;return;}
+    box.innerHTML=(data||[]).length?(data||[]).map(e=>'<div style="padding:5px 0;border-top:1px solid #edf0f1"><b>'+escapeHtml(e.stage||e.level)+'</b> · '+escapeHtml(e.message)+' <span style="color:#8a969c">('+new Date(e.created_at).toLocaleString('nl-NL')+')</span></div>').join(''):'Nog geen aanvullende gebeurtenissen.';
+  }
+  async function logEvent(id,level,stage,message,details={}) {
+    const {error}=await client.from('exam_ingest_events').insert({job_id:id,level,stage,message,details});
+    if(error)console.warn('Event log mislukt',error.message);
+  }
+  async function uploadAll() {
+    const files=[...selected]; if(!files.length)return;
+    $('upload').disabled=true;$('clear').disabled=true;
+    let succeeded=0;
+    for(const file of files) {
+      $('selection-note').textContent='Uploaden: '+file.name;
+      const id=crypto.randomUUID();
+      const path=id+'/'+safeName(file.name);
+      const mime=file.type||(file.name.toLowerCase().endsWith('.pdf')?'application/pdf':'application/zip');
+      try {
+        const {error:uploadError}=await client.storage.from(BUCKET).upload(path,file,{contentType:mime,upsert:false,cacheControl:'3600'});
+        if(uploadError)throw uploadError;
+        const {error:rowError}=await client.from('exam_ingest_jobs').insert({
+          id,original_filename:file.name,storage_path:path,file_size_bytes:file.size,mime_type:mime,
+          status:'uploaded',stage:'Upload ontvangen',progress:0,
+          message:'Bestand staat in de beveiligde wachtruimte. Klaar voor analyse.'
+        });
+        if(rowError){await client.storage.from(BUCKET).remove([path]);throw rowError;}
+        await logEvent(id,'success','Upload','Bestand veilig ontvangen',{filename:file.name,size:file.size});
+        succeeded++;
+      } catch(error) {
+        console.error(error);toast('Upload mislukt voor '+file.name+': '+error.message,true);
+      }
+      await loadJobs();
+    }
+    selected=[];renderSelected();
+    $('selection-note').textContent=succeeded+' van '+files.length+' bestand(en) succesvol geüpload';
+    if(succeeded)toast(succeeded+' bestand(en) opgeslagen. Ze staan klaar voor verwerking.');
+    $('upload').disabled=false;$('clear').disabled=false;
+  }
+  async function retryJob(id) {
+    const {error}=await client.from('exam_ingest_jobs').update({status:'uploaded',stage:'Opnieuw aangeboden',progress:0,message:'Wacht op de verwerkingsmotor.',error_details:null,updated_at:new Date().toISOString()}).eq('id',id);
+    if(error){toast(error.message,true);return;}
+    await logEvent(id,'info','Herstart','Upload opnieuw aangeboden aan de wachtrij.');
+    toast('Upload opnieuw klaargezet.');loadJobs();
+  }
+  async function deleteJob(id) {
+    const job=jobs.find(j=>j.id===id);if(!job)return;
+    if(!confirm('Deze upload en de bijbehorende logregels verwijderen?'))return;
+    const {error:storageError}=await client.storage.from(BUCKET).remove([job.storage_path]);
+    if(storageError){toast('Bestand kon niet worden verwijderd: '+storageError.message,true);return;}
+    const {error}=await client.from('exam_ingest_jobs').delete().eq('id',id);
+    if(error){toast(error.message,true);return;}
+    toast('Upload verwijderd.');loadJobs();
+  }
+  const drop=$('drop');
+  drop.addEventListener('click',()=>$('files').click());
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('files').click();}});
+  $('files').addEventListener('change',e=>{addFiles(e.target.files);e.target.value='';});
+  ['dragenter','dragover'].forEach(name=>drop.addEventListener(name,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(name=>drop.addEventListener(name,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+  $('upload').addEventListener('click',uploadAll);
+  $('clear').addEventListener('click',()=>{selected=[];renderSelected();});
+  $('refresh').addEventListener('click',loadJobs);
+  loadJobs();
+})();
+</script>
+</body></html>
