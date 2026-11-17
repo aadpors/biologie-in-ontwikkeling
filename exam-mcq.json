@@ -440,7 +440,7 @@
       },
       {
         "key": "C",
-        "text": "in het ruggenmerg kans op het ontwikkelen van"
+        "text": "in het ruggenmerg kans op het ontwikkelen van schizofrenie 1% 3% 9% 14% 50%"
       }
     ],
     "correct": "A",
@@ -528,7 +528,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -860,7 +860,15 @@
       },
       {
         "key": "D",
-        "text": "plasmacellen verworven T-helpercellen"
+        "text": "plasmacellen verworven T-helpercellen aangeboren"
+      },
+      {
+        "key": "E",
+        "text": "T-helpercellen verworven"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "D",
@@ -944,7 +952,15 @@
       },
       {
         "key": "D",
-        "text": "verteren van vetten maag verteren van vetten"
+        "text": "verteren van vetten maag verteren van vetten twaalfvingerige darm"
+      },
+      {
+        "key": "E",
+        "text": "verteren van vetten dikke darm"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "B",
@@ -994,7 +1010,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "D",
@@ -1044,7 +1060,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -1258,7 +1274,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -1426,7 +1442,15 @@
       },
       {
         "key": "D",
-        "text": "differentiatie genexpressie differentiatie"
+        "text": "differentiatie genexpressie differentiatie mutatie"
+      },
+      {
+        "key": "E",
+        "text": "differentiatie recombinatie"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "D",
@@ -1514,7 +1538,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "A",
@@ -1678,7 +1702,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "B",
@@ -1922,7 +1946,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "A",
@@ -1968,7 +1992,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "B",
@@ -2010,7 +2034,7 @@
       },
       {
         "key": "D",
-        "text": "bepaalde eiwitten een bepaalde nucleotidenvolgorde Toen Jean covid had, had hij veel last van kortademigheid."
+        "text": "bepaalde eiwitten een bepaalde nucleotidenvolgorde Toen Jean covid had, had hij veel last van kortademigheid. Kortademigheid kan ontstaan als de diffusiesnelheid van zuurstof van de lucht in de longblaasjes naar het bloed verandert. De diffusiesnelheid (V) in de longblaasjes kun je bepalen met de onderstaande formule.  D: de diffusieconstante D × A × (c - c ) 1 2 V =  A: het diffusieoppervlak x (c1 – c2) : het verschil in zuurstofconcentratie  tussen bloed en lucht x: de diffusie-afstand  Als in de longblaasjes meer slijm aanwezig is, verandert de diffusie- afstand. Als er minder longblaasjes zijn, wordt een andere factor uit de formule kleiner."
       }
     ],
     "correct": "D",
@@ -2018,6 +2042,48 @@
     "images": [
       "exam-snippets/context-ha25t2-q16-complete.jpg",
       "exam-snippets/question-ha25t2-16-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-25-2-o.pdf",
+    "cv": "examens/ha-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha25t2-mcq-17",
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 17,
+    "points": 2,
+    "page": 8,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "x: de diffusie-afstand\n\nAls in de longblaasjes meer slijm aanwezig is, verandert de diffusie-\nafstand. Als er minder longblaasjes zijn, wordt een andere factor uit de\nformule kleiner.",
+    "q": "Is de diffusie-afstand (x) door het extra slijm groter of kleiner geworden?\nEn welke factor is kleiner als er minder longblaasjes zijn?\ndiffusie-afstand\nfactor die kleiner is\ndoor extra slijm\nbij minder longblaasjes",
+    "options": [
+      {
+        "key": "A",
+        "text": "groter A"
+      },
+      {
+        "key": "B",
+        "text": "groter D"
+      },
+      {
+        "key": "C",
+        "text": "kleiner A"
+      },
+      {
+        "key": "D",
+        "text": "kleiner"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-ha25t2-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q17-complete.jpg",
+      "exam-snippets/question-ha25t2-17-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
     "cv": "examens/ha-1018-a-25-2-c.pdf",
@@ -2102,7 +2168,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -2152,7 +2218,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "F",
@@ -2362,7 +2428,7 @@
       },
       {
         "key": "D",
-        "text": "uitgescheiden via de nieren. doorbloeding darmen neemt af"
+        "text": "uitgescheiden via de nieren. doorbloeding darmen neemt af neemt toe neemt af neemt toe"
       }
     ],
     "correct": "B",
@@ -2534,7 +2600,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -2660,7 +2726,15 @@
       },
       {
         "key": "D",
-        "text": "mutualisme organische stoffen parasitisme"
+        "text": "mutualisme organische stoffen parasitisme anorganische stoffen"
+      },
+      {
+        "key": "E",
+        "text": "parasitisme organische stoffen"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "D",
@@ -2770,15 +2844,15 @@
     "options": [
       {
         "key": "A",
-        "text": ""
+        "text": "Bekijk optie A in de oorspronkelijke afbeelding"
       },
       {
         "key": "B",
-        "text": ""
+        "text": "Bekijk optie B in de oorspronkelijke afbeelding"
       },
       {
         "key": "C",
-        "text": ""
+        "text": "Bekijk optie C in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "B",
@@ -2866,7 +2940,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "B",
@@ -2988,7 +3062,15 @@
       },
       {
         "key": "D",
-        "text": "mutualisme parasitisme parasitisme"
+        "text": "mutualisme parasitisme parasitisme commensalisme"
+      },
+      {
+        "key": "E",
+        "text": "parasitisme mutualisme"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "B",
@@ -3034,11 +3116,11 @@
       },
       {
         "key": "E",
-        "text": "x groter x"
+        "text": "x groter x kleiner"
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "F",
@@ -3160,7 +3242,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "A",
@@ -3248,7 +3330,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -3286,7 +3368,7 @@
       },
       {
         "key": "C",
-        "text": "in de haarvaten rond het tweede gekronkelde buisje witte bonen rundvlees"
+        "text": "in de haarvaten rond het tweede gekronkelde buisje witte bonen rundvlees 9,73 26,29 28 61 percentage van de aanwezige aminozuren 12,7 9,4 16,0 15,1 8,0 7,8 6,9 8,3"
       }
     ],
     "correct": "A",
@@ -3454,7 +3536,15 @@
       },
       {
         "key": "D",
-        "text": "pluripotent totipotent totipotent"
+        "text": "pluripotent totipotent totipotent multipotent"
+      },
+      {
+        "key": "E",
+        "text": "totipotent pluripotent"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -3706,7 +3796,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -3752,7 +3842,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -3920,7 +4010,15 @@
       },
       {
         "key": "D",
-        "text": "de niche vertraagd het ecosysteem"
+        "text": "de niche vertraagd het ecosysteem versneld"
+      },
+      {
+        "key": "E",
+        "text": "het ecosysteem vertraagd"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "D",
@@ -4198,19 +4296,19 @@
     "options": [
       {
         "key": "A",
-        "text": ""
+        "text": "Bekijk optie A in de oorspronkelijke afbeelding"
       },
       {
         "key": "B",
-        "text": ""
+        "text": "Bekijk optie B in de oorspronkelijke afbeelding"
       },
       {
         "key": "C",
-        "text": ""
+        "text": "Bekijk optie C in de oorspronkelijke afbeelding"
       },
       {
         "key": "D",
-        "text": ""
+        "text": "Bekijk optie D in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -4828,7 +4926,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -4870,15 +4968,15 @@
       },
       {
         "key": "D",
-        "text": "Bernadien Claire Claire"
+        "text": "Bernadien Claire Claire Azra"
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Claire Bernadien"
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -5134,7 +5232,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "E",
@@ -5642,7 +5740,7 @@
       },
       {
         "key": "E",
-        "text": ""
+        "text": "Bekijk optie E in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
@@ -5692,7 +5790,7 @@
       },
       {
         "key": "F",
-        "text": ""
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
       }
     ],
     "correct": "C",
