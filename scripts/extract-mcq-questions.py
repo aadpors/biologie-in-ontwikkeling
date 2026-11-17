@@ -293,6 +293,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     ("ha26t1", 8): "Bomen langs de beek zorgen voor schaduw",
                     ("vw26t1", 2): "Bloedplaatjes ontstaan in het rode beenmerg",
                     ("vw26t2", 14): "De waterspreeuw is de enige zangvogel",
+                    ("vw26t2", 24): "Als het darmslijmvlies is opgezwollen",
                 }
                 anchored_context = False
                 anchor_text = manual_context_anchors.get((prefix, marker["number"]))
