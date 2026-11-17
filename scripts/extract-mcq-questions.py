@@ -346,6 +346,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     ("ha26t1", 17): "Hieronder staat een beschrijving van het onderzoek",
                     ("vw25t1", 30): "In tabel 2 is de aminozuurvolgorde",
                     ("vw25t1", 32): "Als een mutatie tot gevolg heeft",
+                    ("vw25t1", 33): "Een stof die Na+-kanaaltjes in C-sensorische neuronen blokkeert",
                     ("vw26t1", 2): "Bloedplaatjes ontstaan in het rode beenmerg",
                     ("vw26t1", 9): "Om het tekort aan bloedplaatjes op te vangen",
                     ("vw26t1", 10): "Uit het bloedonderzoek bleek",
@@ -428,6 +429,13 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         {"key": "D", "text": "27%"},
                         {"key": "E", "text": "71%"},
                         {"key": "F", "text": "84%"},
+                    ]
+                if (prefix, marker["number"]) == ("vw26t1", 22):
+                    options = [
+                        {"key": "A", "text": "samentrekken van de slagaderwand; diastolische druk"},
+                        {"key": "B", "text": "samentrekken van de slagaderwand; systolische druk"},
+                        {"key": "C", "text": "uitrekken van de slagaderwand; diastolische druk"},
+                        {"key": "D", "text": "uitrekken van de slagaderwand; systolische druk"},
                     ]
 
                 first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
@@ -542,6 +550,13 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         y0 + 2,
                     ),
                 )
+                if (prefix, marker["number"]) == ("vw26t1", 22):
+                    # The final option sits below the text block detected by
+                    # the generic parser; include the complete answer table.
+                    systolic_hits = page.search_for("systolische druk")
+                    if len(systolic_hits) < 2:
+                        raise RuntimeError("Could not locate all options for VWO 2026-I question 22")
+                    y1 = max(y1, max(rect.y1 for rect in systolic_hits) + 7)
                 crop = fitz.Rect(0, y0, page.rect.width, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
