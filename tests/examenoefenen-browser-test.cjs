@@ -27,6 +27,42 @@ const assert = require("node:assert/strict");
     await page.locator("#reset").click();
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
 
+    // A question must not inherit unrelated labels from the broad syllabus end term.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2024");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForFunction(() => document.querySelector(".qhead")?.textContent.includes("vraag 1"));
+    const questionOneTopics = await page.locator(".tags .tag").allTextContents();
+    assert.deepEqual(questionOneTopics.filter(tag => !tag.startsWith("Eindterm")), ["Hart en bloedsomloop"],
+      "Havo 2024 tijdvak 1 vraag 1 moet uitsluitend aan Hart en bloedsomloop gekoppeld zijn");
+
+    // Audit the topic output for the complete 519-question set, not only the example.
+    const topicAudit = await page.evaluate(() => {
+      const rows = questions.map(q => ({ id: q.id, topics: onderwerpenVanVraag(q) }));
+      return {
+        total: rows.length,
+        unclassified: rows.filter(row => row.topics.length === 0).map(row => row.id),
+        overTagged: rows.filter(row => row.topics.length > 3)
+      };
+    });
+    assert.equal(topicAudit.total, 519, "De volledige vragenset moet zijn meegenomen in de onderwerpaudit");
+    assert.deepEqual(topicAudit.unclassified, [], "Alle 519 vragen moeten een passende onderwerpclassificatie hebben");
+    assert.deepEqual(topicAudit.overTagged, [], "Er zijn vragen met meer dan drie onderwerpstags; controleer op overmatige rubricering");
+
+    // Context words must not create unrelated subjects on two known edge cases.
+    const edgeTopicAudit = await page.evaluate(() => ({
+      beetle: onderwerpenVanVraag(questions.find(q => q.id === "ha24t2-3")),
+      vitamin: onderwerpenVanVraag(questions.find(q => q.id === "vw26t2-mcq-17")),
+      flamingo: onderwerpenVanVraag(questions.find(q => q.id === "vw26t2-open-39"))
+    }));
+    assert.deepEqual(edgeTopicAudit.beetle, ["Ecologie: kringlopen"],
+      "Havo 2024 tijdvak 2 vraag 3 mag geen onterechte labels voor eutrofiëring, planten of uitscheiding krijgen");
+    assert.deepEqual(edgeTopicAudit.vitamin, ["Hart en bloedsomloop"],
+      "Vwo 2026 tijdvak 2 vraag 17 toetst de bloedroute, niet huid, uitscheiding of vertering");
+    assert.deepEqual(edgeTopicAudit.flamingo, ["Ecologie"],
+      "Vwo 2026 tijdvak 2 vraag 39 gaat over populatiegroei en draagkracht");
+
     // Previous/next and question dots move through the filtered sequence.
     const firstHeading = await page.locator(".qhead").innerText();
     await page.locator("#nextQuestion").click();
@@ -109,6 +145,7 @@ const assert = require("node:assert/strict");
       result: "PASS",
       totalQuestions: 519,
       filters: "PASS",
+      topicAudit,
       navigation: "PASS",
       mcqPersistence: "PASS",
       openAnswerPersistence: "PASS",
