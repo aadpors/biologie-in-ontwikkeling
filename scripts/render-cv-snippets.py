@@ -37,6 +37,7 @@ def heading_at(lines, index, number=None):
     return False
 
 def render_question(pdf_path, question, output):
+    # Crop full-width answer strips while excluding running page footers.
     with fitz.open(pdf_path) as doc:
         for page_index, page in enumerate(doc):
             lines = page_lines(page)
