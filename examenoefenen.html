@@ -96,8 +96,8 @@ function onderwerpenVanVraag(q){
  (exactTheme[theme]||[]).forEach(add);
  // Alleen onderscheidende begrippen; woorden als 'long', 'transport',
  // 'orgaan', 'organisme', 'plant' of 'onderzoek' zijn op zichzelf te breed.
- if(/ademhaling|gaswisseling|longblaasjes|luchtpijp|bronchi(?:ën)?|ventilatie|inademing|uitademing/.test(t))add("Ademhalingsstelsel");
- if(/afweer|antistof|antilichaam|immuun|immuniteit|vaccin|fagocyt|lymfocyt|mhc|antigeen|allerg(?:ie|isch)|ontstekingsreactie|ziekteverwekker|pathogeen/.test(t))add("Afweer");
+ if(/ademhaling|gaswisseling|longblaasjes|luchtpijp|bronchi(?:ën)?|ventilatie|inademing|uitademing|hyperventil|diepe ademhaling|ondiepe ademhaling|dode ruimte|restvolume/.test(t))add("Ademhalingsstelsel");
+ if(/afweer|antistof|antilichaam|immuun|immuniteit|vaccin|fagocyt|lymfocyt|mhc|antigeen|allerg(?:ie|isch)|ontstekingsreactie|ziekteverwekker|pathogeen|antiserum|slangengif|gifklier/.test(t))add("Afweer");
  if(/stamcel|celdeling|celdifferentiatie|mitose|meiose|celcyclus/.test(t))add("Cellen: deling en differentiatie");
  if(/organel|lysosoom|ribosoom|golgi(?:-systeem)?|endoplasmatisch reticulum|mitochondri(?:um|ën)|chloroplast/.test(t))add("Cellen: organellen");
  if(/dissimilatie|assimilatie|stofwisseling|melkzuur|anaeroob|aeroob|atp-productie|fotosynthese|celademhaling/.test(t))add("Cellen: stofwisseling");
@@ -112,7 +112,7 @@ function onderwerpenVanVraag(q){
  if(/enzym|katalys|substraat|activeringsenergie/.test(t)){hits.delete("Eiwitten & enzymen");add("Enzymen");}
  if(/erfelijk|overerving|allel|genotype|fenotype|stamboom|inteelt|recessief|dominant|kruising|genetische variatie/.test(t))add("Erfelijkheid");
  if(/evolutie|selectiedruk|natuurlijke selectie|genetic drift|stichtereffect|soortvorming|convergente evolutie|divergente evolutie|adaptatie/.test(t))add("Evolutie");
- if(/hart|bloedvat|slagader|ader|haarvat|bloeddruk|slagvolume|polsslag|bloedsomloop|bloedplaat|bloedcel|lymfe|weefselvloeistof|hartklep/.test(t))add("Hart en bloedsomloop");
+ if(/hart|bloedvat|slagader|ader|haarvat|bloeddruk|slagvolume|polsslag|bloedsomloop|bloedplaat|bloedcel|lymfe|weefselvloeistof|hartklep|bloedtoevoer|doorbloeding|bloed naar de organen|hartslagfrequentie/.test(t))add("Hart en bloedsomloop");
  if(/hormoon|hormonale regulatie|tpo|histamine|ovulatie|terugkoppeling|hypothalamus|insuline|glucagon/.test(t))add("Hormonale regulatie");
  if(/zweetproductie|zweetklier|thermoregulatie|huidbarrière|hoornlaag|verenkleed/.test(t))add("Huid");
  if(/organisatieniveau|celniveau|weefselniveau|orgaanniveau/.test(t))add("Organisatieniveaus");
@@ -122,11 +122,18 @@ function onderwerpenVanVraag(q){
  if(/\bnieren?\b|\burine\b|\bnefron\b|kapsel van bowman|leverontgifting|ontgifting in de lever|ureumvorming|uitscheiding/.test(t))add("Uitscheiding: lever en nieren");
  if(/grafiek|diagram|tabel|gegevens aflezen|trend|verband in de gegevens/.test(stem))add("Vaardigheden: grafieken & tabellen");
  if(/bereken|berekening|percentage|kans|verhouding|snelheid|concentratie|volume|oppervlak/.test(stem))add("Vaardigheden: rekenen");
- if(/hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|controlegroep|experimentele groep|onderzoeksopzet/.test(stem))add("Vaardigheden: wetenschappelijk onderzoek");
+ if(/hypothese|afhankelijke variabele|onafhankelijke variabele|proefopzet|controlegroep|experimentele groep|onderzoeksopzet|opzet van het experiment|welke metingen|beschrijf.*experiment/.test(stem))add("Vaardigheden: wetenschappelijk onderzoek");
  if(/vertering|maag|alvleesklier|gal|resorptie|darmslijmvlies|dumpingsyndroom|verteringsenzym/.test(t))add("Verteringsstelsel");
  if(/zenuwstelsel|zenuwcel|zenuwimpuls|hersenen|hersenstam|synaps|neurotransmitter|membraanpotentiaal|reflexboog|oogzenuw|netvlies|zintuig/.test(t))add("Zenuwstelsel & oog");
  if(/zwangerschap|embryo|foetus|placenta|baarmoeder|eierstok|zaadcel|eicel|bevruchting|menstruatiecyclus/.test(t))add("Zwangerschap");
  if(["Ecologie: eutrofiëring","Ecologie: kringlopen","Ecologie: relaties & energiestromen"].some(x=>hits.has(x)))hits.delete("Ecologie");
+ if(!hits.size && q.source){
+  // Sommige examenprompts zijn bewust generiek (bijv. "beoordeel de uitspraken").
+  // Gebruik dan alleen als noodhulp de bijbehorende context en ken maximaal één
+  // onderwerp toe; zo wordt de hele context niet als lijst met onderwerpen getoond.
+  const fallback=onderwerpenVanVraag({q:q.source,source:"",theme:"",concept:"",focus:""});
+  return fallback.length?[fallback[0]]:[];
+ }
  return onderwerpCategorieen.filter(x=>hits.has(x));
 }
 
