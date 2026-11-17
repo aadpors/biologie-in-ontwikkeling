@@ -14,6 +14,11 @@ on:
       - '.github/workflows/render-exam-snippets.yml'
 permissions:
   contents: write
+
+# Voorkom gelijktijdige renders die elkaars gegenereerde commit overschrijven.
+concurrency:
+  group: render-exam-snippets-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   render:
     runs-on: ubuntu-latest
