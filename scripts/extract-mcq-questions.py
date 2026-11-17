@@ -499,7 +499,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         intro_hits = page.search_for("Freek wil graag zwarte kippen gaan fokken")
                         q7_marker = next((m for m in markers if m["number"] == 7), None)
                         inbreeding_hits = page.search_for("Fokkers kruisen vaker")
-                        inbreeding_end_hits = page.search_for("tot uiting komen")
+                        inbreeding_end_hits = page.search_for("tot uiting komen.")
                         q9_prompt_hits = page.search_for("Verklaar hoe inteelt leidt")
                         if not intro_hits or not q7_marker or not inbreeding_hits or not inbreeding_end_hits or not q9_prompt_hits:
                             raise RuntimeError("Could not isolate the Havo 2025-II question 9 context fragments")
