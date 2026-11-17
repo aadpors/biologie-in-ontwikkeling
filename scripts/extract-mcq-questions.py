@@ -213,6 +213,7 @@ def answer_from_cv(cv_text, qnum):
     return ""
 
 def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
+    # Remaining multi-question pages have explicit context-start anchors.
     # Question 24 in VWO 2026-II starts at its own HAE context paragraph.
     # The selected same-page exceptions use exact context-start anchors.
     # Question 9 uses two precise context crops to exclude questions 7 and 8.
