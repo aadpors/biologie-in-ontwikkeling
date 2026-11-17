@@ -2426,19 +2426,19 @@
     "options": [
       {
         "key": "A",
-        "text": "samentrekken van de slagaderwand"
+        "text": "samentrekken van de slagaderwand; diastolische druk"
       },
       {
         "key": "B",
-        "text": "samentrekken van de slagaderwand"
+        "text": "samentrekken van de slagaderwand; systolische druk"
       },
       {
         "key": "C",
-        "text": "uitrekken van de slagaderwand"
+        "text": "uitrekken van de slagaderwand; diastolische druk"
       },
       {
         "key": "D",
-        "text": "uitrekken van de slagaderwand bloeddruk diastolische druk"
+        "text": "uitrekken van de slagaderwand; systolische druk"
       }
     ],
     "correct": "D",
