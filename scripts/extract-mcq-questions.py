@@ -569,7 +569,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_ranges,
                     )
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
-                    if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
+                    if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14)}:
                         context_paths = context_image_fragments(
                             page, lines, context_line_indices, prefix, marker["number"],
                             question_top, footer_y, previous_ranges,
@@ -619,9 +619,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         if marker["number"] == 14:
                             context_record["images"].append("exam-snippets/vw25-t1-hippo-q14-context.jpg")
                         elif marker["number"] in {15, 16, 17, 18}:
-                            context_record["images"].append(
-                                f"exam-snippets/vw25-t1-hippo-q{marker['number']}-context.jpg"
-                            )
+                            context_record["images"].extend(context_paths)
                         context_record["images"].append(f"exam-snippets/{context_image}")
                     contexts.append(context_record)
 
