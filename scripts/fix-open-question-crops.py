@@ -40,7 +40,7 @@ def main():
         return docs[path][page_index]
 
     def set_crop(question_id, image):
-        name = f"source-complete-{question_id}.jpg"
+        name = f"question-complete-{question_id}.jpg"
         image_path = f"exam-snippets/{name}"
         image.save(ROOT / image_path, quality=94)
         for record in open_records:
