@@ -821,6 +821,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     cursor = question_end_line + 1
                     continue
                 if not options:
+                    selected_prompt = "\n".join(
+                        lines[j]["text"] for j in range(start, question_end_line + 1)
+                        if j not in {marker["number_line"], marker["points_line"]}
+                        and not HEADER_RE.match(lines[j]["text"])
+                    ).strip()
                     if context_record is None:
                         raise RuntimeError(f"No image/context record for open question {prefix} {marker['number']}")
                     open_found.append({
@@ -1056,6 +1061,33 @@ if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
         "cv": "examens/vw-1018-a-25-2-c.pdf",
         "questionType": "mcq",
     })
+
+# Hard coverage gate: each numbered exam question must appear exactly once.
+for exam in EXAMS:
+    exam_key, level, year, period, exam_rel, cv_rel = exam
+    with fitz.open(ROOT / exam_rel) as source_doc:
+        detected = set()
+        for page in source_doc:
+            detected.update(
+                marker["number"] for marker in find_markers(
+                    line_records(page), allow_multiline_number_first=(exam_key == "ha24t1")
+                )
+            )
+    represented = [
+        q for q in all_questions + all_open_questions
+        if q["level"] == level and q["year"] == year and q["period"] == period
+    ]
+    represented_numbers = [q["n"] for q in represented]
+    expected = set(range(1, max(detected or {0}) + 1))
+    missing = sorted(expected - set(represented_numbers))
+    duplicates = sorted(n for n in set(represented_numbers) if represented_numbers.count(n) > 1)
+    if missing or duplicates:
+        raise RuntimeError(
+            f"Incomplete or duplicate question inventory for {exam_key}: "
+            f"missing={missing}, duplicates={duplicates}, detected={sorted(detected)}"
+        )
+if len(EXAMS) != 12:
+    raise RuntimeError(f"Expected all 12 Havo/Vwo exams from 2024-2026, found {len(EXAMS)}")
 
 all_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 all_open_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
