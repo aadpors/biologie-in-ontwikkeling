@@ -27,7 +27,7 @@ jobs:
           rm -rf exam-snippets
           mkdir -p exam-snippets
       - name: Install PDF renderer
-        run: pip install PyMuPDF
+        run: pip install PyMuPDF Pillow
       - name: Render selected original exam fragments
         run: python scripts/render-exam-snippets.py
       - name: Render official marking-scheme snippets
