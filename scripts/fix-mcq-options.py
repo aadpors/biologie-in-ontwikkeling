@@ -259,7 +259,6 @@ def main():
             pix.save(ROOT / "exam-snippets" / crop_name)
             image_path = f"exam-snippets/{crop_name}"
             record["image"] = image_path
-            record["images"] = [image_path]
             print(f"VOLLEDIGE BRONAFBEELDING {record['id']}: {image_path}")
 
     for record in records:
