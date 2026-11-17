@@ -10,8 +10,10 @@
         "through_question": 14,
         "continuation_top": 25,
         "question_margin": 7,
-        "bottom_margin": 25,
-        "output": "vw25-t1-hippo-context.jpg"
+        "bottom_margin": 85,
+        "output": "vw25-t1-hippo-context.jpg",
+        "question_context_anchor": "Hieronder staan uitspraken over de populatiegroei",
+        "question_context_output": "vw25-t1-hippo-q14-context.jpg"
       }
     ]
   }
