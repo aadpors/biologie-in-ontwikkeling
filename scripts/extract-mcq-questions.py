@@ -83,6 +83,55 @@ def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
     result.save(output, quality=94)
 
 
+def footer_boundary(page, lines):
+    """Find the end of exam content before the printed footer."""
+    footer_re = re.compile(
+        r"(?:[HV][AW]-1018-a-|\\b\\d{1,2}\\s*/\\s*\\d{1,2}\\b|"
+        r"centraal examen|ministerie van onderwijs|biologie\\s*[-|])", re.I
+    )
+    hits = [line["bbox"][1] for line in lines
+            if line["bbox"][1] >= page.rect.height * 0.88 and footer_re.search(line["text"])]
+    return max(1, min(hits, default=page.rect.height - 18) - 3)
+
+
+def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, scale=1.8):
+    """Render each distinct preceding context paragraph separately."""
+    ordered = sorted({i for i in indices if 0 <= i < len(lines) and lines[i]["bbox"][1] < question_top},
+                     key=lambda i: (round(lines[i]["bbox"][1], 1), lines[i]["bbox"][0]))
+    if not ordered:
+        return []
+    groups, current = [], [ordered[0]]
+    previous_bottom = lines[ordered[0]]["bbox"][3]
+    for index in ordered[1:]:
+        line = lines[index]
+        if line["bbox"][1] - previous_bottom > 11:
+            groups.append(current)
+            current = [index]
+        else:
+            current.append(index)
+        previous_bottom = max(previous_bottom, line["bbox"][3])
+    groups.append(current)
+    paths = []
+    for part, group in enumerate(groups, 1):
+        top = max(0, min(lines[i]["bbox"][1] for i in group) - 5)
+        bottom = min(bottom_limit, max(lines[i]["bbox"][3] for i in group) + 5, question_top - 2)
+        nearby = [rect for info in page.get_images(full=True) for rect in page.get_image_rects(info[0])
+                  if rect.y1 >= top - 10 and rect.y0 <= bottom + 10]
+        nearby += [d["rect"] for d in page.get_drawings()
+                   if d["rect"].width > 8 and d["rect"].height > 8
+                   and d["rect"].y1 >= top - 10 and d["rect"].y0 <= bottom + 10]
+        if nearby:
+            top = max(0, min(top, min(r.y0 for r in nearby)))
+            bottom = min(bottom_limit, max(bottom, max(r.y1 for r in nearby)), question_top - 2)
+        if bottom <= top + 2:
+            continue
+        name = f"context-{prefix}-q{number}-part-{part}.jpg"
+        page.get_pixmap(matrix=fitz.Matrix(scale, scale),
+                        clip=fitz.Rect(0, top, page.rect.width, bottom), alpha=False).save(OUT / name)
+        paths.append(f"exam-snippets/{name}")
+    return paths
+
+
 def line_records(page):
     records = []
     data = page.get_text("dict")
@@ -378,6 +427,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if not anchored_context:
                     context_y0 = min(context_y0, max(0, lines[start]["bbox"][1] - 0.5))
 
+                footer_y = footer_boundary(page, lines)
                 if prefix == "vw25t1" and marker["number"] in {14, 15, 16, 17, 18}:
                     # Shared context is stitched separately from page 8 and
                     # the continuation on page 9; keep these crops question-only.
@@ -484,15 +534,31 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
 
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
-                    context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                    question_top = max(0, lines[marker["number_line"]]["bbox"][1] - 1)
+                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
                     save_page_crop(
                         page,
-                        fitz.Rect(0, context_y0, page.rect.width, context_y1),
+                        fitz.Rect(0, context_y0, page.rect.width, question_y1),
                         OUT / context_image,
                         lines,
                         previous_ranges,
                     )
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
+                    if (prefix, marker["number"]) not in {("ha25t2", 9), ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
+                        context_paths = context_image_fragments(
+                            page, lines, context_line_indices, prefix, marker["number"],
+                            question_top, footer_y,
+                        )
+                        question_name = f"question-{prefix}-{marker['number']}-only.jpg"
+                        if question_y1 > question_top + 2:
+                            page.get_pixmap(
+                                matrix=fitz.Matrix(1.8, 1.8),
+                                clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
+                                alpha=False,
+                            ).save(OUT / question_name)
+                            context_paths.append(f"exam-snippets/{question_name}")
+                        if context_paths:
+                            context_record["images"] = context_paths
                     if (prefix, marker["number"]) == ("ha25t2", 9):
                         # Keep the initial pedigree context and the later inbreeding
                         # paragraph, but never include the intervening questions 7 and 8.
@@ -508,12 +574,12 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         intro_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
                         inbreeding_y0 = max(0, min(rect.y0 for rect in inbreeding_hits) - 5)
                         inbreeding_y1 = min(page.rect.height, max(rect.y1 for rect in inbreeding_end_hits) + 5)
-                        question_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
                         intro_name = "context-ha25t2-q9-intro.jpg"
                         inbreeding_name = "context-ha25t2-q9-inbreeding.jpg"
-                        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, intro_y0, page.rect.width, q7_y - 5), alpha=False).save(OUT / intro_name)
+                        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, intro_y0, page.rect.width, min(q7_y - 5, footer_y)), alpha=False).save(OUT / intro_name)
                         page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, inbreeding_y0, page.rect.width, inbreeding_y1), alpha=False).save(OUT / inbreeding_name)
-                        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, max(0, q9_y - 0.5), page.rect.width, question_y1), alpha=False).save(OUT / context_image)
+                        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, max(0, q9_y - 0.5), page.rect.width, min(question_y1, footer_y)), alpha=False).save(OUT / context_image)
                         context_record["images"] = [
                             f"exam-snippets/{intro_name}",
                             f"exam-snippets/{inbreeding_name}",
@@ -543,7 +609,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # Full-width page strip containing context and question.
                 y0 = min(context_y0, max(0, lines[start]["bbox"][1] - 5))
                 y1 = min(
-                    page.rect.height,
+                    footer_y,
                     max(
                         lines[question_end_line]["bbox"][3] + 7,
                         lines[start]["bbox"][3] + 7,
@@ -556,7 +622,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     systolic_hits = page.search_for("systolische druk")
                     if len(systolic_hits) < 2:
                         raise RuntimeError("Could not locate all options for VWO 2026-I question 22")
-                    y1 = max(y1, max(rect.y1 for rect in systolic_hits) + 7)
+                    y1 = min(footer_y, max(y1, max(rect.y1 for rect in systolic_hits) + 7))
                 crop = fitz.Rect(0, y0, page.rect.width, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
