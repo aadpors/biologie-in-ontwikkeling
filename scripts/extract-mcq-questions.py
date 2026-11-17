@@ -618,9 +618,14 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg"]
                         if marker["number"] == 14:
                             context_record["images"].append("exam-snippets/vw25-t1-hippo-q14-context.jpg")
+                            context_record["images"].append(f"exam-snippets/{context_image}")
                         elif marker["number"] in {15, 16, 17, 18}:
+                            # context_paths already contains the individual context
+                            # and the question-only crop; do not append context_image
+                            # again, which duplicates the question in the rendered card.
                             context_record["images"].extend(context_paths)
-                        context_record["images"].append(f"exam-snippets/{context_image}")
+                        else:
+                            context_record["images"].append(f"exam-snippets/{context_image}")
                     contexts.append(context_record)
 
                 false_positive_open_questions = {
