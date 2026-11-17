@@ -57,6 +57,8 @@
     "image": "exam-snippets/complete-vwo-2025-t1-q15.jpg",
     "images": [
       "exam-snippets/vw25-t1-hippo-context.jpg",
+      "exam-snippets/context-vw25t1-q15-complete.jpg",
+      "exam-snippets/question-vw25t1-15-only.jpg",
       "exam-snippets/question-vw25t1-15.jpg"
     ]
   },
@@ -69,6 +71,8 @@
     "image": "exam-snippets/complete-vwo-2025-t1-q16.jpg",
     "images": [
       "exam-snippets/vw25-t1-hippo-context.jpg",
+      "exam-snippets/context-vw25t1-q16-complete.jpg",
+      "exam-snippets/question-vw25t1-16-only.jpg",
       "exam-snippets/question-vw25t1-16.jpg"
     ]
   },
@@ -81,6 +85,8 @@
     "image": "exam-snippets/complete-vwo-2025-t1-q17.jpg",
     "images": [
       "exam-snippets/vw25-t1-hippo-context.jpg",
+      "exam-snippets/context-vw25t1-q17-complete.jpg",
+      "exam-snippets/question-vw25t1-17-only.jpg",
       "exam-snippets/question-vw25t1-17.jpg"
     ]
   },
@@ -93,6 +99,8 @@
     "image": "exam-snippets/complete-vwo-2025-t1-q18.jpg",
     "images": [
       "exam-snippets/vw25-t1-hippo-context.jpg",
+      "exam-snippets/context-vw25t1-q18-complete.jpg",
+      "exam-snippets/question-vw25t1-18-only.jpg",
       "exam-snippets/question-vw25t1-18.jpg"
     ]
   },
