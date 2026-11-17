@@ -75,7 +75,7 @@ def render_shared_context(doc, clip, scale):
     statement_hits = question_page.search_for(clip.get("question_context_anchor", "Hieronder staan uitspraken over de populatiegroei"))
     if statement_hits:
         statement_top = max(0, min(rect.y0 for rect in statement_hits) - 5)
-        statement_bottom = max(statement_top + 2, marker[1] - clip.get("question_margin", 7))
+        statement_bottom = max(statement_top + 2, marker[1] - 2)  # Preserve descenders in the final statement line.
         statement_rect = fitz.Rect(0, statement_top, question_page.rect.width, statement_bottom)
         statement_pix = question_page.get_pixmap(matrix=matrix, clip=statement_rect, alpha=False)
         statement_image = Image.frombytes("RGB", (statement_pix.width, statement_pix.height), statement_pix.samples)
@@ -112,7 +112,7 @@ def render_question(doc, clip, scale):
         and re.fullmatch(r"\d{1,2}", word[4].strip(".,:"))
         and word[0] < page.rect.width * 0.35
     ]
-    y_end = min((word[1] - 5 for word in following), default=page.rect.height - 25)
+    y_end = min((word[1] - 2 for word in following), default=page.rect.height - 25)
     y_end = max(y_end, marker_word[3] + 35)
     # A generous context window from the top of this page prevents clipping
     # introductory text and full-width diagrams. Never narrow the page width.
