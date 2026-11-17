@@ -5,12 +5,12 @@
     "clips": [
       {
         "page": 8,
-        "rect": [
-          0,
-          45,
-          595,
-          745
-        ],
+        "top": 45,
+        "through_page": 9,
+        "through_question": 14,
+        "continuation_top": 25,
+        "question_margin": 7,
+        "bottom_margin": 25,
         "output": "vw25-t1-hippo-context.jpg"
       }
     ]
