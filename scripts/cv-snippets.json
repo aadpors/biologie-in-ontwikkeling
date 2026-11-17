@@ -1,5 +1,17 @@
 [
   {
+    "id": "ha24-1",
+    "question": 1,
+    "pdf": "examens/ha-1018-a-24-1-c.pdf",
+    "output": "cv-ha24-1.jpg"
+  },
+  {
+    "id": "ha24-8",
+    "question": 8,
+    "pdf": "examens/ha-1018-a-24-1-c.pdf",
+    "output": "cv-ha24-8.jpg"
+  },
+  {
     "id": "vw25-14",
     "question": 14,
     "pdf": "examens/vw-1018-a-25-1-c.pdf",
