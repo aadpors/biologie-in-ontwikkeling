@@ -37,6 +37,18 @@ const assert = require("node:assert/strict");
     assert.deepEqual(questionOneTopics.filter(tag => !tag.startsWith("Eindterm")), ["Hart en bloedsomloop"],
       "Havo 2024 tijdvak 1 vraag 1 moet uitsluitend aan Hart en bloedsomloop gekoppeld zijn");
 
+    // Audit the topic output for the complete 519-question set, not only the example.
+    const topicAudit = await page.evaluate(() => {
+      const rows = questions.map(q => ({ id: q.id, topics: onderwerpenVanVraag(q) }));
+      return {
+        total: rows.length,
+        unclassified: rows.filter(row => row.topics.length === 0).map(row => row.id),
+        overTagged: rows.filter(row => row.topics.length > 3)
+      };
+    });
+    assert.equal(topicAudit.total, 519, "De volledige vragenset moet zijn meegenomen in de onderwerpaudit");
+    assert.deepEqual(topicAudit.overTagged, [], "Er zijn vragen met meer dan drie onderwerpstags; controleer op overmatige rubricering");
+
     // Previous/next and question dots move through the filtered sequence.
     const firstHeading = await page.locator(".qhead").innerText();
     await page.locator("#nextQuestion").click();
@@ -119,6 +131,7 @@ const assert = require("node:assert/strict");
       result: "PASS",
       totalQuestions: 519,
       filters: "PASS",
+      topicAudit,
       navigation: "PASS",
       mcqPersistence: "PASS",
       openAnswerPersistence: "PASS",
