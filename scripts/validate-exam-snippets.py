@@ -47,6 +47,6 @@ for filename, label in DATASETS:
                 errors.append(f"{label} {qid}: ongeldige afbeelding {rel}: {exc}")
 
 if errors:
-    print("\\n".join(errors))
+    print("\n".join(errors))
     raise SystemExit(f"Controle mislukt: {len(errors)} fouten in {total} vragen.")
 print(f"Controle geslaagd: {total} vragen; alle primaire, context- en vraagafbeeldingen bestaan en zijn leesbare afbeeldingen.")
