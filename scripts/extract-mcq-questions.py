@@ -1011,7 +1011,7 @@ for exam in EXAMS:
     all_questions.extend(items)
     all_open_questions.extend(open_items)
     all_contexts.extend(contexts)
-    print(f"{exam[0]}: {len(items)} meerkeuzevragen, {len(open_items)} open vragen, {len(contexts)} vraagcontexten)
+    print(f"{exam[0]}: {len(items)} meerkeuzevragen, {len(open_items)} open vragen, {len(contexts)} vraagcontexten")
 # Question 40 in VWO 2025 time slot 2 uses a table layout that PyMuPDF
 # does not expose as ordinary A-D text blocks; add it from the official page.
 if not any(q["id"] == "vw25t2-mcq-40" for q in all_questions):
@@ -1116,4 +1116,5 @@ for item in all_contexts:
     context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
 all_contexts = list(context_by_key.values())
 (ROOT / "exam-contexts.json").write_text(json.dumps(all_contexts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+(ROOT / "exam-open.json").write_text(json.dumps(all_open_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(f"Geschreven: {len(all_questions)} meerkeuzevragen en {len(all_open_questions)} open vragen uit {len(EXAMS)} examens.")
