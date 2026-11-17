@@ -826,6 +826,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         if j not in {marker["number_line"], marker["points_line"]}
                         and not HEADER_RE.match(lines[j]["text"])
                     ).strip()
+                    if context_record is None and selected_context_page is not None:
+                        previous_ranges.append((start, question_end_line + 1))
+                        cursor = question_end_line + 1
+                        continue
                     if context_record is None:
                         raise RuntimeError(f"No image/context record for open question {prefix} {marker['number']}")
                     open_found.append({
