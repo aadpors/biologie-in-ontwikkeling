@@ -293,6 +293,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     # Shared context is stitched separately from page 8 and
                     # the continuation on page 9; keep these crops question-only.
                     context_y0 = max(0, lines[marker["number_line"]]["bbox"][1] - 0.5)
+                    print(f"Question-only crop {prefix} question {marker['number']}: starts at printed question marker")
 
                 excluded = {marker["number_line"], marker["points_line"]}
                 block_text = []
