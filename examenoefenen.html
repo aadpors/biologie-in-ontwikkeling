@@ -56,7 +56,6 @@ let questions=[
 {id:"ha24-8",level:"Havo",year:"2024",period:"1",n:8,points:2,theme:"Cellen: deling en differentiatie",concept:"Mitose, celdifferentiatie en genexpressie",end:"M · Molecuul- en celniveau",page:5,focus:"Beoordelen van uitspraken over mitose, celdifferentiatie en genexpressie.",source:"Tijdens de groeifase komen verschillende stamcellen het kunstvezelnetwerk binnen. Gestimuleerd door de ontsteking gaan deze stamcellen zich delen om nieuwe cellen te vormen. De vraag bevat drie uitspraken over de groeifase.",q:"Schrijf de nummers 1, 2 en 3 onder elkaar en noteer erachter of de betreffende uitspraak juist of onjuist is.",a:"1 onjuist; 2 juist; 3 juist.",why:"Bij mitose ontstaan genetisch gelijke dochtercellen; celdifferentiatie bepaalt de vorm en functie van cellen en hangt samen met veranderingen in genexpressie.",pdf:"examens/ha-1018-a-24-1-o-spr.pdf",cv:"examens/ha-1018-a-24-1-c.pdf"}
 ];
 
-{id:"ha24t2-2",level:"Havo",year:"2024",period:"2",n:2,points:2,theme:"Ecologie: kringlopen",concept:"Stofkringloop en voedselrelaties",end:"D · Ecosystemen",focus:"Organismen plaatsen in een kringloop en anorganische stofstromen herkennen.",source:"In een natuurgebied leven bacteriën, gras, mestkevers en runderen. Mestkevers en bacteriën verwerken organische resten uit mest. De stoffen worden via verschillende routes door het ecosysteem verplaatst.",q:"Afbeelding 2 geeft een kringloop van stoffen schematisch weer. In de vakken S, T en U moeten bacteriën, mestkevers en runderen worden ingevuld. Schrijf S, T en U onder elkaar en noteer de bijbehorende organismen. Noteer ook het nummer van de pijl die alleen het transport van anorganische stoffen weergeeft.",a:"S: runderen; T: mestkevers; U: bacteriën. De pijl voor alleen anorganische stoffen is pijl 4.",why:"Runderen produceren mest; mestkevers en bacteriën verwerken organisch materiaal. In de kringloop geeft pijl 4 het transport van alleen anorganische stoffen weer.",pdf:"examens/ha-1018-a-24-2-o-spr.pdf",cv:"examens/ha-1018-a-24-2-c.pdf"},
 questions.push(
 {id:"vw24-1",level:"Vwo",year:"2024",period:"1",n:1,points:2,theme:"Zenuwstelsel & oog",concept:"Synapsen en neurotransmitters",end:"M · Molecuul- en celniveau",focus:"Farmacologische beïnvloeding van synaptische signaaloverdracht.",source:"Nicotine bindt aan acetylcholinereceptoren op axonen van dopamineproducerende neuronen. Na binding neemt de afgifte van dopamine in de synaps toe. Dopamine wordt vervolgens heropgenomen in het presynaptische neuron.",q:"Over afbeelding 1 worden de volgende uitspraken gedaan: 1. Nicotine is een antagonist van acetylcholine. 2. Dopamine komt via endocytose in de synapsspleet terecht. 3. Heropname van dopamine vindt plaats door dopaminereceptoren. Schrijf de nummers 1, 2 en 3 onder elkaar en noteer erachter of de betreffende uitspraak juist of onjuist is.",a:"1 onjuist; 2 onjuist; 3 onjuist.",why:"Nicotine werkt als agonist op de acetylcholinereceptor. Neurotransmitters worden via exocytose afgegeven; heropname verloopt via transporteiwitten en niet via dopaminereceptoren.",pdf:"examens/vw-1018-a-24-1-o-spr.pdf",cv:"examens/vw-1018-a-24-1-c.pdf",cvImage:"exam-snippets/cv-vw24-1.jpg"},
 {id:"vw24t2-1",level:"Vwo",year:"2024",period:"2",n:1,points:1,theme:"Evolutie en erfelijkheid",concept:"Soortbegrip en voortplantingsisolatie",end:"E · Evolutie",focus:"Het biologische soortbegrip toegepast op chromosoomaantallen en vruchtbare nakomelingen.",source:"Het przewalskipaard heeft 66 chromosomen en het gedomesticeerde paard 64. Een kruising tussen beide levert vruchtbare nakomelingen op met 65 chromosomen.",q:"Stel dat jij mag bepalen welke van de twee wetenschappelijke namen het przewalskipaard krijgt. Noteer welke naam je kiest en geef een biologisch argument dat jouw keuze ondersteunt.",a:"Twee redeneringen zijn mogelijk: Equus przewalskii, omdat het chromosoomaantal verschilt en je de dieren als aparte soort beschouwt; of Equus ferus przewalskii, omdat kruising vruchtbare nakomelingen oplevert en je ze als ondersoorten van één soort beschouwt.",why:"De keuze moet passen bij het biologische argument. Het officiële correctievoorschrift accepteert beide keuzes met een passende toelichting.",pdf:"examens/vw-1018-a-24-2-o-spr.pdf",cv:"examens/vw-1018-a-24-2-c.pdf",cvImage:"exam-snippets/cv-vw24t2-1.jpg"},
@@ -121,7 +120,7 @@ function render(){
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
- const assetVersion="2026-11-17-24";
+ const assetVersion="2026-11-17-25";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  let snippet=snippetImages.map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'?v='+assetVersion+'" alt="'+(i<snippetImages.length-1?'Context bij vraag ':'Originele examenopgave bij vraag ')+q.n+'" loading="lazy"><figcaption>'+(i<snippetImages.length-1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
@@ -157,7 +156,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-24");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-25");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
@@ -169,7 +168,7 @@ async function loadMCQ(){
     }
    }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-17-24");
+  const response=await fetch("exam-mcq.json?v=2026-11-17-25");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
