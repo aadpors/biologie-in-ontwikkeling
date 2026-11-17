@@ -8,6 +8,7 @@ on:
       - 'scripts/render-exam-snippets.py'
       - 'scripts/render-cv-snippets.py'
       - 'scripts/extract-mcq-questions.py'
+      - 'examenoefenen.html'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/exam-snippets.json'
       - 'scripts/cv-snippets.json'
