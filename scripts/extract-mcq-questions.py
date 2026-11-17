@@ -465,6 +465,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     ("vw25t1", 30): "In tabel 2 is de aminozuurvolgorde",
                     ("vw25t1", 32): "Als een mutatie tot gevolg heeft",
                     ("vw25t1", 33): "Een stof die Na+-kanaaltjes in C-sensorische neuronen blokkeert",
+                    ("vw25t1", 15): "In Afrika veroorzaken droge perioden",
+                    ("vw25t1", 16): "Doordat de nijlpaardenpopulatie",
+                    ("vw25t1", 17): "Sommige wetenschappers denken",
+                    ("vw25t1", 18): "Nijlpaarden worden ‘ecosystem engineers’ genoemd",
                     ("vw26t1", 2): "Bloedplaatjes ontstaan in het rode beenmerg",
                     ("vw26t1", 9): "Om het tekort aan bloedplaatjes op te vangen",
                     ("vw26t1", 10): "Uit het bloedonderzoek bleek",
@@ -635,6 +639,15 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             ),
                         )
                         if not context_paths:
+                            if (prefix, marker["number"]) in {
+                                ("vw25t1", 15), ("vw25t1", 16),
+                                ("vw25t1", 17), ("vw25t1", 18),
+                            }:
+                                raise RuntimeError(
+                                    f"Question-specific context crop failed for {prefix} "
+                                    f"question {marker['number']}; refusing to substitute "
+                                    "preceding question contexts."
+                                )
                             context_paths = fallback_context_fragment(
                                 page, lines, prefix, marker["number"], question_top, previous_ranges,
                             )
