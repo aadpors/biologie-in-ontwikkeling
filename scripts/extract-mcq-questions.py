@@ -194,6 +194,10 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         question_top - 1,
         final_context_text_bottom + 12,
     )
+    if prefix == "ha24t1" and number == 1:
+        # The heart-valve diagram is placed below the "afbeelding 1" label.
+        # Include the complete figure up to (but not into) question 1.
+        context_bottom = min(bottom_limit, question_top - 2)
     if end_anchor:
         end_hits = page.search_for(end_anchor)
         if not end_hits:
