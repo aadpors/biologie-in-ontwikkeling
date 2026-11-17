@@ -11,6 +11,8 @@ on:
       - 'exam-contexts.json'
       - 'beheer-7f4d9b2c/**'
       - 'supabase/migrations/**'
+      - 'supabase/functions/**'
+      - 'docs/exam-management.md'
       - 'scripts/extract-mcq-questions.py'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/validate-site.mjs'
