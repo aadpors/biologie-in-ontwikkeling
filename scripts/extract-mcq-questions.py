@@ -127,9 +127,17 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     # distance above the next question marker. The latter clipped descenders
     # and the lower edge of the final line on tightly spaced exam pages.
     final_context_text_bottom = max(lines[i]["bbox"][3] for i in ordered)
+    # question_top is already inset from the printed question marker. Keep
+    # the final context line intact and leave a small white lower margin.
+    context_bottom = min(bottom_limit, question_top - 2)
+    if final_context_text_bottom > context_bottom:
+        raise RuntimeError(
+            f"Context text for {prefix} question {number} reaches the question boundary; "
+            "refusing to publish a clipped context crop."
+        )
     context_bottom = min(
         bottom_limit,
-        max(question_top - 2, final_context_text_bottom + 9),
+        max(context_bottom, final_context_text_bottom + 6),
     )
     if context_bottom <= context_top + 2:
         return []
@@ -732,9 +740,16 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             footer_y,
                             max(question_y1, max(option_bottoms) + BOTTOM_TEXT_PADDING),
                         )
+                    # The context must stop above the printed score/question
+                    # marker, not above marker["line"]: that can be the prompt
+                    # line itself and let the top of the question leak into the
+                    # context card. Keep a visible lower margin as well.
+                    context_question_top = max(
+                        0, lines[marker["number_line"]]["bbox"][1] - 8
+                    )
                     context_paths = context_image_fragments(
                         page, lines, context_line_indices, prefix,
-                        marker["number"], question_top, footer_y, previous_ranges,
+                        marker["number"], context_question_top, footer_y, previous_ranges,
                     )
                     if not context_paths:
                         context_paths = fallback_context_fragment(
