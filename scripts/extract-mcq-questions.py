@@ -196,6 +196,21 @@ def clean_context(lines):
         cleaned.append(text)
     return "\n".join(cleaned).strip()
 
+
+def save_context_fragments(doc, fragments, prefix, question_number):
+    paths = []
+    for index, fragment in enumerate(fragments, start=1):
+        page = doc[fragment["page_index"]]
+        y0 = max(0, fragment["y0"])
+        y1 = min(page.rect.height - 25, fragment["y1"])
+        if y1 <= y0 + 2:
+            continue
+        filename = f"context-{prefix}-q{question_number}-p{fragment['page_index'] + 1}-{index}.jpg"
+        clip = fitz.Rect(0, y0, page.rect.width, y1)
+        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=clip, alpha=False).save(OUT / filename)
+        paths.append(f"exam-snippets/{filename}")
+    return paths
+
 def answer_from_cv(cv_text, qnum):
     # The official CV stores MCQ answers as e.g. "11  B  2".
     line_pattern = re.compile(rf"^\s*{qnum}\s+([A-F])\s+\d+\s*$")
@@ -221,6 +236,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
     found = []
     contexts = []
     heading_re = re.compile(r"^(?:vraag|antwoord|scores|afbeelding(?:\s+\d+)?|tabel(?:\s+\d+)?|grafiek(?:\s+\d+)?|legenda|lees verder|einde)$", re.I)
+    active_context_fragments = []
+    hippo_q14_end_y = None
     with fitz.open(exam_path) as doc:
         for page_index, page in enumerate(doc):
             # Context is page-local. Never carry text from the preceding PDF page:
@@ -237,9 +254,20 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     and not heading_re.match(line["text"])
                     and not re.match(r"^\d+\s*p", line["text"], re.I)
                 ]
-                # Pages without questions can contain the start or continuation
-                # of a context. It is deliberately not reused on another page:
-                # the next page is segmented independently to avoid stale context.
+                content_indices = [j for j, line in enumerate(lines) if not HEADER_RE.match(line["text"])]
+                if headings:
+                    start_line = headings[-1]
+                    active_context_fragments = [{
+                        "page_index": page_index,
+                        "y0": max(0, lines[start_line]["bbox"][1] - 5),
+                        "y1": page.rect.height - 25,
+                    }]
+                elif content_indices:
+                    active_context_fragments.append({
+                        "page_index": page_index,
+                        "y0": max(0, min(lines[j]["bbox"][1] for j in content_indices) - 5),
+                        "y1": page.rect.height - 25,
+                    })
                 continue
 
             previous_ranges = []
@@ -257,7 +285,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 ]
                 if headings:
                     cursor = headings[-1]
-                    active_context = []
+                    active_context_fragments = []
+                prior_context_fragments = list(active_context_fragments)
                 context_line_indices = [j for j in range(cursor, start) if not any(a <= j < b for a, b in previous_ranges)]
                 context_lines = [lines[j]["text"] for j in context_line_indices]
                 # Each question gets only the context physically preceding it on
@@ -265,7 +294,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # Do not append prior-page context: that silently associates unrelated
                 # topics with the current question.
                 context = clean_context(context_lines)
-                context_y0 = max(0, min((lines[j]["bbox"][1] for j in context_line_indices), default=35) - 5)
+                context_y0 = (
+                    max(0, min(lines[j]["bbox"][1] for j in context_line_indices) - 5)
+                    if context_line_indices else max(0, lines[start]["bbox"][1] - 0.5)
+                )
 
                 # Havo 2025-I question 14 starts a new stem-cell-transplant
                 # context on the same page as questions 12 and 13. The generic
@@ -294,6 +326,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     # the continuation on page 9; keep these crops question-only.
                     context_y0 = max(0, lines[marker["number_line"]]["bbox"][1] - 0.5)
                     print(f"Question-only crop {prefix} question {marker['number']}: starts at printed question marker")
+                    if marker["number"] == 14:
+                        hippo_q14_end_y = lines[question_end_line]["bbox"][3] + 5
 
                 excluded = {marker["number_line"], marker["points_line"]}
                 block_text = []
@@ -375,13 +409,36 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
+                if context_line_indices:
+                    active_context_fragments.append({
+                        "page_index": page_index,
+                        "y0": context_y0,
+                        "y1": max(context_y0 + 2, lines[start]["bbox"][1] - 5),
+                    })
+
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     context_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
                     page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, context_y0, page.rect.width, context_y1), alpha=False).save(OUT / context_image)
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
-                    if (prefix, marker["number"]) in {("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18)}:
-                        context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg", f"exam-snippets/{context_image}"]
+                    if prefix == "vw25t1" and marker["number"] in {14, 15, 16, 17, 18}:
+                        prior_fragments = [
+                            f for f in prior_context_fragments
+                            if f["page_index"] == page_index and hippo_q14_end_y is not None and f["y0"] > hippo_q14_end_y
+                        ]
+                        context_record["images"] = ["exam-snippets/vw25-t1-hippo-context.jpg"]
+                        context_record["images"].extend(save_context_fragments(doc, prior_fragments, prefix, marker["number"]))
+                        if marker["number"] > 14 and context_line_indices:
+                            supplement = [{
+                                "page_index": page_index,
+                                "y0": context_y0,
+                                "y1": max(context_y0 + 2, lines[start]["bbox"][1] - 5),
+                            }]
+                            context_record["images"].extend(save_context_fragments(doc, supplement, prefix, marker["number"]))
+                        context_record["images"].append(f"exam-snippets/{context_image}")
+                    else:
+                        prior_paths = save_context_fragments(doc, prior_context_fragments, prefix, marker["number"])
+                        context_record["images"] = prior_paths + [f"exam-snippets/{context_image}"] if prior_paths else [f"exam-snippets/{context_image}"]
                     contexts.append(context_record)
 
                 false_positive_open_questions = {
@@ -436,6 +493,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     "options": options,
                     "correct": correct,
                     "image": f"exam-snippets/{image_name}",
+                    **({"images": save_context_fragments(doc, prior_context_fragments, prefix, marker["number"]) + [f"exam-snippets/{image_name}"]} if prior_context_fragments else {}),
                     "pdf": exam_rel,
                     "cv": cv_rel,
                     "questionType": "mcq",
