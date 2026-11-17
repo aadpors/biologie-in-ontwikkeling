@@ -300,7 +300,7 @@ def line_records(page):
 def find_markers(lines, allow_multiline_number_first=False):
     markers = []
     prompt_starts = re.compile(
-        r"^(hieronder|wat|wie|welk|welke|waar|wanneer|waarom|hoe|door|wordt|zal|stroomt|vindt|behoort|bij|kruis|vul|teken|neem|gedurende|leg|verklaar|beargumenteer|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|de vorming|tot welke|in welk|op welk|op welke|hoeveel|waardoor)",
+        r"^(hieronder|wat|wie|welk|welke|waar|wanneer|waarom|hoe|door|wordt|zal|stroomt|vindt|behoort|bij|kruis|vul|teken|neem|gedurende|draagt|leg|verklaar|beargumenteer|beschrijf|noteer|geef|noem|is|zijn|neemt|beoordeel|schrijf|bereken|licht|beredeneer|laat|de vorming|tot welke|in welk|op welk|op welke|hoeveel|waardoor)",
         re.I,
     )
     point_re = re.compile(r"^\s*(\d+)\s*p\s*$", re.I)
@@ -856,7 +856,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     contexts.append(context_record)
 
                 false_positive_open_questions = {
-                    ("vw26t1", 30)
+                    
                 }
                 if (prefix, marker["number"]) in false_positive_open_questions:
                     previous_ranges.append((start, question_end_line + 1))
