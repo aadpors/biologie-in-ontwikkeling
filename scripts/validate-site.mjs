@@ -85,7 +85,16 @@ for (const [index, question] of openExamQuestions.entries()) {
   assert.ok(typeof question.q === 'string' && question.q.trim(), `${where}: vraagtekst ontbreekt`);
   assertSnippetExists(question.image, where);
   for (const path of question.images || []) assertSnippetExists(path, where);
-  assert.ok((question.images || []).length >= 2, `${where}: aparte context- en vraagafbeeldingen ontbreken`);
+  const questionImages = question.images || [];
+  const hasSeparateContextAndQuestionImages = questionImages.length >= 2;
+  const hasSingleCompleteSourcePage =
+    questionImages.length === 1 &&
+    questionImages[0] === question.image &&
+    questionImages[0].endsWith(`question-complete-${question.id}.jpg`);
+  assert.ok(
+    hasSeparateContextAndQuestionImages || hasSingleCompleteSourcePage,
+    `${where}: aparte context-/vraagafbeeldingen of één volledige bronpagina ontbreken`
+  );
   assert.ok(question.pdf && question.cv, `${where}: originele opgave of correctievoorschrift ontbreekt`);
 }
 const allQuestionKeys = [...examQuestions, ...openExamQuestions].map(q => [q.level, q.year, q.period, q.n].join('|'));
