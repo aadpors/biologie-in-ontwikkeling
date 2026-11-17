@@ -198,6 +198,7 @@ def clean_context(lines):
 
 
 def save_context_fragments(doc, fragments, prefix, question_number):
+    # Preserve text, raster figures and vector diagrams on earlier pages.
     # Section resets use only prominent headings, not bold body paragraphs.
     # Preserve both text and embedded figures from preceding source pages.
     # These crops keep complete source-page context at the same full-page width.
