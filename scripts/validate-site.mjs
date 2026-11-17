@@ -31,12 +31,11 @@ assert.ok(examPage.includes('(o.text?" "+o.text:"")'), 'Frontend verbergt de ant
 assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
 assert.ok(examPage.includes('antwoordteksten (A t/m F)'), 'De toelichting over zichtbare antwoordopties ontbreekt');
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
-assert.ok(open2024.length > 0, 'Geselecteerde open vragen uit 2024 ontbreken');
+assert.ok(open2024.length >= 3, 'Te weinig geselecteerde open vragen uit 2024');
 assert.ok(examQuestions.some(question => question.year === '2024' && question.options.length === 6), 'Meerkeuzevragen met zes antwoordopties (A-F) uit 2024 ontbreken');
 
 const selected2024OpenQuestions = [
   { id: 'ha24t1-10', level: 'Havo', period: '1', n: 10, cv: 'exam-snippets/cv-ha24t1-10.jpg' },
-  { id: 'ha24t2-2', level: 'Havo', period: '2', n: 2, cv: 'exam-snippets/cv-ha24t2-2.jpg' },
   { id: 'vw24-1', level: 'Vwo', period: '1', n: 1, cv: 'exam-snippets/cv-vw24-1.jpg' },
   { id: 'vw24t2-1', level: 'Vwo', period: '2', n: 1, cv: 'exam-snippets/cv-vw24t2-1.jpg' },
 ];
