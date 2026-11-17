@@ -134,9 +134,13 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     # same vertical band as the question marker. Preserve the complete context
     # line rather than cutting it at the marker's y-coordinate; the question
     # crop itself remains a separate image.
+    # Keep at least a small gap before the question marker. If the context
+    # line ends earlier, retain six points of breathing room; never extend the
+    # context crop into the question merely to satisfy that padding.
     context_bottom = min(
         bottom_limit,
-        max(question_boundary, final_context_text_bottom + 6),
+        question_top - 5,
+        final_context_text_bottom + 6,
     )
     if context_bottom <= context_top + 2:
         return []
