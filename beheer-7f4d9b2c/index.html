@@ -58,7 +58,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
 </section>
 </div>
 <section class="jobs">
-<div class="jobs-head"><h2>Uploadgeschiedenis</h2><button class="btn soft" id="refresh">Vernieuwen</button></div>
+<div class="jobs-head"><h2>Uploadgeschiedenis</h2><div class="toolbar" style="margin:0"><button class="btn primary" id="inventory">Inventariseer wachtende uploads</button><button class="btn soft" id="refresh">Vernieuwen</button></div></div>
 <div id="jobs-list"><div class="empty">Uploads worden geladen…</div></div>
 </section>
 </main>
@@ -119,7 +119,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
     $('jobs-list').querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryJob(b.dataset.retry)));
     $('jobs-list').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteJob(b.dataset.delete)));
   }
-  async function loadJobs() {
+  async function runInventory() {\n    const pending=jobs.filter(j=>['uploaded','failed'].includes(j.status));\n    if(!pending.length){toast('Er staan geen uploads klaar voor inventarisatie.');return;}\n    const button=$('inventory');button.disabled=true;let done=0;let failed=0;\n    for(const job of pending){\n      $('jobs-list').querySelector('.empty')?.remove();\n      toast('Inventariseren: '+job.original_filename);\n      const {data,error}=await client.functions.invoke('inventory-exam-upload',{body:{job_id:job.id}});\n      if(error||!data?.ok){failed++;console.error('Inventarisatie mislukt',job.original_filename,error||data);toast('Inventarisatie mislukt voor '+job.original_filename+': '+(data?.error||error?.message||'onbekende fout'),true);}\n      else done++;\n      await loadJobs();\n    }\n    button.disabled=false;toast('Inventarisatie afgerond: '+done+' geslaagd, '+failed+' mislukt.');\n  }\n  async function loadJobs() {
     const {data,error}=await client.from('exam_ingest_jobs').select('*').order('created_at',{ascending:false}).limit(50);
     if(error){$('jobs-list').innerHTML='<div class="empty">Kon de uploadgeschiedenis niet laden: '+escapeHtml(error.message)+'</div>';return;}
     jobs=data||[];renderJobs();
@@ -190,7 +190,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
   drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
   $('upload').addEventListener('click',uploadAll);
   $('clear').addEventListener('click',()=>{selected=[];renderSelected();});
-  $('refresh').addEventListener('click',loadJobs);
+  $('refresh').addEventListener('click',loadJobs);\n  $('inventory').addEventListener('click',runInventory);
   loadJobs();
 })();
 </script>
