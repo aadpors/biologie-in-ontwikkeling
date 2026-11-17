@@ -43,6 +43,36 @@ def discover_exams():
 
 EXAMS = discover_exams()
 
+def appendix_pdfs_for_exam(exam_pdf):
+    """Find separately published printable answer/work appendices for an exam."""
+    source = Path(exam_pdf)
+    stem = source.stem
+    # The exam identifier is stable across opgaven, correction and appendix files.
+    base = re.sub(r"-o(?:-[a-z0-9]+)?$", "", stem, flags=re.I)
+    appendix_suffix = re.compile(
+        r"^(?:-u|-ub|-bijlage|-bijlagen|-uitwerkbijlage|-uitwerkblad"
+        r"|-antwoordblad|-werkblad|-tekenblad|-bijl"
+        r"|-o-(?:bijlage|bijlagen|uitwerkbijlage|uitwerkblad|antwoordblad|werkblad))"
+        r"(?:[-_][a-z0-9]+)?$",
+        re.I,
+    )
+    found = []
+    for candidate in sorted((ROOT / "examens").glob("*.pdf")):
+        candidate_stem = candidate.stem
+        if not candidate_stem.lower().startswith(base.lower()):
+            continue
+        suffix = candidate_stem[len(base):]
+        if appendix_suffix.fullmatch(suffix):
+            found.append(str(candidate.relative_to(ROOT)).replace("\\\\", "/"))
+    return found
+
+
+def attach_appendix_links(records):
+    for record in records:
+        attachments = appendix_pdfs_for_exam(record["pdf"])
+        if attachments:
+            record["attachmentPdfs"] = attachments
+
 SELECTED_CONTEXTS = {
     ("ha24t1", 1), ("ha24t1", 8),
     ("ha24t1", 10), ("ha24t2", 3), ("ha24t2", 6), ("ha24t2", 7), ("vw24t1", 1), ("vw24t2", 1), ("vw24t2", 2),
@@ -1165,7 +1195,7 @@ for exam in EXAMS:
 if len(EXAMS) != 12:
     raise RuntimeError(f"Expected all 12 Havo/Vwo exams from 2024-2026, found {len(EXAMS)}")
 
-all_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
+attach_appendix_links(all_questions)\nattach_appendix_links(all_open_questions)\n\nall_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 all_open_questions.sort(key=lambda q: (int(q["year"]), int(q["period"]), int(q["n"]), q["level"]))
 
 missing = [q["id"] for q in all_questions if not q["correct"]]
