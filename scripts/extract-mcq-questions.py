@@ -98,7 +98,7 @@ def footer_boundary(page, lines):
     return max(1, min(hits, default=page.rect.height - 18) - 3)
 
 
-def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8):
+def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8, end_anchor=None):
     """Render one complete, full-width context crop, preserving figures and tables."""
     ordered = sorted({i for i in indices if 0 <= i < len(lines) and lines[i]["bbox"][1] < question_top},
                      key=lambda i: (round(lines[i]["bbox"][1], 1), lines[i]["bbox"][0]))
@@ -142,6 +142,19 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         question_top - 1,
         final_context_text_bottom + 12,
     )
+    if end_anchor:
+        end_hits = page.search_for(end_anchor)
+        if not end_hits:
+            raise RuntimeError(
+                f"Could not find the end of the context for {prefix} question {number}: {end_anchor!r}"
+            )
+        # Exact final phrase is more reliable than inferred line ordering for
+        # the multi-question hippopotamus passage, whose text blocks share a
+        # page with several question markers.
+        context_bottom = min(
+            bottom_limit,
+            max(rect.y1 for rect in end_hits) + 12,
+        )
     # A very shallow fragment is not a usable context card. Let the
     # bounded page-local fallback preserve the preceding context instead.
     if context_bottom <= context_top + 35:
@@ -595,9 +608,19 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context_question_top = max(
                             0, lines[marker["number_line"]]["bbox"][1]
                         )
+                        context_end_anchors = {
+                            15: "biotische factoren.",
+                            16: "populaties in Afrika.",
+                            17: "aparte soort.",
+                            18: "climaxsoorten beïnvloeden.",
+                        }
                         context_paths = context_image_fragments(
                             page, lines, context_line_indices, prefix, marker["number"],
                             context_question_top, footer_y, previous_ranges,
+                            end_anchor=(
+                                context_end_anchors.get(marker["number"])
+                                if prefix == "vw25t1" else None
+                            ),
                         )
                         if not context_paths:
                             context_paths = fallback_context_fragment(
