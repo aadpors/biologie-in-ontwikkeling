@@ -705,6 +705,19 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if mcq_images is None:
                     question_top = max(0, lines[start]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
+                    # When the generic end-line detector misses a compact or
+                    # table-style prompt, use the parsed answer-option rows as
+                    # a second boundary so the final option is never clipped.
+                    option_bottoms = [
+                        lines[i]["bbox"][3]
+                        for i in range(start, min(end, len(lines)))
+                        if OPTION_RE.match(lines[i]["text"])
+                    ]
+                    if option_bottoms:
+                        question_y1 = min(
+                            footer_y,
+                            max(question_y1, max(option_bottoms) + BOTTOM_TEXT_PADDING),
+                        )
                     context_paths = context_image_fragments(
                         page, lines, context_line_indices, prefix,
                         marker["number"], question_top, footer_y, previous_ranges,
