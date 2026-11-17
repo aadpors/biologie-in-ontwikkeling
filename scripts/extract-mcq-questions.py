@@ -505,6 +505,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # response rows that resemble question markers; only q31 is
                 # an actual exam question on this page.
                 markers = [m for m in markers if m["number"] not in {2, 3, 4, 5}]
+            if prefix == "ha24t2" and page_index == 10:
+                # The diagram/table on printed page 11 contains isolated
+                # labels 4, 5 and 9 before question 24; they are not questions.
+                markers = [m for m in markers if m["number"] not in {4, 5, 9}]
             if not markers:
                 headings = [
                     j for j, line in enumerate(lines)
@@ -1110,6 +1114,8 @@ for exam in EXAMS:
             )
             if exam_key == "ha24t1" and page_index == 15:
                 page_markers = [m for m in page_markers if m["number"] not in {2, 3, 4, 5}]
+            if exam_key == "ha24t2" and page_index == 10:
+                page_markers = [m for m in page_markers if m["number"] not in {4, 5, 9}]
             detected.update(marker["number"] for marker in page_markers)
     represented = [
         q for q in all_questions + all_open_questions
