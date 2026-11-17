@@ -27,6 +27,16 @@ const assert = require("node:assert/strict");
     await page.locator("#reset").click();
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
 
+    // A question must not inherit unrelated labels from the broad syllabus end term.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2024");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForFunction(() => document.querySelector(".qhead")?.textContent.includes("vraag 1"));
+    const questionOneTopics = await page.locator(".tags .tag").allTextContents();
+    assert.deepEqual(questionOneTopics.filter(tag => !tag.startsWith("Eindterm")), ["Hart en bloedsomloop"],
+      "Havo 2024 tijdvak 1 vraag 1 moet uitsluitend aan Hart en bloedsomloop gekoppeld zijn");
+
     // Previous/next and question dots move through the filtered sequence.
     const firstHeading = await page.locator(".qhead").innerText();
     await page.locator("#nextQuestion").click();
