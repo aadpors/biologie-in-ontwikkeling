@@ -25,7 +25,7 @@ for filename, label in DATASETS:
             errors.append(f"{label} {qid}: dubbele afbeelding in images-array")
         if not any("context" in p.lower() for p in paths):
             errors.append(f"{label} {qid}: geen contextafbeelding gekoppeld")
-        if not any("question" in p.lower() for p in paths):
+        if not any(("question" in p.lower() or "mcq-" in p.lower()) for p in paths):
             errors.append(f"{label} {qid}: geen vraagafbeelding gekoppeld")
         for rel in ([primary] if primary else []) + paths:
             path = ROOT / rel
