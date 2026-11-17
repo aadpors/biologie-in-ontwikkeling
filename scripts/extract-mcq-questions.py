@@ -37,7 +37,7 @@ OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
 
 # Extra room below every text-based crop so glyph descenders (g, j, p, q, y)
 # are never clipped by a tight PDF text bounding box.
-BOTTOM_TEXT_PADDING = 12
+BOTTOM_TEXT_PADDING = 9
 
 def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
     """Render a full-width crop and remove earlier question blocks without leaving blank bands."""
@@ -802,7 +802,45 @@ context_by_key = {}
 for item in all_contexts:
     context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
 all_contexts = list(context_by_key.values())
-# Context records intentionally contain image references only. The original
-# exam page snippets are the sole source of question/context wording.
+# Build a single complete preview image for every question card. Some clients
+# display only the primary "image" field; previously that could show the question
+# crop while silently omitting its context images. Keep the separate "images"
+# array as well, but make the primary image a vertically stitched context+question.
+def stitch_question_images(record, fallback_prefix):
+    image_paths = record.get("images") or ([record["image"]] if record.get("image") else [])
+    existing = [ROOT / path for path in image_paths if (ROOT / path).exists()]
+    if not existing:
+        raise RuntimeError(f"No source images found for {record.get('id', record.get('n'))}")
+    opened = [Image.open(path).convert("RGB") for path in existing]
+    width = max(image.width for image in opened)
+    height = sum(image.height for image in opened) + 12 * (len(opened) - 1)
+    combined = Image.new("RGB", (width, height), "white")
+    y = 0
+    for image in opened:
+        combined.paste(image, (0, y))
+        y += image.height + 12
+    key = record.get("id") or f"{record['level'].lower()}-{record['year']}-t{record['period']}-q{record['n']}"
+    output_name = f"{fallback_prefix}-{key}.jpg"
+    combined.save(OUT / output_name, quality=94)
+    record["image"] = f"exam-snippets/{output_name}"
+    for image in opened:
+        image.close()
+
+# Apply the same context-first presentation to every MCQ and every selected
+# open-question context, rather than relying on the frontend to render arrays.
+for record in all_questions:
+    if record.get("images"):
+        stitch_question_images(record, "complete")
+for record in all_contexts:
+    if record.get("images"):
+        stitch_question_images(record, "complete")
+
+# Context records retain their separate image list for clients that support it;
+# the primary image now always contains the full context followed by the question.
+(ROOT / "exam-mcq.json").write_text(json.dumps(all_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+context_by_key = {}
+for item in all_contexts:
+    context_by_key.setdefault((item["level"], item["year"], item["period"], item["n"]), item)
+all_contexts = list(context_by_key.values())
 (ROOT / "exam-contexts.json").write_text(json.dumps(all_contexts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-print("Geschreven: exam-mcq.json en exam-contexts.json")
+print("Geschreven: exam-mcq.json en exam-contexts.json met complete context+vraag-previewafbeeldingen")
