@@ -545,9 +545,9 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # that question so earlier question prompts are not repeated.
                 manual_context_anchors = {
                     ("ha24t2", 3): "De aanwezigheid van mestkevers in de mest",
-                    ("ha24t2", 6): "Hoewel ivermectine ongevaarlijk is voor egels",
+                    ("ha24t2", 6): "Een infectie met nematoden is aan te tonen",
                     ("ha24t2", 7): "Helmer gaat in gesprek met veehouders",
-                    ("vw24t2", 2): "Over afbeelding 2 worden de volgende uitspraken gedaan",
+                    ("vw24t2", 2): "Lange tijd werd aangenomen dat przewalskipaarden wilde paarden zijn",
                     ("ha25t1", 14): "Eileen komt in aanmerking",
                     ("ha25t1", 27): "Uit onderzoek bij zeehonden",
                     ("ha26t1", 5): "Een kwartier na afloop van de inspanning",
