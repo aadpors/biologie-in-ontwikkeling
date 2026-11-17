@@ -48,6 +48,10 @@ def main():
                     and record.get("year") == "2026" and record.get("period") == "1" and record.get("n") == 41)
                 or (question_id == "vw24t2-open-11" and record.get("level") == "Vwo"
                     and record.get("year") == "2024" and record.get("period") == "2" and record.get("n") == 11)
+                or (question_id == "vw26t1-open-36" and record.get("level") == "Vwo"
+                    and record.get("year") == "2026" and record.get("period") == "1" and record.get("n") == 36)
+                or (question_id == "vw26t2-open-38" and record.get("level") == "Vwo"
+                    and record.get("year") == "2026" and record.get("period") == "2" and record.get("n") == 38)
             ):
                 record["image"] = image_path
                         print(f"Volledige bronuitsnede hersteld: {question_id}")
@@ -92,6 +96,28 @@ def main():
     second.close()
     set_crop("vw24t2-open-11", combined)
     combined.close()
+
+    # VWO 2026-I q36: the graph in figure 4 is a drawn graphic and was cut off
+    # by the text-only context boundary.
+    page = get_page("vw-1018-a-26-1-o.pdf", 14)
+    top = page.search_for("Obesitas kan leiden tot ongevoeligheid")
+    if not top:
+        raise ValueError("vw26t1-open-36: source context anchor missing")
+    set_crop(
+        "vw26t1-open-36",
+        render_region(page, min(x.y0 for x in top) - 5, page.rect.height - 20),
+    )
+
+    # VWO 2026-II q38: include the complete population-growth graph and prompt.
+    page = get_page("vw-1018-a-26-2-o.pdf", 18)
+    top = page.search_for("De onderzoekers concludeerden")
+    end = page.search_for("exponentieel verloopt.")
+    if not top or not end:
+        raise ValueError("vw26t2-open-38: source graph/question anchors missing")
+    set_crop(
+        "vw26t2-open-38",
+        render_region(page, min(x.y0 for x in top) - 5, max(x.y1 for x in end) + 10),
+    )
 
     for record in open_records + context_records:
         image_paths = [record.get("image"), *record.get("images", [])]
