@@ -106,7 +106,7 @@ fill("theme",questions.flatMap(onderwerpenVanVraag));
 ["level","year","period","questionType","theme"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
 let currentIndex=0;
 const selfChecks=JSON.parse(localStorage.getItem("bioExamSelfChecksV1")||"{}");
-function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||onderwerpenVanVraag(q).includes($("theme").value)))}
+function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||onderwerpenVanVraag(q).includes($("theme").value))).sort((a,b)=>Number(a.year)-Number(b.year)||Number(a.period)-Number(b.period)||Number(a.n)-Number(b.n)||a.level.localeCompare(b.level,"nl"))}
 function render(){
  const filtered=getFiltered();
  if(currentIndex>=filtered.length)currentIndex=Math.max(0,filtered.length-1);
