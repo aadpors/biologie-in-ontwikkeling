@@ -123,7 +123,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         context_top = min(context_top, min(rect.y0 for rect in visual_rects))
 
     context_top = max(0, context_top - 5)
-    context_bottom = min(bottom_limit, question_top - 2, max(lines[i]["bbox"][3] for i in ordered) + 4)
+    context_bottom = min(bottom_limit, question_top - 2)
     if context_bottom <= context_top + 2:
         return []
 
