@@ -238,7 +238,7 @@ def main():
         "ha25t1-mcq-31": "De milt is onderdeel van het lymfevatenstelsel",
         "vw24t2-mcq-36": "Om te bepalen hoe slaap en chromosoomdynamiek samenhangen",
         "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
-        "ha26t2-mcq-4": "pneumokokken",
+        "ha26t2-mcq-4": "pneumokokbacteriën",
         "ha25t2-mcq-17": "Als in de longblaasjes meer slijm aanwezig is",
     }
 
