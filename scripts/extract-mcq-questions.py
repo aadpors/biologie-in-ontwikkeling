@@ -61,6 +61,7 @@ SELECTED_CONTEXT_PAGES = {("ha24t1", 1): 2, ("ha24t1", 8): 5}
 
 HEADER_RE = re.compile(r"^(?:[HV][AW]-1018-a-\d{2}-\d-o|\d+\s*/\s*\d+|lees verder|einde|vraag\s+antwoord\s+scores|vraag|antwoord|scores)\b", re.I)
 MARKER_RE = re.compile(r"^\s*(\d+)\s*p\s+(\d{1,2})(?:\s+|$)", re.I)
+NUMBER_FIRST_MARKER_RE = re.compile(r"^\s*(\d{1,2})\s+(\d+)\s*p(?:\s+|$)", re.I)
 NUMBER_RE = re.compile(r"^\s*(\d{1,2})\s*$")
 OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
 
@@ -317,6 +318,17 @@ def find_markers(lines, allow_multiline_number_first=False):
         return index
 
     for i, record in enumerate(lines):
+        number_first = NUMBER_FIRST_MARKER_RE.match(record["text"])
+        if number_first:
+            inline_prompt = record["text"][number_first.end():].strip()
+            start = i if inline_prompt else prompt_start_before(i)
+            markers.append({
+                "line": start, "number_line": i, "points_line": i,
+                "number": int(number_first.group(1)), "points": int(number_first.group(2)),
+                "inline_prompt": inline_prompt
+            })
+            continue
+
         inline = MARKER_RE.match(record["text"])
         if inline:
             inline_prompt = record["text"][inline.end():].strip()
@@ -487,7 +499,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
             # a new topic can begin at the top of every page, and stale context
             # was the cause of unrelated introductions appearing on later questions.
             lines = line_records(page)
-            markers = find_markers(lines, allow_multiline_number_first=(prefix == "ha24t1"))
+            markers = find_markers(lines, allow_multiline_number_first=(prefix == "ha24t1" and page_index != 15))
             if not markers:
                 headings = [
                     j for j, line in enumerate(lines)
@@ -1090,7 +1102,7 @@ for exam in EXAMS:
         for page in source_doc:
             detected.update(
                 marker["number"] for marker in find_markers(
-                    line_records(page), allow_multiline_number_first=(exam_key == "ha24t1")
+                    line_records(page), allow_multiline_number_first=(exam_key == "ha24t1" and page_index != 15)
                 )
             )
     represented = [
@@ -1114,6 +1126,20 @@ for exam in EXAMS:
                             "page": page_index + 1,
                             "lines": [x["text"] for x in page_lines[lo:hi]]
                         })
+        if missing:
+            missing_text = {}
+            with fitz.open(ROOT / exam_rel) as source_doc:
+                for page_index, page in enumerate(source_doc):
+                    page_lines = line_records(page)
+                    for line_index, line in enumerate(page_lines):
+                        if NUMBER_RE.fullmatch(line["text"]) and int(line["text"]) in missing:
+                            lo = max(0, line_index - 3)
+                            hi = min(len(page_lines), line_index + 12)
+                            missing_text.setdefault(int(line["text"]), []).append({
+                                "page": page_index + 1,
+                                "lines": [x["text"] for x in page_lines[lo:hi]]
+                            })
+            print(f"Missing-number source lines for {exam_key}: {missing_text}")
         print(f"Question marker diagnostics for {exam_key}: {details}")
         raise RuntimeError(
             f"Incomplete or duplicate question inventory for {exam_key}: "
