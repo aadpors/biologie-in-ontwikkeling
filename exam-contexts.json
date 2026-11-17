@@ -83,7 +83,7 @@
     "image": "exam-snippets/complete-vwo-2025-t1-q17.jpg",
     "images": [
       "exam-snippets/vw25-t1-hippo-context.jpg",
-      "exam-snippets/context-vw25t1-q17-complete.jpg",
+      "exam-snippets/context-vw25t1-q17-fallback.jpg",
       "exam-snippets/question-vw25t1-17-only.jpg"
     ]
   },
@@ -157,7 +157,7 @@
     "page": 4,
     "image": "exam-snippets/complete-havo-2026-t1-q4.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q4-complete.jpg",
+      "exam-snippets/context-ha26t1-q4-fallback.jpg",
       "exam-snippets/question-ha26t1-4-only.jpg"
     ]
   },
@@ -193,7 +193,7 @@
     "page": 5,
     "image": "exam-snippets/complete-havo-2026-t1-q8.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q8-complete.jpg",
+      "exam-snippets/context-ha26t1-q8-fallback.jpg",
       "exam-snippets/question-ha26t1-8-only.jpg"
     ]
   },
@@ -265,7 +265,7 @@
     "page": 7,
     "image": "exam-snippets/complete-vwo-2026-t1-q14.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q14-complete.jpg",
+      "exam-snippets/context-vw26t1-q14-fallback.jpg",
       "exam-snippets/question-vw26t1-14-only.jpg"
     ]
   },
@@ -337,7 +337,7 @@
     "page": 13,
     "image": "exam-snippets/complete-vwo-2026-t2-q24.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q24-complete.jpg",
+      "exam-snippets/context-vw26t2-q24-fallback.jpg",
       "exam-snippets/question-vw26t2-24-only.jpg"
     ]
   }
