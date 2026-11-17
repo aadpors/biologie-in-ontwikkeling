@@ -16,7 +16,7 @@ def discover_exams():
     automatically; an unmatched exam or marking scheme is a hard error.
     """
     exam_dir = ROOT / "examens"
-    pattern = re.compile(r"^(ha|vw)-1018-a-(\\d{2})-(\\d)-o(?:-[a-z0-9]+)?\\.pdf$", re.I)
+    pattern = re.compile(r"^(ha|vw)-1018-a-(\d{2})-(\d)-o(?:-[a-z0-9]+)?\.pdf$", re.I)
     discovered = []
     for source in sorted(exam_dir.glob("*.pdf")):
         match = pattern.match(source.name)
