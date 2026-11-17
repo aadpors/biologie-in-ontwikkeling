@@ -283,27 +283,35 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     if context_y_candidates else max(0, lines[start]["bbox"][1] - 0.5)
                 )
 
-                # Havo 2025-I question 14 starts a new stem-cell-transplant
-                # context on the same page as questions 12 and 13. The generic
-                # open-question boundary can consume that paragraph as part of
-                # question 13, leaving question 14 without its own context.
-                # Anchor this card to the start of its actual context paragraph;
-                # keep the full page width and stop at question 14 as usual.
-                if (prefix, marker["number"]) == ("ha25t1", 14):
-                    anchor = page.search_for("Eileen komt in aanmerking")
-                    if anchor:
-                        anchor_y = anchor[0].y0
+                # A few pages contain multiple questions within one large text
+                # block. Anchor these cards to the actual context paragraph for
+                # that question so earlier question prompts are not repeated.
+                manual_context_anchors = {
+                    ("ha25t1", 14): "Eileen komt in aanmerking",
+                    ("ha26t1", 5): "Een kwartier na afloop van de inspanning",
+                    ("ha26t1", 8): "Bomen langs de beek zorgen voor schaduw",
+                    ("vw26t1", 2): "Bloedplaatjes ontstaan in het rode beenmerg",
+                    ("vw26t2", 14): "De waterspreeuw is de enige zangvogel",
+                }
+                anchored_context = False
+                anchor_text = manual_context_anchors.get((prefix, marker["number"]))
+                if anchor_text:
+                    anchor_hits = page.search_for(anchor_text)
+                    if anchor_hits:
+                        anchor_y = min(rect.y0 for rect in anchor_hits)
                         context_line_indices = [
                             j for j, line in enumerate(lines)
                             if anchor_y - 1 <= line["bbox"][1] < lines[start]["bbox"][1]
                         ]
                         context = clean_context([lines[j]["text"] for j in context_line_indices])
                         context_y0 = max(0, anchor_y - 5)
+                        anchored_context = True
 
                 # A question can start very near the top of a PDF page. In
                 # that case the default context margin must not begin below
                 # the question itself, or the resulting image crop is empty.
-                context_y0 = min(context_y0, max(0, lines[start]["bbox"][1] - 0.5))
+                if not anchored_context:
+                    context_y0 = min(context_y0, max(0, lines[start]["bbox"][1] - 0.5))
 
                 if prefix == "vw25t1" and marker["number"] in {14, 15, 16, 17, 18}:
                     # Shared context is stitched separately from page 8 and
