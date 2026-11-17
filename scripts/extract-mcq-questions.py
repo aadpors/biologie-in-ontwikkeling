@@ -45,6 +45,9 @@ EXAMS = discover_exams()
 
 SELECTED_CONTEXTS = {
     ("ha24t1", 1), ("ha24t1", 8),
+# Question-number false positives elsewhere in Havo 2024-I must never
+# overwrite the correctly anchored page-2/page-5 image files.
+SELECTED_CONTEXT_PAGES = {("ha24t1", 1): 2, ("ha24t1", 8): 5}
     ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18),
     ("ha25t1", 1), ("ha25t1", 3), ("ha25t1", 5),
     ("ha26t1", 4), ("ha26t1", 5), ("ha26t1", 7), ("ha26t1", 8), ("ha26t1", 15), ("ha26t1", 16),
@@ -663,7 +666,9 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
-                if (prefix, marker["number"]) in SELECTED_CONTEXTS:
+                selected_context_page = SELECTED_CONTEXT_PAGES.get((prefix, marker["number"]))
+                if ( (prefix, marker["number"]) in SELECTED_CONTEXTS
+                     and (selected_context_page is None or page_index + 1 == selected_context_page) ):
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     question_top = max(0, lines[start]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
@@ -949,11 +954,7 @@ for exam in EXAMS:
     for context in contexts:
         key = (exam[0], context["n"])
         if key in selected_contexts_seen:
-            # Some PDFs repeat isolated numbered list markers in a way that
-            # resembles an already-seen question. Keep the first occurrence
-            # (the earliest page) and discard later duplicate context records.
-            print(f"Ignoring duplicate selected context {key} on page {context['page']}")
-            continue
+            raise RuntimeError(f"Selected open-question context generated more than once: {key}")
         selected_contexts_seen.add(key)
     print(f"{exam[0]}: {len(items)} meerkeuzevragen; {len(contexts)} geselecteerde contexten")
 
