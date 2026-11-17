@@ -500,6 +500,11 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
             # was the cause of unrelated introductions appearing on later questions.
             lines = line_records(page)
             markers = find_markers(lines, allow_multiline_number_first=(prefix == "ha24t1" and page_index != 15))
+            if prefix == "ha24t1" and page_index == 15:
+                # The answer-key table on printed page 16 contains numbered
+                # response rows that resemble question markers; only q31 is
+                # an actual exam question on this page.
+                markers = [m for m in markers if m["number"] not in {2, 3, 4, 5}]
             if not markers:
                 headings = [
                     j for j, line in enumerate(lines)
@@ -1100,11 +1105,12 @@ for exam in EXAMS:
     with fitz.open(ROOT / exam_rel) as source_doc:
         detected = set()
         for page_index, page in enumerate(source_doc):
-            detected.update(
-                marker["number"] for marker in find_markers(
-                    line_records(page), allow_multiline_number_first=(exam_key == "ha24t1" and page_index != 15)
-                )
+            page_markers = find_markers(
+                line_records(page), allow_multiline_number_first=(exam_key == "ha24t1" and page_index != 15)
             )
+            if exam_key == "ha24t1" and page_index == 15:
+                page_markers = [m for m in page_markers if m["number"] not in {2, 3, 4, 5}]
+            detected.update(marker["number"] for marker in page_markers)
     represented = [
         q for q in all_questions + all_open_questions
         if q["level"] == level and q["year"] == year and q["period"] == period
