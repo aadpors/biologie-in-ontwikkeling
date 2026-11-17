@@ -5,6 +5,7 @@ const html = fs.readFileSync('index.html', 'utf8');
 const examPage = fs.readFileSync('examenoefenen.html', 'utf8');
 const publications = JSON.parse(fs.readFileSync('publicaties.json', 'utf8'));
 const examQuestions = JSON.parse(fs.readFileSync('exam-mcq.json', 'utf8'));
+const openExamQuestions = JSON.parse(fs.readFileSync('exam-open.json', 'utf8'));
 const examContexts = JSON.parse(fs.readFileSync('exam-contexts.json', 'utf8'));
 
 function assertSnippetExists(path, where) {
@@ -14,6 +15,7 @@ function assertSnippetExists(path, where) {
 }
 
 assert.ok(Array.isArray(examQuestions) && examQuestions.length > 0, 'exam-mcq.json moet examenvragen bevatten');
+assert.ok(Array.isArray(openExamQuestions), 'exam-open.json moet open examenvragen bevatten');
 assert.ok(Array.isArray(examContexts) && examContexts.length > 0, 'exam-contexts.json moet contexten bevatten');
 const examYears = new Set(examQuestions.map(question => question.year));
 const sourceExamFiles = fs.readdirSync('examens');
@@ -69,6 +71,26 @@ const sortedExamQuestions = [...examQuestions].sort((a, b) =>
 );
 assert.deepEqual(examQuestions.map(sortKey), sortedExamQuestions.map(sortKey),
   'Meerkeuzevragen moeten oplopend op examenjaar, tijdvak en vraagnummer staan');
+
+const openIds = new Set();
+for (const [index, question] of openExamQuestions.entries()) {
+  const where = `exam-open.json vraag ${index + 1}`;
+  assert.ok(question.id && !openIds.has(question.id), `${where}: ontbrekend of dubbel vraag-ID`);
+  openIds.add(question.id);
+  assert.ok(['Havo', 'Vwo'].includes(question.level), `${where}: onbekend niveau`);
+  assert.ok(['2024', '2025', '2026'].includes(question.year), `${where}: examenjaar buiten de opdracht`);
+  assert.ok(['1', '2'].includes(question.period), `${where}: ongeldig tijdvak`);
+  assert.ok(Number.isInteger(question.n) && question.n > 0, `${where}: ongeldig vraagnummer`);
+  assert.ok(Number.isInteger(question.points) && question.points > 0, `${where}: ontbrekende score`);
+  assert.ok(typeof question.q === 'string' && question.q.trim(), `${where}: vraagtekst ontbreekt`);
+  assertSnippetExists(question.image, where);
+  for (const path of question.images || []) assertSnippetExists(path, where);
+  assert.ok((question.images || []).length >= 2, `${where}: aparte context- en vraagafbeeldingen ontbreken`);
+  assert.ok(question.pdf && question.cv, `${where}: originele opgave of correctievoorschrift ontbreekt`);
+}
+const allQuestionKeys = [...examQuestions, ...openExamQuestions].map(q => [q.level, q.year, q.period, q.n].join('|'));
+assert.equal(new Set(allQuestionKeys).size, allQuestionKeys.length, 'Een examenvraag staat dubbel als open en/of meerkeuzevraag');
+assert.ok(openExamQuestions.length > 0, 'Geen open vragen uit de volledige examenextractie gevonden');
 
 const examIds = new Set();
 for (const [index, question] of examQuestions.entries()) {
