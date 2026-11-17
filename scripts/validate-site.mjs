@@ -3,6 +3,34 @@ import assert from 'node:assert/strict';
 
 const html = fs.readFileSync('index.html', 'utf8');
 const publications = JSON.parse(fs.readFileSync('publicaties.json', 'utf8'));
+const examQuestions = JSON.parse(fs.readFileSync('exam-mcq.json', 'utf8'));
+const examContexts = JSON.parse(fs.readFileSync('exam-contexts.json', 'utf8'));
+
+function assertSnippetExists(path, where) {
+  assert.equal(typeof path, 'string', `${where}: snippetverwijzing ontbreekt`);
+  assert.ok(path.startsWith('exam-snippets/'), `${where}: snippet moet uit exam-snippets komen`);
+  assert.ok(fs.existsSync(path), `${where}: afbeelding ontbreekt: ${path}`);
+}
+
+assert.ok(Array.isArray(examQuestions) && examQuestions.length > 0, 'exam-mcq.json moet examenvragen bevatten');
+assert.ok(Array.isArray(examContexts) && examContexts.length > 0, 'exam-contexts.json moet contexten bevatten');
+const examIds = new Set();
+for (const [index, question] of examQuestions.entries()) {
+  const where = `exam-mcq.json vraag ${index + 1}`;
+  assert.ok(question.id && !examIds.has(question.id), `${where}: ontbrekend of dubbel vraag-ID`);
+  examIds.add(question.id);
+  assertSnippetExists(question.image, where);
+  for (const path of question.images || []) assertSnippetExists(path, where);
+  assert.ok(Array.isArray(question.options) && question.options.length >= 3, `${where}: antwoordopties ontbreken`);
+  const keys = question.options.map(option => option.key);
+  assert.equal(new Set(keys).size, keys.length, `${where}: dubbele antwoordletter`);
+  assert.ok(keys.includes(question.correct), `${where}: correct antwoord ${question.correct} ontbreekt bij de opties`);
+}
+for (const [index, context] of examContexts.entries()) {
+  const where = `exam-contexts.json context ${index + 1}`;
+  assertSnippetExists(context.image, where);
+  for (const path of context.images || []) assertSnippetExists(path, where);
+}
 
 assert.ok(Array.isArray(publications), 'publicaties.json moet een array bevatten');
 assert.ok(publications.length > 0, 'publicatiedatabase mag niet leeg zijn');
@@ -75,4 +103,4 @@ const counts = publications.reduce((result, item) => {
   result[item.page] = (result[item.page] || 0) + 1;
   return result;
 }, {});
-console.log(`Validatie geslaagd: ${publications.length} publicaties (${counts.science || 0} vakinhoudelijk, ${counts.education || 0} pedagogisch-didactisch); ${inlineScripts.length} JavaScript-blok(ken) syntactisch geldig.`);
+console.log(`Validatie geslaagd: ${publications.length} publicaties (${counts.science || 0} vakinhoudelijk, ${counts.education || 0} pedagogisch-didactisch), ${examQuestions.length} examenvragen, ${examContexts.length} contexten en alle bijbehorende afbeeldingen aanwezig; ${inlineScripts.length} JavaScript-blok(ken) syntactisch geldig.`);
