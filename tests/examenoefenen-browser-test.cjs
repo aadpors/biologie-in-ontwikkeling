@@ -47,6 +47,7 @@ const assert = require("node:assert/strict");
       };
     });
     assert.equal(topicAudit.total, 519, "De volledige vragenset moet zijn meegenomen in de onderwerpaudit");
+    assert.deepEqual(topicAudit.unclassified, ["vw26t2-open-39"], "Alleen de vraag zonder geëxtraheerde context mag zonder automatisch onderwerp blijven");
     assert.deepEqual(topicAudit.overTagged, [], "Er zijn vragen met meer dan drie onderwerpstags; controleer op overmatige rubricering");
 
     // Context words must not create unrelated subjects on two known edge cases.
