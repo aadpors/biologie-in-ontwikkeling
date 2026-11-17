@@ -1102,6 +1102,19 @@ for exam in EXAMS:
     missing = sorted(expected - set(represented_numbers))
     duplicates = sorted(n for n in set(represented_numbers) if represented_numbers.count(n) > 1)
     if missing or duplicates:
+        details = {}
+        with fitz.open(ROOT / exam_rel) as source_doc:
+            for page_index, page in enumerate(source_doc):
+                page_lines = line_records(page)
+                for marker in find_markers(page_lines, allow_multiline_number_first=(exam_key == "ha24t1")):
+                    if marker["number"] in duplicates or marker["number"] in missing:
+                        lo = max(0, marker["line"] - 2)
+                        hi = min(len(page_lines), marker["line"] + 5)
+                        details.setdefault(marker["number"], []).append({
+                            "page": page_index + 1,
+                            "lines": [x["text"] for x in page_lines[lo:hi]]
+                        })
+        print(f"Question marker diagnostics for {exam_key}: {details}")
         raise RuntimeError(
             f"Incomplete or duplicate question inventory for {exam_key}: "
             f"missing={missing}, duplicates={duplicates}, detected={sorted(detected)}"
