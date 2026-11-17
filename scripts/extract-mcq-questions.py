@@ -448,10 +448,6 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
             # a new topic can begin at the top of every page, and stale context
             # was the cause of unrelated introductions appearing on later questions.
             lines = line_records(page)
-            if prefix == "ha24t1" and page_index in {1, 4}:
-                print(f"DEBUG {prefix} page {page_index + 1}:")
-                for line_index, line in enumerate(lines):
-                    print(f"  {line_index}: {line['text']!r} y={line['bbox'][1]:.1f} x={line['bbox'][0]:.1f}")
             markers = find_markers(lines, allow_multiline_number_first=(prefix == "ha24t1"))
             if not markers:
                 headings = [
@@ -613,6 +609,13 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         {"key": "B", "text": "samentrekken van de slagaderwand; systolische druk"},
                         {"key": "C", "text": "uitrekken van de slagaderwand; diastolische druk"},
                         {"key": "D", "text": "uitrekken van de slagaderwand; systolische druk"},
+                    ]
+                if (prefix, marker["number"]) == ("ha24t1", 9):
+                    options = [
+                        {"key": "A", "text": "met een lysosoom"},
+                        {"key": "B", "text": "met een mitochondrium"},
+                        {"key": "C", "text": "met een ribosoom"},
+                        {"key": "D", "text": "met het endoplasmatisch reticulum met het golgi-systeem"},
                     ]
 
                 first_option = next((i for i, x in enumerate(block_text) if OPTION_RE.match(x.strip())), len(block_text))
