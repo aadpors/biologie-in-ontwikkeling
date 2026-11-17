@@ -79,7 +79,7 @@ const assert = require("node:assert/strict");
     let appendix = page.locator('a[href$="-u.pdf"]');
     for (let i = 0; i < 60 && await appendix.count() === 0; i++) {
       const heading = await page.locator(".qhead").innerText();
-      if (/vraag 12\\b/.test(heading)) break;
+      if (/vraag 12\b/.test(heading)) break;
       await page.locator("#nextQuestion").click();
       appendix = page.locator('a[href$="-u.pdf"]');
     }
