@@ -142,7 +142,9 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         question_top - 5,
         final_context_text_bottom + 6,
     )
-    if context_bottom <= context_top + 2:
+    # A very shallow fragment is not a usable context card. Let the
+    # bounded page-local fallback preserve the preceding context instead.
+    if context_bottom <= context_top + 35:
         return []
 
     name = f"context-{prefix}-q{number}-complete.jpg"
