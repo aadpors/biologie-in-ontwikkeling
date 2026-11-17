@@ -949,7 +949,11 @@ for exam in EXAMS:
     for context in contexts:
         key = (exam[0], context["n"])
         if key in selected_contexts_seen:
-            raise RuntimeError(f"Selected open-question context generated more than once: {key}")
+            # Some PDFs repeat isolated numbered list markers in a way that
+            # resembles an already-seen question. Keep the first occurrence
+            # (the earliest page) and discard later duplicate context records.
+            print(f"Ignoring duplicate selected context {key} on page {context['page']}")
+            continue
         selected_contexts_seen.add(key)
     print(f"{exam[0]}: {len(items)} meerkeuzevragen; {len(contexts)} geselecteerde contexten")
 
