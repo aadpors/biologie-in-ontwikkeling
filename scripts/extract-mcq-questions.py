@@ -340,13 +340,20 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # that question so earlier question prompts are not repeated.
                 manual_context_anchors = {
                     ("ha25t1", 14): "Eileen komt in aanmerking",
+                    ("ha25t1", 27): "Uit onderzoek bij zeehonden",
                     ("ha26t1", 5): "Een kwartier na afloop van de inspanning",
                     ("ha26t1", 8): "Bomen langs de beek zorgen voor schaduw",
+                    ("ha26t1", 17): "Hieronder staat een beschrijving van het onderzoek",
+                    ("vw25t1", 30): "In tabel 2 is de aminozuurvolgorde",
+                    ("vw25t1", 32): "Als een mutatie tot gevolg heeft",
                     ("vw26t1", 2): "Bloedplaatjes ontstaan in het rode beenmerg",
+                    ("vw26t1", 9): "Om het tekort aan bloedplaatjes op te vangen",
+                    ("vw26t1", 10): "Uit het bloedonderzoek bleek",
                     ("vw26t2", 14): "De waterspreeuw is de enige zangvogel",
                     ("vw26t2", 24): "Als het darmslijmvlies is opgezwollen",
                     ("ha26t1", 23): "Bij monocultuur verbouwt een boer één gewas",
                     ("ha26t1", 43): "Door antistoffen te gebruiken in de behandeling van mastitis",
+                    ("ha26t2", 7): "Het bleek worden is het gevolg van het samentrekken",
                     ("ha26t2", 10): "Destiny laat zien dat de zwarte mangrove",
                     ("vw26t2", 3): "Voor de aanmaak van de nepetalactonen",
                 }
@@ -388,6 +395,17 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         block_indices.append(j)
 
                 options = parse_options(block_text)
+                if (prefix, marker["number"]) == ("vw26t1", 9):
+                    # The six percentage choices are split across columns in
+                    # the source PDF; keep each alternative separate.
+                    options = [
+                        {"key": "A", "text": "2,6%"},
+                        {"key": "B", "text": "4,0%"},
+                        {"key": "C", "text": "16%"},
+                        {"key": "D", "text": "27%"},
+                        {"key": "E", "text": "71%"},
+                        {"key": "F", "text": "84%"},
+                    ]
 
                 # Exam PDFs often place the next context paragraph immediately
                 # after the final answer option. The old parser treated that
@@ -527,6 +545,25 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 image_name = f"mcq-{qid}.jpg"
                 save_page_crop(page, crop, OUT / image_name, lines, previous_ranges)
                 mcq_images = None
+                if (prefix, marker["number"]) == ("vw26t1", 9):
+                    if page_index == 0:
+                        raise RuntimeError("VWO 2026-I question 9 has no preceding context page")
+                    previous_page = doc[page_index - 1]
+                    previous_lines = line_records(previous_page)
+                    previous_markers = find_markers(previous_lines)
+                    q5_marker = next((m for m in previous_markers if m["number"] == 5), None)
+                    intro_hits = previous_page.search_for("Nadat andere oorzaken werden uitgesloten")
+                    if not q5_marker or not intro_hits:
+                        raise RuntimeError("Could not isolate the HPA context table for VWO 2026-I question 9")
+                    context_top = max(0, min(rect.y0 for rect in intro_hits) - 5)
+                    context_bottom = max(context_top + 20, previous_lines[q5_marker["line"]]["bbox"][1] - 5)
+                    context_name = "context-vw26t1-q9-table.jpg"
+                    previous_page.get_pixmap(
+                        matrix=fitz.Matrix(1.8, 1.8),
+                        clip=fitz.Rect(0, context_top, previous_page.rect.width, context_bottom),
+                        alpha=False,
+                    ).save(OUT / context_name)
+                    mcq_images = [f"exam-snippets/{context_name}", f"exam-snippets/{image_name}"]
                 if (prefix, marker["number"]) == ("vw26t2", 37):
                     # The model and introductory context belong to question 37;
                     # questions 36's statements must not be repeated in its card.
