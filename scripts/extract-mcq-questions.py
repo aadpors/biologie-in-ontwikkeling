@@ -50,7 +50,7 @@ def appendix_pdfs_for_exam(exam_pdf):
     # The exam identifier is stable across opgaven, correction and appendix files.
     base = re.sub(r"-o(?:-[a-z0-9]+)?$", "", stem, flags=re.I)
     appendix_suffix = re.compile(
-        r"^(?:-u|-ub|-bijlage|-bijlagen|-uitwerkbijlage|-uitwerkblad"
+        r"^(?:-u|-ub|-b|-bijlage|-bijlagen|-uitwerkbijlage|-uitwerkblad"
         r"|-antwoordblad|-werkblad|-tekenblad|-bijl"
         r"|-o-(?:bijlage|bijlagen|uitwerkbijlage|uitwerkblad|antwoordblad|werkblad))"
         r"(?:[-_][a-z0-9]+)?$",
@@ -59,10 +59,17 @@ def appendix_pdfs_for_exam(exam_pdf):
     found = []
     for candidate in sorted((ROOT / "examens").glob("*.pdf")):
         candidate_stem = candidate.stem
-        if not candidate_stem.lower().startswith(base.lower()):
+        candidate_lower = candidate_stem.lower()
+        base_lower = base.lower()
+        if base_lower not in candidate_lower:
             continue
-        suffix = candidate_stem[len(base):]
-        if appendix_suffix.fullmatch(suffix):
+        suffix = candidate_stem[candidate_lower.index(base_lower) + len(base):]
+        named_as_appendix = re.search(
+            r"uitwerk|bijlage|antwoordblad|werkblad|tekenblad",
+            candidate_stem,
+            re.I,
+        )
+        if appendix_suffix.fullmatch(suffix) or named_as_appendix:
             found.append(candidate.relative_to(ROOT).as_posix())
     return found
 
