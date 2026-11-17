@@ -45,9 +45,6 @@ EXAMS = discover_exams()
 
 SELECTED_CONTEXTS = {
     ("ha24t1", 1), ("ha24t1", 8),
-# Question-number false positives elsewhere in Havo 2024-I must never
-# overwrite the correctly anchored page-2/page-5 image files.
-SELECTED_CONTEXT_PAGES = {("ha24t1", 1): 2, ("ha24t1", 8): 5}
     ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18),
     ("ha25t1", 1), ("ha25t1", 3), ("ha25t1", 5),
     ("ha26t1", 4), ("ha26t1", 5), ("ha26t1", 7), ("ha26t1", 8), ("ha26t1", 15), ("ha26t1", 16),
@@ -57,6 +54,9 @@ SELECTED_CONTEXT_PAGES = {("ha24t1", 1): 2, ("ha24t1", 8): 5}
     ("ha26t2", 3), ("ha26t2", 9),
     ("vw26t2", 14), ("vw26t2", 24),
 }
+# Question-number false positives elsewhere in Havo 2024-I must never
+# overwrite the correctly anchored page-2/page-5 image files.
+SELECTED_CONTEXT_PAGES = {("ha24t1", 1): 2, ("ha24t1", 8): 5}
 
 HEADER_RE = re.compile(r"^(?:[HV][AW]-1018-a-\d{2}-\d-o|\d+\s*/\s*\d+|lees verder|einde|vraag\s+antwoord\s+scores|vraag|antwoord|scores)\b", re.I)
 MARKER_RE = re.compile(r"^\s*(\d+)\s*p\s+(\d{1,2})(?:\s+|$)", re.I)
