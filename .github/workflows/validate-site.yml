@@ -2,17 +2,28 @@ name: Validate website
 on:
   push:
     branches: [main]
+    paths:
+      - 'index.html'
+      - 'publicaties.json'
+      - 'scripts/validate-site.mjs'
+      - '.github/workflows/validate-site.yml'
   pull_request:
     branches: [main]
+  workflow_run:
+    workflows: ["Render exam snippets"]
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   validate:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out latest main
         uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
