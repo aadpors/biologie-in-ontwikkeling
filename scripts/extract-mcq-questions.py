@@ -373,13 +373,7 @@ def find_markers(lines, allow_multiline_number_first=False):
     return unique
 
 def parse_options(block_lines):
-    """Parse sequential A-F choices, including multiple choices on one PDF line.
-
-    PDF extraction sometimes joins the end of D with the E label (or E with F).
-    Once an A option has been identified at the start of a line, split only on
-    the next expected standalone letter. This avoids interpreting ordinary
-    capital letters in the question stem as answer labels.
-    """
+    """Parse sequential A-F choices, including multiple choices on one PDF line."""
     options = []
     current = None
     expected = "A"
@@ -389,7 +383,7 @@ def parse_options(block_lines):
         r"de onderzoekers|vervolgens)", re.I
     )
 
-    def begin_option(key, value):
+    def begin_option(key, value=""):
         nonlocal current, expected
         if current is not None:
             options.append(current)
@@ -402,20 +396,20 @@ def parse_options(block_lines):
             continue
         start_match = OPTION_RE.match(line)
         if start_match and start_match.group(1) == expected:
-            begin_option(start_match.group(1), "")
+            begin_option(start_match.group(1))
             line = (start_match.group(2) or "").strip()
         elif current is None:
             continue
-        if re.match(r"^\\d+\\s*p$", line, re.I) or HEADER_RE.match(line):
+
+        if re.match(r"^\d+\s*p$", line, re.I) or HEADER_RE.match(line):
             break
         if len(options) >= 3 and current["text"] and stop_starts.match(line):
             break
 
-        # Some PDF text layers put the next option on the same line as the
-        # current one. Split at the next expected isolated A-F label only.
+        # A PDF text layer can put e.g. D ... E ... on one extracted line.
         remainder = line
         while expected and expected <= "F":
-            inline = re.search(r"\\s(" + re.escape(expected) + r")(?:\\s+|$)", remainder)
+            inline = re.search(r"\s(" + re.escape(expected) + r")(?:\s+|$)", remainder)
             if not inline:
                 break
             before = remainder[:inline.start()].strip()
@@ -423,7 +417,7 @@ def parse_options(block_lines):
                 current["text"] = (current["text"] + " " + before).strip()
             key = inline.group(1)
             remainder = remainder[inline.end():].strip()
-            begin_option(key, "")
+            begin_option(key)
         if remainder:
             current["text"] = (current["text"] + " " + remainder).strip()
 
@@ -432,10 +426,8 @@ def parse_options(block_lines):
 
     keys = [option["key"] for option in options]
     if len(keys) < 3 or keys != list("ABCDEF"[:len(keys)]):
-        # Keep support for diagram-based answer options whose letters are
-        # extracted as a compact A B C D E F sequence on a single line.
         compact = " ".join(block_lines)
-        labels = re.search(r"\\bA\\s+B\\s+C\\s+D(?:\\s+E)?(?:\\s+F)?\\b", compact)
+        labels = re.search(r"\bA\s+B\s+C\s+D(?:\s+E)?(?:\s+F)?\b", compact)
         if not labels:
             return []
         keys = labels.group(0).split()
