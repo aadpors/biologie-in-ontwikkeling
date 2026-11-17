@@ -491,18 +491,20 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         intro_hits = page.search_for("Freek wil graag zwarte kippen gaan fokken")
                         q7_marker = next((m for m in markers if m["number"] == 7), None)
                         inbreeding_hits = page.search_for("Fokkers kruisen vaker")
+                        inbreeding_end_hits = page.search_for("tot uiting komen")
                         q9_prompt_hits = page.search_for("Verklaar hoe inteelt leidt")
-                        if not intro_hits or not q7_marker or not inbreeding_hits or not q9_prompt_hits:
+                        if not intro_hits or not q7_marker or not inbreeding_hits or not inbreeding_end_hits or not q9_prompt_hits:
                             raise RuntimeError("Could not isolate the Havo 2025-II question 9 context fragments")
                         q7_y = lines[q7_marker["line"]]["bbox"][1]
                         q9_y = min(rect.y0 for rect in q9_prompt_hits)
                         intro_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
                         inbreeding_y0 = max(0, min(rect.y0 for rect in inbreeding_hits) - 5)
+                        inbreeding_y1 = min(page.rect.height, max(rect.y1 for rect in inbreeding_end_hits) + 5)
                         question_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
                         intro_name = "context-ha25t2-q9-intro.jpg"
                         inbreeding_name = "context-ha25t2-q9-inbreeding.jpg"
                         page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, intro_y0, page.rect.width, q7_y - 5), alpha=False).save(OUT / intro_name)
-                        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, inbreeding_y0, page.rect.width, q9_y - 5), alpha=False).save(OUT / inbreeding_name)
+                        page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, inbreeding_y0, page.rect.width, inbreeding_y1), alpha=False).save(OUT / inbreeding_name)
                         page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, max(0, q9_y - 0.5), page.rect.width, question_y1), alpha=False).save(OUT / context_image)
                         context_record["images"] = [
                             f"exam-snippets/{intro_name}",
