@@ -139,8 +139,8 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     # context crop into the question merely to satisfy that padding.
     context_bottom = min(
         bottom_limit,
-        question_top - 5,
-        final_context_text_bottom + 6,
+        question_top - 1,
+        final_context_text_bottom + 8,
     )
     # A very shallow fragment is not a usable context card. Let the
     # bounded page-local fallback preserve the preceding context instead.
