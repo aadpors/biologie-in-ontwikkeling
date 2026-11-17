@@ -92,6 +92,15 @@ const allQuestionKeys = [...examQuestions, ...openExamQuestions].map(q => [q.lev
 assert.equal(new Set(allQuestionKeys).size, allQuestionKeys.length, 'Een examenvraag staat dubbel als open en/of meerkeuzevraag');
 assert.ok(openExamQuestions.length > 0, 'Geen open vragen uit de volledige examenextractie gevonden');
 
+assert.ok(examPage.includes('Volledige uitwerkbijlage'), 'Frontend biedt geen link naar de volledige uitwerkbijlage');
+for (const [index, question] of [...examQuestions, ...openExamQuestions].entries()) {
+  for (const attachment of question.attachmentPdfs || []) {
+    assert.equal(typeof attachment, 'string', `examenvraag ${index + 1}: ongeldige uitwerkbijlageverwijzing`);
+    assert.ok(attachment.startsWith('examens/'), `examenvraag ${index + 1}: uitwerkbijlage moet uit examens komen`);
+    assert.ok(fs.existsSync(attachment), `examenvraag ${index + 1}: volledige uitwerkbijlage ontbreekt: ${attachment}`);
+  }
+}
+
 const examIds = new Set();
 for (const [index, question] of examQuestions.entries()) {
   const where = `exam-mcq.json vraag ${index + 1}`;
