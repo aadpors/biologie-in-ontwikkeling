@@ -44,6 +44,7 @@ def discover_exams():
 EXAMS = discover_exams()
 
 SELECTED_CONTEXTS = {
+    ("ha24t1", 1), ("ha24t1", 8),
     ("vw25t1", 14), ("vw25t1", 15), ("vw25t1", 16), ("vw25t1", 17), ("vw25t1", 18),
     ("ha25t1", 1), ("ha25t1", 3), ("ha25t1", 5),
     ("ha26t1", 4), ("ha26t1", 5), ("ha26t1", 7), ("ha26t1", 8), ("ha26t1", 15), ("ha26t1", 16),
