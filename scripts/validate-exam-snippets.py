@@ -55,6 +55,26 @@ for filename, label in DATASETS:
             except Exception as exc:
                 errors.append(f"{label} {qid}: ongeldige afbeelding {rel}: {exc}")
 
+# Every official correction-scheme manifest entry must resolve to a readable generated image.
+cv_manifest = json.loads((ROOT / "scripts" / "cv-snippets.json").read_text(encoding="utf-8"))
+for item in cv_manifest:
+    for key in ("output", "amendment_output"):
+        rel = item.get(key)
+        if not rel:
+            continue
+        path = ROOT / "exam-snippets" / rel if not str(rel).startswith("exam-snippets/") else ROOT / rel
+        if not path.is_file():
+            errors.append(f"correctievoorschrift {item.get('id')}: ontbrekende snippet {path.relative_to(ROOT)}")
+            continue
+        try:
+            with Image.open(path) as image:
+                image.verify()
+            with Image.open(path) as image:
+                if image.width < 100 or image.height < 30:
+                    errors.append(f"correctievoorschrift {item.get('id')}: onwaarschijnlijk kleine afbeelding {rel} ({image.size})")
+        except Exception as exc:
+            errors.append(f"correctievoorschrift {item.get('id')}: ongeldige afbeelding {rel}: {exc}")
+
 if errors:
     print("\n".join(errors))
     raise SystemExit(f"Controle mislukt: {len(errors)} fouten in {total} vragen.")

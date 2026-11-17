@@ -153,6 +153,8 @@ fill("theme",questions.flatMap(onderwerpenVanVraag));
 ["level","year","period","questionType","theme"].forEach(id=>{if(filterState[id]!==undefined)$(id).value=filterState[id]});
 let currentIndex=0;
 const selfChecks=JSON.parse(localStorage.getItem("bioExamSelfChecksV1")||"{}");
+ const zeroScores=JSON.parse(localStorage.getItem("bioExamZeroScoresV1")||"{}");
+ const isSelfChecked=id=>Boolean(zeroScores[id]||selfChecks[id]?.length);
 function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||onderwerpenVanVraag(q).includes($("theme").value))).sort((a,b)=>Number(a.year)-Number(b.year)||Number(a.period)-Number(b.period)||Number(a.n)-Number(b.n)||a.level.localeCompare(b.level,"nl"))}
 function render(){
  const filtered=getFiltered();
@@ -162,19 +164,19 @@ function render(){
  $("prevQuestion").disabled=currentIndex===0;$("nextQuestion").disabled=currentIndex>=filtered.length-1;
  if(!filtered.length){$("questions").innerHTML='<div class="empty">Geen vragen gevonden. Wis een of meer filters.</div>';$("questionNav").hidden=true;return}
  $("questionNav").hidden=false;
- filtered.forEach((q,i)=>{const d=document.createElement("button");d.type="button";d.className="dot"+(i===currentIndex?" active":"")+((q.options?.length?saved[q.id]:selfChecks[q.id]?.length)?" done":"");d.title="Vraag "+q.n+" ("+(i+1)+" van "+filtered.length+")";d.setAttribute("aria-label",d.title);d.addEventListener("click",()=>{currentIndex=i;render()});$("questionDots").append(d)});
+ filtered.forEach((q,i)=>{const d=document.createElement("button");d.type="button";d.className="dot"+(i===currentIndex?" active":"")+((q.options?.length?saved[q.id]:isSelfChecked(q.id))?" done":"");d.title="Vraag "+q.n+" ("+(i+1)+" van "+filtered.length+")";d.setAttribute("aria-label",d.title);d.addEventListener("click",()=>{currentIndex=i;render()});$("questionDots").append(d)});
  const q=filtered[currentIndex],a=document.createElement("article");a.className="question";
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
- const assetVersion="2026-11-17-28";
+ const assetVersion="2026-11-17-29";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  let snippet=snippetImages.map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'?v='+assetVersion+'" alt="'+(i<snippetImages.length-1?'Context bij vraag ':'Originele examenopgave bij vraag ')+q.n+'" loading="lazy"><figcaption>'+(i<snippetImages.length-1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
   ?'<fieldset class="mcq-options"><legend>Kies één antwoord</legend>'+q.options.map(o=>'<label><input type="radio" name="answer-'+q.id+'" value="'+o.key+'" '+(saved[q.id]===o.key?'checked':'')+'><span><b>'+o.key+'.</b>'+'</span></label>').join("")+'</fieldset><p class="sourcehint">De antwoordteksten staan in de oorspronkelijke opgave hierboven; kies hier de bijbehorende letter.</p><div class="mcq-feedback" id="mcqFeedback" hidden></div>'
   :'<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>';
  const cvMarkup=isMCQ?"":q.cvImage?'<section class="cv-reveal"><button class="source" type="button" id="toggleCv" aria-expanded="false">Toon correctievoorschrift bij vraag '+q.n+'</button><figure id="cvSnippet" hidden><img data-src="'+q.cvImage+'" alt="Origineel beoordelingsmodel uit het officiële correctievoorschrift, vraag '+q.n+'" loading="lazy"><figcaption>Officieel correctievoorschrift · vraag '+q.n+'</figcaption></figure>'+(q.cvAmendment?'<figure id="cvAmendment" hidden><img data-src="'+q.cvAmendment+'" alt="Officiële aanvulling op het correctievoorschrift bij vraag '+q.n+'" loading="lazy"><figcaption>Officiële aanvulling op het correctievoorschrift · van toepassing op vraag '+q.n+'</figcaption></figure>':"")+'</section>':'<p class="sourcehint">Het volledige officiële correctievoorschrift is beschikbaar via de PDF-link hierboven.</p>';
- const selfCheckMarkup=isMCQ?"":'<section class="selfcheck"><h3>Zelf beoordelen</h3><p style="font-size:13px;margin:0 0 8px;color:#53616a">Vergelijk je antwoord met de officiële beoordelingscriteria hierboven en vink per scorepunt aan of je het hebt behaald.</p>'+Array.from({length:q.points},(_,i)=>'<label><input type="checkbox" data-point="'+i+'" '+((selfChecks[q.id]||[]).includes(i)?"checked":"")+' > Punt '+(i+1)+' behaald</label>').join("")+'</section>';
+ const selfCheckMarkup=isMCQ?"":'<section class="selfcheck"><h3>Zelf beoordelen</h3><p style="font-size:13px;margin:0 0 8px;color:#53616a">Vergelijk je antwoord met de officiële beoordelingscriteria hierboven en vink per scorepunt aan of je het hebt behaald.</p><label><input type="checkbox" data-zero '+(zeroScores[q.id]?"checked":"")+' > 0 punten behaald</label>'+Array.from({length:q.points},(_,i)=>'<label><input type="checkbox" data-point="'+i+'" '+((selfChecks[q.id]||[]).includes(i)?"checked":"")+' > Punt '+(i+1)+' behaald</label>').join("")+'</section>';
  a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Open vraag")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+q.end+'</span>':"")+'</div>'+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+(q.attachmentPdfs?.length?' · '+q.attachmentPdfs.map((path,index)=>'<a href="'+path+'" target="_blank" rel="noopener">Volledige uitwerkbijlage'+(q.attachmentPdfs.length>1?' '+(index+1):'')+' (PDF) ↗</a>').join(' · '):"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
  $("questions").append(a);
  if(isMCQ){
@@ -191,7 +193,8 @@ function render(){
   const ta=a.querySelector("textarea");ta.value=saved[q.id]||"";ta.addEventListener("input",()=>{saved[q.id]=ta.value;localStorage.setItem("bioExamAnswersV2",JSON.stringify(saved))});
   const cvButton=a.querySelector("#toggleCv"),cvFigure=a.querySelector("#cvSnippet"),cvImage=cvFigure?.querySelector("img"),amendmentFigure=a.querySelector("#cvAmendment");
   if(cvButton)cvButton.addEventListener("click",()=>{const show=cvFigure.hidden;cvFigure.hidden=!show;cvButton.setAttribute("aria-expanded",String(show));cvButton.textContent=show?"Verberg correctievoorschrift":"Toon correctievoorschrift bij vraag "+q.n;if(show&&!cvImage.src)cvImage.src=cvImage.dataset.src;if(show&&amendmentFigure){amendmentFigure.hidden=false;const amendmentImage=amendmentFigure.querySelector("img");if(!amendmentImage.src)amendmentImage.src=amendmentImage.dataset.src}});
-  a.querySelectorAll("[data-point]").forEach(cb=>cb.addEventListener("change",()=>{const arr=selfChecks[q.id]||[],n=Number(cb.dataset.point);selfChecks[q.id]=cb.checked?[...new Set([...arr,n])]:arr.filter(x=>x!==n);localStorage.setItem("bioExamSelfChecksV1",JSON.stringify(selfChecks));[...$("questionDots").children].forEach((d,i)=>{d.className="dot"+(i===currentIndex?" active":"")+(selfChecks[filtered[i].id]?.length?" done":"")})}));
+  const zeroInput=a.querySelector("[data-zero]");if(zeroInput)zeroInput.addEventListener("change",()=>{zeroScores[q.id]=zeroInput.checked;if(zeroInput.checked){selfChecks[q.id]=[];a.querySelectorAll("[data-point]").forEach(cb=>cb.checked=false)}localStorage.setItem("bioExamZeroScoresV1",JSON.stringify(zeroScores));localStorage.setItem("bioExamSelfChecksV1",JSON.stringify(selfChecks));[...$("questionDots").children].forEach((d,i)=>{d.className="dot"+(i===currentIndex?" active":"")+(isSelfChecked(filtered[i].id)?" done":"")})});
+   a.querySelectorAll("[data-point]").forEach(cb=>cb.addEventListener("change",()=>{const arr=selfChecks[q.id]||[],n=Number(cb.dataset.point);selfChecks[q.id]=cb.checked?[...new Set([...arr,n])]:arr.filter(x=>x!==n);zeroScores[q.id]=false;if(zeroInput)zeroInput.checked=false;localStorage.setItem("bioExamSelfChecksV1",JSON.stringify(selfChecks));localStorage.setItem("bioExamZeroScoresV1",JSON.stringify(zeroScores));[...$("questionDots").children].forEach((d,i)=>{d.className="dot"+(i===currentIndex?" active":"")+(isSelfChecked(filtered[i].id)?" done":"")})}));
  }
 }
 $("prevQuestion").addEventListener("click",()=>{if(currentIndex>0){currentIndex--;render()}});
@@ -203,7 +206,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-28");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-17-29");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
@@ -215,7 +218,7 @@ async function loadMCQ(){
     }
    }
   }
-  const openResponse=await fetch("exam-open.json?v=2026-11-17-28");
+  const openResponse=await fetch("exam-open.json?v=2026-11-17-29");
   if(openResponse.ok){
    const openItems=await openResponse.json();
    for(const item of openItems){
@@ -230,7 +233,7 @@ async function loadMCQ(){
     }
    }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-17-28");
+  const response=await fetch("exam-mcq.json?v=2026-11-17-29");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
@@ -247,6 +250,14 @@ async function loadMCQ(){
     item.questionType="mcq";
     map.set(key(item),item);
    }
+  }
+  const cvResponse=await fetch("scripts/cv-snippets.json?v=2026-11-17-29");
+  if(!cvResponse.ok)throw new Error("CV-snippetsmanifest niet beschikbaar");
+  const cvItems=await cvResponse.json();
+  const cvById=new Map(cvItems.map(item=>[item.id,item]));
+  for(const question of map.values()){
+   const cvItem=cvById.get(question.id);
+   if(cvItem){question.cvImage="exam-snippets/"+cvItem.output;if(cvItem.amendment_output)question.cvAmendment="exam-snippets/"+cvItem.amendment_output;}
   }
   questions=[...map.values()];
   fill("theme",questions.flatMap(onderwerpenVanVraag));

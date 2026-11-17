@@ -85,6 +85,19 @@ const assert = require("node:assert/strict");
     await page.waitForSelector('input[type="radio"]');
     assert.equal(await page.locator('input[type="radio"]:checked').getAttribute("value"), selectedValue);
 
+    // The explicit zero-point option is selectable and survives reload.
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForSelector("[data-zero]");
+    await page.locator("[data-zero]").check();
+    const zeroSaved = await page.evaluate(() => JSON.parse(localStorage.getItem("bioExamZeroScoresV1") || "{}"));
+    assert.ok(Object.values(zeroSaved).includes(true), "0 punten is niet opgeslagen");
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForSelector("[data-zero]");
+    assert.equal(await page.locator("[data-zero]").isChecked(), true);
+    await page.locator("[data-zero]").uncheck();
+
     // Open-answer text and self-assessment survive reload.
     await page.locator("#questionType").selectOption("open");
     await page.waitForSelector("textarea");
@@ -98,6 +111,20 @@ const assert = require("node:assert/strict");
     await page.waitForSelector("textarea");
     assert.equal(await page.locator("textarea").inputValue(), answer);
     assert.equal(await page.locator("[data-point]").first().isChecked(), true);
+
+    // Official correction-scheme snippets are connected to their questions and reveal on click.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2024");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForFunction(() => document.querySelector(".qhead")?.textContent.includes("vraag 1"));
+    const cvButton = page.locator("#toggleCv");
+    assert.equal(await cvButton.count(), 1, "Knop voor het correctievoorschrift ontbreekt");
+    await cvButton.click();
+    const cvImage = page.locator("#cvSnippet img");
+    await cvImage.evaluate(img => img.decode());
+    const cvImageState = await cvImage.evaluate(img => ({ complete: img.complete, width: img.naturalWidth, height: img.naturalHeight }));
+    assert.ok(cvImageState.complete && cvImageState.width > 0 && cvImageState.height > 0, JSON.stringify(cvImageState));
 
     // A question image must load at its natural dimensions.
     const imageState = await page.locator(".exam-snippets img").first().evaluate(img => ({
