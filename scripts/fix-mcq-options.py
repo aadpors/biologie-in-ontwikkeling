@@ -223,9 +223,9 @@ def main():
             {"key": "D", "text": "slaap → chromosoomdynamiek (−)"},
         ],
         "ha26t1-mcq-35": [
-            {"key": "A", "text": "Stamboom A (zie volledige vraagafbeelding)"},
-            {"key": "B", "text": "Stamboom B (zie volledige vraagafbeelding)"},
-            {"key": "C", "text": "Stamboom C (zie volledige vraagafbeelding)"},
+            {"key": "A", "text": "Stamboomafbeelding (zie volledige vraagafbeelding)"},
+            {"key": "B", "text": "Stamboomafbeelding (zie volledige vraagafbeelding)"},
+            {"key": "C", "text": "Stamboomafbeelding (zie volledige vraagafbeelding)"},
         ],
     }
     manual_question_text = {
@@ -236,7 +236,6 @@ def main():
     }
     full_page_anchors = {
         "ha25t1-mcq-31": "De milt is onderdeel van het lymfevatenstelsel",
-        "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
         "vw24t2-mcq-36": "Om te bepalen hoe slaap en chromosoomdynamiek samenhangen",
         "ha26t1-mcq-35": "In de evolutionaire stamboom zie je",
     }
