@@ -65,18 +65,24 @@ def render_shared_context(doc, clip, scale):
     first_page = doc[clip["page"] - 1]
     matrix = fitz.Matrix(scale, scale)
     first_rect = fitz.Rect(0, clip.get("top", 25), first_page.rect.width, first_page.rect.height - clip.get("bottom_margin", 25))
-    second_top = clip.get("continuation_top", 25)
-    second_rect = fitz.Rect(0, second_top, question_page.rect.width, max(second_top + 1, marker[1] - clip.get("question_margin", 7)))
     first_pix = first_page.get_pixmap(matrix=matrix, clip=first_rect, alpha=False)
-    second_pix = question_page.get_pixmap(matrix=matrix, clip=second_rect, alpha=False)
     first = Image.frombytes("RGB", (first_pix.width, first_pix.height), first_pix.samples)
-    second = Image.frombytes("RGB", (second_pix.width, second_pix.height), second_pix.samples)
-    if first.width != second.width:
-        raise ValueError("Pages in shared context have different rendered widths")
-    combined = Image.new("RGB", (first.width, first.height + second.height), "white")
-    combined.paste(first, (0, 0))
-    combined.paste(second, (0, first.height))
-    return combined, question_page_index + 1
+
+    # The shared hippopotamus introduction belongs to questions 14–18, but
+    # the statements immediately before question 14 belong to question 14
+    # only. Keep the shared image clean and save those statements separately.
+    continuation_top = clip.get("continuation_top", 25)
+    statement_hits = question_page.search_for(clip.get("question_context_anchor", "Hieronder staan uitspraken over de populatiegroei"))
+    if statement_hits:
+        statement_top = max(0, min(rect.y0 for rect in statement_hits) - 5)
+        statement_bottom = max(statement_top + 2, marker[1] - clip.get("question_margin", 7))
+        statement_rect = fitz.Rect(0, statement_top, question_page.rect.width, statement_bottom)
+        statement_pix = question_page.get_pixmap(matrix=matrix, clip=statement_rect, alpha=False)
+        statement_image = Image.frombytes("RGB", (statement_pix.width, statement_pix.height), statement_pix.samples)
+        statement_image.save(OUT / clip.get("question_context_output", "vw25-t1-hippo-q14-context.jpg"), quality=94)
+
+    # Do not append the question-14 statements to the shared context image.
+    return first, question_page_index + 1
 
 
 def render_question(doc, clip, scale):
