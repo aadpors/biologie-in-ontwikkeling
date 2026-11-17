@@ -52,6 +52,12 @@ def main():
                     and record.get("year") == "2026" and record.get("period") == "1" and record.get("n") == 36)
                 or (question_id == "vw26t2-open-38" and record.get("level") == "Vwo"
                     and record.get("year") == "2026" and record.get("period") == "2" and record.get("n") == 38)
+                or (question_id == "vw26t1-open-32" and record.get("level") == "Vwo"
+                    and record.get("year") == "2026" and record.get("period") == "1" and record.get("n") == 32)
+                or (question_id == "ha26t2-open-9" and record.get("level") == "Havo"
+                    and record.get("year") == "2026" and record.get("period") == "2" and record.get("n") == 9)
+                or (question_id == "vw25t2-open-14" and record.get("level") == "Vwo"
+                    and record.get("year") == "2025" and record.get("period") == "2" and record.get("n") == 14)
             ):
                 record["image"] = image_path
         print(f"Volledige bronuitsnede hersteld: {question_id}")
@@ -116,6 +122,40 @@ def main():
         raise ValueError("vw26t2-open-38: source graph/question anchors missing")
     set_crop(
         "vw26t2-open-38",
+        render_region(page, min(x.y0 for x in top) - 5, max(x.y1 for x in end) + 10),
+    )
+
+    # VWO 2026-I q32: the CRISPR mechanism diagram (figure 2) was cut at the
+    # question boundary even though it is needed to answer the prompt.
+    page = get_page("vw-1018-a-26-1-o.pdf", 13)
+    top = page.search_for("De onderzoekers brachten met een virus")
+    end = page.search_for("Het effect van de beige vetcellen")
+    if not top or not end:
+        raise ValueError("vw26t1-open-32: source diagram anchors missing")
+    set_crop(
+        "vw26t1-open-32",
+        render_region(page, min(x.y0 for x in top) - 5, min(x.y0 for x in end) - 5),
+    )
+
+    # Havo 2026-II q9: include both complete mangrove figures and the prompt.
+    page = get_page("ha-1018-a-26-2-o.pdf", 4)
+    top = page.search_for("Bon biní na Boneiru")
+    end = page.search_for("zuurstofarme omstandigheden.")
+    if not top or not end:
+        raise ValueError("ha26t2-open-9: source figure/context anchors missing")
+    set_crop(
+        "ha26t2-open-9",
+        render_region(page, min(x.y0 for x in top) - 5, max(x.y1 for x in end) + 10),
+    )
+
+    # VWO 2025-II q14: restore the complete oogenesis diagram.
+    page = get_page("vw-1018-a-25-2-o.pdf", 6)
+    top = page.search_for("Verouderende eicellen")
+    end = page.search_for("haploïd zijn.")
+    if not top or not end:
+        raise ValueError("vw25t2-open-14: source figure/question anchors missing")
+    set_crop(
+        "vw25t2-open-14",
         render_region(page, min(x.y0 for x in top) - 5, max(x.y1 for x in end) + 10),
     )
 
