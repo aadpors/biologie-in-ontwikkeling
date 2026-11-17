@@ -448,6 +448,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
             # a new topic can begin at the top of every page, and stale context
             # was the cause of unrelated introductions appearing on later questions.
             lines = line_records(page)
+            if prefix == "ha24t1" and page_index in {1, 4}:
+                print(f"DEBUG {prefix} page {page_index + 1}:")
+                for line_index, line in enumerate(lines):
+                    print(f"  {line_index}: {line['text']!r} y={line['bbox'][1]:.1f} x={line['bbox'][0]:.1f}")
             markers = find_markers(lines, allow_multiline_number_first=(prefix == "ha24t1"))
             if not markers:
                 headings = [
