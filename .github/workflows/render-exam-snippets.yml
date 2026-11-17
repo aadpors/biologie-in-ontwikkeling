@@ -46,18 +46,29 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add exam-snippets/ exam-mcq.json exam-contexts.json
             git commit -m "Add original exam image snippets"
-            # Andere commits kunnen ook na het ophalen van main binnenkomen.
-            # Haal daarom bij iedere poging opnieuw op, rebase en probeer te pushen.
-            # De render-workflow zelf is via concurrency al geserialiseerd.
+            # Bewaar de gegenereerde boom en zet bij iedere poging eerst
+            # main recht. Een rebase kan bij opnieuw gegenereerde JPG/PNG-
+            # bestanden niet automatisch samenvoegen en veroorzaakte eerder
+            # binaire conflicten. Neem daarom de volledige gegenereerde
+            # outputboom over op de nieuwste main en maak daarop een nieuwe commit.
+            generated_commit=$(git rev-parse HEAD)
             pushed=false
             for attempt in 1 2 3 4 5; do
               git fetch origin main
-              git rebase origin/main
+              git reset --hard origin/main
+              git checkout "$generated_commit" -- exam-snippets/ exam-mcq.json exam-contexts.json
+              git add exam-snippets/ exam-mcq.json exam-contexts.json
+              if git diff --cached --quiet; then
+                echo "Generated snippets are already current."
+                pushed=true
+                break
+              fi
+              git commit -m "Add original exam image snippets"
               if git push origin HEAD:main; then
                 pushed=true
                 break
               fi
-              echo "Pushpoging $attempt mislukt; opnieuw synchroniseren met main."
+              echo "Push attempt $attempt failed; synchronizing with main again."
               sleep 2
             done
             if [[ "$pushed" != true ]]; then
