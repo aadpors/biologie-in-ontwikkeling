@@ -85,7 +85,7 @@ def find_markers(lines):
             if prompt_starts.match(lines[j]["text"]):
                 return j
             if (
-                (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5))
+                (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 12.5))
                 and len(lines[j]["text"]) < 90
                 and not re.match(r"^(afbeelding|tabel|grafiek|legenda)(?:\s+\d+)?$", lines[j]["text"], re.I)
             ):
@@ -287,7 +287,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 end = markers[idx + 1]["line"] if idx + 1 < len(markers) else len(lines)
                 headings = [
                     j for j in range(cursor, start)
-                    if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 10.5))
+                    if (lines[j]["size"] >= 13 or (lines[j]["bold"] and lines[j]["size"] >= 12.5))
                     and len(lines[j]["text"]) < 90
                     and not HEADER_RE.match(lines[j]["text"])
                     and not heading_re.match(lines[j]["text"])
