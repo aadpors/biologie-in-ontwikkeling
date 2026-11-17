@@ -17,27 +17,9 @@
       },
       {
         "page": 8,
-        "from_anchor": "In Afrika veroorzaken droge perioden",
+        "from_anchor": "Afrika",
         "before_question": 15,
         "output": "vw25-t1-hippo-q15-context.jpg"
-      },
-      {
-        "page": 8,
-        "from_anchor": "Doordat de nijlpaardenpopulatie in Colombia",
-        "before_question": 16,
-        "output": "vw25-t1-hippo-q16-context.jpg"
-      },
-      {
-        "page": 8,
-        "from_anchor": "Sommige wetenschappers denken dat de populatie",
-        "before_question": 17,
-        "output": "vw25-t1-hippo-q17-context.jpg"
-      },
-      {
-        "page": 8,
-        "from_anchor": "Nijlpaarden worden ‘ecosystem engineers’ genoemd",
-        "before_question": 18,
-        "output": "vw25-t1-hippo-q18-context.jpg"
       }
     ]
   }
