@@ -19,7 +19,7 @@ const examYears = new Set(examQuestions.map(question => question.year));
 const sourceExamFiles = fs.readdirSync('examens');
 const discoveredExamYears = new Set(
   sourceExamFiles
-    .map(name => name.match(/^(?:ha|vw)-1018-a-(\\d{2})-\\d-o(?:-[a-z0-9]+)?\\.pdf$/i))
+    .map(name => name.match(/^(?:ha|vw)-1018-a-(\d{2})-\d-o(?:-[a-z0-9]+)?\.pdf$/i))
     .filter(Boolean)
     .map(match => `20${match[1]}`)
 );
