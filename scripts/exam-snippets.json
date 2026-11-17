@@ -16,7 +16,7 @@
         "question_context_output": "vw25-t1-hippo-q14-context.jpg"
       },
       {
-        "page": 8,
+        "page": 9,
         "from_anchor": "Afrika",
         "before_question": 15,
         "output": "vw25-t1-hippo-q15-context.jpg"
