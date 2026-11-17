@@ -119,7 +119,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         context_top = min(context_top, min(rect.y0 for rect in visual_rects))
 
     context_top = max(0, context_top - 5)
-    context_bottom = min(bottom_limit, question_top - 2)
+    context_bottom = min(bottom_limit, question_top - 2, max(lines[i]["bbox"][3] for i in ordered) + 4)
     if context_bottom <= context_top + 2:
         return []
 
@@ -538,7 +538,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
                     question_top = max(0, lines[start]["bbox"][1] - 1)
-                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
+                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
                     save_page_crop(
                         page,
                         fitz.Rect(0, context_y0, page.rect.width, question_y1),
@@ -576,8 +576,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         q9_y = min(rect.y0 for rect in q9_prompt_hits)
                         intro_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
                         inbreeding_y0 = max(0, min(rect.y0 for rect in inbreeding_hits) - 5)
-                        inbreeding_y1 = min(page.rect.height, max(rect.y1 for rect in inbreeding_end_hits) + 5)
-                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
+                        inbreeding_y1 = min(page.rect.height, max(rect.y1 for rect in inbreeding_end_hits) + 8)
+                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
                         intro_name = "context-ha25t2-q9-intro.jpg"
                         inbreeding_name = "context-ha25t2-q9-inbreeding.jpg"
                         page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, intro_y0, page.rect.width, min(q7_y - 5, footer_y)), alpha=False).save(OUT / intro_name)
@@ -617,8 +617,8 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 y1 = min(
                     footer_y,
                     max(
-                        lines[question_end_line]["bbox"][3] + 7,
-                        lines[start]["bbox"][3] + 7,
+                        lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING,
+                        lines[start]["bbox"][3] + BOTTOM_TEXT_PADDING,
                         y0 + 2,
                     ),
                 )
@@ -628,7 +628,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     systolic_hits = page.search_for("systolische druk")
                     if len(systolic_hits) < 2:
                         raise RuntimeError("Could not locate all options for VWO 2026-I question 22")
-                    y1 = min(footer_y, max(y1, max(rect.y1 for rect in systolic_hits) + 7))
+                    y1 = min(footer_y, max(y1, max(rect.y1 for rect in systolic_hits) + BOTTOM_TEXT_PADDING))
                 crop = fitz.Rect(0, y0, page.rect.width, y1)
                 qid = f"{prefix}-mcq-{marker['number']}"
                 image_name = f"mcq-{qid}.jpg"
@@ -645,7 +645,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     if not q5_marker or not intro_hits:
                         raise RuntimeError("Could not isolate the HPA context table for VWO 2026-I question 9")
                     context_top = max(0, min(rect.y0 for rect in intro_hits) - 5)
-                    context_bottom = max(context_top + 20, previous_lines[q5_marker["line"]]["bbox"][1] - 5)
+                    context_bottom = max(context_top + 20, previous_lines[q5_marker["line"]]["bbox"][1] - 2)
                     context_name = "context-vw26t1-q9-table.jpg"
                     previous_page.get_pixmap(
                         matrix=fitz.Matrix(1.8, 1.8),
@@ -662,9 +662,9 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     if not intro_hits or not context_end_hits or not q37_hits:
                         raise RuntimeError("Could not isolate VWO 2026-II question 37 context")
                     context_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
-                    context_y1 = min(page.rect.height, min(rect.y0 for rect in context_end_hits) - 5)
+                    context_y1 = min(page.rect.height, min(rect.y0 for rect in context_end_hits) - 2)
                     question_y0 = max(0, min(rect.y0 for rect in q37_hits) - 0.5)
-                    question_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + 7)
+                    question_y1 = min(page.rect.height, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
                     context_name = "context-vw26t2-q37-model.jpg"
                     question_name = "question-vw26t2-37.jpg"
                     page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, context_y0, page.rect.width, context_y1), alpha=False).save(OUT / context_name)
@@ -678,7 +678,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # question and answer options are always rendered separately.
                 if mcq_images is None:
                     question_top = max(0, lines[start]["bbox"][1] - 1)
-                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
+                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
                     context_paths = context_image_fragments(
                         page, lines, context_line_indices, prefix,
                         marker["number"], question_top, footer_y, previous_ranges,
