@@ -14,12 +14,6 @@
         "output": "vw25-t1-hippo-context.jpg",
         "question_context_anchor": "Hieronder staan uitspraken over de populatiegroei",
         "question_context_output": "vw25-t1-hippo-q14-context.jpg"
-      },
-      {
-        "page": 9,
-        "from_anchor": "Afrika",
-        "before_question": 15,
-        "output": "vw25-t1-hippo-q15-context.jpg"
       }
     ]
   }
