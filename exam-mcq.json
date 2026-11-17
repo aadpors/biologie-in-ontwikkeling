@@ -1023,8 +1023,8 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wordt een kankercel herkend aan MHC-I of aan MHC-II? En worden",
-    "q": "kankercellen gedood door fagocytose of door lysis?\nherkenning aan\ndoding door",
+    "source": "De toename van het aantal tumoren bij de proefdieren zou een gevolg\nkunnen zijn van een verminderde hoeveelheid T-lymfocyten.",
+    "q": "Wordt een kankercel herkend aan MHC-I of aan MHC-II? En worden\nkankercellen gedood door fagocytose of door lysis?\nherkenning aan\ndoding door",
     "options": [
       {
         "key": "A",
@@ -1765,8 +1765,8 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wordt het aantal plaatsen met γH2AX per kern weergegeven door lijn P of",
-    "q": "door lijn Q? En waarom?",
+    "source": "Afbeelding 3 toont de gemeten hoeveelheid γH2AX en de chromosoom-\ndynamiek in neuronen van zebravis-larven gedurende 25 uur.\nafbeelding 3\nIn de legenda is niet weergegeven welke lijn bij welke as hoort.",
+    "q": "Wordt het aantal plaatsen met γH2AX per kern weergegeven door lijn P of\ndoor lijn Q? En waarom?",
     "options": [
       {
         "key": "A",
@@ -1788,7 +1788,7 @@
     "correct": "A",
     "image": "exam-snippets/complete-vw24t2-mcq-35.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q35-fallback.jpg",
+      "exam-snippets/context-vw24t2-q35-complete.jpg",
       "exam-snippets/question-vw24t2-35-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
@@ -3316,6 +3316,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw25t2-mcq-15",
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 15,
+    "points": 2,
+    "page": 7,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Behalve trisomie kunnen er ook andere chromosomale afwijkingen\nontstaan. Er zijn een aantal factoren bekend die kunnen bijdragen aan het\nontstaan van chromosomale afwijkingen in eicellen. Zo wordt bij oudere\nvrouwen crossing-over minder goed uitgevoerd.",
+    "q": "Gedurende welke vorm van deling kan crossing-over leiden tot\nrecombinatie van erfelijk materiaal? En hoe ontstaan chromosomale\nafwijkingen door crossing-over?\ndeling\nafwijkingen ontstaan doordat",
+    "options": [
+      {
+        "key": "A",
+        "text": "meiose homologe delen worden uitgewisseld"
+      },
+      {
+        "key": "B",
+        "text": "meiose niet-homologe delen worden uitgewisseld"
+      },
+      {
+        "key": "C",
+        "text": "mitose homologe delen worden uitgewisseld"
+      },
+      {
+        "key": "D",
+        "text": "mitose niet-homologe delen worden uitgewisseld"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw25t2-mcq-15.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q15-complete.jpg",
+      "exam-snippets/question-vw25t2-15-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-25-2-o.pdf",
+    "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha25t2-mcq-16",
     "level": "Havo",
     "year": "2025",
@@ -3802,6 +3844,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "ha25t2-mcq-31",
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 31,
+    "points": 2,
+    "page": 14,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Onderzoekers in Zweden deden onderzoek naar de invloed van\nstikstofverbindingen in de bodem op de aanwezigheid van zonnedauw. Zij\nhebben een veld waar ronde zonnedauw (Drosera rotundifolia) groeit,\nopgedeeld in vijf delen. Aan deze delen dienden ze jaarlijks verschillende\nhoeveelheden van een anorganische stikstofverbinding toe. De\nonderzoekers hebben er vier jaar lang in september en in juni het aantal\nplantjes zonnedauw per vierkante meter geteld.",
+    "q": "Behoort de zonnedauw uit het Zweedse onderzoek tot dezelfde soort als\nde zonnedauw in het Korenburgerveen? En tot hetzelfde genus\n(geslacht)?\nzelfde soort\nzelfde genus",
+    "options": [
+      {
+        "key": "A",
+        "text": "ja ja"
+      },
+      {
+        "key": "B",
+        "text": "ja nee"
+      },
+      {
+        "key": "C",
+        "text": "nee ja"
+      },
+      {
+        "key": "D",
+        "text": "nee nee"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-ha25t2-mcq-31.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q31-complete.jpg",
+      "exam-snippets/question-ha25t2-31-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-25-2-o.pdf",
+    "cv": "examens/ha-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "vw25t2-mcq-40",
     "level": "Vwo",
     "year": "2025",
@@ -3841,6 +3925,48 @@
     ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
     "cv": "examens/vw-1018-a-25-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha25t2-mcq-41",
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 41,
+    "points": 2,
+    "page": 18,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De dierenarts bepaalt bij het urine-onderzoek de dichtheid van de urine.\nDe dichtheid van water is ongeveer 1000 gram / L. Een zoutoplossing\nheeft een hogere dichtheid. Als de dichtheid van de urine van katten lager\nis dan 1035 gram / L, zijn er mogelijk nierproblemen.\nDe urine van Rio blijkt een dichtheid van 1005 gram / L te hebben.",
+    "q": "Vindt er in de nieren van Rio te veel of te weinig reabsorptie\n(terugresorptie) van water plaats? Zal Rio daardoor meer of minder urine\nproduceren dan een gezonde kat?\nreabsorptie\nhoeveelheid urine",
+    "options": [
+      {
+        "key": "A",
+        "text": "te veel meer"
+      },
+      {
+        "key": "B",
+        "text": "te veel minder"
+      },
+      {
+        "key": "C",
+        "text": "te weinig meer"
+      },
+      {
+        "key": "D",
+        "text": "te weinig minder"
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-ha25t2-mcq-41.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q41-complete.jpg",
+      "exam-snippets/question-ha25t2-41-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-25-2-o.pdf",
+    "cv": "examens/ha-1018-a-25-2-c.pdf",
     "questionType": "mcq"
   },
   {
@@ -4746,6 +4872,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t1-mcq-31",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 31,
+    "points": 2,
+    "page": 13,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Het UCP1-gen bevindt zich op chromosoom 4. Na de translatie komt het\neiwit in ongevouwen toestand terecht in het grondplasma. Daar wordt het\nherkend door speciale eiwitten op de mitochondriën. Deze eiwitten\nbrengen het daarna in de mitochondriën, en plaatsen het met de juiste\nvouwing in de binnenmembraan.",
+    "q": "Vindt translatie van UCP1-RNA plaats aan ribosomen op het ER of aan\nvrije ribosomen? En is de UCP1-polypeptideketen in het golgi-systeem\ngeweest?\ntranslatie aan\nin het golgi-systeem geweest?",
+    "options": [
+      {
+        "key": "A",
+        "text": "ribosomen op het ER ja"
+      },
+      {
+        "key": "B",
+        "text": "ribosomen op het ER nee"
+      },
+      {
+        "key": "C",
+        "text": "vrije ribosomen ja"
+      },
+      {
+        "key": "D",
+        "text": "vrije ribosomen nee"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-vw26t1-mcq-31.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q31-complete.jpg",
+      "exam-snippets/question-vw26t1-31-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-1-o.pdf",
+    "cv": "examens/vw-1018-a-26-1-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "ha26t1-mcq-32",
     "level": "Havo",
     "year": "2026",
@@ -5082,6 +5250,48 @@
     "questionType": "mcq"
   },
   {
+    "id": "vw26t2-mcq-2",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 2,
+    "points": 2,
+    "page": 3,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Het gen voor de gevoeligheid voor kattenkruid ligt op een autosoom.",
+    "q": "Uit het fenotype van welke nakomeling (afbeelding 2) blijkt dat het gen\nniet op het X-chromosoom ligt?",
+    "options": [
+      {
+        "key": "A",
+        "text": "9"
+      },
+      {
+        "key": "B",
+        "text": "19"
+      },
+      {
+        "key": "C",
+        "text": "24"
+      },
+      {
+        "key": "D",
+        "text": "26"
+      }
+    ],
+    "correct": "B",
+    "image": "exam-snippets/complete-vw26t2-mcq-2.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q2-fallback.jpg",
+      "exam-snippets/question-vw26t2-2-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-2-o.pdf",
+    "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "vw26t2-mcq-3",
     "level": "Vwo",
     "year": "2026",
@@ -5376,6 +5586,56 @@
     "questionType": "mcq"
   },
   {
+    "id": "ha26t2-mcq-11",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 11,
+    "points": 2,
+    "page": 6,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Destiny plukt bladeren van de zwarte mangrove en laat de toeristen eraan\nlikken. Die bladeren smaken heel zout. Dit komt doordat de bladeren\nspeciale klieren hebben om zout uit te scheiden. Hiermee reguleert de\nzwarte mangrove de osmotische waarde van de cellen van de bladeren.",
+    "q": "Wordt de osmotische waarde van de bladcellen hoger of lager door de\nuitscheiding van zouten? En via welke vorm van transport worden zout-\nionen uitgescheiden?\nosmotische waarde cellen wordt",
+    "options": [
+      {
+        "key": "A",
+        "text": "hoger"
+      },
+      {
+        "key": "B",
+        "text": "hoger"
+      },
+      {
+        "key": "C",
+        "text": "hoger"
+      },
+      {
+        "key": "D",
+        "text": "lager lager"
+      },
+      {
+        "key": "E",
+        "text": "lager"
+      },
+      {
+        "key": "F",
+        "text": "Bekijk optie F in de oorspronkelijke afbeelding"
+      }
+    ],
+    "correct": "D",
+    "image": "exam-snippets/complete-ha26t2-mcq-11.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q11-complete.jpg",
+      "exam-snippets/question-ha26t2-11-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "vw26t2-mcq-16",
     "level": "Vwo",
     "year": "2026",
@@ -5408,6 +5668,48 @@
     "images": [
       "exam-snippets/context-vw26t2-q16-fallback.jpg",
       "exam-snippets/question-vw26t2-16-only.jpg"
+    ],
+    "pdf": "examens/vw-1018-a-26-2-o.pdf",
+    "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "vw26t2-mcq-17",
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 17,
+    "points": 2,
+    "page": 10,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "De vitamine D3 die wordt aangemaakt in de huid, wordt via het bloed naar\nde lever vervoerd.\nDe vitamine D3 die wordt opgenomen in de darmen, wordt voornamelijk\nvervoerd in chylomicronen (vetbolletjes). Deze worden eerst via de lymfe\nen vervolgens via het bloed vervoerd naar de lever.",
+    "q": "Via welk bloedvat bereikt vitamine D3 vanuit de huid de lever via de\nkortste weg? En via welk bloedvat bereikt vitamine D3 in chylomicronen\nde lever via de kortste weg?\nvanaf de huid via de\nvanaf de darmen in chylomicronen via de",
+    "options": [
+      {
+        "key": "A",
+        "text": "leverslagader leverslagader"
+      },
+      {
+        "key": "B",
+        "text": "leverslagader poortader"
+      },
+      {
+        "key": "C",
+        "text": "poortader leverslagader"
+      },
+      {
+        "key": "D",
+        "text": "poortader poortader"
+      }
+    ],
+    "correct": "A",
+    "image": "exam-snippets/complete-vw26t2-mcq-17.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q17-complete.jpg",
+      "exam-snippets/question-vw26t2-17-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
@@ -5682,6 +5984,56 @@
     "questionType": "mcq"
   },
   {
+    "id": "ha26t2-mcq-32",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 32,
+    "points": 2,
+    "page": 15,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Bloedbanken zijn altijd op zoek naar bloeddonoren met Vel-negatief\nbloed, omdat er daar maar weinig van zijn. Isa, Kate en Mounir gaan naar\nde bloedbank om te kijken of zij zo’n bloeddonor kunnen worden. Bij ieder\nwordt een buisje bloed afgenomen.\nIn het laboratorium wordt DNA geïsoleerd uit het bloed. Het SMIM1-gen\nwordt uit het DNA geknipt. Het DNA-fragment met dit gen wordt\nvermeerderd.\nDe DNA-fragmenten worden met gel-elektroforese gescheiden op basis\nvan lengte. Hierbij gaan kleinere fragmenten sneller door de gel dan\ngrotere fragmenten. In de afbeelding staan de resultaten van de gel-\nelektroforese van de DNA-fragmenten van Isa, Kate en Mounir.",
+    "q": "Wie zou geschikt kunnen zijn als bloeddonor voor een Vel-negatieve\npersoon? En wie zou geschikt kunnen zijn als bloeddonor voor een Vel-\npositieve persoon?\nvoor een Vel-negatieve persoon",
+    "options": [
+      {
+        "key": "A",
+        "text": "Isa"
+      },
+      {
+        "key": "B",
+        "text": "Isa"
+      },
+      {
+        "key": "C",
+        "text": "Isa"
+      },
+      {
+        "key": "D",
+        "text": "Kate Kate"
+      },
+      {
+        "key": "E",
+        "text": "Kate"
+      },
+      {
+        "key": "F",
+        "text": "voor een Vel-positieve persoon alleen Kate alleen Mounir zowel Isa als Kate als Mounir alleen Kate alleen Mounir zowel Isa als Kate als Mounir"
+      }
+    ],
+    "correct": "F",
+    "image": "exam-snippets/complete-ha26t2-mcq-32.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q32-complete.jpg",
+      "exam-snippets/question-ha26t2-32-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
     "id": "vw26t2-mcq-34",
     "level": "Vwo",
     "year": "2026",
@@ -5759,6 +6111,44 @@
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
     "cv": "examens/vw-1018-a-26-2-c.pdf",
+    "questionType": "mcq"
+  },
+  {
+    "id": "ha26t2-mcq-41",
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 41,
+    "points": 1,
+    "page": 18,
+    "theme": "Meerkeuzevragen",
+    "concept": "Meerkeuze",
+    "end": "Nog te rubriceren",
+    "focus": "Meerkeuzevraag uit het officiële centraal examen.",
+    "source": "Gras en hooi voor paarden mogen niet te veel fructaan bevatten. Fructaan\nis een koolhydraat dat is opgebouwd uit de monosachariden fructose en\nglucose. Wanneer paarden gras met veel fructaan eten, kunnen ze\ndarmproblemen krijgen.\nEen gedeelte van de monosachariden die overdag worden geproduceerd\nbij fotosynthese, wordt opgeslagen als fructaan. Als fructaan wordt\nomgezet, kunnen de producten worden gebruikt voor de groei van het\ngras. Een hoog fructaangehalte in gras kan ontstaan als de temperatuur\n’s nachts lager is dan 5 °C. In het gras wordt fructaan dan nauwelijks\nomgezet.",
+    "q": "De vorming van fructaan uit monosachariden is een voorbeeld van",
+    "options": [
+      {
+        "key": "A",
+        "text": "koolstofassimilatie."
+      },
+      {
+        "key": "B",
+        "text": "stikstofassimilatie."
+      },
+      {
+        "key": "C",
+        "text": "voortgezette assimilatie."
+      }
+    ],
+    "correct": "C",
+    "image": "exam-snippets/complete-ha26t2-mcq-41.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q41-complete.jpg",
+      "exam-snippets/question-ha26t2-41-only.jpg"
+    ],
+    "pdf": "examens/ha-1018-a-26-2-o.pdf",
+    "cv": "examens/ha-1018-a-26-2-c.pdf",
     "questionType": "mcq"
   },
   {

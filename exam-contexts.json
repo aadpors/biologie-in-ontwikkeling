@@ -15,12 +15,96 @@
     "level": "Havo",
     "year": "2024",
     "period": "1",
+    "n": 2,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2024-t1-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q2-complete.jpg",
+      "exam-snippets/question-ha24t1-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t1-q3.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q3-fallback.jpg",
+      "exam-snippets/question-ha24t1-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t1-q4.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q4-complete.jpg",
+      "exam-snippets/question-ha24t1-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 5,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t1-q5.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q5-complete.jpg",
+      "exam-snippets/question-ha24t1-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2024-t1-q6.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q6-fallback.jpg",
+      "exam-snippets/question-ha24t1-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 7,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2024-t1-q7.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q7-complete.jpg",
+      "exam-snippets/question-ha24t1-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
     "n": 8,
     "page": 5,
     "image": "exam-snippets/complete-havo-2024-t1-q8.jpg",
     "images": [
       "exam-snippets/context-ha24t1-q8-complete.jpg",
       "exam-snippets/question-ha24t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2024-t1-q9.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q9-complete.jpg",
+      "exam-snippets/question-ha24t1-9-only.jpg"
     ]
   },
   {
@@ -38,6 +122,450 @@
   {
     "level": "Havo",
     "year": "2024",
+    "period": "1",
+    "n": 11,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2024-t1-q11.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q11-complete.jpg",
+      "exam-snippets/question-ha24t1-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2024-t1-q12.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q12-complete.jpg",
+      "exam-snippets/question-ha24t1-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 13,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2024-t1-q13.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q13-complete.jpg",
+      "exam-snippets/question-ha24t1-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 14,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t1-q14.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q14-complete.jpg",
+      "exam-snippets/question-ha24t1-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 15,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t1-q15.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q15-complete.jpg",
+      "exam-snippets/question-ha24t1-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 16,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t1-q16.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q16-complete.jpg",
+      "exam-snippets/question-ha24t1-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 17,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t1-q17.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q17-complete.jpg",
+      "exam-snippets/question-ha24t1-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 18,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t1-q18.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q18-fallback.jpg",
+      "exam-snippets/question-ha24t1-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 19,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t1-q19.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q19-fallback.jpg",
+      "exam-snippets/question-ha24t1-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 20,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t1-q20.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q20-complete.jpg",
+      "exam-snippets/question-ha24t1-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 21,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t1-q21.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q21-complete.jpg",
+      "exam-snippets/question-ha24t1-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 22,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2024-t1-q22.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q22-complete.jpg",
+      "exam-snippets/question-ha24t1-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 23,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2024-t1-q23.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q23-complete.jpg",
+      "exam-snippets/question-ha24t1-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 24,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t1-q24.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q24-complete.jpg",
+      "exam-snippets/question-ha24t1-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 25,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t1-q25.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q25-complete.jpg",
+      "exam-snippets/question-ha24t1-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 26,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t1-q26.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q26-complete.jpg",
+      "exam-snippets/question-ha24t1-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 27,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2024-t1-q27.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q27-complete.jpg",
+      "exam-snippets/question-ha24t1-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 28,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2024-t1-q28.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q28-complete.jpg",
+      "exam-snippets/question-ha24t1-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 29,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2024-t1-q29.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q29-fallback.jpg",
+      "exam-snippets/question-ha24t1-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 30,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2024-t1-q30.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q30-complete.jpg",
+      "exam-snippets/question-ha24t1-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 31,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2024-t1-q31.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q31-complete.jpg",
+      "exam-snippets/question-ha24t1-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 32,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2024-t1-q32.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q32-complete.jpg",
+      "exam-snippets/question-ha24t1-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 33,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2024-t1-q33.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q33-complete.jpg",
+      "exam-snippets/question-ha24t1-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 34,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2024-t1-q34.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q34-complete.jpg",
+      "exam-snippets/question-ha24t1-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 35,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2024-t1-q35.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q35-complete.jpg",
+      "exam-snippets/question-ha24t1-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 36,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2024-t1-q36.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q36-complete.jpg",
+      "exam-snippets/question-ha24t1-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 37,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2024-t1-q37.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q37-complete.jpg",
+      "exam-snippets/question-ha24t1-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 38,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t1-q38.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q38-complete.jpg",
+      "exam-snippets/question-ha24t1-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 39,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t1-q39.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q39-fallback.jpg",
+      "exam-snippets/question-ha24t1-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 40,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t1-q40.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q40-complete.jpg",
+      "exam-snippets/question-ha24t1-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 41,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t1-q41.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q41-complete.jpg",
+      "exam-snippets/question-ha24t1-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 42,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t1-q42.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q42-complete.jpg",
+      "exam-snippets/question-ha24t1-42-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 43,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2024-t1-q43.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q43-complete.jpg",
+      "exam-snippets/question-ha24t1-43-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 44,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2024-t1-q44.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q44-complete.jpg",
+      "exam-snippets/question-ha24t1-44-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 45,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2024-t1-q45.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q45-complete.jpg",
+      "exam-snippets/question-ha24t1-45-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2024-t2-q1.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q1-complete.jpg",
+      "exam-snippets/question-ha24t2-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 2,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q2-complete.jpg",
+      "exam-snippets/question-ha24t2-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
     "period": "2",
     "n": 3,
     "page": 3,
@@ -45,6 +573,30 @@
     "images": [
       "exam-snippets/context-ha24t2-q3-complete.jpg",
       "exam-snippets/question-ha24t2-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t2-q4.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q4-complete.jpg",
+      "exam-snippets/question-ha24t2-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 5,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2024-t2-q5.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q5-fallback.jpg",
+      "exam-snippets/question-ha24t2-5-only.jpg"
     ]
   },
   {
@@ -73,6 +625,498 @@
   },
   {
     "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2024-t2-q8.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q8-complete.jpg",
+      "exam-snippets/question-ha24t2-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2024-t2-q9.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q9-fallback.jpg",
+      "exam-snippets/question-ha24t2-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 10,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2024-t2-q10.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q10-complete.jpg",
+      "exam-snippets/question-ha24t2-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2024-t2-q11.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q11-complete.jpg",
+      "exam-snippets/question-ha24t2-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2024-t2-q12.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q12-complete.jpg",
+      "exam-snippets/question-ha24t2-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 13,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2024-t2-q13.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q13-complete.jpg",
+      "exam-snippets/question-ha24t2-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 14,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2024-t2-q14.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q14-complete.jpg",
+      "exam-snippets/question-ha24t2-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 15,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2024-t2-q15.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q15-complete.jpg",
+      "exam-snippets/question-ha24t2-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 16,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2024-t2-q16.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q16-fallback.jpg",
+      "exam-snippets/question-ha24t2-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 17,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t2-q17.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q17-complete.jpg",
+      "exam-snippets/question-ha24t2-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 18,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t2-q18.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q18-complete.jpg",
+      "exam-snippets/question-ha24t2-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 19,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2024-t2-q19.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q19-complete.jpg",
+      "exam-snippets/question-ha24t2-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 20,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t2-q20.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q20-complete.jpg",
+      "exam-snippets/question-ha24t2-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 21,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t2-q21.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q21-complete.jpg",
+      "exam-snippets/question-ha24t2-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 22,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2024-t2-q22.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q22-complete.jpg",
+      "exam-snippets/question-ha24t2-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 23,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2024-t2-q23.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q23-complete.jpg",
+      "exam-snippets/question-ha24t2-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 24,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2024-t2-q24.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q24-complete.jpg",
+      "exam-snippets/question-ha24t2-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 25,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2024-t2-q25.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q25-fallback.jpg",
+      "exam-snippets/question-ha24t2-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 26,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2024-t2-q26.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q26-complete.jpg",
+      "exam-snippets/question-ha24t2-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 27,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2024-t2-q27.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q27-complete.jpg",
+      "exam-snippets/question-ha24t2-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 28,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t2-q28.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q28-complete.jpg",
+      "exam-snippets/question-ha24t2-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 29,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t2-q29.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q29-complete.jpg",
+      "exam-snippets/question-ha24t2-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 30,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t2-q30.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q30-complete.jpg",
+      "exam-snippets/question-ha24t2-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 31,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2024-t2-q31.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q31-fallback.jpg",
+      "exam-snippets/question-ha24t2-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 32,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2024-t2-q32.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q32-fallback.jpg",
+      "exam-snippets/question-ha24t2-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 33,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2024-t2-q33.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q33-complete.jpg",
+      "exam-snippets/question-ha24t2-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 34,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2024-t2-q34.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q34-complete.jpg",
+      "exam-snippets/question-ha24t2-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 35,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2024-t2-q35.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q35-complete.jpg",
+      "exam-snippets/question-ha24t2-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 36,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2024-t2-q36.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q36-fallback.jpg",
+      "exam-snippets/question-ha24t2-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 37,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2024-t2-q37.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q37-complete.jpg",
+      "exam-snippets/question-ha24t2-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 38,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2024-t2-q38.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q38-complete.jpg",
+      "exam-snippets/question-ha24t2-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 39,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2024-t2-q39.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q39-complete.jpg",
+      "exam-snippets/question-ha24t2-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 40,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2024-t2-q40.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q40-complete.jpg",
+      "exam-snippets/question-ha24t2-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 41,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2024-t2-q41.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q41-complete.jpg",
+      "exam-snippets/question-ha24t2-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 42,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2024-t2-q42.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q42-complete.jpg",
+      "exam-snippets/question-ha24t2-42-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 43,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2024-t2-q43.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q43-complete.jpg",
+      "exam-snippets/question-ha24t2-43-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 44,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2024-t2-q44.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q44-complete.jpg",
+      "exam-snippets/question-ha24t2-44-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 45,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2024-t2-q45.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q45-complete.jpg",
+      "exam-snippets/question-ha24t2-45-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 46,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t2-q46.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q46-complete.jpg",
+      "exam-snippets/question-ha24t2-46-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 47,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t2-q47.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q47-complete.jpg",
+      "exam-snippets/question-ha24t2-47-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "2",
+    "n": 48,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2024-t2-q48.jpg",
+    "images": [
+      "exam-snippets/context-ha24t2-q48-fallback.jpg",
+      "exam-snippets/question-ha24t2-48-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
     "year": "2025",
     "period": "1",
     "n": 1,
@@ -81,6 +1125,18 @@
     "images": [
       "exam-snippets/context-ha25t1-q1-complete.jpg",
       "exam-snippets/question-ha25t1-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 2,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2025-t1-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q2-fallback.jpg",
+      "exam-snippets/question-ha25t1-2-only.jpg"
     ]
   },
   {
@@ -99,12 +1155,564 @@
     "level": "Havo",
     "year": "2025",
     "period": "1",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2025-t1-q4.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q4-complete.jpg",
+      "exam-snippets/question-ha25t1-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
     "n": 5,
     "page": 4,
     "image": "exam-snippets/complete-havo-2025-t1-q5.jpg",
     "images": [
       "exam-snippets/context-ha25t1-q5-complete.jpg",
       "exam-snippets/question-ha25t1-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2025-t1-q6.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q6-complete.jpg",
+      "exam-snippets/question-ha25t1-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 7,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2025-t1-q7.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q7-complete.jpg",
+      "exam-snippets/question-ha25t1-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2025-t1-q8.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q8-complete.jpg",
+      "exam-snippets/question-ha25t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2025-t1-q9.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q9-complete.jpg",
+      "exam-snippets/question-ha25t1-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 10,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2025-t1-q10.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q10-fallback.jpg",
+      "exam-snippets/question-ha25t1-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2025-t1-q11.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q11-complete.jpg",
+      "exam-snippets/question-ha25t1-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2025-t1-q12.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q12-fallback.jpg",
+      "exam-snippets/question-ha25t1-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 13,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2025-t1-q13.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q13-complete.jpg",
+      "exam-snippets/question-ha25t1-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 14,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2025-t1-q14.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q14-complete.jpg",
+      "exam-snippets/question-ha25t1-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 15,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2025-t1-q15.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q15-complete.jpg",
+      "exam-snippets/question-ha25t1-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 16,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2025-t1-q16.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q16-complete.jpg",
+      "exam-snippets/question-ha25t1-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 17,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2025-t1-q17.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q17-fallback.jpg",
+      "exam-snippets/question-ha25t1-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 18,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t1-q18.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q18-complete.jpg",
+      "exam-snippets/question-ha25t1-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 19,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t1-q19.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q19-complete.jpg",
+      "exam-snippets/question-ha25t1-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 20,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2025-t1-q20.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q20-complete.jpg",
+      "exam-snippets/question-ha25t1-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 21,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2025-t1-q21.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q21-complete.jpg",
+      "exam-snippets/question-ha25t1-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 22,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2025-t1-q22.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q22-complete.jpg",
+      "exam-snippets/question-ha25t1-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 23,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2025-t1-q23.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q23-complete.jpg",
+      "exam-snippets/question-ha25t1-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 24,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2025-t1-q24.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q24-complete.jpg",
+      "exam-snippets/question-ha25t1-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 25,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2025-t1-q25.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q25-complete.jpg",
+      "exam-snippets/question-ha25t1-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 26,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2025-t1-q26.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q26-complete.jpg",
+      "exam-snippets/question-ha25t1-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 27,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2025-t1-q27.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q27-complete.jpg",
+      "exam-snippets/question-ha25t1-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 28,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2025-t1-q28.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q28-fallback.jpg",
+      "exam-snippets/question-ha25t1-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 29,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2025-t1-q29.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q29-fallback.jpg",
+      "exam-snippets/question-ha25t1-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 30,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2025-t1-q30.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q30-complete.jpg",
+      "exam-snippets/question-ha25t1-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 31,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2025-t1-q31.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q31-complete.jpg",
+      "exam-snippets/question-ha25t1-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 32,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2025-t1-q32.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q32-complete.jpg",
+      "exam-snippets/question-ha25t1-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 33,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2025-t1-q33.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q33-complete.jpg",
+      "exam-snippets/question-ha25t1-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 34,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2025-t1-q34.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q34-fallback.jpg",
+      "exam-snippets/question-ha25t1-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 35,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2025-t1-q35.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q35-complete.jpg",
+      "exam-snippets/question-ha25t1-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 36,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2025-t1-q36.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q36-complete.jpg",
+      "exam-snippets/question-ha25t1-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 37,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2025-t1-q37.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q37-complete.jpg",
+      "exam-snippets/question-ha25t1-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 38,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2025-t1-q38.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q38-complete.jpg",
+      "exam-snippets/question-ha25t1-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 39,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2025-t1-q39.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q39-complete.jpg",
+      "exam-snippets/question-ha25t1-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 40,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2025-t1-q40.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q40-complete.jpg",
+      "exam-snippets/question-ha25t1-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 41,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2025-t1-q41.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q41-complete.jpg",
+      "exam-snippets/question-ha25t1-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 42,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2025-t1-q42.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q42-complete.jpg",
+      "exam-snippets/question-ha25t1-42-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 43,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2025-t1-q43.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q43-complete.jpg",
+      "exam-snippets/question-ha25t1-43-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 44,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2025-t1-q44.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q44-complete.jpg",
+      "exam-snippets/question-ha25t1-44-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 45,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2025-t1-q45.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q45-complete.jpg",
+      "exam-snippets/question-ha25t1-45-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 46,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2025-t1-q46.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q46-complete.jpg",
+      "exam-snippets/question-ha25t1-46-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 47,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2025-t1-q47.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q47-complete.jpg",
+      "exam-snippets/question-ha25t1-47-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "1",
+    "n": 48,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2025-t1-q48.jpg",
+    "images": [
+      "exam-snippets/context-ha25t1-q48-complete.jpg",
+      "exam-snippets/question-ha25t1-48-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2025-t2-q1.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q1-complete.jpg",
+      "exam-snippets/question-ha25t2-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 2,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2025-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q2-complete.jpg",
+      "exam-snippets/question-ha25t2-2-only.jpg"
     ]
   },
   {
@@ -123,6 +1731,66 @@
     "level": "Havo",
     "year": "2025",
     "period": "2",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2025-t2-q4.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q4-complete.jpg",
+      "exam-snippets/question-ha25t2-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 5,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2025-t2-q5.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q5-complete.jpg",
+      "exam-snippets/question-ha25t2-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2025-t2-q6.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q6-complete.jpg",
+      "exam-snippets/question-ha25t2-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 7,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2025-t2-q7.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q7-complete.jpg",
+      "exam-snippets/question-ha25t2-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2025-t2-q8.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q8-fallback.jpg",
+      "exam-snippets/question-ha25t2-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
     "n": 9,
     "page": 5,
     "image": "exam-snippets/complete-havo-2025-t2-q9.jpg",
@@ -130,6 +1798,462 @@
       "exam-snippets/context-ha25t2-q9-intro.jpg",
       "exam-snippets/context-ha25t2-q9-inbreeding.jpg",
       "exam-snippets/question-ha25t2-9.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 10,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2025-t2-q10.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q10-complete.jpg",
+      "exam-snippets/question-ha25t2-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2025-t2-q11.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q11-fallback.jpg",
+      "exam-snippets/question-ha25t2-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 12,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2025-t2-q12.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q12-fallback.jpg",
+      "exam-snippets/question-ha25t2-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 13,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2025-t2-q13.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q13-complete.jpg",
+      "exam-snippets/question-ha25t2-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 14,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2025-t2-q14.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q14-complete.jpg",
+      "exam-snippets/question-ha25t2-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 15,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2025-t2-q15.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q15-complete.jpg",
+      "exam-snippets/question-ha25t2-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 16,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2025-t2-q16.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q16-complete.jpg",
+      "exam-snippets/question-ha25t2-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 17,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2025-t2-q17.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q17-complete.jpg",
+      "exam-snippets/question-ha25t2-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 18,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t2-q18.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q18-complete.jpg",
+      "exam-snippets/question-ha25t2-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 19,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t2-q19.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q19-fallback.jpg",
+      "exam-snippets/question-ha25t2-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 20,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t2-q20.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q20-complete.jpg",
+      "exam-snippets/question-ha25t2-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 21,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t2-q21.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q21-complete.jpg",
+      "exam-snippets/question-ha25t2-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 22,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2025-t2-q22.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q22-complete.jpg",
+      "exam-snippets/question-ha25t2-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 23,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2025-t2-q23.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q23-complete.jpg",
+      "exam-snippets/question-ha25t2-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 24,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2025-t2-q24.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q24-complete.jpg",
+      "exam-snippets/question-ha25t2-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 25,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2025-t2-q25.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q25-complete.jpg",
+      "exam-snippets/question-ha25t2-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 26,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2025-t2-q26.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q26-complete.jpg",
+      "exam-snippets/question-ha25t2-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 27,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2025-t2-q27.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q27-complete.jpg",
+      "exam-snippets/question-ha25t2-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 28,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2025-t2-q28.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q28-complete.jpg",
+      "exam-snippets/question-ha25t2-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 29,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2025-t2-q29.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q29-complete.jpg",
+      "exam-snippets/question-ha25t2-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 30,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2025-t2-q30.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q30-complete.jpg",
+      "exam-snippets/question-ha25t2-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 31,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2025-t2-q31.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q31-complete.jpg",
+      "exam-snippets/question-ha25t2-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 32,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2025-t2-q32.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q32-complete.jpg",
+      "exam-snippets/question-ha25t2-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 33,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2025-t2-q33.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q33-complete.jpg",
+      "exam-snippets/question-ha25t2-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 34,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2025-t2-q34.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q34-complete.jpg",
+      "exam-snippets/question-ha25t2-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 35,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2025-t2-q35.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q35-complete.jpg",
+      "exam-snippets/question-ha25t2-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 36,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2025-t2-q36.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q36-complete.jpg",
+      "exam-snippets/question-ha25t2-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 37,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2025-t2-q37.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q37-fallback.jpg",
+      "exam-snippets/question-ha25t2-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 38,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2025-t2-q38.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q38-complete.jpg",
+      "exam-snippets/question-ha25t2-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 39,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2025-t2-q39.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q39-complete.jpg",
+      "exam-snippets/question-ha25t2-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 40,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2025-t2-q40.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q40-complete.jpg",
+      "exam-snippets/question-ha25t2-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 41,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2025-t2-q41.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q41-complete.jpg",
+      "exam-snippets/question-ha25t2-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 42,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2025-t2-q42.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q42-complete.jpg",
+      "exam-snippets/question-ha25t2-42-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 43,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2025-t2-q43.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q43-complete.jpg",
+      "exam-snippets/question-ha25t2-43-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2025",
+    "period": "2",
+    "n": 44,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2025-t2-q44.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q44-complete.jpg",
+      "exam-snippets/question-ha25t2-44-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 1,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2026-t1-q1.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q1-complete.jpg",
+      "exam-snippets/question-ha26t1-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 2,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2026-t1-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q2-complete.jpg",
+      "exam-snippets/question-ha26t1-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 3,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2026-t1-q3.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q3-fallback.jpg",
+      "exam-snippets/question-ha26t1-3-only.jpg"
     ]
   },
   {
@@ -160,6 +2284,18 @@
     "level": "Havo",
     "year": "2026",
     "period": "1",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2026-t1-q6.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q6-complete.jpg",
+      "exam-snippets/question-ha26t1-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
     "n": 7,
     "page": 5,
     "image": "exam-snippets/complete-havo-2026-t1-q7.jpg",
@@ -178,6 +2314,78 @@
     "images": [
       "exam-snippets/context-ha26t1-q8-fallback.jpg",
       "exam-snippets/question-ha26t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2026-t1-q9.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q9-complete.jpg",
+      "exam-snippets/question-ha26t1-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 10,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2026-t1-q10.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q10-fallback.jpg",
+      "exam-snippets/question-ha26t1-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2026-t1-q11.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q11-complete.jpg",
+      "exam-snippets/question-ha26t1-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2026-t1-q12.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q12-complete.jpg",
+      "exam-snippets/question-ha26t1-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 13,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2026-t1-q13.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q13-fallback.jpg",
+      "exam-snippets/question-ha26t1-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 14,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2026-t1-q14.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q14-complete.jpg",
+      "exam-snippets/question-ha26t1-14-only.jpg"
     ]
   },
   {
@@ -207,6 +2415,354 @@
   {
     "level": "Havo",
     "year": "2026",
+    "period": "1",
+    "n": 17,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2026-t1-q17.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q17-complete.jpg",
+      "exam-snippets/question-ha26t1-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 18,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2026-t1-q18.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q18-complete.jpg",
+      "exam-snippets/question-ha26t1-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 19,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2026-t1-q19.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q19-complete.jpg",
+      "exam-snippets/question-ha26t1-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 20,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2026-t1-q20.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q20-complete.jpg",
+      "exam-snippets/question-ha26t1-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 21,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2026-t1-q21.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q21-complete.jpg",
+      "exam-snippets/question-ha26t1-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 22,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2026-t1-q22.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q22-complete.jpg",
+      "exam-snippets/question-ha26t1-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 23,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2026-t1-q23.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q23-complete.jpg",
+      "exam-snippets/question-ha26t1-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 24,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2026-t1-q24.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q24-complete.jpg",
+      "exam-snippets/question-ha26t1-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 25,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2026-t1-q25.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q25-complete.jpg",
+      "exam-snippets/question-ha26t1-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 26,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2026-t1-q26.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q26-complete.jpg",
+      "exam-snippets/question-ha26t1-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 27,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2026-t1-q27.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q27-complete.jpg",
+      "exam-snippets/question-ha26t1-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 28,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2026-t1-q28.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q28-fallback.jpg",
+      "exam-snippets/question-ha26t1-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 29,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2026-t1-q29.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q29-complete.jpg",
+      "exam-snippets/question-ha26t1-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 30,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2026-t1-q30.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q30-complete.jpg",
+      "exam-snippets/question-ha26t1-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 31,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2026-t1-q31.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q31-complete.jpg",
+      "exam-snippets/question-ha26t1-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 32,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2026-t1-q32.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q32-complete.jpg",
+      "exam-snippets/question-ha26t1-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 33,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2026-t1-q33.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q33-complete.jpg",
+      "exam-snippets/question-ha26t1-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 34,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2026-t1-q34.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q34-fallback.jpg",
+      "exam-snippets/question-ha26t1-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 35,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2026-t1-q35.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q35-complete.jpg",
+      "exam-snippets/question-ha26t1-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 36,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2026-t1-q36.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q36-complete.jpg",
+      "exam-snippets/question-ha26t1-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 37,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t1-q37.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q37-complete.jpg",
+      "exam-snippets/question-ha26t1-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 38,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t1-q38.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q38-complete.jpg",
+      "exam-snippets/question-ha26t1-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 39,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t1-q39.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q39-complete.jpg",
+      "exam-snippets/question-ha26t1-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 40,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t1-q40.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q40-fallback.jpg",
+      "exam-snippets/question-ha26t1-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 41,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2026-t1-q41.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q41-complete.jpg",
+      "exam-snippets/question-ha26t1-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 42,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2026-t1-q42.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q42-fallback.jpg",
+      "exam-snippets/question-ha26t1-42-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "1",
+    "n": 43,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2026-t1-q43.jpg",
+    "images": [
+      "exam-snippets/context-ha26t1-q43-fallback.jpg",
+      "exam-snippets/question-ha26t1-43-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2026-t2-q1.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q1-complete.jpg",
+      "exam-snippets/question-ha26t2-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 2,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2026-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q2-fallback.jpg",
+      "exam-snippets/question-ha26t2-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
     "period": "2",
     "n": 3,
     "page": 3,
@@ -214,6 +2770,66 @@
     "images": [
       "exam-snippets/context-ha26t2-q3-complete.jpg",
       "exam-snippets/question-ha26t2-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2026-t2-q4.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q4-complete.jpg",
+      "exam-snippets/question-ha26t2-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 5,
+    "page": 3,
+    "image": "exam-snippets/complete-havo-2026-t2-q5.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q5-complete.jpg",
+      "exam-snippets/question-ha26t2-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2026-t2-q6.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q6-complete.jpg",
+      "exam-snippets/question-ha26t2-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 7,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2026-t2-q7.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q7-fallback.jpg",
+      "exam-snippets/question-ha26t2-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 8,
+    "page": 4,
+    "image": "exam-snippets/complete-havo-2026-t2-q8.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q8-complete.jpg",
+      "exam-snippets/question-ha26t2-8-only.jpg"
     ]
   },
   {
@@ -229,6 +2845,450 @@
     ]
   },
   {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 10,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2026-t2-q10.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q10-complete.jpg",
+      "exam-snippets/question-ha26t2-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2026-t2-q11.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q11-complete.jpg",
+      "exam-snippets/question-ha26t2-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 12,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2026-t2-q12.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q12-complete.jpg",
+      "exam-snippets/question-ha26t2-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 13,
+    "page": 6,
+    "image": "exam-snippets/complete-havo-2026-t2-q13.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q13-fallback.jpg",
+      "exam-snippets/question-ha26t2-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 14,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2026-t2-q14.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q14-complete.jpg",
+      "exam-snippets/question-ha26t2-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 15,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2026-t2-q15.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q15-complete.jpg",
+      "exam-snippets/question-ha26t2-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 16,
+    "page": 7,
+    "image": "exam-snippets/complete-havo-2026-t2-q16.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q16-complete.jpg",
+      "exam-snippets/question-ha26t2-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 17,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2026-t2-q17.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q17-complete.jpg",
+      "exam-snippets/question-ha26t2-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 18,
+    "page": 8,
+    "image": "exam-snippets/complete-havo-2026-t2-q18.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q18-fallback.jpg",
+      "exam-snippets/question-ha26t2-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 19,
+    "page": 9,
+    "image": "exam-snippets/complete-havo-2026-t2-q19.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q19-complete.jpg",
+      "exam-snippets/question-ha26t2-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 20,
+    "page": 10,
+    "image": "exam-snippets/complete-havo-2026-t2-q20.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q20-complete.jpg",
+      "exam-snippets/question-ha26t2-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 21,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2026-t2-q21.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q21-complete.jpg",
+      "exam-snippets/question-ha26t2-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 22,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2026-t2-q22.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q22-complete.jpg",
+      "exam-snippets/question-ha26t2-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 23,
+    "page": 11,
+    "image": "exam-snippets/complete-havo-2026-t2-q23.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q23-complete.jpg",
+      "exam-snippets/question-ha26t2-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 24,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2026-t2-q24.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q24-complete.jpg",
+      "exam-snippets/question-ha26t2-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 25,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2026-t2-q25.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q25-complete.jpg",
+      "exam-snippets/question-ha26t2-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 26,
+    "page": 12,
+    "image": "exam-snippets/complete-havo-2026-t2-q26.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q26-complete.jpg",
+      "exam-snippets/question-ha26t2-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 27,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2026-t2-q27.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q27-complete.jpg",
+      "exam-snippets/question-ha26t2-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 28,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2026-t2-q28.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q28-fallback.jpg",
+      "exam-snippets/question-ha26t2-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 29,
+    "page": 13,
+    "image": "exam-snippets/complete-havo-2026-t2-q29.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q29-complete.jpg",
+      "exam-snippets/question-ha26t2-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 30,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2026-t2-q30.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q30-complete.jpg",
+      "exam-snippets/question-ha26t2-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 31,
+    "page": 14,
+    "image": "exam-snippets/complete-havo-2026-t2-q31.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q31-complete.jpg",
+      "exam-snippets/question-ha26t2-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 32,
+    "page": 15,
+    "image": "exam-snippets/complete-havo-2026-t2-q32.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q32-complete.jpg",
+      "exam-snippets/question-ha26t2-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 33,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2026-t2-q33.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q33-complete.jpg",
+      "exam-snippets/question-ha26t2-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 34,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2026-t2-q34.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q34-complete.jpg",
+      "exam-snippets/question-ha26t2-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 35,
+    "page": 16,
+    "image": "exam-snippets/complete-havo-2026-t2-q35.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q35-fallback.jpg",
+      "exam-snippets/question-ha26t2-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 36,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2026-t2-q36.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q36-complete.jpg",
+      "exam-snippets/question-ha26t2-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 37,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2026-t2-q37.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q37-complete.jpg",
+      "exam-snippets/question-ha26t2-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 38,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2026-t2-q38.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q38-complete.jpg",
+      "exam-snippets/question-ha26t2-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 39,
+    "page": 17,
+    "image": "exam-snippets/complete-havo-2026-t2-q39.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q39-complete.jpg",
+      "exam-snippets/question-ha26t2-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 40,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2026-t2-q40.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q40-complete.jpg",
+      "exam-snippets/question-ha26t2-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 41,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2026-t2-q41.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q41-complete.jpg",
+      "exam-snippets/question-ha26t2-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 42,
+    "page": 18,
+    "image": "exam-snippets/complete-havo-2026-t2-q42.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q42-fallback.jpg",
+      "exam-snippets/question-ha26t2-42-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 43,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t2-q43.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q43-complete.jpg",
+      "exam-snippets/question-ha26t2-43-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 44,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t2-q44.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q44-fallback.jpg",
+      "exam-snippets/question-ha26t2-44-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 45,
+    "page": 19,
+    "image": "exam-snippets/complete-havo-2026-t2-q45.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q45-complete.jpg",
+      "exam-snippets/question-ha26t2-45-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2026",
+    "period": "2",
+    "n": 46,
+    "page": 20,
+    "image": "exam-snippets/complete-havo-2026-t2-q46.jpg",
+    "images": [
+      "exam-snippets/context-ha26t2-q46-complete.jpg",
+      "exam-snippets/question-ha26t2-46-only.jpg"
+    ]
+  },
+  {
     "level": "Vwo",
     "year": "2024",
     "period": "1",
@@ -238,6 +3298,498 @@
     "images": [
       "exam-snippets/context-vw24t1-q1-complete.jpg",
       "exam-snippets/question-vw24t1-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 2,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2024-t1-q2.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q2-fallback.jpg",
+      "exam-snippets/question-vw24t1-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2024-t1-q3.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q3-complete.jpg",
+      "exam-snippets/question-vw24t1-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2024-t1-q4.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q4-complete.jpg",
+      "exam-snippets/question-vw24t1-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 5,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2024-t1-q5.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q5-complete.jpg",
+      "exam-snippets/question-vw24t1-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2024-t1-q6.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q6-complete.jpg",
+      "exam-snippets/question-vw24t1-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 7,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2024-t1-q7.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q7-complete.jpg",
+      "exam-snippets/question-vw24t1-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2024-t1-q8.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q8-complete.jpg",
+      "exam-snippets/question-vw24t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2024-t1-q9.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q9-complete.jpg",
+      "exam-snippets/question-vw24t1-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 10,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2024-t1-q10.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q10-complete.jpg",
+      "exam-snippets/question-vw24t1-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 11,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t1-q11.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q11-complete.jpg",
+      "exam-snippets/question-vw24t1-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t1-q12.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q12-complete.jpg",
+      "exam-snippets/question-vw24t1-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 13,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t1-q13.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q13-fallback.jpg",
+      "exam-snippets/question-vw24t1-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 14,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2024-t1-q14.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q14-complete.jpg",
+      "exam-snippets/question-vw24t1-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 15,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2024-t1-q15.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q15-complete.jpg",
+      "exam-snippets/question-vw24t1-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 16,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2024-t1-q16.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q16-complete.jpg",
+      "exam-snippets/question-vw24t1-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 17,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2024-t1-q17.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q17-complete.jpg",
+      "exam-snippets/question-vw24t1-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 18,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2024-t1-q18.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q18-fallback.jpg",
+      "exam-snippets/question-vw24t1-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 19,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2024-t1-q19.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q19-complete.jpg",
+      "exam-snippets/question-vw24t1-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 20,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2024-t1-q20.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q20-complete.jpg",
+      "exam-snippets/question-vw24t1-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 21,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2024-t1-q21.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q21-complete.jpg",
+      "exam-snippets/question-vw24t1-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 22,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t1-q22.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q22-complete.jpg",
+      "exam-snippets/question-vw24t1-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 23,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t1-q23.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q23-fallback.jpg",
+      "exam-snippets/question-vw24t1-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 24,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t1-q24.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q24-fallback.jpg",
+      "exam-snippets/question-vw24t1-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 25,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t1-q25.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q25-complete.jpg",
+      "exam-snippets/question-vw24t1-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 26,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2024-t1-q26.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q26-complete.jpg",
+      "exam-snippets/question-vw24t1-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 27,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t1-q27.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q27-complete.jpg",
+      "exam-snippets/question-vw24t1-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 28,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t1-q28.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q28-complete.jpg",
+      "exam-snippets/question-vw24t1-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 29,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t1-q29.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q29-fallback.jpg",
+      "exam-snippets/question-vw24t1-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 30,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t1-q30.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q30-fallback.jpg",
+      "exam-snippets/question-vw24t1-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 31,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2024-t1-q31.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q31-complete.jpg",
+      "exam-snippets/question-vw24t1-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 32,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2024-t1-q32.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q32-complete.jpg",
+      "exam-snippets/question-vw24t1-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 33,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2024-t1-q33.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q33-complete.jpg",
+      "exam-snippets/question-vw24t1-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 34,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2024-t1-q34.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q34-fallback.jpg",
+      "exam-snippets/question-vw24t1-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 35,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2024-t1-q35.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q35-complete.jpg",
+      "exam-snippets/question-vw24t1-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 36,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2024-t1-q36.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q36-complete.jpg",
+      "exam-snippets/question-vw24t1-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 37,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2024-t1-q37.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q37-fallback.jpg",
+      "exam-snippets/question-vw24t1-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 38,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2024-t1-q38.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q38-complete.jpg",
+      "exam-snippets/question-vw24t1-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 39,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2024-t1-q39.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q39-complete.jpg",
+      "exam-snippets/question-vw24t1-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 40,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2024-t1-q40.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q40-complete.jpg",
+      "exam-snippets/question-vw24t1-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 41,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2024-t1-q41.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q41-fallback.jpg",
+      "exam-snippets/question-vw24t1-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "1",
+    "n": 42,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2024-t1-q42.jpg",
+    "images": [
+      "exam-snippets/context-vw24t1-q42-complete.jpg",
+      "exam-snippets/question-vw24t1-42-only.jpg"
     ]
   },
   {
@@ -262,6 +3814,630 @@
     "images": [
       "exam-snippets/context-vw24t2-q2-complete.jpg",
       "exam-snippets/question-vw24t2-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 3,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2024-t2-q3.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q3-complete.jpg",
+      "exam-snippets/question-vw24t2-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 4,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2024-t2-q4.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q4-complete.jpg",
+      "exam-snippets/question-vw24t2-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 5,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2024-t2-q5.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q5-complete.jpg",
+      "exam-snippets/question-vw24t2-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 6,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2024-t2-q6.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q6-complete.jpg",
+      "exam-snippets/question-vw24t2-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 7,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2024-t2-q7.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q7-fallback.jpg",
+      "exam-snippets/question-vw24t2-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2024-t2-q8.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q8-complete.jpg",
+      "exam-snippets/question-vw24t2-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 9,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2024-t2-q9.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q9-complete.jpg",
+      "exam-snippets/question-vw24t2-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 10,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2024-t2-q10.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q10-fallback.jpg",
+      "exam-snippets/question-vw24t2-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 11,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t2-q11.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q11-fallback.jpg",
+      "exam-snippets/question-vw24t2-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t2-q12.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q12-complete.jpg",
+      "exam-snippets/question-vw24t2-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 13,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t2-q13.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q13-complete.jpg",
+      "exam-snippets/question-vw24t2-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 14,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2024-t2-q14.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q14-fallback.jpg",
+      "exam-snippets/question-vw24t2-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 15,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2024-t2-q15.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q15-complete.jpg",
+      "exam-snippets/question-vw24t2-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 16,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2024-t2-q16.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q16-complete.jpg",
+      "exam-snippets/question-vw24t2-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 17,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2024-t2-q17.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q17-complete.jpg",
+      "exam-snippets/question-vw24t2-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 18,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2024-t2-q18.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q18-fallback.jpg",
+      "exam-snippets/question-vw24t2-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 19,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2024-t2-q19.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q19-complete.jpg",
+      "exam-snippets/question-vw24t2-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 20,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2024-t2-q20.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q20-complete.jpg",
+      "exam-snippets/question-vw24t2-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 21,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2024-t2-q21.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q21-complete.jpg",
+      "exam-snippets/question-vw24t2-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 22,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2024-t2-q22.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q22-complete.jpg",
+      "exam-snippets/question-vw24t2-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 23,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2024-t2-q23.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q23-complete.jpg",
+      "exam-snippets/question-vw24t2-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 24,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t2-q24.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q24-complete.jpg",
+      "exam-snippets/question-vw24t2-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 25,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t2-q25.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q25-complete.jpg",
+      "exam-snippets/question-vw24t2-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 26,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2024-t2-q26.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q26-complete.jpg",
+      "exam-snippets/question-vw24t2-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 27,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2024-t2-q27.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q27-complete.jpg",
+      "exam-snippets/question-vw24t2-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 28,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2024-t2-q28.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q28-fallback.jpg",
+      "exam-snippets/question-vw24t2-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 29,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t2-q29.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q29-complete.jpg",
+      "exam-snippets/question-vw24t2-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 30,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t2-q30.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q30-complete.jpg",
+      "exam-snippets/question-vw24t2-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 31,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t2-q31.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q31-complete.jpg",
+      "exam-snippets/question-vw24t2-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 32,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2024-t2-q32.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q32-fallback.jpg",
+      "exam-snippets/question-vw24t2-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 33,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2024-t2-q33.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q33-complete.jpg",
+      "exam-snippets/question-vw24t2-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 34,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2024-t2-q34.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q34-complete.jpg",
+      "exam-snippets/question-vw24t2-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 35,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2024-t2-q35.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q35-complete.jpg",
+      "exam-snippets/question-vw24t2-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 36,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2024-t2-q36.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q36-complete.jpg",
+      "exam-snippets/question-vw24t2-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 37,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2024-t2-q37.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q37-complete.jpg",
+      "exam-snippets/question-vw24t2-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 38,
+    "page": 20,
+    "image": "exam-snippets/complete-vwo-2024-t2-q38.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q38-complete.jpg",
+      "exam-snippets/question-vw24t2-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 39,
+    "page": 20,
+    "image": "exam-snippets/complete-vwo-2024-t2-q39.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q39-fallback.jpg",
+      "exam-snippets/question-vw24t2-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 40,
+    "page": 20,
+    "image": "exam-snippets/complete-vwo-2024-t2-q40.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q40-complete.jpg",
+      "exam-snippets/question-vw24t2-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2024",
+    "period": "2",
+    "n": 41,
+    "page": 20,
+    "image": "exam-snippets/complete-vwo-2024-t2-q41.jpg",
+    "images": [
+      "exam-snippets/context-vw24t2-q41-fallback.jpg",
+      "exam-snippets/question-vw24t2-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2025-t1-q1.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q1-complete.jpg",
+      "exam-snippets/question-vw25t1-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 2,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2025-t1-q2.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q2-fallback.jpg",
+      "exam-snippets/question-vw25t1-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2025-t1-q3.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q3-complete.jpg",
+      "exam-snippets/question-vw25t1-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2025-t1-q4.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q4-fallback.jpg",
+      "exam-snippets/question-vw25t1-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 5,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2025-t1-q5.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q5-complete.jpg",
+      "exam-snippets/question-vw25t1-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2025-t1-q6.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q6-complete.jpg",
+      "exam-snippets/question-vw25t1-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 7,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2025-t1-q7.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q7-complete.jpg",
+      "exam-snippets/question-vw25t1-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2025-t1-q8.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q8-complete.jpg",
+      "exam-snippets/question-vw25t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2025-t1-q9.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q9-fallback.jpg",
+      "exam-snippets/question-vw25t1-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 10,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2025-t1-q10.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q10-complete.jpg",
+      "exam-snippets/question-vw25t1-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2025-t1-q11.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q11-complete.jpg",
+      "exam-snippets/question-vw25t1-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 12,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2025-t1-q12.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q12-complete.jpg",
+      "exam-snippets/question-vw25t1-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 13,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2025-t1-q13.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q13-complete.jpg",
+      "exam-snippets/question-vw25t1-13-only.jpg"
     ]
   },
   {
@@ -332,6 +4508,330 @@
   {
     "level": "Vwo",
     "year": "2025",
+    "period": "1",
+    "n": 19,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2025-t1-q19.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q19-fallback.jpg",
+      "exam-snippets/question-vw25t1-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 20,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2025-t1-q20.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q20-fallback.jpg",
+      "exam-snippets/question-vw25t1-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 21,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2025-t1-q21.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q21-complete.jpg",
+      "exam-snippets/question-vw25t1-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 22,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2025-t1-q22.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q22-complete.jpg",
+      "exam-snippets/question-vw25t1-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 23,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2025-t1-q23.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q23-complete.jpg",
+      "exam-snippets/question-vw25t1-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 24,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2025-t1-q24.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q24-complete.jpg",
+      "exam-snippets/question-vw25t1-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 25,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2025-t1-q25.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q25-complete.jpg",
+      "exam-snippets/question-vw25t1-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 26,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2025-t1-q26.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q26-complete.jpg",
+      "exam-snippets/question-vw25t1-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 27,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2025-t1-q27.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q27-complete.jpg",
+      "exam-snippets/question-vw25t1-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 28,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2025-t1-q28.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q28-complete.jpg",
+      "exam-snippets/question-vw25t1-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 29,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2025-t1-q29.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q29-complete.jpg",
+      "exam-snippets/question-vw25t1-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 30,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2025-t1-q30.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q30-complete.jpg",
+      "exam-snippets/question-vw25t1-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 31,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2025-t1-q31.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q31-complete.jpg",
+      "exam-snippets/question-vw25t1-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 32,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2025-t1-q32.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q32-complete.jpg",
+      "exam-snippets/question-vw25t1-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 33,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2025-t1-q33.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q33-complete.jpg",
+      "exam-snippets/question-vw25t1-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 34,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2025-t1-q34.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q34-complete.jpg",
+      "exam-snippets/question-vw25t1-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 35,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2025-t1-q35.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q35-fallback.jpg",
+      "exam-snippets/question-vw25t1-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 36,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2025-t1-q36.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q36-complete.jpg",
+      "exam-snippets/question-vw25t1-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 37,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2025-t1-q37.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q37-complete.jpg",
+      "exam-snippets/question-vw25t1-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 38,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2025-t1-q38.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q38-complete.jpg",
+      "exam-snippets/question-vw25t1-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 39,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2025-t1-q39.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q39-complete.jpg",
+      "exam-snippets/question-vw25t1-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "1",
+    "n": 40,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2025-t1-q40.jpg",
+    "images": [
+      "exam-snippets/context-vw25t1-q40-complete.jpg",
+      "exam-snippets/question-vw25t1-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2025-t2-q1.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q1-complete.jpg",
+      "exam-snippets/question-vw25t2-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 2,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2025-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q2-fallback.jpg",
+      "exam-snippets/question-vw25t2-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2025-t2-q3.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q3-complete.jpg",
+      "exam-snippets/question-vw25t2-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2025-t2-q4.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q4-complete.jpg",
+      "exam-snippets/question-vw25t2-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 5,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2025-t2-q5.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q5-fallback.jpg",
+      "exam-snippets/question-vw25t2-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
     "period": "2",
     "n": 6,
     "page": 4,
@@ -345,12 +4845,432 @@
     "level": "Vwo",
     "year": "2025",
     "period": "2",
+    "n": 7,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2025-t2-q7.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q7-fallback.jpg",
+      "exam-snippets/question-vw25t2-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
     "n": 8,
     "page": 5,
     "image": "exam-snippets/complete-vwo-2025-t2-q8.jpg",
     "images": [
       "exam-snippets/context-vw25t2-q8-complete.jpg",
       "exam-snippets/question-vw25t2-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2025-t2-q9.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q9-complete.jpg",
+      "exam-snippets/question-vw25t2-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 10,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2025-t2-q10.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q10-complete.jpg",
+      "exam-snippets/question-vw25t2-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 11,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2025-t2-q11.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q11-complete.jpg",
+      "exam-snippets/question-vw25t2-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 12,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2025-t2-q12.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q12-fallback.jpg",
+      "exam-snippets/question-vw25t2-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 13,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2025-t2-q13.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q13-complete.jpg",
+      "exam-snippets/question-vw25t2-13-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 14,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2025-t2-q14.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q14-complete.jpg",
+      "exam-snippets/question-vw25t2-14-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 15,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2025-t2-q15.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q15-complete.jpg",
+      "exam-snippets/question-vw25t2-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 16,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2025-t2-q16.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q16-complete.jpg",
+      "exam-snippets/question-vw25t2-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 17,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2025-t2-q17.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q17-complete.jpg",
+      "exam-snippets/question-vw25t2-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 18,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2025-t2-q18.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q18-complete.jpg",
+      "exam-snippets/question-vw25t2-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 19,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2025-t2-q19.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q19-complete.jpg",
+      "exam-snippets/question-vw25t2-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 20,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2025-t2-q20.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q20-fallback.jpg",
+      "exam-snippets/question-vw25t2-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 21,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2025-t2-q21.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q21-complete.jpg",
+      "exam-snippets/question-vw25t2-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 22,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2025-t2-q22.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q22-complete.jpg",
+      "exam-snippets/question-vw25t2-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 23,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2025-t2-q23.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q23-complete.jpg",
+      "exam-snippets/question-vw25t2-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 24,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2025-t2-q24.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q24-fallback.jpg",
+      "exam-snippets/question-vw25t2-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 25,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2025-t2-q25.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q25-complete.jpg",
+      "exam-snippets/question-vw25t2-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 26,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2025-t2-q26.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q26-complete.jpg",
+      "exam-snippets/question-vw25t2-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 27,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2025-t2-q27.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q27-complete.jpg",
+      "exam-snippets/question-vw25t2-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 28,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2025-t2-q28.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q28-fallback.jpg",
+      "exam-snippets/question-vw25t2-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 29,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2025-t2-q29.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q29-complete.jpg",
+      "exam-snippets/question-vw25t2-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 30,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2025-t2-q30.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q30-complete.jpg",
+      "exam-snippets/question-vw25t2-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 31,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2025-t2-q31.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q31-complete.jpg",
+      "exam-snippets/question-vw25t2-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 32,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2025-t2-q32.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q32-complete.jpg",
+      "exam-snippets/question-vw25t2-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 33,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2025-t2-q33.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q33-complete.jpg",
+      "exam-snippets/question-vw25t2-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 34,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2025-t2-q34.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q34-complete.jpg",
+      "exam-snippets/question-vw25t2-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 35,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2025-t2-q35.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q35-complete.jpg",
+      "exam-snippets/question-vw25t2-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 36,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2025-t2-q36.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q36-complete.jpg",
+      "exam-snippets/question-vw25t2-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 37,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2025-t2-q37.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q37-complete.jpg",
+      "exam-snippets/question-vw25t2-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 38,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2025-t2-q38.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q38-complete.jpg",
+      "exam-snippets/question-vw25t2-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 39,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2025-t2-q39.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q39-complete.jpg",
+      "exam-snippets/question-vw25t2-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 40,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2025-t2-q40.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q40-complete.jpg",
+      "exam-snippets/question-vw25t2-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 41,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2025-t2-q41.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q41-complete.jpg",
+      "exam-snippets/question-vw25t2-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2025",
+    "period": "2",
+    "n": 42,
+    "page": 20,
+    "image": "exam-snippets/complete-vwo-2025-t2-q42.jpg",
+    "images": [
+      "exam-snippets/context-vw25t2-q42-complete.jpg",
+      "exam-snippets/question-vw25t2-42-only.jpg"
     ]
   },
   {
@@ -381,12 +5301,132 @@
     "level": "Vwo",
     "year": "2026",
     "period": "1",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2026-t1-q3.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q3-complete.jpg",
+      "exam-snippets/question-vw26t1-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 4,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2026-t1-q4.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q4-complete.jpg",
+      "exam-snippets/question-vw26t1-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 5,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2026-t1-q5.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q5-complete.jpg",
+      "exam-snippets/question-vw26t1-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 6,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2026-t1-q6.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q6-complete.jpg",
+      "exam-snippets/question-vw26t1-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 7,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2026-t1-q7.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q7-complete.jpg",
+      "exam-snippets/question-vw26t1-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2026-t1-q8.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q8-complete.jpg",
+      "exam-snippets/question-vw26t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 9,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2026-t1-q9.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q9-complete.jpg",
+      "exam-snippets/question-vw26t1-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 10,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2026-t1-q10.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q10-complete.jpg",
+      "exam-snippets/question-vw26t1-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 11,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2026-t1-q11.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q11-complete.jpg",
+      "exam-snippets/question-vw26t1-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
     "n": 12,
     "page": 6,
     "image": "exam-snippets/complete-vwo-2026-t1-q12.jpg",
     "images": [
       "exam-snippets/context-vw26t1-q12-complete.jpg",
       "exam-snippets/question-vw26t1-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 13,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2026-t1-q13.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q13-complete.jpg",
+      "exam-snippets/question-vw26t1-13-only.jpg"
     ]
   },
   {
@@ -405,6 +5445,18 @@
     "level": "Vwo",
     "year": "2026",
     "period": "1",
+    "n": 15,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2026-t1-q15.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q15-fallback.jpg",
+      "exam-snippets/question-vw26t1-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
     "n": 16,
     "page": 7,
     "image": "exam-snippets/complete-vwo-2026-t1-q16.jpg",
@@ -417,12 +5469,456 @@
     "level": "Vwo",
     "year": "2026",
     "period": "1",
+    "n": 17,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2026-t1-q17.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q17-complete.jpg",
+      "exam-snippets/question-vw26t1-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 18,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2026-t1-q18.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q18-fallback.jpg",
+      "exam-snippets/question-vw26t1-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 19,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2026-t1-q19.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q19-complete.jpg",
+      "exam-snippets/question-vw26t1-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
     "n": 20,
     "page": 9,
     "image": "exam-snippets/complete-vwo-2026-t1-q20.jpg",
     "images": [
       "exam-snippets/context-vw26t1-q20-complete.jpg",
       "exam-snippets/question-vw26t1-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 21,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2026-t1-q21.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q21-fallback.jpg",
+      "exam-snippets/question-vw26t1-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 22,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2026-t1-q22.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q22-complete.jpg",
+      "exam-snippets/question-vw26t1-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 23,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2026-t1-q23.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q23-complete.jpg",
+      "exam-snippets/question-vw26t1-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 24,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2026-t1-q24.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q24-complete.jpg",
+      "exam-snippets/question-vw26t1-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 25,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2026-t1-q25.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q25-complete.jpg",
+      "exam-snippets/question-vw26t1-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 26,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2026-t1-q26.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q26-fallback.jpg",
+      "exam-snippets/question-vw26t1-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 27,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2026-t1-q27.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q27-complete.jpg",
+      "exam-snippets/question-vw26t1-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 28,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2026-t1-q28.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q28-complete.jpg",
+      "exam-snippets/question-vw26t1-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 29,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2026-t1-q29.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q29-fallback.jpg",
+      "exam-snippets/question-vw26t1-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 30,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2026-t1-q30.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q30-complete.jpg",
+      "exam-snippets/question-vw26t1-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 31,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2026-t1-q31.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q31-complete.jpg",
+      "exam-snippets/question-vw26t1-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 32,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2026-t1-q32.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q32-complete.jpg",
+      "exam-snippets/question-vw26t1-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 33,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2026-t1-q33.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q33-complete.jpg",
+      "exam-snippets/question-vw26t1-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 34,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t1-q34.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q34-complete.jpg",
+      "exam-snippets/question-vw26t1-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 35,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t1-q35.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q35-fallback.jpg",
+      "exam-snippets/question-vw26t1-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 36,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t1-q36.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q36-complete.jpg",
+      "exam-snippets/question-vw26t1-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 37,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2026-t1-q37.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q37-complete.jpg",
+      "exam-snippets/question-vw26t1-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 38,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2026-t1-q38.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q38-complete.jpg",
+      "exam-snippets/question-vw26t1-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 39,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2026-t1-q39.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q39-complete.jpg",
+      "exam-snippets/question-vw26t1-39-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 40,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2026-t1-q40.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q40-complete.jpg",
+      "exam-snippets/question-vw26t1-40-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "1",
+    "n": 41,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2026-t1-q41.jpg",
+    "images": [
+      "exam-snippets/context-vw26t1-q41-complete.jpg",
+      "exam-snippets/question-vw26t1-41-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-vwo-2026-t2-q1.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q1-complete.jpg",
+      "exam-snippets/question-vw26t2-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 2,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2026-t2-q2.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q2-fallback.jpg",
+      "exam-snippets/question-vw26t2-2-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 3,
+    "page": 3,
+    "image": "exam-snippets/complete-vwo-2026-t2-q3.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q3-complete.jpg",
+      "exam-snippets/question-vw26t2-3-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 4,
+    "page": 4,
+    "image": "exam-snippets/complete-vwo-2026-t2-q4.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q4-complete.jpg",
+      "exam-snippets/question-vw26t2-4-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 5,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2026-t2-q5.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q5-complete.jpg",
+      "exam-snippets/question-vw26t2-5-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 6,
+    "page": 5,
+    "image": "exam-snippets/complete-vwo-2026-t2-q6.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q6-fallback.jpg",
+      "exam-snippets/question-vw26t2-6-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 7,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2026-t2-q7.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q7-complete.jpg",
+      "exam-snippets/question-vw26t2-7-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 8,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2026-t2-q8.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q8-complete.jpg",
+      "exam-snippets/question-vw26t2-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 9,
+    "page": 6,
+    "image": "exam-snippets/complete-vwo-2026-t2-q9.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q9-complete.jpg",
+      "exam-snippets/question-vw26t2-9-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 10,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2026-t2-q10.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q10-complete.jpg",
+      "exam-snippets/question-vw26t2-10-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 11,
+    "page": 7,
+    "image": "exam-snippets/complete-vwo-2026-t2-q11.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q11-complete.jpg",
+      "exam-snippets/question-vw26t2-11-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 12,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2026-t2-q12.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q12-complete.jpg",
+      "exam-snippets/question-vw26t2-12-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 13,
+    "page": 8,
+    "image": "exam-snippets/complete-vwo-2026-t2-q13.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q13-complete.jpg",
+      "exam-snippets/question-vw26t2-13-only.jpg"
     ]
   },
   {
@@ -441,12 +5937,300 @@
     "level": "Vwo",
     "year": "2026",
     "period": "2",
+    "n": 15,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2026-t2-q15.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q15-complete.jpg",
+      "exam-snippets/question-vw26t2-15-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 16,
+    "page": 9,
+    "image": "exam-snippets/complete-vwo-2026-t2-q16.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q16-fallback.jpg",
+      "exam-snippets/question-vw26t2-16-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 17,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2026-t2-q17.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q17-complete.jpg",
+      "exam-snippets/question-vw26t2-17-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 18,
+    "page": 10,
+    "image": "exam-snippets/complete-vwo-2026-t2-q18.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q18-complete.jpg",
+      "exam-snippets/question-vw26t2-18-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 19,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2026-t2-q19.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q19-complete.jpg",
+      "exam-snippets/question-vw26t2-19-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 20,
+    "page": 11,
+    "image": "exam-snippets/complete-vwo-2026-t2-q20.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q20-complete.jpg",
+      "exam-snippets/question-vw26t2-20-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 21,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2026-t2-q21.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q21-complete.jpg",
+      "exam-snippets/question-vw26t2-21-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 22,
+    "page": 12,
+    "image": "exam-snippets/complete-vwo-2026-t2-q22.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q22-fallback.jpg",
+      "exam-snippets/question-vw26t2-22-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 23,
+    "page": 13,
+    "image": "exam-snippets/complete-vwo-2026-t2-q23.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q23-complete.jpg",
+      "exam-snippets/question-vw26t2-23-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
     "n": 24,
     "page": 13,
     "image": "exam-snippets/complete-vwo-2026-t2-q24.jpg",
     "images": [
       "exam-snippets/context-vw26t2-q24-fallback.jpg",
       "exam-snippets/question-vw26t2-24-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 25,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2026-t2-q25.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q25-complete.jpg",
+      "exam-snippets/question-vw26t2-25-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 26,
+    "page": 14,
+    "image": "exam-snippets/complete-vwo-2026-t2-q26.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q26-complete.jpg",
+      "exam-snippets/question-vw26t2-26-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 27,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t2-q27.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q27-complete.jpg",
+      "exam-snippets/question-vw26t2-27-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 28,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t2-q28.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q28-fallback.jpg",
+      "exam-snippets/question-vw26t2-28-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 29,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t2-q29.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q29-fallback.jpg",
+      "exam-snippets/question-vw26t2-29-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 30,
+    "page": 15,
+    "image": "exam-snippets/complete-vwo-2026-t2-q30.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q30-fallback.jpg",
+      "exam-snippets/question-vw26t2-30-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 31,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2026-t2-q31.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q31-complete.jpg",
+      "exam-snippets/question-vw26t2-31-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 32,
+    "page": 16,
+    "image": "exam-snippets/complete-vwo-2026-t2-q32.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q32-complete.jpg",
+      "exam-snippets/question-vw26t2-32-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 33,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2026-t2-q33.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q33-complete.jpg",
+      "exam-snippets/question-vw26t2-33-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 34,
+    "page": 17,
+    "image": "exam-snippets/complete-vwo-2026-t2-q34.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q34-fallback.jpg",
+      "exam-snippets/question-vw26t2-34-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 35,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2026-t2-q35.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q35-complete.jpg",
+      "exam-snippets/question-vw26t2-35-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 36,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2026-t2-q36.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q36-complete.jpg",
+      "exam-snippets/question-vw26t2-36-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 37,
+    "page": 18,
+    "image": "exam-snippets/complete-vwo-2026-t2-q37.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q37-fallback.jpg",
+      "exam-snippets/question-vw26t2-37-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 38,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2026-t2-q38.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q38-complete.jpg",
+      "exam-snippets/question-vw26t2-38-only.jpg"
+    ]
+  },
+  {
+    "level": "Vwo",
+    "year": "2026",
+    "period": "2",
+    "n": 39,
+    "page": 19,
+    "image": "exam-snippets/complete-vwo-2026-t2-q39.jpg",
+    "images": [
+      "exam-snippets/context-vw26t2-q39-fallback.jpg",
+      "exam-snippets/question-vw26t2-39-only.jpg"
     ]
   }
 ]
