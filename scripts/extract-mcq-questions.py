@@ -138,6 +138,24 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     )
     return [f"exam-snippets/{name}"]
 
+def fallback_context_fragment(page, lines, prefix, number, question_top, previous_ranges=(), scale=1.8):
+    """Keep preceding shared text/figures when semantic context-line detection finds no text."""
+    top = 25
+    bottom = min(question_top - 2, page.rect.height - 20)
+    if bottom <= top + 2:
+        return []
+    name = f"context-{prefix}-q{number}-fallback.jpg"
+    save_page_crop(
+        page,
+        fitz.Rect(0, top, page.rect.width, bottom),
+        OUT / name,
+        lines,
+        previous_ranges,
+        scale=scale,
+    )
+    return [f"exam-snippets/{name}"]
+
+
 def line_records(page):
     records = []
     data = page.get_text("dict")
@@ -556,6 +574,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             page, lines, context_line_indices, prefix, marker["number"],
                             question_top, footer_y, previous_ranges,
                         )
+                        if not context_paths:
+                            context_paths = fallback_context_fragment(
+                                page, lines, prefix, marker["number"], question_top, previous_ranges,
+                            )
                         question_name = f"question-{prefix}-{marker['number']}-only.jpg"
                         if question_y1 > question_top + 2:
                             page.get_pixmap(
@@ -687,6 +709,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         page, lines, context_line_indices, prefix,
                         marker["number"], question_top, footer_y, previous_ranges,
                     )
+                    if not context_paths:
+                        context_paths = fallback_context_fragment(
+                            page, lines, prefix, marker["number"], question_top, previous_ranges,
+                        )
                     question_name = f"question-{prefix}-{marker['number']}-only.jpg"
                     if question_y1 > question_top + 2:
                         page.get_pixmap(
@@ -808,10 +834,12 @@ all_contexts = list(context_by_key.values())
 # array as well, but make the primary image a vertically stitched context+question.
 def stitch_question_images(record, fallback_prefix):
     image_paths = record.get("images") or ([record["image"]] if record.get("image") else [])
-    existing = [ROOT / path for path in image_paths if (ROOT / path).exists()]
-    if not existing:
+    missing = [path for path in image_paths if not (ROOT / path).exists()]
+    if missing:
+        raise RuntimeError(f"Missing source images for {record.get('id', record.get('n'))}: {missing}")
+    if not image_paths:
         raise RuntimeError(f"No source images found for {record.get('id', record.get('n'))}")
-    opened = [Image.open(path).convert("RGB") for path in existing]
+    opened = [Image.open(ROOT / path).convert("RGB") for path in image_paths]
     width = max(image.width for image in opened)
     height = sum(image.height for image in opened) + 12 * (len(opened) - 1)
     combined = Image.new("RGB", (width, height), "white")
