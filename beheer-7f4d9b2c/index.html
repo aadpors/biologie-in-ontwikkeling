@@ -210,7 +210,8 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
   drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
   $('upload').addEventListener('click',uploadAll);
   $('clear').addEventListener('click',()=>{selected=[];renderSelected();});
-  $('refresh').addEventListener('click',loadJobs);\n  $('inventory').addEventListener('click',runInventory);
+  $('refresh').addEventListener('click',loadJobs);
+  $('inventory').addEventListener('click',runInventory);
   loadJobs();
 })();
 </script>
