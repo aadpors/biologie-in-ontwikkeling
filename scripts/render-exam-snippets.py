@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 import fitz
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "scripts" / "exam-snippets.json"
@@ -56,10 +57,33 @@ def find_question_page(doc, number, preferred_page):
         f"{[i + 1 for i, _ in matches]}; refusing ambiguous crop."
     )
 
+def render_shared_context(doc, clip, scale):
+    # Join the full-width end of page 8 and the continuation on page 9.
+    question_number = clip["through_question"]
+    question_page_index, question_page = find_question_page(doc, question_number, clip["through_page"])
+    marker = min(question_marker_words(question_page, question_number), key=lambda word: word[1])
+    first_page = doc[clip["page"] - 1]
+    matrix = fitz.Matrix(scale, scale)
+    first_rect = fitz.Rect(0, clip.get("top", 25), first_page.rect.width, first_page.rect.height - clip.get("bottom_margin", 25))
+    second_top = clip.get("continuation_top", 25)
+    second_rect = fitz.Rect(0, second_top, question_page.rect.width, max(second_top + 1, marker[1] - clip.get("question_margin", 7)))
+    first_pix = first_page.get_pixmap(matrix=matrix, clip=first_rect, alpha=False)
+    second_pix = question_page.get_pixmap(matrix=matrix, clip=second_rect, alpha=False)
+    first = Image.frombytes("RGB", (first_pix.width, first_pix.height), first_pix.samples)
+    second = Image.frombytes("RGB", (second_pix.width, second_pix.height), second_pix.samples)
+    if first.width != second.width:
+        raise ValueError("Pages in shared context have different rendered widths")
+    combined = Image.new("RGB", (first.width, first.height + second.height), "white")
+    combined.paste(first, (0, 0))
+    combined.paste(second, (0, first.height))
+    return combined, question_page_index + 1
+
+
 def render_question(doc, clip, scale):
     number = question_number_from_filename(clip["output"])
     if number is None:
-        # Shared context-only images retain their explicitly configured crop.
+        if clip.get("through_question"):
+            return render_shared_context(doc, clip, scale)
         page = doc[clip["page"] - 1]
         configured = fitz.Rect(*clip["rect"])
         rect = fitz.Rect(0, configured.y0, page.rect.width, configured.y1)
@@ -101,5 +125,8 @@ for item in items:
         for clip in item["clips"]:
             pix, actual_page = render_question(doc, clip, scale)
             output = OUT / clip["output"]
-            pix.save(output)
+            if isinstance(pix, Image.Image):
+                pix.save(output, quality=94)
+            else:
+                pix.save(output)
             print(f"Rendered {clip['output']} from {item['pdf']} page {actual_page}")
