@@ -134,7 +134,13 @@ function onderwerpenVanVraag(q){
   const fallback=onderwerpenVanVraag({q:q.source,source:"",theme:"",concept:"",focus:""});
   return fallback.length?[fallback[0]]:[];
  }
- return onderwerpCategorieen.filter(x=>hits.has(x));
+ const result=onderwerpCategorieen.filter(x=>hits.has(x));
+ const skillTags=["Vaardigheden: grafieken & tabellen","Vaardigheden: rekenen","Vaardigheden: wetenschappelijk onderzoek"];
+ const biological=result.filter(x=>!skillTags.includes(x));
+ // Vaardigheden zijn geen extra biologisch onderwerp. Toon ze alleen als de
+ // deelvraag niet al twee of meer inhoudelijke onderwerpen heeft.
+ if(biological.length>=2)return biological;
+ return result.slice(0,3);
 }
 
 const saved=JSON.parse(localStorage.getItem("bioExamAnswersV2")||"{}");
