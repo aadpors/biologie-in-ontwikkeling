@@ -130,14 +130,13 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     # question_top is already inset from the printed question marker. Keep
     # the final context line intact and leave a small white lower margin.
     question_boundary = min(bottom_limit, question_top - 2)
-    if final_context_text_bottom > question_boundary:
-        raise RuntimeError(
-            f"Context text for {prefix} question {number} reaches the question boundary; "
-            "refusing to publish a clipped context crop."
-        )
+    # On two-column pages, text from the neighbouring column can share the
+    # same vertical band as the question marker. Preserve the complete context
+    # line rather than cutting it at the marker's y-coordinate; the question
+    # crop itself remains a separate image.
     context_bottom = min(
-        question_boundary,
-        final_context_text_bottom + 6,
+        bottom_limit,
+        max(question_boundary, final_context_text_bottom + 6),
     )
     if context_bottom <= context_top + 2:
         return []
