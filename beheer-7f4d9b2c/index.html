@@ -34,7 +34,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
 <body>
 <header><div class="eyebrow">Biologie in ontwikkeling · privébeheer</div><h1>Examenbeheer</h1><p>Upload examens, volg de verwerking en beoordeel straks alleen de twijfelgevallen.</p></header>
 <main>
-<div class="notice"><b>Voorlopige beheeromgeving.</b> Upload en opslag zijn aangesloten. Met ‘Inventariseer wachtende uploads’ wordt nu ook per PDF de pagina-inventarisatie uitgevoerd. De eerste AI-vraag- en contextanalyse is nu aangesloten. Daarvoor is een OPENAI_API_KEY nodig in Supabase Secrets. De analyse maakt een conceptinventaris per vraag; beeldsamenstelling en visuele beoordeling volgen daarna. Er wordt nog niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
+<div class="notice"><b>Gratis verwerkingsroute.</b> Uploads en pagina-inventarisatie blijven in Supabase. Met <b>Download ChatGPT-verwerkingspakket</b> haal je de originele opgaven-PDF’s en pagina-inventarisaties op in één ZIP. Die analyseer ik vervolgens hier in ChatGPT; er wordt geen AI-API aangeroepen en dus geen API-kosten gemaakt. Beeldsamenstelling, volledige controle en publicatie volgen pas daarna. Er wordt niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
 <div class="grid">
 <section class="panel">
 <h2>Nieuwe examens toevoegen</h2>
@@ -58,12 +58,13 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
 </section>
 </div>
 <section class="jobs">
-<div class="jobs-head"><h2>Uploadgeschiedenis</h2><div class="toolbar" style="margin:0"><button class="btn primary" id="inventory">Inventariseer wachtende uploads</button><button class="btn soft" id="refresh">Vernieuwen</button></div></div>
+<div class="jobs-head"><h2>Uploadgeschiedenis</h2><div class="toolbar" style="margin:0"><button class="btn primary" id="export-chatgpt">Download ChatGPT-verwerkingspakket</button><button class="btn soft" id="inventory">Inventariseer wachtende uploads</button><button class="btn soft" id="refresh">Vernieuwen</button></div></div>
 <div id="jobs-list"><div class="empty">Uploads worden geladen…</div></div>
 </section>
 </main>
 <div id="toast" role="status" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 (() => {
   const URL = 'https://xhlkjruauimxrjyvqiac.supabase.co';
@@ -120,11 +121,10 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
     if(!jobs.length){$('jobs-list').innerHTML='<div class="empty">Nog geen examens geüpload. Voeg hierboven je eerste PDF of ZIP toe.</div>';return;}
     $('jobs-list').innerHTML=jobs.map(j=>{
       const date=new Date(j.created_at).toLocaleString('nl-NL',{dateStyle:'medium',timeStyle:'short'});
-      return '<article class="job"><div class="job-top"><div><div class="job-name">'+escapeHtml(j.original_filename)+'</div><div class="job-meta">'+date+' · '+formatBytes(j.file_size_bytes)+'</div></div><span class="status '+escapeHtml(j.status)+'">'+statusLabel(j.status)+'</span></div><div class="progress"><i style="width:'+Math.max(0,Math.min(100,j.progress||0))+'%"></i></div><div class="job-message"><b>'+escapeHtml(j.stage||'')+'</b>'+(j.message?' · '+escapeHtml(j.message):'')+'</div><div class="job-actions"><button class="btn soft" data-details="'+j.id+'">Details</button>'+(j.status==='review_required' && j.stage==='Inventarisatie afgerond' && j.detected_metadata?.documentType==='opgaven'?'<button class="btn primary" data-ai="'+j.id+'">AI-analyse starten</button>':'')+(j.status==='failed'?'<button class="btn soft" data-retry="'+j.id+'">Opnieuw proberen</button>':'')+'<button class="btn danger" data-delete="'+j.id+'">Verwijderen</button></div><div id="events-'+j.id+'" hidden class="job-message" style="margin-top:10px"></div></article>';
+      return '<article class="job"><div class="job-top"><div><div class="job-name">'+escapeHtml(j.original_filename)+'</div><div class="job-meta">'+date+' · '+formatBytes(j.file_size_bytes)+'</div></div><span class="status '+escapeHtml(j.status)+'">'+statusLabel(j.status)+'</span></div><div class="progress"><i style="width:'+Math.max(0,Math.min(100,j.progress||0))+'%"></i></div><div class="job-message"><b>'+escapeHtml(j.stage||'')+'</b>'+(j.message?' · '+escapeHtml(j.message):'')+'</div><div class="job-actions"><button class="btn soft" data-details="'+j.id+'">Details</button>'+(j.status==='failed'?'<button class="btn soft" data-retry="'+j.id+'">Opnieuw proberen</button>':'')+'<button class="btn danger" data-delete="'+j.id+'">Verwijderen</button></div><div id="events-'+j.id+'" hidden class="job-message" style="margin-top:10px"></div></article>';
     }).join('');
     $('jobs-list').querySelectorAll('[data-details]').forEach(b=>b.addEventListener('click',()=>toggleDetails(b.dataset.details)));
-    $('jobs-list').querySelectorAll('[data-ai]').forEach(b=>b.addEventListener('click',()=>analyzeJob(b.dataset.ai)));
-    $('jobs-list').querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryJob(b.dataset.retry)));
+$('jobs-list').querySelectorAll('[data-retry]').forEach(b=>b.addEventListener('click',()=>retryJob(b.dataset.retry)));
     $('jobs-list').querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>deleteJob(b.dataset.delete)));
   }
   async function runInventory() {
@@ -140,17 +140,65 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
     }
     button.disabled=false;toast('Inventarisatie afgerond: '+done+' geslaagd, '+failed+' mislukt.');
   }
-  async function analyzeJob(id) {
-    const job=jobs.find(j=>j.id===id); if(!job)return;
-    const button=$('jobs-list').querySelector('[data-ai="'+id+'"]');
-    if(button){button.disabled=true;button.textContent='AI analyseert…';}
-    toast('AI-analyse gestart voor '+job.original_filename+'. Dit kan even duren.');
-    const {data,error}=await client.functions.invoke('analyze-exam-questions',{body:{job_id:id}});
-    await loadJobs();
-    if(error || !data?.ok){const message=data?.error||error?.message||'Onbekende fout';toast('AI-analyse niet afgerond: '+message,true);return;}
-    if(data.skipped){toast(data.message||'Bestand overgeslagen.');return;}
-    const s=data.summary||{};
-    toast('AI vond '+(s.questionCount??'?')+' vragen: '+(s.openCount??'?')+' open en '+(s.mcqCount??'?')+' meerkeuze. Controle blijft nodig.');
+  async function exportChatGPTPackage() {
+    const button=$('export-chatgpt');
+    const included=jobs.filter(j=>['opgaven','uitwerkbijlage'].includes(j.detected_metadata?.documentType));
+    if(!included.length){toast('Geen geïnventariseerde opgaven-PDF’s gevonden.',true);return;}
+    if(!window.JSZip){toast('ZIP-module kon niet worden geladen. Vernieuw de pagina en probeer opnieuw.',true);return;}
+    button.disabled=true;
+    const zip=new JSZip();
+    const manifest={createdAt:new Date().toISOString(),purpose:'Gratis ChatGPT-verwerking van biologie-examens',sourcePolicy:'Gebruik alleen opgaven en bijbehorende uitwerkbijlagen als bron voor vraaginhoud en vraagbeelden. Correctievoorschriften zijn bewust uitgesloten.',documents:[]};
+    const instructions=[
+      '# Verwerkingspakket Website biologie','',
+      'Dit pakket bevat originele opgaven-PDF’s, eventuele uitwerkbijlagen en per document de pagina-inventarisatie.','',
+      '## Verwerkingsregels',
+      '- Verwerk alle examenvragen: zowel open vragen als meerkeuzevragen, zonder uitzonderingen.',
+      '- Gebruik de originele PDF als enige bron voor vraagtekst, figuren, tabellen, bijschriften en afbeeldingen.',
+      '- Gebruik inventory.json als navigatiehulp; de PDF blijft leidend.',
+      '- Koppel contexten ook wanneer ze op eerdere pagina’s staan of tussen vragen van dezelfde groep voorkomen.',
+      '- Bewaar de leesvolgorde en kolomstructuur; voeg alleen fragmenten samen die inhoudelijk bij de vraag horen.',
+      '- Maak per vraag een volledig overzicht van benodigde bronpagina’s en horizontale uitsneden. Neem bij twijfel liever te veel dan te weinig mee.',
+      '- Reconstructeer, herschrijf of genereer nooit exameninhoud of beeldmateriaal.',
+      '- Markeer twijfelgevallen met vraagnummer, PDF-pagina, reden en voorgestelde ruimere uitsnede.',
+      '- Controleer aantallen en nummering tegen de volledige PDF; sla geen open of meerkeuzevragen over.',
+      '- Publiceer niets. Lever conceptresultaten en een expliciete lijst met onzekerheden op.','',
+      'Zie manifest.json voor bestanden en metadata.'
+    ].join('\n');
+    zip.file('VERWERKINGSINSTRUCTIES.md',instructions);
+    for(let i=0;i<included.length;i++){
+      const j=included[i], meta=j.detected_metadata||{};
+      const folder=safeName(j.original_filename.replace(/\.pdf$/i,''));
+      $('selection-note').textContent='Pakket samenstellen: '+(i+1)+'/'+included.length+' · '+j.original_filename;
+      try{
+        const {data:pdf,error:pdfError}=await client.storage.from(BUCKET).download(j.storage_path);
+        if(pdfError||!pdf)throw pdfError||new Error('PDF-download gaf geen bestand terug');
+        zip.file('pdf/'+folder+'.pdf',pdf);
+        const inventoryPath=meta.inventoryPath;
+        if(inventoryPath){
+          const {data:inventory,error:inventoryError}=await client.storage.from(BUCKET).download(inventoryPath);
+          if(inventoryError||!inventory)throw inventoryError||new Error('Inventarisatiebestand ontbreekt');
+          zip.file('inventaris/'+folder+'.inventory.json',inventory);
+        }
+        manifest.documents.push({filename:j.original_filename,documentType:meta.documentType,level:meta.level??null,year:meta.year??null,period:meta.period??null,pageCount:meta.pageCount??null,pdfPath:'pdf/'+folder+'.pdf',inventoryPath:meta.inventoryPath?'inventaris/'+folder+'.inventory.json':null});
+      }catch(error){
+        console.error('Exportfout',j.original_filename,error);
+        button.disabled=false;
+        toast('Pakket niet compleet: '+j.original_filename+' — '+error.message,true);
+        $('selection-note').textContent='Pakket samenstellen afgebroken';
+        return;
+      }
+    }
+    zip.file('manifest.json',JSON.stringify(manifest,null,2));
+    $('selection-note').textContent='ZIP-bestand comprimeren…';
+    try{
+      const blob=await zip.generateAsync({type:'blob',compression:'STORE'},meta=>{$('selection-note').textContent='ZIP maken: '+Math.round(meta.percent)+'%';});
+      const url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download='biologie-chatgpt-verwerkingspakket.zip';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+      toast('Verwerkingspakket gemaakt: '+manifest.documents.length+' PDF-bestanden. Geen AI-API gebruikt.');
+      $('selection-note').textContent=manifest.documents.length+' documenten in ChatGPT-pakket';
+    }catch(error){console.error(error);toast('ZIP maken mislukt: '+error.message,true);}
+    finally{button.disabled=false;}
   }
   async function loadJobs() {
     const {data,error}=await client.from('exam_ingest_jobs').select('*').order('created_at',{ascending:false}).limit(50);
@@ -225,6 +273,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
   $('clear').addEventListener('click',()=>{selected=[];renderSelected();});
   $('refresh').addEventListener('click',loadJobs);
   $('inventory').addEventListener('click',runInventory);
+  $('export-chatgpt').addEventListener('click',exportChatGPTPackage);
   loadJobs();
 })();
 </script>
