@@ -372,7 +372,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if prefix == "vw25t1" and marker["number"] in {14, 15, 16, 17, 18}:
                     # Shared context is stitched separately from page 8 and
                     # the continuation on page 9; keep these crops question-only.
-                    context_y0 = max(0, lines[start]["bbox"][1] - 5)
+                    context_y0 = max(0, lines[marker["number_line"]]["bbox"][1] - 5)
 
                 if (prefix, marker["number"]) in SELECTED_CONTEXTS:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
