@@ -1,6 +1,30 @@
 [
   {
     "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 1,
+    "page": 2,
+    "image": "exam-snippets/complete-havo-2024-t1-q1.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q1-complete.jpg",
+      "exam-snippets/question-ha24t1-1-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
+    "year": "2024",
+    "period": "1",
+    "n": 8,
+    "page": 5,
+    "image": "exam-snippets/complete-havo-2024-t1-q8.jpg",
+    "images": [
+      "exam-snippets/context-ha24t1-q8-complete.jpg",
+      "exam-snippets/question-ha24t1-8-only.jpg"
+    ]
+  },
+  {
+    "level": "Havo",
     "year": "2025",
     "period": "1",
     "n": 1,
