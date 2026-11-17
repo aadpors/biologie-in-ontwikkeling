@@ -123,7 +123,14 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
         context_top = min(context_top, min(rect.y0 for rect in visual_rects))
 
     context_top = max(0, context_top - 5)
-    context_bottom = min(bottom_limit, question_top - 2)
+    # End below the complete final context text line, not merely a fixed
+    # distance above the next question marker. The latter clipped descenders
+    # and the lower edge of the final line on tightly spaced exam pages.
+    final_context_text_bottom = max(lines[i]["bbox"][3] for i in ordered)
+    context_bottom = min(
+        bottom_limit,
+        max(question_top - 2, final_context_text_bottom + 9),
+    )
     if context_bottom <= context_top + 2:
         return []
 
