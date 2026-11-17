@@ -129,15 +129,15 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     final_context_text_bottom = max(lines[i]["bbox"][3] for i in ordered)
     # question_top is already inset from the printed question marker. Keep
     # the final context line intact and leave a small white lower margin.
-    context_bottom = min(bottom_limit, question_top - 2)
-    if final_context_text_bottom > context_bottom:
+    question_boundary = min(bottom_limit, question_top - 2)
+    if final_context_text_bottom > question_boundary:
         raise RuntimeError(
             f"Context text for {prefix} question {number} reaches the question boundary; "
             "refusing to publish a clipped context crop."
         )
     context_bottom = min(
-        bottom_limit,
-        max(context_bottom, final_context_text_bottom + 6),
+        question_boundary,
+        final_context_text_bottom + 6,
     )
     if context_bottom <= context_top + 2:
         return []
