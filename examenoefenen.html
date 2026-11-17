@@ -164,7 +164,7 @@ function render(){
  $("prevQuestion").disabled=currentIndex===0;$("nextQuestion").disabled=currentIndex>=filtered.length-1;
  if(!filtered.length){$("questions").innerHTML='<div class="empty">Geen vragen gevonden. Wis een of meer filters.</div>';$("questionNav").hidden=true;return}
  $("questionNav").hidden=false;
- filtered.forEach((q,i)=>{const d=document.createElement("button");d.type="button";d.className="dot"+(i===currentIndex?" active":"")+((q.options?.length?saved[q.id]:selfChecks[q.id]?.length)?" done":"");d.title="Vraag "+q.n+" ("+(i+1)+" van "+filtered.length+")";d.setAttribute("aria-label",d.title);d.addEventListener("click",()=>{currentIndex=i;render()});$("questionDots").append(d)});
+ filtered.forEach((q,i)=>{const d=document.createElement("button");d.type="button";d.className="dot"+(i===currentIndex?" active":"")+((q.options?.length?saved[q.id]:isSelfChecked(q.id))?" done":"");d.title="Vraag "+q.n+" ("+(i+1)+" van "+filtered.length+")";d.setAttribute("aria-label",d.title);d.addEventListener("click",()=>{currentIndex=i;render()});$("questionDots").append(d)});
  const q=filtered[currentIndex],a=document.createElement("article");a.className="question";
  const pdfBase="examens/"+(q.level==="Havo"?"ha":"vw")+"-1018-a-"+q.year.slice(2)+"-"+q.period+"-o.pdf";
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
