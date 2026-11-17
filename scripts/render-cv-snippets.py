@@ -17,7 +17,13 @@ def page_lines(page):
             spans = line.get("spans", [])
             text = " ".join(s.get("text", "") for s in spans).strip()
             if text:
-                lines.append({"text": text, "x0": min(s["bbox"][0] for s in spans), "y0": min(s["bbox"][1] for s in spans)})
+                lines.append({
+                "text": text,
+                "x0": min(s["bbox"][0] for s in spans),
+                "y0": min(s["bbox"][1] for s in spans),
+                "size": max(s.get("size", 0) for s in spans),
+                "bold": any("bold" in s.get("font", "").lower() for s in spans),
+            })
     return sorted(lines, key=lambda line: (round(line["y0"], 1), line["x0"]))
 
 def heading_at(lines, index, number=None):
@@ -46,8 +52,21 @@ def render_question(pdf_path, question, output):
                 continue
             heading = lines[matches[0]]
             following = [line for i, line in enumerate(lines) if line["y0"] > heading["y0"] + 3 and heading_at(lines, i)]
+            # A marking-scheme page can end with the title of the next exam topic
+            # before the next numbered answer. Do not let that title leak into
+            # the current question's answer snippet.
+            next_topic = [
+                line for line in lines
+                if line["y0"] > heading["y0"] + 3
+                and line["bold"]
+                and line["size"] >= 14
+                and len(line["text"]) < 100
+                and not re.match(r"^\d{1,2}\s+", line["text"])
+                and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
+            ]
             top = max(0, heading["y0"] - 8)
-            bottom = min(page.rect.height - 80, min((line["y0"] for line in following), default=page.rect.height - 80) - 5)
+            boundary_candidates = [line["y0"] for line in following + next_topic]
+            bottom = min(page.rect.height - 80, min(boundary_candidates, default=page.rect.height - 80) - 5)
             bottom = max(top + 35, bottom)
             # Keep the full page width; crop only vertically around the answer.
             rect = fitz.Rect(0, top, page.rect.width, bottom)
