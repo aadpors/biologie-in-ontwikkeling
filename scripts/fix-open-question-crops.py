@@ -46,13 +46,10 @@ def main():
         for record in open_records:
             if record.get("id") == question_id:
                 record["image"] = image_path
-                # The frontend renders record['images'] when present. Replace
-                # its final question image too, or the restored source image
-                # is silently ignored in the old exam route.
-                if record.get("images"):
-                    record["images"][-1] = image_path
-                else:
-                    record["images"] = [image_path]
+                # The complete source crop already contains the context and
+                # question. Use it as the sole image so an earlier fallback
+                # context crop (which can be blank or incomplete) is not shown.
+                record["images"] = [image_path]
         for record in context_records:
             if (
                 (question_id == "ha26t2-open-12" and record.get("level") == "Havo"
@@ -73,6 +70,10 @@ def main():
                     and record.get("year") == "2025" and record.get("period") == "2" and record.get("n") == 14)
             ):
                 record["image"] = image_path
+                # Context cards are merged into the question in the frontend;
+                # replace their image list as well, otherwise stale fallback
+                # crops can still appear before the complete source image.
+                record["images"] = [image_path]
         print(f"Volledige bronuitsnede hersteld: {question_id}")
 
     # Havo 2026-II q12: include the complete sea-grass photograph, caption and prompt.
