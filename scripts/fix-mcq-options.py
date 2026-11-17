@@ -280,6 +280,13 @@ def main():
             pix.save(ROOT / "exam-snippets" / crop_name)
             image_path = f"exam-snippets/{crop_name}"
             record["image"] = image_path
+            # The frontend prefers record["images"] over record["image"].
+            # Replace the final question-only crop so the full source page is
+            # actually displayed to students; retain the separate context image.
+            if record.get("images"):
+                record["images"][-1] = image_path
+            else:
+                record["images"] = [image_path]
             print(f"VOLLEDIGE BRONAFBEELDING {record['id']}: {image_path}")
 
     for record in records:
