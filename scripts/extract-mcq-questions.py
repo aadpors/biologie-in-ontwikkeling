@@ -256,17 +256,25 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     and not re.match(r"^\d+\s*p", line["text"], re.I)
                 ]
                 content_indices = [j for j, line in enumerate(lines) if not HEADER_RE.match(line["text"])]
+                page_image_rects = [
+                    rect for image_info in page.get_images(full=True)
+                    for rect in page.get_image_rects(image_info[0])
+                ]
                 if headings:
                     start_line = headings[-1]
                     active_context_fragments = [{
                         "page_index": page_index,
-                        "y0": max(0, lines[start_line]["bbox"][1] - 5),
+                        "y0": max(0, min(
+                            [lines[start_line]["bbox"][1]]
+                            + [rect.y0 for rect in page_image_rects if rect.y0 >= lines[start_line]["bbox"][1]]
+                        ) - 5),
                         "y1": page.rect.height - 25,
                     }]
-                elif content_indices:
+                elif content_indices or page_image_rects:
+                    y_candidates = [lines[j]["bbox"][1] for j in content_indices] + [rect.y0 for rect in page_image_rects]
                     active_context_fragments.append({
                         "page_index": page_index,
-                        "y0": max(0, min(lines[j]["bbox"][1] for j in content_indices) - 5),
+                        "y0": max(0, min(y_candidates) - 5),
                         "y1": page.rect.height - 25,
                     })
                 continue
@@ -295,9 +303,15 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # Do not append prior-page context: that silently associates unrelated
                 # topics with the current question.
                 context = clean_context(context_lines)
+                page_image_rects = [
+                    rect for image_info in page.get_images(full=True)
+                    for rect in page.get_image_rects(image_info[0])
+                    if rect.y0 < lines[start]["bbox"][1]
+                ]
+                context_y_candidates = [lines[j]["bbox"][1] for j in context_line_indices] + [rect.y0 for rect in page_image_rects]
                 context_y0 = (
-                    max(0, min(lines[j]["bbox"][1] for j in context_line_indices) - 5)
-                    if context_line_indices else max(0, lines[start]["bbox"][1] - 0.5)
+                    max(0, min(context_y_candidates) - 5)
+                    if context_y_candidates else max(0, lines[start]["bbox"][1] - 0.5)
                 )
 
                 # Havo 2025-I question 14 starts a new stem-cell-transplant
@@ -410,7 +424,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         previous_bottom = max(previous_bottom, lines[j]["bbox"][3])
                 question_end_line = max(start, min(question_end_line, end - 1))
 
-                if context_line_indices:
+                if context_line_indices or page_image_rects:
                     active_context_fragments.append({
                         "page_index": page_index,
                         "y0": context_y0,
