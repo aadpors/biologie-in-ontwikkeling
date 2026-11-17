@@ -97,7 +97,12 @@
     "period": "2",
     "n": 9,
     "page": 5,
-    "image": "exam-snippets/question-ha25t2-9.jpg"
+    "image": "exam-snippets/question-ha25t2-9.jpg",
+    "images": [
+      "exam-snippets/context-ha25t2-q9-intro.jpg",
+      "exam-snippets/context-ha25t2-q9-inbreeding.jpg",
+      "exam-snippets/question-ha25t2-9.jpg"
+    ]
   },
   {
     "level": "Vwo",
