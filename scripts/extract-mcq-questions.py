@@ -86,8 +86,8 @@ def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
 def footer_boundary(page, lines):
     """Find the end of exam content before the printed footer."""
     footer_re = re.compile(
-        r"(?:[HV][AW]-1018-a-|\\b\\d{1,2}\\s*/\\s*\\d{1,2}\\b|"
-        r"centraal examen|ministerie van onderwijs|biologie\\s*[-|])", re.I
+        r"(?:[HV][AW]-1018-a-|\b\d{1,2}\s*/\s*\d{1,2}\b|"
+        r"centraal examen|ministerie van onderwijs|biologie\s*[-|])", re.I
     )
     hits = [line["bbox"][1] for line in lines
             if line["bbox"][1] >= page.rect.height * 0.88 and footer_re.search(line["text"])]
@@ -667,6 +667,27 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, question_y0, page.rect.width, question_y1), alpha=False).save(OUT / question_name)
                     image_name = question_name
                     mcq_images = [f"exam-snippets/{context_name}", f"exam-snippets/{question_name}"]
+
+                # Apply the same context/question separation to every MCQ, not
+                # only to the hand-picked open-question context inventory.
+                # Context paragraphs are independent full-width strips; the
+                # question and answer options are always rendered separately.
+                if mcq_images is None:
+                    question_top = max(0, lines[start]["bbox"][1] - 1)
+                    question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + 7)
+                    context_paths = context_image_fragments(
+                        page, lines, base_context_line_indices, prefix,
+                        marker["number"], question_top, footer_y,
+                    )
+                    question_name = f"question-{prefix}-{marker['number']}-only.jpg"
+                    if question_y1 > question_top + 2:
+                        page.get_pixmap(
+                            matrix=fitz.Matrix(1.8, 1.8),
+                            clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
+                            alpha=False,
+                        ).save(OUT / question_name)
+                        context_paths.append(f"exam-snippets/{question_name}")
+                    mcq_images = context_paths or [f"exam-snippets/{image_name}"]
 
                 prompt = "\n".join(x for x in block_text[:first_option] if x.strip()).strip()
                 if not prompt:
