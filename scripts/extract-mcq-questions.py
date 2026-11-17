@@ -402,9 +402,9 @@ def parse_options(block_lines):
             continue
         start_match = OPTION_RE.match(line)
         if start_match and start_match.group(1) == expected:
-            begin_option(start_match.group(1), start_match.group(2) or "")
-            continue
-        if current is None:
+            begin_option(start_match.group(1), "")
+            line = (start_match.group(2) or "").strip()
+        elif current is None:
             continue
         if re.match(r"^\\d+\\s*p$", line, re.I) or HEADER_RE.match(line):
             break
