@@ -213,6 +213,7 @@ def answer_from_cv(cv_text, qnum):
     return ""
 
 def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
+    # Question 9 uses two precise context crops to exclude questions 7 and 8.
     # Keep each card's crop local to its context and question; never include prior question text.
     exam_path, cv_path = ROOT / exam_rel, ROOT / cv_rel
     if not exam_path.exists() or not cv_path.exists():
