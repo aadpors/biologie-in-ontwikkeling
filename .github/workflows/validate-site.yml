@@ -15,6 +15,7 @@ on:
       - 'docs/exam-management.md'
       - 'scripts/extract-mcq-questions.py'
       - 'scripts/fix-mcq-options.py'
+      - 'scripts/fix-open-question-crops.py'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/validate-site.mjs'
   pull_request:
@@ -91,6 +92,7 @@ jobs:
           python scripts/render-cv-snippets.py
           python scripts/extract-mcq-questions.py
           python scripts/fix-mcq-options.py
+          python scripts/fix-open-question-crops.py
       - name: Validate every generated question, image and appendix link
         run: python scripts/validate-exam-snippets.py
       - name: Validate complete website data
