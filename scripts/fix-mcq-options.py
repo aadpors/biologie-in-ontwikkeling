@@ -268,11 +268,12 @@ def main():
             hits = page.search_for(anchor)
             if not hits:
                 raise ValueError(f"{record['id']}: source crop anchor not found: {anchor}")
-            top = max(0, min(hit.y0 for hit in hits) - 5)
-            footer = max(1, page.rect.height - 20)
+            # These questions depend on figures above and/or answer tables below
+            # the printed question marker. Preserve the entire original page so
+            # neither context nor any answer option can be clipped.
             pix = page.get_pixmap(
                 matrix=fitz.Matrix(1.8, 1.8),
-                clip=fitz.Rect(0, top, page.rect.width, footer),
+                clip=page.rect,
                 alpha=False,
             )
             crop_name = f"source-complete-{record['id']}.jpg"
