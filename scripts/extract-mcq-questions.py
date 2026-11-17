@@ -213,6 +213,7 @@ def answer_from_cv(cv_text, qnum):
     return ""
 
 def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
+    # Question 24 in VWO 2026-II starts at its own HAE context paragraph.
     # The selected same-page exceptions use exact context-start anchors.
     # Question 9 uses two precise context crops to exclude questions 7 and 8.
     # Keep each card's crop local to its context and question; never include prior question text.
