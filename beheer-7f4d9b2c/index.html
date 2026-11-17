@@ -34,7 +34,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
 <body>
 <header><div class="eyebrow">Biologie in ontwikkeling · privébeheer</div><h1>Examenbeheer</h1><p>Upload examens, volg de verwerking en beoordeel straks alleen de twijfelgevallen.</p></header>
 <main>
-<div class="notice"><b>Voorlopige beheeromgeving.</b> De upload en veilige opslag zijn aangesloten. De automatische inhoudelijke analyse, beeldsamenstelling en visuele beoordelingsstappen worden hierna aangesloten. Er wordt nog niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
+<div class="notice"><b>Voorlopige beheeromgeving.</b> Upload en opslag zijn aangesloten. Met ‘Inventariseer wachtende uploads’ wordt nu ook per PDF de pagina-inventarisatie uitgevoerd. AI-vraagherkenning, contextkoppeling, beeldsamenstelling en visuele beoordeling volgen nog. Er wordt nog niets automatisch gepubliceerd. Deze URL is voorlopig de enige toegangsbarrière; deel hem niet.</div>
 <div class="grid">
 <section class="panel">
 <h2>Nieuwe examens toevoegen</h2>
@@ -75,7 +75,7 @@ h2{font-size:18px;color:var(--wine);margin:0 0 12px}.muted{color:var(--muted)}
   let selected = [];
   let jobs = [];
 
-  function toast(message, error=false) {
+  async function ensureAnonymousSession() {\n    const {data:{session}}=await client.auth.getSession();\n    if(session) return true;\n    const {error}=await client.auth.signInAnonymously();\n    if(error){toast('Beheersessie kon niet worden gestart: '+error.message,true);return false;}\n    return true;\n  }\n  function toast(message, error=false) {
     const el=$('toast'); el.textContent=message; el.style.display='block';
     el.style.background=error?'#8f263b':'#24313b';
     clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.style.display='none',4200);
