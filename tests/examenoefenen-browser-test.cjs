@@ -323,7 +323,7 @@ const assert = require("node:assert/strict");
     for (let i = 0; i < cvInventory.length; i += 20) {
       const batch = await Promise.all(cvInventory.slice(i, i + 20).map(async q => {
         const response = await page.request.get(new URL(q.src, page.url()).toString());
-        return response.status() === 200 && /image\\/jpeg/i.test(response.headers()["content-type"] || "") ? null : {id:q.id,src:q.src,status:response.status(),type:response.headers()["content-type"]};
+        return response.status() === 200 && (response.headers()["content-type"] || "").toLowerCase().startsWith("image/jpeg") ? null : {id:q.id,src:q.src,status:response.status(),type:response.headers()["content-type"]};
       }));
       cvAssetFailures.push(...batch.filter(Boolean));
     }
