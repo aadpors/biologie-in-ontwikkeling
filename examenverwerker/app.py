@@ -309,7 +309,7 @@ class ExamApp:
             analysis=analyze_pdf(source)
             candidates=[x for x in self.data.get("vraagkandidaten",[]) if x.get("document_id")==doc["id"]]
             proposals=propose_question_regions(analysis,candidates)
-            proposal=next((p for p in proposals if p["number"]==row["number"] and p["start_page"]==row["page"]),None)
+            proposal=next((p for p in proposals if p["number"]==row["number"] and p["start_page"]==row["page"] and abs(p["source_segments"][0]["bbox"][1]-(row["bbox"][1]-8.0))<1.0),None)
             if not proposal:
                 messagebox.showinfo("Geen fragment","Er kon geen voorlopig fragment worden samengesteld.")
                 return
