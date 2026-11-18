@@ -129,6 +129,20 @@ def find_context_references(analysis: dict, question_text: str, before_pages: in
                                 "status":"contextkandidaat_niet_bevestigd"})
     return results
 
+
+def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.25):
+    """Render a full original page for human visual review."""
+    import fitz
+    doc=fitz.open(pdf_path)
+    if page_number < 1 or page_number > len(doc):
+        doc.close()
+        raise ValueError("Paginanummer valt buiten het document.")
+    pix=doc[page_number-1].get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
+    output.parent.mkdir(parents=True,exist_ok=True)
+    pix.save(output)
+    doc.close()
+    return output
+
 def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Path, scale: float=2.0):
     """Render a source PDF rectangle unchanged; coordinates are PDF points."""
     import fitz
