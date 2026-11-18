@@ -314,6 +314,31 @@ else:
         "Vwo 2026-I vraag 18: beide beoordelingscriteria",
     )
 
+
+# Every extracted exam question must retain its curated syllabus classification.
+rubric_records = json.loads((ROOT / "scripts" / "exam-rubricering.json").read_text(encoding="utf-8"))
+rubric_by_id = {item.get("id"): item for item in rubric_records}
+classified_ids = set()
+for filename in ("exam-open.json", "exam-mcq.json"):
+    records = json.loads((ROOT / filename).read_text(encoding="utf-8"))
+    for record in records:
+        qid = record.get("id")
+        if qid in classified_ids:
+            errors.append(f"{filename} {qid}: dubbel vraag-ID in exameninventaris")
+        classified_ids.add(qid)
+        expected = rubric_by_id.get(qid)
+        if expected is None:
+            errors.append(f"{filename} {qid}: geen rubricering in exam-rubricering.json")
+            continue
+        for field in ("theme", "concept", "end"):
+            if record.get(field) != expected.get(field) or record.get(field) in (None, "", "Nog te rubriceren"):
+                errors.append(f"{filename} {qid}: {field}-rubricering ontbreekt of wijkt af van de gecontroleerde indeling")
+if len(rubric_by_id) != 519 or classified_ids != set(rubric_by_id):
+    errors.append(
+        f"Rubricering dekt niet exact alle 519 examenvragen "
+        f"(rubricering={len(rubric_by_id)}, vragen={len(classified_ids)})"
+    )
+
 if errors:
     print("\n".join(errors))
     raise SystemExit(f"Controle mislukt: {len(errors)} fouten in {total} vragen.")
