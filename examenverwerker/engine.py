@@ -202,32 +202,35 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
 
 def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.25):
     """Render a full original page for human visual review."""
-    import fitz
+    import pymupdf as fitz
     doc=fitz.open(pdf_path)
-    if page_number < 1 or page_number > len(doc):
+    try:
+        if page_number < 1 or page_number > len(doc):
+            raise ValueError("Paginanummer valt buiten het document.")
+        pix=doc[page_number-1].get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
+        output.parent.mkdir(parents=True,exist_ok=True)
+        pix.save(output)
+    finally:
         doc.close()
-        raise ValueError("Paginanummer valt buiten het document.")
-    pix=doc[page_number-1].get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
-    output.parent.mkdir(parents=True,exist_ok=True)
-    pix.save(output)
-    doc.close()
     return output
 
 def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Path, scale: float=2.0):
     """Render a source PDF rectangle unchanged; coordinates are PDF points."""
-    import fitz
+    import pymupdf as fitz
     if page_number < 1: raise ValueError("Paginanummer begint bij 1.")
     doc=fitz.open(pdf_path)
-    if page_number > len(doc): raise ValueError("Paginanummer valt buiten het document.")
-    page=doc[page_number-1]
-    rect=fitz.Rect(*bbox) & page.rect
-    if rect.is_empty or rect.width < 2 or rect.height < 2: raise ValueError("Ongeldige uitsnede.")
-    pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),clip=rect,alpha=False)
-    output.parent.mkdir(parents=True,exist_ok=True)
-    pix.save(output)
-    doc.close()
-    return {"path":str(output),"page":page_number,"bbox":list(rect),"source_sha256":digest_file(pdf_path),
-            "method":"directe PDF-render; geen inhoudelijke beeldbewerking"}
+    try:
+        if page_number > len(doc): raise ValueError("Paginanummer valt buiten het document.")
+        page=doc[page_number-1]
+        rect=fitz.Rect(*bbox) & page.rect
+        if rect.is_empty or rect.width < 2 or rect.height < 2: raise ValueError("Ongeldige uitsnede.")
+        pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),clip=rect,alpha=False)
+        output.parent.mkdir(parents=True,exist_ok=True)
+        pix.save(output)
+        return {"path":str(output),"page":page_number,"bbox":list(rect),"source_sha256":digest_file(pdf_path),
+                "method":"directe PDF-render; geen inhoudelijke beeldbewerking"}
+    finally:
+        doc.close()
 
 
 def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, scale: float = 1.5):
