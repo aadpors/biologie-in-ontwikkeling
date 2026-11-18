@@ -317,11 +317,9 @@ def validate_website_records(mcq: list, opened: list, contexts: list) -> list[di
 
 def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
     """Return blockers before a human can explicitly approve a draft question."""
-    required=["question_text","question_type","points","cv_alignment","images_and_context","appendices"]
+    required=["question_text","question_type","points","cv_alignment","images_and_context","appendices","cv_addenda"]
     if (record.get("exam") or {}).get("questionType")=="mcq":
         required.append("answer_options")
-    if record.get("cv_amendment_pdfs"):
-        required.append("cv_addenda")
     missing=[key for key in required if checklist.get(key) is not True]
     errors=[f"controle_niet_afgevinkt:{key}" for key in missing]
     if not str(record.get("question_text","")).strip():
