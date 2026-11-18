@@ -110,6 +110,21 @@ class ExamApp:
         self._log("Welkom. Maak een project per examen. Voeg daarna alle beschikbare PDF's toe.")
         self._log("Tip: selecteer opgaven, correctievoorschrift, uitwerkbijlage en eventuele aanvullingen tegelijk.")
 
+    def _error(self, context, exc):
+        details=traceback.format_exc()
+        if self.project_dir:
+            log_dir=self.project_dir/"logs"
+        else:
+            base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
+            log_dir=base/"logs"
+        try:
+            log_dir.mkdir(parents=True,exist_ok=True)
+            stamp=datetime.now().strftime("%Y%m%d-%H%M%S")
+            (log_dir/f"fout-{stamp}.txt").write_text(context+"\n\n"+details,encoding="utf-8")
+            self._log(f"{context}: niet gelukt. De details zijn veilig opgeslagen in de map logs.")
+        except Exception:
+            self._log(f"{context}: niet gelukt. Start het programma opnieuw en probeer het nogmaals.")
+
     def _log(self, text):
         self.log.configure(state="normal")
         self.log.insert("end", f"[{datetime.now().strftime('%H:%M:%S')}] {text}\n")
@@ -148,7 +163,8 @@ class ExamApp:
             self.refresh()
             self._log(f"Project geopend: {self.project_dir}")
         except Exception as exc:
-            messagebox.showerror("Project openen mislukt", str(exc))
+            self._error("Project openen",exc)
+            messagebox.showerror("Project openen mislukt","Dit project kon niet worden geopend. Controleer of het projectbestand geldig is. Details staan in de map logs.")
 
     def add_pdfs(self):
         if not self.data:
@@ -188,7 +204,7 @@ class ExamApp:
                 self._log(f"{source.name}: {kind} voorgesteld ({confidence:.0%}), {extracted['pagina_aantal']} pagina's. OCR-controle op pagina's: {doc['pagina_zonder_tekst'] or 'niet nodig'}.")
                 added += 1
             except Exception as exc:
-                self._log(f"FOUT bij {source.name}: {exc}")
+                self._error(f"PDF toevoegen ({source.name})",exc)
         self.save_project()
         self.refresh()
         self.status.configure(text=f"{added} PDF('s) toegevoegd. Controleer de voorgestelde documenttypen.")
@@ -360,7 +376,8 @@ class ExamApp:
             canvas.configure(scrollregion=canvas.bbox("all"))
             self._log(f"Voorlopige snippet(s) voor vraag {row['number']} gemaakt. Visuele controle blijft verplicht.")
         except Exception as exc:
-            messagebox.showerror("Snippetvoorstel mislukt",str(exc))
+            self._error("Voorlopige snippet maken",exc)
+            messagebox.showerror("Snippetvoorstel mislukt","Er kon geen betrouwbaar fragment worden gemaakt. De originele PDF is niet gewijzigd. Details staan in logs.")
 
     def preview_candidate(self, rows, tree, parent):
         selected=tree.selection()
@@ -390,7 +407,8 @@ class ExamApp:
             canvas.configure(scrollregion=canvas.bbox("all"))
             ttk.Label(win,text=f"Originele bronpagina · kandidaat vraag {row['number']} · markering is nog niet automatisch goedgekeurd",padding=8).pack(fill="x")
         except Exception as exc:
-            messagebox.showerror("Voorvertoning mislukt",str(exc))
+            self._error("Originele PDF-pagina tonen",exc)
+            messagebox.showerror("Voorvertoning mislukt","Deze pagina kon niet worden getoond. Controleer of de PDF nog in de projectmap staat. Details staan in logs.")
 
     def selected_doc(self):
         selected = self.table.selection()
@@ -481,7 +499,14 @@ def main():
         ExamApp(root)
         root.mainloop()
     except Exception:
-        messagebox.showerror("Programmafout", traceback.format_exc())
+        details=traceback.format_exc()
+        try:
+            log_dir=(Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent)/"logs"
+            log_dir.mkdir(parents=True,exist_ok=True)
+            (log_dir/f"crash-{datetime.now().strftime('%Y%m%d-%H%M%S')}.txt").write_text(details,encoding="utf-8")
+        except Exception:
+            pass
+        messagebox.showerror("Programma tijdelijk gestopt","Het programma is onverwacht gestopt. Start het opnieuw. Als het probleem terugkomt, stuur dan het nieuwste bestand uit de map logs mee.")
         raise
 
 
