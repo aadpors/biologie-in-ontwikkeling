@@ -61,6 +61,11 @@ def render_question(pdf_path, question, output):
                 and not re.match(r"^\d{1,2}\s+", line["text"])
                 and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
             ]
+            if pdf_path.name == "vw-1018-a-26-1-c.pdf" and question == 18:
+                print("CV-Q18-BOUNDARY", json.dumps({
+                    "following": [{"y": line["y0"], "text": line["text"], "size": line["size"], "bold": line["bold"]} for line in following],
+                    "next_topic": [{"y": line["y0"], "text": line["text"], "size": line["size"], "bold": line["bold"], "codes": [ord(ch) for ch in line["text"].strip()]} for line in next_topic]
+                }, ensure_ascii=False))
             top = max(0, heading["y0"] - 8)
             boundaries = [line["y0"] for line in following + next_topic]
             bottom = min(page.rect.height - 80, min(boundaries, default=page.rect.height - 80) - 5)
