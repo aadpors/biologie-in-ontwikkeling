@@ -43,6 +43,13 @@ class ExportTests(unittest.TestCase):
             manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["records"][0]["cv_amendment_pdfs"][0]["file"],"examens/aanvulling.pdf")
 
+    def test_invalidated_source_analysis_is_blocked_even_if_record_was_approved(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["source_analysis_invalidated"]=True
+            errors=validate_review_records([record],project)
+            self.assertIn("bron_analyse_verouderd",[x["error"] for x in errors])
+
     def test_approved_flag_without_complete_checklist_is_blocked(self):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
