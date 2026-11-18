@@ -56,6 +56,22 @@ class EngineTests(unittest.TestCase):
         ]
         self.assertEqual([x["bestand"] for x in match_correction_documents(op,cvs)],["cv-hernoemd.pdf"])
 
+    def test_weaker_same_number_prompt_is_suppressed_when_points_marker_exists(self):
+        analysis={"pages":[
+            {"page":1,"height":800,"blocks":[{"bbox":[50,100,100,130],"lines":[
+                {"bbox":[50,100,60,110],"text":"11"},
+                {"bbox":[70,112,90,122],"text":"2p"}]}]},
+            {"page":2,"height":800,"blocks":[{"bbox":[40,140,500,180],"lines":[
+                {"bbox":[40,140,50,150],"text":"11"},
+                {"bbox":[60,140,500,160],"text":"Welk effect heeft dit op de populatie?"}]}]}
+        ]}
+        got=detect_question_candidates(analysis)
+        self.assertEqual([(x["number"],x["page"],x["confidence"]) for x in got],[(11,1,0.95)])
+        suppressed=analysis["suppressed_question_candidates"]
+        self.assertEqual(len(suppressed),1)
+        self.assertEqual(suppressed[0]["page"],2)
+        self.assertEqual(suppressed[0]["suppressed_by"]["page"],1)
+
     def test_question_candidates_keep_repeated_numbers(self):
         a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\\nBeschrijf de functie van dit orgaan."}]},
                     {"page":2,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,140,14],"text":"1. Welke stof wordt gevormd?"}],"text":"1. Welke stof wordt gevormd?"}]}]}
