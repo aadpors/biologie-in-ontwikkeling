@@ -326,7 +326,7 @@ function render(){
    if(cvFigure)cvFigure.hidden=!show;cvButton.setAttribute("aria-expanded",String(show));
    cvButton.textContent=show?"Verberg correctievoorschrift":"Toon correctievoorschrift bij vraag "+q.n;
    if(show&&cvImage&&!cvImage.src)cvImage.src=cvImage.dataset.src;
-   if(show&&!cvFigure)window.open(cv,"_blank","noopener");
+   if(show&&!cvFigure)throw new Error("Lokale CV-snippet ontbreekt voor "+q.id+"; publicatiecontrole had dit moeten blokkeren.");
    if(show&&amendmentFigure){amendmentFigure.hidden=false;const amendmentImage=amendmentFigure.querySelector("img");if(!amendmentImage.src)amendmentImage.src=amendmentImage.dataset.src;}
    [...$("questionDots").children].forEach((d,i)=>{d.className="dot"+(i===currentIndex?" active":"")+(cvViewed[filtered[i].id]?" done":"")});
    updateSelectionProgress(filtered);
