@@ -322,7 +322,7 @@ class ExamApp:
             tree.set(selected[0],"status",row["status"])
             learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
             suggestion=learned.get("suggestion")
-            hint=("Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
+            hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
             if learned.get("support",0): hint+=f" ({learned['support']}×)"
             tree.set(selected[0],"learning",hint)
             self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
