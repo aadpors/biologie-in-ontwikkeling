@@ -55,10 +55,10 @@ def render_question(pdf_path, question, output):
             next_topic = [
                 line for line in lines
                 if line["y0"] > heading["y0"] + 3
-                # Only a genuinely large heading starts a new topic.
-                # Bold text is also used for marking criteria, so treating
-                # every bold line as a topic boundary clipped valid answers.
-                and line["size"] >= 16
+                # Topic headings in these CvTE PDFs are about 14 pt;
+                # answer criteria and body text are about 11 pt. Do not use
+                # boldness alone because marking criteria are also bold.
+                and line["size"] >= 13.5
                 and len(line["text"]) < 100
                 # Bullet glyphs are part of answer criteria, not section headings.
                 and line["text"].strip() not in {"•", "●", "▪", "◦", "-", "–", "—"}
