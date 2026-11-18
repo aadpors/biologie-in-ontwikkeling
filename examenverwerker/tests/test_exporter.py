@@ -45,6 +45,8 @@ class ExportTests(unittest.TestCase):
             cv_data=json.loads((out/"scripts"/"cv-snippets.json").read_text(encoding="utf-8"))
             manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["records"][0]["cv_amendment_pdfs"][0]["file"],"examens/aanvulling.pdf")
+            self.assertTrue(manifest["records"][0]["cv_snippet_sha256"])
+            self.assertTrue(manifest["records"][0]["cv_amendment_snippet_sha256"])
             self.assertEqual(cv_data[0]["amendment_output"],"cv-amend1.png")
 
     def test_invalidated_source_analysis_is_blocked_even_if_record_was_approved(self):
