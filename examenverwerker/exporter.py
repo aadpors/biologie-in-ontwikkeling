@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib, json, shutil
 from pathlib import Path
 from datetime import datetime
-from engine import infer_exam_metadata
+from engine import infer_exam_metadata, review_checklist_errors
 
 def sha256(path: Path):
     h=hashlib.sha256()
@@ -28,6 +28,10 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         rid=r.get("id") or f"record-{i+1}"
         if r.get("approved_by_human") is not True: errors.append({"id":rid,"error":"niet_menselijk_goedgekeurd"})
         if r.get("status") not in ("goedgekeurd","approved"): errors.append({"id":rid,"error":"status_niet_goedgekeurd"})
+        for review_error in review_checklist_errors(r,r.get("record_review_checklist",{})):
+            errors.append({"id":rid,"error":review_error})
+        if r.get("source_analysis_invalidated") is True:
+            errors.append({"id":rid,"error":"bron_analyse_verouderd"})
         meta=r.get("exam",{})
         for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
             if meta.get(field) in (None,""): errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
