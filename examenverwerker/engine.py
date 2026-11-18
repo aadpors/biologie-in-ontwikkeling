@@ -127,9 +127,21 @@ def propose_question_regions(analysis: dict, candidates: list[dict], horizontal_
                 if p:
                     y1=min(p["height"],max(10.0,next_item["bbox"][1]-5.0))
                     segments.append({"page":next_item["page"],"bbox":[x0,0.0,x1,y1]})
+        text_parts=[]
+        for segment in segments:
+            p=pages.get(segment["page"],{})
+            for block in p.get("blocks",[]):
+                for line in (block.get("lines") or [{"bbox":block["bbox"],"text":x} for x in block["text"].splitlines()]):
+                    box=line["bbox"]
+                    if box[1] >= segment["bbox"][1] and box[1] <= segment["bbox"][3]:
+                        text_parts.append((segment["page"],box[1],box[0],line["text"]))
+        text_parts.sort(key=lambda x:(x[0],x[1],x[2]))
+        text_proposal="\n".join(x[3] for x in text_parts)
+        context_candidates=find_context_references(analysis,text_proposal)
         proposals.append({"number":item["number"],"start_page":page_no,
-                          "source_segments":segments,"status":"voorstel_niet_goedgekeurd",
-                          "completeness":"onbekend",
+                          "source_segments":segments,"text_proposal":text_proposal,
+                          "context_candidates":context_candidates,
+                          "status":"voorstel_niet_goedgekeurd","completeness":"onbekend",
                           "warning":"Dit fragment loopt tot de volgende gevonden nummerkandidaat. Gedeelde context, bijschriften en verwijzingen kunnen erbuiten staan."})
     return proposals
 
