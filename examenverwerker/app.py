@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -292,6 +292,55 @@ class ExamApp:
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
         ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
         ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
+        ttk.Button(actions,text="Voorlopige snippet maken",command=lambda:self.create_snippet_proposal(rows,tree,win)).pack(side="left",padx=8)
+
+    def create_snippet_proposal(self, rows, tree, parent):
+        selected=tree.selection()
+        if not selected:
+            messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een kandidaat.")
+            return
+        row=rows[int(selected[0])]
+        doc=next((d for d in self.data["documenten"] if d["id"]==row.get("document_id")),None)
+        if not doc:
+            messagebox.showerror("Bron ontbreekt","Het bijbehorende bronbestand is niet gevonden.")
+            return
+        source=self.project_dir/"bronnen"/doc["opslagbestand"]
+        try:
+            analysis=analyze_pdf(source)
+            candidates=[x for x in self.data.get("vraagkandidaten",[]) if x.get("document_id")==doc["id"]]
+            proposals=propose_question_regions(analysis,candidates)
+            proposal=next((p for p in proposals if p["number"]==row["number"] and p["start_page"]==row["page"]),None)
+            if not proposal:
+                messagebox.showinfo("Geen fragment","Er kon geen voorlopig fragment worden samengesteld.")
+                return
+            files=[]
+            for idx,segment in enumerate(proposal["source_segments"],1):
+                name=f"voorstel-q{row['number']}-p{segment['page']}-deel{idx}.png"
+                target=self.project_dir/"snippets"/name
+                render_crop(source,segment["page"],segment["bbox"],target,scale=1.8)
+                files.append(name)
+            row["snippet_proposal_files"]=files
+            row["snippet_proposal_warning"]=proposal["warning"]
+            self.save_project()
+            win=tk.Toplevel(parent); win.title(f"Voorlopig fragment vraag {row['number']}"); win.geometry("900x800")
+            ttk.Label(win,text="VOORSTEL – NIET GECONTROLEERD OF PUBLICATIEKLAAR",foreground="#9b4d00",padding=8).pack(fill="x")
+            ttk.Label(win,text=proposal["warning"],wraplength=860,padding=8).pack(fill="x")
+            frame=ttk.Frame(win); frame.pack(fill="both",expand=True)
+            canvas=tk.Canvas(frame,background="#dce3e6")
+            sy=ttk.Scrollbar(frame,orient="vertical",command=canvas.yview)
+            sx=ttk.Scrollbar(frame,orient="horizontal",command=canvas.xview)
+            canvas.configure(yscrollcommand=sy.set,xscrollcommand=sx.set)
+            sy.pack(side="right",fill="y"); sx.pack(side="bottom",fill="x"); canvas.pack(side="left",fill="both",expand=True)
+            photos=[]; y=0
+            for name in files:
+                photo=tk.PhotoImage(file=str(self.project_dir/"snippets"/name))
+                photos.append(photo); canvas.create_image(0,y,image=photo,anchor="nw")
+                y += photo.height()+12
+            canvas.images=photos
+            canvas.configure(scrollregion=canvas.bbox("all"))
+            self._log(f"Voorlopige snippet(s) voor vraag {row['number']} gemaakt. Visuele controle blijft verplicht.")
+        except Exception as exc:
+            messagebox.showerror("Snippetvoorstel mislukt",str(exc))
 
     def preview_candidate(self, rows, tree, parent):
         selected=tree.selection()
