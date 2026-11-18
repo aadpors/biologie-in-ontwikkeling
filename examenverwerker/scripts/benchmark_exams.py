@@ -34,7 +34,9 @@ def main():
                 item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo",
                              "year":"20"+key[1],"period":key[2],"candidate_count":len(candidates),
                              "expected_question_count":expected,
-                             "candidate_count_delta":len(candidates)-expected if expected is not None else None})
+                             "candidate_count_delta":len(candidates)-expected if expected is not None else None,
+                             # Preserve exact evidence for false-positive diagnosis.
+                             "candidate_details":candidates})
                 if not candidates: failures.append(f"{path.name}: geen vraagstartkandidaten")
                 if expected is not None and len(candidates)!=expected:
                     warnings.append(f"{path.name}: {len(candidates)} kandidaten tegenover {expected} bekende vragen; verschil {len(candidates)-expected}. Handmatige controle en detectieverbetering nodig.")
