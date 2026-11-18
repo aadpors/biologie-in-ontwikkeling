@@ -477,13 +477,13 @@ def link_context_assets(analysis: dict, references: list[dict],
     pages = analysis.get("pages", [])
     page_map = {int(p.get("page", 0)): p for p in pages}
     caption_re = re.compile(
-        r"^\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema)\s*([0-9]{1,2}|[A-Z])\b",
+        r"^\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema|bron|tekst|bijlage)\s*([0-9]{1,2}|[A-Z])\b",
         re.I
     )
     kind_map = {
         "figuur": "figuur", "afbeelding": "afbeelding", "foto": "afbeelding",
         "illustratie": "afbeelding", "tabel": "tabel", "grafiek": "grafiek",
-        "diagram": "grafiek", "schema": "grafiek"
+        "diagram": "grafiek", "schema": "grafiek",\n        "bron": "bron", "tekst": "bron", "bijlage": "bron"
     }
     results = []
     for ref in references:
@@ -509,10 +509,28 @@ def link_context_assets(analysis: dict, references: list[dict],
                         captions.append({"page": page_no, "text": text,
                                          "bbox": line.get("bbox", block.get("bbox", [0,0,0,0]))})
         asset_candidates = []
+        text_region_candidates = []
         for caption in captions:
             page = page_map.get(caption["page"], {})
             cb = caption["bbox"]
             cy = (float(cb[1]) + float(cb[3])) / 2
+            if kind == "bron":
+                # Source texts are often plain text rather than raster/vector
+                # figures. Keep the following text blocks as explicit candidates.
+                following=[]
+                for block in page.get("blocks",[]):
+                    bb=block.get("bbox",[0,0,0,0])
+                    by=(float(bb[1])+float(bb[3]))/2
+                    if float(bb[1]) >= float(cb[1]) and by > cy:
+                        following.append((float(bb[1])-cy,block))
+                for distance,block in sorted(following,key=lambda x:x[0])[:8]:
+                    text_region_candidates.append({
+                        "page":caption["page"],"bbox":block.get("bbox"),
+                        "text":str(block.get("text",""))[:1200],
+                        "caption":caption["text"],"distance_to_caption":round(distance,1),
+                        "status":"broncontext_visueel_controleren"
+                    })
+                continue
             ranked = []
             for asset in page.get("visual_assets", []):
                 ab = asset.get("bbox", [0,0,0,0])
@@ -543,7 +561,9 @@ def link_context_assets(analysis: dict, references: list[dict],
         results.append({
             **ref, "caption_matches": captions,
             "asset_candidates": asset_candidates,
-            "link_status": "caption_en_geometrie_gevonden" if captions and asset_candidates
+            "text_region_candidates": text_region_candidates,
+            "link_status": "caption_en_tekstregio_gevonden" if captions and text_region_candidates
+                           else "caption_en_geometrie_gevonden" if captions and asset_candidates
                            else "caption_gevonden_geen_asset" if captions
                            else "geen_caption_gevonden_handmatige_koppeling"
         })
