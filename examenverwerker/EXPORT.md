@@ -4,7 +4,10 @@ De exporter sluit aan op het bestaande contract dat \`examenoefenen.html\` gebru
 
 ## Publicatiepoort
 Een record wordt alleen geëxporteerd wanneer:
-- een mens het expliciet heeft goedgekeurd;\n- alle verplichte onderdelen van de menselijke eindcontrolechecklist zijn afgevinkt;\n- het record niet ongeldig is geworden door een nieuwe analyse van de bron-PDF;\n- opgaven, CV, uitwerkbijlagen en CV-aanvullingen aantoonbaar bij hetzelfde niveau, jaar en tijdvak horen (of de koppeling per document expliciet handmatig is bevestigd);
+- een mens het expliciet heeft goedgekeurd;
+- alle verplichte onderdelen van de menselijke eindcontrolechecklist zijn afgevinkt;
+- het record niet ongeldig is geworden door een nieuwe analyse van de bron-PDF;
+- opgaven, CV, uitwerkbijlagen en CV-aanvullingen aantoonbaar bij hetzelfde niveau, jaar en tijdvak horen (of de koppeling per document expliciet handmatig is bevestigd);
 - status op goedgekeurd staat;
 - examenmetadata compleet is;
 - opgaven-PDF en correctievoorschrift aanwezig zijn;
