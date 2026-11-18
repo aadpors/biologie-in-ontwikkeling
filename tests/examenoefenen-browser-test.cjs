@@ -299,6 +299,11 @@ const assert = require("node:assert/strict");
     assert.ok((q26Images[0] || "").includes("context-ha25t1-q26-complete.jpg"));
     assert.ok((q26Images[1] || "").includes("question-ha25t1-26-only.jpg"));
     assert.equal(await page.locator(".exam-snippets img").count(), 2, "Vraag 26 moet context en vraagtekst als twee afzonderlijke uitsneden tonen");
+    const q26QuestionImage = page.locator(".exam-snippets img").nth(1);
+    await q26QuestionImage.evaluate(img => img.decode());
+    const q26QuestionDimensions = await q26QuestionImage.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
+    assert.ok(q26QuestionDimensions.width > 500 && q26QuestionDimensions.height > 120,
+      "Vraag 26 moet de drie genummerde uitspraken én de vraaginstructie bevatten; alleen de instructieregel is onvoldoende");
 
     await page.locator("#questionType").selectOption("mcq");
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
