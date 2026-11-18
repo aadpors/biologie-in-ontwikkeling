@@ -1068,6 +1068,19 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         if j not in {marker["number_line"], marker["points_line"]}
                         and not HEADER_RE.match(lines[j]["text"])
                     ).strip()
+                    if prefix == "ha25t1" and marker["number"] == 26:
+                        # The source PDF places the heading and three numbered
+                        # statements above the printed score/question marker.
+                        # Keep the shared context clean and put the lead-in in
+                        # the question text; the dedicated crop contains all
+                        # three statements and the final instruction.
+                        context = re.sub(
+                            r"\\n?Hieronder staan drie uitspraken\\..*$",
+                            "",
+                            context,
+                            flags=re.S,
+                        ).strip()
+                        selected_prompt = "Hieronder staan drie uitspraken.\\n" + selected_prompt
                     if context_record is None and selected_context_page is not None:
                         previous_ranges.append((start, question_end_line + 1))
                         cursor = question_end_line + 1
