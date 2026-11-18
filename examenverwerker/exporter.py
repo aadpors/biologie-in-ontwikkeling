@@ -159,6 +159,8 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         manifest.append({"id":r["id"],"source_sha256":sha256(project_dir/"bronnen"/source_name),
                          "cv_sha256":sha256(project_dir/"bronnen"/cv_name),
                          "snippet_sha256":[sha256(project_dir/"snippets"/name) for name in snippet_names],
+                         "cv_snippet_sha256":sha256(project_dir/"snippets"/(r.get("cv_snippet_files") or [r.get("cv_snippet_file")])[0]) if meta["questionType"]=="open" else None,
+                         "cv_amendment_snippet_sha256":sha256(project_dir/"snippets"/r["cv_amendment_snippet_file"]) if r.get("cv_amendment_snippet_file") else None,
                          "uitwerkbijlagen":[{"file":name,"sha256":sha256(output_dir/name)} for name in appendix],
                          "cv_amendment_pdfs":[{"file":name,"sha256":sha256(output_dir/name)} for name in cv_amendments],
                          "human_approved":True})
