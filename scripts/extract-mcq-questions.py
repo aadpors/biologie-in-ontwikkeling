@@ -568,6 +568,26 @@ def parse_options(block_lines):
             option["text"] = "Bekijk optie " + option["key"] + " in de oorspronkelijke afbeelding"
     return options
 
+def find_numbered_list_prompt(lines, context_indices, marker):
+    """Find a question lead-in introducing a numbered list before its score marker."""
+    heading_re = re.compile(
+        r"^\\s*(?:hieronder|hierna)\\s+(?:staan|staat|is|zijn|volgt|volgen|wordt|worden)\\b",
+        re.I,
+    )
+    item_re = re.compile(r"^\\s*([1-4])(?:[.)]\\s+|\\s+\\S)")
+    eligible = sorted(i for i in context_indices if i < marker["number_line"])
+    lower_bound = max(0, marker["number_line"] - 36)
+    for heading_index in reversed([i for i in eligible if i >= lower_bound and heading_re.match(lines[i]["text"])]):
+        subsequent = [i for i in eligible if heading_index < i < marker["number_line"]]
+        first = next((i for i in subsequent if lines[i]["text"].strip()), None)
+        if first is None or not re.match(r"^\\s*1(?:[.)]\\s+|\\s+\\S)", lines[first]["text"]):
+            continue
+        numbers = {int(match.group(1)) for i in subsequent if (match := item_re.match(lines[i]["text"]))}
+        if len(numbers) >= 2:
+            return heading_index
+    return None
+
+
 def clean_context(lines):
     cleaned = []
     for line in lines:
@@ -657,6 +677,10 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     cursor = headings[-1]
                     active_context = []
                 context_line_indices = [j for j in range(cursor, start) if not any(a <= j < b for a, b in previous_ranges)]
+                # Move a lead-in plus its numbered statements out of general context.
+                list_prompt_start = find_numbered_list_prompt(lines, context_line_indices, marker)
+                if list_prompt_start is not None:
+                    context_line_indices = [j for j in context_line_indices if j < list_prompt_start]
                 context_lines = [lines[j]["text"] for j in context_line_indices]
                 # Each question gets only the context physically preceding it on
                 # this page (plus context continued between questions on this page).
@@ -847,18 +871,19 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 context_record = None
                 if selected_context_page is None or page_index + 1 == selected_context_page:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
+                    question_start_line = list_prompt_start if list_prompt_start is not None else start
                     question_top = min(
-                        max(0, lines[start]["bbox"][1] - 1), page.rect.height - 55
+                        max(0, lines[question_start_line]["bbox"][1] - 1), page.rect.height - 55
                     )
                     # Havo 2025-I question 26 has three numbered statements
                     # immediately before the printed question marker. They are
                     # question material, not general context: start the separate
                     # question crop at statement 1 so all three remain visible.
                     if prefix == "ha25t1" and marker["number"] == 26:
-                        statement_start = page.search_for("Door het inhouden van de adem")
+                        statement_start = page.search_for("Hieronder staan drie uitspraken.")
                         if not statement_start:
-                            raise RuntimeError("Could not locate the first Havo 2025-I question 26 statement")
-                        question_top = max(0, min(rect.y0 for rect in statement_start))
+                            raise RuntimeError("Could not locate the Havo 2025-I question 26 lead-in")
+                        question_top = max(0, min(rect.y0 for rect in statement_start) - 2)
                     question_y1 = min(
                         page.rect.height - 15,
                         max(question_top + 40, min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)),
@@ -894,7 +919,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         # Use the printed score/question marker as the
                         # lower boundary for open-question context fragments too.
                         context_question_top = max(
-                            0, lines[marker["number_line"]]["bbox"][1]
+                            0, lines[list_prompt_start if list_prompt_start is not None else marker["number_line"]]["bbox"][1]
                         )
                         context_start_anchors = {
                             15: "In Afrika veroorzaken droge perioden",
@@ -1037,19 +1062,22 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     cursor = question_end_line + 1
                     continue
                 if not options:
+                    prompt_start_line = list_prompt_start if list_prompt_start is not None else start
                     selected_prompt = "\n".join(
-                        lines[j]["text"] for j in range(start, question_end_line + 1)
+                        lines[j]["text"] for j in range(prompt_start_line, question_end_line + 1)
                         if j not in {marker["number_line"], marker["points_line"]}
                         and not HEADER_RE.match(lines[j]["text"])
                     ).strip()
                     if prefix == "ha25t1" and marker["number"] == 26:
-                        # Keep the statements in the question, not in its
-                        # general context. The heading is part of the prompt.
+                        # The source PDF places the heading and three numbered
+                        # statements above the printed score/question marker.
+                        # Keep the shared context clean and put the lead-in in
+                        # the question text; the dedicated crop contains all
+                        # three statements and the final instruction.
                         context = re.sub(
-                            r"\n?Hieronder staan drie uitspraken\..*$",
+                            r"(?is)\s*Hieronder\s+staan\s+drie\s+uitspraken\b.*$",
                             "",
                             context,
-                            flags=re.S,
                         ).strip()
                         selected_prompt = "Hieronder staan drie uitspraken.\n" + selected_prompt
                     if context_record is None and selected_context_page is not None:

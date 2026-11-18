@@ -28,6 +28,7 @@ const assert = require("node:assert/strict");
       "Havo 2025-I vraag 27: de algemene context moet als oorspronkelijke afbeelding worden getoond, niet als geëxtraheerde tekst");
     assert.equal(await page.locator(".exam-snippets img").count(), 2,
       "Havo 2025-I vraag 27: zowel context- als vraagafbeelding moeten zichtbaar zijn");
+
     const contextImageAudit = await page.evaluate(() => ({
       total: questions.length,
       withImageContext: questions.filter(q => (q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\.jpg$/i.test(q.images[0]))).length,
@@ -299,6 +300,7 @@ const assert = require("node:assert/strict");
     assert.ok((q26Images[0] || "").includes("context-ha25t1-q26-complete.jpg"));
     assert.ok((q26Images[1] || "").includes("question-ha25t1-26-only.jpg"));
     assert.equal(await page.locator(".exam-snippets img").count(), 2, "Vraag 26 moet context en vraagtekst als twee afzonderlijke uitsneden tonen");
+    assert.equal(await page.locator(".sourceblock").count(), 0, "Vraag 26 mag de algemene context niet nogmaals als OCR-tekst tonen");
     const q26QuestionImage = page.locator(".exam-snippets img").nth(1);
     await q26QuestionImage.evaluate(img => img.decode());
     const q26QuestionDimensions = await q26QuestionImage.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
