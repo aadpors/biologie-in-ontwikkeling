@@ -9,7 +9,7 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type
 
 APP_VERSION = "0.2.0"
@@ -138,7 +138,7 @@ class ExamApp:
         if not folder:
             return
         base = Path(folder)
-        name = tk.simpledialog.askstring("Nieuw examen", "Geef het examen een herkenbare naam:", initialvalue=base.name)
+        name = simpledialog.askstring("Nieuw examen", "Geef het examen een herkenbare naam:", initialvalue=base.name)
         if not name:
             return
         self.project_dir = base / re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
@@ -325,7 +325,7 @@ class ExamApp:
                 messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een gevonden vraagstart.")
                 return
             row=rows[int(selected[0])]
-            reason=tk.simpledialog.askstring("Waarom deze keuze?","Korte reden (optioneel):",parent=win) or ""
+            reason=simpledialog.askstring("Waarom deze keuze?","Korte reden (optioneel):",parent=win) or ""
             row["status"]="bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
             row["human_decision"]=bool(is_question)
             row["decision_reason"]=reason
