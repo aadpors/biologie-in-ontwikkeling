@@ -8,6 +8,10 @@ on:
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-tests.yml"]
   workflow_dispatch:
 
+concurrency:
+  group: examenverwerker-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     strategy:
