@@ -579,7 +579,12 @@ def find_numbered_list_prompt(lines, context_indices, marker):
     # heuristic can advance its cursor to (or beyond) the very lead-in we need
     # to move into the question. Search the complete local page window instead,
     # then select only a semantic heading immediately preceding a numbered run.
-    lower_bound = max(0, marker["number_line"] - 48)
+    # Long context pages can place a question's lead-in more than 48 text
+    # lines before its printed score marker (especially around large figures).
+    # The semantic-heading + consecutive-item checks below keep this wider
+    # search local to the actual question rather than treating arbitrary lists
+    # in the passage as question material.
+    lower_bound = max(0, marker["number_line"] - 120)
     candidates = list(range(lower_bound, marker["number_line"]))
 
     def item_number(value):
@@ -790,6 +795,20 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context = clean_context([lines[j]["text"] for j in context_line_indices])
                         context_y0 = max(0, anchor_y - 5)
                         anchored_context = True
+
+                # Manual context anchors are applied after the automatic
+                # question-boundary detector. Reapply that boundary afterwards:
+                # otherwise an anchor can accidentally put numbered question
+                # statements back into the context text and context image.
+                if list_prompt_start is not None:
+                    context_line_indices = [
+                        j for j in context_line_indices if j < list_prompt_start
+                    ]
+                    context = clean_context([lines[j]["text"] for j in context_line_indices])
+                    if context_line_indices:
+                        context_y0 = max(
+                            0, min(lines[j]["bbox"][1] for j in context_line_indices) - 5
+                        )
 
                 # A question can start very near the top of a PDF page. In
                 # that case the default context margin must not begin below
