@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -265,11 +265,13 @@ class ExamApp:
                     following = ordered[index + 1] if index + 1 < len(ordered) else None
                     proposal_text = extract_candidate_text(analysis, item, following)
                     type_check = detect_question_type(proposal_text)
+                    context_refs = detect_context_references(proposal_text)
                     item.update({
                         "document_id": doc["id"], "bestand": doc["bestand"],
                         "vraagtekst_voorstel": proposal_text,
                         "vraagtype_controle": type_check,
-                        "vraagtype_status": "controle_nodig"
+                        "vraagtype_status": "controle_nodig",
+                        "context_verwijzingen": context_refs
                     })
                 candidates = ordered
                 all_op_candidates.extend(candidates)
@@ -372,6 +374,10 @@ class ExamApp:
                 warning=("Ontbrekende labels: "+(", ".join(gaps) if gaps else "geen")+
                          " | Dubbele labels: "+(", ".join(duplicates) if duplicates else "geen"))
                 ttk.Label(detail,text=warning,foreground="#9b4d00",wraplength=720,padding=10).pack(anchor="w")
+            refs=row.get("context_verwijzingen",[])
+            ref_lines=[f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
+            ttk.Label(detail,text="Mogelijke verwijzingen naar contextmateriaal:",padding=(10,4)).pack(anchor="w")
+            ttk.Label(detail,text="\\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
             ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
         ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
