@@ -275,9 +275,17 @@ def validate_website_records(mcq: list, opened: list, contexts: list) -> list[di
     return errors
 
 def build_question_record(meta: dict, candidate: dict, question_text: str, source_pdf: str, cv_pdf: str) -> dict:
-    """Create a review record, deliberately not a website publication record."""
-    return {"schema":"biologie-question-review-v1","id":None,"exam":meta,
+    """Create a review record; never an approved website record."""
+    level_prefix="ha" if meta.get("level")=="Havo" else "vw"
+    year=str(meta.get("year",""))[-2:]
+    period=str(meta.get("period",""))
+    question_type=meta.get("questionType","open")
+    rid=f"{level_prefix}{year}t{period}-{question_type}-{candidate['number']}"
+    return {"schema":"biologie-question-review-v1","id":rid,"exam":meta,
             "number":candidate["number"],"source_page":candidate["page"],
             "source_bbox":candidate["bbox"],"question_text":question_text,
-            "source_pdf":source_pdf,"cv_pdf":cv_pdf,"snippet_candidates":[],
-            "status":"controle_nodig","approved_by_human":False}
+            "source_pdf":source_pdf,"cv_pdf":cv_pdf,"snippet_files":[],
+            "cv_snippet_file":None,"uitwerkbijlagen":[],"source_context":"",
+            "status":"controle_nodig","approved_by_human":False,
+            "candidate_confidence":candidate.get("confidence",0.0),
+            "candidate_status":candidate.get("status","controle_nodig")}
