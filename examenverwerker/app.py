@@ -251,7 +251,7 @@ class ExamApp:
                 cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
                 cv_candidates.extend(detect_cv_question_numbers(cv_analysis))
             except Exception as exc:
-                self._log(f"CV-analyse mislukt voor {cv_doc['bestand']}: {exc}")
+                self._error(f"CV-analyse ({cv_doc['bestand']})",exc)
         all_op_candidates = []
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
