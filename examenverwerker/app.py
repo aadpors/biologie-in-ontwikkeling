@@ -57,7 +57,8 @@ def extract_pdf(path: Path):
     doc = fitz.open(path)
     pages = []
     for index, page in enumerate(doc):
-        pages.append({"pagina": index + 1, "tekst": page.get_text("text", sort=True)})
+        text = page.get_text("text", sort=True)
+        pages.append({"pagina": index + 1, "tekst": text, "tekens": len(text.strip()), "ocr_nodig": len(text.strip()) < 20})
     meta = doc.metadata or {}
     result = {"pagina_aantal": len(doc), "metadata": meta, "pagina_tekst": pages}
     doc.close()
@@ -192,11 +193,13 @@ class ExamApp:
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
                        "herkenningssignalen": scores, "status": "controle_nodig" if confidence < 0.9 else "herkend_nog_niet_goedgekeurd",
                        "toegevoegd": now(), "pagina_aantal": extracted["pagina_aantal"],
-                       "metadata": extracted["metadata"]}
+                       "metadata": extracted["metadata"],
+                       "pagina_zonder_tekst": [p["pagina"] for p in extracted["pagina_tekst"] if p.get("ocr_nodig")],
+                       "ocr_status": "handmatige_ocr_controle_nodig" if any(p.get("ocr_nodig") for p in extracted["pagina_tekst"]) else "tekstlaag_aanwezig"}
                 (self.project_dir / "analyse" / f"{digest[:16]}.json").write_text(
                     json.dumps(extracted, ensure_ascii=False, indent=2), encoding="utf-8")
                 self.data["documenten"].append(doc)
-                self._log(f"{source.name}: {kind} voorgesteld ({confidence:.0%}), {extracted['pagina_aantal']} pagina's.")
+                self._log(f"{source.name}: {kind} voorgesteld ({confidence:.0%}), {extracted['pagina_aantal']} pagina's. OCR-controle op pagina's: {doc['pagina_zonder_tekst'] or 'niet nodig'}.")
                 added += 1
             except Exception as exc:
                 self._log(f"FOUT bij {source.name}: {exc}")
