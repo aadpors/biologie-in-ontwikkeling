@@ -508,7 +508,7 @@ class ExamApp:
         context_list.pack(fill="x")
         for idx,item in enumerate(context_files):
             context_list.insert("end",f"Pagina {item.get('page')} · {item.get('caption') or item.get('asset_id')} · {item.get('file')}")
-                ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
+        ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
         snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-*.png"))
         cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
         cv_snippet_combo=ttk.Combobox(outer,textvariable=cv_snippet_var,values=[""]+snippet_names,state="readonly")
