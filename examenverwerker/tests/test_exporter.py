@@ -15,7 +15,8 @@ class ExportTests(unittest.TestCase):
                     "concept":"Ecosystemen","end":"E1","focus":"Toepassing","questionType":"open"},
             "number":1,"source_page":2,"source_pdf":"opgaven.pdf","cv_pdf":"cv.pdf",
             "snippet_file":"vraag1.png","cv_snippet_file":"cv1.jpg","question_text":"Beschrijf de relatie.",
-            "source_match_human_confirmed":True,"cv_match_human_confirmed":True,\n            "appendix_match_human_confirmed":True,"cv_amendment_match_human_confirmed":True,
+            "source_match_human_confirmed":True,"cv_match_human_confirmed":True,
+            "appendix_match_human_confirmed":True,"cv_amendment_match_human_confirmed":True,
             "uitwerkbijlagen":["uitwerkbijlage.pdf"]
         }
         return project,record
