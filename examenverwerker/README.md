@@ -6,12 +6,19 @@ Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologi
 - Examenprojecten aanmaken, openen en hervatten.
 - Originele PDF's ongewijzigd opnemen en SHA-256-dedupliceren.
 - Documenttypen voorstellen: opgaven, correctievoorschrift, uitwerkbijlage en aanvulling.
-- PDF-tekst, metadata, pagina's en geometrie uitlezen.\n- Rasterafbeeldingen en grotere vectorregio's in originele PDF's inventariseren.\n- Figuur- en tabelverwijzingen koppelen aan mogelijke bijschriften en beeldregio's, zonder automatische goedkeuring.
+- PDF-tekst, metadata, pagina's en geometrie uitlezen.
+- Rasterafbeeldingen en grotere vectorregio's in originele PDF's inventariseren.
+- Figuur- en tabelverwijzingen koppelen aan mogelijke bijschriften en beeldregio's, zonder automatische goedkeuring.
 - Pagina's zonder bruikbare tekst markeren voor OCR-controle.
 - Mogelijke vraagstarts detecteren, ook bij losse nummerregels en dubbele nummers.
 - Opgaven- en CV-nummering als controlesignaal vergelijken.
 - Originele bronpagina's visueel tonen.
-- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.\n- Concept-vraagrecords samenstellen met bewerkbare vraagtekst, metadata, antwoordopties, exact gekoppelde CV's, uitwerkbijlagen en officiële CV-aanvullingen.\n- Volledige CV-antwoorden over meerdere pagina's samenvoegen tot één controleerbare afbeelding.\n- Een expliciete menselijke eindcontrole uitvoeren met checklist, visuele bronvoorbeelden en herroepbare goedkeuring.\n- Een veilig exportpakket samenstellen; de exportpoort controleert de checklist en de examenidentiteit opnieuw.\n- Correctievoorschriftfragmenten over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
+- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.
+- Concept-vraagrecords samenstellen met bewerkbare vraagtekst, metadata, antwoordopties, exact gekoppelde CV's, uitwerkbijlagen en officiële CV-aanvullingen.
+- Volledige CV-antwoorden over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
+- Een expliciete menselijke eindcontrole uitvoeren met checklist, visuele bronvoorbeelden en herroepbare goedkeuring.
+- Een veilig exportpakket samenstellen; de exportpoort controleert de checklist en de examenidentiteit opnieuw.
+- Correctievoorschriftfragmenten over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
 - Menselijke beslissingen opslaan in een lokale leerbank.
 - Optionele externe AI-adapter gebruiken na expliciete toestemming; standaard volledig offline.
 - Een exportpoort gebruiken die niet-goedgekeurde of onvolledige records blokkeert en originele uitwerkbijlagen volledig meeneemt.
@@ -39,9 +46,12 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 3. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak).
 4. Laat vraagstarts analyseren.
 5. Bekijk kandidaten op de originele pagina en bevestig of wijs ze af.
-6. Maak voorlopige snippets en controleer de volledige context, figuren, tabellen, bijschriften en leesbaarheid.
-7. Controleer CV, aanvullingen en uitwerkbijlagen.
-8. Exporteer pas nadat ieder record volledig en menselijk goedgekeurd is.
+6. Bevestig vraagstarts handmatig; maak daarna concept-vraagrecords en controleer de volledige vraagtekst en antwoordopties.
+7. Maak CV-fragmenten vanuit het bijbehorende originele correctievoorschrift; controleer alle pagina's, punten, aanvullingen en beoordelingsregels.
+8. Selecteer alleen figuur-, tabel- en tekstregio's die aantoonbaar bij de vraag horen; controleer bijschriften en context.
+9. Controleer alle pagina's van uitwerkbijlagen en CV-aanvullingen.
+10. Open 'Vraagrecords beoordelen en goedkeuren', vink alleen werkelijk gecontroleerde onderdelen af en keur ieder record expliciet goed.
+11. Maak pas daarna een exportpakket. Dit wijzigt of publiceert niets op de live website.
 
 ## Betrouwbaarheidsregels
 - Originele PDF's worden nooit aangepast.
@@ -57,7 +67,8 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 - OCR voor gescande pagina's is nog niet ingebouwd.
 - Vraaggrenzen en contextkoppelingen vragen nog menselijke bevestiging.
 - CV-nummering is een signaal en moet inhoudelijk worden gecontroleerd.
-- De eindcontrole is expliciet en handmatig; visuele signalen of AI mogen nooit een vinkje of goedkeuring zetten.\n- Automatische contextkoppelingen zijn uitsluitend kandidaten op basis van PDF-geometrie en bijschriften; inhoudelijke koppeling blijft handwerk.
+- De eindcontrole is expliciet en handmatig; visuele signalen of AI mogen nooit een vinkje of goedkeuring zetten.
+- Automatische contextkoppelingen zijn uitsluitend kandidaten op basis van PDF-geometrie en bijschriften; inhoudelijke koppeling blijft handwerk.
 - De portable build moet nog op een echte Windows 11-computer worden gestart en met representatieve examenbestanden worden getest.
 
 Zie ook \`ONTWERP.md\`, \`SCHEMA.md\`, \`VALIDATIE.md\`, \`LEERBANK.md\`, \`EXPORT.md\` en \`PRIVACY.md\`.
