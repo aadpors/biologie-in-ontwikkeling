@@ -327,6 +327,7 @@ async function loadMCQ(){
      if(item.image)existing.image=item.image;
      if(item.page)existing.page=item.page;
      if(item.source)existing.source=item.source;
+     if(item.q)existing.q=item.q;
     }else{
      item.questionType="open";
      map.set(key(item),item);
@@ -361,7 +362,6 @@ async function loadMCQ(){
    if(cvItem){question.cvImage="exam-snippets/"+cvItem.output;if(cvItem.amendment_output)question.cvAmendment="exam-snippets/"+cvItem.amendment_output;}
   }
   questions=buildRepeatedContexts([...map.values()]);
-  for(const item of openItems){const existing=map.get(key(item));if(existing&&item.q)existing.q=item.q;}
   for(const question of questions)question.binaryChoice=getBinaryChoiceDefinition(question);
   fill("theme",questions.flatMap(onderwerpenVanVraag));
   if(filterState.theme && onderwerpCategorieen.includes(filterState.theme))$("theme").value=filterState.theme;
