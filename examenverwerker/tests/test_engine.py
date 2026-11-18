@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
 
 class EngineTests(unittest.TestCase):
     def test_question_candidates_keep_repeated_numbers(self):
@@ -22,6 +22,18 @@ class EngineTests(unittest.TestCase):
         row={"id":"same","level":"Havo","year":"2025","period":"1","n":1,"page":1,"q":"x","pdf":"a.pdf","cv":"b.pdf"}
         errors=validate_website_records([row],[row],[])
         self.assertTrue(any(e["kind"]=="duplicate_id" for e in errors))
+    def test_cv_numbering_crosscheck_reports_differences(self):
+        op=[{"number":1},{"number":2},{"number":3}]
+        cv=[{"number":1},{"number":3},{"number":4}]
+        result=compare_question_numbering(op,cv)
+        self.assertEqual(result["ontbreekt_in_cv"],[2])
+        self.assertEqual(result["ontbreekt_in_opgaven"],[4])
+    def test_question_regions_can_span_pages(self):
+        analysis={"pages":[{"page":1,"width":600,"height":800},{"page":2,"width":600,"height":800}]}
+        candidates=[{"number":1,"page":1,"bbox":[50,700,80,720]},{"number":2,"page":2,"bbox":[50,100,80,120]}]
+        regions=propose_question_regions(analysis,candidates)
+        self.assertEqual(len(regions[0]["source_segments"]),2)
+        self.assertEqual(regions[0]["status"],"voorstel_niet_goedgekeurd")
     def test_pdf_text_and_exact_crop(self):
         try:
             import fitz
