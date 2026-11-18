@@ -136,6 +136,60 @@ def render_question(doc, clip, scale):
     return pix, page_index + 1
 
 
+# Havo 2025-I q26: the sentence "Hieronder staan drie uitspraken" is
+# the question introduction, not part of the shared Bajau context. Split the
+# source page at that exact printed boundary so the two images reflect the
+# original exam structure.
+def render_havo_2025_i_q26():
+    pdf = ROOT / "examens" / "ha-1018-a-25-1-o.pdf"
+    if not pdf.exists():
+        raise FileNotFoundError(pdf)
+    with fitz.open(pdf) as doc:
+        page = doc[11]  # printed page 12
+        context_top = page.search_for("De Bajau")
+        context_end = page.search_for("ontstaat, en kan zo verdrinken.")
+        question_top = page.search_for("Hieronder staan drie uitspraken.")
+        question_end = page.search_for("bijbehorende uitspraak juist of onjuist is.")
+        if not all((context_top, context_end, question_top, question_end)):
+            raise ValueError(
+                "Havo 2025-I q26: missing exact source boundary anchor; "
+                "refusing to publish incorrectly divided context/question images."
+            )
+        scale = fitz.Matrix(1.8, 1.8)
+        def save_crop(top, bottom, filename):
+            rect = fitz.Rect(0, max(0, top), page.rect.width, min(page.rect.height, bottom))
+            if rect.height <= 2:
+                raise ValueError(f"Havo 2025-I q26: invalid crop bounds for {filename}")
+            pix = page.get_pixmap(matrix=scale, clip=rect, alpha=False)
+            pix.save(OUT / filename)
+        context_bottom = max(r.y1 for r in context_end) + 7
+        question_start = min(r.y0 for r in question_top) - 5
+        question_bottom = max(r.y1 for r in question_end) + 9
+        if context_bottom >= question_start:
+            raise ValueError("Havo 2025-I q26: context and question boundary overlaps")
+        save_crop(min(r.y0 for r in context_top) - 5, context_bottom,
+                  "context-ha25t1-q26-complete.jpg")
+        save_crop(question_start, question_bottom,
+                  "question-ha25t1-26-only.jpg")
+    # Keep the manifest paths stable; the open-question record already points
+    # to these two images. The primary fallback should point to the question
+    # crop rather than an obsolete combined crop.
+    open_path = ROOT / "exam-open.json"
+    records = json.loads(open_path.read_text(encoding="utf-8"))
+    target = next((r for r in records if r.get("id") == "ha25t1-open-26"), None)
+    if target is None:
+        raise ValueError("Havo 2025-I q26: open-question record missing")
+    target["image"] = "exam-snippets/question-ha25t1-26-only.jpg"
+    target["images"] = [
+        "exam-snippets/context-ha25t1-q26-complete.jpg",
+        "exam-snippets/question-ha25t1-26-only.jpg",
+    ]
+    open_path.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    print("Havo 2025-I q26: context/question boundary corrected")
+
+
+render_havo_2025_i_q26()
+
 items = json.loads(MANIFEST.read_text(encoding="utf-8"))
 for item in items:
     source = ROOT / item["pdf"]
