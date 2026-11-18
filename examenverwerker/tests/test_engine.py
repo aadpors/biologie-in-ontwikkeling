@@ -81,6 +81,28 @@ class EngineTests(unittest.TestCase):
         self.assertFalse(missing["options_complete"])
         self.assertEqual(missing["option_gaps"],["B"])
 
+    def test_context_reference_detection(self):
+        from engine import detect_context_references
+        refs=detect_context_references("Gebruik figuur 2 en tabel 1. Vergelijk dit met bron A.")
+        self.assertEqual([(x["kind"],x["number"]) for x in refs],
+                         [("figuur","2"),("tabel","1"),("bron","A")])
+        unnumbered=detect_context_references("Gebruik de bovenstaande afbeelding.")
+        self.assertEqual(unnumbered[0]["kind"],"ongenummerde_verwijzing")
+
+    def test_candidate_text_is_bounded_by_next_question(self):
+        from engine import extract_candidate_text
+        analysis={"pages":[
+            {"page":1,"blocks":[{"bbox":[0,10,100,20],"lines":[
+                {"bbox":[0,10,10,20],"text":"1."},
+                {"bbox":[0,25,100,35],"text":"Gebruik figuur 2."},
+                {"bbox":[0,50,100,60],"text":"2. Volgende vraag."}]}]},
+            {"page":2,"blocks":[{"bbox":[0,5,100,15],"lines":[
+                {"bbox":[0,5,100,15],"text":"Vervolg van vraag 2."}]}]}
+        ]}
+        first={"number":1,"page":1,"bbox":[0,10,10,20]}
+        second={"number":2,"page":1,"bbox":[0,50,100,60]}
+        self.assertEqual(extract_candidate_text(analysis,first,second),"1.\nGebruik figuur 2.")
+
     def test_pdf_text_and_exact_crop(self):
         try:
             import pymupdf as fitz
