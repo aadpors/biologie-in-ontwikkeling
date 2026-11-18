@@ -192,7 +192,7 @@ class ExamApp:
                 extracted = extract_pdf(target)
                 all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
                 kind, confidence, scores = classify_document_role(source.name, all_text)
-                exam_meta = infer_exam_metadata(source.name) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
+                exam_meta = infer_exam_metadata(source.name, all_text) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
                        "exam_metadata": exam_meta,
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
