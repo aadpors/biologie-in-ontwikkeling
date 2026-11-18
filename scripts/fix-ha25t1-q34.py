@@ -75,7 +75,15 @@ def main():
     q33, q34 = by_id.get("ha25t1-open-33"), by_id.get("ha25t1-open-34")
     if not q33 or not q34:
         raise ValueError("Havo 2025-I q34: q33/q34 data record missing")
-    q34["source"] = q33["source"]
+    q30 = by_id.get("ha25t1-open-30")
+    q32 = by_id.get("ha25t1-open-32")
+    if not q30 or not q32:
+        raise ValueError("Havo 2025-I q34: required study and heredity context records missing")
+    q34["source"] = "\\n\\n".join(
+        record["source"].strip()
+        for record in (q30, q32, q33)
+        if record.get("source")
+    )
     q34["q"] = (
         "De onderzoekers vermoeden dat de grotere milt van de Bajau-mannen "
         "het gevolg is van evolutie.\n"
@@ -83,6 +91,8 @@ def main():
     )
     q34["image"] = "exam-snippets/question-ha25t1-34-only.jpg"
     q34["images"] = [
+        "exam-snippets/context-ha25t1-q30-complete.jpg",
+        "exam-snippets/context-ha25t1-q32-complete.jpg",
         "exam-snippets/context-ha25t1-q33-complete.jpg",
         "exam-snippets/question-ha25t1-34-only.jpg",
     ]
@@ -99,8 +109,10 @@ def main():
     ), None)
     if context_q34 is None:
         raise ValueError("Havo 2025-I q34: context record missing")
-    context_q34["image"] = "exam-snippets/context-ha25t1-q33-complete.jpg"
+    context_q34["image"] = "exam-snippets/context-ha25t1-q30-complete.jpg"
     context_q34["images"] = [
+        "exam-snippets/context-ha25t1-q30-complete.jpg",
+        "exam-snippets/context-ha25t1-q32-complete.jpg",
         "exam-snippets/context-ha25t1-q33-complete.jpg",
         "exam-snippets/question-ha25t1-34-only.jpg",
     ]
