@@ -168,6 +168,29 @@ class EngineTests(unittest.TestCase):
         second={"number":2,"page":1,"bbox":[0,50,100,60]}
         self.assertEqual(extract_candidate_text(analysis,first,second),"1.\nGebruik figuur 2.")
 
+    def test_pdf_analysis_inventories_raster_and_vector_visual_assets(self):
+        try:
+            import pymupdf as fitz
+        except ImportError:
+            self.skipTest("PyMuPDF not installed")
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/"visuals.pdf"
+            doc=fitz.open()
+            page=doc.new_page()
+            pix=fitz.Pixmap(fitz.csRGB,fitz.IRect(0,0,40,40),0)
+            pix.clear_with(180)
+            page.insert_image(fitz.Rect(50,100,250,250),pixmap=pix)
+            page.draw_rect(fitz.Rect(300,100,500,250),color=(0,0,0),width=1)
+            page.insert_text((50,280),"Figuur 2",fontsize=11)
+            doc.save(p); doc.close()
+            result=analyze_pdf(p)
+            assets=result["pages"][0]["visual_assets"]
+            self.assertTrue(any(x["kind"]=="image" for x in assets))
+            self.assertTrue(any(x["kind"]=="vector_region" for x in assets))
+            linked=link_context_assets(result,[{"kind":"figuur","number":"2"}],1,1)
+            self.assertEqual(linked[0]["link_status"],"caption_en_geometrie_gevonden")
+            self.assertGreaterEqual(len(linked[0]["asset_candidates"]),2)
+
     def test_pdf_text_and_exact_crop(self):
         try:
             import pymupdf as fitz
