@@ -365,7 +365,7 @@ class ExamApp:
             option_lines=[f"{o.get('label')}. {o.get('text')}" for o in options]
             if not option_lines:
                 option_lines=["Geen A-H-antwoordopties herkend. Controleer of het een open vraag, juist/onjuist-vraag of wel/niet-vraag is."]
-            ttk.Label(detail,text="\\n".join(option_lines),wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
+            ttk.Label(detail,text="\n".join(option_lines),wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
             if check.get("type")=="meerkeuze":
                 gaps=check.get("option_gaps",[])
                 duplicates=check.get("duplicate_option_labels",[])
