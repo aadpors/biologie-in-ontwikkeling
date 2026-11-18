@@ -426,7 +426,7 @@ def link_context_assets(analysis: dict, references: list[dict],
     pages = analysis.get("pages", [])
     page_map = {int(p.get("page", 0)): p for p in pages}
     caption_re = re.compile(
-        r"^\\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema)\\s*([0-9]{1,2}|[A-Z])\\b",
+        r"^\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema)\s*([0-9]{1,2}|[A-Z])\b",
         re.I
     )
     kind_map = {
