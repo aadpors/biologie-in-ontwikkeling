@@ -184,8 +184,8 @@ def suggest_from_learning(knowledge_dir: Path, key: str) -> dict:
     support=counts[winner]
     competing=max((n for value,n in counts.items() if value!=winner),default=0)
     # One decision is not a reusable pattern; ties are conflicting evidence.
-    if support < 2 or support==competing:
-        return {"suggestion":None,"support":support,"conflicting":support==competing and competing>0,"auto_apply":False}
+    if support < 2 or competing > 0:
+        return {"suggestion":None,"support":support,"conflicting":competing>0,"auto_apply":False}
     return {"suggestion":json.loads(winner),"support":support,"conflicting":False,"auto_apply":False}
 
 def validate_website_records(mcq: list, opened: list, contexts: list) -> list[dict]:
@@ -231,7 +231,7 @@ def detect_cv_question_numbers(analysis: dict) -> list[dict]:
     found = []
     seen = set()
     for page in analysis.get("pages", []):
-        text = str(page.get("text", ""))
+        text = str(page.get("text", "")).replace("\\n", "\n")
         for line in text.splitlines():
             value = line.strip()
             # CVs commonly use ' vraag 3', 'Vraag 3', or a standalone '3'.
