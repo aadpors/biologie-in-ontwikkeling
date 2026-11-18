@@ -260,7 +260,7 @@ class ExamApp:
                 for record in self.data.get("vraagrecords",[]):
                     if record.get("candidate_document_id")==doc["id"]:
                         record["approved_by_human"]=False
-                        record["status"]="controle_nodig"
+                        record["status"]="bron_opnieuw_te_controleren"
                         record["source_analysis_invalidated"]=True
                         record["approval_revoked_reason"]="Bron-PDF opnieuw geanalyseerd; vraaggrenzen en uitsneden opnieuw controleren."
                 analysis = analyze_pdf(source)
@@ -353,7 +353,7 @@ class ExamApp:
                 for record in self.data.get("vraagrecords",[]):
                     if record.get("candidate_document_id")==row.get("document_id") and record.get("number")==row.get("number") and record.get("source_page")==row.get("page"):
                         record["approved_by_human"]=False
-                        record["status"]="controle_nodig"
+                        record["status"]="vraagstart_afgewezen_record_ongeldig"
                         record["source_analysis_invalidated"]=True
                         record["approval_revoked_reason"]="De bijbehorende vraagstart is handmatig afgewezen."
             learn_decision(self.project_dir/"kennisbank",{
@@ -653,6 +653,8 @@ class ExamApp:
         win.transient(parent)
         outer=ttk.Frame(win,padding=12); outer.pack(fill="both",expand=True)
         ttk.Label(outer,text="Controleer de volledige originele bron en het correctievoorschrift. Vink pas daarna de onderdelen af.",wraplength=980).pack(anchor="w")
+        if record.get("source_analysis_invalidated") is True:
+            ttk.Label(outer,text="LET OP: de opgaven-PDF is opnieuw geanalyseerd of de vraagstart is afgewezen. Stel het conceptrecord opnieuw samen vanuit de actuele kandidaat voordat je verdergaat.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
         meta=record.get("exam",{})
         ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
         ttk.Label(outer,text="Vraagtekst").pack(anchor="w")
