@@ -363,7 +363,7 @@ def detect_context_references(text: str) -> list[dict]:
                           "matched_text": match.group(0),
                           "status": "context_koppeling_controleren"})
     if re.search(r"\b(bovenstaande|onderstaande|afgebeelde|hierboven|hieronder)\s+(afbeelding|figuur|tabel|grafiek|tekst)\b", value, re.I):
-        found.append({"kind": "ong genummerde_verwijzing", "number": None,
+        found.append({"kind": "ongenummerde_verwijzing", "number": None,
                       "matched_text": "Verwijzing naar bovenstaand/onderstaand materiaal",
                       "status": "context_koppeling_controleren"})
     return found
