@@ -60,7 +60,7 @@ def main():
             status=cv["status"] if cv else "geen gekoppeld CV"
             print("{}: {} kandidaten; {}".format(row["file"],row["candidate_count"],status))
             for candidate in row.get("candidate_details",[]):
-                print("  n{} p{} y={:.1f} c={:.2f} {} | volgende: {}".format(candidate["number"],candidate["page"],candidate["bbox"][1],candidate["confidence"],candidate["line"][:80],candidate.get("next_line","")[:100]))
+                print("  n{} p{} x={:.1f} y={:.1f} w={:.1f} c={:.2f} {} | volgende: {}".format(candidate["number"],candidate["page"],candidate["bbox"][0],candidate["bbox"][1],candidate["bbox"][2]-candidate["bbox"][0],candidate["confidence"],candidate["line"][:80],candidate.get("next_line","")[:100]))
             if cv:
                 print("  alleen opgaven: {}; alleen CV: {}".format(cv["ontbreekt_in_cv"],cv["ontbreekt_in_opgaven"]))
                 print("  CV-ankers: {}; CV-tekstpagina's: {}".format(len(cv["cv_candidate_details"]),cv["cv_pages_with_text"]))
