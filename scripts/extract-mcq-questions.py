@@ -937,6 +937,43 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             ).save(OUT / question_name)
                             trim_question_bottom_rule(OUT / question_name)
                             context_paths.append(f"exam-snippets/{question_name}")
+
+                        # Havo 2025-I q26: the numbered statements are part of
+                        # the question, but are printed above its score/number
+                        # marker. Build the question crop from the exact first
+                        # statement through the exact final instruction line;
+                        # the general context crop ends before the statements.
+                        if prefix == "ha25t1" and marker["number"] == 26:
+                            statement_hits = page.search_for("Door het inhouden van de adem")
+                            prompt_hits = page.search_for("bijbehorende uitspraak juist of onjuist is.")
+                            if not statement_hits or not prompt_hits:
+                                raise RuntimeError(
+                                    "Could not locate all Havo 2025-I q26 statements and final prompt"
+                                )
+                            statement_top = max(0, min(hit.y0 for hit in statement_hits) - 3)
+                            prompt_bottom = min(
+                                page.rect.height - 12,
+                                max(hit.y1 for hit in prompt_hits) + 6,
+                            )
+                            if prompt_bottom <= statement_top + 100:
+                                raise RuntimeError(
+                                    f"Invalid Havo 2025-I q26 statement crop: "
+                                    f"top={statement_top}, bottom={prompt_bottom}"
+                                )
+                            page.get_pixmap(
+                                matrix=fitz.Matrix(1.8, 1.8),
+                                clip=fitz.Rect(0, statement_top, page.rect.width, prompt_bottom),
+                                alpha=False,
+                            ).save(OUT / question_name)
+                            question_crop = Image.open(OUT / question_name)
+                            try:
+                                if question_crop.height < 180:
+                                    raise RuntimeError(
+                                        f"Havo 2025-I q26 crop omits its three statements: "
+                                        f"{question_crop.width}x{question_crop.height}"
+                                    )
+                            finally:
+                                question_crop.close()
                         if context_paths:
                             context_record["images"] = context_paths
                     if (prefix, marker["number"]) == ("ha25t2", 9):
