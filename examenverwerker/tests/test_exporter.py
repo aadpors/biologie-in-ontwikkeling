@@ -65,7 +65,7 @@ class ExportTests(unittest.TestCase):
             record["source_pdf"]="ha-1018-a-26-1-o.pdf"
             record["cv_pdf"]="ha-1018-a-26-2-c.pdf"
             record["source_match_human_confirmed"]=True
-            record["cv_match_human_confirmed"]=True
+            record["cv_match_human_confirmed"]=False
             errors=validate_review_records([record],project)
             self.assertIn("correctievoorschrift_past_niet_bij_examen",[x["error"] for x in errors])
 
@@ -87,6 +87,7 @@ class ExportTests(unittest.TestCase):
             wrong="ha-1018-a-26-2-u.pdf"
             (project/"bronnen"/wrong).write_bytes(b"wrong period appendix")
             record["uitwerkbijlagen"]=[wrong]
+            record["appendix_match_human_confirmed"]=False
             errors=validate_review_records([record],project)
             self.assertIn("uitwerkbijlage_past_niet_bij_examen:"+wrong,[x["error"] for x in errors])
 
