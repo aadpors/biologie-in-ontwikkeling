@@ -236,9 +236,9 @@ def detect_cv_question_numbers(analysis: dict) -> list[dict]:
             value = line.strip()
             # CVs commonly use ' vraag 3', 'Vraag 3', or a standalone '3'.
             patterns = (
-                re.match(r"(?i)^vraag\\s+(\\d{1,2})(?:\\b|[.:)])", value),
-                re.match(r"(?i)^ vraag\\s+(\\d{1,2})", value),
-                re.match(r"^(\\d{1,2})[.)]?\\s*$", value),
+                re.match(r"(?i)^vraag\s+(\d{1,2})(?:\b|[.:)])", value),
+                re.match(r"(?i)^ vraag\s+(\d{1,2})", value),
+                re.match(r"^(\d{1,2})[.)]?\s*$", value),
             )
             match = next((m for m in patterns if m), None)
             if not match:
@@ -313,7 +313,7 @@ def detect_question_type(text: str) -> dict:
     value = str(text or "")
     options = []
     for line in value.splitlines():
-        match = re.match(r"^\\s*([A-H])[.)]\\s+(.+)$", line)
+        match = re.match(r"^\s*([A-H])[.)]\s+(.+)$", line)
         if match:
             options.append({"label": match.group(1), "text": match.group(2).strip()})
     lowered = value.lower()
@@ -325,9 +325,9 @@ def detect_question_type(text: str) -> dict:
                 "options": options, "option_labels": labels,
                 "options_complete": complete, "confidence": 0.85 if complete and len(options) >= 2 else 0.55,
                 "status": "controle_nodig"}
-    if re.search(r"\\b(juist|onjuist|waar|niet waar)\\b", lowered) and re.search(r"\\b(stelling|uitspraken|bewering)\\b", lowered):
+    if re.search(r"\b(juist|onjuist|waar|niet waar)\b", lowered) and re.search(r"\b(stelling|uitspraken|bewering)\b", lowered):
         qtype, subtype, confidence = "juist_onjuist", "stellingbeoordeling", 0.65
-    elif re.search(r"\\b(wel of niet|wel/niet|ja of nee|ja/nee)\\b", lowered):
+    elif re.search(r"\b(wel of niet|wel/niet|ja of nee|ja/nee)\b", lowered):
         qtype, subtype, confidence = "wel_niet", "binaire_beoordeling", 0.7
     else:
         qtype, subtype, confidence = "open", "open_vraag", 0.55
