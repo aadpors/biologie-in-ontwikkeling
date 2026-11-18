@@ -575,9 +575,12 @@ def find_numbered_list_prompt(lines, context_indices, marker):
     its statement. Accept both layouts, and recognise the different lead-ins
     used by exam writers (not only sentences beginning with "Hieronder").
     """
-    eligible = sorted(i for i in context_indices if i < marker["number_line"])
+    # Do not restrict the search to context_indices: the context-heading
+    # heuristic can advance its cursor to (or beyond) the very lead-in we need
+    # to move into the question. Search the complete local page window instead,
+    # then select only a semantic heading immediately preceding a numbered run.
     lower_bound = max(0, marker["number_line"] - 48)
-    candidates = [i for i in eligible if i >= lower_bound]
+    candidates = list(range(lower_bound, marker["number_line"]))
 
     def item_number(value):
         value = value.strip()
