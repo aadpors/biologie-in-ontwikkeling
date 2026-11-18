@@ -478,7 +478,13 @@ class ExamApp:
         for idx,doc in enumerate(amendment_docs):
             amendment_list.insert("end",doc["bestand"])
             if doc.get("opslagbestand") in existing_amendments: amendment_list.selection_set(idx)
-        ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
+        context_files=row.get("context_asset_proposal_files",[])
+        ttk.Label(outer,text="Extra figuur-/tabeluitsneden die bij deze vraag horen (selecteer alleen de juiste; controleer bijschriften en context)").pack(anchor="w",pady=(8,2))
+        context_list=tk.Listbox(outer,selectmode="multiple",height=min(5,max(2,len(context_files))))
+        context_list.pack(fill="x")
+        for idx,item in enumerate(context_files):
+            context_list.insert("end",f"Pagina {item.get('page')} · {item.get('caption') or item.get('asset_id')} · {item.get('file')}")
+                ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
         snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-*.png"))
         cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
         cv_snippet_combo=ttk.Combobox(outer,textvariable=cv_snippet_var,values=[""]+snippet_names,state="readonly")
@@ -568,7 +574,8 @@ class ExamApp:
                 candidate=dict(row)
                 record=build_question_record(meta,candidate,qtext,source_doc["opslagbestand"],cv_doc["opslagbestand"])
                 record.update({"exam":meta,"options":options,"correct":correct,
-                               "snippet_files":list(row.get("snippet_proposal_files",[])),
+                               "snippet_files":list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()],
+                               "context_asset_candidates":context_files,
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
                                "cv_amendment_pdfs":[amendment_docs[i]["opslagbestand"] for i in amendment_list.curselection()],
@@ -661,13 +668,15 @@ class ExamApp:
         for idx,name in enumerate(record.get("uitwerkbijlagen",[]),1):
             appendix=self.project_dir/"bronnen"/name
             if appendix.is_file():
-                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-bijlage-{idx}.png"
-                preview_specs.append((f"Uitwerkbijlage {idx} · eerste pagina van origineel",appendix,1,target))
+                for page_no in range(1,analyze_pdf(appendix)["page_count"]+1):
+                    target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-bijlage-{idx}-p{page_no}.png"
+                    preview_specs.append((f"Uitwerkbijlage {idx} · originele pagina {page_no}",appendix,page_no,target))
         for idx,name in enumerate(record.get("cv_amendment_pdfs",[]),1):
             amendment=self.project_dir/"bronnen"/name
             if amendment.is_file():
-                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-aanvulling-{idx}.png"
-                preview_specs.append((f"CV-aanvulling {idx} · eerste pagina van origineel",amendment,1,target))
+                for page_no in range(1,analyze_pdf(amendment)["page_count"]+1):
+                    target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-aanvulling-{idx}-p{page_no}.png"
+                    preview_specs.append((f"CV-aanvulling {idx} · originele pagina {page_no}",amendment,page_no,target))
         for label,path,page_no,target in preview_specs:
             canvas.create_text(8,y,anchor="nw",text=label)
             y+=24
