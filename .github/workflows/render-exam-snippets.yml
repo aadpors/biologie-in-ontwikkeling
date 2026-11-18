@@ -9,6 +9,7 @@ on:
       - 'scripts/render-cv-snippets.py'
       - 'scripts/cv-snippets.json'
       - 'scripts/extract-mcq-questions.py'
+      - 'scripts/fix-ha25t1-q34.py'
       - 'scripts/trim-question-image-edges.py'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/exam-snippets.json'
@@ -53,6 +54,8 @@ jobs:
         run: python scripts/render-cv-snippets.py
       - name: Extract multiple-choice questions from all available exams
         run: python scripts/extract-mcq-questions.py
+      - name: Restore Havo 2025-I question 34 context and question crop
+        run: python scripts/fix-ha25t1-q34.py
       - name: Trim source-page separators below all question images
         run: python scripts/trim-question-image-edges.py
       - name: Validate every generated question and image
