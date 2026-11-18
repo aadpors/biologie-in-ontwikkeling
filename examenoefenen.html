@@ -207,20 +207,35 @@ function escapeContextHtml(value){
  return String(value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function buildRepeatedContexts(items){
+ // Explicitly checked context starts for all twelve exam editions. Question numbers
+ // are taken from the original exam context headings, not inferred from page breaks.
+ const contextStarts={
+  'Havo|2024|1':[1,10,14,22,31,36],
+  'Havo|2024|2':[1,8,14,20,26,37,43],
+  'Havo|2025|1':[1,11,18,26,35,44],
+  'Havo|2025|2':[1,5,10,16,24,28,34,40],
+  'Havo|2026|1':[1,7,16,22,29,33,36],
+  'Havo|2026|2':[1,9,17,21,30,33,40],
+  'Vwo|2024|1':[1,10,17,21,26,38],
+  'Vwo|2024|2':[1,9,19,29,37],
+  'Vwo|2025|1':[1,8,14,24,34],
+  'Vwo|2025|2':[1,6,14,23,31,38],
+  'Vwo|2026|1':[1,12,20,28,37],
+  'Vwo|2026|2':[1,7,15,23,33]
+ };
  const exams=new Map();
  for(const q of items){const key=[q.level,q.year,q.period].join('|');if(!exams.has(key))exams.set(key,[]);exams.get(key).push(q);}
- for(const list of exams.values()){
+ for(const [key,list] of exams){
   list.sort((a,b)=>Number(a.n)-Number(b.n));
+  const starts=new Set(contextStarts[key]||[Number(list[0]?.n)]);
   let segments=[];
   for(let i=0;i<list.length;i++){
    const q=list[i],source=String(q.source||'').trim();
-   const lines=source.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
-   const first=lines[0]||'',second=lines[1]||'';
-   const heading=lines.length>1&&first.length<=90&&!/[.!?;:]$/.test(first)&&/^[A-ZÀ-Þ0-9“'\"(]/.test(second)&&!/^(Gebruik de context|Afbeelding \d|afbeelding \d)/i.test(first);
-   if(i===0||heading)segments=[];
-   if(source&&!/^Gebruik de context en gegevens in de oorspronkelijke examenopgave\.?$/i.test(source))segments.push(source);
-   q.repeatedContext=segments.join('\n\n');
-   q.contextHeading=heading?first:(i===0?first:'');
+   if(i===0||starts.has(Number(q.n)))segments=[];
+   if(source&&!/^Gebruik de context en gegevens in de oorspronkelijke examenopgave\\.?$/i.test(source))segments.push(source);
+   q.repeatedContext=segments.join('\\n\\n');
+   q.contextHeading=starts.has(Number(q.n))?(source.split(/\\r?\\n/).map(line=>line.trim()).find(Boolean)||'') : '';
+   q.contextGroupStart=starts.has(Number(q.n));
   }
  }
  return items;
