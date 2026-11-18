@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from engine import analyze_pdf, detect_question_candidates, learn_decision, render_page
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -216,6 +216,15 @@ class ExamApp:
             messagebox.showinfo("Geen opgaven-PDF", "Voeg eerst de opgaven-PDF toe en bevestig zo nodig het documenttype.")
             return
         total = 0
+        cv_docs = [d for d in self.data["documenten"] if d.get("type_voorstel") == "correctievoorschrift"]
+        cv_candidates = []
+        for cv_doc in cv_docs:
+            try:
+                cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
+                cv_candidates.extend(detect_cv_question_numbers(cv_analysis))
+            except Exception as exc:
+                self._log(f"CV-analyse mislukt voor {cv_doc['bestand']}: {exc}")
+        all_op_candidates = []
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
             try:
@@ -223,6 +232,7 @@ class ExamApp:
                 candidates = detect_question_candidates(analysis)
                 for item in candidates:
                     item.update({"document_id": doc["id"], "bestand": doc["bestand"]})
+                all_op_candidates.extend(candidates)
                 self.data.setdefault("vraagkandidaten", [])
                 self.data["vraagkandidaten"] = [x for x in self.data["vraagkandidaten"] if x.get("document_id") != doc["id"]] + candidates
                 (self.project_dir / "analyse" / f"{doc['id']}-vraagkandidaten.json").write_text(
@@ -231,9 +241,16 @@ class ExamApp:
                 total += len(candidates)
             except Exception as exc:
                 self._log(f"Vraaganalyse mislukt voor {doc['bestand']}: {exc}")
+        if cv_candidates:
+            comparison = compare_question_numbering(all_op_candidates, cv_candidates)
+            self.data["nummeringsvergelijking_cv"] = comparison
+            self._log(f"Vergelijking met CV: ontbreekt in CV {comparison['ontbreekt_in_cv']}; ontbreekt in opgaven {comparison['ontbreekt_in_opgaven']}. Dit is een controlesignaal.")
+        else:
+            self.data["nummeringsvergelijking_cv"] = {"status":"geen_CV_kandidaat_gevonden"}
+            self._log("Geen CV-nummering gevonden om mee te vergelijken.")
         self.save_project()
         self.refresh()
-        messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Dit zijn kandidaten, geen automatisch goedgekeurde vragen.")
+        messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. CV-nummering is waar mogelijk vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
 
     def show_candidates(self):
         if not self.data:
