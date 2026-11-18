@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, link_context_assets, render_composite_crops
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -21,6 +21,14 @@ class EngineTests(unittest.TestCase):
         ]
         got=match_correction_documents(op,cvs)
         self.assertEqual([x["bestand"] for x in got],["ha-1018-a-26-1-c.pdf"])
+
+    def test_appendix_matching_excludes_other_exam_periods(self):
+        op={"bestand":"ha-1018-a-26-1-o.pdf"}
+        related=[
+            {"bestand":"ha-1018-a-26-2-u.pdf"},
+            {"bestand":"ha-1018-a-26-1-u.pdf"}
+        ]
+        self.assertEqual([x["bestand"] for x in match_exam_documents(op,related)],["ha-1018-a-26-1-u.pdf"])
 
     def test_correction_scheme_matching_uses_confirmed_per_document_identity(self):
         identity={"level":"Vwo","year":"2025","period":"2","source":"handmatig_bevestigd"}
