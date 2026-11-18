@@ -264,7 +264,7 @@ function render(){
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
  const binaryChoice=q.binaryChoice;
- const assetVersion="2026-11-18-01";
+ const assetVersion="2026-11-18-02";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  // If the original exam context is available as a source-page image, show that
  // image as the authoritative context. Do not duplicate it as OCR/PyMuPDF text.
