@@ -152,7 +152,7 @@ function getBinaryChoiceDefinition(q){
  else if(/wel\s+(?:of\s+geen|een[\s\S]*?of\s+geen)/i.test(prompt))labels=["Wel","Geen"];
  else if(/wel\s+of\s+niet/i.test(prompt))labels=["Wel","Niet"];
  const keyEntry=typeof binaryAnswerKeys!=="undefined"?binaryAnswerKeys[q.id]:null;
- if(!labels&&!keyEntry)return null;
+ if(!keyEntry)return null;
  const named=prompt.match(/namen\s+Isa,\s*Kate\s+en\s+Mounir/i);
  if(named){
   const rows=[];let current=null;
