@@ -289,6 +289,46 @@ const assert = require("node:assert/strict");
     assert.equal(await page.locator("textarea").inputValue(), answer);
     assert.equal(await page.locator("[data-point]").first().isChecked(), true);
 
+    // Regression checks for the three reported Havo 2025-I image defects.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2025");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 26); render(); });
+    const q26Images = await page.locator(".exam-snippets img").evaluateAll(images => images.map(img => img.getAttribute("src")));
+    assert.match(q26Images[0] || "", /context-ha25t1-q26-complete\\.jpg/);
+    assert.match(q26Images[1] || "", /question-ha25t1-26-only\\.jpg/);
+    assert.equal(await page.locator(".exam-snippets img").count(), 2, "Vraag 26 moet context en vraagtekst als twee afzonderlijke uitsneden tonen");
+
+    await page.locator("#questionType").selectOption("mcq");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
+    const q27Context = await page.locator(".exam-snippets img").first().getAttribute("src");
+    assert.match(q27Context || "", /context-ha25t1-q27-complete\\.jpg/, "Vraag 27 moet de eigen zeehondencontext tonen, niet de Bajau-context van vraag 26");
+    await page.locator(".exam-snippets img").first().evaluate(img => img.decode());
+
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 29); render(); });
+    const q29Question = page.locator(".exam-snippets img").nth(1);
+    assert.match(await q29Question.getAttribute("src") || "", /question-ha25t1-29-only\\.jpg/);
+    await q29Question.evaluate(img => img.decode());
+    const q29Dimensions = await q29Question.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
+    assert.ok(q29Dimensions.width > 500 && q29Dimensions.height > 20, "Vraag 29 moet volledig en zonder een lege of afgesneden uitsnede worden getoond");
+
+    // Every one of the 373 open questions must resolve to a local CV image,
+    // and every generated image must be reachable over the same origin.
+    const cvInventory = await page.evaluate(() => questions.filter(q => q.questionType === "open").map(q => ({id:q.id,src:q.cvImage})));
+    assert.equal(cvInventory.length, 373, "De CV-audit moet alle 373 open vragen omvatten");
+    assert.deepEqual(cvInventory.filter(q => !q.src || !q.src.startsWith("exam-snippets/cv-") || !q.src.endsWith(".jpg")).map(q => q.id), [], "Elke open vraag moet een lokale CV-afbeelding hebben");
+    const cvAssetFailures = [];
+    for (let i = 0; i < cvInventory.length; i += 20) {
+      const batch = await Promise.all(cvInventory.slice(i, i + 20).map(async q => {
+        const response = await page.request.get(new URL(q.src, page.url()).toString());
+        return response.status() === 200 && /image\\/jpeg/i.test(response.headers()["content-type"] || "") ? null : {id:q.id,src:q.src,status:response.status(),type:response.headers()["content-type"]};
+      }));
+      cvAssetFailures.push(...batch.filter(Boolean));
+    }
+    assert.deepEqual(cvAssetFailures, [], "Elke lokale CV-afbeelding moet daadwerkelijk laden; geen ontbrekende of niet-JPEG assets toegestaan");
+
     // Official correction-scheme snippets are connected to their questions and reveal on click.
     await page.locator("#level").selectOption("Havo");
     await page.locator("#year").selectOption("2024");
