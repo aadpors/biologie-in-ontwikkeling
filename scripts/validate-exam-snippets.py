@@ -99,6 +99,24 @@ for filename, label in DATASETS:
             except Exception as exc:
                 errors.append(f"{label} {qid}: ongeldige afbeelding {rel}: {exc}")
 
+# Audit the lower edge of every generated question crop.
+for image_path in sorted((ROOT / "exam-snippets").glob("question-*.jpg")):
+    try:
+        with Image.open(image_path) as source:
+            gray = source.convert("L")
+            pixels = gray.load()
+            width, height = gray.size
+            for y in range(max(0, height - 12), height):
+                if sum(1 for x in range(width) if pixels[x, y] < 235) >= width * 0.70:
+                    errors.append(
+                        f"{image_path.name}: horizontale paginascheidingslijn of rand "
+                        "blijft aan de onderrand van de vraagafbeelding staan"
+                    )
+                    break
+            gray.close()
+    except Exception as exc:
+        errors.append(f"{image_path.name}: kan vraagafbeelding niet visueel controleren: {exc}")
+
 # Every official correction-scheme manifest entry must resolve to a readable generated image.
 cv_manifest = json.loads((ROOT / "scripts" / "cv-snippets.json").read_text(encoding="utf-8"))
 for item in cv_manifest:

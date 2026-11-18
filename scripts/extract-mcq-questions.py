@@ -1281,6 +1281,12 @@ all_contexts = list(context_by_key.values())
 # display only the primary "image" field; previously that could show the question
 # crop while silently omitting its context images. Keep the separate "images"
 # array as well, but make the primary image a vertically stitched context+question.
+def trim_all_question_images():
+    """Apply the separator-edge cleanup to every generated question crop."""
+    for image_path in OUT.glob("question-*.jpg"):
+        trim_question_bottom_rule(image_path)
+
+
 def stitch_question_images(record, fallback_prefix):
     image_paths = record.get("images") or ([record["image"]] if record.get("image") else [])
     missing = [path for path in image_paths if not (ROOT / path).exists()]
@@ -1302,6 +1308,8 @@ def stitch_question_images(record, fallback_prefix):
     record["image"] = f"exam-snippets/{output_name}"
     for image in opened:
         image.close()
+
+trim_all_question_images()
 
 # Apply the same context-first presentation to every MCQ and every selected
 # open-question context, rather than relying on the frontend to render arrays.
