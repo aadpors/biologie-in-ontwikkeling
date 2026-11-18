@@ -624,9 +624,6 @@ def find_numbered_list_prompt(lines, context_indices, marker):
         for heading_index in reversed(preceding[-8:]):
             if heading_re.search(lines[heading_index]["text"]):
                 return heading_index
-        # Some questions print only a numbered list, without a separate
-        # heading. Its first numbered item is still question material.
-        return first_item
     return None
 
 
