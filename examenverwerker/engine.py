@@ -127,14 +127,20 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
 def match_exam_documents(exam_doc: dict, related_docs: list[dict]) -> list[dict]:
     """Match related PDFs only when level, year and period all agree."""
     meta = exam_doc.get("exam_metadata") or infer_exam_metadata(exam_doc.get("bestand", ""))
-    if not all(meta.get(k) for k in ("level", "year", "period")):
+    def reliable(identity):
+        if not all(identity.get(k) for k in ("level", "year", "period")):
+            return False
+        if identity.get("source") == "eerste_pdf_paginas" and float(identity.get("confidence", 0)) < 0.9:
+            return False
+        return True
+    if not reliable(meta):
         return []
     key = (str(meta["level"]).lower(), str(meta["year"]), str(meta["period"]))
     matches = []
     for doc in related_docs:
         other = doc.get("exam_metadata") or infer_exam_metadata(doc.get("bestand", ""))
         other_key = (str(other.get("level", "")).lower(), str(other.get("year", "")), str(other.get("period", "")))
-        if all(other_key) and other_key == key:
+        if reliable(other) and other_key == key:
             matches.append(doc)
     return matches
 
