@@ -301,7 +301,7 @@ function render(){
   :binaryChoice?binaryMarkup:'<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>';
  const cvMarkup=isMCQ?"":'<section class="cv-reveal"><button class="source" type="button" id="toggleCv" aria-expanded="false" '+(isQuestionAnswered(q)?"":"disabled")+'>'+(cvViewed[q.id]?"Verberg correctievoorschrift":"Toon correctievoorschrift bij vraag "+q.n)+'</button>'+(q.cvImage?'<figure id="cvSnippet" hidden><img data-src="'+q.cvImage+'" alt="Origineel beoordelingsmodel uit het officiële correctievoorschrift, vraag '+q.n+'" loading="lazy"><figcaption>Officieel correctievoorschrift · vraag '+q.n+'</figcaption></figure>':"")+(q.cvAmendment?'<figure id="cvAmendment" hidden><img data-src="'+q.cvAmendment+'" alt="Officiële aanvulling op het correctievoorschrift bij vraag '+q.n+'" loading="lazy"><figcaption>Officiële aanvulling op het correctievoorschrift · van toepassing op vraag '+q.n+'</figcaption></figure>':"")+'</section>'
  const selfCheckMarkup=(isMCQ||binaryChoice)?"":'<section class="selfcheck"><h3>Zelf beoordelen</h3><p style="font-size:13px;margin:0 0 8px;color:#53616a">Vergelijk je antwoord met de officiële beoordelingscriteria hierboven en vink per scorepunt aan of je het hebt behaald.</p><label><input type="checkbox" data-zero '+(zeroScores[q.id]?"checked":"")+' > 0 punten behaald</label>'+Array.from({length:q.points},(_,i)=>'<label><input type="checkbox" data-point="'+i+'" '+((selfChecks[q.id]||[]).includes(i)?"checked":"")+' > Punt '+(i+1)+' behaald</label>').join("")+'</section>';
- a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Open vraag")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+q.end+'</span>':"")+'</div>'+contextText+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+(q.attachmentPdfs?.length?' · '+q.attachmentPdfs.map((path,index)=>'<a href="'+path+'" target="_blank" rel="noopener">Volledige uitwerkbijlage'+(q.attachmentPdfs.length>1?' '+(index+1):'')+' (PDF) ↗</a>').join(' · '):"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
+ a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Open vraag")+'</span></div><div class="tags">'+(q.theme?'<span class="tag">'+escapeContextHtml(q.theme)+'</span>':"")+(q.concept?'<span class="tag">'+escapeContextHtml(q.concept)+'</span>':"")+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+escapeContextHtml(q.end)+'</span>':"")+'</div>'+contextText+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+(q.attachmentPdfs?.length?' · '+q.attachmentPdfs.map((path,index)=>'<a href="'+path+'" target="_blank" rel="noopener">Volledige uitwerkbijlage'+(q.attachmentPdfs.length>1?' '+(index+1):'')+' (PDF) ↗</a>').join(' · '):"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
  $("questions").append(a);
  if(isMCQ){
   const feedback=a.querySelector("#mcqFeedback");
@@ -427,6 +427,7 @@ async function loadMCQ(){
      if(item.page)existing.page=item.page;
      if(item.source)existing.source=item.source;
      if(item.q)existing.q=item.q;
+     for(const field of ["theme","concept","end"])if(item[field])existing[field]=item[field];
     }else{
      item.questionType="open";
      map.set(key(item),item);
@@ -446,6 +447,7 @@ async function loadMCQ(){
     existing.image=item.image;
     existing.pdf=item.pdf;
     existing.cv=item.cv;
+    for(const field of ["theme","concept","end"])if(item[field])existing[field]=item[field];
     existing.questionType="mcq";
    }else{
     item.questionType="mcq";
