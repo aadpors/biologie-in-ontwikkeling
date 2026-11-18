@@ -16,6 +16,20 @@ class EngineTests(unittest.TestCase):
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[1,1])
         self.assertTrue(all(x["status"]=="controle_nodig" for x in got))
+    def test_question_candidates_reject_numbered_source_lines_and_keep_score_markers(self):
+        a={"pages":[{"page":1,"blocks":[{"bbox":[0,0,300,300],"lines":[
+            {"bbox":[10,10,20,20],"text":"1"},
+            {"bbox":[10,25,20,35],"text":"2"},
+            {"bbox":[10,40,20,50],"text":"3"},
+            {"bbox":[10,55,200,65],"text":"Een doorlopende tekstregel."},
+            {"bbox":[10,100,20,110],"text":"4"},
+            {"bbox":[30,100,50,110],"text":"1p"},
+            {"bbox":[30,120,200,130],"text":"De vraagtekst volgt hier."}
+        ],"text":"1\\n2\\n3\\nEen doorlopende tekstregel.\\n4\\n1p\\nDe vraagtekst volgt hier."}]}]}
+        got=detect_question_candidates(a)
+        self.assertEqual([x["number"] for x in got],[4])
+        self.assertEqual(got[0]["confidence"],0.95)
+
     def test_question_number_at_bottom_can_continue_on_next_page(self):
         a={"pages":[
             {"page":1,"height":800,"blocks":[{"bbox":[20,760,40,780],"lines":[{"bbox":[20,760,40,780],"text":"7."}],"text":"7."}]},
