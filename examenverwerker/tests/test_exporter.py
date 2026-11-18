@@ -5,7 +5,7 @@ from exporter import export_approved_records, validate_review_records
 class ExportTests(unittest.TestCase):
     def make_fixture(self, root):
         project=Path(root)/"project"; (project/"bronnen").mkdir(parents=True); (project/"snippets").mkdir()
-        for name in ("opgaven.pdf","cv.pdf","uitwerkbijlage.pdf"):
+        for name in ("opgaven.pdf","cv.pdf","uitwerkbijlage.pdf","aanvulling.pdf"):
             (project/"bronnen"/name).write_bytes(b"%PDF-original-"+name.encode())
         (project/"snippets"/"vraag1.png").write_bytes(b"PNG-snippet")
         (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")
@@ -15,7 +15,7 @@ class ExportTests(unittest.TestCase):
                     "concept":"Ecosystemen","end":"E1","focus":"Toepassing","questionType":"open"},
             "number":1,"source_page":2,"source_pdf":"opgaven.pdf","cv_pdf":"cv.pdf",
             "snippet_file":"vraag1.png","cv_snippet_file":"cv1.jpg","question_text":"Beschrijf de relatie.",
-            "source_match_human_confirmed":True,"cv_match_human_confirmed":True,
+            "source_match_human_confirmed":True,"cv_match_human_confirmed":True,\n            "appendix_match_human_confirmed":True,"cv_amendment_match_human_confirmed":True,
             "uitwerkbijlagen":["uitwerkbijlage.pdf"]
         }
         return project,record
@@ -26,6 +26,20 @@ class ExportTests(unittest.TestCase):
             result=export_approved_records([record],project,Path(d)/"out")
             self.assertFalse(result["ok"])
             self.assertIn("niet_menselijk_goedgekeurd",[x["error"] for x in result["errors"]])
+
+    def test_complete_cv_addendum_pdf_is_preserved_in_export(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["cv_amendment_pdfs"]=["aanvulling.pdf"]
+            out=Path(d)/"out"
+            result=export_approved_records([record],project,out)
+            self.assertTrue(result["ok"],result)
+            self.assertTrue((out/"examens"/"aanvulling.pdf").is_file())
+            import json
+            cv_data=json.loads((out/"scripts"/"cv-snippets.json").read_text(encoding="utf-8"))
+            self.assertEqual(cv_data[0]["amendment_pdfs"],["examens/aanvulling.pdf"])
+            manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["records"][0]["cv_amendment_pdfs"][0]["file"],"examens/aanvulling.pdf")
 
     def test_mismatched_official_correction_scheme_is_blocked(self):
         with tempfile.TemporaryDirectory() as d:
