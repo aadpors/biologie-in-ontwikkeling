@@ -17,7 +17,7 @@ def digest_file(path: Path) -> str:
     return h.hexdigest()
 
 def analyze_pdf(path: Path) -> dict[str, Any]:
-    import fitz
+    import pymupdf as fitz
     doc=fitz.open(path)
     pages=[]
     for i,page in enumerate(doc):
@@ -205,7 +205,10 @@ def suggest_from_learning(knowledge_dir: Path, key: str) -> dict:
         counts[value]=counts.get(value,0)+1
     if not counts: return {"suggestion":None,"support":0,"auto_apply":False}
     winner=max(counts,key=counts.get)
-    return {"suggestion":json.loads(winner),"support":counts[winner],"auto_apply":False}
+    support=counts[winner]
+    # One human decision is an example, not a reusable pattern.
+    if support < 2: return {"suggestion":None,"support":support,"auto_apply":False}
+    return {"suggestion":json.loads(winner),"support":support,"auto_apply":False}
 
 def validate_website_records(mcq: list, opened: list, contexts: list) -> list[dict]:
     errors=[]
