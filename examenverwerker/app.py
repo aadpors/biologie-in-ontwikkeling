@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -188,7 +188,7 @@ class ExamApp:
                 extracted = extract_pdf(target)
                 all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
                 kind, confidence, scores = classify_document_role(source.name, all_text)
-                exam_meta = infer_exam_metadata(source.name) if kind=="opgaven" else {}
+                exam_meta = infer_exam_metadata(source.name) if kind in ("opgaven", "correctievoorschrift") else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
                        "exam_metadata": exam_meta,
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
@@ -245,16 +245,9 @@ class ExamApp:
         if not docs:
             messagebox.showinfo("Geen opgaven-PDF", "Voeg eerst de opgaven-PDF toe en bevestig zo nodig het documenttype.")
             return
-        total = 0
         cv_docs = [d for d in self.data["documenten"] if d.get("type_voorstel") == "correctievoorschrift"]
-        cv_candidates = []
-        for cv_doc in cv_docs:
-            try:
-                cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
-                cv_candidates.extend(detect_cv_question_numbers(cv_analysis))
-            except Exception as exc:
-                self._error(f"CV-analyse ({cv_doc['bestand']})",exc)
-        all_op_candidates = []
+        total = 0
+        comparisons = {}
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
             try:
@@ -274,25 +267,38 @@ class ExamApp:
                         "context_verwijzingen": context_refs
                     })
                 candidates = ordered
-                all_op_candidates.extend(candidates)
                 self.data.setdefault("vraagkandidaten", [])
                 self.data["vraagkandidaten"] = [x for x in self.data["vraagkandidaten"] if x.get("document_id") != doc["id"]] + candidates
                 (self.project_dir / "analyse" / f"{doc['id']}-vraagkandidaten.json").write_text(
                     json.dumps(candidates, ensure_ascii=False, indent=2), encoding="utf-8")
                 self._log(f"{doc['bestand']}: {len(candidates)} mogelijke vraagstarts gevonden; alles staat nog op controle nodig.")
                 total += len(candidates)
+
+                # Compare only with the CV belonging to this exact exam identity.
+                # Combining all CVs in a project can create plausible but false matches.
+                matching_cvs = match_correction_documents(doc, cv_docs)
+                if len(matching_cvs) == 1:
+                    cv_doc = matching_cvs[0]
+                    cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
+                    cv_candidates = detect_cv_question_numbers(cv_analysis)
+                    comparison = compare_question_numbering(candidates, cv_candidates)
+                    comparison.update({"cv_file": cv_doc["bestand"], "cv_document_id": cv_doc["id"],
+                                       "status": "controle_nodig" if comparison["status"] != "nummers_overeen" else "nummers_overeen"})
+                    doc["cv_vergelijking"] = comparison
+                    comparisons[doc["id"]] = comparison
+                    self._log(f"CV-controle voor {doc['bestand']} met {cv_doc['bestand']}: ontbreekt in CV {comparison['ontbreekt_in_cv']}; ontbreekt in opgaven {comparison['ontbreekt_in_opgaven']}. Dit blijft een controlesignaal.")
+                elif len(matching_cvs) > 1:
+                    doc["cv_vergelijking"] = {"status": "meerdere_CVs_voor_hetzelfde_examen", "cv_bestanden": [x["bestand"] for x in matching_cvs]}
+                    self._log(f"CV-controle overgeslagen voor {doc['bestand']}: meerdere correctievoorschriften met dezelfde examenmetadata.")
+                else:
+                    doc["cv_vergelijking"] = {"status": "geen_passend_CV", "reden": "Geen correctievoorschrift met hetzelfde niveau, jaar en tijdvak gevonden."}
+                    self._log(f"Geen bijbehorend CV met dezelfde examenmetadata gevonden voor {doc['bestand']}.")
             except Exception as exc:
-                self._error(f"Vraaganalyse ({doc['bestand']})",exc)
-        if cv_candidates:
-            comparison = compare_question_numbering(all_op_candidates, cv_candidates)
-            self.data["nummeringsvergelijking_cv"] = comparison
-            self._log(f"Vergelijking met CV: ontbreekt in CV {comparison['ontbreekt_in_cv']}; ontbreekt in opgaven {comparison['ontbreekt_in_opgaven']}. Dit is een controlesignaal.")
-        else:
-            self.data["nummeringsvergelijking_cv"] = {"status":"geen_CV_kandidaat_gevonden"}
-            self._log("Geen CV-nummering gevonden om mee te vergelijken.")
+                self._error(f"Vraaganalyse ({doc['bestand']})", exc)
+        self.data["nummeringsvergelijkingen_cv"] = comparisons
         self.save_project()
         self.refresh()
-        messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. CV-nummering is waar mogelijk vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
+        messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Per examen is alleen het bijbehorende correctievoorschrift vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
 
     def show_candidates(self):
         if not self.data:
