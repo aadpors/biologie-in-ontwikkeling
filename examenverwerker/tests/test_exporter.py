@@ -69,6 +69,18 @@ class ExportTests(unittest.TestCase):
             errors=validate_review_records([record],project)
             self.assertIn("correctievoorschrift_past_niet_bij_examen",[x["error"] for x in errors])
 
+    def test_manual_cv_identity_override_is_allowed_after_review(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"bronnen"/"ha-1018-a-26-1-o.pdf").write_bytes(b"opgaven")
+            (project/"bronnen"/"ha-1018-a-26-2-c.pdf").write_bytes(b"manually confirmed cv")
+            record["source_pdf"]="ha-1018-a-26-1-o.pdf"
+            record["cv_pdf"]="ha-1018-a-26-2-c.pdf"
+            record["source_match_human_confirmed"]=False
+            record["cv_match_human_confirmed"]=True
+            errors=validate_review_records([record],project)
+            self.assertNotIn("correctievoorschrift_past_niet_bij_examen",[x["error"] for x in errors])
+
     def test_appendix_from_another_exam_is_blocked(self):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
