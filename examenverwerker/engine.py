@@ -224,3 +224,112 @@ def build_question_record(meta: dict, candidate: dict, question_text: str, sourc
             "status":"controle_nodig","approved_by_human":False,
             "candidate_confidence":candidate.get("confidence",0.0),
             "candidate_status":candidate.get("status","controle_nodig")}
+
+
+def detect_cv_question_numbers(analysis: dict) -> list[dict]:
+    """Detect question anchors in a correction scheme; candidates require review."""
+    found = []
+    seen = set()
+    for page in analysis.get("pages", []):
+        text = str(page.get("text", ""))
+        for line in text.splitlines():
+            value = line.strip()
+            # CVs commonly use ' vraag 3', 'Vraag 3', or a standalone '3'.
+            patterns = (
+                re.match(r"(?i)^vraag\\s+(\\d{1,2})(?:\\b|[.:)])", value),
+                re.match(r"(?i)^ vraag\\s+(\\d{1,2})", value),
+                re.match(r"^(\\d{1,2})[.)]?\\s*$", value),
+            )
+            match = next((m for m in patterns if m), None)
+            if not match:
+                continue
+            number = int(match.group(1))
+            if not 1 <= number <= 60:
+                continue
+            key = (number, page.get("page"))
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append({"number": number, "page": page.get("page"),
+                          "line": value, "confidence": 0.75,
+                          "status": "controle_nodig",
+                          "reason": "Vraaganker in correctievoorschrift; inhoudelijke controle vereist."})
+    return found
+
+
+def compare_question_numbering(opgaven: list[dict], cv: list[dict]) -> dict:
+    """Compare unique question numbers without assuming either source is complete."""
+    op_numbers = sorted({int(x["number"]) for x in opgaven if x.get("number") is not None})
+    cv_numbers = sorted({int(x["number"]) for x in cv if x.get("number") is not None})
+    return {
+        "opgaven_nummers": op_numbers,
+        "cv_nummers": cv_numbers,
+        "ontbreekt_in_cv": sorted(set(op_numbers) - set(cv_numbers)),
+        "ontbreekt_in_opgaven": sorted(set(cv_numbers) - set(op_numbers)),
+        "status": "controle_nodig" if set(op_numbers) != set(cv_numbers) else "nummers_overeen"
+    }
+
+
+def propose_question_regions(analysis: dict, candidates: list[dict]) -> list[dict]:
+    """Propose per-question page regions, split by page; proposals are never approved."""
+    pages = {int(p["page"]): p for p in analysis.get("pages", [])}
+    ordered = sorted(candidates, key=lambda c: (int(c["page"]), float(c.get("bbox", [0, 0])[1])))
+    proposals = []
+    for index, candidate in enumerate(ordered):
+        start_page = int(candidate["page"])
+        if start_page not in pages:
+            continue
+        start_bbox = candidate.get("bbox", [0, 0, 0, 0])
+        start_y = max(0.0, float(start_bbox[1]) - 8.0)
+        next_candidate = ordered[index + 1] if index + 1 < len(ordered) else None
+        end_page = int(next_candidate["page"]) if next_candidate else max(pages)
+        end_y = max(0.0, float(next_candidate.get("bbox", [0, 0])[1]) - 8.0) if next_candidate else None
+        segments = []
+        for page_no in range(start_page, end_page + 1):
+            page = pages.get(page_no)
+            if not page:
+                continue
+            width, height = float(page.get("width", 0)), float(page.get("height", 0))
+            if width <= 0 or height <= 0:
+                continue
+            y0 = start_y if page_no == start_page else 0.0
+            y1 = end_y if page_no == end_page and end_y is not None else height
+            if y1 > y0:
+                segments.append({"page": page_no, "bbox": [0.0, y0, width, y1]})
+        if not segments:
+            continue
+        proposals.append({
+            "number": int(candidate["number"]), "start_page": start_page,
+            "end_page": end_page, "source_segments": segments,
+            "text_proposal": "", "context_candidates": [],
+            "status": "voorstel_niet_goedgekeurd",
+            "warning": "Automatische paginagrenzen zijn indicatief. Controleer vraagtekst, afbeeldingen, context en eventuele doorloop handmatig."
+        })
+    return proposals
+
+
+def detect_question_type(text: str) -> dict:
+    """Heuristic question-format detection; returns reviewable signals, not truth."""
+    value = str(text or "")
+    options = []
+    for line in value.splitlines():
+        match = re.match(r"^\\s*([A-H])[.)]\\s+(.+)$", line)
+        if match:
+            options.append({"label": match.group(1), "text": match.group(2).strip()})
+    lowered = value.lower()
+    if options:
+        labels = [x["label"] for x in options]
+        expected = list("ABCDEFGH"[:len(labels)])
+        complete = labels == expected
+        return {"type": "meerkeuze", "subtype": "enkelvoudige_keuze",
+                "options": options, "option_labels": labels,
+                "options_complete": complete, "confidence": 0.85 if complete and len(options) >= 2 else 0.55,
+                "status": "controle_nodig"}
+    if re.search(r"\\b(juist|onjuist|waar|niet waar)\\b", lowered) and re.search(r"\\b(stelling|uitspraken|bewering)\\b", lowered):
+        qtype, subtype, confidence = "juist_onjuist", "stellingbeoordeling", 0.65
+    elif re.search(r"\\b(wel of niet|wel/niet|ja of nee|ja/nee)\\b", lowered):
+        qtype, subtype, confidence = "wel_niet", "binaire_beoordeling", 0.7
+    else:
+        qtype, subtype, confidence = "open", "open_vraag", 0.55
+    return {"type": qtype, "subtype": subtype, "options": [], "option_labels": [],
+            "options_complete": None, "confidence": confidence, "status": "controle_nodig"}
