@@ -45,11 +45,14 @@ def main():
         # Use the final printed word of q34 as the lower boundary. There is
         # no following question on this page, so falling back to page height
         # included the footer and a large empty area in the published image.
-        final_line = page.search_for("geleid.")
-        final_line = [rect for rect in final_line if rect.y0 > marker[1]]
-        if not final_line:
-            raise ValueError("Havo 2025-I q34: final prompt line 'geleid.' not found")
-        bottom = max(rect.y1 for rect in final_line) + 9
+        final_words = [
+            word for word in page.get_text("words", sort=True)
+            if word[4].strip(".,:;!?").lower() == "geleid"
+            and word[1] > marker[1]
+        ]
+        if not final_words:
+            raise ValueError("Havo 2025-I q34: final prompt word 'geleid' not found")
+        bottom = max(word[3] for word in final_words) + 9
         top = max(0, marker[1] - 34)
         if bottom <= top + 10 or bottom >= page.rect.height - 35:
             raise ValueError(f"Havo 2025-I q34: implausible crop bounds top={top}, bottom={bottom}")
