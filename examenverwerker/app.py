@@ -51,7 +51,7 @@ def classify(filename: str, text: str):
 
 def extract_pdf(path: Path):
     try:
-        import fitz
+        import pymupdf as fitz
     except ImportError as exc:
         raise RuntimeError("PDF-lezer ontbreekt. Start BUILD_PORTABLE.bat of installeer requirements.txt.") from exc
     doc = fitz.open(path)
