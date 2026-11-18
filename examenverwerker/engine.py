@@ -524,7 +524,7 @@ def link_context_assets(analysis: dict, references: list[dict],
     pages = analysis.get("pages", [])
     page_map = {int(p.get("page", 0)): p for p in pages}
     caption_re = re.compile(
-        r"^\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema|bron|tekst|bijlage)\s*([0-9]{1,2}|[A-Z])\b",
+        r"^\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema|bron|tekst|bijlage)\s*([0-9]{1,2}[A-Z]?|[A-Z])\b",
         re.I
     )
     kind_map = {
@@ -626,11 +626,11 @@ def detect_context_references(text: str) -> list[dict]:
     """Find explicit figure/table/source references for human context linking."""
     value = str(text or "")
     patterns = [
-        ("figuur", r"\b(figuur)\s*([0-9]{1,2}|[A-Z])\b"),
-        ("afbeelding", r"\b(afbeelding|foto|illustratie)\s*([0-9]{1,2}|[A-Z])\b"),
-        ("tabel", r"\b(tabel)\s*([0-9]{1,2}|[A-Z])\b"),
-        ("grafiek", r"\b(grafiek|diagram|schema)\s*([0-9]{1,2}|[A-Z])\b"),
-        ("bron", r"\b(bron|tekst|bijlage)\s*([0-9]{1,2}|[A-Z])\b"),
+        ("figuur", r"\b(figuur)\s*([0-9]{1,2}[A-Z]?|[A-Z])\b"),
+        ("afbeelding", r"\b(afbeelding|foto|illustratie)\s*([0-9]{1,2}[A-Z]?|[A-Z])\b"),
+        ("tabel", r"\b(tabel)\s*([0-9]{1,2}[A-Z]?|[A-Z])\b"),
+        ("grafiek", r"\b(grafiek|diagram|schema)\s*([0-9]{1,2}[A-Z]?|[A-Z])\b"),
+        ("bron", r"\b(bron|tekst|bijlage)\s*([0-9]{1,2}[A-Z]?|[A-Z])\b"),
     ]
     found = []
     seen = set()
