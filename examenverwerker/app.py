@@ -265,25 +265,40 @@ class ExamApp:
                         record["approval_revoked_reason"]="Bron-PDF opnieuw geanalyseerd; vraaggrenzen en uitsneden opnieuw controleren."
                 analysis = analyze_pdf(source)
                 candidates = detect_question_candidates(analysis)
-                ordered = sorted(candidates, key=lambda x: (int(x["page"]), float(x.get("bbox", [0, 0])[1])))
-                for index, item in enumerate(ordered):
-                    following = ordered[index + 1] if index + 1 < len(ordered) else None
-                    proposal_text = extract_candidate_text(analysis, item, following)
-                    type_check = detect_question_type(proposal_text)
-                    context_refs = detect_context_references(proposal_text)
-                    item.update({
-                        "document_id": doc["id"], "bestand": doc["bestand"],
-                        "vraagtekst_voorstel": proposal_text,
-                        "vraagtype_controle": type_check,
-                        "vraagtype_status": "controle_nodig",
-                        "context_verwijzingen": context_refs
-                    })
-                candidates = ordered
-                self.data.setdefault("vraagkandidaten", [])
-                self.data["vraagkandidaten"] = [x for x in self.data["vraagkandidaten"] if x.get("document_id") != doc["id"]] + candidates
-                (self.project_dir / "analyse" / f"{doc['id']}-vraagkandidaten.json").write_text(
-                    json.dumps(candidates, ensure_ascii=False, indent=2), encoding="utf-8")
-                self._log(f"{doc['bestand']}: {len(candidates)} mogelijke vraagstarts gevonden; alles staat nog op controle nodig.")
+                suppressed = analysis.get("suppressed_question_candidates", [])
+                # Preserve a user's explicit decision to restore a suppressed
+                # candidate across later re-analyses of the same source.
+                restored_keys=set(self.data.get("restored_suppressed_candidate_keys",[]))
+                def candidate_key(item):
+                    return f"{doc['id']}|{item['number']}|{item['page']}|{float(item.get('bbox',[0,0])[1]):.1f}"
+                still_suppressed=[]
+                for item in suppressed:
+                    if candidate_key(item) in restored_keys:
+                        item["status"]="controle_nodig"
+                        item["reason"]="Handmatig hersteld uit de lijst met onderdrukte dubbelingen; opnieuw controleren."
+                        item.pop("suppressed_by",None)
+                        candidates.append(item)
+                    else:
+                        still_suppressed.append(item)
+                suppressed=still_suppressed
+                all_ordered=sorted(candidates+suppressed,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                for index,item in enumerate(all_ordered):
+                    following=all_ordered[index+1] if index+1<len(all_ordered) else None
+                    proposal_text=extract_candidate_text(analysis,item,following)
+                    type_check=detect_question_type(proposal_text)
+                    context_refs=detect_context_references(proposal_text)
+                    item.update({"document_id":doc["id"],"bestand":doc["bestand"],
+                        "vraagtekst_voorstel":proposal_text,"vraagtype_controle":type_check,
+                        "vraagtype_status":"controle_nodig","context_verwijzingen":context_refs})
+                ordered=sorted(candidates,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                candidates=ordered
+                self.data.setdefault("vraagkandidaten",[])
+                self.data.setdefault("onderdrukte_vraagkandidaten",[])
+                self.data["vraagkandidaten"]=[x for x in self.data["vraagkandidaten"] if x.get("document_id")!=doc["id"]]+candidates
+                self.data["onderdrukte_vraagkandidaten"]=[x for x in self.data["onderdrukte_vraagkandidaten"] if x.get("document_id")!=doc["id"]]+suppressed
+                (self.project_dir/"analyse"/f"{doc['id']}-vraagkandidaten.json").write_text(json.dumps(candidates,ensure_ascii=False,indent=2),encoding="utf-8")
+                (self.project_dir/"analyse"/f"{doc['id']}-onderdrukte-kandidaten.json").write_text(json.dumps(suppressed,ensure_ascii=False,indent=2),encoding="utf-8")
+                self._log(f"{doc['bestand']}: {len(candidates)} vraagstartkandidaten; {len(suppressed)} zwakkere nummerdubbelingen apart bewaard voor controle.")
                 total += len(candidates)
 
                 # Compare only with the CV belonging to this exact exam identity.
@@ -298,7 +313,7 @@ class ExamApp:
                     cv_numbers = {int(x["number"]) for x in cv_candidates}
                     opgaven_numbers = {int(x["number"]) for x in candidates}
                     cv_crosscheck_available = len(cv_numbers) >= max(5, int(len(opgaven_numbers) * 0.6))
-                    for candidate in candidates:
+                    for candidate in candidates+suppressed:
                         candidate["cv_number_match"] = (int(candidate["number"]) in cv_numbers) if cv_crosscheck_available else None
                         candidate["cv_crosscheck_status"] = ("nummer_in_CV" if candidate["cv_number_match"] else "nummer_niet_in_CV_controleren") if cv_crosscheck_available else "CV-onvoldoende-herkend"
                     comparison = compare_question_numbering(candidates, cv_candidates)
