@@ -16,6 +16,15 @@ class EngineTests(unittest.TestCase):
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[1,1])
         self.assertTrue(all(x["status"]=="controle_nodig" for x in got))
+    def test_question_candidates_recognise_welk_prompt(self):
+        a={"pages":[{"page":1,"blocks":[{"bbox":[0,0,300,100],"lines":[
+            {"bbox":[10,10,20,20],"text":"8."},
+            {"bbox":[30,10,250,20],"text":"Welk orgaan produceert dit hormoon?"}
+        ],"text":"8.\\nWelk orgaan produceert dit hormoon?"}]}]}
+        got=detect_question_candidates(a)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["number"],8)
+
     def test_question_candidates_reject_numbered_source_lines_and_keep_score_markers(self):
         a={"pages":[{"page":1,"blocks":[{"bbox":[0,0,300,300],"lines":[
             {"bbox":[10,10,20,20],"text":"1"},
