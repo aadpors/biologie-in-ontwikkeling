@@ -596,6 +596,8 @@ class ExamApp:
                                "approval_revoked_reason":None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
                                "cv_amendment_pdfs":[amendment_docs[i]["opslagbestand"] for i in amendment_list.curselection()],
+                               "available_appendix_candidates":[d["opslagbestand"] for d in appendix_docs],
+                               "available_cv_amendment_candidates":[d["opslagbestand"] for d in amendment_docs],
                                "appendix_match_human_confirmed":True,
                                "cv_amendment_match_human_confirmed":True,
                                "candidate_document_id":row.get("document_id"),
@@ -657,6 +659,10 @@ class ExamApp:
             ttk.Label(outer,text="LET OP: de opgaven-PDF is opnieuw geanalyseerd of de vraagstart is afgewezen. Stel het conceptrecord opnieuw samen vanuit de actuele kandidaat voordat je verdergaat.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
         meta=record.get("exam",{})
         ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        appendix_candidates=record.get("available_appendix_candidates",[])
+        addendum_candidates=record.get("available_cv_amendment_candidates",[])
+        ttk.Label(outer,text="Uitwerkbijlagen beschikbaar: "+(", ".join(Path(x).name for x in appendix_candidates) if appendix_candidates else "geen bijbehorende PDF gevonden")+"\nGeselecteerd: "+(", ".join(Path(x).name for x in record.get("uitwerkbijlagen",[])) if record.get("uitwerkbijlagen") else "geen")).pack(anchor="w")
+        ttk.Label(outer,text="CV-aanvullingen beschikbaar: "+(", ".join(Path(x).name for x in addendum_candidates) if addendum_candidates else "geen bijbehorende PDF gevonden")+"\nGeselecteerd: "+(", ".join(Path(x).name for x in record.get("cv_amendment_pdfs",[])) if record.get("cv_amendment_pdfs") else "geen")).pack(anchor="w",pady=(0,5))
         ttk.Label(outer,text="Vraagtekst").pack(anchor="w")
         qbox=tk.Text(outer,height=6,wrap="word")
         qbox.pack(fill="x")
