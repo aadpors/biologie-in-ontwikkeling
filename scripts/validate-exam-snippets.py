@@ -245,6 +245,30 @@ else:
 q27 = mcq_by_id.get("ha25t1-mcq-27")
 if not q27 or not q27.get("images") or q27["images"][0] != "exam-snippets/context-ha25t1-q27-complete.jpg":
     errors.append("Havo 2025-I vraag 27: eigen zeehondencontext ontbreekt of is vervangen door de Bajau-context")
+elif "Uit onderzoek bij zeehonden" not in q27.get("source", "") or "De Bajau" in q27.get("source", ""):
+    errors.append("Havo 2025-I vraag 27: de tekstuele context is niet exclusief de zeehondencontext")
+
+# The question-specific statement lists must be moved out of shared context
+# and remain attached to the question text and question image.
+q23 = mcq_by_id.get("ha26t1-mcq-23")
+if not q23 or "Hieronder staan uitspraken over de vergelijking" not in q23.get("q", ""):
+    errors.append("Havo 2026-I vraag 23: uitspraken ontbreken bij de vraagtekst")
+elif "Hieronder staan uitspraken over de vergelijking" in q23.get("source", ""):
+    errors.append("Havo 2026-I vraag 23: vraaguitspraken staan nog in de algemene context")
+if not q23 or len(q23.get("images", [])) < 2 or q23["images"][-1] != "exam-snippets/question-ha26t1-23-only.jpg":
+    errors.append("Havo 2026-I vraag 23: aparte vraaguitsnede ontbreekt")
+else:
+    audit_crop_height(q23["images"][-1], 150, "Havo 2026-I vraag 23: inleiding en twee uitspraken")
+
+q2 = open_by_id.get("vw24t2-open-2")
+if not q2 or "Over het cladogram worden de volgende uitspraken gedaan" not in q2.get("q", ""):
+    errors.append("Vwo 2024-II vraag 2: uitspraken ontbreken bij de vraagtekst")
+elif "Over het cladogram worden de volgende uitspraken gedaan" in q2.get("source", ""):
+    errors.append("Vwo 2024-II vraag 2: vraaguitspraken staan nog in de algemene context")
+if not q2 or len(q2.get("images", [])) < 2 or q2["images"][-1] != "exam-snippets/question-vw24t2-2-only.jpg":
+    errors.append("Vwo 2024-II vraag 2: aparte vraaguitsnede ontbreekt")
+else:
+    audit_crop_height(q2["images"][-1], 100, "Vwo 2024-II vraag 2: inleiding en drie uitspraken")
 
 q29 = open_by_id.get("ha25t1-open-29")
 if not q29 or len(q29.get("images", [])) < 2:
