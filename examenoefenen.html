@@ -146,7 +146,9 @@ function onderwerpenVanVraag(q){
  const biological=result.filter(x=>!skillTags.includes(x));
  // Vaardigheden zijn geen extra biologisch onderwerp. Toon ze alleen als de
  // deelvraag niet al twee of meer inhoudelijke onderwerpen heeft.
- if(biological.length>=2)return biological;
+ // Keep multi-topic questions useful in the filter without allowing a
+ // long shared focus description to flood the subject list.
+ if(biological.length>=2)return biological.slice(0,3);
  return result.slice(0,3);
 }
 
