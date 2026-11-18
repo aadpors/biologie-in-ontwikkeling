@@ -568,6 +568,8 @@ class ExamApp:
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
                                "cv_amendment_pdfs":[amendment_docs[i]["opslagbestand"] for i in amendment_list.curselection()],
+                               "appendix_match_human_confirmed":True,
+                               "cv_amendment_match_human_confirmed":True,
                                "candidate_document_id":row.get("document_id"),
                                "source_match_human_confirmed":True,
                                "cv_match_human_confirmed":True,
