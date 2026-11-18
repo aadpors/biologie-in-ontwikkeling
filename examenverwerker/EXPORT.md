@@ -22,6 +22,6 @@ Een record wordt alleen geëxporteerd wanneer:
 - \`exam-snippets/\` met goedgekeurde PDF-renders
 - \`manifest.json\` met bronhashes en menselijke goedkeuring
 
-De exporter gebruikt het bestaande veld \`attachmentPdfs\` voor volledige uitwerkbijlagen. De huidige website toont die als afzonderlijke PDF-links bij de vraag. Er wordt geen onbekend veld toegevoegd.
+De exporter gebruikt het bestaande veld \`attachmentPdfs\` voor volledige uitwerkbijlagen. De huidige website toont die als afzonderlijke PDF-links bij de vraag. Officiële CV-aanvullingen worden volledig in `examens/` bewaard en in het manifest verantwoord; het bestaande website-JSON-contract wordt daarvoor niet uitgebreid.
 
 De uitvoermap moet nieuw of leeg zijn. De exporter overschrijft nooit bestaande bestanden en publiceert nooit rechtstreeks naar de live website.
