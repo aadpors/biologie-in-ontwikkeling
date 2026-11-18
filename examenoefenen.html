@@ -171,13 +171,14 @@ function render(){
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
  const assetVersion="2026-11-17-29";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
+ const contextText=q.repeatedContext?'<section class="sourceblock"><h3>Context en gegevens</h3><p>'+escapeContextHtml(q.repeatedContext).replace(/\r?\n/g,'<br>')+'</p></section>':'';
  let snippet=snippetImages.map((src,i)=>'<section class="exam-snippets"><figure><img src="'+src+'?v='+assetVersion+'" alt="'+(i<snippetImages.length-1?'Context bij vraag ':'Originele examenopgave bij vraag ')+q.n+'" loading="lazy"><figcaption>'+(i<snippetImages.length-1?'Context uit de oorspronkelijke examenopgave':'Originele examenopgave · vraag '+q.n)+'</figcaption></figure></section>').join("")||'<p class="empty">De originele examensnippet wordt nog gegenereerd.</p>';
  const responseMarkup=isMCQ
   ?'<fieldset class="mcq-options"><legend>Kies één antwoord</legend>'+q.options.map(o=>'<label><input type="radio" name="answer-'+q.id+'" value="'+o.key+'" '+(saved[q.id]===o.key?'checked':'')+'><span><b>'+o.key+'.</b>'+'</span></label>').join("")+'</fieldset><p class="sourcehint">De antwoordteksten staan in de oorspronkelijke opgave hierboven; kies hier de bijbehorende letter.</p><div class="mcq-feedback" id="mcqFeedback" hidden></div>'
   :'<div class="response"><label for="answer-'+q.id+'">Jouw antwoord</label><textarea id="answer-'+q.id+'" placeholder="Typ hier je antwoord..."></textarea></div>';
  const cvMarkup=isMCQ?"":q.cvImage?'<section class="cv-reveal"><button class="source" type="button" id="toggleCv" aria-expanded="false">Toon correctievoorschrift bij vraag '+q.n+'</button><figure id="cvSnippet" hidden><img data-src="'+q.cvImage+'" alt="Origineel beoordelingsmodel uit het officiële correctievoorschrift, vraag '+q.n+'" loading="lazy"><figcaption>Officieel correctievoorschrift · vraag '+q.n+'</figcaption></figure>'+(q.cvAmendment?'<figure id="cvAmendment" hidden><img data-src="'+q.cvAmendment+'" alt="Officiële aanvulling op het correctievoorschrift bij vraag '+q.n+'" loading="lazy"><figcaption>Officiële aanvulling op het correctievoorschrift · van toepassing op vraag '+q.n+'</figcaption></figure>':"")+'</section>':'<p class="sourcehint">Het volledige officiële correctievoorschrift is beschikbaar via de PDF-link hierboven.</p>';
  const selfCheckMarkup=isMCQ?"":'<section class="selfcheck"><h3>Zelf beoordelen</h3><p style="font-size:13px;margin:0 0 8px;color:#53616a">Vergelijk je antwoord met de officiële beoordelingscriteria hierboven en vink per scorepunt aan of je het hebt behaald.</p><label><input type="checkbox" data-zero '+(zeroScores[q.id]?"checked":"")+' > 0 punten behaald</label>'+Array.from({length:q.points},(_,i)=>'<label><input type="checkbox" data-point="'+i+'" '+((selfChecks[q.id]||[]).includes(i)?"checked":"")+' > Punt '+(i+1)+' behaald</label>').join("")+'</section>';
- a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Open vraag")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+q.end+'</span>':"")+'</div>'+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+(q.attachmentPdfs?.length?' · '+q.attachmentPdfs.map((path,index)=>'<a href="'+path+'" target="_blank" rel="noopener">Volledige uitwerkbijlage'+(q.attachmentPdfs.length>1?' '+(index+1):'')+' (PDF) ↗</a>').join(' · '):"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
+ a.innerHTML='<div class="qhead"><h2>'+q.level+" "+q.year+" · tijdvak "+q.period+" · vraag "+q.n+' <span style="font-size:13px;color:#63717b;font-weight:normal">· '+q.points+" punt"+(q.points===1?"":"en")+'</span></h2><span class="tag gold">'+(isMCQ?"Meerkeuzevraag":"Open vraag")+'</span></div><div class="tags">'+onderwerpenVanVraag(q).map(topic=>'<span class="tag">'+topic+'</span>').join("")+(q.end?'<span class="tag muted">Eindterm · '+q.end+'</span>':"")+'</div>'+contextText+snippet+'<div class="sourcehint"><a href="'+pdf+'" target="_blank" rel="noopener">Originele examenopgave (PDF) ↗</a> · <a href="'+cv+'" target="_blank" rel="noopener">Officieel correctievoorschrift (volledig, origineel) ↗</a>'+(q.id==="ha26-16"?' · <a href="examens/ha-1018-a-26-1-c-a1_0.pdf" target="_blank" rel="noopener">Officiële aanvulling op het correctievoorschrift ↗</a>':"")+(q.attachmentPdfs?.length?' · '+q.attachmentPdfs.map((path,index)=>'<a href="'+path+'" target="_blank" rel="noopener">Volledige uitwerkbijlage'+(q.attachmentPdfs.length>1?' '+(index+1):'')+' (PDF) ↗</a>').join(' · '):"")+'</div>'+responseMarkup+cvMarkup+selfCheckMarkup;
  $("questions").append(a);
  if(isMCQ){
   const feedback=a.querySelector("#mcqFeedback");
@@ -202,6 +203,28 @@ $("nextQuestion").addEventListener("click",()=>{const f=getFiltered();if(current
 
 ["level","year","period","questionType","theme"].forEach(id=>$(id).addEventListener("change",()=>{currentIndex=0;const state={};["level","year","period","questionType","theme"].forEach(k=>state[k]=$(k).value);localStorage.setItem("bioExamFiltersV1",JSON.stringify(state));render()}));
 $("reset").addEventListener("click",()=>{["level","year","period","questionType","theme"].forEach(id=>$(id).value="");currentIndex=0;localStorage.removeItem("bioExamFiltersV1");render()});
+function escapeContextHtml(value){
+ return String(value||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function buildRepeatedContexts(items){
+ const exams=new Map();
+ for(const q of items){const key=[q.level,q.year,q.period].join('|');if(!exams.has(key))exams.set(key,[]);exams.get(key).push(q);}
+ for(const list of exams.values()){
+  list.sort((a,b)=>Number(a.n)-Number(b.n));
+  let segments=[];
+  for(let i=0;i<list.length;i++){
+   const q=list[i],source=String(q.source||'').trim();
+   const lines=source.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+   const first=lines[0]||'',second=lines[1]||'';
+   const heading=lines.length>1&&first.length<=90&&!/[.!?;:]$/.test(first)&&/^[A-ZÀ-Þ0-9“'\"(]/.test(second)&&!/^(Gebruik de context|Afbeelding \d|afbeelding \d)/i.test(first);
+   if(i===0||heading)segments=[];
+   if(source&&!/^Gebruik de context en gegevens in de oorspronkelijke examenopgave\.?$/i.test(source))segments.push(source);
+   q.repeatedContext=segments.join('\n\n');
+   q.contextHeading=heading?first:(i===0?first:'');
+  }
+ }
+ return items;
+}
 async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
@@ -259,7 +282,7 @@ async function loadMCQ(){
    const cvItem=cvById.get(question.id);
    if(cvItem){question.cvImage="exam-snippets/"+cvItem.output;if(cvItem.amendment_output)question.cvAmendment="exam-snippets/"+cvItem.amendment_output;}
   }
-  questions=[...map.values()];
+  questions=buildRepeatedContexts([...map.values()]);
   fill("theme",questions.flatMap(onderwerpenVanVraag));
   if(filterState.theme && onderwerpCategorieen.includes(filterState.theme))$("theme").value=filterState.theme;
  }catch(error){console.warn(error)}
