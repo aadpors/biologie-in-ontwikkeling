@@ -223,6 +223,11 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(linked[0]["link_status"],"geen_nummer_handmatige_koppeling")
         self.assertEqual(linked[0]["asset_candidates"],[])
 
+    def test_context_references_recognise_lettered_subfigures(self):
+        refs=detect_context_references("Vergelijk figuur 2A met figuur 2B en tabel 3.")
+        self.assertEqual([(x["kind"],x["number"]) for x in refs],
+                         [("figuur","2A"),("figuur","2B"),("tabel","3")])
+
     def test_context_reference_detection(self):
         from engine import detect_context_references
         refs=detect_context_references("Gebruik figuur 2 en tabel 1. Vergelijk dit met bron A.")
