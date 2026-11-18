@@ -194,7 +194,7 @@ def render_havo_2025_i_q26():
         "exam-snippets/context-ha25t1-q26-complete.jpg",
         "exam-snippets/question-ha25t1-26-only.jpg",
     ]
-    open_path.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    open_path.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Havo 2025-I q26: context/question boundary corrected")
 
 
