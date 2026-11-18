@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from exporter import export_approved_records
+from exporter import export_approved_records, validate_review_records
 
 class ExportTests(unittest.TestCase):
     def make_fixture(self, root):
@@ -15,6 +15,7 @@ class ExportTests(unittest.TestCase):
                     "concept":"Ecosystemen","end":"E1","focus":"Toepassing","questionType":"open"},
             "number":1,"source_page":2,"source_pdf":"opgaven.pdf","cv_pdf":"cv.pdf",
             "snippet_file":"vraag1.png","cv_snippet_file":"cv1.jpg","question_text":"Beschrijf de relatie.",
+            "source_match_human_confirmed":True,"cv_match_human_confirmed":True,
             "uitwerkbijlagen":["uitwerkbijlage.pdf"]
         }
         return project,record
@@ -25,6 +26,27 @@ class ExportTests(unittest.TestCase):
             result=export_approved_records([record],project,Path(d)/"out")
             self.assertFalse(result["ok"])
             self.assertIn("niet_menselijk_goedgekeurd",[x["error"] for x in result["errors"]])
+
+    def test_mismatched_official_correction_scheme_is_blocked(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"bronnen"/"ha-1018-a-26-1-o.pdf").write_bytes(b"opgaven")
+            (project/"bronnen"/"ha-1018-a-26-2-c.pdf").write_bytes(b"wrong cv")
+            record["source_pdf"]="ha-1018-a-26-1-o.pdf"
+            record["cv_pdf"]="ha-1018-a-26-2-c.pdf"
+            record["source_match_human_confirmed"]=True
+            record["cv_match_human_confirmed"]=True
+            errors=validate_review_records([record],project)
+            self.assertIn("correctievoorschrift_past_niet_bij_examen",[x["error"] for x in errors])
+
+    def test_mcq_duplicate_or_empty_options_are_blocked(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["exam"]["questionType"]="mcq"
+            record["options"]=[{"key":"A","text":"Optie A"},{"key":"A","text":""}]
+            record["correct"]="A"
+            errors=validate_review_records([record],project)
+            self.assertIn("meerkeuzeopties_of_correct_antwoord_ongeldig",[x["error"] for x in errors])
 
     def test_approved_export_includes_complete_appendix_pdf(self):
         with tempfile.TemporaryDirectory() as d:
