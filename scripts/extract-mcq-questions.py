@@ -114,7 +114,7 @@ OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
 
 # Extra room below every text-based crop so glyph descenders (g, j, p, q, y)
 # are never clipped by a tight PDF text bounding box.
-BOTTOM_TEXT_PADDING = 4
+BOTTOM_TEXT_PADDING = 0
 
 def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
     """Render a full-width crop and remove earlier question blocks without leaving blank bands."""
@@ -888,7 +888,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         intro_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
                         inbreeding_y0 = max(0, min(rect.y0 for rect in inbreeding_hits) - 5)
                         inbreeding_y1 = min(page.rect.height, max(rect.y1 for rect in inbreeding_end_hits) + 8)
-                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
+                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + max(BOTTOM_TEXT_PADDING, 4))
                         intro_name = "context-ha25t2-q9-intro.jpg"
                         inbreeding_name = "context-ha25t2-q9-inbreeding.jpg"
                         page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, intro_y0, page.rect.width, min(q7_y - 5, footer_y)), alpha=False).save(OUT / intro_name)
