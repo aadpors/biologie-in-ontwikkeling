@@ -58,9 +58,10 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             if len(cv_snippets)!=1:
                 errors.append({"id":rid,"error":"exact_een_cv_snippet_verplicht_voor_huidige_website"})
             for name in cv_snippets:
-                if not (project_dir/"snippets"/name).is_file(): errors.append({"id":rid,"error":f"cv_snippet_ontbreekt:{name}"})
+                if Path(name).name!=name: errors.append({"id":rid,"error":"ongeldig_cv_snippetpad"})
+                elif not (project_dir/"snippets"/name).is_file(): errors.append({"id":rid,"error":f"cv_snippet_ontbreekt:{name}"})
         amendment=r.get("cv_amendment_snippet_file")
-        if amendment and not (project_dir/"snippets"/amendment).is_file(): errors.append({"id":rid,"error":"cv_aanvulling_snippet_ontbreekt"})
+        if amendment and (Path(amendment).name!=amendment or not (project_dir/"snippets"/amendment).is_file()): errors.append({"id":rid,"error":"cv_aanvulling_snippet_ontbreekt"})
         if not r.get("question_text"): errors.append({"id":rid,"error":"vraagtekst_ontbreekt"})
         if rid in seen: errors.append({"id":rid,"error":"dubbel_id"})
         seen.add(rid)
