@@ -81,9 +81,13 @@ function onderwerpenVanVraag(q){
  const concept=String(q.concept||"").toLowerCase();
  const focus=String(q.focus||"").toLowerCase();
  const theme=String(q.theme||"").toLowerCase();
- const t=[stem,concept,focus].join(" ");
+ const optionText=Array.isArray(q.options)?q.options.map(option=>String(option.text||"")).join(" ").toLowerCase():"";
+ const t=[stem,concept,focus,optionText].join(" ");
  const hits=new Set(),add=x=>hits.add(x);
- const manualQuestionTopics={"vw26t2-open-39":["Ecologie"]};
+ const manualQuestionTopics={
+  "vw26t2-open-39":["Ecologie"],
+  "ha25t1-mcq-37":["Zenuwstelsel & oog"]
+ };
  (manualQuestionTopics[q.id]||[]).forEach(add);
  const exactTheme={
   "hart en bloedsomloop":["Hart en bloedsomloop"],
@@ -106,7 +110,7 @@ function onderwerpenVanVraag(q){
  if(/diffusie|osmose|osmotische waarde|celmembraan|membraantransport|actief transport|passief transport|wet van fick|wateropname|verzilting/.test(t))add("Cellen: transport");
  if(/dna|chromosoom|genotype|fenotype|allel|mutatie|genoom|codon|transcriptie|translatie|genexpressie|pcr|transgeen|cisgeen|genetische modificatie|chromatine|h2ax|dsb|crispr|aon|intron|exon|promotor|locus|lpl-gen|functioneel gen|gen wordt ingebracht|genetisch verschil|genetische verschillen/.test(t))add("Dna: expressie, transcriptie, translatie en onderzoek");
  if(/duurzaamheid|duurzaam|ecologisch duurzamer|ecologisch duurzame|milieuvervuiling|klimaatverandering|versterkte broeikaseffect|broeikasgas|bestrijdingsmiddel|insecticide|herbicide|persistent/.test(t))add("Duurzaamheid & milieu");
- if(/populatie|ecosysteem|habitat|niche|trofisch|voedselweb|voedselketen|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|kringloop|mineralisatie|successie|pioniersoort|climaxsoort|biodiversiteit|biotische factor|abiotische factor|slak|zeearend|koolmees|eikels|eikenprocessierups|broedpaar|herbicide|insecticide|pesticide|ambrosia|bladhaantje|exoot|invasief|nematod|gifkikker|driekleurige gifkikker|kustecosysteem|zegras|slijkgras|duurzame bestrijding|biomassa|vraatinsect|zebrarups|sint-jakobsvlinder|citrusplantage|gele drakenziekte|indicatorsoort|waterspreeuw|waterkwaliteit|ecologisch duurzaam|nest met dode koolmees|landelijke omgeving|stedelijke omgeving|broeikasgassen|knolletjesbacterie|wortelknol|rhizobium|witte klaver|klaver|lintworm|taenia|gastheer|beekprik|temperatuurtolerantie|tolerantiegrens/.test(t))add("Ecologie");
+ if(/populatie|ecosysteem|habitat|niche|trofisch|voedselweb|voedselketen|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|kringloop|mineralisatie|successie|pioniersoort|climaxsoort|biodiversiteit|biotische factor|abiotische factor|slak|zeearend|koolmees|eikels|eikenprocessierups|broedpaar|herbicide|insecticide|pesticide|ambrosia|bladhaantje|exoot|invasief|nematod|gifkikker|driekleurige gifkikker|kustecosysteem|zegras|slijkgras|duurzame bestrijding|biomassa|vraatinsect|zebrarups|sint-jakobsvlinder|citrusplantage|gele drakenziekte|indicatorsoort|waterspreeuw|waterkwaliteit|ecologisch duurzaam|nest met dode koolmees|landelijke omgeving|stedelijke omgeving|broeikasgassen|knolletjesbacterie|wortelknol|rhizobium|witte klaver|klaver|lintworm|taenia|gastheer|beekprik|temperatuurtolerantie|tolerantiegrens|adaptatie|fitness|selectiedruk|genenpool|evolutie|natuurlijke selectie|monocultuur|strokenteelt/.test(t))add("Ecologie");
  if(/eutrofiëring|algenbloei|fosfaat|vermesting/.test(t))add("Ecologie: eutrofiëring");
  if(/kringloop|mineralisatie|afbraak van organisch materiaal|stofkringloop|koolstofkringloop|stikstofkringloop|fosforkringloop/.test(t))add("Ecologie: kringlopen");
  if(/voedselweb|trofisch|predatie|concurrentie|symbiose|parasitisme|mutualisme|commensalisme|interactie tussen soorten|voedselketen/.test(t))add("Ecologie: relaties & energiestromen");
