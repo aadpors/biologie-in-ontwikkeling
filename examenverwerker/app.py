@@ -676,29 +676,56 @@ class ExamApp:
             messagebox.showinfo("Selecteer een document", "Selecteer eerst een PDF in de lijst.")
             return
         choices = ["opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling", "onbekend"]
+        initial = doc.get("exam_metadata") or infer_exam_metadata(doc.get("bestand","")) or self.data.get("exam_metadata",{})
         win = tk.Toplevel(self.root)
-        win.title("Documenttype bevestigen")
+        win.title("Documenttype en examenidentiteit bevestigen")
         win.transient(self.root)
-        ttk.Label(win, text=f"Welk type is '{doc['bestand']}'?").pack(padx=18, pady=(18, 8))
+        win.grab_set()
+        frame=ttk.Frame(win,padding=16); frame.pack(fill="both",expand=True)
+        ttk.Label(frame, text=f"Document: {doc['bestand']}",wraplength=520).grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,8))
+        ttk.Label(frame, text="Documenttype").grid(row=1,column=0,sticky="w",pady=5)
         choice = tk.StringVar(value=doc["type_voorstel"])
-        combo = ttk.Combobox(win, textvariable=choice, values=choices, state="readonly", width=28)
-        combo.pack(padx=18, pady=8)
+        ttk.Combobox(frame, textvariable=choice, values=choices, state="readonly", width=28).grid(row=1,column=1,sticky="ew",pady=5)
+        ttk.Label(frame,text="Examenidentiteit (nodig om opgaven, CV en bijlagen veilig te koppelen)").grid(row=2,column=0,columnspan=2,sticky="w",pady=(12,4))
+        level=tk.StringVar(value=initial.get("level","Havo"))
+        year=tk.StringVar(value=str(initial.get("year","")))
+        period=tk.StringVar(value=str(initial.get("period","1")))
+        for row,label,var,widget in [
+            (3,"Niveau",level,ttk.Combobox(frame,textvariable=level,values=["Havo","Vwo"],state="readonly",width=24)),
+            (4,"Jaar",year,ttk.Entry(frame,textvariable=year,width=27)),
+            (5,"Tijdvak",period,ttk.Combobox(frame,textvariable=period,values=["1","2","3"],state="readonly",width=24))
+        ]:
+            ttk.Label(frame,text=label).grid(row=row,column=0,sticky="w",pady=4)
+            widget.grid(row=row,column=1,sticky="ew",pady=4)
+        ttk.Label(frame,text="Controleer dit per PDF. De bestandsnaam of projectmetadata kan onjuist zijn; alleen opslaan betekent dat jij de identiteit van dit document bevestigt.",wraplength=520).grid(row=6,column=0,columnspan=2,sticky="w",pady=(10,4))
         def apply():
             old = doc["type_voorstel"]
             new = choice.get()
+            if new in ("opgaven","correctievoorschrift","uitwerkbijlage","aanvulling"):
+                if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
+                    messagebox.showerror("Examenidentiteit onvolledig","Controleer niveau, jaartal en tijdvak.",parent=win)
+                    return
+                doc["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),
+                                      "confidence":1.0,"source":"handmatig_bevestigd"}
             doc["type_voorstel"] = new
             doc["type_zekerheid"] = 1.0
             doc["status"] = "handmatig_bevestigd"
-            self.data["beslissingen"].append({"document_id": doc["id"], "van": old, "naar": new, "tijd": now(), "reden": "handmatige bevestiging"})
+            self.data["beslissingen"].append({"document_id": doc["id"], "van": old, "naar": new, "tijd": now(), "reden": "handmatige bevestiging documenttype en examenidentiteit"})
             learn_decision(self.project_dir/"kennisbank",{
                 "pattern_key":"document_role:pdf-name-pattern",
                 "chosen":new,"accepted":True,"scope":"voorstel_voor_toekomstige_documentherkenning",
-                "filename":doc["bestand"],"previous":old,"human_decision":True})
+                "filename":doc["bestand"],"previous":old,"human_decision":True,
+                "exam_identity":doc.get("exam_metadata")})
+            if new=="opgaven":
+                self.data["exam_metadata"]={k:doc["exam_metadata"][k] for k in ("level","year","period")}
             self.save_project()
             self.refresh()
-            self._log(f"Herkenning bevestigd: {doc['bestand']} → {new}. Deze correctie wordt bewaard.")
+            self._log(f"Herkenning en examenidentiteit bevestigd: {doc['bestand']} → {new} ({doc.get('exam_metadata',{}).get('level','')} {doc.get('exam_metadata',{}).get('year','')} tijdvak {doc.get('exam_metadata',{}).get('period','')}).")
             win.destroy()
-        ttk.Button(win, text="Bevestigen", command=apply).pack(pady=(8, 18))
+        buttons=ttk.Frame(frame); buttons.grid(row=7,column=0,columnspan=2,sticky="ew",pady=(12,0))
+        ttk.Button(buttons,text="Bevestigen",command=apply).pack(side="right")
+        ttk.Button(buttons,text="Annuleren",command=win.destroy).pack(side="right",padx=8)
+        frame.columnconfigure(1,weight=1)
 
     def save_project(self):
         if not self.data or not self.project_dir:
