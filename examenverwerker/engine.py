@@ -147,6 +147,15 @@ def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Pat
     return {"path":str(output),"page":page_number,"bbox":list(rect),"source_sha256":digest_file(pdf_path),
             "method":"directe PDF-render; geen inhoudelijke beeldbewerking"}
 
+
+def question_pattern_key(candidate: dict) -> str:
+    line=str(candidate.get("line","")).strip()
+    if re.match(r"^\d{1,2}[.)]\s+\S",line):
+        return "question_start:numbered_line_with_text"
+    if re.fullmatch(r"\d{1,2}[.)]?",line) and candidate.get("next_line"):
+        return "question_start:standalone_number_then_text"
+    return "question_start:other_number_pattern"
+
 def learn_decision(knowledge_dir: Path, decision: dict):
     knowledge_dir.mkdir(parents=True,exist_ok=True)
     path=knowledge_dir/"decisions.jsonl"
