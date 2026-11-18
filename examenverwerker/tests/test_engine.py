@@ -29,6 +29,16 @@ class EngineTests(unittest.TestCase):
         got=match_correction_documents(op,cvs)
         self.assertEqual([x["bestand"] for x in got],["ha-1018-a-26-1-c.pdf"])
 
+    def test_low_confidence_cover_metadata_requires_manual_confirmation_before_pairing(self):
+        low={"level":"Havo","year":"2025","period":"1","confidence":0.82,"source":"eerste_pdf_paginas"}
+        op={"bestand":"renamed-o.pdf","exam_metadata":low}
+        cv={"bestand":"renamed-c.pdf","exam_metadata":low}
+        self.assertEqual(match_correction_documents(op,[cv]),[])
+        confirmed={**low,"confidence":1.0,"source":"handmatig_bevestigd"}
+        op["exam_metadata"]=confirmed
+        cv["exam_metadata"]=confirmed
+        self.assertEqual(match_correction_documents(op,[cv]),[cv])
+
     def test_appendix_matching_excludes_other_exam_periods(self):
         op={"bestand":"ha-1018-a-26-1-o.pdf"}
         related=[
