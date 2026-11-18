@@ -245,7 +245,9 @@ def detect_cv_question_numbers(analysis: dict) -> list[dict]:
             # CVs commonly use ' vraag 3', 'Vraag 3', or a standalone '3'.
             patterns = (
                 re.match(r"(?i)^vraag\s+(\d{1,2})(?:\b|[.:)])", value),
-                re.match(r"(?i)^ vraag\s+(\d{1,2})", value),
+                # Official Dutch CV tables often use "1 maximumscore 2".
+                # Subcriteria such as "1 (allel) g" are deliberately excluded.
+                re.match(r"(?i)^(\d{1,2})\s+maximumscore\b", value),
                 re.match(r"^(\d{1,2})[.)]?\s*$", value),
             )
             match = next((m for m in patterns if m), None)
