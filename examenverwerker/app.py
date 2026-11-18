@@ -9,9 +9,9 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, ttk\nfrom engine import analyze_pdf, detect_question_candidates, learn_decision
 
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
 DOC_TYPES = {
     "opgaven": ["opgaven", "opgave", "vragenboekje", "examenopgaven"],
@@ -117,7 +117,7 @@ class ExamApp:
         foot = ttk.Frame(body)
         foot.pack(fill="x", pady=(10, 0))
         ttk.Button(foot, text="Document bekijken", command=self.show_document).pack(side="left")
-        ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)
+        ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)\n        ttk.Button(foot, text="Vraagstarts analyseren", command=self.analyze_questions, style="Accent.TButton").pack(side="left", padx=6)\n        ttk.Button(foot, text="Kandidaten bekijken", command=self.show_candidates).pack(side="left")
         ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
         self.log = tk.Text(body, height=6, wrap="word", font=("Consolas", 9), background="#f5f7f7", relief="flat")
         self.log.pack(fill="x", pady=(12, 0))
@@ -147,7 +147,7 @@ class ExamApp:
         (self.project_dir / "snippets").mkdir(exist_ok=True)
         self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
                      "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
-                     "publicatiestatus": "niet_vrijgegeven"}
+                     "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
         self.save_project()
         self.refresh()
         self._log(f"Nieuw project aangemaakt: {self.project_dir}")
@@ -202,6 +202,51 @@ class ExamApp:
         self.save_project()
         self.refresh()
         self.status.configure(text=f"{added} PDF('s) toegevoegd. Controleer de voorgestelde documenttypen.")
+
+    def analyze_questions(self):
+        if not self.data:
+            messagebox.showinfo("Eerst een project", "Open eerst een examenproject.")
+            return
+        docs = [d for d in self.data["documenten"] if d.get("type_voorstel") == "opgaven"]
+        if not docs:
+            messagebox.showinfo("Geen opgaven-PDF", "Voeg eerst de opgaven-PDF toe en bevestig zo nodig het documenttype.")
+            return
+        total = 0
+        for doc in docs:
+            source = self.project_dir / "bronnen" / doc["opslagbestand"]
+            try:
+                analysis = analyze_pdf(source)
+                candidates = detect_question_candidates(analysis)
+                for item in candidates:
+                    item.update({"document_id": doc["id"], "bestand": doc["bestand"]})
+                self.data.setdefault("vraagkandidaten", [])
+                self.data["vraagkandidaten"] = [x for x in self.data["vraagkandidaten"] if x.get("document_id") != doc["id"]] + candidates
+                (self.project_dir / "analyse" / f"{doc['id']}-vraagkandidaten.json").write_text(
+                    json.dumps(candidates, ensure_ascii=False, indent=2), encoding="utf-8")
+                self._log(f"{doc['bestand']}: {len(candidates)} mogelijke vraagstarts gevonden; alles staat nog op controle nodig.")
+                total += len(candidates)
+            except Exception as exc:
+                self._log(f"Vraaganalyse mislukt voor {doc['bestand']}: {exc}")
+        self.save_project()
+        self.refresh()
+        messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Dit zijn kandidaten, geen automatisch goedgekeurde vragen.")
+
+    def show_candidates(self):
+        if not self.data:
+            return
+        rows = self.data.get("vraagkandidaten", [])
+        win = tk.Toplevel(self.root)
+        win.title("Mogelijke vraagstarts – altijd controleren")
+        win.geometry("900x580")
+        ttk.Label(win, text=f"{len(rows)} kandidaten gevonden. Herhaalde nummers blijven bewust zichtbaar.", padding=10).pack(anchor="w")
+        cols=("number","page","confidence","line","status")
+        tree=ttk.Treeview(win,columns=cols,show="headings")
+        for col,label,width in [("number","Nr.",55),("page","PDF-pagina",90),("confidence","Signaal",90),("line","Gevonden tekst",520),("status","Status",140)]:
+            tree.heading(col,text=label); tree.column(col,width=width)
+        tree.pack(fill="both",expand=True,padx=10,pady=10)
+        for i,row in enumerate(rows):
+            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",row.get("line"),row.get("status")))
+        ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Bevestiging en contextcontrole volgen in de volgende fase.",wraplength=850).pack(anchor="w",padx=12,pady=(0,12))
 
     def selected_doc(self):
         selected = self.table.selection()
@@ -276,8 +321,8 @@ class ExamApp:
                 f"{doc['type_zekerheid']:.0%}", doc["status"].replace("_", " ")
             ))
         count = len(self.data["documenten"])
-        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])
-        self.status.configure(text=f"{count} document(en) opgenomen · {todo} herkenning(en) vragen controle · publicatie geblokkeerd tot volledige kwaliteitscontrole.")
+        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])\n        candidates = len(self.data.get("vraagkandidaten", []))
+        self.status.configure(text=f"{count} document(en) opgenomen · {candidates} vraagstartkandidaten · {todo} documentherkenningen vragen controle · publicatie geblokkeerd.")
 
 def main():
     root = tk.Tk()
