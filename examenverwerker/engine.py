@@ -10,6 +10,36 @@ MC_RE = re.compile(r"^\s*([A-D])[\.\)]\s+")
 FIGURE_RE = re.compile(r"(?i)\b(afbeelding|figuur|tabel|schema)\s+(\d+)\b")
 POINTS_RE = re.compile(r"\((\d+)\s*(?:pnt|punten?)\)", re.I)
 
+
+DOC_ROLE_TERMS={
+    "opgaven":["opgaven","opgave","vragenboekje","examenopgaven"],
+    "correctievoorschrift":["correctievoorschrift","correctievoorschr","antwoordmodel","beoordelingsmodel"],
+    "uitwerkbijlage":["uitwerkbijlage","uitwerkblad"],
+    "aanvulling":["aanvulling","aanvullingen","erratum","errata"],
+}
+
+def classify_document_role(filename: str, text: str):
+    lower=filename.lower()
+    hay=(lower+" "+text[:12000].lower())
+    scores={kind:sum(2 if term in lower else 1 for term in terms if term in hay)
+            for kind,terms in DOC_ROLE_TERMS.items()}
+    if re.search(r"-(?:o)(?:-|\.pdf$)",lower): scores["opgaven"]+=3
+    if re.search(r"-(?:c)(?:-|\.pdf$)",lower): scores["correctievoorschrift"]+=3
+    if re.search(r"-(?:c)-a\d",lower): scores["aanvulling"]+=5
+    if "uitwerkbijlage" in lower or "uitwerkbijlage" in hay: scores["uitwerkbijlage"]+=5
+    best=max(scores,key=scores.get); ordered=sorted(scores.values(),reverse=True)
+    if ordered[0]==0: return "onbekend",0.0,scores
+    confidence=0.96 if ordered[0]>=4 and ordered[0]>ordered[1] else (0.78 if ordered[0]>ordered[1] else 0.35)
+    return best,confidence,scores
+
+def infer_exam_metadata(filename: str):
+    name=Path(filename).stem.lower()
+    m=re.search(r"(?:^|[-_])(ha|vw)[-_]1018[-_]a[-_](\d{2})[-_](\d+)[-_]([oc])(?:[-_]|$)",name)
+    if not m: m=re.search(r"(ha|vw)[-_]?(\d{2})t(\d+)",name)
+    if not m: return {}
+    return {"level":"Havo" if m.group(1)=="ha" else "Vwo","year":"20"+m.group(2),
+            "period":str(int(m.group(3))),"confidence":0.96,"source":"bestandsnaam"}
+
 def digest_file(path: Path) -> str:
     h=hashlib.sha256()
     with path.open("rb") as f:
