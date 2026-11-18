@@ -10,6 +10,8 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(classify_document_role("ha-1018-a-25-1-u.pdf","")[0],"uitwerkbijlage")
         self.assertEqual(infer_exam_metadata("ha-1018-a-24-1-o-spr.pdf")["level"],"Havo")
         self.assertEqual(infer_exam_metadata("vw-1018-a-26-2-o.pdf")["year"],"2026")
+        self.assertEqual(infer_exam_metadata("ha-1018-a-25-1-u.pdf")["period"],"1")
+        self.assertEqual(infer_exam_metadata("ha-1018-a-26-1-c-a1_0.pdf")["year"],"2026")
     def test_correction_scheme_matching_never_pools_other_exams(self):
         op={"bestand":"ha-1018-a-26-1-o.pdf"}
         cvs=[
