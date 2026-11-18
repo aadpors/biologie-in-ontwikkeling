@@ -783,6 +783,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 }
                 base_context_line_indices = context_line_indices[:]
                 anchored_context = False
+                list_prompt_applies_to_question = list_prompt_start is not None
                 anchor_text = manual_context_anchors.get((prefix, marker["number"]))
                 if anchor_text:
                     anchor_hits = page.search_for(anchor_text)
@@ -795,12 +796,20 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context = clean_context([lines[j]["text"] for j in context_line_indices])
                         context_y0 = max(0, anchor_y - 5)
                         anchored_context = True
+                        # A list found before this manually selected context
+                        # belongs to the preceding question, not this one.
+                        if (
+                            list_prompt_start is not None
+                            and context_line_indices
+                            and list_prompt_start < min(context_line_indices)
+                        ):
+                            list_prompt_applies_to_question = False
 
                 # Manual context anchors are applied after the automatic
                 # question-boundary detector. Reapply that boundary afterwards:
                 # otherwise an anchor can accidentally put numbered question
                 # statements back into the context text and context image.
-                if list_prompt_start is not None:
+                if list_prompt_applies_to_question:
                     context_line_indices = [
                         j for j in context_line_indices if j < list_prompt_start
                     ]
@@ -932,7 +941,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 context_record = None
                 if selected_context_page is None or page_index + 1 == selected_context_page:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
-                    question_start_line = list_prompt_start if list_prompt_start is not None else start
+                    question_start_line = list_prompt_start if list_prompt_applies_to_question else start
                     question_top = min(
                         max(0, lines[question_start_line]["bbox"][1] - 1), page.rect.height - 55
                     )
