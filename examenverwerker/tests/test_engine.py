@@ -119,7 +119,7 @@ class EngineTests(unittest.TestCase):
         record={"exam":{"questionType":"open"},"question_text":"Leg uit.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
                 "snippet_files":["q.png"],"cv_snippet_file":"cv-q1.png"}
         checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
-                   "images_and_context":True,"appendices":False}
+                   "images_and_context":True,"appendices":False,"cv_addenda":True}
         self.assertIn("controle_niet_afgevinkt:appendices",review_checklist_errors(record,checklist))
         checklist["appendices"]=True
         self.assertEqual(review_checklist_errors(record,checklist),[])
@@ -128,7 +128,7 @@ class EngineTests(unittest.TestCase):
         record={"exam":{"questionType":"open"},"question_text":"Leg uit.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
                 "snippet_files":["q.png"]}
         checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
-                   "images_and_context":True,"appendices":True}
+                   "images_and_context":True,"appendices":True,"cv_addenda":True}
         self.assertIn("cv_fragment_ontbreekt",review_checklist_errors(record,checklist))
 
     def test_mcq_approval_requires_answer_option_review(self):
