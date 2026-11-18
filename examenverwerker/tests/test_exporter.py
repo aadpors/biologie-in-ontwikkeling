@@ -43,6 +43,13 @@ class ExportTests(unittest.TestCase):
             manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["records"][0]["cv_amendment_pdfs"][0]["file"],"examens/aanvulling.pdf")
 
+    def test_approved_flag_without_complete_checklist_is_blocked(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["record_review_checklist"]["images_and_context"]=False
+            errors=validate_review_records([record],project)
+            self.assertIn("controle_niet_afgevinkt:images_and_context",[x["error"] for x in errors])
+
     def test_mismatched_official_correction_scheme_is_blocked(self):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
