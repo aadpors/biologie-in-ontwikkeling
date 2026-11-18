@@ -268,7 +268,7 @@ class ExamApp:
                 self._log(f"{doc['bestand']}: {len(candidates)} mogelijke vraagstarts gevonden; alles staat nog op controle nodig.")
                 total += len(candidates)
             except Exception as exc:
-                self._log(f"Vraaganalyse mislukt voor {doc['bestand']}: {exc}")
+                self._error(f"Vraaganalyse ({doc['bestand']})",exc)
         if cv_candidates:
             comparison = compare_question_numbering(all_op_candidates, cv_candidates)
             self.data["nummeringsvergelijking_cv"] = comparison
