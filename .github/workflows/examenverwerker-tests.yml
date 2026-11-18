@@ -6,6 +6,7 @@ on:
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-tests.yml"]
   pull_request:
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-tests.yml"]
+  workflow_dispatch:
 
 jobs:
   tests:
