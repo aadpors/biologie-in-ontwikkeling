@@ -903,16 +903,21 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # the statements have been removed from context by the
                 # boundary detector, so carry their text into the question
                 # prompt as well as the separate question image.
-                if (
-                    list_prompt_applies_to_question
-                    and list_prompt_start is not None
-                    and list_prompt_start < start
-                ):
+                if list_prompt_applies_to_question and list_prompt_start is not None:
+                    # The marker parser can place the printed question start
+                    # before or after the preceding statement block in PDF
+                    # reading order. Include the block unless it is already
+                    # present in the selected prompt.
                     lead_in_lines = [
-                        lines[j]["text"] for j in range(list_prompt_start, start)
+                        lines[j]["text"]
+                        for j in range(list_prompt_start, marker["number_line"])
                         if lines[j]["text"].strip()
                     ]
-                    selected_prompt = "\n".join([*lead_in_lines, selected_prompt]).strip()
+                    if (
+                        lead_in_lines
+                        and lead_in_lines[0].strip() not in selected_prompt
+                    ):
+                        selected_prompt = "\n".join([*lead_in_lines, selected_prompt]).strip()
 
                 # Determine where the question itself ends so later context can be
                 # carried forward without carrying the previous question into the next card.
@@ -1290,7 +1295,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     # line itself and let the top of the question leak into the
                     # context card. Keep a visible lower margin as well.
                     context_question_top = max(
-                        0, lines[marker["number_line"]]["bbox"][1]
+                        0, lines[question_start_line]["bbox"][1]
                     )
                     context_paths = context_image_fragments(
                         page, lines, context_line_indices, prefix,
