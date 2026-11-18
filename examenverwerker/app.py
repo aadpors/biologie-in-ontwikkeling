@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -288,13 +288,17 @@ class ExamApp:
         win.title("Mogelijke vraagstarts – altijd controleren")
         win.geometry("900x580")
         ttk.Label(win, text=f"{len(rows)} kandidaten gevonden. Herhaalde nummers blijven bewust zichtbaar.", padding=10).pack(anchor="w")
-        cols=("number","page","confidence","line","status")
+        cols=("number","page","confidence","line","learning","status")
         tree=ttk.Treeview(win,columns=cols,show="headings")
-        for col,label,width in [("number","Nr.",55),("page","PDF-pagina",90),("confidence","Signaal",90),("line","Gevonden tekst",520),("status","Status",140)]:
+        for col,label,width in [("number","Nr.",55),("page","PDF-pagina",90),("confidence","Signaal",80),("line","Gevonden tekst",430),("learning","Leerbank",125),("status","Status",140)]:
             tree.heading(col,text=label); tree.column(col,width=width)
         tree.pack(fill="both",expand=True,padx=10,pady=10)
         for i,row in enumerate(rows):
-            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",row.get("line"),row.get("status")))
+            learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
+            suggestion=learned.get("suggestion")
+            hint=("Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
+            if learned.get("support",0): hint+=f" ({learned['support']}×)"
+            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",row.get("line"),hint,row.get("status")))
         ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Jouw beoordeling wordt lokaal als leerdata opgeslagen.",wraplength=850).pack(anchor="w",padx=12,pady=(0,8))
         actions=ttk.Frame(win); actions.pack(fill="x",padx=12,pady=(0,12))
         def decide(is_question):
@@ -308,7 +312,7 @@ class ExamApp:
             row["human_decision"]=bool(is_question)
             row["decision_reason"]=reason
             learn_decision(self.project_dir/"kennisbank",{
-                "pattern_key":"question_start:numbered-line",
+                "pattern_key":question_pattern_key(row),
                 "chosen":"question" if is_question else "not_question",
                 "accepted":True,"scope":"voorstel_voor_toekomstige_herkenning",
                 "document_id":row.get("document_id"),"page":row.get("page"),
