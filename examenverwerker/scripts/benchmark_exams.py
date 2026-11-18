@@ -19,7 +19,7 @@ PATTERN=re.compile(r"^(ha|vw)-1018-a-(\d{2})-(\d+)-o(?:-|\.pdf)",re.I)
 
 def main():
     if not PDF_DIR.is_dir(): raise SystemExit(f"Examensmap niet gevonden: {PDF_DIR}")
-    rows=[]; failures=[]
+    rows=[]; failures=[]; warnings=[]
     for path in sorted(PDF_DIR.glob("*.pdf")):
         try:
             analysis=analyze_pdf(path)
@@ -30,10 +30,14 @@ def main():
             if match:
                 key=(match.group(1).lower(),match.group(2),match.group(3))
                 candidates=detect_question_candidates(analysis)
+                expected=EXPECTED.get(key)
                 item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo",
                              "year":"20"+key[1],"period":key[2],"candidate_count":len(candidates),
-                             "expected_question_count":EXPECTED.get(key)})
+                             "expected_question_count":expected,
+                             "candidate_count_delta":len(candidates)-expected if expected is not None else None})
                 if not candidates: failures.append(f"{path.name}: geen vraagstartkandidaten")
+                if expected is not None and len(candidates)!=expected:
+                    warnings.append(f"{path.name}: {len(candidates)} kandidaten tegenover {expected} bekende vragen; verschil {len(candidates)-expected}. Handmatige controle en detectieverbetering nodig.")
             elif "-c" in path.stem.lower(): item["role"]="correctievoorschrift"
             elif "-u" in path.stem.lower(): item["role"]="uitwerkbijlage"
             if item["pages"]<1: failures.append(f"{path.name}: geen pagina's")
@@ -42,12 +46,14 @@ def main():
         except Exception as exc:
             failures.append(f"{path.name}: {exc}")
     OUT.parent.mkdir(parents=True,exist_ok=True)
-    OUT.write_text(json.dumps({"pdf_count":len(rows),"failures":failures,"documents":rows},ensure_ascii=False,indent=2),encoding="utf-8")
+    OUT.write_text(json.dumps({"pdf_count":len(rows),"failures":failures,"warnings":warnings,"documents":rows},ensure_ascii=False,indent=2),encoding="utf-8")
     print(f"PDF's onderzocht: {len(rows)}")
-    print(f"Problemen: {len(failures)}")
+    print(f"Technische problemen: {len(failures)}")
+    print(f"Waarschuwingen over kandidaataantallen: {len(warnings)}")
     for row in rows:
         if row["role"]=="opgaven":
             print(f"{row['file']}: {row['candidate_count']} kandidaten (verwacht {row['expected_question_count']})")
+    for warning in warnings: print("WAARSCHUWING:",warning)
     for failure in failures: print("FOUT:",failure)
     if not rows: raise SystemExit("Geen examen-PDF's gevonden.")
     if failures: raise SystemExit(1)
