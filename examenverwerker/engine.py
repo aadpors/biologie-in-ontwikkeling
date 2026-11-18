@@ -208,6 +208,47 @@ def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Pat
             "method":"directe PDF-render; geen inhoudelijke beeldbewerking"}
 
 
+def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, scale: float = 1.5):
+    """Render multiple page regions into one tall PNG, preserving CV answers across pages."""
+    import pymupdf as fitz
+    if not segments:
+        raise ValueError("Geen fragmentregio's opgegeven.")
+    source = fitz.open(pdf_path)
+    try:
+        normalized=[]
+        width=0.0
+        total_height=0.0
+        for segment in segments:
+            page_no=int(segment["page"])
+            if not 1 <= page_no <= len(source):
+                raise ValueError(f"Ongeldig PDF-paginanummer: {page_no}")
+            rect=fitz.Rect(segment["bbox"])
+            rect &= source[page_no-1].rect
+            if rect.is_empty or rect.width <= 0 or rect.height <= 0:
+                continue
+            normalized.append((page_no-1,rect))
+            width=max(width,rect.width)
+            total_height += rect.height + 12.0
+        if not normalized:
+            raise ValueError("De opgegeven fragmenten bevatten geen zichtbaar paginagebied.")
+        output_doc=fitz.open()
+        try:
+            target_page=output_doc.new_page(width=width,height=max(100.0,total_height))
+            y=0.0
+            for page_index,clip in normalized:
+                target=fitz.Rect(0,y,clip.width,y+clip.height)
+                target_page.show_pdf_page(target,source,page_index,clip=clip,keep_proportion=False)
+                y += clip.height + 12.0
+            pix=target_page.get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
+            output.parent.mkdir(parents=True,exist_ok=True)
+            pix.save(output)
+        finally:
+            output_doc.close()
+    finally:
+        source.close()
+    return output
+
+
 def question_pattern_key(candidate: dict) -> str:
     line=str(candidate.get("line","")).strip()
     if re.match(r"^\d{1,2}[.)]\s+\S",line):
@@ -323,7 +364,17 @@ def detect_cv_question_numbers(analysis: dict) -> list[dict]:
             if key in seen:
                 continue
             seen.add(key)
-            found.append({"number": number, "page": page.get("page"),
+            bbox=None
+            for block in page.get("blocks",[]):
+                for text_line in block.get("lines",[]):
+                    if str(text_line.get("text","")).strip()==value:
+                        bbox=text_line.get("bbox")
+                        break
+                if bbox:
+                    break
+            if bbox is None:
+                bbox=[0.0,0.0,float(page.get("width",0)),0.0]
+            found.append({"number": number, "page": page.get("page"), "bbox": bbox,
                           "line": value, "confidence": 0.75,
                           "status": "controle_nodig",
                           "reason": "Vraaganker in correctievoorschrift; inhoudelijke controle vereist."})
