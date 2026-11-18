@@ -24,6 +24,7 @@ const discoveredExamYears = new Set(
     .map(name => name.match(/^(?:ha|vw)-1018-a-(\d{2})-\d-o(?:-[a-z0-9]+)?\.pdf$/i))
     .filter(Boolean)
     .map(match => `20${match[1]}`)
+    .filter(year => ["2024", "2025", "2026"].includes(year))
 );
 assert.ok(discoveredExamYears.size > 0, 'Geen examen-PDF’s gevonden');
 for (const year of discoveredExamYears) {
@@ -31,7 +32,7 @@ for (const year of discoveredExamYears) {
 }
 assert.ok(examPage.includes('De antwoordteksten staan in de oorspronkelijke opgave hierboven'), 'Meerkeuzevragen verwijzen niet naar de originele antwoordteksten');
 assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
-assert.ok(examPage.includes('Meerkeuzevragen hebben aanklikbare antwoordopties en directe feedback.'), 'De toelichting over de meerkeuze-interactie ontbreekt');
+assert.ok(examPage.includes('Meerkeuzevragen én juist/onjuist- en wel/niet-vragen worden automatisch nagekeken volgens het officiële correctievoorschrift.'), 'De toelichting over de automatische nakijkinteractie ontbreekt');
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
 assert.ok(open2024.length >= 3, 'Te weinig geselecteerde open vragen uit 2024');
 assert.ok(examQuestions.some(question => question.year === '2024' && question.options.length === 6), 'Meerkeuzevragen met zes antwoordopties (A-F) uit 2024 ontbreken');

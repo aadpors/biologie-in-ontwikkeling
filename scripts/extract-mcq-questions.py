@@ -23,6 +23,11 @@ def discover_exams():
         if not match:
             continue
         level_code, short_year, period = match.groups()
+        # The practice bank covers the complete 2024–2026 exam set. Older
+        # archived source PDFs without a paired correction scheme are not part
+        # of this bank and must not block reprocessing of the supported years.
+        if int(short_year) < 24 or int(short_year) > 26:
+            continue
         cv = exam_dir / f"{level_code}-1018-a-{short_year}-{period}-c.pdf"
         if not cv.is_file():
             raise FileNotFoundError(
