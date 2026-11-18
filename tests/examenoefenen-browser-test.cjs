@@ -317,7 +317,7 @@ const assert = require("node:assert/strict");
     assert.ok((await q29Question.getAttribute("src") || "").includes("question-ha25t1-29-only.jpg"));
     await q29Question.evaluate(img => img.decode());
     const q29Dimensions = await q29Question.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
-    assert.ok(q29Dimensions.width > 500 && q29Dimensions.height > 20, "Vraag 29 moet volledig en zonder een lege of afgesneden uitsnede worden getoond");
+    assert.ok(q29Dimensions.width > 500 && q29Dimensions.height > 20 && q29Dimensions.height < 120, "Vraag 29 moet volledig worden getoond, zonder afgesneden tekst of een te grote lege onderrand");
 
     // Vwo 2026-I Q18 contains two bullet-point marking criteria. The CV crop
     // must not stop at the introductory phrase or a right-aligned score value.
@@ -415,6 +415,7 @@ const assert = require("node:assert/strict");
       openAnswerPersistence: "PASS",
       selfAssessmentPersistence: "PASS",
       imageLoading: imageState,
+      cvAssetsChecked: cvInventory.length,
       appendices: [{ href: appendixHref, status: appendixResponse.status() }, { href: "examens/vw-1018-a-26-2-u.pdf", status: vwoAppendixResponse.status() }],
       pageErrors
     }, null, 2));
