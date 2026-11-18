@@ -103,6 +103,11 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(record["id"],"ha26t1-open-7")
         self.assertFalse(record["approved_by_human"])
         self.assertEqual(record["status"],"controle_nodig")
+    def test_cv_parser_rejects_bare_page_numbers(self):
+        a={"pages":[{"page":1,"text":"56\n57\n60\nVraag\n4\nmaximumscore 2\n"}]}
+        got=detect_cv_question_numbers(a)
+        self.assertEqual([x["number"] for x in got],[4])
+
     def test_cv_anchor_detection(self):
         a={"pages":[{"page":1,"text":"Vraag 1\\nBeoordelingsmodel\\nVraag 3"}]}
         got=detect_cv_question_numbers(a)
