@@ -61,7 +61,7 @@
     "q": "Leg uit dat in aanwezigheid van nicotine het beloningscentrum meer\ngeactiveerd wordt dan in aanwezigheid van acetylcholine.",
     "image": "exam-snippets/complete-vw24t1-open-2.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q2-fallback.jpg",
+      "exam-snippets/context-vw24t1-q2-complete.jpg",
       "exam-snippets/question-vw24t1-2-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -84,7 +84,7 @@
     "q": "Leg uit waardoor energiegebrek ontstaat als er minder bloed naar de\norganen stroomt.",
     "image": "exam-snippets/complete-ha24t1-open-3.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q3-fallback.jpg",
+      "exam-snippets/context-ha24t1-q1-complete.jpg",
       "exam-snippets/question-ha24t1-3-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -429,7 +429,7 @@
     "q": "Verklaar waardoor de populatiegrootte van andere soorten herbivoren\njuist kan afnemen.",
     "image": "exam-snippets/complete-vw24t1-open-13.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q13-fallback.jpg",
+      "exam-snippets/context-vw24t1-q13-complete.jpg",
       "exam-snippets/question-vw24t1-13-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -613,7 +613,7 @@
     "q": "Verklaar hoe een afname in biodiversiteit kan leiden tot een toename van\nhet aantal eikenprocessierupsen in eikenbossen.",
     "image": "exam-snippets/complete-ha24t1-open-18.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q18-fallback.jpg",
+      "exam-snippets/context-ha24t1-q18-complete.jpg",
       "exam-snippets/question-ha24t1-18-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -636,7 +636,7 @@
     "q": "Verklaar hoe een herbicide in de jonge koolmezen terecht kan komen.",
     "image": "exam-snippets/complete-vw24t1-open-18.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q18-fallback.jpg",
+      "exam-snippets/context-vw24t1-q18-complete.jpg",
       "exam-snippets/question-vw24t1-18-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -659,7 +659,7 @@
     "q": "Beredeneer dit.",
     "image": "exam-snippets/complete-ha24t1-open-19.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q19-fallback.jpg",
+      "exam-snippets/context-ha24t1-q19-complete.jpg",
       "exam-snippets/question-ha24t1-19-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -797,7 +797,7 @@
     "q": "Leg dit uit aan de hand van afbeelding 2.",
     "image": "exam-snippets/complete-vw24t1-open-23.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q23-fallback.jpg",
+      "exam-snippets/context-vw24t1-q23-complete.jpg",
       "exam-snippets/question-vw24t1-23-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -843,7 +843,7 @@
     "q": "Verklaar hoe een hoge bloeddruk oedeem kan veroorzaken.",
     "image": "exam-snippets/complete-vw24t1-open-24.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q24-fallback.jpg",
+      "exam-snippets/context-vw24t1-q24-complete.jpg",
       "exam-snippets/question-vw24t1-24-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -981,7 +981,7 @@
     "q": "Beschrijf op welke manier oestradiol wordt uitgescheiden zodat het\nterechtkomt in de ontlasting.",
     "image": "exam-snippets/complete-ha24t1-open-29.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q29-fallback.jpg",
+      "exam-snippets/context-ha24t1-q29-complete.jpg",
       "exam-snippets/question-ha24t1-29-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -1004,7 +1004,7 @@
     "q": "Leg uit hoe hemolyse leidt tot deze geelverkleuring.",
     "image": "exam-snippets/complete-vw24t1-open-29.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q29-fallback.jpg",
+      "exam-snippets/context-vw24t1-q29-complete.jpg",
       "exam-snippets/question-vw24t1-29-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -1211,7 +1211,7 @@
     "q": "Beargumenteer dat bonenziekte geen allergische reactie is.",
     "image": "exam-snippets/complete-vw24t1-open-37.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q37-fallback.jpg",
+      "exam-snippets/context-vw24t1-q37-complete.jpg",
       "exam-snippets/question-vw24t1-37-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-1-o-spr.pdf",
@@ -1717,7 +1717,7 @@
     "q": "Bereken hoeveel liter bloed per minuut het hart van deze persoon\nrondpompt tijdens deze ecg-meting. Rond je antwoord af op één\ndecimaal.",
     "image": "exam-snippets/complete-ha24t2-open-9.jpg",
     "images": [
-      "exam-snippets/context-ha24t2-q9-fallback.jpg",
+      "exam-snippets/context-ha24t2-q9-complete.jpg",
       "exam-snippets/question-ha24t2-9-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
@@ -2453,7 +2453,7 @@
     "q": "Bereken hoeveel mensen in Nederland geholpen zouden kunnen worden\nmet Slybera. Ga ervan uit dat de regel van Hardy-Weinberg van\ntoepassing is en dat het bevolkingsaantal van Nederland 18 miljoen is.",
     "image": "exam-snippets/complete-vw24t2-open-28.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q28-fallback.jpg",
+      "exam-snippets/context-vw24t2-q28-complete.jpg",
       "exam-snippets/question-vw24t2-28-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
@@ -2660,7 +2660,7 @@
     "q": "Noteer de belangrijkste functie van deze medicijnen.",
     "image": "exam-snippets/complete-ha24t2-open-36.jpg",
     "images": [
-      "exam-snippets/context-ha24t2-q36-fallback.jpg",
+      "exam-snippets/context-ha24t2-q36-complete.jpg",
       "exam-snippets/question-ha24t2-36-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
@@ -2798,7 +2798,7 @@
     "q": "Leg uit dat een kortere stengel van witte klaver nadelig is voor de\nknolletjesbacteriën als er ook andere plantensoorten aanwezig zijn.",
     "image": "exam-snippets/complete-vw24t2-open-41.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q41-fallback.jpg",
+      "exam-snippets/context-vw24t2-q41-complete.jpg",
       "exam-snippets/question-vw24t2-41-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
@@ -2936,7 +2936,7 @@
     "q": "Licht toe wat in de gifproducerende cellen de functie is van\n\nhet grote aantal ribosomen;\n\nhet grote golgi-systeem.",
     "image": "exam-snippets/complete-vw25t1-open-2.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q2-fallback.jpg",
+      "exam-snippets/context-vw25t1-q2-complete.jpg",
       "exam-snippets/question-vw25t1-2-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -3005,7 +3005,7 @@
     "q": "Verklaar dit op moleculair niveau.",
     "image": "exam-snippets/complete-vw25t1-open-4.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q4-fallback.jpg",
+      "exam-snippets/context-vw25t1-q4-complete.jpg",
       "exam-snippets/question-vw25t1-4-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -3235,7 +3235,7 @@
     "q": "Leg uit hoe transport van water naar de bladeren afneemt als gevolg van\nhet zuurstoftekort in de cellen van de wortels.",
     "image": "exam-snippets/complete-vw25t1-open-9.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q9-fallback.jpg",
+      "exam-snippets/context-vw25t1-q9-complete.jpg",
       "exam-snippets/question-vw25t1-9-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -3258,7 +3258,7 @@
     "q": "Geef een argument voor deze stelling.",
     "image": "exam-snippets/complete-ha25t1-open-10.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q10-fallback.jpg",
+      "exam-snippets/context-ha25t1-q10-complete.jpg",
       "exam-snippets/question-ha25t1-10-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
@@ -3565,7 +3565,7 @@
     "q": "Noteer de naam van dit C3-molecuul. Gebruik je informatieboek.",
     "image": "exam-snippets/complete-vw25t1-open-19.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q19-fallback.jpg",
+      "exam-snippets/context-vw25t1-q19-complete.jpg",
       "exam-snippets/question-vw25t1-19-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -3910,7 +3910,7 @@
     "q": "Noteer de naam van dit eiwit.",
     "image": "exam-snippets/complete-ha25t1-open-29.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q29-fallback.jpg",
+      "exam-snippets/context-ha25t1-q29-complete.jpg",
       "exam-snippets/question-ha25t1-29-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
@@ -4025,7 +4025,7 @@
     "q": "Beschrijf hoe evolutie tot een grotere milt kan hebben geleid.",
     "image": "exam-snippets/complete-ha25t1-open-34.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q34-fallback.jpg",
+      "exam-snippets/context-ha25t1-q34-complete.jpg",
       "exam-snippets/question-ha25t1-34-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
@@ -4094,7 +4094,7 @@
     "q": "Verklaar dat histidine vooral in eiwitrijke producten aanwezig is.",
     "image": "exam-snippets/complete-vw25t1-open-35.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q35-fallback.jpg",
+      "exam-snippets/context-vw25t1-q35-complete.jpg",
       "exam-snippets/question-vw25t1-35-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-1-o.pdf",
@@ -4652,7 +4652,7 @@
     "q": "Noteer de namen van drie anorganische verbindingen die de plant ten\nminste moet hebben opgenomen als bouwstoffen voor putrescine.",
     "image": "exam-snippets/complete-vw25t2-open-7.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q7-fallback.jpg",
+      "exam-snippets/context-vw25t2-q7-complete.jpg",
       "exam-snippets/question-vw25t2-7-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
@@ -4675,7 +4675,7 @@
     "q": "Noteer de mogelijke fenotypen van de nakomelingen van deze\nkruising als haan II-5 heterozygoot is.\n\nNoteer de verhouding waarin deze fenotypen dan aanwezig zijn.",
     "image": "exam-snippets/complete-ha25t2-open-8.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q8-fallback.jpg",
+      "exam-snippets/context-ha25t2-q8-complete.jpg",
       "exam-snippets/question-ha25t2-8-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
@@ -4814,7 +4814,7 @@
     "q": "Noteer de naam van het proces dat in deze gistcellen optreedt waardoor\nethanol ontstaat.",
     "image": "exam-snippets/complete-ha25t2-open-11.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q11-fallback.jpg",
+      "exam-snippets/context-ha25t2-q11-complete.jpg",
       "exam-snippets/question-ha25t2-11-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
@@ -4837,7 +4837,7 @@
     "q": "Geef de namen van de eindproducten die ontstaan bij het proces dat\nplaatsvindt als zuurstof wel aanwezig is.",
     "image": "exam-snippets/complete-ha25t2-open-12.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q12-fallback.jpg",
+      "exam-snippets/context-ha25t2-q12-complete.jpg",
       "exam-snippets/question-ha25t2-12-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
@@ -5044,7 +5044,7 @@
     "q": "Noteer de naam van de cellen van het verworven afweersysteem die\ngeïnfecteerde cellen kunnen lekprikken.",
     "image": "exam-snippets/complete-ha25t2-open-19.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q19-fallback.jpg",
+      "exam-snippets/context-ha25t2-q19-complete.jpg",
       "exam-snippets/question-ha25t2-19-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
@@ -5090,7 +5090,7 @@
     "q": "Licht toe waarom deze niet gebruikt konden worden voor stap 3 en 4.",
     "image": "exam-snippets/complete-vw25t2-open-20.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q20-fallback.jpg",
+      "exam-snippets/context-vw25t2-q20-complete.jpg",
       "exam-snippets/question-vw25t2-20-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
@@ -5182,7 +5182,7 @@
     "q": "Zal de TSH-concentratie in het bloed van Ellen voorafgaand aan de\nbehandeling met methimazol hoger of lager zijn geweest dan die bij een\ngezonde persoon? Licht je antwoord toe.",
     "image": "exam-snippets/complete-vw25t2-open-24.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q24-fallback.jpg",
+      "exam-snippets/context-vw25t2-q24-complete.jpg",
       "exam-snippets/question-vw25t2-24-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
@@ -5297,7 +5297,7 @@
     "q": "Beschrijf op molecuulniveau wat het directe effect is van de\nveranderde structuur van het IgG.\n\nBeschrijf wat het gevolg is van de veranderde structuur van het IgG\nvoor de werking van de schildklier.",
     "image": "exam-snippets/complete-vw25t2-open-28.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q28-fallback.jpg",
+      "exam-snippets/context-vw25t2-q28-complete.jpg",
       "exam-snippets/question-vw25t2-28-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-25-2-o.pdf",
@@ -5964,7 +5964,7 @@
     "q": "Verklaar waardoor de bloeddruk stijgt als het slagvolume toeneemt.",
     "image": "exam-snippets/complete-ha26t1-open-4.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q4-fallback.jpg",
+      "exam-snippets/context-ha26t1-q4-complete.jpg",
       "exam-snippets/question-ha26t1-4-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -6286,7 +6286,7 @@
     "q": "Is de gemodificeerde E. coli cisgeen of transgeen? Licht je antwoord toe.",
     "image": "exam-snippets/complete-vw26t1-open-14.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q14-fallback.jpg",
+      "exam-snippets/context-vw26t1-q14-complete.jpg",
       "exam-snippets/question-vw26t1-14-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -6516,7 +6516,7 @@
     "q": "Verklaar waardoor er bij de eerste steek geen allergische reactie op\nbijengif kan ontstaan.",
     "image": "exam-snippets/complete-vw26t1-open-21.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q21-fallback.jpg",
+      "exam-snippets/context-vw26t1-q21-complete.jpg",
       "exam-snippets/question-vw26t1-21-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -6700,7 +6700,7 @@
     "q": "Leg uit hoe een mutatie bij de ziekteverwekker ertoe kan leiden dat de\nplant wel geïnfecteerd kan worden.",
     "image": "exam-snippets/complete-ha26t1-open-28.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q28-fallback.jpg",
+      "exam-snippets/context-ha26t1-q28-complete.jpg",
       "exam-snippets/question-ha26t1-28-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -6769,7 +6769,7 @@
     "q": "Verklaar hoe obesitas zou kunnen bijdragen aan de afwezigheid van\nbruin vetweefsel.\n\nVerklaar hoe de afwezigheid van bruin vetweefsel zou kunnen\nbijdragen aan het ontstaan van obesitas.",
     "image": "exam-snippets/complete-vw26t1-open-29.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q29-fallback.jpg",
+      "exam-snippets/context-vw26t1-q29-complete.jpg",
       "exam-snippets/question-vw26t1-29-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-1-o.pdf",
@@ -6907,7 +6907,7 @@
     "q": "Hoe kan zonder DNA-analyse vastgesteld worden dat de verschillende\npopulaties tot verschillende soorten behoren?",
     "image": "exam-snippets/complete-ha26t1-open-34.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q34-fallback.jpg",
+      "exam-snippets/context-ha26t1-q34-complete.jpg",
       "exam-snippets/question-ha26t1-34-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-1-o.pdf",
@@ -7531,7 +7531,7 @@
     "q": "Beredeneer hoe eutrofiëring zou kunnen bijdragen aan de verdringing van\nT. testudinum door H. stipulacea. Geef hierbij aan wat eutrofiëring is, en\nwat de rol is van licht bij de verdringing.",
     "image": "exam-snippets/complete-ha26t2-open-13.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q13-fallback.jpg",
+      "exam-snippets/context-ha26t2-q13-complete.jpg",
       "exam-snippets/question-ha26t2-13-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
@@ -7968,7 +7968,7 @@
     "q": "Beredeneer aan de hand van een factor uit de wet van Fick hoe de\nzwelling van het darmslijmvlies leidt tot verminderde opname van water.",
     "image": "exam-snippets/complete-vw26t2-open-24.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q24-fallback.jpg",
+      "exam-snippets/context-vw26t2-q24-complete.jpg",
       "exam-snippets/question-vw26t2-24-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
@@ -8155,7 +8155,7 @@
     "q": "Licht toe waarom de toediening herhaald moet worden.",
     "image": "exam-snippets/complete-vw26t2-open-30.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q30-fallback.jpg",
+      "exam-snippets/context-vw26t2-q30-complete.jpg",
       "exam-snippets/question-vw26t2-30-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-26-2-o.pdf",
@@ -8569,7 +8569,7 @@
     "q": "Leg uit hoe diarree ontstaat door de vorming van monosachariden in de\ndikke darm.",
     "image": "exam-snippets/complete-ha26t2-open-44.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q44-fallback.jpg",
+      "exam-snippets/context-ha26t2-q44-complete.jpg",
       "exam-snippets/question-ha26t2-44-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",

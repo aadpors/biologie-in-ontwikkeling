@@ -31,7 +31,7 @@
     "page": 3,
     "image": "exam-snippets/complete-havo-2024-t1-q3.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q3-fallback.jpg",
+      "exam-snippets/context-ha24t1-q1-complete.jpg",
       "exam-snippets/question-ha24t1-3-only.jpg"
     ]
   },
@@ -67,7 +67,7 @@
     "page": 4,
     "image": "exam-snippets/complete-havo-2024-t1-q6.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q6-fallback.jpg",
+      "exam-snippets/context-ha24t1-q6-complete.jpg",
       "exam-snippets/question-ha24t1-6-only.jpg"
     ]
   },
@@ -211,7 +211,7 @@
     "page": 10,
     "image": "exam-snippets/complete-havo-2024-t1-q18.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q18-fallback.jpg",
+      "exam-snippets/context-ha24t1-q18-complete.jpg",
       "exam-snippets/question-ha24t1-18-only.jpg"
     ]
   },
@@ -223,7 +223,7 @@
     "page": 10,
     "image": "exam-snippets/complete-havo-2024-t1-q19.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q19-fallback.jpg",
+      "exam-snippets/context-ha24t1-q19-complete.jpg",
       "exam-snippets/question-ha24t1-19-only.jpg"
     ]
   },
@@ -343,7 +343,7 @@
     "page": 14,
     "image": "exam-snippets/complete-havo-2024-t1-q29.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q29-fallback.jpg",
+      "exam-snippets/context-ha24t1-q29-complete.jpg",
       "exam-snippets/question-ha24t1-29-only.jpg"
     ]
   },
@@ -463,7 +463,7 @@
     "page": 19,
     "image": "exam-snippets/complete-havo-2024-t1-q39.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q39-fallback.jpg",
+      "exam-snippets/context-ha24t1-q39-complete.jpg",
       "exam-snippets/question-ha24t1-39-only.jpg"
     ]
   },
@@ -643,7 +643,7 @@
     "page": 5,
     "image": "exam-snippets/complete-havo-2024-t2-q9.jpg",
     "images": [
-      "exam-snippets/context-ha24t2-q9-fallback.jpg",
+      "exam-snippets/context-ha24t2-q9-complete.jpg",
       "exam-snippets/question-ha24t2-9-only.jpg"
     ]
   },
@@ -967,7 +967,7 @@
     "page": 15,
     "image": "exam-snippets/complete-havo-2024-t2-q36.jpg",
     "images": [
-      "exam-snippets/context-ha24t2-q36-fallback.jpg",
+      "exam-snippets/context-ha24t2-q36-complete.jpg",
       "exam-snippets/question-ha24t2-36-only.jpg"
     ]
   },
@@ -1231,7 +1231,7 @@
     "page": 5,
     "image": "exam-snippets/complete-havo-2025-t1-q10.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q10-fallback.jpg",
+      "exam-snippets/context-ha25t1-q10-complete.jpg",
       "exam-snippets/question-ha25t1-10-only.jpg"
     ]
   },
@@ -1315,7 +1315,7 @@
     "page": 8,
     "image": "exam-snippets/complete-havo-2025-t1-q17.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q17-fallback.jpg",
+      "exam-snippets/context-ha25t1-q17-complete.jpg",
       "exam-snippets/question-ha25t1-17-only.jpg"
     ]
   },
@@ -1447,7 +1447,7 @@
     "page": 13,
     "image": "exam-snippets/complete-havo-2025-t1-q28.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q28-fallback.jpg",
+      "exam-snippets/context-ha25t1-q28-complete.jpg",
       "exam-snippets/question-ha25t1-28-only.jpg"
     ]
   },
@@ -1459,7 +1459,7 @@
     "page": 13,
     "image": "exam-snippets/complete-havo-2025-t1-q29.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q29-fallback.jpg",
+      "exam-snippets/context-ha25t1-q29-complete.jpg",
       "exam-snippets/question-ha25t1-29-only.jpg"
     ]
   },
@@ -1519,7 +1519,7 @@
     "page": 14,
     "image": "exam-snippets/complete-havo-2025-t1-q34.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q34-fallback.jpg",
+      "exam-snippets/context-ha25t1-q34-complete.jpg",
       "exam-snippets/question-ha25t1-34-only.jpg"
     ]
   },
@@ -1783,7 +1783,7 @@
     "page": 5,
     "image": "exam-snippets/complete-havo-2025-t2-q8.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q8-fallback.jpg",
+      "exam-snippets/context-ha25t2-q8-complete.jpg",
       "exam-snippets/question-ha25t2-8-only.jpg"
     ]
   },
@@ -1820,7 +1820,7 @@
     "page": 6,
     "image": "exam-snippets/complete-havo-2025-t2-q11.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q11-fallback.jpg",
+      "exam-snippets/context-ha25t2-q11-complete.jpg",
       "exam-snippets/question-ha25t2-11-only.jpg"
     ]
   },
@@ -1832,7 +1832,7 @@
     "page": 6,
     "image": "exam-snippets/complete-havo-2025-t2-q12.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q12-fallback.jpg",
+      "exam-snippets/context-ha25t2-q12-complete.jpg",
       "exam-snippets/question-ha25t2-12-only.jpg"
     ]
   },
@@ -1916,7 +1916,7 @@
     "page": 9,
     "image": "exam-snippets/complete-havo-2025-t2-q19.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q19-fallback.jpg",
+      "exam-snippets/context-ha25t2-q19-complete.jpg",
       "exam-snippets/question-ha25t2-19-only.jpg"
     ]
   },
@@ -2252,7 +2252,7 @@
     "page": 4,
     "image": "exam-snippets/complete-havo-2026-t1-q3.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q3-fallback.jpg",
+      "exam-snippets/context-ha26t1-q3-complete.jpg",
       "exam-snippets/question-ha26t1-3-only.jpg"
     ]
   },
@@ -2264,7 +2264,7 @@
     "page": 4,
     "image": "exam-snippets/complete-havo-2026-t1-q4.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q4-fallback.jpg",
+      "exam-snippets/context-ha26t1-q4-complete.jpg",
       "exam-snippets/question-ha26t1-4-only.jpg"
     ]
   },
@@ -2552,7 +2552,7 @@
     "page": 13,
     "image": "exam-snippets/complete-havo-2026-t1-q28.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q28-fallback.jpg",
+      "exam-snippets/context-ha26t1-q28-complete.jpg",
       "exam-snippets/question-ha26t1-28-only.jpg"
     ]
   },
@@ -2624,7 +2624,7 @@
     "page": 16,
     "image": "exam-snippets/complete-havo-2026-t1-q34.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q34-fallback.jpg",
+      "exam-snippets/context-ha26t1-q34-complete.jpg",
       "exam-snippets/question-ha26t1-34-only.jpg"
     ]
   },
@@ -2732,7 +2732,7 @@
     "page": 20,
     "image": "exam-snippets/complete-havo-2026-t1-q43.jpg",
     "images": [
-      "exam-snippets/context-ha26t1-q43-fallback.jpg",
+      "exam-snippets/context-ha26t1-q43-complete.jpg",
       "exam-snippets/question-ha26t1-43-only.jpg"
     ]
   },
@@ -2756,7 +2756,7 @@
     "page": 2,
     "image": "exam-snippets/complete-havo-2026-t2-q2.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q2-fallback.jpg",
+      "exam-snippets/context-ha26t2-q2-complete.jpg",
       "exam-snippets/question-ha26t2-2-only.jpg"
     ]
   },
@@ -2816,7 +2816,7 @@
     "page": 4,
     "image": "exam-snippets/complete-havo-2026-t2-q7.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q7-fallback.jpg",
+      "exam-snippets/context-ha26t2-q7-complete.jpg",
       "exam-snippets/question-ha26t2-7-only.jpg"
     ]
   },
@@ -2888,7 +2888,7 @@
     "page": 6,
     "image": "exam-snippets/complete-havo-2026-t2-q13.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q13-fallback.jpg",
+      "exam-snippets/context-ha26t2-q13-complete.jpg",
       "exam-snippets/question-ha26t2-13-only.jpg"
     ]
   },
@@ -3260,7 +3260,7 @@
     "page": 19,
     "image": "exam-snippets/complete-havo-2026-t2-q44.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q44-fallback.jpg",
+      "exam-snippets/context-ha26t2-q44-complete.jpg",
       "exam-snippets/question-ha26t2-44-only.jpg"
     ]
   },
@@ -3308,7 +3308,7 @@
     "page": 2,
     "image": "exam-snippets/complete-vwo-2024-t1-q2.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q2-fallback.jpg",
+      "exam-snippets/context-vw24t1-q2-complete.jpg",
       "exam-snippets/question-vw24t1-2-only.jpg"
     ]
   },
@@ -3440,7 +3440,7 @@
     "page": 7,
     "image": "exam-snippets/complete-vwo-2024-t1-q13.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q13-fallback.jpg",
+      "exam-snippets/context-vw24t1-q13-complete.jpg",
       "exam-snippets/question-vw24t1-13-only.jpg"
     ]
   },
@@ -3500,7 +3500,7 @@
     "page": 10,
     "image": "exam-snippets/complete-vwo-2024-t1-q18.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q18-fallback.jpg",
+      "exam-snippets/context-vw24t1-q18-complete.jpg",
       "exam-snippets/question-vw24t1-18-only.jpg"
     ]
   },
@@ -3560,7 +3560,7 @@
     "page": 13,
     "image": "exam-snippets/complete-vwo-2024-t1-q23.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q23-fallback.jpg",
+      "exam-snippets/context-vw24t1-q23-complete.jpg",
       "exam-snippets/question-vw24t1-23-only.jpg"
     ]
   },
@@ -3572,7 +3572,7 @@
     "page": 13,
     "image": "exam-snippets/complete-vwo-2024-t1-q24.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q24-fallback.jpg",
+      "exam-snippets/context-vw24t1-q24-complete.jpg",
       "exam-snippets/question-vw24t1-24-only.jpg"
     ]
   },
@@ -3632,7 +3632,7 @@
     "page": 15,
     "image": "exam-snippets/complete-vwo-2024-t1-q29.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q29-fallback.jpg",
+      "exam-snippets/context-vw24t1-q29-complete.jpg",
       "exam-snippets/question-vw24t1-29-only.jpg"
     ]
   },
@@ -3644,7 +3644,7 @@
     "page": 15,
     "image": "exam-snippets/complete-vwo-2024-t1-q30.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q30-fallback.jpg",
+      "exam-snippets/context-vw24t1-q30-complete.jpg",
       "exam-snippets/question-vw24t1-30-only.jpg"
     ]
   },
@@ -3728,7 +3728,7 @@
     "page": 17,
     "image": "exam-snippets/complete-vwo-2024-t1-q37.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q37-fallback.jpg",
+      "exam-snippets/context-vw24t1-q37-complete.jpg",
       "exam-snippets/question-vw24t1-37-only.jpg"
     ]
   },
@@ -3776,7 +3776,7 @@
     "page": 19,
     "image": "exam-snippets/complete-vwo-2024-t1-q41.jpg",
     "images": [
-      "exam-snippets/context-vw24t1-q41-fallback.jpg",
+      "exam-snippets/context-vw24t1-q41-complete.jpg",
       "exam-snippets/question-vw24t1-41-only.jpg"
     ]
   },
@@ -3956,7 +3956,7 @@
     "page": 7,
     "image": "exam-snippets/complete-vwo-2024-t2-q14.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q14-fallback.jpg",
+      "exam-snippets/context-vw24t2-q14-complete.jpg",
       "exam-snippets/question-vw24t2-14-only.jpg"
     ]
   },
@@ -4124,7 +4124,7 @@
     "page": 14,
     "image": "exam-snippets/complete-vwo-2024-t2-q28.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q28-fallback.jpg",
+      "exam-snippets/context-vw24t2-q28-complete.jpg",
       "exam-snippets/question-vw24t2-28-only.jpg"
     ]
   },
@@ -4256,7 +4256,7 @@
     "page": 20,
     "image": "exam-snippets/complete-vwo-2024-t2-q39.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q39-fallback.jpg",
+      "exam-snippets/context-vw24t2-q39-complete.jpg",
       "exam-snippets/question-vw24t2-39-only.jpg"
     ]
   },
@@ -4280,7 +4280,7 @@
     "page": 20,
     "image": "exam-snippets/complete-vwo-2024-t2-q41.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q41-fallback.jpg",
+      "exam-snippets/context-vw24t2-q41-complete.jpg",
       "exam-snippets/question-vw24t2-41-only.jpg"
     ]
   },
@@ -4304,7 +4304,7 @@
     "page": 3,
     "image": "exam-snippets/complete-vwo-2025-t1-q2.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q2-fallback.jpg",
+      "exam-snippets/context-vw25t1-q2-complete.jpg",
       "exam-snippets/question-vw25t1-2-only.jpg"
     ]
   },
@@ -4328,7 +4328,7 @@
     "page": 3,
     "image": "exam-snippets/complete-vwo-2025-t1-q4.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q4-fallback.jpg",
+      "exam-snippets/context-vw25t1-q4-complete.jpg",
       "exam-snippets/question-vw25t1-4-only.jpg"
     ]
   },
@@ -4388,7 +4388,7 @@
     "page": 5,
     "image": "exam-snippets/complete-vwo-2025-t1-q9.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q9-fallback.jpg",
+      "exam-snippets/context-vw25t1-q9-complete.jpg",
       "exam-snippets/question-vw25t1-9-only.jpg"
     ]
   },
@@ -4513,7 +4513,7 @@
     "page": 11,
     "image": "exam-snippets/complete-vwo-2025-t1-q19.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q19-fallback.jpg",
+      "exam-snippets/context-vw25t1-q19-complete.jpg",
       "exam-snippets/question-vw25t1-19-only.jpg"
     ]
   },
@@ -4525,7 +4525,7 @@
     "page": 11,
     "image": "exam-snippets/complete-vwo-2025-t1-q20.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q20-fallback.jpg",
+      "exam-snippets/context-vw25t1-q20-complete.jpg",
       "exam-snippets/question-vw25t1-20-only.jpg"
     ]
   },
@@ -4705,7 +4705,7 @@
     "page": 17,
     "image": "exam-snippets/complete-vwo-2025-t1-q35.jpg",
     "images": [
-      "exam-snippets/context-vw25t1-q35-fallback.jpg",
+      "exam-snippets/context-vw25t1-q35-complete.jpg",
       "exam-snippets/question-vw25t1-35-only.jpg"
     ]
   },
@@ -4849,7 +4849,7 @@
     "page": 5,
     "image": "exam-snippets/complete-vwo-2025-t2-q7.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q7-fallback.jpg",
+      "exam-snippets/context-vw25t2-q7-complete.jpg",
       "exam-snippets/question-vw25t2-7-only.jpg"
     ]
   },
@@ -4909,7 +4909,7 @@
     "page": 6,
     "image": "exam-snippets/complete-vwo-2025-t2-q12.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q12-fallback.jpg",
+      "exam-snippets/context-vw25t2-q12-complete.jpg",
       "exam-snippets/question-vw25t2-12-only.jpg"
     ]
   },
@@ -5005,7 +5005,7 @@
     "page": 9,
     "image": "exam-snippets/complete-vwo-2025-t2-q20.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q20-fallback.jpg",
+      "exam-snippets/context-vw25t2-q20-complete.jpg",
       "exam-snippets/question-vw25t2-20-only.jpg"
     ]
   },
@@ -5053,7 +5053,7 @@
     "page": 11,
     "image": "exam-snippets/complete-vwo-2025-t2-q24.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q24-fallback.jpg",
+      "exam-snippets/context-vw25t2-q24-complete.jpg",
       "exam-snippets/question-vw25t2-24-only.jpg"
     ]
   },
@@ -5101,7 +5101,7 @@
     "page": 13,
     "image": "exam-snippets/complete-vwo-2025-t2-q28.jpg",
     "images": [
-      "exam-snippets/context-vw25t2-q28-fallback.jpg",
+      "exam-snippets/context-vw25t2-q28-complete.jpg",
       "exam-snippets/question-vw25t2-28-only.jpg"
     ]
   },
@@ -5437,7 +5437,7 @@
     "page": 7,
     "image": "exam-snippets/complete-vwo-2026-t1-q14.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q14-fallback.jpg",
+      "exam-snippets/context-vw26t1-q14-complete.jpg",
       "exam-snippets/question-vw26t1-14-only.jpg"
     ]
   },
@@ -5449,7 +5449,7 @@
     "page": 7,
     "image": "exam-snippets/complete-vwo-2026-t1-q15.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q15-fallback.jpg",
+      "exam-snippets/context-vw26t1-q15-complete.jpg",
       "exam-snippets/question-vw26t1-15-only.jpg"
     ]
   },
@@ -5521,7 +5521,7 @@
     "page": 9,
     "image": "exam-snippets/complete-vwo-2026-t1-q21.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q21-fallback.jpg",
+      "exam-snippets/context-vw26t1-q21-complete.jpg",
       "exam-snippets/question-vw26t1-21-only.jpg"
     ]
   },
@@ -5581,7 +5581,7 @@
     "page": 11,
     "image": "exam-snippets/complete-vwo-2026-t1-q26.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q26-fallback.jpg",
+      "exam-snippets/context-vw26t1-q26-complete.jpg",
       "exam-snippets/question-vw26t1-26-only.jpg"
     ]
   },
@@ -5617,7 +5617,7 @@
     "page": 13,
     "image": "exam-snippets/complete-vwo-2026-t1-q29.jpg",
     "images": [
-      "exam-snippets/context-vw26t1-q29-fallback.jpg",
+      "exam-snippets/context-vw26t1-q29-complete.jpg",
       "exam-snippets/question-vw26t1-29-only.jpg"
     ]
   },
@@ -5953,7 +5953,7 @@
     "page": 9,
     "image": "exam-snippets/complete-vwo-2026-t2-q16.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q16-fallback.jpg",
+      "exam-snippets/context-vw26t2-q16-complete.jpg",
       "exam-snippets/question-vw26t2-16-only.jpg"
     ]
   },
@@ -6049,7 +6049,7 @@
     "page": 13,
     "image": "exam-snippets/complete-vwo-2026-t2-q24.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q24-fallback.jpg",
+      "exam-snippets/context-vw26t2-q24-complete.jpg",
       "exam-snippets/question-vw26t2-24-only.jpg"
     ]
   },
@@ -6121,7 +6121,7 @@
     "page": 15,
     "image": "exam-snippets/complete-vwo-2026-t2-q30.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q30-fallback.jpg",
+      "exam-snippets/context-vw26t2-q30-complete.jpg",
       "exam-snippets/question-vw26t2-30-only.jpg"
     ]
   },
@@ -6169,7 +6169,7 @@
     "page": 17,
     "image": "exam-snippets/complete-vwo-2026-t2-q34.jpg",
     "images": [
-      "exam-snippets/context-vw26t2-q34-fallback.jpg",
+      "exam-snippets/context-vw26t2-q34-complete.jpg",
       "exam-snippets/question-vw26t2-34-only.jpg"
     ]
   },
