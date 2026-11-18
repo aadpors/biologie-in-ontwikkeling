@@ -30,6 +30,32 @@ for filename, label in DATASETS:
                 f"{label} {qid}: gedeelde algemene hartklepcontext ontbreekt "
                 "of staat niet vóór de vraagafbeelding"
             )
+        # A numbered statement list is part of the question whenever the
+        # response asks students to judge/identify those statements. It must
+        # not remain in the general context text; the renderer starts the
+        # question crop at the detected lead-in.
+        question_prompt = record.get("q", "")
+        numbered_answer = bool(
+            __import__("re").search(
+                r"(?i)(schrijf|noteer)\\s+de\\s+nummers|welke\\s+uitspraak|"
+                r"welk\\s+van\\s+deze\\s+uitspraken|welke\\s+van\\s+deze\\s+uitspraken",
+                question_prompt,
+            )
+        )
+        source_text = record.get("source", "")
+        has_statement_block = bool(
+            __import__("re").search(
+                r"(?is)(?:uitspraken?|situaties?|onderdelen|processen|stoffen|"
+                r"kenmerken|gevolgen|conclusies|gegevens)[^\\n]*:?\\s*"
+                r"(?:\\n[^\\n]*){0,2}\\n\\s*1(?:[.)]\\s+|\\s+\\S).*?"
+                r"\\n\\s*2(?:[.)]\\s+|\\s+\\S)",
+                source_text,
+            )
+        )
+        if numbered_answer and has_statement_block:
+            errors.append(
+                f"{label} {qid}: genummerde vraagonderdelen staan nog in de algemene contexttekst"
+            )
         for attachment in record.get("attachmentPdfs", []):
             if not (ROOT / attachment).is_file():
                 errors.append(f"{label} {qid}: ontbrekende volledige uitwerkbijlage {attachment}")
