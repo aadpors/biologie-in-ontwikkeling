@@ -255,9 +255,9 @@ def detect_cv_question_numbers(analysis: dict) -> list[dict]:
     seen = set()
     for page in analysis.get("pages", []):
         text = str(page.get("text", "")).replace("\\n", "\n")
-        for line in text.splitlines():
-            value = line.strip()
-            # CVs commonly use ' vraag 3', 'Vraag 3', or a standalone '3'.
+        lines = [line.strip() for line in text.splitlines()]
+        for index, value in enumerate(lines):
+            # CVs commonly use 'Vraag 3', or a compact table row.
             patterns = (
                 re.match(r"(?i)^vraag\s+(\d{1,2})(?:\b|[.:)])", value),
                 # Official Dutch CV tables often use "1 maximumscore 2".
@@ -265,9 +265,18 @@ def detect_cv_question_numbers(analysis: dict) -> list[dict]:
                 re.match(r"(?i)^(\d{1,2})\s+maximumscore\b", value),
                 # MCQ rows use e.g. "2 B 1" (question, answer letter, score).
                 re.match(r"(?i)^(\d{1,2})\s+[A-H]\s+\d\b", value),
-                re.match(r"^(\d{1,2})[.)]?\s*$", value),
             )
             match = next((m for m in patterns if m), None)
+            # Some layouts split "Vraag" and its number, or put the number
+            # immediately above "maximumscore". Never accept a bare number
+            # without one of those structural cues: page/line numbers abound.
+            if not match and re.fullmatch(r"\d{1,2}[.)]?", value):
+                previous = lines[index - 1] if index else ""
+                following = lines[index + 1] if index + 1 < len(lines) else ""
+                if (re.fullmatch(r"(?i)vraag", previous)
+                    or re.match(r"(?i)^maximumscore\b", following)
+                    or re.match(r"(?i)^[A-H]\s+\d\b", following)):
+                    match = re.match(r"^(\d{1,2})", value)
             if not match:
                 continue
             number = int(match.group(1))
