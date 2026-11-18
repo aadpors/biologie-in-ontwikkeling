@@ -14,6 +14,7 @@ const assert = require("node:assert/strict");
     await page.goto("http://127.0.0.1:8000/examenoefenen.html", { waitUntil: "networkidle" });
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
     assert.match(await page.locator("#count").innerText(), /519 vragen/);
+    await page.waitForFunction(() => typeof questions !== "undefined" && questions.length === 519 && questions.every(q => typeof q.repeatedContext === "string"));
 
     // Cards stay grouped by exam (year, time period, level), then follow original question order.
     const sortedCards = await page.evaluate(() => getFiltered().map(q => ({ year: Number(q.year), period: Number(q.period), level: q.level, n: Number(q.n) })));
