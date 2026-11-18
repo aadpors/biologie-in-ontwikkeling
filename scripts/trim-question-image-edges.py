@@ -39,3 +39,36 @@ for path in sorted(OUT.glob("question-*.jpg")):
 print(f"Vraagafbeeldingen gecontroleerd: {len(list(OUT.glob('question-*.jpg')))}; scheidingslijnen verwijderd: {len(trimmed)}")
 if trimmed:
     print("\n".join(trimmed))
+
+# These two primary images are full-page composites and retain a printed
+# horizontal rule after the question. Remove that rule explicitly after the
+# generic pass, preserving the complete question text.
+for filename in (
+    "question-complete-vw24t2-open-11.jpg",
+    "question-complete-vw26t1-open-32.jpg",
+):
+    path = OUT / filename
+    if not path.is_file():
+        continue
+    with Image.open(path) as source:
+        image = source.convert("RGB")
+    gray = image.convert("L")
+    pixels = gray.load()
+    width, height = gray.size
+    rule_y = None
+    for y in range(max(0, height - 24), height - 1):
+        if sum(1 for x in range(width) if pixels[x, y] < 235) >= width * 0.70:
+            rule_y = y
+            break
+    gray.close()
+    if rule_y is None:
+        raise RuntimeError(f"Expected bottom separator not found in {filename}")
+    bottom = rule_y - 1
+    content = image.crop((0, 0, width, bottom))
+    result = Image.new("RGB", (width, bottom + 4), "white")
+    result.paste(content, (0, 0))
+    result.save(path, quality=94)
+    content.close()
+    result.close()
+    image.close()
+    print(f"Specifieke onderrand gecorrigeerd: {filename}")
