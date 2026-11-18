@@ -1075,10 +1075,9 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         # the question text; the dedicated crop contains all
                         # three statements and the final instruction.
                         context = re.sub(
-                            r"\\n?Hieronder staan drie uitspraken\\..*$",
+                            r"(?is)\\s*Hieronder\\s+staan\\s+drie\\s+uitspraken\\b.*$",
                             "",
                             context,
-                            flags=re.S,
                         ).strip()
                         selected_prompt = "Hieronder staan drie uitspraken.\\n" + selected_prompt
                     if context_record is None and selected_context_page is not None:
