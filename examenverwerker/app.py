@@ -51,6 +51,8 @@ class ExamApp:
         self.root.minsize(820, 560)
         self.project_dir = None
         self.data = None
+        app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
+        self.knowledge_dir=app_base/"kennisbank"
         self._style()
         self._build()
         self._welcome()
@@ -294,7 +296,7 @@ class ExamApp:
             tree.heading(col,text=label); tree.column(col,width=width)
         tree.pack(fill="both",expand=True,padx=10,pady=10)
         for i,row in enumerate(rows):
-            learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
+            learned=suggest_from_learning(self.knowledge_dir,question_pattern_key(row))
             suggestion=learned.get("suggestion")
             hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
             if learned.get("support",0): hint+=f" ({learned['support']}×)"
