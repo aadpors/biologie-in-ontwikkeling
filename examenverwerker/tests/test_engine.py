@@ -34,6 +34,10 @@ class EngineTests(unittest.TestCase):
         regions=propose_question_regions(analysis,candidates)
         self.assertEqual(len(regions[0]["source_segments"]),2)
         self.assertEqual(regions[0]["status"],"voorstel_niet_goedgekeurd")
+    def test_cv_anchor_detection(self):
+        a={"pages":[{"page":1,"text":"Vraag 1\\nBeoordelingsmodel\\nVraag 3"}]}
+        got=detect_cv_question_numbers(a)
+        self.assertEqual([x["number"] for x in got],[1,3])
     def test_pdf_text_and_exact_crop(self):
         try:
             import pymupdf as fitz
