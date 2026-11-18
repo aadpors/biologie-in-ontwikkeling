@@ -107,7 +107,7 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
                 continue
             probe=value+" "+next_text
             point_marker=bool(re.fullmatch(r"\d{1,2}\s*p",next_text,re.I))
-            question_cue=bool(re.search(r"\b(verklaar|beschrijf|noem|geef|welke|wat|waarom|bereken|noteer|leg|toon|gebruik|kies|bepaal|licht toe|beargumenteer|leid af|selecteer)\b",probe,re.I))
+            question_cue=bool(re.search(r"\b(verklaar|beschrijf|noem|geef|welk|welke|wat|wie|waar|waarom|waardoor|waarin|waarmee|wanneer|hoe|bereken|noteer|leg|toon|gebruik|kies|bepaal|licht toe|beargumenteer|leid af|selecteer)\b",probe,re.I))
             # A bare number is not enough: text line numbers and table cells are common
             # in biology exams. Keep a standalone number only with a scoring marker
             # or a recognisable instruction/question cue in the adjacent text.
