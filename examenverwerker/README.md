@@ -29,7 +29,7 @@ Op een Windows-machine met Python 3.12:
 3. Kopieer de volledige map \`dist\\BiologieExamenverwerker\\\` naar een USB-stick of gewenste locatie.
 4. Start daar \`START.bat\`.
 
-De doelcomputer heeft daarna geen Python-installatie of administratorrechten nodig. De applicatie installeert niets in Windows.
+De doelcomputer heeft daarna geen Python-installatie of administratorrechten nodig. De applicatie installeert niets in Windows. De centrale map `kennisbank/` staat naast het programma; bewaar deze map bij updates om de opgebouwde leerervaring te behouden.
 
 Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 
