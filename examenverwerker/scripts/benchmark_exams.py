@@ -31,7 +31,7 @@ def main():
                     cv_result["cv_file"]=cv_path.name
                     cv_result["cv_candidate_details"]=cv_candidates
                     cv_all_text="\\n".join(p.get("text","") for p in cv_analysis["pages"])
-                    model_pos=cv_all_text.lower().find("beoordelingsmodel")
+                    model_pos=cv_all_text.lower().rfind("beoordelingsmodel")
                     cv_result["cv_text_sample"]=cv_all_text[max(0,model_pos-150):model_pos+2200] if model_pos>=0 else cv_all_text[:2200]
                     cv_result["cv_pages_with_text"]=sum(bool(p.get("text","").strip()) for p in cv_analysis["pages"])
                 item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo","year":"20"+key[1],"period":key[2],"candidate_count":len(candidates),"candidate_details":candidates,"cv_crosscheck":cv_result,"candidate_count_is_ground_truth":False})
