@@ -473,12 +473,19 @@ class ExamApp:
             self.data.setdefault("vraagkandidaten",[]).append(item)
             keys=self.data.setdefault("restored_suppressed_candidate_keys",[])
             if key not in keys: keys.append(key)
+            learn_decision(self.project_dir/"kennisbank",{
+                "pattern_key":question_pattern_key(item),"chosen":"question","accepted":True,
+                "scope":"voorstel_voor_toekomstige_herkenning","document_id":item.get("document_id"),
+                "page":item.get("page"),"candidate_line":item.get("line"),
+                "reason":"Handmatig hersteld uit onderdrukte nummerdubbelingen.","human_decision":True})
             self.save_project()
             self._log(f"Onderdrukte kandidaat vraag {item.get('number')} op pagina {item.get('page')} handmatig hersteld.")
             win.destroy()
             parent.destroy()
             self.show_candidates()
-        ttk.Button(win,text="Herstel geselecteerde kandidaat",command=restore).pack(anchor="e",padx=10,pady=(0,10))
+        buttons=ttk.Frame(win); buttons.pack(fill="x",padx=10,pady=(0,10))
+        ttk.Button(buttons,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left")
+        ttk.Button(buttons,text="Herstel geselecteerde kandidaat",command=restore).pack(side="right")
 
     def create_question_record(self, rows, tree, parent):
         selected=tree.selection()
