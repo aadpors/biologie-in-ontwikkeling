@@ -27,7 +27,10 @@ def page_lines(page):
 def heading_at(lines, index, number=None):
     line = lines[index]
     text = re.sub(r"\s+", " ", line["text"]).strip()
-    combined = r"(?:maximumscore\b|[A-F](?:\s+\d\b)?\b)"
+    # A rubric answer can begin with isotope notation such as "13 C".
+    # Treat a standalone A–F token as an answer key only when the line ends
+    # there (or has a trailing score), never when ordinary text follows it.
+    combined = r"(?:maximumscore\b|[A-F](?:\s+\d\b)?(?=\s*$))"
     if number is not None:
         if re.match(rf"^{number}\s+{combined}", text, re.I):
             return True
@@ -61,11 +64,6 @@ def render_question(pdf_path, question, output):
                 and not re.match(r"^\d{1,2}\s+", line["text"])
                 and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
             ]
-            if pdf_path.name == "vw-1018-a-26-1-c.pdf" and question == 18:
-                print("CV-Q18-BOUNDARY", json.dumps({
-                    "following": [{"y": line["y0"], "text": line["text"], "size": line["size"], "bold": line["bold"]} for line in following],
-                    "next_topic": [{"y": line["y0"], "text": line["text"], "size": line["size"], "bold": line["bold"], "codes": [ord(ch) for ch in line["text"].strip()]} for line in next_topic]
-                }, ensure_ascii=False))
             top = max(0, heading["y0"] - 8)
             boundaries = [line["y0"] for line in following + next_topic]
             bottom = min(page.rect.height - 80, min(boundaries, default=page.rect.height - 80) - 5)
