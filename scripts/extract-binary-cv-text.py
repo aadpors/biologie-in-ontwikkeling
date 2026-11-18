@@ -33,9 +33,20 @@ def answer_side(answer):
         return "right"
     raise ValueError(f"Unknown binary answer: {answer!r}")
 
-binary = [q for q in questions if is_binary(q)]
+# The same shared statement prompt can be attached to several consecutive
+# open questions in a passage. Count the explicitly curated interactive
+# question IDs, not every card whose copied prompt happens to contain the
+# words "wel of niet" or "juist of onjuist".
+questions_by_id = {q["id"]: q for q in questions}
+missing_questions = sorted(set(keys) - set(questions_by_id))
+if missing_questions:
+    raise SystemExit(f"Binary answer-key questions missing from exam data: {missing_questions}")
+binary = [questions_by_id[question_id] for question_id in keys]
+not_binary = [q["id"] for q in binary if not is_binary(q)]
+if not_binary:
+    raise SystemExit(f"Curated binary questions lack a binary prompt: {not_binary}")
 if len(binary) != 72:
-    raise SystemExit(f"Expected 72 binary questions, found {len(binary)}")
+    raise SystemExit(f"Expected 72 curated binary questions, found {len(binary)}")
 
 for q in binary:
     key = keys.get(q["id"])
