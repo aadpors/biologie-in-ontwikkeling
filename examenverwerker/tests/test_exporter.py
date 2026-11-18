@@ -7,7 +7,8 @@ class ExportTests(unittest.TestCase):
         project=Path(root)/"project"; (project/"bronnen").mkdir(parents=True); (project/"snippets").mkdir()
         for name in ("opgaven.pdf","cv.pdf","uitwerkbijlage.pdf"):
             (project/"bronnen"/name).write_bytes(b"%PDF-original-"+name.encode())
-        (project/"snippets"/"vraag1.png").write_bytes(b"PNG-snippet")\n        (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")
+        (project/"snippets"/"vraag1.png").write_bytes(b"PNG-snippet")
+        (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")
         record={
             "id":"ha26t1-open-1","status":"goedgekeurd","approved_by_human":True,
             "exam":{"level":"Havo","year":"2026","period":"1","points":2,"theme":"Ecologie",
@@ -33,6 +34,10 @@ class ExportTests(unittest.TestCase):
             self.assertTrue(result["ok"],result)
             self.assertTrue((out/"examens"/"uitwerkbijlage.pdf").is_file())
             self.assertTrue((out/"exam-open.json").is_file())
-            self.assertTrue((out/"manifest.json").is_file())\n            self.assertTrue((out/"scripts"/"cv-snippets.json").is_file())\n            import json\n            opened=json.loads((out/"exam-open.json").read_text(encoding="utf-8"))\n            self.assertEqual(opened[0]["attachmentPdfs"],["examens/uitwerkbijlage.pdf"])
+            self.assertTrue((out/"manifest.json").is_file())
+            self.assertTrue((out/"scripts"/"cv-snippets.json").is_file())
+            import json
+            opened=json.loads((out/"exam-open.json").read_text(encoding="utf-8"))
+            self.assertEqual(opened[0]["attachmentPdfs"],["examens/uitwerkbijlage.pdf"])
 
 if __name__=="__main__": unittest.main()
