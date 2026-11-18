@@ -4,6 +4,8 @@ on:
   push:
     branches: ["bouw/**"]
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
+  pull_request:
+    paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
   workflow_dispatch:
 
 jobs:
