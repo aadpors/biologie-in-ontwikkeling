@@ -336,7 +336,7 @@ const assert = require("node:assert/strict");
 
     // Every one of the 373 open questions must resolve to a local CV image,
     // and every generated image must be reachable over the same origin.
-    const cvInventory = await page.evaluate(() => questions.filter(q => q.questionType === "open").map(q => ({id:q.id,src:q.cvImage})));
+    const cvInventory = await page.evaluate(() => questions.filter(q => !Array.isArray(q.options) || q.options.length === 0).map(q => ({id:q.id,src:q.cvImage})));
     assert.equal(cvInventory.length, 373, "De CV-audit moet alle 373 open vragen omvatten");
     assert.deepEqual(cvInventory.filter(q => !q.src || !q.src.startsWith("exam-snippets/cv-") || !q.src.endsWith(".jpg")).map(q => q.id), [], "Elke open vraag moet een lokale CV-afbeelding hebben");
     const cvAssetFailures = [];
