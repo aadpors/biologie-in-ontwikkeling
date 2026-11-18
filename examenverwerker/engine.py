@@ -322,6 +322,8 @@ def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
         required.append("answer_options")
     missing=[key for key in required if checklist.get(key) is not True]
     errors=[f"controle_niet_afgevinkt:{key}" for key in missing]
+    if record.get("source_analysis_invalidated") is True:
+        errors.append("bron_opnieuw_geanalyseerd_record_opnieuw_samenstellen")
     if not str(record.get("question_text","")).strip():
         errors.append("vraagtekst_ontbreekt")
     if not record.get("source_pdf") or not record.get("cv_pdf"):
