@@ -21,13 +21,14 @@ def main():
                 key=(match.group(1).lower(),match.group(2),match.group(3))
                 candidates=detect_question_candidates(analysis)
                 cv_name=re.sub(r"-o(?:-spr)?\.pdf$","-c.pdf",path.name,flags=re.I)
-                cv_path=PDF_DIR/cv_name
+                cv_matches=[p for p in PDF_DIR.glob("*.pdf") if p.name.lower()==cv_name.lower()]
+                cv_path=cv_matches[0] if cv_matches else None
                 cv_result=None
-                if cv_path.is_file():
+                if cv_path and cv_path.is_file():
                     cv_analysis=analyze_pdf(cv_path)
                     cv_candidates=detect_cv_question_numbers(cv_analysis)
                     cv_result=compare_question_numbering(candidates,cv_candidates)
-                    cv_result["cv_file"]=cv_name
+                    cv_result["cv_file"]=cv_path.name
                     cv_result["cv_candidate_details"]=cv_candidates
                 item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo","year":"20"+key[1],"period":key[2],"candidate_count":len(candidates),"candidate_details":candidates,"cv_crosscheck":cv_result,"candidate_count_is_ground_truth":False})
                 if not candidates: failures.append(f"{path.name}: geen vraagstartkandidaten")
