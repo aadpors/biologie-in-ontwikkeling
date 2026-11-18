@@ -114,7 +114,7 @@ OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
 
 # Extra room below every text-based crop so glyph descenders (g, j, p, q, y)
 # are never clipped by a tight PDF text bounding box.
-BOTTOM_TEXT_PADDING = 14
+BOTTOM_TEXT_PADDING = 8
 
 def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
     """Render a full-width crop and remove earlier question blocks without leaving blank bands."""
@@ -177,6 +177,17 @@ def footer_boundary(page, lines):
 
 def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8, end_anchor=None, start_anchor=None):
     """Render one complete, full-width context crop, preserving figures and tables."""
+    # Havo 2024-I questions 1–9 share the heart-valve introduction printed
+    # before question 1 on the preceding page. Question 3 starts on page 3,
+    # where the page-local detector cannot see that introduction. Reuse the
+    # already rendered original context image instead of manufacturing an
+    # almost-empty fallback crop from page 3.
+    if prefix == "ha24t1" and number == 3:
+        shared = OUT / "context-ha24t1-q1-complete.jpg"
+        if not shared.is_file():
+            raise RuntimeError("Shared Havo 2024-I heart-valve context for question 3 was not rendered")
+        return ["exam-snippets/context-ha24t1-q1-complete.jpg"]
+
     if start_anchor and end_anchor:
         start_hits = page.search_for(start_anchor)
         end_hits = page.search_for(end_anchor)
@@ -223,7 +234,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     if visual_rects:
         context_top = min(context_top, min(rect.y0 for rect in visual_rects))
 
-    context_top = max(0, context_top - 5)
+    context_top = max(0, context_top - 10)
     # End below the complete final context text line, not merely a fixed
     # distance above the next question marker. The latter clipped descenders
     # and the lower edge of the final line on tightly spaced exam pages.
@@ -241,7 +252,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     context_bottom = min(
         bottom_limit,
         question_top - 1,
-        final_context_text_bottom + 12,
+        final_context_text_bottom + 18,
     )
     if prefix == "ha24t1" and number == 1:
         # The heart-valve diagram is placed below the "afbeelding 1" label.
@@ -290,7 +301,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
 
 def fallback_context_fragment(page, lines, prefix, number, question_top, previous_ranges=(), scale=1.8):
     """Keep preceding shared text/figures when semantic context-line detection finds no text."""
-    top = 25
+    top = 12
     bottom = min(question_top - 2, page.rect.height - 20)
     if bottom <= top + 2:
         return []
