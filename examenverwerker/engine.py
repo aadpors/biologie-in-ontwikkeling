@@ -308,6 +308,36 @@ def propose_question_regions(analysis: dict, candidates: list[dict]) -> list[dic
     return proposals
 
 
+
+def extract_candidate_text(analysis: dict, candidate: dict, next_candidate: dict | None = None) -> str:
+    """Extract a bounded text proposal between consecutive question anchors."""
+    start_page = int(candidate["page"])
+    start_y = float(candidate.get("bbox", [0, 0, 0, 0])[1])
+    stop_page = int(next_candidate["page"]) if next_candidate else None
+    stop_y = float(next_candidate.get("bbox", [0, 0, 0, 0])[1]) if next_candidate else None
+    collected = []
+    for page in analysis.get("pages", []):
+        page_no = int(page["page"])
+        if page_no < start_page or (stop_page is not None and page_no > stop_page):
+            continue
+        for block in page.get("blocks", []):
+            lines = block.get("lines") or [{"bbox": block.get("bbox", [0, 0, 0, 0]), "text": x}
+                                           for x in str(block.get("text", "")).splitlines()]
+            for line in lines:
+                text = str(line.get("text", "")).strip()
+                if not text:
+                    continue
+                y = float(line.get("bbox", [0, 0, 0, 0])[1])
+                if page_no == start_page and y + 1 < start_y:
+                    continue
+                if stop_page is not None and page_no == stop_page and y >= stop_y:
+                    continue
+                collected.append((page_no, y, text))
+    collected.sort(key=lambda item: (item[0], item[1]))
+    return "\n".join(item[2] for item in collected)
+
+
+
 def detect_question_type(text: str) -> dict:
     """Heuristic question-format detection; returns reviewable signals, not truth."""
     value = str(text or "")
