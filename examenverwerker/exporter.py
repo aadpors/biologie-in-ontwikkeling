@@ -11,6 +11,7 @@ def sha256(path: Path):
     return h.hexdigest()
 
 def _copy_source(project_dir: Path, source_name: str, dest_dir: Path):
+    if Path(source_name).name!=source_name: raise ValueError("Ongeldig bronbestandspad.")
     source=project_dir/"bronnen"/source_name
     if not source.is_file(): raise FileNotFoundError(f"Bronbestand ontbreekt: {source_name}")
     dest_dir.mkdir(parents=True,exist_ok=True)
@@ -45,7 +46,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             if len(options)<2 or not r.get("correct") or r.get("correct") not in keys:
                 errors.append({"id":rid,"error":"meerkeuzeopties_of_correct_antwoord_ongeldig"})
         for field,label in (("source_pdf","opgavenbron_ontbreekt"),("cv_pdf","correctievoorschrift_ontbreekt")):
-            if not r.get(field) or not (project_dir/"bronnen"/r[field]).is_file(): errors.append({"id":rid,"error":label})
+            if not r.get(field) or Path(str(r.get(field,""))).name!=r.get(field) or not (project_dir/"bronnen"/r[field]).is_file(): errors.append({"id":rid,"error":label})
         snippets=r.get("snippet_files") or ([r["snippet_file"]] if r.get("snippet_file") else [])
         if not snippets: errors.append({"id":rid,"error":"snippet_ontbreekt"})
         for name in snippets:
