@@ -162,11 +162,21 @@ def render_havo_2025_i_q26():
                 raise ValueError(f"Havo 2025-I q26: invalid crop bounds for {filename}")
             pix = page.get_pixmap(matrix=scale, clip=rect, alpha=False)
             pix.save(OUT / filename)
-        context_bottom = max(r.y1 for r in context_end) + 7
-        question_start = min(r.y0 for r in question_top) - 5
+        # The two source lines are adjacent in the printed exam. Use the
+        # whitespace midpoint between their text boxes as one shared boundary;
+        # independent padding on both crops caused a false overlap and stopped
+        # the entire 2024–2026 regeneration.
+        context_text_bottom = max(r.y1 for r in context_end)
+        question_text_top = min(r.y0 for r in question_top)
+        if question_text_top <= context_text_bottom:
+            raise ValueError(
+                "Havo 2025-I q26: source text boxes themselves overlap; "
+                "refusing to publish ambiguous context/question crops."
+            )
+        boundary = (context_text_bottom + question_text_top) / 2
+        context_bottom = boundary
+        question_start = boundary
         question_bottom = max(r.y1 for r in question_end) + 9
-        if context_bottom >= question_start:
-            raise ValueError("Havo 2025-I q26: context and question boundary overlaps")
         save_crop(min(r.y0 for r in context_top) - 5, context_bottom,
                   "context-ha25t1-q26-complete.jpg")
         save_crop(question_start, question_bottom,
