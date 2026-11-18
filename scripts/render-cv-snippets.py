@@ -26,18 +26,18 @@ def page_lines(page):
 
 def heading_at(lines, index, number=None):
     line = lines[index]
-    text = re.sub(r"\\s+", " ", line["text"]).strip()
-    combined = r"(?:maximumscore\\b|[A-F](?:\\s+\\d\\b)?\\b)"
+    text = re.sub(r"\s+", " ", line["text"]).strip()
+    combined = r"(?:maximumscore\b|[A-F](?:\s+\d\b)?\b)"
     if number is not None:
-        if re.match(rf"^{number}\\s+{combined}", text, re.I):
+        if re.match(rf"^{number}\s+{combined}", text, re.I):
             return True
         if text == str(number):
-            return any(abs(other["y0"] - line["y0"]) < 14 and re.match(rf"^{combined}", re.sub(r"\\s+", " ", other["text"]).strip(), re.I) for other in lines if other is not line)
+            return any(abs(other["y0"] - line["y0"]) < 14 and re.match(rf"^{combined}", re.sub(r"\s+", " ", other["text"]).strip(), re.I) for other in lines if other is not line)
         return False
-    if re.match(rf"^\\d{{1,2}}\\s+{combined}", text, re.I):
+    if re.match(rf"^\d{{1,2}}\s+{combined}", text, re.I):
         return True
-    if re.fullmatch(r"\\d{1,2}", text):
-        return any(abs(other["y0"] - line["y0"]) < 14 and re.match(rf"^{combined}", re.sub(r"\\s+", " ", other["text"]).strip(), re.I) for other in lines if other is not line)
+    if re.fullmatch(r"\d{1,2}", text):
+        return any(abs(other["y0"] - line["y0"]) < 14 and re.match(rf"^{combined}", re.sub(r"\s+", " ", other["text"]).strip(), re.I) for other in lines if other is not line)
     return False
 
 def render_question(pdf_path, question, output):
@@ -54,8 +54,8 @@ def render_question(pdf_path, question, output):
                 if line["y0"] > heading["y0"] + 3
                 and (line["bold"] or line["size"] >= 16)
                 and line["size"] >= 11 and len(line["text"]) < 100
-                and not re.match(r"^\\d{1,2}\\s+", line["text"])
-                and not re.match(r"^(?:maximumscore|antwoord|scores)\\b", line["text"], re.I)
+                and not re.match(r"^\d{1,2}\s+", line["text"])
+                and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
             ]
             top = max(0, heading["y0"] - 8)
             boundaries = [line["y0"] for line in following + next_topic]
@@ -102,7 +102,7 @@ for record in records:
     items_by_id[qid] = item
 
 items = sorted(items_by_id.values(), key=lambda item: item["id"])
-MANIFEST.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+MANIFEST.write_text(json.dumps(items, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 for item in items:
     source = ROOT / item["pdf"]
     render_question(source, item["question"], item["output"])
