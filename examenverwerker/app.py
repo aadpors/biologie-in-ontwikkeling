@@ -344,6 +344,36 @@ class ExamApp:
             if learned.get("support",0): hint+=f" ({learned['support']}×)"
             tree.set(selected[0],"learning",hint)
             self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
+        def inspect_question():
+            selected=tree.selection()
+            if not selected:
+                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een kandidaat.")
+                return
+            row=rows[int(selected[0])]
+            check=row.get("vraagtype_controle",{})
+            detail=tk.Toplevel(win)
+            detail.title(f"Vraag {row.get('number')} – tekst- en optiecontrole")
+            detail.geometry("760x680")
+            ttk.Label(detail,text=f"Voorgesteld vraagtype: {check.get('type','onbekend')}  |  zekerheid: {check.get('confidence',0):.0%}  |  status: altijd handmatig controleren",padding=10).pack(anchor="w")
+            ttk.Label(detail,text="Vraagtekstvoorstel (afbakening kan nog onjuist zijn):",padding=(10,2)).pack(anchor="w")
+            question_box=tk.Text(detail,height=19,wrap="word")
+            question_box.pack(fill="both",expand=True,padx=10,pady=4)
+            question_box.insert("1.0",row.get("vraagtekst_voorstel",""))
+            question_box.configure(state="disabled")
+            ttk.Label(detail,text="Gevonden antwoordopties:",padding=(10,6)).pack(anchor="w")
+            options=check.get("options",[])
+            option_lines=[f"{o.get('label')}. {o.get('text')}" for o in options]
+            if not option_lines:
+                option_lines=["Geen A-H-antwoordopties herkend. Controleer of het een open vraag, juist/onjuist-vraag of wel/niet-vraag is."]
+            ttk.Label(detail,text="\\n".join(option_lines),wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
+            if check.get("type")=="meerkeuze":
+                gaps=check.get("option_gaps",[])
+                duplicates=check.get("duplicate_option_labels",[])
+                warning=("Ontbrekende labels: "+(", ".join(gaps) if gaps else "geen")+
+                         " | Dubbele labels: "+(", ".join(duplicates) if duplicates else "geen"))
+                ttk.Label(detail,text=warning,foreground="#9b4d00",wraplength=720,padding=10).pack(anchor="w")
+            ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
+        ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
         ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
         ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
