@@ -172,6 +172,11 @@ if q26_regression:
         errors.append("Havo 2025-I vraag 26: de vraagafbeelding is niet als laatste afbeelding gekoppeld")
 
 
+open_by_id = {
+    record.get("id"): record
+    for record in json.loads((ROOT / "exam-open.json").read_text(encoding="utf-8"))
+}
+
 # Havo 2025-I q34 shares q33's information framework, but not q33's question.
 q34 = open_by_id.get("ha25t1-open-34")
 q33 = open_by_id.get("ha25t1-open-33")
@@ -248,10 +253,6 @@ def audit_crop_height(rel, minimum, label, maximum=None):
     except Exception as exc:
         errors.append(f"{label}: uitsnede kan niet worden gelezen: {exc}")
 
-open_by_id = {
-    record.get("id"): record
-    for record in json.loads((ROOT / "exam-open.json").read_text(encoding="utf-8"))
-}
 mcq_by_id = {
     record.get("id"): record
     for record in json.loads((ROOT / "exam-mcq.json").read_text(encoding="utf-8"))
