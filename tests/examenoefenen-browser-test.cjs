@@ -296,20 +296,20 @@ const assert = require("node:assert/strict");
     await page.locator("#questionType").selectOption("open");
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 26); render(); });
     const q26Images = await page.locator(".exam-snippets img").evaluateAll(images => images.map(img => img.getAttribute("src")));
-    assert.match(q26Images[0] || "", /context-ha25t1-q26-complete\\.jpg/);
-    assert.match(q26Images[1] || "", /question-ha25t1-26-only\\.jpg/);
+    assert.ok((q26Images[0] || "").includes("context-ha25t1-q26-complete.jpg"));
+    assert.ok((q26Images[1] || "").includes("question-ha25t1-26-only.jpg"));
     assert.equal(await page.locator(".exam-snippets img").count(), 2, "Vraag 26 moet context en vraagtekst als twee afzonderlijke uitsneden tonen");
 
     await page.locator("#questionType").selectOption("mcq");
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
     const q27Context = await page.locator(".exam-snippets img").first().getAttribute("src");
-    assert.match(q27Context || "", /context-ha25t1-q27-complete\\.jpg/, "Vraag 27 moet de eigen zeehondencontext tonen, niet de Bajau-context van vraag 26");
+    assert.ok((q27Context || "").includes("context-ha25t1-q27-complete.jpg"), "Vraag 27 moet de eigen zeehondencontext tonen, niet de Bajau-context van vraag 26");
     await page.locator(".exam-snippets img").first().evaluate(img => img.decode());
 
     await page.locator("#questionType").selectOption("open");
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 29); render(); });
     const q29Question = page.locator(".exam-snippets img").nth(1);
-    assert.match(await q29Question.getAttribute("src") || "", /question-ha25t1-29-only\\.jpg/);
+    assert.ok((await q29Question.getAttribute("src") || "").includes("question-ha25t1-29-only.jpg"));
     await q29Question.evaluate(img => img.decode());
     const q29Dimensions = await q29Question.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
     assert.ok(q29Dimensions.width > 500 && q29Dimensions.height > 20, "Vraag 29 moet volledig en zonder een lege of afgesneden uitsnede worden getoond");
