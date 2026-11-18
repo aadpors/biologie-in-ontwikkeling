@@ -56,6 +56,8 @@ def render_question(pdf_path, question, output):
                 and line["size"] >= 11 and len(line["text"]) < 100
                 # Bullet glyphs are part of answer criteria, not section headings.
                 and line["text"].strip() not in {"•", "●", "▪", "◦", "-", "–", "—"}
+                # Right-aligned score values (1/2/0) are not section headings.
+                and not re.fullmatch(r"\d{1,2}", line["text"].strip())
                 and not re.match(r"^\d{1,2}\s+", line["text"])
                 and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
             ]
