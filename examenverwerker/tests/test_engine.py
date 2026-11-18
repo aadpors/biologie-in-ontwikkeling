@@ -10,6 +10,16 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(classify_document_role("ha-1018-a-25-1-u.pdf","")[0],"uitwerkbijlage")
         self.assertEqual(infer_exam_metadata("ha-1018-a-24-1-o-spr.pdf")["level"],"Havo")
         self.assertEqual(infer_exam_metadata("vw-1018-a-26-2-o.pdf")["year"],"2026")
+    def test_correction_scheme_matching_never_pools_other_exams(self):
+        op={"bestand":"ha-1018-a-26-1-o.pdf"}
+        cvs=[
+            {"bestand":"ha-1018-a-26-1-c.pdf"},
+            {"bestand":"ha-1018-a-26-2-c.pdf"},
+            {"bestand":"vw-1018-a-26-1-c.pdf"}
+        ]
+        got=match_correction_documents(op,cvs)
+        self.assertEqual([x["bestand"] for x in got],["ha-1018-a-26-1-c.pdf"])
+
     def test_question_candidates_keep_repeated_numbers(self):
         a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\\nBeschrijf de functie van dit orgaan."}]},
                     {"page":2,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,140,14],"text":"1. Welke stof wordt gevormd?"}],"text":"1. Welke stof wordt gevormd?"}]}]}
