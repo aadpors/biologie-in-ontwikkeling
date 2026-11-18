@@ -79,6 +79,27 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
     return found
 
 
+
+def detect_cv_question_numbers(analysis: dict) -> list[dict]:
+    """Find explicit 'Vraag N'/'Opgave N' anchors in a marking scheme."""
+    found=[]
+    pattern=re.compile(r"(?i)\b(vraag|opgave)\s+(\d{1,2})\b")
+    for page in analysis.get("pages",[]):
+        for match in pattern.finditer(page.get("text","")):
+            found.append({"number":int(match.group(2)),"page":page["page"],
+                          "label":match.group(1).lower(),"status":"controle_nodig"})
+    return found
+
+def compare_question_numbering(opgaven: list[dict], cv: list[dict]) -> dict:
+    op_numbers={x["number"] for x in opgaven}
+    cv_numbers={x["number"] for x in cv}
+    return {"opgaven_nummers":sorted(op_numbers),"cv_nummers":sorted(cv_numbers),
+            "ontbreekt_in_cv":sorted(op_numbers-cv_numbers),
+            "ontbreekt_in_opgaven":sorted(cv_numbers-op_numbers),
+            "opgaven_dubbelen":sorted(n for n in op_numbers if sum(x["number"]==n for x in opgaven)>1),
+            "cv_dubbelen":sorted(n for n in cv_numbers if sum(x["number"]==n for x in cv)>1),
+            "status":"vergelijking_is_signaal_geen_goedkeuring"}
+
 def propose_question_regions(analysis: dict, candidates: list[dict], horizontal_margin: float=28.0) -> list[dict]:
     """Propose source-page regions between consecutive starts; never call them complete."""
     pages={p["page"]:p for p in analysis.get("pages",[])}
