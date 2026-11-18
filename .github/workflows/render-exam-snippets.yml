@@ -61,7 +61,9 @@ jobs:
         run: python scripts/extract-mcq-questions.py
       - name: Restore Havo 2025-I question 34 context and question crop
         run: python scripts/fix-ha25t1-q34.py
-      - name: Restore curated syllabus assignments for every exam question\n        run: python scripts/restore-exam-rubricering.py\n      - name: Trim source-page separators below all question images
+      - name: Restore curated syllabus assignments for every exam question
+        run: python scripts/restore-exam-rubricering.py
+      - name: Trim source-page separators below all question images
         run: python scripts/trim-question-image-edges.py
       - name: Validate every generated question and image
         run: python scripts/validate-exam-snippets.py
