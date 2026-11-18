@@ -21,6 +21,7 @@ on:
       - 'scripts/render-exam-snippets.py'
       - 'scripts/render-cv-snippets.py'
       - 'scripts/extract-mcq-questions.py'
+      - 'scripts/fix-ha25t1-q34.py'
       - 'examenoefenen.html'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/exam-snippets.json'
