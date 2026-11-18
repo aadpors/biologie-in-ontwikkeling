@@ -293,6 +293,13 @@ class ExamApp:
                     cv_doc = matching_cvs[0]
                     cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
                     cv_candidates = detect_cv_question_numbers(cv_analysis)
+                    # A well-populated CV gives a useful independent signal for
+                    # suspicious source-line numbers; it never auto-rejects a start.
+                    cv_crosscheck_available = len(cv_candidates) >= 5
+                    cv_numbers = {int(x["number"]) for x in cv_candidates}
+                    for candidate in candidates:
+                        candidate["cv_number_match"] = (int(candidate["number"]) in cv_numbers) if cv_crosscheck_available else None
+                        candidate["cv_crosscheck_status"] = ("nummer_in_CV" if candidate["cv_number_match"] else "nummer_niet_in_CV_controleren") if cv_crosscheck_available else "CV-onvoldoende-herkend"
                     comparison = compare_question_numbering(candidates, cv_candidates)
                     comparison.update({"cv_file": cv_doc["bestand"], "cv_document_id": cv_doc["id"],
                                        "status": "controle_nodig" if comparison["status"] != "nummers_overeen" else "nummers_overeen"})
@@ -320,9 +327,9 @@ class ExamApp:
         win.title("Mogelijke vraagstarts – altijd controleren")
         win.geometry("900x580")
         ttk.Label(win, text=f"{len(rows)} kandidaten gevonden. Herhaalde nummers blijven bewust zichtbaar.", padding=10).pack(anchor="w")
-        cols=("number","page","confidence","type","options","line","learning","status")
+        cols=("number","page","confidence","type","options","cv","line","learning","status")
         tree=ttk.Treeview(win,columns=cols,show="headings")
-        for col,label,width in [("number","Nr.",48),("page","PDF-pagina",78),("confidence","Signaal",68),("type","Vraagtype",105),("options","Opties",65),("line","Gevonden tekst",330),("learning","Leerbank",105),("status","Status",125)]:
+        for col,label,width in [("number","Nr.",48),("page","PDF-pagina",78),("confidence","Signaal",68),("type","Vraagtype",105),("options","Opties",65),("cv","CV",88),("line","Gevonden tekst",290),("learning","Leerbank",105),("status","Status",125)]:
             tree.heading(col,text=label); tree.column(col,width=width)
         tree.pack(fill="both",expand=True,padx=10,pady=10)
         for i,row in enumerate(rows):
@@ -336,7 +343,8 @@ class ExamApp:
             option_label=f"{option_count} gevonden"
             if check.get("type")=="meerkeuze" and not check.get("options_complete"):
                 option_label += " – controle"
-            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",type_label,option_label,row.get("line"),hint,row.get("status")))
+            cv_label=("Match" if row.get("cv_number_match") is True else "Niet in CV" if row.get("cv_number_match") is False else "—")
+            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",type_label,option_label,cv_label,row.get("line"),hint,row.get("status")))
         ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Jouw beoordeling wordt lokaal als leerdata opgeslagen.",wraplength=850).pack(anchor="w",padx=12,pady=(0,8))
         actions=ttk.Frame(win); actions.pack(fill="x",padx=12,pady=(0,12))
         def decide(is_question):
