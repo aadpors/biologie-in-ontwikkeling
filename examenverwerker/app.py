@@ -472,9 +472,9 @@ class ExamApp:
         def save_draft():
             try:
                 meta={key:var.get().strip() for key,var in values.items()}
-                if meta["level"] not in ("Havo","Vwo") or not re.fullmatch(r"20\\d{2}",meta["year"]) or meta["period"] not in ("1","2","3"):
+                if meta["level"] not in ("Havo","Vwo") or not re.fullmatch(r"20\d{2}",meta["year"]) or meta["period"] not in ("1","2","3"):
                     raise ValueError("Niveau, jaartal of tijdvak is ongeldig.")
-                if not re.fullmatch(r"\\d+",meta["points"]):
+                if not re.fullmatch(r"\d+",meta["points"]):
                     raise ValueError("Vul het aantal punten van deze vraag in.")
                 if any(not meta[x] for x in ("theme","concept","end","focus")):
                     raise ValueError("Vul thema, concept, eindterm en focus in; deze velden zijn nodig voor de website.")
