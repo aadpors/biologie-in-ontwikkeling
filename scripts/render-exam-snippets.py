@@ -235,7 +235,7 @@ def render_havo_2025_i_q34():
         following = [
             word for word in words
             if word[1] > marker[1] + 12
-            and re.fullmatch(r"\\d{1,2}", word[4].strip(".,:"))
+            and re.fullmatch(r"\d{1,2}", word[4].strip(".,:"))
             and word[0] < page.rect.width * 0.35
         ]
         bottom = min((word[1] - 2 for word in following), default=page.rect.height - 25)
@@ -256,7 +256,7 @@ def render_havo_2025_i_q34():
     q34["source"] = q33["source"]
     q34["q"] = (
         "De onderzoekers vermoeden dat de grotere milt van de Bajau-mannen "
-        "het gevolg is van evolutie.\\n"
+        "het gevolg is van evolutie.\n"
         "Beschrijf hoe evolutie tot een grotere milt kan hebben geleid."
     )
     q34["image"] = "exam-snippets/" + output
@@ -264,7 +264,7 @@ def render_havo_2025_i_q34():
         "exam-snippets/context-ha25t1-q33-complete.jpg",
         "exam-snippets/" + output,
     ]
-    open_path.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    open_path.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     context_path = ROOT / "exam-contexts.json"
     context_records = json.loads(context_path.read_text(encoding="utf-8"))
