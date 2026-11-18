@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib, json, shutil
 from pathlib import Path
 from datetime import datetime
+from engine import infer_exam_metadata
 
 def sha256(path: Path):
     h=hashlib.sha256()
@@ -42,9 +43,25 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             errors.append({"id":rid,"error":"vraagnummer_of_bronpagina_ongeldig"})
         if meta.get("questionType")=="mcq":
             options=r.get("options") or []
-            keys={o.get("key") for o in options if isinstance(o,dict)}
-            if len(options)<2 or not r.get("correct") or r.get("correct") not in keys:
+            keys=[str(o.get("key","")).upper() for o in options if isinstance(o,dict)]
+            if (not isinstance(options,list) or len(options)<2 or len(keys)!=len(options)
+                or len(set(keys))!=len(keys) or any(k not in "ABCDEFGH" or len(k)!=1 for k in keys)
+                or any(not str(o.get("text","")).strip() for o in options if isinstance(o,dict))
+                or str(r.get("correct","")).upper() not in keys):
                 errors.append({"id":rid,"error":"meerkeuzeopties_of_correct_antwoord_ongeldig"})
+        expected={"level":meta.get("level"),"year":str(meta.get("year")),"period":str(meta.get("period"))}
+        source_identity=infer_exam_metadata(str(r.get("source_pdf","")))
+        cv_identity=infer_exam_metadata(str(r.get("cv_pdf","")))
+        for label,identity,confirmation_flag in (
+            ("opgavenbron",source_identity,"source_match_human_confirmed"),
+            ("correctievoorschrift",cv_identity,"cv_match_human_confirmed")
+        ):
+            if identity:
+                actual={"level":identity.get("level"),"year":str(identity.get("year")),"period":str(identity.get("period"))}
+                if actual!=expected:
+                    errors.append({"id":rid,"error":f"{label}_past_niet_bij_examen"})
+            elif r.get(confirmation_flag) is not True:
+                errors.append({"id":rid,"error":f"{label}_niet_handmatig_gecontroleerd"})
         for field,label in (("source_pdf","opgavenbron_ontbreekt"),("cv_pdf","correctievoorschrift_ontbreekt")):
             if not r.get(field) or Path(str(r.get(field,""))).name!=r.get(field) or not (project_dir/"bronnen"/r[field]).is_file(): errors.append({"id":rid,"error":label})
         snippets=r.get("snippet_files") or ([r["snippet_file"]] if r.get("snippet_file") else [])
