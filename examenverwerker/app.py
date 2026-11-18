@@ -430,6 +430,8 @@ class ExamApp:
         header.pack(fill="x")
         ttk.Label(header, text=f"{doc['bestand']}  |  {doc['pagina_aantal']} pagina's", font=("Segoe UI", 12, "bold")).pack(anchor="w")
         ttk.Label(header, text=f"Voorstel: {doc['type_voorstel']} ({doc['type_zekerheid']:.0%}) · SHA-256: {doc['sha256']}", wraplength=800).pack(anchor="w")
+        if doc.get("pagina_zonder_tekst"):
+            ttk.Label(header,text="Let op: op deze pagina's ontbreekt een bruikbare tekstlaag; OCR/visuele controle nodig: "+", ".join(map(str,doc["pagina_zonder_tekst"])),foreground="#9b4d00",wraplength=800).pack(anchor="w",pady=(5,0))
         box = tk.Text(preview, wrap="word", font=("Segoe UI", 10))
         box.pack(fill="both", expand=True, padx=12, pady=(0, 12))
         for page in extracted["pagina_tekst"]:
