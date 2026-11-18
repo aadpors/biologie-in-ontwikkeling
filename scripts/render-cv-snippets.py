@@ -78,14 +78,10 @@ def render_amendment(pdf_path, output):
 # question gets an official, local answer-key fragment.
 old_items = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.exists() else []
 old_by_id = {item["id"]: item for item in old_items}
-records = []
-for filename in ("exam-open.json", "exam-mcq.json"):
-    path = ROOT / filename
-    if not path.exists():
-        raise FileNotFoundError(f"Question inventory missing: {path}")
-    records.extend(json.loads(path.read_text(encoding="utf-8")))
-
-items_by_id = {}
+records = json.loads((ROOT / "exam-open.json").read_text(encoding="utf-8"))
+# Retain previously selected open-question snippets and add every open question
+# from the generated inventory. MCQs are auto-graded and have no CV reveal UI.
+items_by_id = {item["id"]: dict(item) for item in old_items}
 for record in records:
     qid = record.get("id")
     if not qid:
@@ -116,8 +112,8 @@ for item in items:
             raise FileNotFoundError(f"Official marking-scheme amendment not found: {amendment}")
         render_amendment(amendment, item["amendment_output"])
 
-expected = {record["id"] for record in records}
+expected = {record["id"] for record in records} | {item["id"] for item in old_items}
 actual = {item["id"] for item in items}
 if expected != actual:
     raise RuntimeError(f"CV coverage mismatch; missing={sorted(expected-actual)}, extra={sorted(actual-expected)}")
-print(f"CV coverage complete: {len(items)} unique questions, including open and multiple-choice questions.")
+print(f"CV coverage complete: {len(items)} open/self-check questions.")
