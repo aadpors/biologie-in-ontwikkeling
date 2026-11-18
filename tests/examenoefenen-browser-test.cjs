@@ -29,20 +29,6 @@ const assert = require("node:assert/strict");
     assert.equal(await page.locator(".exam-snippets img").count(), 2,
       "Havo 2025-I vraag 27: zowel context- als vraagafbeelding moeten zichtbaar zijn");
 
-    // Regression: the Bajau context must end before the question lead-in.
-    await page.locator("#questionType").selectOption("open");
-    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 26); render(); });
-    await page.waitForFunction(() => [...document.querySelectorAll(".exam-snippets img")].length === 2);
-    assert.equal(await page.locator(".sourceblock").count(), 0,
-      "Havo 2025-I vraag 26: de context mag niet als OCR-tekst worden herhaald");
-    const q26Images = await page.locator(".exam-snippets img").evaluateAll(images => images.map(img => ({
-      src: img.getAttribute("src"),
-      loaded: img.complete && img.naturalWidth > 0
-    })));
-    assert.match(q26Images[0].src, /context-ha25t1-q26-complete\\.jpg/);
-    assert.match(q26Images[1].src, /question-ha25t1-26-only\\.jpg/);
-    assert.ok(q26Images.every(image => image.loaded),
-      "Havo 2025-I vraag 26: beide gescheiden uitsneden moeten werkelijk laden");
     const contextImageAudit = await page.evaluate(() => ({
       total: questions.length,
       withImageContext: questions.filter(q => (q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\.jpg$/i.test(q.images[0]))).length,
@@ -314,6 +300,7 @@ const assert = require("node:assert/strict");
     assert.ok((q26Images[0] || "").includes("context-ha25t1-q26-complete.jpg"));
     assert.ok((q26Images[1] || "").includes("question-ha25t1-26-only.jpg"));
     assert.equal(await page.locator(".exam-snippets img").count(), 2, "Vraag 26 moet context en vraagtekst als twee afzonderlijke uitsneden tonen");
+    assert.equal(await page.locator(".sourceblock").count(), 0, "Vraag 26 mag de algemene context niet nogmaals als OCR-tekst tonen");
     const q26QuestionImage = page.locator(".exam-snippets img").nth(1);
     await q26QuestionImage.evaluate(img => img.decode());
     const q26QuestionDimensions = await q26QuestionImage.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
