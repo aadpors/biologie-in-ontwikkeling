@@ -504,6 +504,8 @@ class ExamApp:
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
                                "candidate_document_id":row.get("document_id"),
+                               "source_match_human_confirmed":True,
+                               "cv_match_human_confirmed":True,
                                "cv_display_name":cv_doc["bestand"],
                                "status":"controle_nodig","approved_by_human":False,
                                "record_review_checklist":{"question_text":False,"question_type":False,"points":False,
