@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -260,8 +260,18 @@ class ExamApp:
             try:
                 analysis = analyze_pdf(source)
                 candidates = detect_question_candidates(analysis)
-                for item in candidates:
-                    item.update({"document_id": doc["id"], "bestand": doc["bestand"]})
+                ordered = sorted(candidates, key=lambda x: (int(x["page"]), float(x.get("bbox", [0, 0])[1])))
+                for index, item in enumerate(ordered):
+                    following = ordered[index + 1] if index + 1 < len(ordered) else None
+                    proposal_text = extract_candidate_text(analysis, item, following)
+                    type_check = detect_question_type(proposal_text)
+                    item.update({
+                        "document_id": doc["id"], "bestand": doc["bestand"],
+                        "vraagtekst_voorstel": proposal_text,
+                        "vraagtype_controle": type_check,
+                        "vraagtype_status": "controle_nodig"
+                    })
+                candidates = ordered
                 all_op_candidates.extend(candidates)
                 self.data.setdefault("vraagkandidaten", [])
                 self.data["vraagkandidaten"] = [x for x in self.data["vraagkandidaten"] if x.get("document_id") != doc["id"]] + candidates
