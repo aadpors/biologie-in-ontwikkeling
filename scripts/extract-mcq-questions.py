@@ -920,6 +920,13 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                                 if prefix == "vw25t1" else None
                             ),
                         )
+                        if prefix == "ha25t1" and marker["number"] == 32:
+                            # Question 32 continues the context introduced with
+                            # question 31; retain that first context fragment.
+                            previous_context = "exam-snippets/context-ha25t1-q31-complete.jpg"
+                            if not (ROOT / previous_context).is_file():
+                                raise RuntimeError("Missing Havo 2025-I question 31 context for question 32")
+                            context_paths = [previous_context, *context_paths]
                         if not context_paths:
                             if (prefix, marker["number"]) in {
                                 ("vw25t1", 15), ("vw25t1", 16),
@@ -1039,12 +1046,12 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         # Keep the statements in the question, not in its
                         # general context. The heading is part of the prompt.
                         context = re.sub(
-                            r"\\n?Hieronder staan drie uitspraken\\..*$",
+                            r"\n?Hieronder staan drie uitspraken\..*$",
                             "",
                             context,
                             flags=re.S,
                         ).strip()
-                        selected_prompt = "Hieronder staan drie uitspraken.\\n" + selected_prompt
+                        selected_prompt = "Hieronder staan drie uitspraken.\n" + selected_prompt
                     if context_record is None and selected_context_page is not None:
                         previous_ranges.append((start, question_end_line + 1))
                         cursor = question_end_line + 1
