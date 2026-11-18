@@ -1323,6 +1323,10 @@ for record in all_open_questions:
     if record.get("images"):
         stitch_question_images(record, "complete")
 
+# Some legacy full-question crops are emitted by the selected-fragment pass;
+# run a final cleanup after every source and composite image has been created.
+trim_all_question_images()
+
 # Context records retain their separate image list for clients that support it;
 # the primary image now always contains the full context followed by the question.
 (ROOT / "exam-mcq.json").write_text(json.dumps(all_questions, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
