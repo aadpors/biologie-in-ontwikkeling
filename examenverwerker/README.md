@@ -11,7 +11,7 @@ Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologi
 - Mogelijke vraagstarts detecteren, ook bij losse nummerregels en dubbele nummers.
 - Opgaven- en CV-nummering als controlesignaal vergelijken.
 - Originele bronpagina's visueel tonen.
-- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.\n- Concept-vraagrecords samenstellen met bewerkbare vraagtekst, metadata, antwoordopties, CV-koppeling en uitwerkbijlagen.\n- Correctievoorschriftfragmenten over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
+- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.\n- Concept-vraagrecords samenstellen met bewerkbare vraagtekst, metadata, antwoordopties, exact gekoppelde CV's, uitwerkbijlagen en officiële CV-aanvullingen.\n- Volledige CV-antwoorden over meerdere pagina's samenvoegen tot één controleerbare afbeelding.\n- Een expliciete menselijke eindcontrole uitvoeren met checklist, visuele bronvoorbeelden en herroepbare goedkeuring.\n- Een veilig exportpakket samenstellen; de exportpoort controleert de checklist en de examenidentiteit opnieuw.\n- Correctievoorschriftfragmenten over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
 - Menselijke beslissingen opslaan in een lokale leerbank.
 - Optionele externe AI-adapter gebruiken na expliciete toestemming; standaard volledig offline.
 - Een exportpoort gebruiken die niet-goedgekeurde of onvolledige records blokkeert en originele uitwerkbijlagen volledig meeneemt.
@@ -57,7 +57,7 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 - OCR voor gescande pagina's is nog niet ingebouwd.
 - Vraaggrenzen en contextkoppelingen vragen nog menselijke bevestiging.
 - CV-nummering is een signaal en moet inhoudelijk worden gecontroleerd.
-- De aparte eindcontrole-/goedkeuringsinterface en exportbediening moeten nog worden afgerond; de exportpoort zelf blokkeert onvolledige records.\n- Automatische contextkoppelingen zijn uitsluitend kandidaten op basis van PDF-geometrie en bijschriften; inhoudelijke koppeling blijft handwerk.
+- De eindcontrole is expliciet en handmatig; visuele signalen of AI mogen nooit een vinkje of goedkeuring zetten.\n- Automatische contextkoppelingen zijn uitsluitend kandidaten op basis van PDF-geometrie en bijschriften; inhoudelijke koppeling blijft handwerk.
 - De portable build moet nog op een echte Windows 11-computer worden gestart en met representatieve examenbestanden worden getest.
 
 Zie ook \`ONTWERP.md\`, \`SCHEMA.md\`, \`VALIDATIE.md\`, \`LEERBANK.md\`, \`EXPORT.md\` en \`PRIVACY.md\`.
