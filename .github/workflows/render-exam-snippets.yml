@@ -98,6 +98,42 @@ jobs:
           else
             echo "Exam snippets are already up to date."
           fi
+      - name: Commit generated snippets to the same-repository pull request branch
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          if [[ -z "$(git status --porcelain exam-snippets exam-mcq.json exam-open.json exam-contexts.json)" ]]; then
+            echo "Generated snippets are already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add exam-snippets/ exam-mcq.json exam-open.json exam-contexts.json
+          git commit -m "Add complete generated exam snippets"
+          generated_commit=$(git rev-parse HEAD)
+          target_branch="$GITHUB_HEAD_REF"
+          pushed=false
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "$target_branch"
+            git checkout -B "$target_branch" "origin/$target_branch"
+            git checkout "$generated_commit" -- exam-snippets/ exam-mcq.json exam-open.json exam-contexts.json
+            git add exam-snippets/ exam-mcq.json exam-open.json exam-contexts.json
+            if git diff --cached --quiet; then
+              echo "Generated snippets are already current on $target_branch."
+              pushed=true
+              break
+            fi
+            git commit -m "Add complete generated exam snippets"
+            if git push origin "HEAD:$target_branch"; then
+              pushed=true
+              break
+            fi
+            echo "Push attempt $attempt failed; synchronizing with $target_branch again."
+            sleep 2
+          done
+          if [[ "$pushed" != true ]]; then
+            echo "Generated snippets konden niet naar de PR-branch worden geschreven."
+            exit 1
+          fi
       - name: Upload generated snippets for visual QA
         uses: actions/upload-artifact@v4
         with:
