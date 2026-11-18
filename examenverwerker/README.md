@@ -6,12 +6,12 @@ Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologi
 - Examenprojecten aanmaken, openen en hervatten.
 - Originele PDF's ongewijzigd opnemen en SHA-256-dedupliceren.
 - Documenttypen voorstellen: opgaven, correctievoorschrift, uitwerkbijlage en aanvulling.
-- PDF-tekst, metadata en pagina's uitlezen.
+- PDF-tekst, metadata, pagina's en geometrie uitlezen.\n- Rasterafbeeldingen en grotere vectorregio's in originele PDF's inventariseren.\n- Figuur- en tabelverwijzingen koppelen aan mogelijke bijschriften en beeldregio's, zonder automatische goedkeuring.
 - Pagina's zonder bruikbare tekst markeren voor OCR-controle.
 - Mogelijke vraagstarts detecteren, ook bij losse nummerregels en dubbele nummers.
 - Opgaven- en CV-nummering als controlesignaal vergelijken.
 - Originele bronpagina's visueel tonen.
-- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.
+- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.\n- Concept-vraagrecords samenstellen met bewerkbare vraagtekst, metadata, antwoordopties, CV-koppeling en uitwerkbijlagen.\n- Correctievoorschriftfragmenten over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
 - Menselijke beslissingen opslaan in een lokale leerbank.
 - Optionele externe AI-adapter gebruiken na expliciete toestemming; standaard volledig offline.
 - Een exportpoort gebruiken die niet-goedgekeurde of onvolledige records blokkeert en originele uitwerkbijlagen volledig meeneemt.
@@ -36,7 +36,7 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 ## Werkwijze
 1. Maak één project per examen.
 2. Voeg alle beschikbare PDF's tegelijk toe.
-3. Controleer de voorgestelde documentrollen.
+3. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak).
 4. Laat vraagstarts analyseren.
 5. Bekijk kandidaten op de originele pagina en bevestig of wijs ze af.
 6. Maak voorlopige snippets en controleer de volledige context, figuren, tabellen, bijschriften en leesbaarheid.
@@ -57,7 +57,7 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 - OCR voor gescande pagina's is nog niet ingebouwd.
 - Vraaggrenzen en contextkoppelingen vragen nog menselijke bevestiging.
 - CV-nummering is een signaal en moet inhoudelijk worden gecontroleerd.
-- De volledige reviewworkflow en automatische exportmapping zijn nog in ontwikkeling.
+- De aparte eindcontrole-/goedkeuringsinterface en exportbediening moeten nog worden afgerond; de exportpoort zelf blokkeert onvolledige records.\n- Automatische contextkoppelingen zijn uitsluitend kandidaten op basis van PDF-geometrie en bijschriften; inhoudelijke koppeling blijft handwerk.
 - De portable build moet nog op een echte Windows 11-computer worden gestart en met representatieve examenbestanden worden getest.
 
 Zie ook \`ONTWERP.md\`, \`SCHEMA.md\`, \`VALIDATIE.md\`, \`LEERBANK.md\`, \`EXPORT.md\` en \`PRIVACY.md\`.
