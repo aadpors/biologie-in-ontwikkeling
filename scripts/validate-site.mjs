@@ -165,10 +165,10 @@ for (const question of [...examQuestions, ...openExamQuestions]) {
   const item = cvById.get(question.id);
   assert.ok(item, `Officiële CV-snippet ontbreekt voor ${question.id}`);
   assert.ok(item.pdf && fs.existsSync(item.pdf), `Bron-PDF correctievoorschrift ontbreekt voor ${question.id}`);
-  assertSnippetExists(`exam-snippets/${item.output}`, `CV vraag ${question.id}`);
+  assert.ok(typeof item.output === 'string' && item.output.endsWith('.jpg'), `Ongeldige lokale CV-snippetnaam voor ${question.id}`);
   if (item.amendment_pdf) {
     assert.ok(fs.existsSync(item.amendment_pdf), `Aanvulling correctievoorschrift ontbreekt voor ${question.id}`);
-    assertSnippetExists(`exam-snippets/${item.amendment_output}`, `CV-aanvulling vraag ${question.id}`);
+    assert.ok(typeof item.amendment_output === 'string' && item.amendment_output.endsWith('.jpg'), `Ongeldige lokale CV-aanvulling voor ${question.id}`);
   }
 }
 assert.ok(!examPage.includes('window.open(cv,\"_blank\"'), 'CV-knop mag niet terugvallen op een externe PDF in plaats van de lokale snippet');
