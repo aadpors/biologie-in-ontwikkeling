@@ -215,3 +215,74 @@ for item in items:
             else:
                 pix.save(output)
             print(f"Rendered {clip['output']} from {item['pdf']} page {actual_page}")
+
+
+# Havo 2025-I q34 shares the genetic/Bajau information framework with q33.
+# The generic page crop incorrectly included q33 above q34. Reuse the exact
+# q33 context crop and render q34 from its own scored question marker only.
+def render_havo_2025_i_q34():
+    pdf = ROOT / "examens" / "ha-1018-a-25-1-o.pdf"
+    if not pdf.exists():
+        raise FileNotFoundError(pdf)
+    output = "question-ha25t1-34-only.jpg"
+    with fitz.open(pdf) as doc:
+        page_index, page = find_question_page(doc, 34, 14)
+        markers = question_marker_words(page, 34)
+        if not markers:
+            raise ValueError("Havo 2025-I q34: scored question marker missing")
+        marker = min(markers, key=lambda word: word[1])
+        words = page.get_text("words", sort=True)
+        following = [
+            word for word in words
+            if word[1] > marker[1] + 12
+            and re.fullmatch(r"\\d{1,2}", word[4].strip(".,:"))
+            and word[0] < page.rect.width * 0.35
+        ]
+        bottom = min((word[1] - 2 for word in following), default=page.rect.height - 25)
+        bottom = max(bottom, marker[3] + 9)
+        rect = fitz.Rect(0, max(0, marker[1] - 4), page.rect.width, min(page.rect.height, bottom))
+        if rect.height <= 2:
+            raise ValueError("Havo 2025-I q34: invalid question-only crop")
+        pix = page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=rect, alpha=False)
+        pix.save(OUT / output)
+        print(f"Rendered {output} from {pdf.name} page {page_index + 1}")
+
+    open_path = ROOT / "exam-open.json"
+    records = json.loads(open_path.read_text(encoding="utf-8"))
+    by_id = {record.get("id"): record for record in records}
+    q33, q34 = by_id.get("ha25t1-open-33"), by_id.get("ha25t1-open-34")
+    if not q33 or not q34:
+        raise ValueError("Havo 2025-I q34: q33/q34 data record missing")
+    q34["source"] = q33["source"]
+    q34["q"] = (
+        "De onderzoekers vermoeden dat de grotere milt van de Bajau-mannen "
+        "het gevolg is van evolutie.\\n"
+        "Beschrijf hoe evolutie tot een grotere milt kan hebben geleid."
+    )
+    q34["image"] = "exam-snippets/" + output
+    q34["images"] = [
+        "exam-snippets/context-ha25t1-q33-complete.jpg",
+        "exam-snippets/" + output,
+    ]
+    open_path.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+
+    context_path = ROOT / "exam-contexts.json"
+    context_records = json.loads(context_path.read_text(encoding="utf-8"))
+    context_q34 = next((
+        record for record in context_records
+        if record.get("level") == "Havo"
+        and str(record.get("year")) == "2025"
+        and str(record.get("period")) == "1"
+        and int(record.get("n", 0)) == 34
+    ), None)
+    if context_q34 is None:
+        raise ValueError("Havo 2025-I q34: context record missing")
+    context_q34["image"] = "exam-snippets/context-ha25t1-q33-complete.jpg"
+    context_q34["images"] = [
+        "exam-snippets/context-ha25t1-q33-complete.jpg",
+        "exam-snippets/" + output,
+    ]
+    context_path.write_text(json.dumps(context_records, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+
+
+render_havo_2025_i_q34()
