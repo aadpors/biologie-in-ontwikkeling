@@ -370,6 +370,10 @@ class ExamApp:
             doc["type_zekerheid"] = 1.0
             doc["status"] = "handmatig_bevestigd"
             self.data["beslissingen"].append({"document_id": doc["id"], "van": old, "naar": new, "tijd": now(), "reden": "handmatige bevestiging"})
+            learn_decision(self.project_dir/"kennisbank",{
+                "pattern_key":"document_role:pdf-name-pattern",
+                "chosen":new,"accepted":True,"scope":"voorstel_voor_toekomstige_documentherkenning",
+                "filename":doc["bestand"],"previous":old,"human_decision":True})
             self.save_project()
             self.refresh()
             self._log(f"Herkenning bevestigd: {doc['bestand']} → {new}. Deze correctie wordt bewaard.")
