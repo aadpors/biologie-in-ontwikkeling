@@ -581,7 +581,7 @@ def find_numbered_list_prompt(lines, context_indices, marker):
 
     def item_number(value):
         value = value.strip()
-        match = re.match(r"^([1-4])(?:[.)]\\s*|\\s+)(.*)$", value)
+        match = re.match(r"^([1-4])(?:[.)]\s*|\s+)(.*)$", value)
         if match and match.group(2).strip():
             return int(match.group(1))
         if re.fullmatch(r"[1-4][.)]?", value):
@@ -616,8 +616,8 @@ def find_numbered_list_prompt(lines, context_indices, marker):
 
     # Prefer the nearest explicit lead-in immediately before the sequence.
     heading_re = re.compile(
-        r"(?i)\\b(?:uitspraken?|situaties?|onderdelen|processen|stoffen|"
-        r"kenmerken|gevolgen|conclusies|mogelijkheden|gegevens)\\b"
+        r"(?i)\b(?:uitspraken?|situaties?|onderdelen|processen|stoffen|"
+        r"kenmerken|gevolgen|conclusies|mogelijkheden|gegevens)\b"
     )
     for first_item, _ in reversed(sequences):
         preceding = [i for i in candidates if i < first_item]
