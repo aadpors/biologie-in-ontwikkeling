@@ -156,6 +156,23 @@ for (const [index, question] of [...examQuestions, ...openExamQuestions].entries
     `examenvraag ${index + 1}: context moet als uitsnede of volledige bronpagina beschikbaar zijn`);
 }
 
+// Every question in both inventories must have a local official CV snippet.
+const cvManifest = JSON.parse(fs.readFileSync('scripts/cv-snippets.json', 'utf8'));
+assert.ok(Array.isArray(cvManifest), 'CV-snippetsmanifest moet een array zijn');
+const cvById = new Map(cvManifest.map(item => [item.id, item]));
+assert.equal(cvById.size, cvManifest.length, 'Dubbele vraag-ID in CV-snippetsmanifest');
+for (const question of [...examQuestions, ...openExamQuestions]) {
+  const item = cvById.get(question.id);
+  assert.ok(item, `Officiële CV-snippet ontbreekt voor ${question.id}`);
+  assert.ok(item.pdf && fs.existsSync(item.pdf), `Bron-PDF correctievoorschrift ontbreekt voor ${question.id}`);
+  assertSnippetExists(`exam-snippets/${item.output}`, `CV vraag ${question.id}`);
+  if (item.amendment_pdf) {
+    assert.ok(fs.existsSync(item.amendment_pdf), `Aanvulling correctievoorschrift ontbreekt voor ${question.id}`);
+    assertSnippetExists(`exam-snippets/${item.amendment_output}`, `CV-aanvulling vraag ${question.id}`);
+  }
+}
+assert.ok(!examPage.includes('window.open(cv,\"_blank\"'), 'CV-knop mag niet terugvallen op een externe PDF in plaats van de lokale snippet');
+
 assert.ok(Array.isArray(publications), 'publicaties.json moet een array bevatten');
 assert.ok(publications.length > 0, 'publicatiedatabase mag niet leeg zijn');
 
