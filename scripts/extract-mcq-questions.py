@@ -935,22 +935,29 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         if not final_prompt:
                             raise RuntimeError("Could not locate the final prompt line for Havo 2025-I question 29")
                         question_y1 = min(footer_y, max(rect.y1 for rect in final_prompt) + 6)
+                    # When a numbered statement list belongs to the question,
+                    # the context image must stop immediately before its lead-in.
+                    # Removing OCR lines alone is insufficient: the PDF crop would
+                    # otherwise still visually include the statements.
+                    context_bottom = question_y1
+                    if list_prompt_start is not None:
+                        context_bottom = max(
+                            context_y0 + 20,
+                            min(context_bottom, lines[list_prompt_start]["bbox"][1] - 2),
+                        )
                     try:
                         save_page_crop(
                             page,
-                            fitz.Rect(0, context_y0, page.rect.width, question_y1),
+                            fitz.Rect(0, context_y0, page.rect.width, context_bottom),
                             OUT / context_image,
                             lines,
                             previous_ranges,
                         )
                     except RuntimeError:
-                        # A page can contain only the current question after
-                        # earlier blocks have been removed. Preserve this
-                        # question-only image; its separate context fragment
-                        # is rendered below and remains independently linked.
+                        # Preserve the independently rendered context fragment.
                         page.get_pixmap(
                             matrix=fitz.Matrix(1.8, 1.8),
-                            clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
+                            clip=fitz.Rect(0, context_y0, page.rect.width, context_bottom),
                             alpha=False,
                         ).save(OUT / context_image)
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
