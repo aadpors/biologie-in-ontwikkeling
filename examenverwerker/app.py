@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, build_question_record
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -385,11 +385,145 @@ class ExamApp:
             ttk.Label(detail,text="Mogelijke verwijzingen naar contextmateriaal:",padding=(10,4)).pack(anchor="w")
             ttk.Label(detail,text="\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
             ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
+        ttk.Button(actions,text="Maak concept-vraagrecord",command=lambda:self.create_question_record(rows,tree,win)).pack(side="left",padx=8)
         ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
         ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
         ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
         ttk.Button(actions,text="Voorlopige snippet maken",command=lambda:self.create_snippet_proposal(rows,tree,win)).pack(side="left",padx=8)
+
+    def create_question_record(self, rows, tree, parent):
+        selected=tree.selection()
+        if not selected:
+            messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een vraagstart.")
+            return
+        row=rows[int(selected[0])]
+        if row.get("human_decision") is not True:
+            messagebox.showwarning("Vraagstart eerst bevestigen","Bevestig eerst handmatig dat dit een echte vraagstart is. Een conceptrecord wordt niet gemaakt op basis van alleen een automatisch signaal.",parent=parent)
+            return
+        source_doc=next((d for d in self.data.get("documenten",[]) if d.get("id")==row.get("document_id")),None)
+        if not source_doc:
+            messagebox.showerror("Bron ontbreekt","De oorspronkelijke opgaven-PDF is niet gekoppeld.",parent=parent)
+            return
+        docs=self.data.get("documenten",[])
+        cv_docs=[d for d in docs if d.get("type_voorstel")=="correctievoorschrift"]
+        matching=match_correction_documents(source_doc,cv_docs)
+        if not matching:
+            messagebox.showwarning("Correctievoorschrift ontbreekt","Er is geen correctievoorschrift met hetzelfde niveau, jaar en tijdvak gevonden. Controleer eerst de documenttypen en examenmetadata.",parent=parent)
+            return
+        current=next((r for r in self.data.get("vraagrecords",[]) if r.get("candidate_document_id")==row.get("document_id") and r.get("number")==row.get("number") and r.get("source_page")==row.get("page")),None)
+        initial_meta=source_doc.get("exam_metadata") or self.data.get("exam_metadata") or infer_exam_metadata(source_doc.get("bestand",""))
+        win=tk.Toplevel(parent); win.title(f"Concept-vraagrecord · vraag {row.get('number')}"); win.geometry("900x820")
+        win.transient(parent); win.grab_set()
+        outer=ttk.Frame(win,padding=14); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text="CONCEPT — NIET GOEDGEKEURD VOOR PUBLICATIE",foreground="#9b4d00").pack(anchor="w")
+        ttk.Label(outer,text="Controleer de tekst, het vraagtype, de punten, de context en de bijlagen aan de hand van de originele PDF en het officiële correctievoorschrift.",wraplength=850).pack(anchor="w",pady=(4,10))
+        meta_frame=ttk.LabelFrame(outer,text="Examen- en vraaggegevens",padding=8); meta_frame.pack(fill="x")
+        values={}
+        defaults={"level":initial_meta.get("level","Havo"),"year":str(initial_meta.get("year","")),
+                  "period":str(initial_meta.get("period","1")),"points":"","theme":"","concept":"","end":"","focus":""}
+        labels=[("level","Niveau"),("year","Jaar"),("period","Tijdvak"),("points","Punten"),("theme","Thema"),("concept","Concept"),("end","Eindterm"),("focus","Focus")]
+        for index,(key,label) in enumerate(labels):
+            rr=index//4; cc=(index%4)*2
+            ttk.Label(meta_frame,text=label).grid(row=rr,column=cc,sticky="w",padx=(2,4),pady=4)
+            var=tk.StringVar(value=str((current or {}).get("exam",{}).get(key,defaults[key])))
+            values[key]=var
+            if key=="level":
+                widget=ttk.Combobox(meta_frame,textvariable=var,values=["Havo","Vwo"],state="readonly",width=12)
+            elif key=="period":
+                widget=ttk.Combobox(meta_frame,textvariable=var,values=["1","2","3"],state="readonly",width=8)
+            else:
+                widget=ttk.Entry(meta_frame,textvariable=var,width=18)
+            widget.grid(row=rr,column=cc+1,sticky="ew",padx=(0,8),pady=4)
+        ttk.Label(outer,text="Vraagtype").pack(anchor="w",pady=(8,2))
+        detected=row.get("vraagtype_controle",{}).get("type")
+        default_type="mcq" if detected=="meerkeuze" else "open"
+        question_type=tk.StringVar(value=(current or {}).get("exam",{}).get("questionType",default_type))
+        ttk.Combobox(outer,textvariable=question_type,values=["open","mcq"],state="readonly",width=12).pack(anchor="w")
+        ttk.Label(outer,text="Vraagtekst (volledig nalopen en zo nodig corrigeren)").pack(anchor="w",pady=(8,2))
+        qbox=tk.Text(outer,height=12,wrap="word")
+        qbox.pack(fill="both",expand=True)
+        qbox.insert("1.0",(current or {}).get("question_text",row.get("vraagtekst_voorstel","")))
+        ttk.Label(outer,text="Meerkeuzeopties als JSON-lijst (voor open vragen leeg laten). Voorbeeld: [{\"key\":\"A\",\"text\":\"...\"},{\"key\":\"B\",\"text\":\"...\"}]").pack(anchor="w",pady=(8,2))
+        detected_options=[{"key":x.get("label"),"text":x.get("text","")} for x in row.get("vraagtype_controle",{}).get("options",[])]
+        obox=tk.Text(outer,height=4,wrap="word")
+        obox.pack(fill="x")
+        obox.insert("1.0",json.dumps((current or {}).get("options",detected_options),ensure_ascii=False,indent=2))
+        correct_var=tk.StringVar(value=(current or {}).get("correct",""))
+        correct_frame=ttk.Frame(outer); correct_frame.pack(fill="x",pady=4)
+        ttk.Label(correct_frame,text="Juiste optie (A-H)").pack(side="left")
+        ttk.Entry(correct_frame,textvariable=correct_var,width=8).pack(side="left",padx=8)
+        ttk.Label(outer,text="Bijbehorend correctievoorschrift").pack(anchor="w",pady=(6,2))
+        cv_names=[d["bestand"] for d in matching]
+        cv_choice=tk.StringVar(value=(current or {}).get("cv_display_name",cv_names[0] if len(cv_names)==1 else ""))
+        ttk.Combobox(outer,textvariable=cv_choice,values=cv_names,state="readonly").pack(fill="x")
+        ttk.Label(outer,text="Uitwerkbijlagen (selecteer alle bijlagen waarnaar deze vraag verwijst)").pack(anchor="w",pady=(8,2))
+        appendix_docs=[d for d in docs if d.get("type_voorstel")=="uitwerkbijlage"]
+        appendix_list=tk.Listbox(outer,selectmode="multiple",height=min(4,max(2,len(appendix_docs))))
+        appendix_list.pack(fill="x")
+        existing_appendices=set((current or {}).get("uitwerkbijlagen",[]))
+        for idx,doc in enumerate(appendix_docs):
+            appendix_list.insert("end",doc["bestand"])
+            if doc.get("opslagbestand") in existing_appendices: appendix_list.selection_set(idx)
+        ttk.Label(outer,text="CV-snippetbestand (voor open vragen verplicht voor export; maak/controleer dit fragment later vanuit het CV)").pack(anchor="w",pady=(8,2))
+        snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("*.png"))
+        cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
+        ttk.Combobox(outer,textvariable=cv_snippet_var,values=[""]+snippet_names,state="readonly").pack(fill="x")
+        def save_draft():
+            try:
+                meta={key:var.get().strip() for key,var in values.items()}
+                if meta["level"] not in ("Havo","Vwo") or not re.fullmatch(r"20\\d{2}",meta["year"]) or meta["period"] not in ("1","2","3"):
+                    raise ValueError("Niveau, jaartal of tijdvak is ongeldig.")
+                if not re.fullmatch(r"\\d+",meta["points"]):
+                    raise ValueError("Vul het aantal punten van deze vraag in.")
+                if any(not meta[x] for x in ("theme","concept","end","focus")):
+                    raise ValueError("Vul thema, concept, eindterm en focus in; deze velden zijn nodig voor de website.")
+                qtext=qbox.get("1.0","end").strip()
+                if not qtext: raise ValueError("De vraagtekst mag niet leeg zijn.")
+                cv_doc=next((d for d in matching if d["bestand"]==cv_choice.get()),None)
+                if not cv_doc: raise ValueError("Selecteer het juiste correctievoorschrift.")
+                qtype=question_type.get()
+                try: options=json.loads(obox.get("1.0","end").strip() or "[]")
+                except json.JSONDecodeError as exc: raise ValueError(f"De opties zijn geen geldige JSON: {exc}")
+                correct=correct_var.get().strip().upper()
+                if qtype=="mcq":
+                    if not isinstance(options,list) or len(options)<2: raise ValueError("Een meerkeuzevraag heeft minimaal twee opties nodig.")
+                    keys=[str(x.get("key","")).upper() for x in options if isinstance(x,dict)]
+                    if len(keys)!=len(options) or len(set(keys))!=len(keys) or any(k not in "ABCDEFGH" or len(k)!=1 for k in keys):
+                        raise ValueError("Optielabels moeten uniek zijn en van A t/m H lopen.")
+                    if correct not in keys: raise ValueError("Selecteer een juist antwoord dat tussen de opties staat.")
+                    options=[{"key":str(x["key"]).upper(),"text":str(x.get("text","")).strip()} for x in options]
+                    if any(not x["text"] for x in options): raise ValueError("Elke antwoordoptie moet tekst bevatten.")
+                else:
+                    options=[]; correct=""
+                meta["points"]=int(meta["points"]); meta["questionType"]=qtype
+                candidate=dict(row)
+                record=build_question_record(meta,candidate,qtext,source_doc["opslagbestand"],cv_doc["opslagbestand"])
+                record.update({"exam":meta,"options":options,"correct":correct,
+                               "snippet_files":list(row.get("snippet_proposal_files",[])),
+                               "cv_snippet_file":cv_snippet_var.get().strip() or None,
+                               "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
+                               "candidate_document_id":row.get("document_id"),
+                               "cv_display_name":cv_doc["bestand"],
+                               "status":"controle_nodig","approved_by_human":False,
+                               "record_review_checklist":{"question_text":False,"question_type":False,"points":False,
+                                   "answer_options":False,"cv_alignment":False,"images_and_context":False,
+                                   "appendices":False}})
+                record["source_page"]=int(row["page"])
+                records=self.data.setdefault("vraagrecords",[])
+                old_index=next((i for i,x in enumerate(records) if x.get("candidate_document_id")==row.get("document_id") and x.get("number")==row.get("number") and x.get("source_page")==row.get("page")),None)
+                if old_index is None: records.append(record)
+                else: records[old_index]=record
+                row["record_id"]=record["id"]
+                self.save_project()
+                self._log(f"Conceptrecord {record['id']} opgeslagen. Het record is nadrukkelijk nog niet goedgekeurd.")
+                win.destroy()
+                messagebox.showinfo("Concept opgeslagen","Het vraagrecord is opgeslagen als concept. Publicatie blijft geblokkeerd totdat alle inhoud, context, CV en bijlagen gecontroleerd en expliciet goedgekeurd zijn.",parent=parent)
+            except Exception as exc:
+                messagebox.showerror("Concept niet opgeslagen",str(exc),parent=win)
+        buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
+        ttk.Button(buttons,text="Concept opslaan",command=save_draft).pack(side="right")
+        ttk.Button(buttons,text="Annuleren",command=win.destroy).pack(side="right",padx=8)
 
     def create_snippet_proposal(self, rows, tree, parent):
         selected=tree.selection()
