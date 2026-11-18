@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, link_context_assets
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, link_context_assets, render_composite_crops
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -199,6 +199,31 @@ class EngineTests(unittest.TestCase):
             linked=link_context_assets(result,[{"kind":"figuur","number":"2"}],1,1)
             self.assertEqual(linked[0]["link_status"],"caption_en_geometrie_gevonden")
             self.assertGreaterEqual(len(linked[0]["asset_candidates"]),2)
+
+    def test_cv_answer_regions_from_multiple_pages_render_as_one_snippet(self):
+        try:
+            import pymupdf as fitz
+        except ImportError:
+            self.skipTest("PyMuPDF not installed")
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/"cv.pdf"
+            doc=fitz.open()
+            page1=doc.new_page(); page1.insert_text((60,80),"1 maximumscore 2")
+            page1.insert_text((60,120),"Eerste beoordelingsregel")
+            page2=doc.new_page(); page2.insert_text((60,80),"Vervolg van het antwoord")
+            page2.insert_text((60,120),"2 maximumscore 1")
+            doc.save(p); doc.close()
+            analysis=analyze_pdf(p)
+            anchors=detect_cv_question_numbers(analysis)
+            q1=next(x for x in anchors if x["number"]==1)
+            self.assertIsNotNone(q1.get("bbox"))
+            regions=propose_question_regions(analysis,anchors)
+            proposal=next(x for x in regions if x["number"]==1)
+            self.assertEqual([x["page"] for x in proposal["source_segments"]],[1,2])
+            out=Path(d)/"snippets"/"cv-q1.png"
+            render_composite_crops(p,proposal["source_segments"],out)
+            self.assertTrue(out.is_file())
+            self.assertGreater(out.stat().st_size,500)
 
     def test_pdf_text_and_exact_crop(self):
         try:
