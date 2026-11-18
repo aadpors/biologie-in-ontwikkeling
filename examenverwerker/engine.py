@@ -21,11 +21,24 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     doc=fitz.open(path)
     pages=[]
     for i,page in enumerate(doc):
+        raw=page.get_text("dict", sort=True)
         blocks=[]
-        for b in page.get_text("blocks", sort=True):
-            x0,y0,x1,y1,text,*_=b
-            if text.strip():
-                blocks.append({"bbox":[round(x0,2),round(y0,2),round(x1,2),round(y1,2)],"text":text.strip()})
+        for block in raw.get("blocks",[]):
+            if block.get("type") != 0: continue
+            lines=[]
+            for line in block.get("lines",[]):
+                spans=line.get("spans",[])
+                text="".join(s.get("text","") for s in spans).strip()
+                if not text: continue
+                boxes=[s["bbox"] for s in spans if s.get("text","").strip()]
+                if boxes:
+                    bbox=[min(b[0] for b in boxes),min(b[1] for b in boxes),
+                          max(b[2] for b in boxes),max(b[3] for b in boxes)]
+                else: bbox=line.get("bbox",block.get("bbox",[0,0,0,0]))
+                lines.append({"bbox":[round(x,2) for x in bbox],"text":text})
+            if lines:
+                blocks.append({"bbox":block.get("bbox",[0,0,0,0]),
+                               "text":"\n".join(x["text"] for x in lines),"lines":lines})
         pages.append({"page":i+1,"width":page.rect.width,"height":page.rect.height,
                       "text":page.get_text("text",sort=True),"blocks":blocks})
     meta=doc.metadata or {}
@@ -33,30 +46,34 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     return {"file":path.name,"sha256":digest_file(path),"page_count":len(pages),"metadata":meta,"pages":pages}
 
 def detect_question_candidates(analysis: dict) -> list[dict]:
-    """Find plausible numbered starts; repeated numbering is intentionally retained."""
+    """Find plausible numbered starts; retain duplicates and page coordinates."""
     found=[]
     for page in analysis.get("pages",[]):
         for block in page.get("blocks",[]):
-            lines=block["text"].splitlines()
-            for line_no,line in enumerate(lines):
-                m=QUESTION_RE.match(line)
-                if not m: continue
-                n=int(m.group(1))
+            lines=block.get("lines") or [{"bbox":block["bbox"],"text":x} for x in block["text"].splitlines()]
+            for idx,line in enumerate(lines):
+                value=line["text"].strip()
+                m=QUESTION_RE.match(value)
+                standalone=re.match(r"^(\d{1,2})[.)]?$",value)
+                if not m and not standalone: continue
+                n=int((m or standalone).group(1))
                 if not 1 <= n <= 60: continue
-                # Exclude likely list numbering and years/decimal fragments.
-                prefix=block["text"][:max(0,block["text"].find(line))]
-                if re.search(r"\b(?:bijvoorbeeld|namelijk|stappenplan)\s*$",prefix,re.I): continue
-                found.append({"number":n,"page":page["page"],"bbox":block["bbox"],
-                              "line":line.strip(),"line_index":line_no,
-                              "confidence":0.45,"status":"controle_nodig",
-                              "reason":"Nummerpatroon gevonden; vraagstart moet inhoudelijk worden bevestigd."})
-    # Confidence is a ranking hint, not approval.
-    for item in found:
-        line=item["line"]
-        if len(line)>12 and re.search(r"\b(verklaar|beschrijf|noem|geef|welke|wat|waarom|bereken|noteer|leg)\b",line,re.I):
-            item["confidence"]=0.72
-        if re.match(r"^\d{1,2}\.\s+[A-Z]",line):
-            item["confidence"]=max(item["confidence"],0.68)
+                next_text=lines[idx+1]["text"].strip() if idx+1<len(lines) else ""
+                if standalone and (not next_text or re.match(r"^[A-D][.)]",next_text)):
+                    continue
+                # Avoid obvious numbered lists; ambiguous cases remain review items.
+                if re.match(r"^\d{1,2}[.)]\s+(?:januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)\b",value,re.I):
+                    continue
+                bbox=line["bbox"]
+                confidence=0.42
+                probe=value+" "+next_text
+                if re.search(r"\b(verklaar|beschrijf|noem|geef|welke|wat|waarom|bereken|noteer|leg|toon)\b",probe,re.I):
+                    confidence=0.68
+                if m and len(value)>16: confidence=max(confidence,0.66)
+                found.append({"number":n,"page":page["page"],"bbox":bbox,
+                              "line":value,"next_line":next_text,"confidence":confidence,
+                              "status":"controle_nodig",
+                              "reason":"Nummerpatroon gevonden; vraagstart en vraaggrens moeten worden bevestigd."})
     return found
 
 def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Path, scale: float=2.0):
