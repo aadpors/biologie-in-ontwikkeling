@@ -62,7 +62,9 @@ for filename in (
             break
     gray.close()
     if rule_y is None:
-        raise RuntimeError(f"Expected bottom separator not found in {filename}")
+        print(f"Specifieke onderrand al schoon: {filename}")
+        image.close()
+        continue
     bottom = rule_y - 1
     content = image.crop((0, 0, width, bottom))
     result = Image.new("RGB", (width, bottom + 4), "white")
