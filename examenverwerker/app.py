@@ -247,7 +247,30 @@ class ExamApp:
         tree.pack(fill="both",expand=True,padx=10,pady=10)
         for i,row in enumerate(rows):
             tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",row.get("line"),row.get("status")))
-        ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Bevestiging en contextcontrole volgen in de volgende fase.",wraplength=850).pack(anchor="w",padx=12,pady=(0,12))
+        ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Jouw beoordeling wordt lokaal als leerdata opgeslagen.",wraplength=850).pack(anchor="w",padx=12,pady=(0,8))
+        actions=ttk.Frame(win); actions.pack(fill="x",padx=12,pady=(0,12))
+        def decide(is_question):
+            selected=tree.selection()
+            if not selected:
+                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een gevonden vraagstart.")
+                return
+            row=rows[int(selected[0])]
+            reason=tk.simpledialog.askstring("Waarom deze keuze?","Korte reden (optioneel):",parent=win) or ""
+            row["status"]="bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
+            row["human_decision"]=bool(is_question)
+            row["decision_reason"]=reason
+            learn_decision(self.project_dir/"kennisbank",{
+                "pattern_key":"question_start:numbered-line",
+                "chosen":"question" if is_question else "not_question",
+                "accepted":True,"scope":"voorstel_voor_toekomstige_herkenning",
+                "document_id":row.get("document_id"),"page":row.get("page"),
+                "candidate_line":row.get("line"),"reason":reason,
+                "human_decision":bool(is_question)})
+            self.save_project()
+            tree.set(selected[0],"status",row["status"])
+            self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
+        ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
+        ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
 
     def selected_doc(self):
         selected = self.table.selection()
