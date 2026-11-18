@@ -30,7 +30,14 @@ assert.ok(discoveredExamYears.size > 0, 'Geen examen-PDF’s gevonden');
 for (const year of discoveredExamYears) {
   assert.ok(examYears.has(year), `Meerkeuzevragen voor beschikbaar examenjaar ${year} ontbreken`);
 }
-assert.ok(examPage.includes('De antwoordteksten staan in de oorspronkelijke opgave hierboven'), 'Meerkeuzevragen verwijzen niet naar de originele antwoordteksten');
+assert.ok(examPage.includes('/^\\d+$/'), 'Binaire tabellen tonen bij genummerde uitspraken niet uitsluitend het uitspraaknummer');
+const havo2025Question32 = openExamQuestions.find(question => question.id === 'ha25t1-open-32');
+assert.ok(havo2025Question32, 'Havo 2025-I vraag 32 ontbreekt');
+assert.deepEqual(
+  havo2025Question32.images?.slice(0, 2),
+  ['exam-snippets/context-ha25t1-q31-complete.jpg', 'exam-snippets/context-ha25t1-q32-complete.jpg'],
+  'Havo 2025-I vraag 32 moet zowel de contextuitsnede van vraag 31 als de vervolgcontext van vraag 32 tonen'
+);
 assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
 assert.ok(examPage.includes('Meerkeuzevragen én juist/onjuist- en wel/niet-vragen worden automatisch nagekeken volgens het officiële correctievoorschrift.'), 'De toelichting over de automatische nakijkinteractie ontbreekt');
 const open2024 = [...examPage.matchAll(/id:"[^"]+",level:"(?:Havo|Vwo)",year:"2024"/g)];
