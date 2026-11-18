@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -115,6 +115,29 @@ class EngineTests(unittest.TestCase):
         regions=propose_question_regions(analysis,candidates)
         self.assertEqual(len(regions[0]["source_segments"]),2)
         self.assertEqual(regions[0]["status"],"voorstel_niet_goedgekeurd")
+    def test_human_approval_requires_all_review_categories(self):
+        record={"exam":{"questionType":"open"},"question_text":"Leg uit.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
+                "snippet_files":["q.png"],"cv_snippet_file":"cv-q1.png"}
+        checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
+                   "images_and_context":True,"appendices":False}
+        self.assertIn("controle_niet_afgevinkt:appendices",review_checklist_errors(record,checklist))
+        checklist["appendices"]=True
+        self.assertEqual(review_checklist_errors(record,checklist),[])
+
+    def test_open_question_cannot_be_approved_without_cv_snippet(self):
+        record={"exam":{"questionType":"open"},"question_text":"Leg uit.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
+                "snippet_files":["q.png"]}
+        checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
+                   "images_and_context":True,"appendices":True}
+        self.assertIn("cv_fragment_ontbreekt",review_checklist_errors(record,checklist))
+
+    def test_mcq_approval_requires_answer_option_review(self):
+        record={"exam":{"questionType":"mcq"},"question_text":"Kies.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
+                "snippet_files":["q.png"],"options":[{"key":"A","text":"A"},{"key":"B","text":"B"}],"correct":"A"}
+        checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
+                   "images_and_context":True,"appendices":True}
+        self.assertIn("controle_niet_afgevinkt:answer_options",review_checklist_errors(record,checklist))
+
     def test_review_record_is_never_preapproved_and_uses_site_id(self):
         meta={"level":"Havo","year":"2026","period":"1","questionType":"open"}
         candidate={"number":7,"page":3,"bbox":[30,100,60,120],"confidence":0.7}
