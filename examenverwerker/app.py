@@ -1,0 +1,295 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+import shutil
+import sys
+import traceback
+from datetime import datetime
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+
+APP_VERSION = "0.1.0"
+PROJECT_FILE = "project.json"
+DOC_TYPES = {
+    "opgaven": ["opgaven", "opgave", "vragen", "exam"],
+    "correctievoorschrift": ["correctievoorschrift", "correctievoorschr", "cv", "antwoordmodel"],
+    "uitwerkbijlage": ["uitwerkbijlage", "uitwerkblad", "bijlage"],
+    "aanvulling": ["aanvulling", "aanvullingen", "erratum", "errata"],
+}
+
+
+def now():
+    return datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def classify(filename: str, text: str):
+    hay = (filename + " " + text[:12000]).lower()
+    scores = {}
+    for kind, terms in DOC_TYPES.items():
+        scores[kind] = sum(2 if term in filename.lower() else 1 for term in terms if term in hay)
+    best = max(scores, key=scores.get)
+    ordered = sorted(scores.values(), reverse=True)
+    confidence = 0.96 if ordered[0] >= 4 and ordered[0] > ordered[1] else (
+        0.78 if ordered[0] > ordered[1] else 0.35
+    )
+    if ordered[0] == 0:
+        return "onbekend", 0.0, scores
+    return best, confidence, scores
+
+
+def extract_pdf(path: Path):
+    try:
+        import fitz
+    except ImportError as exc:
+        raise RuntimeError("PDF-lezer ontbreekt. Start BUILD_PORTABLE.bat of installeer requirements.txt.") from exc
+    doc = fitz.open(path)
+    pages = []
+    for index, page in enumerate(doc):
+        pages.append({"pagina": index + 1, "tekst": page.get_text("text", sort=True)})
+    meta = doc.metadata or {}
+    result = {"pagina_aantal": len(doc), "metadata": meta, "pagina_tekst": pages}
+    doc.close()
+    return result
+
+
+class ExamApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Biologie Examenverwerker")
+        self.root.geometry("1040x700")
+        self.root.minsize(820, 560)
+        self.project_dir = None
+        self.data = None
+        self._style()
+        self._build()
+        self._welcome()
+
+    def _style(self):
+        style = ttk.Style()
+        try:
+            style.theme_use("clam")
+        except tk.TclError:
+            pass
+        style.configure("Title.TLabel", font=("Segoe UI", 20, "bold"), foreground="#741d3b")
+        style.configure("Sub.TLabel", font=("Segoe UI", 10), foreground="#52616b")
+        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"), padding=8)
+        style.configure("Treeview", rowheight=30, font=("Segoe UI", 9))
+        style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
+
+    def _build(self):
+        top = ttk.Frame(self.root, padding=(20, 16))
+        top.pack(fill="x")
+        ttk.Label(top, text="Biologie Examenverwerker", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(top, text="Van originele examen-PDF's naar gecontroleerde, publicatieklare vragen.", style="Sub.TLabel").pack(anchor="w", pady=(3, 0))
+        bar = ttk.Frame(self.root, padding=(20, 4))
+        bar.pack(fill="x")
+        self.project_label = ttk.Label(bar, text="Geen project geopend", style="Sub.TLabel")
+        self.project_label.pack(side="left", fill="x", expand=True)
+        ttk.Button(bar, text="Nieuw examenproject", command=self.new_project, style="Accent.TButton").pack(side="left", padx=4)
+        ttk.Button(bar, text="Project openen", command=self.open_project).pack(side="left", padx=4)
+        ttk.Button(bar, text="PDF's toevoegen", command=self.add_pdfs, style="Accent.TButton").pack(side="left", padx=4)
+
+        body = ttk.Frame(self.root, padding=(20, 12))
+        body.pack(fill="both", expand=True)
+        self.status = ttk.Label(body, text="Begin met een nieuw examenproject of open een bestaand project.", style="Sub.TLabel")
+        self.status.pack(anchor="w", pady=(0, 10))
+        columns = ("name", "type", "pages", "confidence", "state")
+        self.table = ttk.Treeview(body, columns=columns, show="headings")
+        for col, title, width in [
+            ("name", "Bestand", 360), ("type", "Herkend als", 170),
+            ("pages", "Pagina's", 80), ("confidence", "Zekerheid", 100), ("state", "Status", 170)
+        ]:
+            self.table.heading(col, text=title)
+            self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
+        self.table.pack(fill="both", expand=True)
+        self.table.bind("<Double-1>", self.show_document)
+        foot = ttk.Frame(body)
+        foot.pack(fill="x", pady=(10, 0))
+        ttk.Button(foot, text="Document bekijken", command=self.show_document).pack(side="left")
+        ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)
+        ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
+        self.log = tk.Text(body, height=6, wrap="word", font=("Consolas", 9), background="#f5f7f7", relief="flat")
+        self.log.pack(fill="x", pady=(12, 0))
+        self.log.configure(state="disabled")
+
+    def _welcome(self):
+        self._log("Welkom. Maak een project per examen. Voeg daarna alle beschikbare PDF's toe.")
+        self._log("Tip: selecteer opgaven, correctievoorschrift, uitwerkbijlage en eventuele aanvullingen tegelijk.")
+
+    def _log(self, text):
+        self.log.configure(state="normal")
+        self.log.insert("end", f"[{datetime.now().strftime('%H:%M:%S')}] {text}\n")
+        self.log.see("end")
+        self.log.configure(state="disabled")
+
+    def new_project(self):
+        folder = filedialog.askdirectory(title="Kies of maak een map voor dit examenproject")
+        if not folder:
+            return
+        base = Path(folder)
+        name = tk.simpledialog.askstring("Nieuw examen", "Geef het examen een herkenbare naam:", initialvalue=base.name)
+        if not name:
+            return
+        self.project_dir = base / re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
+        (self.project_dir / "bronnen").mkdir(parents=True, exist_ok=True)
+        (self.project_dir / "analyse").mkdir(exist_ok=True)
+        (self.project_dir / "snippets").mkdir(exist_ok=True)
+        self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
+                     "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
+                     "publicatiestatus": "niet_vrijgegeven"}
+        self.save_project()
+        self.refresh()
+        self._log(f"Nieuw project aangemaakt: {self.project_dir}")
+
+    def open_project(self):
+        filename = filedialog.askopenfilename(title="Open projectbestand", filetypes=[("Examenproject", PROJECT_FILE), ("JSON", "*.json")])
+        if not filename:
+            return
+        try:
+            data = json.loads(Path(filename).read_text(encoding="utf-8"))
+            if data.get("schema") != "biologie-examenproject-v1":
+                raise ValueError("Dit is geen herkenbaar examenprojectbestand.")
+            self.project_dir = Path(filename).parent
+            self.data = data
+            self.refresh()
+            self._log(f"Project geopend: {self.project_dir}")
+        except Exception as exc:
+            messagebox.showerror("Project openen mislukt", str(exc))
+
+    def add_pdfs(self):
+        if not self.data:
+            messagebox.showinfo("Eerst een project", "Maak eerst een nieuw examenproject of open een bestaand project.")
+            return
+        files = filedialog.askopenfilenames(title="Selecteer de examen-PDF's", filetypes=[("PDF-bestanden", "*.pdf")])
+        if not files:
+            return
+        added = 0
+        for source_name in files:
+            source = Path(source_name)
+            try:
+                digest = sha256(source)
+                if any(d.get("sha256") == digest for d in self.data["documenten"]):
+                    self._log(f"Overgeslagen (exact duplicaat): {source.name}")
+                    continue
+                target = self.project_dir / "bronnen" / f"{digest[:12]}-{source.name}"
+                shutil.copy2(source, target)
+                extracted = extract_pdf(target)
+                all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
+                kind, confidence, scores = classify(source.name, all_text)
+                doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
+                       "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
+                       "herkenningssignalen": scores, "status": "controle_nodig" if confidence < 0.9 else "herkend_nog_niet_goedgekeurd",
+                       "toegevoegd": now(), "pagina_aantal": extracted["pagina_aantal"],
+                       "metadata": extracted["metadata"]}
+                (self.project_dir / "analyse" / f"{digest[:16]}.json").write_text(
+                    json.dumps(extracted, ensure_ascii=False, indent=2), encoding="utf-8")
+                self.data["documenten"].append(doc)
+                self._log(f"{source.name}: {kind} voorgesteld ({confidence:.0%}), {extracted['pagina_aantal']} pagina's.")
+                added += 1
+            except Exception as exc:
+                self._log(f"FOUT bij {source.name}: {exc}")
+        self.save_project()
+        self.refresh()
+        self.status.configure(text=f"{added} PDF('s) toegevoegd. Controleer de voorgestelde documenttypen.")
+
+    def selected_doc(self):
+        selected = self.table.selection()
+        if not selected or not self.data:
+            return None
+        idx = int(selected[0])
+        return self.data["documenten"][idx]
+
+    def show_document(self, _event=None):
+        doc = self.selected_doc()
+        if not doc:
+            return
+        analysis = self.project_dir / "analyse" / f"{doc['id']}.json"
+        extracted = json.loads(analysis.read_text(encoding="utf-8"))
+        preview = tk.Toplevel(self.root)
+        preview.title(doc["bestand"])
+        preview.geometry("850x620")
+        header = ttk.Frame(preview, padding=12)
+        header.pack(fill="x")
+        ttk.Label(header, text=f"{doc['bestand']}  |  {doc['pagina_aantal']} pagina's", font=("Segoe UI", 12, "bold")).pack(anchor="w")
+        ttk.Label(header, text=f"Voorstel: {doc['type_voorstel']} ({doc['type_zekerheid']:.0%}) · SHA-256: {doc['sha256']}", wraplength=800).pack(anchor="w")
+        box = tk.Text(preview, wrap="word", font=("Segoe UI", 10))
+        box.pack(fill="both", expand=True, padx=12, pady=(0, 12))
+        for page in extracted["pagina_tekst"]:
+            box.insert("end", f"\n{'='*25} PAGINA {page['pagina']} {'='*25}\n")
+            box.insert("end", page["tekst"] or "[Geen selecteerbare tekst gevonden; mogelijk scan of afbeelding.]")
+        box.configure(state="disabled")
+
+    def correct_type(self):
+        doc = self.selected_doc()
+        if not doc:
+            messagebox.showinfo("Selecteer een document", "Selecteer eerst een PDF in de lijst.")
+            return
+        choices = ["opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling", "onbekend"]
+        win = tk.Toplevel(self.root)
+        win.title("Documenttype bevestigen")
+        win.transient(self.root)
+        ttk.Label(win, text=f"Welk type is '{doc['bestand']}'?").pack(padx=18, pady=(18, 8))
+        choice = tk.StringVar(value=doc["type_voorstel"])
+        combo = ttk.Combobox(win, textvariable=choice, values=choices, state="readonly", width=28)
+        combo.pack(padx=18, pady=8)
+        def apply():
+            old = doc["type_voorstel"]
+            new = choice.get()
+            doc["type_voorstel"] = new
+            doc["type_zekerheid"] = 1.0
+            doc["status"] = "handmatig_bevestigd"
+            self.data["beslissingen"].append({"document_id": doc["id"], "van": old, "naar": new, "tijd": now(), "reden": "handmatige bevestiging"})
+            self.save_project()
+            self.refresh()
+            self._log(f"Herkenning bevestigd: {doc['bestand']} → {new}. Deze correctie wordt bewaard.")
+            win.destroy()
+        ttk.Button(win, text="Bevestigen", command=apply).pack(pady=(8, 18))
+
+    def save_project(self):
+        if not self.data or not self.project_dir:
+            return
+        self.data["bijgewerkt"] = now()
+        temp = self.project_dir / (PROJECT_FILE + ".tmp")
+        temp.write_text(json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8")
+        temp.replace(self.project_dir / PROJECT_FILE)
+        self.project_label.configure(text=f"Project: {self.data['naam']}  ·  {self.project_dir}")
+
+    def refresh(self):
+        for item in self.table.get_children():
+            self.table.delete(item)
+        if not self.data:
+            return
+        for idx, doc in enumerate(self.data["documenten"]):
+            self.table.insert("", "end", iid=str(idx), values=(
+                doc["bestand"], doc["type_voorstel"], doc["pagina_aantal"],
+                f"{doc['type_zekerheid']:.0%}", doc["status"].replace("_", " ")
+            ))
+        count = len(self.data["documenten"])
+        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])
+        self.status.configure(text=f"{count} document(en) opgenomen · {todo} herkenning(en) vragen controle · publicatie geblokkeerd tot volledige kwaliteitscontrole.")
+
+def main():
+    root = tk.Tk()
+    try:
+        from tkinter import simpledialog
+        tk.simpledialog = simpledialog
+        ExamApp(root)
+        root.mainloop()
+    except Exception:
+        messagebox.showerror("Programmafout", traceback.format_exc())
+        raise
+
+
+if __name__ == "__main__":
+    main()
