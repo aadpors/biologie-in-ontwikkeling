@@ -569,22 +569,69 @@ def parse_options(block_lines):
     return options
 
 def find_numbered_list_prompt(lines, context_indices, marker):
-    """Find a question lead-in introducing a numbered list before its score marker."""
-    heading_re = re.compile(
-        r"^\\s*(?:hieronder|hierna)\\s+(?:staan|staat|is|zijn|volgt|volgen|wordt|worden)\\b",
-        re.I,
-    )
-    item_re = re.compile(r"^\\s*([1-4])(?:[.)]\\s+|\\s+\\S)")
-    eligible = sorted(i for i in context_indices if i < marker["number_line"])
-    lower_bound = max(0, marker["number_line"] - 36)
-    for heading_index in reversed([i for i in eligible if i >= lower_bound and heading_re.match(lines[i]["text"])]):
-        subsequent = [i for i in eligible if heading_index < i < marker["number_line"]]
-        first = next((i for i in subsequent if lines[i]["text"].strip()), None)
-        if first is None or not re.match(r"^\\s*1(?:[.)]\\s+|\\s+\\S)", lines[first]["text"]):
+    """Find question-owned numbered statements before the printed score marker.
+
+    PDF text extraction sometimes puts the item number on a separate line from
+    its statement. Accept both layouts, and recognise the different lead-ins
+    used by exam writers (not only sentences beginning with "Hieronder").
+    """
+    # Do not restrict the search to context_indices: the context-heading
+    # heuristic can advance its cursor to (or beyond) the very lead-in we need
+    # to move into the question. Search the complete local page window instead,
+    # then select only a semantic heading immediately preceding a numbered run.
+    # Long context pages can place a question's lead-in more than 48 text
+    # lines before its printed score marker (especially around large figures).
+    # The semantic-heading + consecutive-item checks below keep this wider
+    # search local to the actual question rather than treating arbitrary lists
+    # in the passage as question material.
+    lower_bound = max(0, marker["number_line"] - 120)
+    candidates = list(range(lower_bound, marker["number_line"]))
+
+    def item_number(value):
+        value = value.strip()
+        match = re.match(r"^([1-4])(?:[.)]\s*|\s+)(.*)$", value)
+        if match and match.group(2).strip():
+            return int(match.group(1))
+        if re.fullmatch(r"[1-4][.)]?", value):
+            return int(value.rstrip(".)"))
+        return None
+
+    # Find a numbered sequence first. A number-only line may be followed by
+    # its wrapped statement on the next physical PDF line.
+    sequences = []
+    for position, line_index in enumerate(candidates):
+        if item_number(lines[line_index]["text"]) != 1:
             continue
-        numbers = {int(match.group(1)) for i in subsequent if (match := item_re.match(lines[i]["text"]))}
+        numbers = []
+        last_number = 0
+        for candidate_index in candidates[position:]:
+            number = item_number(lines[candidate_index]["text"])
+            if number is None:
+                continue
+            if number == last_number + 1:
+                numbers.append(number)
+                last_number = number
+            elif number == 1 and not numbers:
+                numbers = [1]
+                last_number = 1
+            elif number > last_number + 1:
+                break
         if len(numbers) >= 2:
-            return heading_index
+            sequences.append((line_index, numbers))
+
+    if not sequences:
+        return None
+
+    # Prefer the nearest explicit lead-in immediately before the sequence.
+    heading_re = re.compile(
+        r"(?i)\b(?:uitspraken?|situaties?|onderdelen|processen|stoffen|"
+        r"kenmerken|gevolgen|conclusies|mogelijkheden|gegevens)\b"
+    )
+    for first_item, _ in reversed(sequences):
+        preceding = [i for i in candidates if i < first_item]
+        for heading_index in reversed(preceding[-8:]):
+            if heading_re.search(lines[heading_index]["text"]):
+                return heading_index
     return None
 
 
@@ -736,6 +783,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 }
                 base_context_line_indices = context_line_indices[:]
                 anchored_context = False
+                list_prompt_applies_to_question = list_prompt_start is not None
                 anchor_text = manual_context_anchors.get((prefix, marker["number"]))
                 if anchor_text:
                     anchor_hits = page.search_for(anchor_text)
@@ -748,6 +796,28 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         context = clean_context([lines[j]["text"] for j in context_line_indices])
                         context_y0 = max(0, anchor_y - 5)
                         anchored_context = True
+                        # A list found before this manually selected context
+                        # belongs to the preceding question, not this one.
+                        if (
+                            list_prompt_start is not None
+                            and context_line_indices
+                            and list_prompt_start < min(context_line_indices)
+                        ):
+                            list_prompt_applies_to_question = False
+
+                # Manual context anchors are applied after the automatic
+                # question-boundary detector. Reapply that boundary afterwards:
+                # otherwise an anchor can accidentally put numbered question
+                # statements back into the context text and context image.
+                if list_prompt_applies_to_question:
+                    context_line_indices = [
+                        j for j in context_line_indices if j < list_prompt_start
+                    ]
+                    context = clean_context([lines[j]["text"] for j in context_line_indices])
+                    if context_line_indices:
+                        context_y0 = max(
+                            0, min(lines[j]["bbox"][1] for j in context_line_indices) - 5
+                        )
 
                 # A question can start very near the top of a PDF page. In
                 # that case the default context margin must not begin below
@@ -828,6 +898,27 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if not selected_prompt:
                     selected_prompt = "\n".join(x for x in block_text if x.strip()).strip()
 
+                # Some multiple-choice questions place their numbered
+                # statements above the printed question number. In that case
+                # the statements have been removed from context by the
+                # boundary detector, so carry their text into the question
+                # prompt as well as the separate question image.
+                if list_prompt_applies_to_question and list_prompt_start is not None:
+                    # The marker parser can place the printed question start
+                    # before or after the preceding statement block in PDF
+                    # reading order. Include the block unless it is already
+                    # present in the selected prompt.
+                    lead_in_lines = [
+                        lines[j]["text"]
+                        for j in range(list_prompt_start, marker["number_line"])
+                        if lines[j]["text"].strip()
+                    ]
+                    if (
+                        lead_in_lines
+                        and lead_in_lines[0].strip() not in selected_prompt
+                    ):
+                        selected_prompt = "\n".join([*lead_in_lines, selected_prompt]).strip()
+
                 # Determine where the question itself ends so later context can be
                 # carried forward without carrying the previous question into the next card.
                 if options and first_option < len(block_text):
@@ -871,7 +962,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 context_record = None
                 if selected_context_page is None or page_index + 1 == selected_context_page:
                     context_image = f"question-{prefix}-{marker['number']}.jpg"
-                    question_start_line = list_prompt_start if list_prompt_start is not None else start
+                    question_start_line = list_prompt_start if list_prompt_applies_to_question else start
                     question_top = min(
                         max(0, lines[question_start_line]["bbox"][1] - 1), page.rect.height - 55
                     )
@@ -896,22 +987,29 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         if not final_prompt:
                             raise RuntimeError("Could not locate the final prompt line for Havo 2025-I question 29")
                         question_y1 = min(footer_y, max(rect.y1 for rect in final_prompt) + 6)
+                    # When a numbered statement list belongs to the question,
+                    # the context image must stop immediately before its lead-in.
+                    # Removing OCR lines alone is insufficient: the PDF crop would
+                    # otherwise still visually include the statements.
+                    context_bottom = question_y1
+                    if list_prompt_start is not None:
+                        context_bottom = max(
+                            context_y0 + 20,
+                            min(context_bottom, lines[list_prompt_start]["bbox"][1] - 2),
+                        )
                     try:
                         save_page_crop(
                             page,
-                            fitz.Rect(0, context_y0, page.rect.width, question_y1),
+                            fitz.Rect(0, context_y0, page.rect.width, context_bottom),
                             OUT / context_image,
                             lines,
                             previous_ranges,
                         )
                     except RuntimeError:
-                        # A page can contain only the current question after
-                        # earlier blocks have been removed. Preserve this
-                        # question-only image; its separate context fragment
-                        # is rendered below and remains independently linked.
+                        # Preserve the independently rendered context fragment.
                         page.get_pixmap(
                             matrix=fitz.Matrix(1.8, 1.8),
-                            clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
+                            clip=fitz.Rect(0, context_y0, page.rect.width, context_bottom),
                             alpha=False,
                         ).save(OUT / context_image)
                     context_record = {"level": level, "year": year, "period": period, "n": marker["number"], "page": page_index + 1, "image": f"exam-snippets/{context_image}"}
@@ -1177,7 +1275,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # Context paragraphs are independent full-width strips; the
                 # question and answer options are always rendered separately.
                 if mcq_images is None:
-                    question_top = max(0, lines[start]["bbox"][1] - 1)
+                    question_top = max(0, lines[question_start_line]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
                     # When the generic end-line detector misses a compact or
                     # table-style prompt, use the parsed answer-option rows as
@@ -1197,7 +1295,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     # line itself and let the top of the question leak into the
                     # context card. Keep a visible lower margin as well.
                     context_question_top = max(
-                        0, lines[marker["number_line"]]["bbox"][1]
+                        0, lines[question_start_line]["bbox"][1]
                     )
                     context_paths = context_image_fragments(
                         page, lines, context_line_indices, prefix,
