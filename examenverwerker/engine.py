@@ -78,6 +78,57 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
                           "reason":"Nummerpatroon gevonden; vraagstart en vraaggrens moeten worden bevestigd."})
     return found
 
+
+def propose_question_regions(analysis: dict, candidates: list[dict], horizontal_margin: float=28.0) -> list[dict]:
+    """Propose source-page regions between consecutive starts; never call them complete."""
+    pages={p["page"]:p for p in analysis.get("pages",[])}
+    ordered=sorted(candidates,key=lambda x:(x["page"],x["bbox"][1],x["bbox"][0]))
+    proposals=[]
+    for i,item in enumerate(ordered):
+        page_no=item["page"]
+        page=pages.get(page_no)
+        if not page: continue
+        x0=horizontal_margin
+        x1=max(x0+10,page["width"]-horizontal_margin)
+        y0=max(0.0,item["bbox"][1]-8.0)
+        next_item=ordered[i+1] if i+1<len(ordered) else None
+        if next_item and next_item["page"]==page_no:
+            y1=min(page["height"],max(y0+10,next_item["bbox"][1]-5.0))
+            segments=[{"page":page_no,"bbox":[x0,y0,x1,y1]}]
+        else:
+            segments=[{"page":page_no,"bbox":[x0,y0,x1,page["height"]]}]
+            if next_item and next_item["page"]>page_no+1:
+                for pno in range(page_no+1,next_item["page"]):
+                    p=pages.get(pno)
+                    if p: segments.append({"page":pno,"bbox":[x0,0.0,x1,p["height"]]})
+            if next_item and next_item["page"]>page_no:
+                p=pages.get(next_item["page"])
+                if p:
+                    y1=min(p["height"],max(10.0,next_item["bbox"][1]-5.0))
+                    segments.append({"page":next_item["page"],"bbox":[x0,0.0,x1,y1]})
+        proposals.append({"number":item["number"],"start_page":page_no,
+                          "source_segments":segments,"status":"voorstel_niet_goedgekeurd",
+                          "completeness":"onbekend",
+                          "warning":"Dit fragment loopt tot de volgende gevonden nummerkandidaat. Gedeelde context, bijschriften en verwijzingen kunnen erbuiten staan."})
+    return proposals
+
+def find_context_references(analysis: dict, question_text: str, before_pages: int=3) -> list[dict]:
+    """Find earlier page mentions of referenced figures/tables as review leads."""
+    refs=[]
+    for kind,number in FIGURE_RE.findall(question_text or ""):
+        refs.append((kind.lower(),int(number)))
+    if not refs: return []
+    pages=analysis.get("pages",[])
+    results=[]
+    for kind,number in refs:
+        pattern=re.compile(rf"(?i)\b{re.escape(kind)}\s+{number}\b")
+        for page in pages:
+            if pattern.search(page.get("text","")):
+                results.append({"kind":kind,"number":number,"page":page["page"],
+                                "match":"verwijzing of bijschrift gevonden",
+                                "status":"contextkandidaat_niet_bevestigd"})
+    return results
+
 def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Path, scale: float=2.0):
     """Render a source PDF rectangle unchanged; coordinates are PDF points."""
     import fitz
