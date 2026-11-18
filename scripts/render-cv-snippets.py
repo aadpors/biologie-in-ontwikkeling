@@ -54,6 +54,8 @@ def render_question(pdf_path, question, output):
                 if line["y0"] > heading["y0"] + 3
                 and (line["bold"] or line["size"] >= 16)
                 and line["size"] >= 11 and len(line["text"]) < 100
+                # Bullet glyphs are part of answer criteria, not section headings.
+                and line["text"].strip() not in {"•", "●", "▪", "◦", "-", "–", "—"}
                 and not re.match(r"^\d{1,2}\s+", line["text"])
                 and not re.match(r"^(?:maximumscore|antwoord|scores)\b", line["text"], re.I)
             ]
@@ -61,12 +63,6 @@ def render_question(pdf_path, question, output):
             boundaries = [line["y0"] for line in following + next_topic]
             bottom = min(page.rect.height - 80, min(boundaries, default=page.rect.height - 80) - 5)
             bottom = max(top + 35, bottom)
-            if pdf_path.name == "vw-1018-a-26-1-c.pdf" and question == 18:
-                print("CV-Q18-DIAGNOSTIC", json.dumps({
-                    "page": page_index + 1, "top": top, "bottom": bottom,
-                    "lines": [{"y": round(line["y0"], 1), "text": line["text"]} for line in lines],
-                    "next_page": [{"y": round(line["y0"], 1), "text": line["text"]} for line in page_lines(doc[page_index + 1])] if page_index + 1 < len(doc) else []
-                }, ensure_ascii=False))
             page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0), clip=fitz.Rect(0, top, page.rect.width, bottom), alpha=False).save(OUT / output)
             print(f"Rendered {output} from {pdf_path.name}, page {page_index + 1}, question {question}")
             return
