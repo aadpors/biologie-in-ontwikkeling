@@ -37,8 +37,8 @@ for filename, label in DATASETS:
         question_prompt = record.get("q", "")
         numbered_answer = bool(
             __import__("re").search(
-                r"(?i)(schrijf|noteer)\\s+de\\s+nummers|welke\\s+uitspraak|"
-                r"welk\\s+van\\s+deze\\s+uitspraken|welke\\s+van\\s+deze\\s+uitspraken",
+                r"(?i)(schrijf|noteer)\s+de\s+nummers|welke\s+uitspraak|"
+                r"welk\s+van\s+deze\s+uitspraken|welke\s+van\s+deze\s+uitspraken",
                 question_prompt,
             )
         )
@@ -46,9 +46,9 @@ for filename, label in DATASETS:
         has_statement_block = bool(
             __import__("re").search(
                 r"(?is)(?:uitspraken?|situaties?|onderdelen|processen|stoffen|"
-                r"kenmerken|gevolgen|conclusies|gegevens)[^\\n]*:?\\s*"
-                r"(?:\\n[^\\n]*){0,2}\\n\\s*1(?:[.)]\\s+|\\s+\\S).*?"
-                r"\\n\\s*2(?:[.)]\\s+|\\s+\\S)",
+                r"kenmerken|gevolgen|conclusies|gegevens)[^\n]*:?\s*"
+                r"(?:\n[^\n]*){0,2}\n\s*1(?:[.)]\s+|\s+\S).*?"
+                r"\n\s*2(?:[.)]\s+|\s+\S)",
                 source_text,
             )
         )
