@@ -185,7 +185,7 @@ if not q34 or not q33:
 else:
     q30 = open_by_id.get("ha25t1-open-30")
     q32 = open_by_id.get("ha25t1-open-32")
-    expected_source = "\\n\\n".join(
+    expected_source = "\n\n".join(
         record.get("source", "").strip()
         for record in (q30, q32, q33)
         if record and record.get("source")
