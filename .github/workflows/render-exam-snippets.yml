@@ -7,6 +7,7 @@ on:
       - 'examens/*.pdf'
       - 'scripts/render-exam-snippets.py'
       - 'scripts/extract-mcq-questions.py'
+      - 'scripts/trim-question-image-edges.py'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/exam-snippets.json'
       - '.github/workflows/render-exam-snippets.yml'
@@ -50,6 +51,8 @@ jobs:
         run: python scripts/render-cv-snippets.py
       - name: Extract multiple-choice questions from all available exams
         run: python scripts/extract-mcq-questions.py
+      - name: Trim source-page separators below all question images
+        run: python scripts/trim-question-image-edges.py
       - name: Validate every generated question and image
         run: python scripts/validate-exam-snippets.py
       - name: Commit generated image snippets
