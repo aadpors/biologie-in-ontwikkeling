@@ -135,7 +135,7 @@ class EngineTests(unittest.TestCase):
         record={"exam":{"questionType":"mcq"},"question_text":"Kies.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
                 "snippet_files":["q.png"],"options":[{"key":"A","text":"A"},{"key":"B","text":"B"}],"correct":"A"}
         checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
-                   "images_and_context":True,"appendices":True}
+                   "images_and_context":True,"appendices":True,"cv_addenda":True}
         self.assertIn("controle_niet_afgevinkt:answer_options",review_checklist_errors(record,checklist))
 
     def test_review_record_is_never_preapproved_and_uses_site_id(self):
