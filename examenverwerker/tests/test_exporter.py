@@ -8,7 +8,7 @@ class ExportTests(unittest.TestCase):
         for name in ("opgaven.pdf","cv.pdf","uitwerkbijlage.pdf","aanvulling.pdf"):
             (project/"bronnen"/name).write_bytes(b"%PDF-original-"+name.encode())
         (project/"snippets"/"vraag1.png").write_bytes(b"PNG-snippet")
-        (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")
+        (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")\n        (project/"snippets"/"cv-amend1.png").write_bytes(b"CV-amendment-snippet")
         record={
             "id":"ha26t1-open-1","status":"goedgekeurd","approved_by_human":True,
             "exam":{"level":"Havo","year":"2026","period":"1","points":2,"theme":"Ecologie",
@@ -34,14 +34,17 @@ class ExportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
             record["cv_amendment_pdfs"]=["aanvulling.pdf"]
+            record["cv_amendment_snippet_file"]="cv-amend1.png"
             out=Path(d)/"out"
             result=export_approved_records([record],project,out)
             self.assertTrue(result["ok"],result)
             self.assertTrue((out/"examens"/"aanvulling.pdf").is_file())
+            self.assertTrue((out/"exam-snippets"/"cv-amend1.png").is_file())
             import json
             cv_data=json.loads((out/"scripts"/"cv-snippets.json").read_text(encoding="utf-8"))
             manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["records"][0]["cv_amendment_pdfs"][0]["file"],"examens/aanvulling.pdf")
+            self.assertEqual(cv_data[0]["amendment_output"],"cv-amend1.png")
 
     def test_invalidated_source_analysis_is_blocked_even_if_record_was_approved(self):
         with tempfile.TemporaryDirectory() as d:
