@@ -9,6 +9,12 @@ PDF_DIR=ROOT/"examens"
 OUT=Path(__file__).resolve().parents[1]/"artifacts"/"exam-analysis-report.json"
 PATTERN=re.compile(r"^(ha|vw)-1018-a-(\d{2})-(\d+)-o(?:-|\.pdf)",re.I)
 def main():
+    # Windows runners and portable consoles may use legacy code pages (e.g. cp1252).
+    # Diagnostic text from source PDFs must never abort the benchmark on Unicode glyphs.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     if not PDF_DIR.is_dir(): raise SystemExit(f"Examensmap niet gevonden: {PDF_DIR}")
     rows=[]; failures=[]; warnings=[]
     for path in sorted(PDF_DIR.glob("*.pdf")):
