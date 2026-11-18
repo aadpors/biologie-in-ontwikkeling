@@ -286,7 +286,7 @@ function render(){
  const pdf=(q.pdf||pdfBase)+"#page="+q.page,cv=q.cv||pdfBase.replace("-o.pdf","-c.pdf");
  const isMCQ=Array.isArray(q.options)&&q.options.length>0;
  const binaryChoice=q.binaryChoice;
- const assetVersion="2026-11-18-02";
+ const assetVersion="2026-11-18-03";
  const snippetImages=q.images?.length?q.images:(q.image?[q.image]:[]);
  // If the original exam context is available as a source-page image, show that
  // image as the authoritative context. Do not duplicate it as OCR/PyMuPDF text.
@@ -404,7 +404,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-18-02");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-18-03");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
@@ -416,7 +416,7 @@ async function loadMCQ(){
     }
    }
   }
-  const openResponse=await fetch("exam-open.json?v=2026-11-18-02");
+  const openResponse=await fetch("exam-open.json?v=2026-11-18-03");
   if(openResponse.ok){
    const openItems=await openResponse.json();
    for(const item of openItems){
@@ -433,7 +433,7 @@ async function loadMCQ(){
     }
    }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-18-02");
+  const response=await fetch("exam-mcq.json?v=2026-11-18-03");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
@@ -452,7 +452,7 @@ async function loadMCQ(){
     map.set(key(item),item);
    }
   }
-  const cvResponse=await fetch("scripts/cv-snippets.json?v=2026-11-18-02");
+  const cvResponse=await fetch("scripts/cv-snippets.json?v=2026-11-18-03");
   if(!cvResponse.ok)throw new Error("CV-snippetsmanifest niet beschikbaar");
   const cvItems=await cvResponse.json();
   const cvById=new Map(cvItems.map(item=>[item.id,item]));
