@@ -255,6 +255,14 @@ class ExamApp:
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
             try:
+                # Re-analysis changes question boundaries and therefore invalidates
+                # every previously approved record derived from this source PDF.
+                for record in self.data.get("vraagrecords",[]):
+                    if record.get("candidate_document_id")==doc["id"]:
+                        record["approved_by_human"]=False
+                        record["status"]="controle_nodig"
+                        record["source_analysis_invalidated"]=True
+                        record["approval_revoked_reason"]="Bron-PDF opnieuw geanalyseerd; vraaggrenzen en uitsneden opnieuw controleren."
                 analysis = analyze_pdf(source)
                 candidates = detect_question_candidates(analysis)
                 ordered = sorted(candidates, key=lambda x: (int(x["page"]), float(x.get("bbox", [0, 0])[1])))
@@ -341,6 +349,13 @@ class ExamApp:
             row["status"]="bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
             row["human_decision"]=bool(is_question)
             row["decision_reason"]=reason
+            if not is_question:
+                for record in self.data.get("vraagrecords",[]):
+                    if record.get("candidate_document_id")==row.get("document_id") and record.get("number")==row.get("number") and record.get("source_page")==row.get("page"):
+                        record["approved_by_human"]=False
+                        record["status"]="controle_nodig"
+                        record["source_analysis_invalidated"]=True
+                        record["approval_revoked_reason"]="De bijbehorende vraagstart is handmatig afgewezen."
             learn_decision(self.project_dir/"kennisbank",{
                 "pattern_key":question_pattern_key(row),
                 "chosen":"question" if is_question else "not_question",
@@ -577,6 +592,8 @@ class ExamApp:
                                "snippet_files":list(dict.fromkeys(list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()])),
                                "context_asset_candidates":context_files,
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
+                               "source_analysis_invalidated":False,
+                               "approval_revoked_reason":None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
                                "cv_amendment_pdfs":[amendment_docs[i]["opslagbestand"] for i in amendment_list.curselection()],
                                "appendix_match_human_confirmed":True,
