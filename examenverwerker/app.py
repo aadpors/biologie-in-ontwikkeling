@@ -320,6 +320,11 @@ class ExamApp:
                 "human_decision":bool(is_question)})
             self.save_project()
             tree.set(selected[0],"status",row["status"])
+            learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
+            suggestion=learned.get("suggestion")
+            hint=("Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
+            if learned.get("support",0): hint+=f" ({learned['support']}×)"
+            tree.set(selected[0],"learning",hint)
             self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
         ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
