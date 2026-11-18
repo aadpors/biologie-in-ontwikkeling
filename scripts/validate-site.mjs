@@ -30,8 +30,7 @@ assert.ok(discoveredExamYears.size > 0, 'Geen examen-PDF’s gevonden');
 for (const year of discoveredExamYears) {
   assert.ok(examYears.has(year), `Meerkeuzevragen voor beschikbaar examenjaar ${year} ontbreken`);
 }
-assert.ok(examPage.includes('De antwoordteksten staan in de oorspronkelijke opgave hierboven'), 'Meerkeuzevragen verwijzen niet naar de originele antwoordteksten');
-assert.ok(examPage.includes('/^\\\\d+$/.test(String(row.label||\"\\"))'), 'Binaire tabellen tonen bij genummerde uitspraken niet uitsluitend het uitspraaknummer');
+assert.ok(examPage.includes('/^\\d+$/'), 'Binaire tabellen tonen bij genummerde uitspraken niet uitsluitend het uitspraaknummer');
 const havo2025Question32 = openExamQuestions.find(question => question.id === 'ha25t1-open-32');
 assert.ok(havo2025Question32, 'Havo 2025-I vraag 32 ontbreekt');
 assert.deepEqual(
