@@ -185,24 +185,30 @@ function getBinaryChoiceDefinition(q){
  const countMatch=prompt.match(/nummers?\s+1\s+tot en met\s+(\d+)/i);
  const expected=keyEntry?.correct?.length||(countMatch?Number(countMatch[1]):(/nummers?\s+1\s*,\s*2\s+en\s+3/i.test(prompt)?3:0));
  if(!expected)return null;
- const lines=String(q.source||"").replace(/\r/g,"").split("\n"),candidates=[];
- for(let i=0;i<lines.length;i++){
-  const first=lines[i].match(/^\s*1[.)]?\s*(.*?)\s*$/);
-  if(!first)continue;
-  const rows=[];let current=first[1].trim(),next=2;
-  for(let j=i+1;j<lines.length;j++){
-   const line=lines[j],m=line.match(/^\s*(\d+)[.)]?\s*(.*?)\s*$/);
-   if(m&&Number(m[1])>=1&&Number(m[1])<=expected){
-    if(Number(m[1])===next){if(current)rows.push(current);current=m[2].trim();next++;if(next===expected+1)break;continue;}
-    if(Number(m[1])===next-1){current+=(current?" ":"")+m[2].trim();continue;}
-    if(Number(m[1])===1)break;
+ const candidates=[];
+ // Numbered statements may now live in q.q (after separating them from the
+ // shared context), or in q.source for older exam records. Try each field
+ // independently so the same statement block is never concatenated twice.
+ for(const textValue of [prompt,String(q.source||"")]){
+  const lines=textValue.replace(/\r/g,"").split("\n");
+  for(let i=0;i<lines.length;i++){
+   const first=lines[i].match(/^\s*1[.)]?\s*(.*?)\s*$/);
+   if(!first)continue;
+   const rows=[];let current=first[1].trim(),next=2;
+   for(let j=i+1;j<lines.length;j++){
+    const line=lines[j],m=line.match(/^\s*(\d+)[.)]?\s*(.*?)\s*$/);
+    if(m&&Number(m[1])>=1&&Number(m[1])<=expected){
+     if(Number(m[1])===next){if(current)rows.push(current);current=m[2].trim();next++;if(next===expected+1)break;continue;}
+     if(Number(m[1])===next-1){current+=(current?" ":"")+m[2].trim();continue;}
+     if(Number(m[1])===1)break;
+    }
+    if(!line.trim())continue;
+    current+=(current?" ":"")+line.trim();
    }
-   if(!line.trim())continue;
-   current+=(current?" ":"")+line.trim();
+   if(next===expected+1){rows.push(current);if(rows.length===expected&&rows.every(Boolean))candidates.push(rows);}
   }
-  if(next===expected+1){rows.push(current);if(rows.length===expected&&rows.every(Boolean))candidates.push(rows);}
  }
- const statements=candidates.at(-1);
+ const statements=candidates[0];
  if(!statements||statements.length!==expected)return null;
  const finalLabels=labels||(/wel\s+of\s+niet|wel\s+of\s+geen/i.test(prompt)?["Wel","Niet"]:["Juist","Onjuist"]);
  return {labels:finalLabels,rows:statements.map((text,index)=>({label:String(index+1),text}))};
