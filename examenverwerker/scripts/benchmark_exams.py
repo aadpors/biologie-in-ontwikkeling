@@ -30,6 +30,8 @@ def main():
                     cv_result=compare_question_numbering(candidates,cv_candidates)
                     cv_result["cv_file"]=cv_path.name
                     cv_result["cv_candidate_details"]=cv_candidates
+                    cv_result["cv_text_sample"]="\\n".join(p.get("text","") for p in cv_analysis["pages"][:2])[:2500]
+                    cv_result["cv_pages_with_text"]=sum(bool(p.get("text","").strip()) for p in cv_analysis["pages"])
                 item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo","year":"20"+key[1],"period":key[2],"candidate_count":len(candidates),"candidate_details":candidates,"cv_crosscheck":cv_result,"candidate_count_is_ground_truth":False})
                 if not candidates: failures.append(f"{path.name}: geen vraagstartkandidaten")
                 if cv_result and cv_result["status"]!="nummers_overeen": warnings.append(f"{path.name}: vraagnummering wijkt af tussen opgaven en CV; beide originele PDFs handmatig controleren.")
@@ -53,6 +55,8 @@ def main():
                 print("  n{} p{} y={:.1f} c={:.2f} {} | volgende: {}".format(candidate["number"],candidate["page"],candidate["bbox"][1],candidate["confidence"],candidate["line"][:80],candidate.get("next_line","")[:100]))
             if cv:
                 print("  alleen opgaven: {}; alleen CV: {}".format(cv["ontbreekt_in_cv"],cv["ontbreekt_in_opgaven"]))
+                print("  CV-ankers: {}; CV-tekstpagina's: {}".format(len(cv["cv_candidate_details"]),cv["cv_pages_with_text"]))
+                print("  CV-tekstvoorbeeld: {}".format(cv["cv_text_sample"][:900].replace("\\n"," / ")))
     for warning in warnings: print("WAARSCHUWING:",warning)
     for failure in failures: print("FOUT:",failure)
     if not rows: raise SystemExit("Geen examen-PDFs gevonden.")
