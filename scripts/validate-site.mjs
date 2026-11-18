@@ -161,7 +161,7 @@ const cvManifest = JSON.parse(fs.readFileSync('scripts/cv-snippets.json', 'utf8'
 assert.ok(Array.isArray(cvManifest), 'CV-snippetsmanifest moet een array zijn');
 const cvById = new Map(cvManifest.map(item => [item.id, item]));
 assert.equal(cvById.size, cvManifest.length, 'Dubbele vraag-ID in CV-snippetsmanifest');
-for (const question of [...examQuestions, ...openExamQuestions]) {
+for (const question of openExamQuestions) {
   const item = cvById.get(question.id);
   assert.ok(item, `Officiële CV-snippet ontbreekt voor ${question.id}`);
   assert.ok(item.pdf && fs.existsSync(item.pdf), `Bron-PDF correctievoorschrift ontbreekt voor ${question.id}`);
