@@ -342,7 +342,7 @@ class ExamApp:
         win = tk.Toplevel(self.root)
         win.title("Mogelijke vraagstarts – altijd controleren")
         win.geometry("900x580")
-        ttk.Label(win, text=f"{len(rows)} kandidaten gevonden. Herhaalde nummers blijven bewust zichtbaar.", padding=10).pack(anchor="w")
+        ttk.Label(win, text=f"{len(rows)} actieve kandidaten. Zwakkere dubbelingen worden apart bewaard en kunnen handmatig worden hersteld.", padding=10).pack(anchor="w")
         cols=("number","page","confidence","type","options","cv","line","learning","status")
         tree=ttk.Treeview(win,columns=cols,show="headings")
         for col,label,width in [("number","Nr.",48),("page","PDF-pagina",78),("confidence","Signaal",68),("type","Vraagtype",105),("options","Opties",65),("cv","CV",88),("line","Gevonden tekst",290),("learning","Leerbank",105),("status","Status",125)]:
@@ -373,7 +373,9 @@ class ExamApp:
             row["status"]="bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
             row["human_decision"]=bool(is_question)
             row["decision_reason"]=reason
+            suppression_key=f"{row.get('document_id')}|{row.get('number')}|{row.get('page')}|{float(row.get('bbox',[0,0])[1]):.1f}"
             if not is_question:
+                self.data["restored_suppressed_candidate_keys"]=[x for x in self.data.get("restored_suppressed_candidate_keys",[]) if x!=suppression_key]
                 for record in self.data.get("vraagrecords",[]):
                     if record.get("candidate_document_id")==row.get("document_id") and record.get("number")==row.get("number") and record.get("source_page")==row.get("page"):
                         record["approved_by_human"]=False
@@ -428,12 +430,48 @@ class ExamApp:
             ttk.Label(detail,text="Mogelijke verwijzingen naar contextmateriaal:",padding=(10,4)).pack(anchor="w")
             ttk.Label(detail,text="\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
             ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
+        suppressed_count=len([x for x in self.data.get("onderdrukte_vraagkandidaten",[])])
+        ttk.Button(actions,text=f"Onderdrukte dubbelingen ({suppressed_count})",command=lambda:self.show_suppressed_candidates(win)).pack(side="left",padx=8)
         ttk.Button(actions,text="Maak concept-vraagrecord",command=lambda:self.create_question_record(rows,tree,win)).pack(side="left",padx=8)
         ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
         ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
         ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
         ttk.Button(actions,text="Voorlopige snippet maken",command=lambda:self.create_snippet_proposal(rows,tree,win)).pack(side="left",padx=8)
+
+    def show_suppressed_candidates(self,parent):
+        rows=self.data.get("onderdrukte_vraagkandidaten",[])
+        win=tk.Toplevel(parent); win.title("Onderdrukte nummerdubbelingen · handmatige controle"); win.geometry("900x520")
+        ttk.Label(win,text=f"{len(rows)} zwakkere kandidaten zijn apart gezet omdat hetzelfde nummer elders met een expliciete puntenaanduiding voorkwam. Dit is geen definitieve afwijzing.",wraplength=860,padding=10).pack(anchor="w")
+        cols=("number","page","confidence","strong_page","line","reason")
+        tree=ttk.Treeview(win,columns=cols,show="headings")
+        for col,label,width in [("number","Nr.",55),("page","Pagina",75),("confidence","Signaal",70),("strong_page","Sterkere kandidaat p.",105),("line","Regeltekst",300),("reason","Waarom apart gezet",260)]:
+            tree.heading(col,text=label); tree.column(col,width=width,anchor="w")
+        tree.pack(fill="both",expand=True,padx=10,pady=8)
+        for idx,item in enumerate(rows):
+            strong=item.get("suppressed_by",{})
+            tree.insert("","end",iid=str(idx),values=(item.get("number"),item.get("page"),f"{item.get('confidence',0):.0%}",
+                strong.get("page"),item.get("next_line",""),item.get("reason","")))
+        def restore():
+            selected=tree.selection()
+            if not selected:
+                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een onderdrukte kandidaat.",parent=win); return
+            item=rows[int(selected[0])]
+            key=f"{item.get('document_id')}|{item.get('number')}|{item.get('page')}|{float(item.get('bbox',[0,0])[1]):.1f}"
+            item["status"]="controle_nodig"
+            item["human_decision"]=None
+            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
+            item.pop("suppressed_by",None)
+            self.data["onderdrukte_vraagkandidaten"]=[x for x in self.data.get("onderdrukte_vraagkandidaten",[]) if x is not item]
+            self.data.setdefault("vraagkandidaten",[]).append(item)
+            keys=self.data.setdefault("restored_suppressed_candidate_keys",[])
+            if key not in keys: keys.append(key)
+            self.save_project()
+            self._log(f"Onderdrukte kandidaat vraag {item.get('number')} op pagina {item.get('page')} handmatig hersteld.")
+            win.destroy()
+            parent.destroy()
+            self.show_candidates()
+        ttk.Button(win,text="Herstel geselecteerde kandidaat",command=restore).pack(anchor="e",padx=10,pady=(0,10))
 
     def create_question_record(self, rows, tree, parent):
         selected=tree.selection()
