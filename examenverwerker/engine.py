@@ -198,7 +198,30 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
                           "line":value,"next_line":next_text,"confidence":confidence,
                           "status":"controle_nodig",
                           "reason":"Nummerpatroon gevonden; vraagstart en vraaggrens moeten worden bevestigd."})
-    return found
+    # One exam question number should normally have one start. If a strong
+    # points-marker candidate exists, a weaker same-number prompt elsewhere is
+    # usually a numbered source-text line. Suppress it but retain the evidence
+    # so a reviewer can restore it if this exam uses an unusual layout.
+    grouped={}
+    for candidate in found:
+        grouped.setdefault(candidate["number"],[]).append(candidate)
+    kept=[]
+    suppressed=[]
+    for number,items in grouped.items():
+        strong=[x for x in items if x["confidence"]>=0.9]
+        weak=[x for x in items if x["confidence"]<0.9]
+        if len(strong)==1 and weak:
+            winner=strong[0]
+            kept.extend(strong)
+            for candidate in weak:
+                suppressed.append({**candidate,"status":"onderdrukt_dubbel_vraagnummer",
+                    "suppressed_by":{"page":winner["page"],"bbox":winner["bbox"],
+                                     "line":winner["line"],"confidence":winner["confidence"]},
+                    "reason":"Zelfde vraagnummer als een sterkere kandidaat met expliciete puntenaanduiding."})
+        else:
+            kept.extend(items)
+    analysis["suppressed_question_candidates"]=suppressed
+    return sorted(kept,key=lambda x:(int(x["page"]),float(x["bbox"][1]),float(x["bbox"][0])))
 
 def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.25):
     """Render a full original page for human visual review."""
