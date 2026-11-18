@@ -16,6 +16,16 @@ class EngineTests(unittest.TestCase):
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[1,1])
         self.assertTrue(all(x["status"]=="controle_nodig" for x in got))
+    def test_question_number_at_bottom_can_continue_on_next_page(self):
+        a={"pages":[
+            {"page":1,"height":800,"blocks":[{"bbox":[20,760,40,780],"lines":[{"bbox":[20,760,40,780],"text":"7."}],"text":"7."}]},
+            {"page":2,"height":800,"blocks":[{"bbox":[20,40,240,60],"lines":[{"bbox":[20,40,240,60],"text":"Beschrijf de oorzaak."}],"text":"Beschrijf de oorzaak."}]}
+        ]}
+        got=detect_question_candidates(a)
+        self.assertEqual(len(got),1)
+        self.assertEqual(got[0]["number"],7)
+        self.assertEqual(got[0]["page"],1)
+        self.assertEqual(got[0]["next_line"],"Beschrijf de oorzaak.")
     def test_learning_requires_repeated_support_and_never_autoplays(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)
