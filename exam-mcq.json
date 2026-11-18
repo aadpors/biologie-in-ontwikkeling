@@ -145,7 +145,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De concentratie nicotine van het kweekmedium was gelijk aan de\ngemiddelde concentratie in het bloed van embryo’s waarvan de moeder\nrookt. Na 21 dagen incubatie werd de diameter van de EB’s bepaald. De\ndiameter is een maat voor het aantal cellen in de EB’s.\nAfbeelding 3 toont een microscopisch beeld van EB’s die aan nicotine zijn\nblootgesteld en van controle-EB’s. De EB’s zijn als donkere vlekken\nzichtbaar. In afbeelding 4 zijn de metingen van de diameter van de EB’s in\nde twee groepen weergegeven.\nafbeelding 3\nOver het resultaat worden de volgende uitspraken gedaan:\n1 Het aantal cellen in een controle-EB is gemiddeld groter dan in een EB\ndie aan nicotine is blootgesteld.\n2 Het verschil in gemiddelde diameter tussen de twee groepen EB’s\nberust op toeval.",
+    "source": "De concentratie nicotine van het kweekmedium was gelijk aan de\ngemiddelde concentratie in het bloed van embryo’s waarvan de moeder\nrookt. Na 21 dagen incubatie werd de diameter van de EB’s bepaald. De\ndiameter is een maat voor het aantal cellen in de EB’s.\nAfbeelding 3 toont een microscopisch beeld van EB’s die aan nicotine zijn\nblootgesteld en van controle-EB’s. De EB’s zijn als donkere vlekken\nzichtbaar. In afbeelding 4 zijn de metingen van de diameter van de EB’s in\nde twee groepen weergegeven.\nafbeelding 3",
     "q": "Welke uitspraak wordt ondersteund door de gegevens?",
     "options": [
       {
@@ -225,7 +225,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Tijdens de ontwikkelingsfase worden de kunstvezels afgebroken, zodat\nuiteindelijk alleen hartklepcellen overblijven in een netwerk van stevige en\nelastische eiwitten. De restanten van de kunstvezels worden opgeruimd\ndoor witte bloedcellen die deze restanten opnemen in een blaasje. Dit\nblaasje versmelt vervolgens met een bepaald celorganel, zodat de\nkunststofrestanten verteerd kunnen worden.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Met welk celorganel versmelt het blaasje zodat de kunststofrestanten\nverteerd kunnen worden?",
     "options": [
       {
@@ -248,7 +248,7 @@
     "correct": "A",
     "image": "exam-snippets/complete-ha24t1-mcq-9.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q9-complete.jpg",
+      "exam-snippets/context-ha24t1-q9-fallback.jpg",
       "exam-snippets/question-ha24t1-9-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -267,7 +267,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Zoals Kerstes verwachtte, worden in een stedelijke omgeving relatief\nmeer gele slakken waargenomen dan in een landelijke omgeving.\nHet temperatuurverschil tussen een stedelijke en een landelijke omgeving\nkan oplopen tot 7 °C. De gele huisjes hebben de lichtste kleur en zullen\ndaardoor meer licht weerkaatsen, en dus minder opwarmen.\nKerstes verwacht dat door de temperatuurstijging als gevolg van\nklimaatverandering het aandeel gele slakken in de populatie zal\ntoenemen.\nOver de toename van het aandeel gele slakken wordt de volgende\nuitspraak gedaan:\nDe temperatuurstijging veroorzaakt …(1)… waardoor de …(2)… van gele\nslakken toeneemt ten opzichte van roze en bruine slakken.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Wat moet worden ingevuld bij 1 en bij 2?\nbij 1\nbij 2",
     "options": [
       {
@@ -290,7 +290,7 @@
     "correct": "C",
     "image": "exam-snippets/complete-ha24t1-mcq-12.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q12-complete.jpg",
+      "exam-snippets/context-ha24t1-q12-fallback.jpg",
       "exam-snippets/question-ha24t1-12-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -683,7 +683,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een veelvoorkomend symptoom van een psychose is het waarnemen van\nstemmen die er niet zijn. Ook kan het zijn dat beelden, geuren of smaken\ndie er niet zijn, waargenomen worden.\nUit deze symptomen is af te leiden dat tijdens een psychose processen\nverstoord zijn in een bepaald deel van het centraal zenuwstelsel.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "In welk deel is dat?",
     "options": [
       {
@@ -702,7 +702,7 @@
     "correct": "A",
     "image": "exam-snippets/complete-ha24t1-mcq-33.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q33-complete.jpg",
+      "exam-snippets/context-ha24t1-q33-fallback.jpg",
       "exam-snippets/question-ha24t1-33-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -985,7 +985,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Anouk zaait de quinoa in maart. Nadat de zaden gekiemd zijn, groeien de\nplanten goed. De biomassa van quinoaplanten kan snel toenemen: in vijf\nmaanden groeit er uit een zaadje een forse plant van 1 tot 1,5 meter\nhoogte.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Welke beschrijving van biomassa is juist?",
     "options": [
       {
@@ -1004,7 +1004,7 @@
     "correct": "B",
     "image": "exam-snippets/complete-ha24t1-mcq-41.jpg",
     "images": [
-      "exam-snippets/context-ha24t1-q41-complete.jpg",
+      "exam-snippets/context-ha24t1-q41-fallback.jpg",
       "exam-snippets/question-ha24t1-41-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-1-o-spr.pdf",
@@ -1191,7 +1191,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De Nederlandse biologen Annette Groeneveld en Inge en Jan Bouman\nmaakten in 1977 een plan voor de herintroductie van przewalskipaarden\nin Mongolië. Zij haalden przewalskipaarden uit dierentuinen en bereidden\nde dieren in een natuurgebied in Flevoland voor op herintroductie. Tussen\n1992 en 2000 zijn 82 ‘Flevolandse’ przewalskipaarden uitgezet in de\nGobi-woestijn in Mongolië.\nDe tekst hieronder beschrijft het verblijf van de przewalskipaarden in het\nnatuurgebied in Flevoland. Op de plaatsen 1 en 2 ontbreekt een woord.\nDoor de przewalskipaarden te plaatsen in het natuurgebied in Flevoland,\nkonden de dieren wennen aan de omstandigheden in het wild. Omdat er\ngeen andere paarden voorkwamen in het gebied, was ...(1)... van de\nprezwalskipaarden nog niet bezet. Door de przewalskipaarden werd de\nsuccessie in het gebied ...(2)... .",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Wat moet worden ingevuld bij 1 en bij 2?\nbij 1\nbij 2",
     "options": [
       {
@@ -1222,7 +1222,7 @@
     "correct": "D",
     "image": "exam-snippets/complete-vw24t2-mcq-5.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q5-complete.jpg",
+      "exam-snippets/context-vw24t2-q5-fallback.jpg",
       "exam-snippets/question-vw24t2-5-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
@@ -1283,7 +1283,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Het samentrekken van spieren in de wand van de bronchiolen wordt\nveroorzaakt door activiteit in een deel van het zenuwstelsel.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Welk deel van het zenuwstelsel laat de spieren in de wand van de\nbronchiolen samentrekken?",
     "options": [
       {
@@ -1302,7 +1302,7 @@
     "correct": "C",
     "image": "exam-snippets/complete-vw24t2-mcq-14.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q14-complete.jpg",
+      "exam-snippets/context-vw24t2-q14-fallback.jpg",
       "exam-snippets/question-vw24t2-14-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
@@ -1321,7 +1321,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wetenschappers onderzochten met behulp van een ecologisch model of\nO. communa ook in andere delen van Europa ingezet kan worden. Met\nhet model zijn de tolerantiecurven van ambrosia en van het bladhaantje\nberekend (afbeelding 4).\nafbeelding 4\nOver de tolerantiecurven worden de volgende uitspraken gedaan:\n1 De tolerantie van ambrosia voor de minimumtemperatuur in de\nkoudste maand is groter dan die van O. communa.\n2 De maximum-tolerantiewaarden voor de jaarlijkse hoeveelheid\nneerslag van ambrosia en van O. communa zijn gelijk.",
+    "source": "Wetenschappers onderzochten met behulp van een ecologisch model of\nO. communa ook in andere delen van Europa ingezet kan worden. Met\nhet model zijn de tolerantiecurven van ambrosia en van het bladhaantje\nberekend (afbeelding 4).\nafbeelding 4",
     "q": "Welk van deze uitspraken is juist?",
     "options": [
       {
@@ -1363,7 +1363,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De driekleurige gifkikker is ongevoelig voor epibatidine. Dit komt doordat\nde acetylcholine-receptor van de driekleurige gifkikker een beetje anders\nis dan die van zijn predatoren. Dat is het gevolg van een puntmutatie in\nhet gen dat codeert voor de acetylcholine-receptor. Door de mutatie bindt\nepibatidine minder sterk aan deze acetylcholine-receptor. Door een aantal\nandere mutaties is de sterkte van de binding van acetylcholine aan de\nreceptor onveranderd.\nOnderzoekers vergeleken het gen voor de acetylcholine-receptor van de\ndriekleurige gifkikker (Epipedobates tricolor) met dat van de gifkikkersoort\nAllobates zaparo, die wél gevoelig is voor epibatidine. Hieronder is de\naminozuurvolgorde van een deel van de receptor van beide soorten\ngifkikkers weergegeven.\npositie aminozuur:\n107 108 109 110\nAllobates zaparo:\nTyr - Cys - Asn - Ala\nEpipedobates tricolor:\nTyr - Ser - Asn - Ala\nIn de receptor van E. tricolor is dus op plaats 108 een ander aminozuur\ningebouwd.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Welk verschil in het codon van het RNA van E. tricolor leidt ertoe dat\nserine wordt ingebouwd? Gebruik je informatieboek.\nBij E. tricolor is…",
     "options": [
       {
@@ -1386,7 +1386,7 @@
     "correct": "C",
     "image": "exam-snippets/complete-ha24t2-mcq-18.jpg",
     "images": [
-      "exam-snippets/context-ha24t2-q18-complete.jpg",
+      "exam-snippets/context-ha24t2-q18-fallback.jpg",
       "exam-snippets/question-ha24t2-18-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-24-2-o-spr.pdf",
@@ -1581,7 +1581,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Doordat neuronen voornamelijk overdag actief zijn, lopen ze voornamelijk\noverdag DNA-schade op.\nDNA-schade wordt veelal veroorzaakt door zuurstofradicalen. Deze\nstoffen ontstaan bij processen waarbij zuurstof wordt gebruikt.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Bij welk proces wordt zuurstof gebruikt?",
     "options": [
       {
@@ -1604,7 +1604,7 @@
     "correct": "D",
     "image": "exam-snippets/complete-vw24t2-mcq-31.jpg",
     "images": [
-      "exam-snippets/context-vw24t2-q31-complete.jpg",
+      "exam-snippets/context-vw24t2-q31-fallback.jpg",
       "exam-snippets/question-vw24t2-31-only.jpg"
     ],
     "pdf": "examens/vw-1018-a-24-2-o-spr.pdf",
@@ -1673,7 +1673,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een voorbeeld van DNA-schade is een dubbelstrengsbreuk (dsb). Bij een\ndsb zijn beide strengen van een DNA-molecuul gebroken. Bij de reparatie\nvan dsb’s kunnen soms inserties of deleties optreden.\nOver inserties en deleties worden de volgende uitspraken gedaan:\n1 Een insertie kan leiden tot een leesraamverschuiving.\n2 Een deletie kan leiden tot de synthese van een langer eiwit.",
+    "source": "Een voorbeeld van DNA-schade is een dubbelstrengsbreuk (dsb). Bij een\ndsb zijn beide strengen van een DNA-molecuul gebroken. Bij de reparatie\nvan dsb’s kunnen soms inserties of deleties optreden.",
     "q": "Welke uitspraak is juist?",
     "options": [
       {
@@ -2067,7 +2067,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Een brughoektumor kan ontstaan door een erfelijke mutatie in het NF2-\ngen. De mutatie leidt tot fouten in de aanmaak van merline-eiwit. Dit eiwit\nremt normaal de celdeling. Door de mutatie is dit eiwit afwezig of niet\nfunctioneel. Het mutante NF2-allel erft autosomaal dominant over.\nOver de mutatie van het NF2-gen worden de volgende uitspraken gedaan:\n1 De mutatie is alleen aanwezig in zenuwcellen.\n2 Door de mutatie wordt celdeling geremd.",
+    "source": "Een brughoektumor kan ontstaan door een erfelijke mutatie in het NF2-\ngen. De mutatie leidt tot fouten in de aanmaak van merline-eiwit. Dit eiwit\nremt normaal de celdeling. Door de mutatie is dit eiwit afwezig of niet\nfunctioneel. Het mutante NF2-allel erft autosomaal dominant over.",
     "q": "Welke uitspraak is juist?",
     "options": [
       {
@@ -2915,7 +2915,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "In afbeelding 2 zijn tekeningen van de hersenscans van Jaspers grote\nhersenen te zien. Het zijn verschillende doorsnedes. De bovenzijde van\nelke tekening is de voorkant van zijn hoofd. De pijlen wijzen plaatsen aan\nwaar zenuwcellen vernietigd zijn door de schimmel.\nafbeelding 2\nOp een van de tekeningen in afbeelding 2 is te zien dat de schimmel het\ngebied heeft geïnfecteerd dat Jaspers rechterhand aanstuurt.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Op welke tekening is dat?",
     "options": [
       {
@@ -2934,7 +2934,7 @@
     "correct": "C",
     "image": "exam-snippets/complete-ha25t1-mcq-37.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q37-complete.jpg",
+      "exam-snippets/context-ha25t1-q37-fallback.jpg",
       "exam-snippets/question-ha25t1-37-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",
@@ -3939,7 +3939,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "De dierenarts bepaalt bij het urine-onderzoek de dichtheid van de urine.\nDe dichtheid van water is ongeveer 1000 gram / L. Een zoutoplossing\nheeft een hogere dichtheid. Als de dichtheid van de urine van katten lager\nis dan 1035 gram / L, zijn er mogelijk nierproblemen.\nDe urine van Rio blijkt een dichtheid van 1005 gram / L te hebben.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Vindt er in de nieren van Rio te veel of te weinig reabsorptie\n(terugresorptie) van water plaats? Zal Rio daardoor meer of minder urine\nproduceren dan een gezonde kat?\nreabsorptie\nhoeveelheid urine",
     "options": [
       {
@@ -3962,7 +3962,7 @@
     "correct": "C",
     "image": "exam-snippets/complete-ha25t2-mcq-41.jpg",
     "images": [
-      "exam-snippets/context-ha25t2-q41-complete.jpg",
+      "exam-snippets/context-ha25t2-q41-fallback.jpg",
       "exam-snippets/question-ha25t2-41-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-2-o.pdf",
@@ -4707,7 +4707,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Bij monocultuur verbouwt een boer één gewas tegelijk op een groot stuk\nland. Bij strokenteelt verbouwt een boer twee of meer gewassen in\nstroken van een aantal meter breed.\nHieronder staan uitspraken over de vergelijking tussen monocultuur en\nstrokenteelt.\n1 Bij monocultuur is de kans op plagen groter.\n2 Bij strokenteelt is de diversiteit aan dierlijke organismen groter.",
+    "source": "Bij monocultuur verbouwt een boer één gewas tegelijk op een groot stuk\nland. Bij strokenteelt verbouwt een boer twee of meer gewassen in\nstroken van een aantal meter breed.",
     "q": "Welke uitspraak is juist?",
     "options": [
       {
@@ -5513,7 +5513,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Wanneer mevrouw Hertogs ontspannen is, kan Vicky haar vaccineren.\nHet vaccin biedt een aantal jaren bescherming tegen de\npneumokokkenziekte.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "Wat zit er in het vaccin?",
     "options": [
       {
@@ -5540,7 +5540,7 @@
     "correct": "A",
     "image": "exam-snippets/complete-ha26t2-mcq-8.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q8-complete.jpg",
+      "exam-snippets/context-ha26t2-q8-fallback.jpg",
       "exam-snippets/question-ha26t2-8-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
@@ -5865,7 +5865,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Michael leest op een forum dat vegan eten beter is voor je nieren. Een\nvegan dieet bevat vaak meer kalium en minder natrium. Dit heeft een\nbloeddrukverlagend effect. Een hoge bloeddruk is een van de oorzaken\nvan nierproblemen.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "In welk deel van de nieren is de bloeddruk het hoogst?",
     "options": [
       {
@@ -5884,7 +5884,7 @@
     "correct": "A",
     "image": "exam-snippets/complete-ha26t2-mcq-26.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q26-complete.jpg",
+      "exam-snippets/context-ha26t2-q26-fallback.jpg",
       "exam-snippets/question-ha26t2-26-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
@@ -6125,7 +6125,7 @@
     "concept": "Meerkeuze",
     "end": "Nog te rubriceren",
     "focus": "Meerkeuzevraag uit het officiële centraal examen.",
-    "source": "Gras en hooi voor paarden mogen niet te veel fructaan bevatten. Fructaan\nis een koolhydraat dat is opgebouwd uit de monosachariden fructose en\nglucose. Wanneer paarden gras met veel fructaan eten, kunnen ze\ndarmproblemen krijgen.\nEen gedeelte van de monosachariden die overdag worden geproduceerd\nbij fotosynthese, wordt opgeslagen als fructaan. Als fructaan wordt\nomgezet, kunnen de producten worden gebruikt voor de groei van het\ngras. Een hoog fructaangehalte in gras kan ontstaan als de temperatuur\n’s nachts lager is dan 5 °C. In het gras wordt fructaan dan nauwelijks\nomgezet.",
+    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
     "q": "De vorming van fructaan uit monosachariden is een voorbeeld van",
     "options": [
       {
@@ -6144,7 +6144,7 @@
     "correct": "C",
     "image": "exam-snippets/complete-ha26t2-mcq-41.jpg",
     "images": [
-      "exam-snippets/context-ha26t2-q41-complete.jpg",
+      "exam-snippets/context-ha26t2-q41-fallback.jpg",
       "exam-snippets/question-ha26t2-41-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-26-2-o.pdf",
