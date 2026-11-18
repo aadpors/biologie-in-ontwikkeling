@@ -382,7 +382,7 @@ async function loadMCQ(){
  try{
   const key=q=>[q.level,q.year,q.period,q.n].join("|");
   const map=new Map(baseQuestions.map(q=>[key(q),q]));
-  const contextResponse=await fetch("exam-contexts.json?v=2026-11-18-01");
+  const contextResponse=await fetch("exam-contexts.json?v=2026-11-18-02");
   if(contextResponse.ok){
    const contexts=await contextResponse.json();
    for(const item of contexts){
@@ -394,7 +394,7 @@ async function loadMCQ(){
     }
    }
   }
-  const openResponse=await fetch("exam-open.json?v=2026-11-18-01");
+  const openResponse=await fetch("exam-open.json?v=2026-11-18-02");
   if(openResponse.ok){
    const openItems=await openResponse.json();
    for(const item of openItems){
@@ -411,7 +411,7 @@ async function loadMCQ(){
     }
    }
   }
-  const response=await fetch("exam-mcq.json?v=2026-11-18-01");
+  const response=await fetch("exam-mcq.json?v=2026-11-18-02");
   if(!response.ok)throw new Error("MCQ-bestand niet beschikbaar");
   const extra=await response.json();
   for(const item of extra){
@@ -430,7 +430,7 @@ async function loadMCQ(){
     map.set(key(item),item);
    }
   }
-  const cvResponse=await fetch("scripts/cv-snippets.json?v=2026-11-18-01");
+  const cvResponse=await fetch("scripts/cv-snippets.json?v=2026-11-18-02");
   if(!cvResponse.ok)throw new Error("CV-snippetsmanifest niet beschikbaar");
   const cvItems=await cvResponse.json();
   const cvById=new Map(cvItems.map(item=>[item.id,item]));
