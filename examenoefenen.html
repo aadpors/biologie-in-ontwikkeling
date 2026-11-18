@@ -250,6 +250,7 @@ async function loadMCQ(){
      if(item.images?.length)existing.images=item.images;
      if(item.image)existing.image=item.image;
      if(item.page)existing.page=item.page;
+     if(item.source)existing.source=item.source;
     }else{
      item.questionType="open";
      map.set(key(item),item);
@@ -263,6 +264,7 @@ async function loadMCQ(){
    const existing=map.get(key(item));
    if(existing){
     if(item.images)existing.images=item.images;
+    if(item.source)existing.source=item.source;
     existing.options=item.options;
     existing.correct=item.correct;
     existing.image=item.image;
