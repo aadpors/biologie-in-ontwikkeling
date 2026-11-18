@@ -48,7 +48,7 @@ def main():
         final_words = [
             word for word in page.get_text("words", sort=True)
             if word[4].strip(".,:;!?").lower() == "geleid"
-            and word[1] > marker[1]
+            and word[1] >= marker[1] - 3
         ]
         if not final_words:
             raise ValueError("Havo 2025-I q34: final prompt word 'geleid' not found")
