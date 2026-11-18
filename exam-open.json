@@ -4022,11 +4022,11 @@
     "concept": "Open vraag",
     "end": "Nog te rubriceren",
     "focus": "Open vraag uit het officiële centraal examen.",
-    "source": "Gebruik de context en gegevens in de oorspronkelijke examenopgave.",
-    "q": "Hieronder staan uitspraken over de gegevens in het informatiekader.\n1 Het mutante allel erft autosomaal over.\n2 Mensen met één keer het mutante allel hebben een intermediair\nfenotype.\n3 De grootte van de milt wordt alleen bepaald door het gen op\nchromosoom 6.\n33\nSchrijf de nummers 1, 2 en 3 onder elkaar. Noteer erachter of de\n2p\nbijbehorende uitspraak wel of niet een juiste conclusie is op basis van de\ngegevens in het informatiekader.\nDe onderzoekers vermoeden dat de grotere milt van de Bajau-mannen het\ngevolg is van evolutie.\nBeschrijf hoe evolutie tot een grotere milt kan hebben geleid.",
-    "image": "exam-snippets/complete-ha25t1-open-34.jpg",
+    "source": "Na de analyse van het DNA vonden onderzoekers in een gen op\nchromosoom 6 een mutatie die samenhangt met de grootte van de milt.\nAfbeelding 4 laat de relatie zien tussen het genotype (aantal mutante\nallelen van dit gen) en het fenotype (de miltgrootte bij Bajau-mannen).\nafbeelding 4",
+    "q": "De onderzoekers vermoeden dat de grotere milt van de Bajau-mannen het gevolg is van evolutie.\nBeschrijf hoe evolutie tot een grotere milt kan hebben geleid.",
+    "image": "exam-snippets/question-ha25t1-34-only.jpg",
     "images": [
-      "exam-snippets/context-ha25t1-q34-fallback.jpg",
+      "exam-snippets/context-ha25t1-q33-complete.jpg",
       "exam-snippets/question-ha25t1-34-only.jpg"
     ],
     "pdf": "examens/ha-1018-a-25-1-o.pdf",

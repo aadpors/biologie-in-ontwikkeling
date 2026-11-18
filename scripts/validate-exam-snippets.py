@@ -171,6 +171,30 @@ if q26_regression:
     if q26_regression.get("images", [])[-1:] != ["exam-snippets/question-ha25t1-26-only.jpg"]:
         errors.append("Havo 2025-I vraag 26: de vraagafbeelding is niet als laatste afbeelding gekoppeld")
 
+
+# Havo 2025-I q34 shares q33's information framework, but not q33's question.
+q34 = open_by_id.get("ha25t1-open-34")
+q33 = open_by_id.get("ha25t1-open-33")
+if not q34 or not q33:
+    errors.append("Havo 2025-I vraag 34: gegevensrecord ontbreekt")
+else:
+    if q34.get("source") != q33.get("source"):
+        errors.append("Havo 2025-I vraag 34: gedeelde Bajau-/genetische context ontbreekt of wijkt af")
+    if "Hieronder staan uitspraken" in q34.get("q", "") or "mutante allel" in q34.get("q", ""):
+        errors.append("Havo 2025-I vraag 34: vraag 33 is nog opgenomen in de vraagtekst")
+    if "Beschrijf hoe evolutie tot een grotere milt kan hebben geleid." not in q34.get("q", ""):
+        errors.append("Havo 2025-I vraag 34: eigen evolutievraag ontbreekt")
+    expected = [
+        "exam-snippets/context-ha25t1-q33-complete.jpg",
+        "exam-snippets/question-ha25t1-34-only.jpg",
+    ]
+    if q34.get("images") != expected:
+        errors.append("Havo 2025-I vraag 34: context- en vraagafbeelding zijn niet correct gescheiden")
+    else:
+        with Image.open(ROOT / expected[1]) as image:
+            if image.height < 100:
+                errors.append("Havo 2025-I vraag 34: vraaguitsnede is onwaarschijnlijk klein")
+
 # Audit the lower edge of every generated question crop.
 for image_path in sorted((ROOT / "exam-snippets").glob("question-*.jpg")):
     try:
