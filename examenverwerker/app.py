@@ -10,9 +10,10 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops
+from exporter import export_approved_records
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors
 
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.4.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -104,6 +105,9 @@ class ExamApp:
         ttk.Button(foot, text="Kandidaten bekijken", command=self.show_candidates).pack(side="left")
         ttk.Button(foot, text="Examengegevens controleren", command=self.edit_exam_metadata).pack(side="left", padx=6)
         ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
+        workflow=ttk.Frame(body); workflow.pack(fill="x",pady=(8,0))
+        ttk.Button(workflow,text="Vraagrecords beoordelen en goedkeuren",command=self.show_records,style="Accent.TButton").pack(side="left")
+        ttk.Button(workflow,text="Veilig exportpakket maken",command=self.export_project).pack(side="left",padx=8)
         self.log = tk.Text(body, height=6, wrap="word", font=("Consolas", 9), background="#f5f7f7", relief="flat")
         self.log.pack(fill="x", pady=(12, 0))
         self.log.configure(state="disabled")
@@ -593,6 +597,164 @@ class ExamApp:
         buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
         ttk.Button(buttons,text="Concept opslaan",command=save_draft).pack(side="right")
         ttk.Button(buttons,text="Annuleren",command=win.destroy).pack(side="right",padx=8)
+
+    def show_records(self):
+        if not self.data:
+            messagebox.showinfo("Geen project","Open eerst een examenproject.")
+            return
+        records=self.data.get("vraagrecords",[])
+        win=tk.Toplevel(self.root); win.title("Vraagrecords · inhoudelijke eindcontrole"); win.geometry("980x600")
+        ttk.Label(win,text=f"{len(records)} concept-vraagrecords. Geen enkel record wordt automatisch goedgekeurd.",padding=10).pack(anchor="w")
+        cols=("id","number","page","type","status","approved")
+        tree=ttk.Treeview(win,columns=cols,show="headings")
+        for col,label,width in [("id","Record-ID",260),("number","Vraag",70),("page","Pagina",80),("type","Type",100),("status","Status",180),("approved","Menselijk akkoord",140)]:
+            tree.heading(col,text=label); tree.column(col,width=width,anchor="w")
+        tree.pack(fill="both",expand=True,padx=10,pady=8)
+        for i,record in enumerate(records):
+            tree.insert("","end",iid=str(i),values=(record.get("id"),record.get("number"),record.get("source_page"),
+                record.get("exam",{}).get("questionType"),record.get("status"),"Ja" if record.get("approved_by_human") is True else "Nee"))
+        def review_selected():
+            selection=tree.selection()
+            if not selection:
+                messagebox.showinfo("Selecteer record","Selecteer eerst een vraagrecord.",parent=win); return
+            self.review_question_record(records[int(selection[0])],win)
+            tree.set(selection[0],"status",records[int(selection[0])].get("status"))
+            tree.set(selection[0],"approved","Ja" if records[int(selection[0])].get("approved_by_human") is True else "Nee")
+        buttons=ttk.Frame(win); buttons.pack(fill="x",padx=10,pady=(0,10))
+        ttk.Button(buttons,text="Open eindcontrole",command=review_selected).pack(side="left")
+        ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
+
+    def review_question_record(self,record,parent):
+        win=tk.Toplevel(parent); win.title(f"Eindcontrole · {record.get('id')}"); win.geometry("1040x850")
+        win.transient(parent)
+        outer=ttk.Frame(win,padding=12); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text="Controleer de volledige originele bron en het correctievoorschrift. Vink pas daarna de onderdelen af.",wraplength=980).pack(anchor="w")
+        meta=record.get("exam",{})
+        ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        ttk.Label(outer,text="Vraagtekst").pack(anchor="w")
+        qbox=tk.Text(outer,height=6,wrap="word")
+        qbox.pack(fill="x")
+        qbox.insert("1.0",record.get("question_text","")); qbox.configure(state="disabled")
+        if meta.get("questionType")=="mcq":
+            option_text="\n".join(f"{x.get('key')}. {x.get('text')}" for x in record.get("options",[]))
+            ttk.Label(outer,text=f"Antwoordopties en opgegeven sleutel ({record.get('correct','')})").pack(anchor="w",pady=(5,0))
+            ttk.Label(outer,text=option_text or "Geen opties vastgelegd",wraplength=980,justify="left").pack(anchor="w")
+        files_frame=ttk.LabelFrame(outer,text="Bronmateriaal en voorlopige uitsneden — visueel nalopen",padding=6)
+        files_frame.pack(fill="both",expand=True,pady=(8,6))
+        image_frame=ttk.Frame(files_frame); image_frame.pack(fill="both",expand=True)
+        canvas=tk.Canvas(image_frame,background="#e8ecee")
+        sy=ttk.Scrollbar(image_frame,orient="vertical",command=canvas.yview)
+        sx=ttk.Scrollbar(image_frame,orient="horizontal",command=canvas.xview)
+        canvas.configure(yscrollcommand=sy.set,xscrollcommand=sx.set)
+        sy.pack(side="right",fill="y"); sx.pack(side="bottom",fill="x"); canvas.pack(side="left",fill="both",expand=True)
+        photos=[]; y=8
+        preview_specs=[]
+        source=self.project_dir/"bronnen"/str(record.get("source_pdf",""))
+        if source.is_file():
+            target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-opgaven.png"
+            preview_specs.append(("Originele opgavenpagina",source,int(record.get("source_page",1)),target))
+        cv_snippet=record.get("cv_snippet_file")
+        if cv_snippet:
+            preview_specs.append(("CV-fragmentvoorstel",self.project_dir/"snippets"/cv_snippet,None,None))
+        for idx,name in enumerate(record.get("snippet_files") or ([record["snippet_file"]] if record.get("snippet_file") else []),1):
+            preview_specs.append((f"Vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
+        for idx,name in enumerate(record.get("uitwerkbijlagen",[]),1):
+            appendix=self.project_dir/"bronnen"/name
+            if appendix.is_file():
+                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-bijlage-{idx}.png"
+                preview_specs.append((f"Uitwerkbijlage {idx} · eerste pagina van origineel",appendix,1,target))
+        for idx,name in enumerate(record.get("cv_amendment_pdfs",[]),1):
+            amendment=self.project_dir/"bronnen"/name
+            if amendment.is_file():
+                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-aanvulling-{idx}.png"
+                preview_specs.append((f"CV-aanvulling {idx} · eerste pagina van origineel",amendment,1,target))
+        for label,path,page_no,target in preview_specs:
+            canvas.create_text(8,y,anchor="nw",text=label)
+            y+=24
+            try:
+                if page_no is not None:
+                    render_page(path,page_no,target,scale=0.9)
+                    image_path=target
+                else:
+                    image_path=path
+                photo=tk.PhotoImage(file=str(image_path))
+                photos.append(photo); canvas.create_image(8,y,image=photo,anchor="nw")
+                y+=photo.height()+18
+            except Exception as exc:
+                canvas.create_text(8,y,anchor="nw",text=f"Voorvertoning niet beschikbaar: {path.name} ({exc})")
+                y+=36
+        canvas.images=photos; canvas.configure(scrollregion=canvas.bbox("all"))
+        ttk.Label(outer,text="Eindcontrole — bevestig alleen wat je daadwerkelijk in de originele PDF hebt gecontroleerd.",padding=(0,5)).pack(anchor="w")
+        checklist=record.get("record_review_checklist",{})
+        checks=[
+            ("question_text","Vraagtekst is volledig, letterlijk correct en bevat alle relevante voorwaarden."),
+            ("question_type","Vraagtype en opbouw zijn correct vastgesteld."),
+            ("points","Puntenaantal en verdeling zijn gecontroleerd."),
+            ("answer_options","Alle antwoordopties zijn volledig en in de juiste volgorde; sleutel is aan CV getoetst."),
+            ("cv_alignment","Bijbehorend officiële correctievoorschrift en alle beoordelingsregels zijn gecontroleerd."),
+            ("images_and_context","Alle figuren, tabellen, bijschriften, context en uitsneden zijn volledig en juist gekoppeld."),
+            ("appendices","Uitwerkbijlagen zijn gecontroleerd; geen bijlage ontbreekt of hoort bij een ander examen."),
+            ("cv_addenda","Alle officiële aanvullingen op het correctievoorschrift zijn gecontroleerd.")
+        ]
+        vars={}
+        checkframe=ttk.Frame(outer); checkframe.pack(fill="x")
+        required={"question_text","question_type","points","cv_alignment","images_and_context","appendices"}
+        if meta.get("questionType")=="mcq": required.add("answer_options")
+        if record.get("cv_amendment_pdfs"): required.add("cv_addenda")
+        for key,label in checks:
+            if key not in required: continue
+            var=tk.BooleanVar(value=checklist.get(key,False) is True)
+            vars[key]=var
+            ttk.Checkbutton(checkframe,text=label,variable=var).pack(anchor="w")
+        def approve():
+            selected={key:var.get() for key,var in vars.items()}
+            errors=review_checklist_errors(record,selected)
+            if errors:
+                messagebox.showwarning("Eindcontrole onvolledig","Dit record kan nog niet worden goedgekeurd:\n\n"+"\n".join(errors),parent=win)
+                return
+            record["record_review_checklist"]=selected
+            record["approved_by_human"]=True
+            record["status"]="goedgekeurd"
+            record["approved_at"]=now()
+            record["approval_method"]="handmatige_eindcontrole"
+            self.save_project()
+            self._log(f"Record {record.get('id')} expliciet handmatig goedgekeurd.")
+            messagebox.showinfo("Record goedgekeurd","Dit record is nu expliciet door jou goedgekeurd. Het wordt pas meegenomen wanneer het volledige exportpakket alle controles doorstaat.",parent=win)
+            win.destroy()
+        def revoke():
+            record["approved_by_human"]=False
+            record["status"]="controle_nodig"
+            record["approved_at"]=None
+            self.save_project()
+            self._log(f"Goedkeuring van record {record.get('id')} ingetrokken.")
+            win.destroy()
+        actions=ttk.Frame(outer); actions.pack(fill="x",pady=(8,0))
+        ttk.Button(actions,text="Goedkeuren",command=approve).pack(side="right")
+        if record.get("approved_by_human") is True:
+            ttk.Button(actions,text="Goedkeuring intrekken",command=revoke).pack(side="right",padx=8)
+
+    def export_project(self):
+        if not self.data:
+            messagebox.showinfo("Geen project","Open eerst een examenproject."); return
+        records=self.data.get("vraagrecords",[])
+        if not records:
+            messagebox.showinfo("Geen vraagrecords","Maak eerst concept-vraagrecords vanuit bevestigde vraagstarts."); return
+        destination=filedialog.askdirectory(title="Kies een nieuwe, lege exportmap")
+        if not destination: return
+        try:
+            result=export_approved_records(records,self.project_dir,Path(destination))
+            if not result.get("ok"):
+                errors=result.get("errors",[])
+                detail="\n".join(f"• {x.get('id','')} · {x.get('error')}" for x in errors[:20])
+                if len(errors)>20: detail+=f"\n… en {len(errors)-20} overige blokkades."
+                messagebox.showwarning("Export geblokkeerd",f"Er is niets gepubliceerd. Los eerst deze controles op:\n\n{detail}",parent=self.root)
+                self._log(f"Export geblokkeerd: {len(errors)} validatiefouten.")
+                return
+            self._log(f"Exportpakket gemaakt: {result['mcq']} meerkeuzevragen en {result['open']} open vragen.")
+            messagebox.showinfo("Exportpakket klaar",f"Veilig exportpakket gemaakt in:\n{result['export_dir']}\n\nEr is niets naar de live website gepubliceerd.",parent=self.root)
+        except Exception as exc:
+            self._error("Exportpakket maken",exc)
+            messagebox.showerror("Export mislukt",str(exc),parent=self.root)
 
     def create_snippet_proposal(self, rows, tree, parent):
         selected=tree.selection()
