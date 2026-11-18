@@ -40,7 +40,11 @@ def main():
                     model_pos=cv_all_text.lower().rfind("beoordelingsmodel")
                     cv_result["cv_text_sample"]=cv_all_text[max(0,model_pos-150):model_pos+2200] if model_pos>=0 else cv_all_text[:2200]
                     cv_result["cv_pages_with_text"]=sum(bool(p.get("text","").strip()) for p in cv_analysis["pages"])
-                item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo","year":"20"+key[1],"period":key[2],"candidate_count":len(candidates),"candidate_details":candidates,"cv_crosscheck":cv_result,"candidate_count_is_ground_truth":False})
+                suppressed=analysis.get("suppressed_question_candidates",[])
+                item.update({"role":"opgaven","level":"Havo" if key[0]=="ha" else "Vwo","year":"20"+key[1],"period":key[2],
+                    "candidate_count":len(candidates),"candidate_details":candidates,
+                    "suppressed_candidate_count":len(suppressed),"suppressed_candidate_details":suppressed,
+                    "cv_crosscheck":cv_result,"candidate_count_is_ground_truth":False})
                 if not candidates: failures.append(f"{path.name}: geen vraagstartkandidaten")
                 if cv_result and cv_result["status"]!="nummers_overeen": warnings.append(f"{path.name}: vraagnummering wijkt af tussen opgaven en CV; beide originele PDFs handmatig controleren.")
             elif "-c" in path.stem.lower(): item["role"]="correctievoorschrift"
