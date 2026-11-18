@@ -845,6 +845,15 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     question_top = min(
                         max(0, lines[start]["bbox"][1] - 1), page.rect.height - 55
                     )
+                    # Havo 2025-I question 26 has three numbered statements
+                    # immediately before the printed question marker. They are
+                    # question material, not general context: start the separate
+                    # question crop at statement 1 so all three remain visible.
+                    if prefix == "ha25t1" and marker["number"] == 26:
+                        statement_start = page.search_for("Door het inhouden van de adem")
+                        if not statement_start:
+                            raise RuntimeError("Could not locate the first Havo 2025-I question 26 statement")
+                        question_top = max(0, min(rect.y0 for rect in statement_start) - 5)
                     question_y1 = min(
                         page.rect.height - 15,
                         max(question_top + 40, min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)),
