@@ -197,8 +197,11 @@ else:
         errors.append("Havo 2025-I vraag 34: context- en vraagafbeelding zijn niet correct gescheiden")
     else:
         with Image.open(ROOT / expected[1]) as image:
-            if image.height < 100:
-                errors.append("Havo 2025-I vraag 34: vraaguitsnede is onwaarschijnlijk klein")
+            if image.height < 90 or image.height > 220:
+                errors.append(
+                    f"Havo 2025-I vraag 34: vraaguitsnede heeft {image.height}px hoogte; "
+                    "verwacht een compacte uitsnede van 90–220px zonder paginavoettekst"
+                )
 
 # Audit the lower edge of every generated question crop.
 for image_path in sorted((ROOT / "exam-snippets").glob("question-*.jpg")):
