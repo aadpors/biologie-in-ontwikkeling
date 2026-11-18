@@ -39,6 +39,11 @@ def classify(filename: str, text: str):
     scores = {}
     for kind, terms in DOC_TYPES.items():
         scores[kind] = sum(2 if term in filename.lower() else 1 for term in terms if term in hay)
+    lower=filename.lower()
+    if re.search(r"-(?:o)(?:-|\.pdf$)",lower): scores["opgaven"] += 3
+    if re.search(r"-(?:c)(?:-|\.pdf$)",lower): scores["correctievoorschrift"] += 3
+    if re.search(r"-(?:c)-a\d",lower): scores["aanvulling"] += 5
+    if "uitwerkbijlage" in lower or "uitwerkbijlage" in hay: scores["uitwerkbijlage"] += 5
     best = max(scores, key=scores.get)
     ordered = sorted(scores.values(), reverse=True)
     confidence = 0.96 if ordered[0] >= 4 and ordered[0] > ordered[1] else (
@@ -48,6 +53,18 @@ def classify(filename: str, text: str):
         return "onbekend", 0.0, scores
     return best, confidence, scores
 
+
+
+def infer_exam_metadata(filename: str):
+    name=Path(filename).stem.lower()
+    m=re.search(r"(?:^|[-_])(ha|vw)[-_]1018[-_]a[-_](\d{2})[-_](\d+)[-_]([oc])(?:[-_]|$)",name)
+    if not m:
+        m=re.search(r"(ha|vw)[-_]?(\d{2})t(\d+)",name)
+    if not m: return {}
+    level="Havo" if m.group(1)=="ha" else "Vwo"
+    year="20"+m.group(2)
+    period=m.group(3)
+    return {"level":level,"year":year,"period":str(int(period)),"confidence":0.96,"source":"bestandsnaam"}
 
 def extract_pdf(path: Path):
     try:
@@ -189,7 +206,9 @@ class ExamApp:
                 extracted = extract_pdf(target)
                 all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
                 kind, confidence, scores = classify(source.name, all_text)
+                exam_meta = infer_exam_metadata(source.name) if kind=="opgaven" else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
+                       "exam_metadata": exam_meta,
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
                        "herkenningssignalen": scores, "status": "controle_nodig" if confidence < 0.9 else "herkend_nog_niet_goedgekeurd",
                        "toegevoegd": now(), "pagina_aantal": extracted["pagina_aantal"],
@@ -199,6 +218,9 @@ class ExamApp:
                 (self.project_dir / "analyse" / f"{digest[:16]}.json").write_text(
                     json.dumps(extracted, ensure_ascii=False, indent=2), encoding="utf-8")
                 self.data["documenten"].append(doc)
+                if exam_meta and not self.data.get("exam_metadata"):
+                    self.data["exam_metadata"]=exam_meta
+                    self._log(f"Examenmetadata voorgesteld vanuit bestandsnaam: {exam_meta['level']} {exam_meta['year']} tijdvak {exam_meta['period']}.")
                 self._log(f"{source.name}: {kind} voorgesteld ({confidence:.0%}), {extracted['pagina_aantal']} pagina's. OCR-controle op pagina's: {doc['pagina_zonder_tekst'] or 'niet nodig'}.")
                 added += 1
             except Exception as exc:
