@@ -55,8 +55,11 @@ def render_question(pdf_path, question, output):
             next_topic = [
                 line for line in lines
                 if line["y0"] > heading["y0"] + 3
-                and (line["bold"] or line["size"] >= 16)
-                and line["size"] >= 11 and len(line["text"]) < 100
+                # Only a genuinely large heading starts a new topic.
+                # Bold text is also used for marking criteria, so treating
+                # every bold line as a topic boundary clipped valid answers.
+                and line["size"] >= 16
+                and len(line["text"]) < 100
                 # Bullet glyphs are part of answer criteria, not section headings.
                 and line["text"].strip() not in {"•", "●", "▪", "◦", "-", "–", "—"}
                 # Right-aligned score values (1/2/0) are not section headings.
