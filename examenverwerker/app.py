@@ -574,7 +574,7 @@ class ExamApp:
                 candidate=dict(row)
                 record=build_question_record(meta,candidate,qtext,source_doc["opslagbestand"],cv_doc["opslagbestand"])
                 record.update({"exam":meta,"options":options,"correct":correct,
-                               "snippet_files":list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()],
+                               "snippet_files":list(dict.fromkeys(list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()])),
                                "context_asset_candidates":context_files,
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
@@ -709,7 +709,7 @@ class ExamApp:
         checkframe=ttk.Frame(outer); checkframe.pack(fill="x")
         required={"question_text","question_type","points","cv_alignment","images_and_context","appendices"}
         if meta.get("questionType")=="mcq": required.add("answer_options")
-        if record.get("cv_amendment_pdfs"): required.add("cv_addenda")
+        required.add("cv_addenda")
         for key,label in checks:
             if key not in required: continue
             var=tk.BooleanVar(value=checklist.get(key,False) is True)
