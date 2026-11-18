@@ -1,8 +1,15 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
 
 class EngineTests(unittest.TestCase):
+    def test_official_exam_filename_roles_and_metadata(self):
+        self.assertEqual(classify_document_role("ha-1018-a-24-1-o-spr.pdf","")[0],"opgaven")
+        self.assertEqual(classify_document_role("ha-1018-a-26-1-c.pdf","")[0],"correctievoorschrift")
+        self.assertEqual(classify_document_role("ha-1018-a-26-1-c-a1_0.pdf","")[0],"aanvulling")
+        self.assertEqual(classify_document_role("ha-1018-a-25-1-u.pdf","")[0],"uitwerkbijlage")
+        self.assertEqual(infer_exam_metadata("ha-1018-a-24-1-o-spr.pdf")["level"],"Havo")
+        self.assertEqual(infer_exam_metadata("vw-1018-a-26-2-o.pdf")["year"],"2026")
     def test_question_candidates_keep_repeated_numbers(self):
         a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\\nBeschrijf de functie van dit orgaan."}]},
                     {"page":2,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,140,14],"text":"1. Welke stof wordt gevormd?"}],"text":"1. Welke stof wordt gevormd?"}]}]}
