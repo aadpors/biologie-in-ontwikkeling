@@ -298,12 +298,14 @@ def propose_question_regions(analysis: dict, candidates: list[dict]) -> list[dic
                 segments.append({"page": page_no, "bbox": [0.0, y0, width, y1]})
         if not segments:
             continue
+        question_text = extract_candidate_text(analysis, candidate, next_candidate)
+        context_refs = detect_context_references(question_text)
         proposals.append({
             "number": int(candidate["number"]), "start_page": start_page,
             "end_page": end_page, "source_segments": segments,
-            "text_proposal": "", "context_candidates": [],
+            "text_proposal": question_text, "context_candidates": context_refs,
             "status": "voorstel_niet_goedgekeurd",
-            "warning": "Automatische paginagrenzen zijn indicatief. Controleer vraagtekst, afbeeldingen, context en eventuele doorloop handmatig."
+            "warning": "Automatische paginagrenzen en contextverwijzingen zijn indicatief. Controleer vraagtekst, figuren, tabellen, bijschriften en eventuele doorloop handmatig."
         })
     return proposals
 
@@ -336,6 +338,35 @@ def extract_candidate_text(analysis: dict, candidate: dict, next_candidate: dict
     collected.sort(key=lambda item: (item[0], item[1]))
     return "\n".join(item[2] for item in collected)
 
+
+
+def detect_context_references(text: str) -> list[dict]:
+    """Find explicit figure/table/source references for human context linking."""
+    value = str(text or "")
+    patterns = [
+        ("figuur", r"\b(figuur)\s*([0-9]{1,2}|[A-Z])\b"),
+        ("afbeelding", r"\b(afbeelding|foto|illustratie)\s*([0-9]{1,2}|[A-Z])\b"),
+        ("tabel", r"\b(tabel)\s*([0-9]{1,2}|[A-Z])\b"),
+        ("grafiek", r"\b(grafiek|diagram|schema)\s*([0-9]{1,2}|[A-Z])\b"),
+        ("bron", r"\b(bron|tekst|bijlage)\s*([0-9]{1,2}|[A-Z])\b"),
+    ]
+    found = []
+    seen = set()
+    for kind, pattern in patterns:
+        for match in re.finditer(pattern, value, flags=re.I):
+            number = match.group(2).upper()
+            key = (kind, number)
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append({"kind": kind, "number": number,
+                          "matched_text": match.group(0),
+                          "status": "context_koppeling_controleren"})
+    if re.search(r"\b(bovenstaande|onderstaande|afgebeelde|hierboven|hieronder)\s+(afbeelding|figuur|tabel|grafiek|tekst)\b", value, re.I):
+        found.append({"kind": "ong genummerde_verwijzing", "number": None,
+                      "matched_text": "Verwijzing naar bovenstaand/onderstaand materiaal",
+                      "status": "context_koppeling_controleren"})
+    return found
 
 
 def detect_question_type(text: str) -> dict:
