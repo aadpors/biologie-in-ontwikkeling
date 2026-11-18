@@ -569,22 +569,64 @@ def parse_options(block_lines):
     return options
 
 def find_numbered_list_prompt(lines, context_indices, marker):
-    """Find a question lead-in introducing a numbered list before its score marker."""
-    heading_re = re.compile(
-        r"^\\s*(?:hieronder|hierna)\\s+(?:staan|staat|is|zijn|volgt|volgen|wordt|worden)\\b",
-        re.I,
-    )
-    item_re = re.compile(r"^\\s*([1-4])(?:[.)]\\s+|\\s+\\S)")
+    """Find question-owned numbered statements before the printed score marker.
+
+    PDF text extraction sometimes puts the item number on a separate line from
+    its statement. Accept both layouts, and recognise the different lead-ins
+    used by exam writers (not only sentences beginning with "Hieronder").
+    """
     eligible = sorted(i for i in context_indices if i < marker["number_line"])
-    lower_bound = max(0, marker["number_line"] - 36)
-    for heading_index in reversed([i for i in eligible if i >= lower_bound and heading_re.match(lines[i]["text"])]):
-        subsequent = [i for i in eligible if heading_index < i < marker["number_line"]]
-        first = next((i for i in subsequent if lines[i]["text"].strip()), None)
-        if first is None or not re.match(r"^\\s*1(?:[.)]\\s+|\\s+\\S)", lines[first]["text"]):
+    lower_bound = max(0, marker["number_line"] - 48)
+    candidates = [i for i in eligible if i >= lower_bound]
+
+    def item_number(value):
+        value = value.strip()
+        match = re.match(r"^([1-4])(?:[.)]\\s*|\\s+)(.*)$", value)
+        if match and match.group(2).strip():
+            return int(match.group(1))
+        if re.fullmatch(r"[1-4][.)]?", value):
+            return int(value.rstrip(".)"))
+        return None
+
+    # Find a numbered sequence first. A number-only line may be followed by
+    # its wrapped statement on the next physical PDF line.
+    sequences = []
+    for position, line_index in enumerate(candidates):
+        if item_number(lines[line_index]["text"]) != 1:
             continue
-        numbers = {int(match.group(1)) for i in subsequent if (match := item_re.match(lines[i]["text"]))}
+        numbers = []
+        last_number = 0
+        for candidate_index in candidates[position:]:
+            number = item_number(lines[candidate_index]["text"])
+            if number is None:
+                continue
+            if number == last_number + 1:
+                numbers.append(number)
+                last_number = number
+            elif number == 1 and not numbers:
+                numbers = [1]
+                last_number = 1
+            elif number > last_number + 1:
+                break
         if len(numbers) >= 2:
-            return heading_index
+            sequences.append((line_index, numbers))
+
+    if not sequences:
+        return None
+
+    # Prefer the nearest explicit lead-in immediately before the sequence.
+    heading_re = re.compile(
+        r"(?i)\\b(?:uitspraken?|situaties?|onderdelen|processen|stoffen|"
+        r"kenmerken|gevolgen|conclusies|mogelijkheden|gegevens)\\b"
+    )
+    for first_item, _ in reversed(sequences):
+        preceding = [i for i in candidates if i < first_item]
+        for heading_index in reversed(preceding[-8:]):
+            if heading_re.search(lines[heading_index]["text"]):
+                return heading_index
+        # Some questions print only a numbered list, without a separate
+        # heading. Its first numbered item is still question material.
+        return first_item
     return None
 
 
