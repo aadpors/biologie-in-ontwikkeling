@@ -183,13 +183,22 @@ q33 = open_by_id.get("ha25t1-open-33")
 if not q34 or not q33:
     errors.append("Havo 2025-I vraag 34: gegevensrecord ontbreekt")
 else:
-    if q34.get("source") != q33.get("source"):
-        errors.append("Havo 2025-I vraag 34: gedeelde Bajau-/genetische context ontbreekt of wijkt af")
+    q30 = open_by_id.get("ha25t1-open-30")
+    q32 = open_by_id.get("ha25t1-open-32")
+    expected_source = "\\n\\n".join(
+        record.get("source", "").strip()
+        for record in (q30, q32, q33)
+        if record and record.get("source")
+    )
+    if not q30 or not q32 or q34.get("source") != expected_source:
+        errors.append("Havo 2025-I vraag 34: volledige onderzoeksopzet, erfelijkheidsbewijs en genetische context ontbreken of wijken af")
     if "Hieronder staan uitspraken" in q34.get("q", "") or "mutante allel" in q34.get("q", ""):
         errors.append("Havo 2025-I vraag 34: vraag 33 is nog opgenomen in de vraagtekst")
     if "Beschrijf hoe evolutie tot een grotere milt kan hebben geleid." not in q34.get("q", ""):
         errors.append("Havo 2025-I vraag 34: eigen evolutievraag ontbreekt")
     expected = [
+        "exam-snippets/context-ha25t1-q30-complete.jpg",
+        "exam-snippets/context-ha25t1-q32-complete.jpg",
         "exam-snippets/context-ha25t1-q33-complete.jpg",
         "exam-snippets/question-ha25t1-34-only.jpg",
     ]
