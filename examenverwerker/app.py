@@ -558,6 +558,45 @@ class ExamApp:
                 self._error("CV-fragment maken",exc)
                 messagebox.showerror("CV-fragment mislukt",str(exc),parent=win)
         ttk.Button(outer,text="CV-fragment uit origineel correctievoorschrift maken",command=make_cv_snippet).pack(anchor="w",pady=(4,2))
+        ttk.Label(outer,text="Eventueel fragment uit officiële CV-aanvulling (alleen als die voor deze vraag een wijziging bevat)").pack(anchor="w",pady=(8,2))
+        amendment_snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-amend-*.png"))
+        amendment_snippet_var=tk.StringVar(value=(current or {}).get("cv_amendment_snippet_file",""))
+        amendment_snippet_combo=ttk.Combobox(outer,textvariable=amendment_snippet_var,values=[""]+amendment_snippet_names,state="readonly")
+        amendment_snippet_combo.pack(fill="x")
+        def make_amendment_snippet():
+            selected_amendments=amendment_list.curselection()
+            if not selected_amendments:
+                messagebox.showinfo("Kies aanvulling","Selecteer eerst de officiële CV-aanvulling die je wilt uitsnijden.",parent=win)
+                return
+            amendment_doc=amendment_docs[selected_amendments[0]]
+            amendment_path=self.project_dir/"bronnen"/amendment_doc["opslagbestand"]
+            try:
+                amendment_analysis=analyze_pdf(amendment_path)
+                anchors=detect_cv_question_numbers(amendment_analysis)
+                matches=[x for x in anchors if int(x["number"])==int(row["number"])]
+                if not matches:
+                    messagebox.showwarning("Geen vraaganker",f"Vraag {row['number']} is niet als afzonderlijk anker herkend in {amendment_doc['bestand']}. Het volledige origineel blijft gekoppeld; controleer de aanvulling handmatig.",parent=win)
+                    return
+                proposals=propose_question_regions(amendment_analysis,anchors)
+                proposal=next((p for p in proposals if p["number"]==int(row["number"]) and p["start_page"]==int(matches[0]["page"])),None)
+                if not proposal:
+                    messagebox.showwarning("Geen fragment","Er kon geen fragmentvoorstel uit de aanvulling worden gemaakt.",parent=win)
+                    return
+                name=f"cv-amend-{amendment_doc['id']}-q{row['number']}-p{matches[0]['page']}.png"
+                target=self.project_dir/"snippets"/name
+                render_composite_crops(amendment_path,proposal["source_segments"],target,scale=1.35)
+                amendment_snippet_combo.configure(values=[""]+sorted(set(amendment_snippet_names+[name])))
+                amendment_snippet_var.set(name)
+                preview=tk.Toplevel(win); preview.title(f"CV-aanvulling vraag {row['number']} · controle"); preview.geometry("900x760")
+                ttk.Label(preview,text="Voorstel uit officiële aanvulling — controleer of dit daadwerkelijk een wijziging voor deze vraag is.",wraplength=850,padding=8).pack(fill="x")
+                photo=tk.PhotoImage(file=str(target)); canvas=tk.Canvas(preview); canvas.pack(fill="both",expand=True)
+                canvas.create_image(0,0,image=photo,anchor="nw"); canvas.image=photo
+                canvas.configure(scrollregion=canvas.bbox("all"))
+                self._log(f"CV-aanvullingsfragment gemaakt voor vraag {row['number']}; inhoudelijke koppeling blijft handmatig.")
+            except Exception as exc:
+                self._error("CV-aanvullingsfragment maken",exc)
+                messagebox.showerror("Fragment mislukt",str(exc),parent=win)
+        ttk.Button(outer,text="Fragment uit geselecteerde CV-aanvulling maken",command=make_amendment_snippet).pack(anchor="w",pady=(4,2))
         def save_draft():
             try:
                 meta={key:var.get().strip() for key,var in values.items()}
@@ -592,6 +631,7 @@ class ExamApp:
                                "snippet_files":list(dict.fromkeys(list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()])),
                                "context_asset_candidates":context_files,
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
+                               "cv_amendment_snippet_file":amendment_snippet_var.get().strip() or None,
                                "source_analysis_invalidated":False,
                                "approval_revoked_reason":None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
@@ -688,7 +728,10 @@ class ExamApp:
         cv_snippet=record.get("cv_snippet_file")
         if cv_snippet:
             preview_specs.append(("CV-fragmentvoorstel",self.project_dir/"snippets"/cv_snippet,None,None))
-        else:
+        amendment_snippet=record.get("cv_amendment_snippet_file")
+        if amendment_snippet:
+            preview_specs.append(("Fragment uit officiële CV-aanvulling",self.project_dir/"snippets"/amendment_snippet,None,None))
+        if not cv_snippet:
             # MCQ records do not require a website CV image, but the reviewer
             # must still see the official answer-key region before approval.
             cv_path=self.project_dir/"bronnen"/str(record.get("cv_pdf",""))
