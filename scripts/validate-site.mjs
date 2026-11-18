@@ -35,9 +35,11 @@ const havo2025Question26 = openExamQuestions.find(question => question.id === 'h
 assert.ok(havo2025Question26, 'Havo 2025-I vraag 26 ontbreekt');
 assert.ok(!havo2025Question26.source.includes('Hieronder staan drie uitspraken'), 'De inleiding van vraag 26 staat nog ten onrechte in de context');
 assert.ok(havo2025Question26.q.startsWith('Hieronder staan drie uitspraken.'), 'De inleiding van vraag 26 moet bij de vraagtekst staan');
-assert.deepEqual(
-  havo2025Question26.images,
-  ['exam-snippets/context-ha25t1-q26-context.svg', 'exam-snippets/question-ha25t1-26-with-intro.svg'],
+assert.ok(
+  [
+    ['exam-snippets/context-ha25t1-q26-context.svg', 'exam-snippets/question-ha25t1-26-with-intro.svg'],
+    ['exam-snippets/context-ha25t1-q26-complete.jpg', 'exam-snippets/question-ha25t1-26-only.jpg'],
+  ].some(expected => JSON.stringify(havo2025Question26.images) === JSON.stringify(expected)),
   'Havo 2025-I vraag 26 moet een contextuitsnede zonder vraaginleiding en een vraaguitsnede met vraaginleiding tonen'
 );
 const havo2025Question32 = openExamQuestions.find(question => question.id === 'ha25t1-open-32');
@@ -46,6 +48,11 @@ assert.deepEqual(
   havo2025Question32.images?.slice(0, 2),
   ['exam-snippets/context-ha25t1-q31-complete.jpg', 'exam-snippets/context-ha25t1-q32-complete.jpg'],
   'Havo 2025-I vraag 32 moet zowel de contextuitsnede van vraag 31 als de vervolgcontext van vraag 32 tonen'
+);
+assert.deepEqual(
+  havo2025Question32.images,
+  ['exam-snippets/context-ha25t1-q31-complete.jpg', 'exam-snippets/context-ha25t1-q32-complete.jpg', 'exam-snippets/question-ha25t1-32-only.jpg'],
+  'Havo 2025-I vraag 32 moet de context van vraag 31, de vervolgcontext van vraag 32 en de afzonderlijke vraaguitsnede tonen'
 );
 assert.ok(!examPage.includes('(q.image?"":(o.text?" "+o.text:""))'), 'Frontend bevat nog de oude onderdrukking van antwoordteksten');
 assert.ok(examPage.includes('Meerkeuzevragen én juist/onjuist- en wel/niet-vragen worden automatisch nagekeken volgens het officiële correctievoorschrift.'), 'De toelichting over de automatische nakijkinteractie ontbreekt');

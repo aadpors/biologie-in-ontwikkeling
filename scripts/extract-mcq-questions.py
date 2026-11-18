@@ -208,7 +208,12 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
                 f"start={start_anchor!r}, end={end_anchor!r}"
             )
         top = max(0, min(rect.y0 for rect in start_hits) - 5)
-        bottom = min(bottom_limit, max(rect.y1 for rect in end_hits) + 1)
+        if prefix == "ha25t1" and number == 26:
+            # The heading introduces the statements and belongs with the
+            # question, so the shared context must stop before the heading.
+            bottom = min(bottom_limit, min(rect.y0 for rect in end_hits) - 2)
+        else:
+            bottom = min(bottom_limit, max(rect.y1 for rect in end_hits) + 1)
         if bottom <= top:
             raise RuntimeError(f"Invalid anchored context bounds for {prefix} question {number}")
         pix = page.get_pixmap(
@@ -915,6 +920,13 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                                 if prefix == "vw25t1" else None
                             ),
                         )
+                        if prefix == "ha25t1" and marker["number"] == 32:
+                            # Question 32 continues the context introduced with
+                            # question 31; retain that first context fragment.
+                            previous_context = "exam-snippets/context-ha25t1-q31-complete.jpg"
+                            if not (ROOT / previous_context).is_file():
+                                raise RuntimeError("Missing Havo 2025-I question 31 context for question 32")
+                            context_paths = [previous_context, *context_paths]
                         if not context_paths:
                             if (prefix, marker["number"]) in {
                                 ("vw25t1", 15), ("vw25t1", 16),
@@ -945,12 +957,13 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         # the general context crop ends before the statements.
                         if prefix == "ha25t1" and marker["number"] == 26:
                             statement_hits = page.search_for("Door het inhouden van de adem")
+                            heading_hits = page.search_for("Hieronder staan drie uitspraken.")
                             prompt_hits = page.search_for("bijbehorende uitspraak juist of onjuist is.")
-                            if not statement_hits or not prompt_hits:
+                            if not statement_hits or not heading_hits or not prompt_hits:
                                 raise RuntimeError(
                                     "Could not locate all Havo 2025-I q26 statements and final prompt"
                                 )
-                            statement_top = max(0, min(hit.y0 for hit in statement_hits) - 3)
+                            statement_top = max(0, min(hit.y0 for hit in heading_hits) - 3)
                             prompt_bottom = min(
                                 page.rect.height - 12,
                                 max(hit.y1 for hit in prompt_hits) + 6,
@@ -1029,6 +1042,16 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         if j not in {marker["number_line"], marker["points_line"]}
                         and not HEADER_RE.match(lines[j]["text"])
                     ).strip()
+                    if prefix == "ha25t1" and marker["number"] == 26:
+                        # Keep the statements in the question, not in its
+                        # general context. The heading is part of the prompt.
+                        context = re.sub(
+                            r"\n?Hieronder staan drie uitspraken\..*$",
+                            "",
+                            context,
+                            flags=re.S,
+                        ).strip()
+                        selected_prompt = "Hieronder staan drie uitspraken.\n" + selected_prompt
                     if context_record is None and selected_context_page is not None:
                         previous_ranges.append((start, question_end_line + 1))
                         cursor = question_end_line + 1
