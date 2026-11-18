@@ -126,6 +126,9 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         snippet_names=r.get("snippet_files") or [r["snippet_file"]]
         for name in snippet_names:
             shutil.copy2(project_dir/"snippets"/name,snippet_dir/name)
+        amendment=r.get("cv_amendment_snippet_file")
+        if amendment:
+            shutil.copy2(project_dir/"snippets"/amendment,snippet_dir/amendment)
         row={"id":r["id"],"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
              "n":int(r["number"]),"points":int(meta["points"]),"page":int(r["source_page"]),
              "theme":meta["theme"],"concept":meta["concept"],"end":meta["end"],"focus":meta["focus"],
@@ -151,9 +154,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
             cv_name_snippet=(r.get("cv_snippet_files") or [r["cv_snippet_file"]])[0]
             shutil.copy2(project_dir/"snippets"/cv_name_snippet,snippet_dir/cv_name_snippet)
             cv_item={"id":r["id"],"question":int(r["number"]),"pdf":f"examens/{cv_target.name}","output":cv_name_snippet}
-            amendment=r.get("cv_amendment_snippet_file")
             if amendment:
-                shutil.copy2(project_dir/"snippets"/amendment,snippet_dir/amendment)
                 cv_item["amendment_output"]=amendment
             cv_manifest.append(cv_item)
         manifest.append({"id":r["id"],"source_sha256":sha256(project_dir/"bronnen"/source_name),
