@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
