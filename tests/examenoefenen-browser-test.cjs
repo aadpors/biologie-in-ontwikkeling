@@ -16,6 +16,61 @@ const assert = require("node:assert/strict");
     assert.match(await page.locator("#count").innerText(), /519 vragen/);
     await page.waitForFunction(() => typeof questions !== "undefined" && questions.length === 519 && questions.every(q => typeof q.repeatedContext === "string"));
 
+    // Binary statement questions use one mutually exclusive radio pair per row.
+    const binaryInventory = await page.evaluate(() => ({
+      total: questions.filter(q => q.binaryChoice).length,
+      malformed: questions.filter(q => q.binaryChoice && (!q.binaryChoice.rows.length || q.binaryChoice.rows.some(row => !row.text))).map(q => q.id)
+    }));
+    assert.equal(binaryInventory.total, 71, "Alle genummerde juist/onjuist- en wel/niet-vragen plus de benoemde en enkelvoudige binaire vraag moeten worden herkend");
+    assert.deepEqual(binaryInventory.malformed, [], "Elke binaire keuzerij moet een uitspraak bevatten");
+
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2024");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForFunction(() => document.querySelector(".qhead")?.textContent.includes("vraag 1"));
+    assert.deepEqual(await page.locator(".binary-choice-table thead th").allTextContents(), ["Uitspraak", "Juist", "Onjuist"]);
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
+    const firstBinaryRow = page.locator('.binary-choice-table [data-binary-row="0"]');
+    await firstBinaryRow.locator('input[value="left"]').check();
+    await firstBinaryRow.locator('input[value="right"]').check();
+    assert.equal(await firstBinaryRow.locator('input:checked').count(), 1, "De twee opties binnen één uitspraak mogen niet tegelijk geselecteerd zijn");
+    assert.equal(await firstBinaryRow.locator('input:checked').getAttribute("value"), "right");
+    await page.locator('.binary-choice-table [data-binary-row="1"] input[value="left"]').check();
+    const binarySaved = await page.evaluate(() => JSON.parse(localStorage.getItem("bioExamAnswersV2") || "{}")["vw24t1-open-1"]);
+    assert.deepEqual(binarySaved, {"0":"right","1":"left"});
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector(".binary-choice-table tbody tr")?.getAttribute("data-binary-row") === "0");
+    assert.equal(await page.locator('.binary-choice-table [data-binary-row="0"] input:checked').getAttribute("value"), "right");
+    assert.equal(await page.locator('.binary-choice-table [data-binary-row="1"] input:checked').getAttribute("value"), "left");
+
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 12); render(); });
+    assert.deepEqual(await page.locator(".binary-choice-table thead th").allTextContents(), ["Uitspraak", "Wel", "Niet"]);
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
+
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
+    assert.deepEqual(await page.locator(".binary-choice-table thead th").allTextContents(), ["Uitspraak", "Wel", "Geen"]);
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 4);
+
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("2");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 30); render(); });
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
+    assert.match(await page.locator(".binary-choice-table tbody").innerText(), /Isa[\\s\\S]*Kate[\\s\\S]*Mounir/);
+
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 28); render(); });
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 1);
+    assert.equal(await page.locator(".binary-explanation textarea").count(), 1);
+    await page.locator("#reset").click();
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+
+
     // Cards stay grouped by exam (year, time period, level), then follow original question order.
     const sortedCards = await page.evaluate(() => getFiltered().map(q => ({ year: Number(q.year), period: Number(q.period), level: q.level, n: Number(q.n) })));
     const levelOrder = { Havo: 0, Vwo: 1 };
