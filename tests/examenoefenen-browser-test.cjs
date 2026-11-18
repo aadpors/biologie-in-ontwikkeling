@@ -14,7 +14,97 @@ const assert = require("node:assert/strict");
     await page.goto("http://127.0.0.1:8000/examenoefenen.html", { waitUntil: "networkidle" });
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
     assert.match(await page.locator("#count").innerText(), /519 vragen/);
+    await page.waitForFunction(() => typeof questions !== "undefined" && questions.length === 519 && questions.every(q => typeof q.repeatedContext === "string"));
 
+    // Binary statement questions use one mutually exclusive radio pair per row.
+    const binaryInventory = await page.evaluate(() => ({
+      total: questions.filter(q => q.binaryChoice).length,
+      malformed: questions.filter(q => q.binaryChoice && (!q.binaryChoice.rows.length || q.binaryChoice.rows.some(row => !row.text))).map(q => q.id)
+    }));
+    assert.equal(binaryInventory.total, 71, "Alle genummerde juist/onjuist- en wel/niet-vragen plus de benoemde en enkelvoudige binaire vraag moeten worden herkend");
+    assert.deepEqual(binaryInventory.malformed, [], "Elke binaire keuzerij moet een uitspraak bevatten");
+
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2024");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.waitForFunction(() => document.querySelector(".qhead")?.textContent.includes("vraag 1"));
+    assert.deepEqual(await page.locator(".binary-choice-table thead th").allTextContents(), ["Uitspraak", "Juist", "Onjuist"]);
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
+    const firstBinaryRow = page.locator('.binary-choice-table [data-binary-row="0"]');
+    await firstBinaryRow.locator('input[value="left"]').check();
+    await firstBinaryRow.locator('input[value="right"]').check();
+    assert.equal(await firstBinaryRow.locator('input:checked').count(), 1, "De twee opties binnen één uitspraak mogen niet tegelijk geselecteerd zijn");
+    assert.equal(await firstBinaryRow.locator('input:checked').getAttribute("value"), "right");
+    await page.locator('.binary-choice-table [data-binary-row="1"] input[value="left"]').check();
+    const binaryQuestionId = await page.evaluate(() => questions.find(q => q.level === "Vwo" && q.year === "2024" && q.period === "1" && Number(q.n) === 1).id);
+    const binarySaved = await page.evaluate(id => JSON.parse(localStorage.getItem("bioExamAnswersV2") || "{}")[id], binaryQuestionId);
+    assert.deepEqual(binarySaved, {"0":"right","1":"left"});
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForFunction(() => document.querySelector(".binary-choice-table tbody tr")?.getAttribute("data-binary-row") === "0");
+    assert.equal(await page.locator('.binary-choice-table [data-binary-row="0"] input:checked').getAttribute("value"), "right");
+    assert.equal(await page.locator('.binary-choice-table [data-binary-row="1"] input:checked').getAttribute("value"), "left");
+
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 12); render(); });
+    assert.deepEqual(await page.locator(".binary-choice-table thead th").allTextContents(), ["Uitspraak", "Wel", "Niet"]);
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
+
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
+    assert.deepEqual(await page.locator(".binary-choice-table thead th").allTextContents(), ["Uitspraak", "Wel", "Geen"]);
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 4);
+
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("2");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 30); render(); });
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
+    assert.match((await page.locator(".binary-choice-table tbody").innerText()).replace(/\s+/g, " "), /Isa[\s\S]*Kate[\s\S]*Mounir/);
+
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 28); render(); });
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 1);
+    assert.equal(await page.locator(".binary-explanation textarea").count(), 1);
+    await page.locator("#reset").click();
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
+
+
+    // Cards stay grouped by exam (year, time period, level), then follow original question order.
+    const sortedCards = await page.evaluate(() => getFiltered().map(q => ({ year: Number(q.year), period: Number(q.period), level: q.level, n: Number(q.n) })));
+    const levelOrder = { Havo: 0, Vwo: 1 };
+    const sortKey = q => [q.year, q.period, levelOrder[q.level], q.n];
+    for (let i = 1; i < sortedCards.length; i++) {
+      const previous = sortKey(sortedCards[i - 1]);
+      const current = sortKey(sortedCards[i]);
+      let comparison = 0;
+      for (let j = 0; j < previous.length; j++) {
+        if (previous[j] !== current[j]) { comparison = previous[j] - current[j]; break; }
+      }
+      assert.ok(comparison <= 0, `Kaartvolgorde wijkt af bij positie ${i}: ${JSON.stringify(sortedCards[i - 1])} → ${JSON.stringify(sortedCards[i])}`);
+    }
+
+    // Shared context is carried forward to every follow-up card, then reset at a new context heading.
+    const contextAudit = await page.evaluate(() => {
+      const get = n => questions.find(q => q.level === 'Havo' && q.year === '2024' && q.period === '1' && Number(q.n) === n);
+      const vwoHippo = questions.find(q => q.level === 'Vwo' && q.year === '2025' && q.period === '1' && Number(q.n) === 14);
+      const havoNewContext = get(14);
+      return { first: get(1)?.repeatedContext || '', followup: get(2)?.repeatedContext || '', laterFollowup: get(3)?.repeatedContext || '', nextContext: get(10)?.repeatedContext || '', havoNewContext: havoNewContext?.repeatedContext || '', vwoHippo: vwoHippo?.repeatedContext || '', questionCount: questions.filter(q => !q.repeatedContext).length, contextStarts: questions.filter(q => q.contextGroupStart).length };
+    });
+    assert.match(contextAudit.first, /Een nieuwe hartklep/);
+    assert.match(contextAudit.followup, /Een nieuwe hartklep/);
+    assert.match(contextAudit.followup, /Twee mogelijke hartafwijkingen/);
+    assert.match(contextAudit.laterFollowup, /Een nieuwe hartklep/);
+    assert.doesNotMatch(contextAudit.nextContext, /Een nieuwe hartklep/);
+    assert.match(contextAudit.nextContext, /Op jacht met SnailSnap/);
+    assert.match(contextAudit.havoNewContext, /Er zijn meerdere vlinders/);
+    assert.doesNotMatch(contextAudit.havoNewContext, /Op jacht met SnailSnap/);
+    assert.match(contextAudit.vwoHippo, /Hieronder staan uitspraken over de populatiegroei/);
+    assert.doesNotMatch(contextAudit.vwoHippo, /Slangengifklieren uit het lab/);
+    assert.equal(contextAudit.questionCount, 0, 'Elke kaart moet een herhaalde context hebben');
+    assert.equal(contextAudit.contextStarts, 73, 'Alle 73 contextblokken uit de twaalf examens moeten expliciet zijn afgebakend');
     // Filters combine correctly and reset restores the full question set.
     await page.locator("#level").selectOption("Havo");
     await page.locator("#year").selectOption("2026");
