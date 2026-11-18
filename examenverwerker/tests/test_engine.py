@@ -12,6 +12,13 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(infer_exam_metadata("vw-1018-a-26-2-o.pdf")["year"],"2026")
         self.assertEqual(infer_exam_metadata("ha-1018-a-25-1-u.pdf")["period"],"1")
         self.assertEqual(infer_exam_metadata("ha-1018-a-26-1-c-a1_0.pdf")["year"],"2026")
+    def test_exam_metadata_can_be_inferred_from_opening_pdf_text(self):
+        got=infer_exam_metadata("hernoemde-opgaven.pdf","CENTRAAL EXAMEN HAVO 2025 tijdvak 2")
+        self.assertEqual(got["level"],"Havo")
+        self.assertEqual(got["year"],"2025")
+        self.assertEqual(got["period"],"2")
+        self.assertEqual(got["source"],"eerste_pdf_paginas")
+
     def test_correction_scheme_matching_never_pools_other_exams(self):
         op={"bestand":"ha-1018-a-26-1-o.pdf"}
         cvs=[
