@@ -33,7 +33,9 @@ const assert = require("node:assert/strict");
     // Shared context is carried forward to every follow-up card, then reset at a new context heading.
     const contextAudit = await page.evaluate(() => {
       const get = n => questions.find(q => q.level === 'Havo' && q.year === '2024' && q.period === '1' && Number(q.n) === n);
-      return { first: get(1)?.repeatedContext || '', followup: get(2)?.repeatedContext || '', laterFollowup: get(3)?.repeatedContext || '', nextContext: get(10)?.repeatedContext || '', questionCount: questions.filter(q => !q.repeatedContext).length };
+      const vwoHippo = questions.find(q => q.level === 'Vwo' && q.year === '2025' && q.period === '1' && Number(q.n) === 14);
+      const havoNewContext = get(14);
+      return { first: get(1)?.repeatedContext || '', followup: get(2)?.repeatedContext || '', laterFollowup: get(3)?.repeatedContext || '', nextContext: get(10)?.repeatedContext || '', havoNewContext: havoNewContext?.repeatedContext || '', vwoHippo: vwoHippo?.repeatedContext || '', questionCount: questions.filter(q => !q.repeatedContext).length, contextStarts: questions.filter(q => q.contextGroupStart).length };
     });
     assert.match(contextAudit.first, /Een nieuwe hartklep/);
     assert.match(contextAudit.followup, /Een nieuwe hartklep/);
@@ -41,7 +43,12 @@ const assert = require("node:assert/strict");
     assert.match(contextAudit.laterFollowup, /Een nieuwe hartklep/);
     assert.doesNotMatch(contextAudit.nextContext, /Een nieuwe hartklep/);
     assert.match(contextAudit.nextContext, /Op jacht met SnailSnap/);
-    assert.equal(contextAudit.questionCount, 0, 'Iedere kaart moet een herhaalde context hebben');
+    assert.match(contextAudit.havoNewContext, /Er zijn meerdere vlinders/);
+    assert.doesNotMatch(contextAudit.havoNewContext, /Op jacht met SnailSnap/);
+    assert.match(contextAudit.vwoHippo, /Hieronder staan uitspraken over de populatiegroei/);
+    assert.doesNotMatch(contextAudit.vwoHippo, /Slangengifklieren uit het lab/);
+    assert.equal(contextAudit.questionCount, 0, 'Elke kaart moet een herhaalde context hebben');
+    assert.equal(contextAudit.contextStarts, 73, 'Alle 73 contextblokken uit de twaalf examens moeten expliciet zijn afgebakend');
     // Filters combine correctly and reset restores the full question set.
     await page.locator("#level").selectOption("Havo");
     await page.locator("#year").selectOption("2026");
