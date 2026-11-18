@@ -14,9 +14,9 @@ from tkinter import filedialog, messagebox, ttk
 APP_VERSION = "0.1.0"
 PROJECT_FILE = "project.json"
 DOC_TYPES = {
-    "opgaven": ["opgaven", "opgave", "vragen", "exam"],
-    "correctievoorschrift": ["correctievoorschrift", "correctievoorschr", "cv", "antwoordmodel"],
-    "uitwerkbijlage": ["uitwerkbijlage", "uitwerkblad", "bijlage"],
+    "opgaven": ["opgaven", "opgave", "vragenboekje", "examenopgaven"],
+    "correctievoorschrift": ["correctievoorschrift", "correctievoorschr", "antwoordmodel", "beoordelingsmodel"],
+    "uitwerkbijlage": ["uitwerkbijlage", "uitwerkblad"],
     "aanvulling": ["aanvulling", "aanvullingen", "erratum", "errata"],
 }
 
