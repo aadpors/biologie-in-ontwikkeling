@@ -69,6 +69,18 @@ class EngineTests(unittest.TestCase):
         a={"pages":[{"page":1,"text":"Vraag 1\\nBeoordelingsmodel\\nVraag 3"}]}
         got=detect_cv_question_numbers(a)
         self.assertEqual([x["number"] for x in got],[1,3])
+
+    def test_question_type_detection_and_option_integrity(self):
+        from engine import detect_question_type
+        result=detect_question_type("Kies het juiste antwoord.\nA. mitochondriën\nB. ribosomen\nC. celkern\nD. celmembraan")
+        self.assertEqual(result["type"],"meerkeuze")
+        self.assertEqual(result["option_labels"],["A","B","C","D"])
+        self.assertTrue(result["options_complete"])
+        self.assertEqual(result["status"],"controle_nodig")
+        missing=detect_question_type("Kies het juiste antwoord.\nA. eerste optie\nC. derde optie")
+        self.assertFalse(missing["options_complete"])
+        self.assertEqual(missing["option_gaps"],["B"])
+
     def test_pdf_text_and_exact_crop(self):
         try:
             import pymupdf as fitz
