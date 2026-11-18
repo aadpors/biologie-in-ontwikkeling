@@ -898,6 +898,22 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 if not selected_prompt:
                     selected_prompt = "\n".join(x for x in block_text if x.strip()).strip()
 
+                # Some multiple-choice questions place their numbered
+                # statements above the printed question number. In that case
+                # the statements have been removed from context by the
+                # boundary detector, so carry their text into the question
+                # prompt as well as the separate question image.
+                if (
+                    list_prompt_applies_to_question
+                    and list_prompt_start is not None
+                    and list_prompt_start < start
+                ):
+                    lead_in_lines = [
+                        lines[j]["text"] for j in range(list_prompt_start, start)
+                        if lines[j]["text"].strip()
+                    ]
+                    selected_prompt = "\n".join([*lead_in_lines, selected_prompt]).strip()
+
                 # Determine where the question itself ends so later context can be
                 # carried forward without carrying the previous question into the next card.
                 if options and first_option < len(block_text):
@@ -1254,7 +1270,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                 # Context paragraphs are independent full-width strips; the
                 # question and answer options are always rendered separately.
                 if mcq_images is None:
-                    question_top = max(0, lines[start]["bbox"][1] - 1)
+                    question_top = max(0, lines[question_start_line]["bbox"][1] - 1)
                     question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
                     # When the generic end-line detector misses a compact or
                     # table-style prompt, use the parsed answer-option rows as
