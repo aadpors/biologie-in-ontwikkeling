@@ -38,6 +38,10 @@ class EngineTests(unittest.TestCase):
             s=suggest_from_learning(p,"layout-a")
             self.assertEqual(s["suggestion"],"question")
             self.assertFalse(s["auto_apply"])
+            learn_decision(p,{"pattern_key":"layout-a","chosen":"not_question","accepted":True})
+            tie=suggest_from_learning(p,"layout-a")
+            self.assertIsNone(tie["suggestion"])
+            self.assertTrue(tie["conflicting"])
     def test_duplicate_ids_reported(self):
         row={"id":"same","level":"Havo","year":"2025","period":"1","n":1,"page":1,"q":"x","pdf":"a.pdf","cv":"b.pdf"}
         errors=validate_website_records([row],[row],[])
