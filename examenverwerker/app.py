@@ -419,12 +419,33 @@ class ExamApp:
                 files.append(name)
             row["snippet_proposal_files"]=files
             row["snippet_proposal_warning"]=proposal["warning"]
+            # Context crops are kept separate from the question snippets and
+            # can never be exported as approved question images by accident.
+            context_files=[]
+            seen_assets=set()
+            for ref_index,ref in enumerate(proposal.get("context_candidates",[]),1):
+                for asset in ref.get("asset_candidates",[])[:4]:
+                    asset_id=asset.get("asset_id")
+                    if not asset_id or asset_id in seen_assets or not asset.get("bbox"):
+                        continue
+                    seen_assets.add(asset_id)
+                    name=f"contextvoorstel-k{candidate_index+1}-q{row['number']}-{asset_id}.png"
+                    target=self.project_dir/"snippets"/name
+                    render_crop(source,int(asset["page"]),asset["bbox"],target,scale=1.8)
+                    context_files.append({"file":name,"page":asset["page"],"caption":asset.get("caption"),
+                                          "asset_id":asset_id,"status":"handmatige_controle_verplicht"})
+            row["context_asset_proposal_files"]=context_files
             self.save_project()
             win=tk.Toplevel(parent); win.title(f"Voorlopig fragment vraag {row['number']}"); win.geometry("900x800")
             ttk.Label(win,text="VOORSTEL – NIET GECONTROLEERD OF PUBLICATIEKLAAR",foreground="#9b4d00",padding=8).pack(fill="x")
             ttk.Label(win,text=proposal["warning"],wraplength=860,padding=8).pack(fill="x")
             refs=proposal.get("context_candidates",[])
-            ref_text="Mogelijke contextverwijzingen: "+(", ".join(f"{x['kind']} {x['number']} (p. {x['page']})" for x in refs) if refs else "geen automatische verwijzing gevonden")
+            ref_summaries=[]
+            for ref in refs:
+                captions=", ".join(f"p. {x['page']}: {x['text']}" for x in ref.get("caption_matches",[])) or "geen bijschrift gevonden"
+                assets=len(ref.get("asset_candidates",[]))
+                ref_summaries.append(f"{ref.get('kind')} {ref.get('number') or ''}: {captions}; {assets} mogelijke beeldregio('s'); status: {ref.get('link_status')}")
+            ref_text="Mogelijke contextverwijzingen (alleen suggesties): "+("; ".join(ref_summaries) if ref_summaries else "geen automatische verwijzing gevonden")
             ttk.Label(win,text=ref_text,wraplength=860,padding=8).pack(fill="x")
             text_box=tk.Text(win,height=5,wrap="word",font=("Segoe UI",9))
             text_box.pack(fill="x",padx=8)
@@ -441,6 +462,11 @@ class ExamApp:
                 photo=tk.PhotoImage(file=str(self.project_dir/"snippets"/name))
                 photos.append(photo); canvas.create_image(0,y,image=photo,anchor="nw")
                 y += photo.height()+12
+            for item in context_files:
+                canvas.create_text(8,y+8,anchor="nw",text=f"CONTEXTKANDIDAAT · pagina {item['page']} · {item.get('caption') or item['asset_id']} · handmatig controleren")
+                photo=tk.PhotoImage(file=str(self.project_dir/"snippets"/item["file"]))
+                photos.append(photo); canvas.create_image(0,y+30,image=photo,anchor="nw")
+                y += photo.height()+44
             canvas.images=photos
             canvas.configure(scrollregion=canvas.bbox("all"))
             self._log(f"Voorlopige snippet(s) voor vraag {row['number']} gemaakt. Visuele controle blijft verplicht.")
