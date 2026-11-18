@@ -281,16 +281,23 @@ class ExamApp:
                     else:
                         still_suppressed.append(item)
                 suppressed=still_suppressed
-                all_ordered=sorted(candidates+suppressed,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
-                for index,item in enumerate(all_ordered):
-                    following=all_ordered[index+1] if index+1<len(all_ordered) else None
+                ordered=sorted(candidates,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                for index,item in enumerate(ordered):
+                    following=ordered[index+1] if index+1<len(ordered) else None
                     proposal_text=extract_candidate_text(analysis,item,following)
                     type_check=detect_question_type(proposal_text)
                     context_refs=detect_context_references(proposal_text)
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
                         "vraagtekst_voorstel":proposal_text,"vraagtype_controle":type_check,
                         "vraagtype_status":"controle_nodig","context_verwijzingen":context_refs})
-                ordered=sorted(candidates,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                suppressed=sorted(suppressed,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                for item in suppressed:
+                    item_order=(int(item["page"]),float(item.get("bbox",[0,0])[1]))
+                    following=next((x for x in ordered if (int(x["page"]),float(x.get("bbox",[0,0])[1]))>item_order),None)
+                    proposal_text=extract_candidate_text(analysis,item,following)
+                    item.update({"document_id":doc["id"],"bestand":doc["bestand"],
+                        "vraagtekst_voorstel":proposal_text,"vraagtype_controle":detect_question_type(proposal_text),
+                        "vraagtype_status":"controle_nodig","context_verwijzingen":detect_context_references(proposal_text)})
                 candidates=ordered
                 self.data.setdefault("vraagkandidaten",[])
                 self.data.setdefault("onderdrukte_vraagkandidaten",[])
