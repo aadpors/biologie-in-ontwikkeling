@@ -853,7 +853,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         statement_start = page.search_for("Door het inhouden van de adem")
                         if not statement_start:
                             raise RuntimeError("Could not locate the first Havo 2025-I question 26 statement")
-                        question_top = max(0, min(rect.y0 for rect in statement_start) - 5)
+                        question_top = max(0, min(rect.y0 for rect in statement_start))
                     question_y1 = min(
                         page.rect.height - 15,
                         max(question_top + 40, min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)),
