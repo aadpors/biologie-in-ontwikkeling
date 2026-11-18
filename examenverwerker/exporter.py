@@ -62,7 +62,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         ):
             if identity:
                 actual={"level":identity.get("level"),"year":str(identity.get("year")),"period":str(identity.get("period"))}
-                if actual!=expected:
+                if actual!=expected and r.get(confirmation_flag) is not True:
                     errors.append({"id":rid,"error":f"{label}_past_niet_bij_examen"})
             elif r.get(confirmation_flag) is not True:
                 errors.append({"id":rid,"error":f"{label}_niet_handmatig_gecontroleerd"})
@@ -93,7 +93,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":f"uitwerkbijlage_ontbreekt:{ref}"})
             else:
                 identity=infer_exam_metadata(ref)
-                if identity and (identity.get("level")!=meta.get("level") or str(identity.get("year"))!=str(meta.get("year")) or str(identity.get("period"))!=str(meta.get("period"))):
+                if identity and (identity.get("level")!=meta.get("level") or str(identity.get("year"))!=str(meta.get("year")) or str(identity.get("period"))!=str(meta.get("period"))) and r.get("appendix_match_human_confirmed") is not True:
                     errors.append({"id":rid,"error":f"uitwerkbijlage_past_niet_bij_examen:{ref}"})
                 elif not identity and r.get("appendix_match_human_confirmed") is not True:
                     errors.append({"id":rid,"error":f"uitwerkbijlage_niet_handmatig_gecontroleerd:{ref}"})
@@ -104,7 +104,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":f"cv_aanvulling_pdf_ontbreekt:{ref}"})
             else:
                 identity=infer_exam_metadata(ref)
-                if identity and (identity.get("level")!=meta.get("level") or str(identity.get("year"))!=str(meta.get("year")) or str(identity.get("period"))!=str(meta.get("period"))):
+                if identity and (identity.get("level")!=meta.get("level") or str(identity.get("year"))!=str(meta.get("year")) or str(identity.get("period"))!=str(meta.get("period"))) and r.get("cv_amendment_match_human_confirmed") is not True:
                     errors.append({"id":rid,"error":f"cv_aanvulling_past_niet_bij_examen:{ref}"})
                 elif not identity and r.get("cv_amendment_match_human_confirmed") is not True:
                     errors.append({"id":rid,"error":f"cv_aanvulling_niet_handmatig_gecontroleerd:{ref}"})
