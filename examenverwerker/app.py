@@ -295,8 +295,9 @@ class ExamApp:
                     cv_candidates = detect_cv_question_numbers(cv_analysis)
                     # A well-populated CV gives a useful independent signal for
                     # suspicious source-line numbers; it never auto-rejects a start.
-                    cv_crosscheck_available = len(cv_candidates) >= 5
                     cv_numbers = {int(x["number"]) for x in cv_candidates}
+                    opgaven_numbers = {int(x["number"]) for x in candidates}
+                    cv_crosscheck_available = len(cv_numbers) >= max(5, int(len(opgaven_numbers) * 0.6))
                     for candidate in candidates:
                         candidate["cv_number_match"] = (int(candidate["number"]) in cv_numbers) if cv_crosscheck_available else None
                         candidate["cv_crosscheck_status"] = ("nummer_in_CV" if candidate["cv_number_match"] else "nummer_niet_in_CV_controleren") if cv_crosscheck_available else "CV-onvoldoende-herkend"
