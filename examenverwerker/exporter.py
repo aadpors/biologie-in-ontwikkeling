@@ -85,7 +85,25 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         for ref in r.get("uitwerkbijlagen",[]):
             if Path(ref).name!=ref:
                 errors.append({"id":rid,"error":"ongeldig_bijlagepad"})
-            elif not (project_dir/"bronnen"/ref).is_file(): errors.append({"id":rid,"error":f"uitwerkbijlage_ontbreekt:{ref}"})
+            elif not (project_dir/"bronnen"/ref).is_file():
+                errors.append({"id":rid,"error":f"uitwerkbijlage_ontbreekt:{ref}"})
+            else:
+                identity=infer_exam_metadata(ref)
+                if identity and (identity.get("level")!=meta.get("level") or str(identity.get("year"))!=str(meta.get("year")) or str(identity.get("period"))!=str(meta.get("period"))):
+                    errors.append({"id":rid,"error":f"uitwerkbijlage_past_niet_bij_examen:{ref}"})
+                elif not identity and r.get("appendix_match_human_confirmed") is not True:
+                    errors.append({"id":rid,"error":f"uitwerkbijlage_niet_handmatig_gecontroleerd:{ref}"})
+        for ref in r.get("cv_amendment_pdfs",[]):
+            if Path(ref).name!=ref:
+                errors.append({"id":rid,"error":"ongeldig_aanvullingpad"})
+            elif not (project_dir/"bronnen"/ref).is_file():
+                errors.append({"id":rid,"error":f"cv_aanvulling_pdf_ontbreekt:{ref}"})
+            else:
+                identity=infer_exam_metadata(ref)
+                if identity and (identity.get("level")!=meta.get("level") or str(identity.get("year"))!=str(meta.get("year")) or str(identity.get("period"))!=str(meta.get("period"))):
+                    errors.append({"id":rid,"error":f"cv_aanvulling_past_niet_bij_examen:{ref}"})
+                elif not identity and r.get("cv_amendment_match_human_confirmed") is not True:
+                    errors.append({"id":rid,"error":f"cv_aanvulling_niet_handmatig_gecontroleerd:{ref}"})
     return errors
 
 def export_approved_records(records: list[dict], project_dir: Path, output_dir: Path):
@@ -114,6 +132,10 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         for ref in r.get("uitwerkbijlagen",[]):
             dest=_copy_source(project_dir,ref,exam_dir)
             appendix.append(f"examens/{dest.name}")
+        cv_amendments=[]
+        for ref in r.get("cv_amendment_pdfs",[]):
+            dest=_copy_source(project_dir,ref,exam_dir)
+            cv_amendments.append(f"examens/{dest.name}")
         if appendix: row["attachmentPdfs"]=appendix
         contexts.append({"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
                          "n":int(r["number"]),"page":int(r["source_page"]),
@@ -125,6 +147,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
             cv_name_snippet=(r.get("cv_snippet_files") or [r["cv_snippet_file"]])[0]
             shutil.copy2(project_dir/"snippets"/cv_name_snippet,snippet_dir/cv_name_snippet)
             cv_item={"id":r["id"],"question":int(r["number"]),"pdf":f"examens/{cv_target.name}","output":cv_name_snippet}
+            if cv_amendments: cv_item["amendment_pdfs"]=cv_amendments
             amendment=r.get("cv_amendment_snippet_file")
             if amendment:
                 shutil.copy2(project_dir/"snippets"/amendment,snippet_dir/amendment)
@@ -134,6 +157,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "cv_sha256":sha256(project_dir/"bronnen"/cv_name),
                          "snippet_sha256":[sha256(project_dir/"snippets"/name) for name in snippet_names],
                          "uitwerkbijlagen":[{"file":name,"sha256":sha256(output_dir/name)} for name in appendix],
+                         "cv_amendment_pdfs":[{"file":name,"sha256":sha256(output_dir/name)} for name in cv_amendments],
                          "human_approved":True})
     (output_dir/"exam-mcq.json").write_text(json.dumps(mcq,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-open.json").write_text(json.dumps(opened,ensure_ascii=False,indent=2),encoding="utf-8")
