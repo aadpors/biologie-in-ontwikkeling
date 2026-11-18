@@ -9,7 +9,8 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk\nfrom engine import analyze_pdf, detect_question_candidates, learn_decision
+from tkinter import filedialog, messagebox, ttk
+from engine import analyze_pdf, detect_question_candidates, learn_decision
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -321,7 +322,8 @@ class ExamApp:
                 f"{doc['type_zekerheid']:.0%}", doc["status"].replace("_", " ")
             ))
         count = len(self.data["documenten"])
-        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])\n        candidates = len(self.data.get("vraagkandidaten", []))
+        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])
+        candidates = len(self.data.get("vraagkandidaten", []))
         self.status.configure(text=f"{count} document(en) opgenomen · {candidates} vraagstartkandidaten · {todo} documentherkenningen vragen controle · publicatie geblokkeerd.")
 
 def main():
