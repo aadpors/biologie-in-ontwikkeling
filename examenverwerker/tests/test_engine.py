@@ -36,7 +36,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(regions[0]["status"],"voorstel_niet_goedgekeurd")
     def test_pdf_text_and_exact_crop(self):
         try:
-            import fitz
+            import pymupdf as fitz
         except ImportError:
             self.skipTest("PyMuPDF not installed")
         with tempfile.TemporaryDirectory() as d:
