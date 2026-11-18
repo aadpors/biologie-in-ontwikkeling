@@ -86,7 +86,8 @@ function onderwerpenVanVraag(q){
  const hits=new Set(),add=x=>hits.add(x);
  const manualQuestionTopics={
   "vw26t2-open-39":["Ecologie"],
-  "ha25t1-mcq-37":["Zenuwstelsel & oog"]
+  "ha25t1-mcq-37":["Zenuwstelsel & oog"],
+  "ha26t1-mcq-23":["Ecologie"]
  };
  (manualQuestionTopics[q.id]||[]).forEach(add);
  const exactTheme={
