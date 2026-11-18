@@ -35,7 +35,7 @@ def classify_document_role(filename: str, text: str):
 
 def infer_exam_metadata(filename: str):
     name=Path(filename).stem.lower()
-    m=re.search(r"(?:^|[-_])(ha|vw)[-_]1018[-_]a[-_](\d{2})[-_](\d+)[-_]([oc])(?:[-_]|$)",name)
+    m=re.search(r"(?:^|[-_])(ha|vw)[-_]1018[-_]a[-_](\d{2})[-_](\d+)[-_]([ocu])(?:[-_]|$)",name)
     if not m: m=re.search(r"(ha|vw)[-_]?(\d{2})t(\d+)",name)
     if not m: return {}
     return {"level":"Havo" if m.group(1)=="ha" else "Vwo","year":"20"+m.group(2),
