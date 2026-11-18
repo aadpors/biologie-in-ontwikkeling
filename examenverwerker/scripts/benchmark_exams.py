@@ -47,7 +47,7 @@ def main():
         if row["role"]=="opgaven":
             cv=row.get("cv_crosscheck")
             status=cv["status"] if cv else "geen gekoppeld CV"
-            print(f"{row[\"file\"]}: {row[\"candidate_count\"]} kandidaten; {status}")
+            print("{}: {} kandidaten; {}".format(row["file"],row["candidate_count"],status))
     for warning in warnings: print("WAARSCHUWING:",warning)
     for failure in failures: print("FOUT:",failure)
     if not rows: raise SystemExit("Geen examen-PDFs gevonden.")
