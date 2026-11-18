@@ -17,6 +17,8 @@ class ExportTests(unittest.TestCase):
             "snippet_file":"vraag1.png","cv_snippet_file":"cv1.jpg","question_text":"Beschrijf de relatie.",
             "source_match_human_confirmed":True,"cv_match_human_confirmed":True,
             "appendix_match_human_confirmed":True,"cv_amendment_match_human_confirmed":True,
+            "record_review_checklist":{"question_text":True,"question_type":True,"points":True,
+                "cv_alignment":True,"images_and_context":True,"appendices":True,"cv_addenda":True},
             "uitwerkbijlagen":["uitwerkbijlage.pdf"]
         }
         return project,record
