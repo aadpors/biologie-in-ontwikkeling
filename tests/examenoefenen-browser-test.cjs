@@ -30,8 +30,8 @@ const assert = require("node:assert/strict");
       "Havo 2025-I vraag 27: zowel context- als vraagafbeelding moeten zichtbaar zijn");
     const contextImageAudit = await page.evaluate(() => ({
       total: questions.length,
-      withImageContext: questions.filter(q => (q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\\.jpg$/i.test(q.images[0]))).length,
-      missingImageContext: questions.filter(q => !((q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\\.jpg$/i.test(q.images[0])))).map(q => q.id)
+      withImageContext: questions.filter(q => (q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\.jpg$/i.test(q.images[0]))).length,
+      missingImageContext: questions.filter(q => !((q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\.jpg$/i.test(q.images[0])))).map(q => q.id)
     }));
     assert.equal(contextImageAudit.total, 519);
     assert.deepEqual(contextImageAudit.missingImageContext, [],
