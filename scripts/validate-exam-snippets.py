@@ -53,6 +53,38 @@ for filename, label in DATASETS:
                 errors.append(f"{label} {qid}: een tussenafbeelding is geen contextafbeelding: {paths[:-1]}")
             if not any(("question" in paths[-1].lower() or "mcq-" in paths[-1].lower()) for _ in [0]):
                 errors.append(f"{label} {qid}: laatste afbeelding is geen vraagafbeelding: {paths[-1]}")
+        # Targeted visual regressions for known source-page boundary failures.
+        if (
+            filename in {"exam-open.json", "exam-contexts.json"}
+            and record.get("level") == "Havo"
+            and str(record.get("year")) == "2024"
+            and str(record.get("period")) == "1"
+            and int(record.get("n", 0)) == 3
+            and len(paths) >= 2
+        ):
+            question_image = ROOT / paths[-1]
+            with Image.open(question_image) as image:
+                gray = image.convert("L")
+                pixels = gray.load()
+                width, height = gray.size
+                for y in range(max(0, height - 12), height):
+                    if sum(1 for x in range(width) if pixels[x, y] < 235) >= width * 0.70:
+                        errors.append(f"{label} {qid}: horizontale paginascheidingslijn blijft aan de onderrand van de vraagafbeelding staan")
+                        break
+                gray.close()
+        visual_minimums = {
+            ("Havo", "2024", "1", 27): 500,
+            ("Vwo", "2025", "1", 11): 600,
+        }
+        visual_key = (record.get("level"), str(record.get("year")), str(record.get("period")), int(record.get("n", 0)))
+        if filename in {"exam-open.json", "exam-contexts.json"} and visual_key in visual_minimums and paths:
+            with Image.open(ROOT / paths[0]) as image:
+                if image.height < visual_minimums[visual_key]:
+                    errors.append(
+                        f"{label} {qid}: contextafbeelding lijkt een doorlopende figuur af te snijden "
+                        f"({image.height}px; verwacht minstens {visual_minimums[visual_key]}px)"
+                    )
+
         for rel in ([primary] if primary else []) + paths:
             path = ROOT / rel
             if not path.is_file():

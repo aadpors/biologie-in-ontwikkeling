@@ -265,15 +265,19 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
                 f"Could not find the end of the context for {prefix} question {number}: {end_anchor!r}"
             )
         # Exact final phrase is more reliable than inferred line ordering for
-        # the multi-question hippopotamus passage, whose text blocks share a
-        # page with several question markers.
-        # Crop exactly after the final phrase's glyph box. Adding PDF
-        # points here can capture the first pixels of the next paragraph
-        # (visible as dotted fragments in the stitched cards). Add white
-        # breathing room after rasterization instead of extending the PDF crop.
+        # the multi-question hippopotamus passage.
         context_bottom = min(
             bottom_limit,
             max(rect.y1 for rect in end_hits) + 1,
+        )
+    # If a diagram/photo begins in the context and extends below the printed
+    # question marker, retain the complete visual. Several exam figures cross
+    # that boundary (e.g. Havo 2024-I q27 and Vwo 2025-I q11); stopping at the
+    # marker silently removed the lower half of the figure.
+    if visual_rects:
+        context_bottom = min(
+            bottom_limit,
+            max(context_bottom, max(rect.y1 for rect in visual_rects) + 10),
         )
     # A very shallow fragment is not a usable context card. Let the
     # bounded page-local fallback preserve the preceding context instead.
@@ -315,6 +319,39 @@ def fallback_context_fragment(page, lines, prefix, number, question_top, previou
         scale=scale,
     )
     return [f"exam-snippets/{name}"]
+
+
+def trim_question_bottom_rule(path):
+    """Remove a full-width page separator accidentally captured below a prompt."""
+    with Image.open(path) as source:
+        image = source.convert("RGB")
+    gray = image.convert("L")
+    width, height = gray.size
+    pixels = gray.load()
+    first_rule = None
+    start = max(0, height - 16)
+    for y in range(start, height - 1):
+        dark = sum(1 for x in range(width) if pixels[x, y] < 235)
+        if dark >= width * 0.70:
+            # A true separator is a long, thin line with clear whitespace above
+            # it. Do not trim the lower edge of a diagram/table whose content
+            # reaches the same boundary.
+            previous = []
+            for py in range(max(0, y - 3), y):
+                previous.append(sum(1 for x in range(width) if pixels[x, py] < 235) / width)
+            if previous and max(previous) < 0.15:
+                first_rule = y
+                break
+    if first_rule is not None:
+        crop_bottom = max(1, first_rule - 1)
+        trimmed = image.crop((0, 0, width, crop_bottom))
+        result = Image.new("RGB", (width, crop_bottom + 4), "white")
+        result.paste(trimmed, (0, 0))
+        result.save(path, quality=94)
+        trimmed.close()
+        result.close()
+    gray.close()
+    image.close()
 
 
 def line_records(page):
@@ -870,6 +907,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                                 clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
                                 alpha=False,
                             ).save(OUT / question_name)
+                            trim_question_bottom_rule(OUT / question_name)
                             context_paths.append(f"exam-snippets/{question_name}")
                         if context_paths:
                             context_record["images"] = context_paths
