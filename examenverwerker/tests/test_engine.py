@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, link_context_assets
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -123,6 +123,28 @@ class EngineTests(unittest.TestCase):
         missing=detect_question_type("Kies het juiste antwoord.\nA. eerste optie\nC. derde optie")
         self.assertFalse(missing["options_complete"])
         self.assertEqual(missing["option_gaps"],["B"])
+
+    def test_context_assets_link_caption_to_nearby_pdf_image_and_vector(self):
+        analysis={"pages":[
+            {"page":1,"blocks":[
+                {"bbox":[40,300,300,320],"text":"Figuur 2","lines":[{"bbox":[40,300,100,320],"text":"Figuur 2"}]}
+            ],"visual_assets":[
+                {"id":"p1-image-1","kind":"image","bbox":[40,80,300,290]},
+                {"id":"p1-vector-1","kind":"vector_region","bbox":[320,90,500,280]}
+            ]},
+            {"page":2,"blocks":[],"visual_assets":[{"id":"p2-image-1","kind":"image","bbox":[40,40,300,250]}]}
+        ]}
+        refs=[{"kind":"figuur","number":"2","matched_text":"figuur 2"}]
+        linked=link_context_assets(analysis,refs,start_page=1,end_page=1)
+        self.assertEqual(linked[0]["link_status"],"caption_en_geometrie_gevonden")
+        self.assertEqual(linked[0]["caption_matches"][0]["page"],1)
+        self.assertEqual({x["asset_id"] for x in linked[0]["asset_candidates"]},{"p1-image-1","p1-vector-1"})
+        self.assertTrue(all(x["status"]=="visueel_controleren" for x in linked[0]["asset_candidates"]))
+
+    def test_unnumbered_context_reference_keeps_manual_review_without_guessing(self):
+        linked=link_context_assets({"pages":[]},[{"kind":"ongenummerde_verwijzing","number":None}],1,1)
+        self.assertEqual(linked[0]["link_status"],"geen_nummer_handmatige_koppeling")
+        self.assertEqual(linked[0]["asset_candidates"],[])
 
     def test_context_reference_detection(self):
         from engine import detect_context_references
