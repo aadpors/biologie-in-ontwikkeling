@@ -282,7 +282,7 @@ def render_havo_2025_i_q34():
         "exam-snippets/context-ha25t1-q33-complete.jpg",
         "exam-snippets/" + output,
     ]
-    context_path.write_text(json.dumps(context_records, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+    context_path.write_text(json.dumps(context_records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 render_havo_2025_i_q34()
