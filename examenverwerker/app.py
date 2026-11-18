@@ -299,7 +299,8 @@ class ExamApp:
         if not selected:
             messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een kandidaat.")
             return
-        row=rows[int(selected[0])]
+        candidate_index=int(selected[0])
+        row=rows[candidate_index]
         doc=next((d for d in self.data["documenten"] if d["id"]==row.get("document_id")),None)
         if not doc:
             messagebox.showerror("Bron ontbreekt","Het bijbehorende bronbestand is niet gevonden.")
@@ -315,7 +316,7 @@ class ExamApp:
                 return
             files=[]
             for idx,segment in enumerate(proposal["source_segments"],1):
-                name=f"voorstel-q{row['number']}-p{segment['page']}-deel{idx}.png"
+                name=f"voorstel-k{candidate_index+1}-q{row['number']}-p{segment['page']}-deel{idx}.png"
                 target=self.project_dir/"snippets"/name
                 render_crop(source,segment["page"],segment["bbox"],target,scale=1.8)
                 files.append(name)
