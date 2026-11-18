@@ -1,6 +1,16 @@
 name: Render exam snippets
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examens/*.pdf'
+      - 'scripts/render-exam-snippets.py'
+      - 'scripts/extract-mcq-questions.py'
+      - 'scripts/trim-question-image-edges.py'
+      - 'scripts/validate-exam-snippets.py'
+      - 'scripts/exam-snippets.json'
+      - '.github/workflows/render-exam-snippets.yml'
   push:
     branches: [main]
     paths:
@@ -41,9 +51,12 @@ jobs:
         run: python scripts/render-cv-snippets.py
       - name: Extract multiple-choice questions from all available exams
         run: python scripts/extract-mcq-questions.py
+      - name: Trim source-page separators below all question images
+        run: python scripts/trim-question-image-edges.py
       - name: Validate every generated question and image
         run: python scripts/validate-exam-snippets.py
       - name: Commit generated image snippets
+        if: github.event_name != 'pull_request'
         run: |
           if [[ -n "$(git status --porcelain exam-snippets exam-mcq.json exam-open.json exam-contexts.json)" ]]; then
             git config user.name "github-actions[bot]"
@@ -57,6 +70,7 @@ jobs:
             # outputboom over op de nieuwste main en maak daarop een nieuwe commit.
             generated_commit=$(git rev-parse HEAD)
             pushed=false
+            target_branch="${GITHUB_HEAD_REF:-main}"
             for attempt in 1 2 3 4 5; do
               git fetch origin main
               git reset --hard origin/main
@@ -68,7 +82,7 @@ jobs:
                 break
               fi
               git commit -m "Add original exam image snippets"
-              if git push origin HEAD:main; then
+              if git push origin "HEAD:$target_branch"; then
                 pushed=true
                 break
               fi
@@ -82,3 +96,9 @@ jobs:
           else
             echo "Exam snippets are already up to date."
           fi
+      - name: Upload generated snippets for visual QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: exam-snippets-qa
+          path: exam-snippets/
+          retention-days: 2

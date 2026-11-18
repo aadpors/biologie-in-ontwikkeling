@@ -114,7 +114,7 @@ OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
 
 # Extra room below every text-based crop so glyph descenders (g, j, p, q, y)
 # are never clipped by a tight PDF text bounding box.
-BOTTOM_TEXT_PADDING = 14
+BOTTOM_TEXT_PADDING = 0
 
 def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
     """Render a full-width crop and remove earlier question blocks without leaving blank bands."""
@@ -177,6 +177,17 @@ def footer_boundary(page, lines):
 
 def context_image_fragments(page, lines, indices, prefix, number, question_top, bottom_limit, previous_ranges=(), scale=1.8, end_anchor=None, start_anchor=None):
     """Render one complete, full-width context crop, preserving figures and tables."""
+    # Havo 2024-I questions 1–9 share the heart-valve introduction printed
+    # before question 1 on the preceding page. Question 3 starts on page 3,
+    # where the page-local detector cannot see that introduction. Reuse the
+    # already rendered original context image instead of manufacturing an
+    # almost-empty fallback crop from page 3.
+    if prefix == "ha24t1" and number == 3:
+        shared = OUT / "context-ha24t1-q1-complete.jpg"
+        if not shared.is_file():
+            raise RuntimeError("Shared Havo 2024-I heart-valve context for question 3 was not rendered")
+        return ["exam-snippets/context-ha24t1-q1-complete.jpg"]
+
     if start_anchor and end_anchor:
         start_hits = page.search_for(start_anchor)
         end_hits = page.search_for(end_anchor)
@@ -223,7 +234,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     if visual_rects:
         context_top = min(context_top, min(rect.y0 for rect in visual_rects))
 
-    context_top = max(0, context_top - 5)
+    context_top = max(0, context_top - 10)
     # End below the complete final context text line, not merely a fixed
     # distance above the next question marker. The latter clipped descenders
     # and the lower edge of the final line on tightly spaced exam pages.
@@ -241,7 +252,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
     context_bottom = min(
         bottom_limit,
         question_top - 1,
-        final_context_text_bottom + 12,
+        final_context_text_bottom + 18,
     )
     if prefix == "ha24t1" and number == 1:
         # The heart-valve diagram is placed below the "afbeelding 1" label.
@@ -254,15 +265,19 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
                 f"Could not find the end of the context for {prefix} question {number}: {end_anchor!r}"
             )
         # Exact final phrase is more reliable than inferred line ordering for
-        # the multi-question hippopotamus passage, whose text blocks share a
-        # page with several question markers.
-        # Crop exactly after the final phrase's glyph box. Adding PDF
-        # points here can capture the first pixels of the next paragraph
-        # (visible as dotted fragments in the stitched cards). Add white
-        # breathing room after rasterization instead of extending the PDF crop.
+        # the multi-question hippopotamus passage.
         context_bottom = min(
             bottom_limit,
             max(rect.y1 for rect in end_hits) + 1,
+        )
+    # If a diagram/photo begins in the context and extends below the printed
+    # question marker, retain the complete visual. Several exam figures cross
+    # that boundary (e.g. Havo 2024-I q27 and Vwo 2025-I q11); stopping at the
+    # marker silently removed the lower half of the figure.
+    if visual_rects:
+        context_bottom = min(
+            bottom_limit,
+            max(context_bottom, max(rect.y1 for rect in visual_rects) + 10),
         )
     # A very shallow fragment is not a usable context card. Let the
     # bounded page-local fallback preserve the preceding context instead.
@@ -290,7 +305,7 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
 
 def fallback_context_fragment(page, lines, prefix, number, question_top, previous_ranges=(), scale=1.8):
     """Keep preceding shared text/figures when semantic context-line detection finds no text."""
-    top = 25
+    top = 12
     bottom = min(question_top - 2, page.rect.height - 20)
     if bottom <= top + 2:
         return []
@@ -304,6 +319,39 @@ def fallback_context_fragment(page, lines, prefix, number, question_top, previou
         scale=scale,
     )
     return [f"exam-snippets/{name}"]
+
+
+def trim_question_bottom_rule(path):
+    """Remove a full-width page separator accidentally captured below a prompt."""
+    with Image.open(path) as source:
+        image = source.convert("RGB")
+    gray = image.convert("L")
+    width, height = gray.size
+    pixels = gray.load()
+    first_rule = None
+    start = max(0, height - 16)
+    for y in range(start, height - 1):
+        dark = sum(1 for x in range(width) if pixels[x, y] < 235)
+        if dark >= width * 0.70:
+            # A true separator is a long, thin line with clear whitespace above
+            # it. Do not trim the lower edge of a diagram/table whose content
+            # reaches the same boundary.
+            previous = []
+            for py in range(max(0, y - 3), y):
+                previous.append(sum(1 for x in range(width) if pixels[x, py] < 235) / width)
+            if previous and max(previous) < 0.15:
+                first_rule = y
+                break
+    if first_rule is not None:
+        crop_bottom = max(1, first_rule - 1)
+        trimmed = image.crop((0, 0, width, crop_bottom))
+        result = Image.new("RGB", (width, crop_bottom + 4), "white")
+        result.paste(trimmed, (0, 0))
+        result.save(path, quality=94)
+        trimmed.close()
+        result.close()
+    gray.close()
+    image.close()
 
 
 def line_records(page):
@@ -859,6 +907,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                                 clip=fitz.Rect(0, question_top, page.rect.width, question_y1),
                                 alpha=False,
                             ).save(OUT / question_name)
+                            trim_question_bottom_rule(OUT / question_name)
                             context_paths.append(f"exam-snippets/{question_name}")
                         if context_paths:
                             context_record["images"] = context_paths
@@ -877,7 +926,7 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                         intro_y0 = max(0, min(rect.y0 for rect in intro_hits) - 5)
                         inbreeding_y0 = max(0, min(rect.y0 for rect in inbreeding_hits) - 5)
                         inbreeding_y1 = min(page.rect.height, max(rect.y1 for rect in inbreeding_end_hits) + 8)
-                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)
+                        question_y1 = min(footer_y, lines[question_end_line]["bbox"][3] + max(BOTTOM_TEXT_PADDING, 4))
                         intro_name = "context-ha25t2-q9-intro.jpg"
                         inbreeding_name = "context-ha25t2-q9-inbreeding.jpg"
                         page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, intro_y0, page.rect.width, min(q7_y - 5, footer_y)), alpha=False).save(OUT / intro_name)
@@ -1232,6 +1281,12 @@ all_contexts = list(context_by_key.values())
 # display only the primary "image" field; previously that could show the question
 # crop while silently omitting its context images. Keep the separate "images"
 # array as well, but make the primary image a vertically stitched context+question.
+def trim_all_question_images():
+    """Apply the separator-edge cleanup to every generated question crop."""
+    for image_path in OUT.glob("question-*.jpg"):
+        trim_question_bottom_rule(image_path)
+
+
 def stitch_question_images(record, fallback_prefix):
     image_paths = record.get("images") or ([record["image"]] if record.get("image") else [])
     missing = [path for path in image_paths if not (ROOT / path).exists()]
@@ -1254,6 +1309,8 @@ def stitch_question_images(record, fallback_prefix):
     for image in opened:
         image.close()
 
+trim_all_question_images()
+
 # Apply the same context-first presentation to every MCQ and every selected
 # open-question context, rather than relying on the frontend to render arrays.
 for record in all_questions:
@@ -1265,6 +1322,10 @@ for record in all_contexts:
 for record in all_open_questions:
     if record.get("images"):
         stitch_question_images(record, "complete")
+
+# Some legacy full-question crops are emitted by the selected-fragment pass;
+# run a final cleanup after every source and composite image has been created.
+trim_all_question_images()
 
 # Context records retain their separate image list for clients that support it;
 # the primary image now always contains the full context followed by the question.
