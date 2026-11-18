@@ -549,8 +549,12 @@ def link_context_assets(analysis: dict, references: list[dict],
                 for block in page.get("blocks",[]):
                     bb=block.get("bbox",[0,0,0,0])
                     by=(float(bb[1])+float(bb[3]))/2
-                    if float(bb[1]) >= float(cb[1]) and by > cy:
-                        following.append((float(bb[1])-cy,block))
+                    block_text=str(block.get("text","")).strip()
+                    begins_after_caption=float(bb[1]) >= float(cb[1])
+                    contains_caption=float(bb[1]) <= float(cb[1]) < float(bb[3])
+                    is_caption_only=block_text.casefold()==str(caption["text"]).casefold()
+                    if by > cy and (begins_after_caption or (contains_caption and not is_caption_only)):
+                        following.append((max(0.0,float(bb[1])-cy),block))
                 for distance,block in sorted(following,key=lambda x:x[0])[:8]:
                     text_region_candidates.append({
                         "page":caption["page"],"bbox":block.get("bbox"),
