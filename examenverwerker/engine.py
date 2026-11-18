@@ -343,17 +343,25 @@ def detect_question_type(text: str) -> dict:
     value = str(text or "")
     options = []
     for line in value.splitlines():
-        match = re.match(r"^\s*([A-H])[.)]\s+(.+)$", line)
+        match = re.match(r"^\s*(?:\(([A-H])\)|([A-H])[.):])\s+(.+)$", line)
         if match:
-            options.append({"label": match.group(1), "text": match.group(2).strip()})
+            label = match.group(1) or match.group(2)
+            option_text = match.group(3).strip()
+            if option_text:
+                options.append({"label": label, "text": option_text})
     lowered = value.lower()
     if options:
         labels = [x["label"] for x in options]
-        expected = list("ABCDEFGH"[:len(labels)])
-        complete = labels == expected
+        last_index = max("ABCDEFGH".index(x) for x in labels)
+        expected = list("ABCDEFGH"[:last_index + 1])
+        gaps = [label for label in expected if label not in labels]
+        duplicates = sorted({label for label in labels if labels.count(label) > 1})
+        complete = not gaps and not duplicates and len(options) >= 2
         return {"type": "meerkeuze", "subtype": "enkelvoudige_keuze",
                 "options": options, "option_labels": labels,
-                "options_complete": complete, "confidence": 0.85 if complete and len(options) >= 2 else 0.55,
+                "options_complete": complete, "option_gaps": gaps,
+                "duplicate_option_labels": duplicates,
+                "confidence": 0.85 if complete else 0.55,
                 "status": "controle_nodig"}
     if re.search(r"\b(juist|onjuist|waar|niet waar)\b", lowered) and re.search(r"\b(stelling|uitspraken|bewering)\b", lowered):
         qtype, subtype, confidence = "juist_onjuist", "stellingbeoordeling", 0.65
@@ -362,4 +370,5 @@ def detect_question_type(text: str) -> dict:
     else:
         qtype, subtype, confidence = "open", "open_vraag", 0.55
     return {"type": qtype, "subtype": subtype, "options": [], "option_labels": [],
-            "options_complete": None, "confidence": confidence, "status": "controle_nodig"}
+            "options_complete": None, "option_gaps": [], "duplicate_option_labels": [],
+            "confidence": confidence, "status": "controle_nodig"}
