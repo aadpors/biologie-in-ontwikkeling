@@ -101,15 +101,23 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
             next_text=page_lines[idx+1]["text"].strip() if idx+1<len(page_lines) else ""
             if standalone and not next_text and page.get("height") and line["bbox"][1] >= page["height"]*0.78 and next_page_lines:
                 next_text=next_page_lines[0]["text"].strip()
-            if standalone and (not next_text or re.match(r"^[A-D][.)]",next_text)):
+            if standalone and (not next_text or re.match(r"^[A-H][.)]?$",next_text)):
                 continue
             if re.match(r"^\d{1,2}[.)]\s+(?:januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)\b",value,re.I):
                 continue
             probe=value+" "+next_text
-            confidence=0.40
-            if re.search(r"\b(verklaar|beschrijf|noem|geef|welke|wat|waarom|bereken|noteer|leg|toon)\b",probe,re.I):
-                confidence=0.68
-            if m and len(value)>16: confidence=max(confidence,0.66)
+            point_marker=bool(re.fullmatch(r"\d{1,2}\s*p",next_text,re.I))
+            question_cue=bool(re.search(r"\b(verklaar|beschrijf|noem|geef|welke|wat|waarom|bereken|noteer|leg|toon|gebruik|kies|bepaal|licht toe|beargumenteer|leid af|selecteer)\b",probe,re.I))
+            # A bare number is not enough: text line numbers and table cells are common
+            # in biology exams. Keep a standalone number only with a scoring marker
+            # or a recognisable instruction/question cue in the adjacent text.
+            if standalone and not point_marker and not question_cue:
+                continue
+            # Numbered prose lines (e.g. line-numbered source texts) are not questions
+            # unless the line itself contains a question/instruction or a score marker.
+            if m and not point_marker and not question_cue:
+                continue
+            confidence=0.95 if point_marker else (0.78 if question_cue else 0.40)
             if standalone and idx==len(page_lines)-1 and next_text:
                 confidence=min(confidence,0.55)
             found.append({"number":n,"page":page["page"],"bbox":line["bbox"],
