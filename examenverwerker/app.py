@@ -137,6 +137,7 @@ class ExamApp:
         foot.pack(fill="x", pady=(10, 0))
         ttk.Button(foot, text="Document bekijken", command=self.show_document).pack(side="left")
         ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)\n        ttk.Button(foot, text="Vraagstarts analyseren", command=self.analyze_questions, style="Accent.TButton").pack(side="left", padx=6)\n        ttk.Button(foot, text="Kandidaten bekijken", command=self.show_candidates).pack(side="left")
+        ttk.Button(foot, text="Examengegevens controleren", command=self.edit_exam_metadata).pack(side="left", padx=6)
         ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
         self.log = tk.Text(body, height=6, wrap="word", font=("Consolas", 9), background="#f5f7f7", relief="flat")
         self.log.pack(fill="x", pady=(12, 0))
@@ -228,6 +229,32 @@ class ExamApp:
         self.save_project()
         self.refresh()
         self.status.configure(text=f"{added} PDF('s) toegevoegd. Controleer de voorgestelde documenttypen.")
+
+    def edit_exam_metadata(self):
+        if not self.data:
+            messagebox.showinfo("Eerst een project","Open eerst een examenproject.")
+            return
+        current=self.data.get("exam_metadata",{})
+        win=tk.Toplevel(self.root); win.title("Examengegevens controleren"); win.transient(self.root); win.grab_set()
+        frame=ttk.Frame(win,padding=18); frame.pack(fill="both",expand=True)
+        ttk.Label(frame,text="Controleer de gegevens die uit de bestandsnaam zijn afgeleid.",wraplength=420).grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,12))
+        ttk.Label(frame,text="Niveau").grid(row=1,column=0,sticky="w",pady=5)
+        level=tk.StringVar(value=current.get("level","Havo"))
+        ttk.Combobox(frame,textvariable=level,values=["Havo","Vwo"],state="readonly",width=18).grid(row=1,column=1,sticky="ew",pady=5)
+        ttk.Label(frame,text="Jaar").grid(row=2,column=0,sticky="w",pady=5)
+        year=tk.StringVar(value=str(current.get("year","2026")))
+        ttk.Entry(frame,textvariable=year,width=20).grid(row=2,column=1,sticky="ew",pady=5)
+        ttk.Label(frame,text="Tijdvak").grid(row=3,column=0,sticky="w",pady=5)
+        period=tk.StringVar(value=str(current.get("period","1")))
+        ttk.Combobox(frame,textvariable=period,values=["1","2","3"],state="readonly",width=18).grid(row=3,column=1,sticky="ew",pady=5)
+        def save():
+            if not re.fullmatch(r"20\d{2}",year.get().strip()):
+                messagebox.showerror("Ongeldig jaar","Vul een jaartal van vier cijfers in.",parent=win); return
+            self.data["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),"confidence":1.0,"source":"handmatig_bevestigd"}
+            self.save_project(); self._log(f"Examenmetadata bevestigd: {level.get()} {year.get()} tijdvak {period.get()}.")
+            win.destroy()
+        ttk.Button(frame,text="Gegevens opslaan",command=save).grid(row=4,column=0,columnspan=2,sticky="ew",pady=(14,0))
+        frame.columnconfigure(1,weight=1)
 
     def analyze_questions(self):
         if not self.data:
