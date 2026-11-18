@@ -798,16 +798,18 @@ class ExamApp:
             context_files=[]
             seen_assets=set()
             for ref_index,ref in enumerate(proposal.get("context_candidates",[]),1):
-                for asset in ref.get("asset_candidates",[])[:4]:
-                    asset_id=asset.get("asset_id")
-                    if not asset_id or asset_id in seen_assets or not asset.get("bbox"):
+                context_candidates=list(ref.get("asset_candidates",[])[:4])+list(ref.get("text_region_candidates",[])[:6])
+                for asset_index,asset in enumerate(context_candidates,1):
+                    asset_id=asset.get("asset_id") or f"text-p{asset.get('page')}-{ref_index}-{asset_index}"
+                    if asset_id in seen_assets or not asset.get("bbox"):
                         continue
                     seen_assets.add(asset_id)
                     name=f"contextvoorstel-k{candidate_index+1}-q{row['number']}-{asset_id}.png"
                     target=self.project_dir/"snippets"/name
                     render_crop(source,int(asset["page"]),asset["bbox"],target,scale=1.8)
                     context_files.append({"file":name,"page":asset["page"],"caption":asset.get("caption"),
-                                          "asset_id":asset_id,"status":"handmatige_controle_verplicht"})
+                                          "asset_id":asset_id,"asset_kind":asset.get("asset_kind","source_text"),
+                                          "status":"handmatige_controle_verplicht"})
             row["context_asset_proposal_files"]=context_files
             self.save_project()
             win=tk.Toplevel(parent); win.title(f"Voorlopig fragment vraag {row['number']}"); win.geometry("900x800")
@@ -818,7 +820,8 @@ class ExamApp:
             for ref in refs:
                 captions=", ".join(f"p. {x['page']}: {x['text']}" for x in ref.get("caption_matches",[])) or "geen bijschrift gevonden"
                 assets=len(ref.get("asset_candidates",[]))
-                ref_summaries.append(f"{ref.get('kind')} {ref.get('number') or ''}: {captions}; {assets} mogelijke beeldregio('s'); status: {ref.get('link_status')}")
+                text_regions=len(ref.get("text_region_candidates",[]))
+                ref_summaries.append(f"{ref.get('kind')} {ref.get('number') or ''}: {captions}; {assets} mogelijke beeldregio('s), {text_regions} tekstregio('s); status: {ref.get('link_status')}")
             ref_text="Mogelijke contextverwijzingen (alleen suggesties): "+("; ".join(ref_summaries) if ref_summaries else "geen automatische verwijzing gevonden")
             ttk.Label(win,text=ref_text,wraplength=860,padding=8).pack(fill="x")
             text_box=tk.Text(win,height=5,wrap="word",font=("Segoe UI",9))
