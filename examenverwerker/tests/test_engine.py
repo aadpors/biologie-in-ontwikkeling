@@ -27,9 +27,9 @@ class EngineTests(unittest.TestCase):
         self.assertEqual([x["number"] for x in got],[1,1])
         self.assertTrue(all(x["status"]=="controle_nodig" for x in got))
     def test_cv_question_anchors_recognise_official_maximumscore_rows(self):
-        a={"pages":[{"page":1,"text":"Vraag Antwoord Scores\n1 maximumscore 2\n1 (allel) g\n2 maximumscore 1\n2 juiste uitleg","blocks":[]} ]}
+        a={"pages":[{"page":1,"text":"Vraag Antwoord Scores\n1 maximumscore 2\n1 (allel) g\n2 B 1\n3 maximumscore 1\n3 juiste uitleg","blocks":[]} ]}
         got=detect_cv_question_numbers(a)
-        self.assertEqual([x["number"] for x in got],[1,2])
+        self.assertEqual([x["number"] for x in got],[1,2,3])
 
     def test_question_candidates_recognise_welk_prompt(self):
         a={"pages":[{"page":1,"blocks":[{"bbox":[0,0,300,100],"lines":[
