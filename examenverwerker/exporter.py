@@ -29,8 +29,18 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             errors.append({"id":rid,"error":"niet_menselijk_goedgekeurd"})
         if r.get("status") not in ("goedgekeurd","approved"):
             errors.append({"id":rid,"error":"status_niet_goedgekeurd"})
-        if not r.get("exam",{}).get("level") or not r.get("exam",{}).get("year") or not r.get("exam",{}).get("period"):
-            errors.append({"id":rid,"error":"examenmetadata_onvolledig"})
+        meta=r.get("exam",{})
+        for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
+            if meta.get(field) in (None,""):
+                errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
+        if meta.get("questionType") not in ("mcq","open"):
+            errors.append({"id":rid,"error":"vraagtype_onbekend"})
+        if not r.get("id"):
+            errors.append({"id":rid,"error":"id_ontbreekt"})
+        if r.get("number") is None or r.get("source_page") is None:
+            errors.append({"id":rid,"error":"vraagnummer_of_bronpagina_ontbreekt"})
+        if meta.get("questionType")=="mcq" and (not r.get("options") or not r.get("correct")):
+            errors.append({"id":rid,"error":"meerkeuzeopties_of_correct_antwoord_ontbreekt"})
         if not r.get("source_pdf") or not (project_dir/"bronnen"/r["source_pdf"]).is_file():
             errors.append({"id":rid,"error":"opgavenbron_ontbreekt"})
         if not r.get("cv_pdf") or not (project_dir/"bronnen"/r["cv_pdf"]).is_file():
