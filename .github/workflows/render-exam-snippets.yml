@@ -6,6 +6,8 @@ on:
     paths:
       - 'examens/*.pdf'
       - 'scripts/render-exam-snippets.py'
+      - 'scripts/render-cv-snippets.py'
+      - 'scripts/cv-snippets.json'
       - 'scripts/extract-mcq-questions.py'
       - 'scripts/trim-question-image-edges.py'
       - 'scripts/validate-exam-snippets.py'
