@@ -50,7 +50,7 @@ def main():
             status=cv["status"] if cv else "geen gekoppeld CV"
             print("{}: {} kandidaten; {}".format(row["file"],row["candidate_count"],status))
             for candidate in row.get("candidate_details",[]):
-                print("  n{} p{} y={:.1f} c={:.2f} {}".format(candidate["number"],candidate["page"],candidate["bbox"][1],candidate["confidence"],candidate["line"][:100]))
+                print("  n{} p{} y={:.1f} c={:.2f} {} | volgende: {}".format(candidate["number"],candidate["page"],candidate["bbox"][1],candidate["confidence"],candidate["line"][:80],candidate.get("next_line","")[:100]))
             if cv:
                 print("  alleen opgaven: {}; alleen CV: {}".format(cv["ontbreekt_in_cv"],cv["ontbreekt_in_opgaven"]))
     for warning in warnings: print("WAARSCHUWING:",warning)
