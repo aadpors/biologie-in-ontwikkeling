@@ -53,6 +53,15 @@ class ExportTests(unittest.TestCase):
             errors=validate_review_records([record],project)
             self.assertIn("correctievoorschrift_past_niet_bij_examen",[x["error"] for x in errors])
 
+    def test_appendix_from_another_exam_is_blocked(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            wrong="ha-1018-a-26-2-u.pdf"
+            (project/"bronnen"/wrong).write_bytes(b"wrong period appendix")
+            record["uitwerkbijlagen"]=[wrong]
+            errors=validate_review_records([record],project)
+            self.assertIn("uitwerkbijlage_past_niet_bij_examen:"+wrong,[x["error"] for x in errors])
+
     def test_mcq_duplicate_or_empty_options_are_blocked(self):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
