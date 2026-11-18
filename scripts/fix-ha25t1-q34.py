@@ -50,14 +50,15 @@ def main():
             scored_next.extend(question_marker_words(page, number))
         below = [word for word in scored_next if word[1] > marker[1] + 12]
         bottom = min((word[1] - 2 for word in below), default=page.rect.height - 25)
-        top = max(0, marker[1] - 4)
+        top = max(0, marker[1] - 34)
         if bottom <= top + 10:
             raise ValueError(f"Havo 2025-I q34: invalid crop bounds top={top}, bottom={bottom}")
         pix = page.get_pixmap(matrix=fitz.Matrix(1.8, 1.8), clip=fitz.Rect(0, top, page.rect.width, bottom), alpha=False)
         pix.save(OUT / "question-ha25t1-34-only.jpg")
         crop_text = page.get_text("text", clip=fitz.Rect(0, top, page.rect.width, bottom))
-        if "Beschrijf hoe evolutie" not in crop_text:
-            raise ValueError("Havo 2025-I q34: own question text is missing from crop")
+        normalized_crop_text = " ".join(crop_text.split())
+        if "De onderzoekers vermoeden dat de grotere milt" not in normalized_crop_text or "Beschrijf hoe evolutie" not in normalized_crop_text:
+            raise ValueError("Havo 2025-I q34: one or more question lines are missing from crop")
         if "Hieronder staan uitspraken" in crop_text or "mutante allel" in crop_text:
             raise ValueError("Havo 2025-I q34: q33 text leaked into q34 crop")
         print(f"Rendered and text-checked q34 crop from page {page_index + 1}")
