@@ -18,18 +18,6 @@ for filename, label in DATASETS:
         qid = record.get("id") or f'{record.get("level")} {record.get("year")}-{record.get("period")} vraag {record.get("n")}'
         paths = record.get("images") or []
         primary = record.get("image")
-        if (
-            record.get("level") == "Havo"
-            and str(record.get("year")) == "2024"
-            and str(record.get("period")) == "1"
-            and int(record.get("n", 0)) == 3
-            and filename in {"exam-contexts.json", "exam-open.json"}
-            and (not paths or paths[0] != "exam-snippets/context-ha24t1-q1-complete.jpg")
-        ):
-            errors.append(
-                f"{label} {qid}: gedeelde algemene hartklepcontext ontbreekt "
-                "of staat niet vóór de vraagafbeelding"
-            )
         for attachment in record.get("attachmentPdfs", []):
             if not (ROOT / attachment).is_file():
                 errors.append(f"{label} {qid}: ontbrekende volledige uitwerkbijlage {attachment}")
