@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 py -3.12 -m pip install -r requirements.txt || goto :error
-py -3.12 -m PyInstaller --noconfirm --clean --windowed --name BiologieExamenverwerker --onedir --collect-all fitz app.py || goto :error
+py -3.12 -m PyInstaller --noconfirm --clean --windowed --name BiologieExamenverwerker --onedir --collect-all pymupdf app.py || goto :error
 copy /Y START.bat dist\BiologieExamenverwerker\START.bat >nul
 echo.
 echo Portable programma staat in: %CD%\dist\BiologieExamenverwerker
