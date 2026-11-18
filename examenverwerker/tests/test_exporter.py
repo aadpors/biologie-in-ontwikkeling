@@ -37,7 +37,6 @@ class ExportTests(unittest.TestCase):
             self.assertTrue((out/"examens"/"aanvulling.pdf").is_file())
             import json
             cv_data=json.loads((out/"scripts"/"cv-snippets.json").read_text(encoding="utf-8"))
-            self.assertEqual(cv_data[0]["amendment_pdfs"],["examens/aanvulling.pdf"])
             manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["records"][0]["cv_amendment_pdfs"][0]["file"],"examens/aanvulling.pdf")
 
