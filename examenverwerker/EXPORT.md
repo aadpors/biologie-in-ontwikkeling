@@ -1,6 +1,6 @@
 # Veilige website-export
 
-De exporter schrijft uitsluitend naar een nieuwe, lege uitvoermap. Hij overschrijft nooit de live website, bestaande JSON of eerdere export.
+De exporter sluit aan op het bestaande contract dat \`examenoefenen.html\` gebruikt.
 
 ## Publicatiepoort
 Een record wordt alleen geëxporteerd wanneer:
@@ -8,15 +8,20 @@ Een record wordt alleen geëxporteerd wanneer:
 - status op goedgekeurd staat;
 - examenmetadata compleet is;
 - opgaven-PDF en correctievoorschrift aanwezig zijn;
-- een snippetbestand aanwezig is;
+- de vraag- en contextsnippets bestaan;
+- bij open vragen een CV-snippet bestaat (de huidige website verwacht één primaire CV-afbeelding en eventueel één aanvulling);
 - vraagtekst compleet is;
 - eventuele uitwerkbijlagen aanwezig zijn.
 
 ## Resultaat
-- `exam-mcq.json`
-- `exam-open.json`
-- `examens/` met originele opgaven, correctievoorschriften en volledige uitwerkbijlagen
-- `exam-snippets/` met goedgekeurde PDF-renders
-- `manifest.json` met hashes en goedkeuringsherkomst
+- \`exam-mcq.json\`
+- \`exam-open.json\`
+- \`exam-contexts.json\`
+- \`scripts/cv-snippets.json\`
+- \`examens/\` met originele opgaven, correctievoorschriften en volledige uitwerkbijlagen
+- \`exam-snippets/\` met goedgekeurde PDF-renders
+- \`manifest.json\` met bronhashes en menselijke goedkeuring
 
-De volledige uitwerkbijlage wordt fysiek in het exportpakket opgenomen. De bestaande website kent nog geen bevestigd veld voor een afzonderlijke uitwerkbijlage-link; daarom wordt geen onbekend JSON-veld stilzwijgend in de productiegegevens geschreven. De uiteindelijke websitekoppeling moet eerst worden gecontroleerd en getest.
+De exporter gebruikt het bestaande veld \`attachmentPdfs\` voor volledige uitwerkbijlagen. De huidige website toont die als afzonderlijke PDF-links bij de vraag. Er wordt geen onbekend veld toegevoegd.
+
+De uitvoermap moet nieuw of leeg zijn. De exporter overschrijft nooit bestaande bestanden en publiceert nooit rechtstreeks naar de live website.
