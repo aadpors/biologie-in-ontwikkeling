@@ -377,7 +377,7 @@ class ExamApp:
             refs=row.get("context_verwijzingen",[])
             ref_lines=[f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
             ttk.Label(detail,text="Mogelijke verwijzingen naar contextmateriaal:",padding=(10,4)).pack(anchor="w")
-            ttk.Label(detail,text="\\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
+            ttk.Label(detail,text="\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
             ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
         ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
