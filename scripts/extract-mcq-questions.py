@@ -114,7 +114,7 @@ OPTION_RE = re.compile(r"^\s*([A-F])(?:\s+(.+))?\s*$")
 
 # Extra room below every text-based crop so glyph descenders (g, j, p, q, y)
 # are never clipped by a tight PDF text bounding box.
-BOTTOM_TEXT_PADDING = 2
+BOTTOM_TEXT_PADDING = 4
 
 def save_page_crop(page, rect, output, lines, excluded_ranges=(), scale=1.8):
     """Render a full-width crop and remove earlier question blocks without leaving blank bands."""
