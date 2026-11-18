@@ -70,8 +70,45 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
             if lines:
                 blocks.append({"bbox":block.get("bbox",[0,0,0,0]),
                                "text":"\n".join(x["text"] for x in lines),"lines":lines})
+        visual_assets = []
+        image_index = 0
+        vector_index = 0
+        for raw_block in raw.get("blocks", []):
+            if raw_block.get("type") == 1 and raw_block.get("bbox"):
+                image_index += 1
+                visual_assets.append({
+                    "id": f"p{i+1}-image-{image_index}", "kind": "image",
+                    "bbox": [round(float(v), 2) for v in raw_block["bbox"]],
+                    "width": int(raw_block.get("width", 0) or 0),
+                    "height": int(raw_block.get("height", 0) or 0),
+                    "extension": str(raw_block.get("ext", "")),
+                    "xref": int(raw_block.get("xref", 0) or 0)
+                })
+        # Vector-based figures and tables do not appear as image blocks.
+        # Keep only substantial drawing bounds; tiny paths are usually glyphs
+        # or decorative lines and would create thousands of noisy candidates.
+        page_area = float(page.rect.width * page.rect.height) or 1.0
+        try:
+            for drawing in page.get_drawings():
+                rect = drawing.get("rect")
+                if not rect:
+                    continue
+                area = max(0.0, float(rect.width) * float(rect.height))
+                if area / page_area < 0.012 or area / page_area > 0.92:
+                    continue
+                vector_index += 1
+                visual_assets.append({
+                    "id": f"p{i+1}-vector-{vector_index}", "kind": "vector_region",
+                    "bbox": [round(float(v), 2) for v in rect],
+                    "drawing_type": str(drawing.get("type", "s"))
+                })
+        except Exception:
+            # Some malformed PDFs expose unsupported drawing commands.
+            # Text and raster inventory should still remain usable.
+            pass
         pages.append({"page":i+1,"width":page.rect.width,"height":page.rect.height,
-                      "text":page.get_text("text",sort=True),"blocks":blocks})
+                      "text":page.get_text("text",sort=True),"blocks":blocks,
+                      "visual_assets": visual_assets})
     meta=doc.metadata or {}
     doc.close()
     return {"file":path.name,"sha256":digest_file(path),"page_count":len(pages),"metadata":meta,"pages":pages}
@@ -336,10 +373,12 @@ def propose_question_regions(analysis: dict, candidates: list[dict]) -> list[dic
             continue
         question_text = extract_candidate_text(analysis, candidate, next_candidate)
         context_refs = detect_context_references(question_text)
+        linked_context = link_context_assets(analysis, context_refs, start_page, end_page)
         proposals.append({
             "number": int(candidate["number"]), "start_page": start_page,
             "end_page": end_page, "source_segments": segments,
-            "text_proposal": question_text, "context_candidates": context_refs,
+            "text_proposal": question_text, "context_candidates": linked_context,
+            "context_assets_require_manual_review": True,
             "status": "voorstel_niet_goedgekeurd",
             "warning": "Automatische paginagrenzen en contextverwijzingen zijn indicatief. Controleer vraagtekst, figuren, tabellen, bijschriften en eventuele doorloop handmatig."
         })
@@ -374,6 +413,90 @@ def extract_candidate_text(analysis: dict, candidate: dict, next_candidate: dict
     collected.sort(key=lambda item: (item[0], item[1]))
     return "\n".join(item[2] for item in collected)
 
+
+
+def link_context_assets(analysis: dict, references: list[dict],
+                       start_page: int | None = None,
+                       end_page: int | None = None) -> list[dict]:
+    """Find reviewable image/vector candidates for explicit figure/table references.
+
+    This is deliberately a candidate linker, not an automatic semantic match.
+    It uses caption text and PDF geometry, and preserves ambiguity for review.
+    """
+    pages = analysis.get("pages", [])
+    page_map = {int(p.get("page", 0)): p for p in pages}
+    caption_re = re.compile(
+        r"^\\s*(figuur|afbeelding|foto|illustratie|tabel|grafiek|diagram|schema)\\s*([0-9]{1,2}|[A-Z])\\b",
+        re.I
+    )
+    kind_map = {
+        "figuur": "figuur", "afbeelding": "afbeelding", "foto": "afbeelding",
+        "illustratie": "afbeelding", "tabel": "tabel", "grafiek": "grafiek",
+        "diagram": "grafiek", "schema": "grafiek"
+    }
+    results = []
+    for ref in references:
+        kind = ref.get("kind")
+        number = str(ref.get("number") or "").upper()
+        if not number or kind == "ongenummerde_verwijzing":
+            results.append({**ref, "caption_matches": [], "asset_candidates": [],
+                            "link_status": "geen_nummer_handmatige_koppeling"})
+            continue
+        captions = []
+        for page in pages:
+            page_no = int(page.get("page", 0))
+            for block in page.get("blocks", []):
+                lines = block.get("lines") or [{"bbox": block.get("bbox", [0,0,0,0]), "text": x}
+                                               for x in str(block.get("text", "")).splitlines()]
+                for line in lines:
+                    text = str(line.get("text", "")).strip()
+                    match = caption_re.match(text)
+                    if not match:
+                        continue
+                    caption_kind = kind_map.get(match.group(1).lower())
+                    if caption_kind == kind and match.group(2).upper() == number:
+                        captions.append({"page": page_no, "text": text,
+                                         "bbox": line.get("bbox", block.get("bbox", [0,0,0,0]))})
+        asset_candidates = []
+        for caption in captions:
+            page = page_map.get(caption["page"], {})
+            cb = caption["bbox"]
+            cy = (float(cb[1]) + float(cb[3])) / 2
+            ranked = []
+            for asset in page.get("visual_assets", []):
+                ab = asset.get("bbox", [0,0,0,0])
+                ay = (float(ab[1]) + float(ab[3])) / 2
+                # Captions can be either above or below the associated figure.
+                distance = abs(ay - cy)
+                if distance <= 220:
+                    ranked.append((distance, asset))
+            for distance, asset in sorted(ranked, key=lambda x: x[0])[:8]:
+                asset_candidates.append({
+                    "page": caption["page"], "asset_id": asset["id"],
+                    "asset_kind": asset["kind"], "bbox": asset["bbox"],
+                    "caption": caption["text"], "distance_to_caption": round(distance, 1),
+                    "status": "visueel_controleren"
+                })
+        if not captions and start_page is not None:
+            lo = max(1, int(start_page) - 1)
+            hi = int(end_page or start_page) + 1
+            for page_no in range(lo, hi + 1):
+                page = page_map.get(page_no, {})
+                for asset in page.get("visual_assets", []):
+                    asset_candidates.append({
+                        "page": page_no, "asset_id": asset["id"],
+                        "asset_kind": asset["kind"], "bbox": asset["bbox"],
+                        "caption": None, "distance_to_caption": None,
+                        "status": "nabijgelegen_mogelijkheid_handmatig_controleren"
+                    })
+        results.append({
+            **ref, "caption_matches": captions,
+            "asset_candidates": asset_candidates,
+            "link_status": "caption_en_geometrie_gevonden" if captions and asset_candidates
+                           else "caption_gevonden_geen_asset" if captions
+                           else "geen_caption_gevonden_handmatige_koppeling"
+        })
+    return results
 
 
 def detect_context_references(text: str) -> list[dict]:
