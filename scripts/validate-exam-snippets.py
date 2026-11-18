@@ -251,14 +251,14 @@ elif "Uit onderzoek bij zeehonden" not in q27.get("source", "") or "De Bajau" in
 # The question-specific statement lists must be moved out of shared context
 # and remain attached to the question text and question image.
 q23 = mcq_by_id.get("ha26t1-mcq-23")
-if not q23 or "Hieronder staan uitspraken over de vergelijking" not in q23.get("q", ""):
-    errors.append("Havo 2026-I vraag 23: uitspraken ontbreken bij de vraagtekst")
-elif "Hieronder staan uitspraken over de vergelijking" in q23.get("source", ""):
+if not q23 or q23.get("q", "").strip() != "Welke uitspraak is juist?":
+    errors.append("Havo 2026-I vraag 23: vraagprompt ontbreekt")
+if q23 and "Hieronder staan uitspraken over de vergelijking" in q23.get("source", ""):
     errors.append("Havo 2026-I vraag 23: vraaguitspraken staan nog in de algemene context")
 if not q23 or len(q23.get("images", [])) < 2 or q23["images"][-1] != "exam-snippets/question-ha26t1-23-only.jpg":
     errors.append("Havo 2026-I vraag 23: aparte vraaguitsnede ontbreekt")
 else:
-    audit_crop_height(q23["images"][-1], 150, "Havo 2026-I vraag 23: inleiding en twee uitspraken")
+    audit_crop_height(q23["images"][-1], 200, "Havo 2026-I vraag 23: inleiding en twee uitspraken")
 
 q2 = open_by_id.get("vw24t2-open-2")
 if not q2 or "Over het cladogram worden de volgende uitspraken gedaan" not in q2.get("q", ""):
