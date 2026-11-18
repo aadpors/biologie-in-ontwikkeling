@@ -680,6 +680,23 @@ class ExamApp:
         cv_snippet=record.get("cv_snippet_file")
         if cv_snippet:
             preview_specs.append(("CV-fragmentvoorstel",self.project_dir/"snippets"/cv_snippet,None,None))
+        else:
+            # MCQ records do not require a website CV image, but the reviewer
+            # must still see the official answer-key region before approval.
+            cv_path=self.project_dir/"bronnen"/str(record.get("cv_pdf",""))
+            if cv_path.is_file():
+                try:
+                    cv_analysis=analyze_pdf(cv_path)
+                    cv_anchors=[x for x in detect_cv_question_numbers(cv_analysis) if int(x["number"])==int(record.get("number",0))]
+                    cv_proposals=propose_question_regions(cv_analysis,detect_cv_question_numbers(cv_analysis))
+                    for cv_index,anchor in enumerate(cv_anchors,1):
+                        proposal=next((p for p in cv_proposals if p["number"]==int(record["number"]) and p["start_page"]==int(anchor["page"])),None)
+                        if proposal:
+                            target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-cv-{cv_index}.png"
+                            render_composite_crops(cv_path,proposal["source_segments"],target,scale=1.0)
+                            preview_specs.append((f"Origineel CV · vraag {record['number']} · anker pagina {anchor['page']}",target,None,None))
+                except Exception as exc:
+                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
         for idx,name in enumerate(record.get("snippet_files") or ([record["snippet_file"]] if record.get("snippet_file") else []),1):
             preview_specs.append((f"Vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
         for idx,name in enumerate(record.get("uitwerkbijlagen",[]),1):
