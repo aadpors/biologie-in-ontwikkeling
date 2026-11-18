@@ -33,13 +33,24 @@ def classify_document_role(filename: str, text: str):
     confidence=0.96 if ordered[0]>=4 and ordered[0]>ordered[1] else (0.78 if ordered[0]>ordered[1] else 0.35)
     return best,confidence,scores
 
-def infer_exam_metadata(filename: str):
+def infer_exam_metadata(filename: str, text: str = ""):
     name=Path(filename).stem.lower()
     m=re.search(r"(?:^|[-_])(ha|vw)[-_]1018[-_]a[-_](\d{2})[-_](\d+)[-_]([ocu])(?:[-_]|$)",name)
     if not m: m=re.search(r"(ha|vw)[-_]?(\d{2})t(\d+)",name)
-    if not m: return {}
-    return {"level":"Havo" if m.group(1)=="ha" else "Vwo","year":"20"+m.group(2),
-            "period":str(int(m.group(3))),"confidence":0.96,"source":"bestandsnaam"}
+    if m:
+        return {"level":"Havo" if m.group(1)=="ha" else "Vwo","year":"20"+m.group(2),
+                "period":str(int(m.group(3))),"confidence":0.96,"source":"bestandsnaam"}
+    # If filenames are renamed, use only the opening pages as a secondary
+    # source. All three identity fields must be present before auto-suggesting.
+    opening=" ".join(str(text or "").split())[:5000]
+    level_match=re.search(r"\b(HAVO|VWO)\b",opening,re.I)
+    year_match=re.search(r"\b(20\d{2})\b",opening)
+    period_match=re.search(r"\b(?:tijdvak|tijdvaknummer|tv)\s*([123])\b",opening,re.I)
+    if level_match and year_match and period_match:
+        return {"level":"Havo" if level_match.group(1).lower()=="havo" else "Vwo",
+                "year":year_match.group(1),"period":period_match.group(1),
+                "confidence":0.82,"source":"eerste_pdf_paginas"}
+    return {}
 
 def digest_file(path: Path) -> str:
     h=hashlib.sha256()
