@@ -483,7 +483,8 @@ def link_context_assets(analysis: dict, references: list[dict],
     kind_map = {
         "figuur": "figuur", "afbeelding": "afbeelding", "foto": "afbeelding",
         "illustratie": "afbeelding", "tabel": "tabel", "grafiek": "grafiek",
-        "diagram": "grafiek", "schema": "grafiek",\n        "bron": "bron", "tekst": "bron", "bijlage": "bron"
+        "diagram": "grafiek", "schema": "grafiek",
+        "bron": "bron", "tekst": "bron", "bijlage": "bron"
     }
     results = []
     for ref in references:
