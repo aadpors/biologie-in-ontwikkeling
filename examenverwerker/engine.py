@@ -76,6 +76,21 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     doc.close()
     return {"file":path.name,"sha256":digest_file(path),"page_count":len(pages),"metadata":meta,"pages":pages}
 
+def match_correction_documents(opgaven_doc: dict, cv_docs: list[dict]) -> list[dict]:
+    """Match only by explicit level/year/period metadata; never pool unrelated CVs."""
+    meta = opgaven_doc.get("exam_metadata") or infer_exam_metadata(opgaven_doc.get("bestand", ""))
+    if not all(meta.get(k) for k in ("level", "year", "period")):
+        return []
+    key = (str(meta["level"]).lower(), str(meta["year"]), str(meta["period"]))
+    matches = []
+    for doc in cv_docs:
+        other = doc.get("exam_metadata") or infer_exam_metadata(doc.get("bestand", ""))
+        other_key = (str(other.get("level", "")).lower(), str(other.get("year", "")), str(other.get("period", "")))
+        if all(other_key) and other_key == key:
+            matches.append(doc)
+    return matches
+
+
 def detect_question_candidates(analysis: dict) -> list[dict]:
     """Find plausible numbered starts across text blocks and page breaks."""
     pages=analysis.get("pages",[])
