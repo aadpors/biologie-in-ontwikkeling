@@ -77,15 +77,20 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     return {"file":path.name,"sha256":digest_file(path),"page_count":len(pages),"metadata":meta,"pages":pages}
 
 def detect_question_candidates(analysis: dict) -> list[dict]:
-    """Find plausible numbered starts across text blocks; retain duplicates."""
-    found=[]
-    for page in analysis.get("pages",[]):
+    """Find plausible numbered starts across text blocks and page breaks."""
+    pages=analysis.get("pages",[])
+    lines_by_page={}
+    for page in pages:
         page_lines=[]
         for block in page.get("blocks",[]):
             for line in (block.get("lines") or [{"bbox":block["bbox"],"text":x} for x in block["text"].splitlines()]):
-                if line.get("text","").strip():
-                    page_lines.append(line)
+                if line.get("text","").strip(): page_lines.append(line)
         page_lines.sort(key=lambda x:(round(x["bbox"][1],1),x["bbox"][0]))
+        lines_by_page[page["page"]]=page_lines
+    found=[]
+    for page_index,page in enumerate(pages):
+        page_lines=lines_by_page.get(page["page"],[])
+        next_page_lines=lines_by_page.get(page["page"]+1,[])
         for idx,line in enumerate(page_lines):
             value=line["text"].strip()
             m=QUESTION_RE.match(value)
@@ -94,6 +99,8 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
             n=int((m or standalone).group(1))
             if not 1 <= n <= 60: continue
             next_text=page_lines[idx+1]["text"].strip() if idx+1<len(page_lines) else ""
+            if standalone and not next_text and page.get("height") and line["bbox"][1] >= page["height"]*0.78 and next_page_lines:
+                next_text=next_page_lines[0]["text"].strip()
             if standalone and (not next_text or re.match(r"^[A-D][.)]",next_text)):
                 continue
             if re.match(r"^\d{1,2}[.)]\s+(?:januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)\b",value,re.I):
@@ -103,96 +110,13 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
             if re.search(r"\b(verklaar|beschrijf|noem|geef|welke|wat|waarom|bereken|noteer|leg|toon)\b",probe,re.I):
                 confidence=0.68
             if m and len(value)>16: confidence=max(confidence,0.66)
+            if standalone and idx==len(page_lines)-1 and next_text:
+                confidence=min(confidence,0.55)
             found.append({"number":n,"page":page["page"],"bbox":line["bbox"],
                           "line":value,"next_line":next_text,"confidence":confidence,
                           "status":"controle_nodig",
                           "reason":"Nummerpatroon gevonden; vraagstart en vraaggrens moeten worden bevestigd."})
     return found
-
-
-
-def detect_cv_question_numbers(analysis: dict) -> list[dict]:
-    """Find explicit 'Vraag N'/'Opgave N' anchors in a marking scheme."""
-    found=[]
-    pattern=re.compile(r"(?i)\b(vraag|opgave)\s+(\d{1,2})\b")
-    for page in analysis.get("pages",[]):
-        for match in pattern.finditer(page.get("text","")):
-            found.append({"number":int(match.group(2)),"page":page["page"],
-                          "label":match.group(1).lower(),"status":"controle_nodig"})
-    return found
-
-def compare_question_numbering(opgaven: list[dict], cv: list[dict]) -> dict:
-    op_numbers={x["number"] for x in opgaven}
-    cv_numbers={x["number"] for x in cv}
-    return {"opgaven_nummers":sorted(op_numbers),"cv_nummers":sorted(cv_numbers),
-            "ontbreekt_in_cv":sorted(op_numbers-cv_numbers),
-            "ontbreekt_in_opgaven":sorted(cv_numbers-op_numbers),
-            "opgaven_dubbelen":sorted(n for n in op_numbers if sum(x["number"]==n for x in opgaven)>1),
-            "cv_dubbelen":sorted(n for n in cv_numbers if sum(x["number"]==n for x in cv)>1),
-            "status":"vergelijking_is_signaal_geen_goedkeuring"}
-
-def propose_question_regions(analysis: dict, candidates: list[dict], horizontal_margin: float=28.0) -> list[dict]:
-    """Propose source-page regions between consecutive starts; never call them complete."""
-    pages={p["page"]:p for p in analysis.get("pages",[])}
-    ordered=sorted(candidates,key=lambda x:(x["page"],x["bbox"][1],x["bbox"][0]))
-    proposals=[]
-    for i,item in enumerate(ordered):
-        page_no=item["page"]
-        page=pages.get(page_no)
-        if not page: continue
-        x0=horizontal_margin
-        x1=max(x0+10,page["width"]-horizontal_margin)
-        y0=max(0.0,item["bbox"][1]-8.0)
-        next_item=ordered[i+1] if i+1<len(ordered) else None
-        if next_item and next_item["page"]==page_no:
-            y1=min(page["height"],max(y0+10,next_item["bbox"][1]-5.0))
-            segments=[{"page":page_no,"bbox":[x0,y0,x1,y1]}]
-        else:
-            segments=[{"page":page_no,"bbox":[x0,y0,x1,page["height"]]}]
-            if next_item and next_item["page"]>page_no+1:
-                for pno in range(page_no+1,next_item["page"]):
-                    p=pages.get(pno)
-                    if p: segments.append({"page":pno,"bbox":[x0,0.0,x1,p["height"]]})
-            if next_item and next_item["page"]>page_no:
-                p=pages.get(next_item["page"])
-                if p:
-                    y1=min(p["height"],max(10.0,next_item["bbox"][1]-5.0))
-                    segments.append({"page":next_item["page"],"bbox":[x0,0.0,x1,y1]})
-        text_parts=[]
-        for segment in segments:
-            p=pages.get(segment["page"],{})
-            for block in p.get("blocks",[]):
-                for line in (block.get("lines") or [{"bbox":block["bbox"],"text":x} for x in block["text"].splitlines()]):
-                    box=line["bbox"]
-                    if box[1] >= segment["bbox"][1] and box[1] <= segment["bbox"][3]:
-                        text_parts.append((segment["page"],box[1],box[0],line["text"]))
-        text_parts.sort(key=lambda x:(x[0],x[1],x[2]))
-        text_proposal="\n".join(x[3] for x in text_parts)
-        context_candidates=find_context_references(analysis,text_proposal)
-        proposals.append({"number":item["number"],"start_page":page_no,
-                          "source_segments":segments,"text_proposal":text_proposal,
-                          "context_candidates":context_candidates,
-                          "status":"voorstel_niet_goedgekeurd","completeness":"onbekend",
-                          "warning":"Dit fragment loopt tot de volgende gevonden nummerkandidaat. Gedeelde context, bijschriften en verwijzingen kunnen erbuiten staan."})
-    return proposals
-
-def find_context_references(analysis: dict, question_text: str, before_pages: int=3) -> list[dict]:
-    """Find earlier page mentions of referenced figures/tables as review leads."""
-    refs=[]
-    for kind,number in FIGURE_RE.findall(question_text or ""):
-        refs.append((kind.lower(),int(number)))
-    if not refs: return []
-    pages=analysis.get("pages",[])
-    results=[]
-    for kind,number in refs:
-        pattern=re.compile(rf"(?i)\b{re.escape(kind)}\s+{number}\b")
-        for page in pages:
-            if pattern.search(page.get("text","")):
-                results.append({"kind":kind,"number":number,"page":page["page"],
-                                "match":"verwijzing of bijschrift gevonden",
-                                "status":"contextkandidaat_niet_bevestigd"})
-    return results
-
 
 def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.25):
     """Render a full original page for human visual review."""
