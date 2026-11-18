@@ -155,7 +155,7 @@ let currentIndex=0;
 const selfChecks=JSON.parse(localStorage.getItem("bioExamSelfChecksV1")||"{}");
  const zeroScores=JSON.parse(localStorage.getItem("bioExamZeroScoresV1")||"{}");
  const isSelfChecked=id=>Boolean(zeroScores[id]||selfChecks[id]?.length);
-function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||onderwerpenVanVraag(q).includes($("theme").value))).sort((a,b)=>Number(a.year)-Number(b.year)||Number(a.period)-Number(b.period)||Number(a.n)-Number(b.n)||a.level.localeCompare(b.level,"nl"))}
+function getFiltered(){return questions.filter(q=>(!$("level").value||q.level===$("level").value)&&(!$("year").value||q.year===$("year").value)&&(!$("period").value||q.period===$("period").value)&&(!$("questionType").value||($("questionType").value==="mcq"?(q.options?.length>0):!(q.options?.length>0)))&&(!$("theme").value||onderwerpenVanVraag(q).includes($("theme").value))).sort((a,b)=>Number(a.year)-Number(b.year)||Number(a.period)-Number(b.period)||a.level.localeCompare(b.level,"nl")||Number(a.n)-Number(b.n))}
 function render(){
  const filtered=getFiltered();
  if(currentIndex>=filtered.length)currentIndex=Math.max(0,filtered.length-1);
