@@ -150,6 +150,17 @@ class EngineTests(unittest.TestCase):
         self.assertEqual({x["asset_id"] for x in linked[0]["asset_candidates"]},{"p1-image-1","p1-vector-1"})
         self.assertTrue(all(x["status"]=="visueel_controleren" for x in linked[0]["asset_candidates"]))
 
+    def test_numbered_source_text_links_to_text_blocks_not_only_images(self):
+        analysis={"pages":[{"page":3,"blocks":[
+            {"bbox":[40,80,200,100],"text":"Bron 1","lines":[{"bbox":[40,80,100,100],"text":"Bron 1"}]},
+            {"bbox":[40,110,500,220],"text":"De bron beschrijft een ecosysteem en bevat relevante gegevens."},
+            {"bbox":[40,230,500,320],"text":"Een tweede alinea met aanvullende context."}
+        ],"visual_assets":[]}]}
+        linked=link_context_assets(analysis,[{"kind":"bron","number":"1","matched_text":"Bron 1"}],3,3)
+        self.assertEqual(linked[0]["link_status"],"caption_en_tekstregio_gevonden")
+        self.assertGreaterEqual(len(linked[0]["text_region_candidates"]),1)
+        self.assertIn("ecosysteem",linked[0]["text_region_candidates"][0]["text"])
+
     def test_unnumbered_context_reference_keeps_manual_review_without_guessing(self):
         linked=link_context_assets({"pages":[]},[{"kind":"ongenummerde_verwijzing","number":None}],1,1)
         self.assertEqual(linked[0]["link_status"],"geen_nummer_handmatige_koppeling")
