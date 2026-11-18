@@ -751,6 +751,7 @@ class ExamApp:
             record["approved_by_human"]=False
             record["status"]="controle_nodig"
             record["approved_at"]=None
+            record["record_review_checklist"]={key:False for key in vars}
             self.save_project()
             self._log(f"Goedkeuring van record {record.get('id')} ingetrokken.")
             win.destroy()
