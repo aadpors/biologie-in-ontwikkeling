@@ -319,6 +319,21 @@ const assert = require("node:assert/strict");
     const q29Dimensions = await q29Question.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
     assert.ok(q29Dimensions.width > 500 && q29Dimensions.height > 20, "Vraag 29 moet volledig en zonder een lege of afgesneden uitsnede worden getoond");
 
+    // Vwo 2026-I Q18 contains two bullet-point marking criteria. The CV crop
+    // must not stop at the introductory phrase or a right-aligned score value.
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 18); render(); });
+    await page.locator("textarea").fill("Browsercontrole van het correctievoorschrift.");
+    await page.locator("#toggleCv").click();
+    const q18Cv = page.locator("#cvSnippet img");
+    await q18Cv.evaluate(img => img.decode());
+    const q18CvDimensions = await q18Cv.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
+    assert.ok(q18CvDimensions.width > 500 && q18CvDimensions.height > 100,
+      "Vwo 2026-I vraag 18 moet beide officiële beoordelingscriteria bevatten, niet alleen de inleidende zin");
+
     // Every one of the 373 open questions must resolve to a local CV image,
     // and every generated image must be reachable over the same origin.
     const cvInventory = await page.evaluate(() => questions.filter(q => q.questionType === "open").map(q => ({id:q.id,src:q.cvImage})));
