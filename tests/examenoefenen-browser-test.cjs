@@ -289,6 +289,66 @@ const assert = require("node:assert/strict");
     assert.equal(await page.locator("textarea").inputValue(), answer);
     assert.equal(await page.locator("[data-point]").first().isChecked(), true);
 
+    // Regression checks for the three reported Havo 2025-I image defects.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2025");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 26); render(); });
+    const q26Images = await page.locator(".exam-snippets img").evaluateAll(images => images.map(img => img.getAttribute("src")));
+    assert.ok((q26Images[0] || "").includes("context-ha25t1-q26-complete.jpg"));
+    assert.ok((q26Images[1] || "").includes("question-ha25t1-26-only.jpg"));
+    assert.equal(await page.locator(".exam-snippets img").count(), 2, "Vraag 26 moet context en vraagtekst als twee afzonderlijke uitsneden tonen");
+    const q26QuestionImage = page.locator(".exam-snippets img").nth(1);
+    await q26QuestionImage.evaluate(img => img.decode());
+    const q26QuestionDimensions = await q26QuestionImage.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
+    assert.ok(q26QuestionDimensions.width > 500 && q26QuestionDimensions.height > 200,
+      "Vraag 26 moet de drie genummerde uitspraken én de vraaginstructie bevatten; alleen de instructieregel is onvoldoende");
+
+    await page.locator("#questionType").selectOption("mcq");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
+    const q27Context = await page.locator(".exam-snippets img").first().getAttribute("src");
+    assert.ok((q27Context || "").includes("context-ha25t1-q27-complete.jpg"), "Vraag 27 moet de eigen zeehondencontext tonen, niet de Bajau-context van vraag 26");
+    await page.locator(".exam-snippets img").first().evaluate(img => img.decode());
+
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 29); render(); });
+    const q29Question = page.locator(".exam-snippets img").nth(1);
+    assert.ok((await q29Question.getAttribute("src") || "").includes("question-ha25t1-29-only.jpg"));
+    await q29Question.evaluate(img => img.decode());
+    const q29Dimensions = await q29Question.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
+    assert.ok(q29Dimensions.width > 500 && q29Dimensions.height > 20 && q29Dimensions.height < 120, "Vraag 29 moet volledig worden getoond, zonder afgesneden tekst of een te grote lege onderrand");
+
+    // Vwo 2026-I Q18 contains two bullet-point marking criteria. The CV crop
+    // must not stop at the introductory phrase or a right-aligned score value.
+    await page.locator("#level").selectOption("Vwo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 18); render(); });
+    await page.locator("textarea").fill("Browsercontrole van het correctievoorschrift.");
+    await page.locator("#toggleCv").click();
+    const q18Cv = page.locator("#cvSnippet img");
+    await q18Cv.evaluate(img => img.decode());
+    const q18CvDimensions = await q18Cv.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
+    assert.ok(q18CvDimensions.width > 500 && q18CvDimensions.height > 100,
+      "Vwo 2026-I vraag 18 moet beide officiële beoordelingscriteria bevatten, niet alleen de inleidende zin");
+
+    // Every one of the 373 open questions must resolve to a local CV image,
+    // and every generated image must be reachable over the same origin.
+    const cvInventory = await page.evaluate(() => questions.filter(q => !Array.isArray(q.options) || q.options.length === 0).map(q => ({id:q.id,src:q.cvImage})));
+    assert.equal(cvInventory.length, 373, "De CV-audit moet alle 373 open vragen omvatten");
+    assert.deepEqual(cvInventory.filter(q => !q.src || !q.src.startsWith("exam-snippets/cv-") || !q.src.endsWith(".jpg")).map(q => q.id), [], "Elke open vraag moet een lokale CV-afbeelding hebben");
+    const cvAssetFailures = [];
+    for (let i = 0; i < cvInventory.length; i += 20) {
+      const batch = await Promise.all(cvInventory.slice(i, i + 20).map(async q => {
+        const response = await page.request.get(new URL(q.src, page.url()).toString());
+        return response.status() === 200 && (response.headers()["content-type"] || "").toLowerCase().startsWith("image/jpeg") ? null : {id:q.id,src:q.src,status:response.status(),type:response.headers()["content-type"]};
+      }));
+      cvAssetFailures.push(...batch.filter(Boolean));
+    }
+    assert.deepEqual(cvAssetFailures, [], "Elke lokale CV-afbeelding moet daadwerkelijk laden; geen ontbrekende of niet-JPEG assets toegestaan");
+
     // Official correction-scheme snippets are connected to their questions and reveal on click.
     await page.locator("#level").selectOption("Havo");
     await page.locator("#year").selectOption("2024");
@@ -355,6 +415,7 @@ const assert = require("node:assert/strict");
       openAnswerPersistence: "PASS",
       selfAssessmentPersistence: "PASS",
       imageLoading: imageState,
+      cvAssetsChecked: cvInventory.length,
       appendices: [{ href: appendixHref, status: appendixResponse.status() }, { href: "examens/vw-1018-a-26-2-u.pdf", status: vwoAppendixResponse.status() }],
       pageErrors
     }, null, 2));

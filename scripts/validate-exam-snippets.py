@@ -137,6 +137,62 @@ for item in cv_manifest:
         except Exception as exc:
             errors.append(f"correctievoorschrift {item.get('id')}: ongeldige afbeelding {rel}: {exc}")
 
+# Explicit visual regressions reported during the Havo 2025-I audit.
+def audit_crop_height(rel, minimum, label, maximum=None):
+    path = ROOT / rel
+    if not path.is_file():
+        errors.append(f"{label}: ontbrekende uitsnede {rel}")
+        return
+    try:
+        with Image.open(path) as image:
+            height = image.height
+        if height < minimum or (maximum is not None and height > maximum):
+            bound = f"minimaal {minimum}px" if maximum is None else f"tussen {minimum} en {maximum}px"
+            errors.append(f"{label}: uitsnede heeft {height}px hoogte; verwacht {bound}")
+    except Exception as exc:
+        errors.append(f"{label}: uitsnede kan niet worden gelezen: {exc}")
+
+open_by_id = {
+    record.get("id"): record
+    for record in json.loads((ROOT / "exam-open.json").read_text(encoding="utf-8"))
+}
+mcq_by_id = {
+    record.get("id"): record
+    for record in json.loads((ROOT / "exam-mcq.json").read_text(encoding="utf-8"))
+}
+q26 = open_by_id.get("ha25t1-open-26")
+if not q26 or len(q26.get("images", [])) < 2:
+    errors.append("Havo 2025-I vraag 26: context- en vraaguitsnede ontbreken")
+else:
+    if q26["images"][0] != "exam-snippets/context-ha25t1-q26-complete.jpg":
+        errors.append("Havo 2025-I vraag 26: algemene Bajau-context is niet apart gekoppeld")
+    if q26["images"][-1] != "exam-snippets/question-ha25t1-26-only.jpg":
+        errors.append("Havo 2025-I vraag 26: vraaguitsnede met drie uitspraken ontbreekt")
+    audit_crop_height(q26["images"][-1], 200, "Havo 2025-I vraag 26: drie uitspraken en instructie")
+
+q27 = mcq_by_id.get("ha25t1-mcq-27")
+if not q27 or not q27.get("images") or q27["images"][0] != "exam-snippets/context-ha25t1-q27-complete.jpg":
+    errors.append("Havo 2025-I vraag 27: eigen zeehondencontext ontbreekt of is vervangen door de Bajau-context")
+
+q29 = open_by_id.get("ha25t1-open-29")
+if not q29 or len(q29.get("images", [])) < 2:
+    errors.append("Havo 2025-I vraag 29: aparte vraaguitsnede ontbreekt")
+else:
+    audit_crop_height(
+        q29["images"][-1], 30,
+        "Havo 2025-I vraag 29: onderrand van de vraaguitsnede",
+        maximum=120,
+    )
+
+q18_cv = next((item for item in cv_manifest if item.get("id") == "vw26t1-open-18"), None)
+if not q18_cv:
+    errors.append("Vwo 2026-I vraag 18: CV-koppeling ontbreekt")
+else:
+    audit_crop_height(
+        f"exam-snippets/{q18_cv['output']}", 100,
+        "Vwo 2026-I vraag 18: beide beoordelingscriteria",
+    )
+
 if errors:
     print("\n".join(errors))
     raise SystemExit(f"Controle mislukt: {len(errors)} fouten in {total} vragen.")

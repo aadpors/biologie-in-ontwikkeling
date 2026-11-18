@@ -193,6 +193,12 @@ def context_image_fragments(page, lines, indices, prefix, number, question_top, 
             raise RuntimeError("Shared Havo 2024-I heart-valve context for question 3 was not rendered")
         return ["exam-snippets/context-ha24t1-q1-complete.jpg"]
 
+    # Havo 2025-I question 26: the three numbered statements belong to
+    # the question itself, not to the shared Bajau context. End the context
+    # crop before that heading so the statements are shown exactly once.
+    if prefix == "ha25t1" and number == 26:
+        start_anchor = "De Bajau"
+        end_anchor = "Hieronder staan drie uitspraken."
     if start_anchor and end_anchor:
         start_hits = page.search_for(start_anchor)
         end_hits = page.search_for(end_anchor)
@@ -839,10 +845,27 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                     question_top = min(
                         max(0, lines[start]["bbox"][1] - 1), page.rect.height - 55
                     )
+                    # Havo 2025-I question 26 has three numbered statements
+                    # immediately before the printed question marker. They are
+                    # question material, not general context: start the separate
+                    # question crop at statement 1 so all three remain visible.
+                    if prefix == "ha25t1" and marker["number"] == 26:
+                        statement_start = page.search_for("Door het inhouden van de adem")
+                        if not statement_start:
+                            raise RuntimeError("Could not locate the first Havo 2025-I question 26 statement")
+                        question_top = max(0, min(rect.y0 for rect in statement_start))
                     question_y1 = min(
                         page.rect.height - 15,
                         max(question_top + 40, min(footer_y, lines[question_end_line]["bbox"][3] + BOTTOM_TEXT_PADDING)),
                     )
+                    # The Havo 2025-I question 29 detector previously retained
+                    # an excessive blank strip below the actual prompt. Use the
+                    # printed final sentence as the precise lower boundary.
+                    if prefix == "ha25t1" and marker["number"] == 29:
+                        final_prompt = page.search_for("Noteer de naam van dit eiwit.")
+                        if not final_prompt:
+                            raise RuntimeError("Could not locate the final prompt line for Havo 2025-I question 29")
+                        question_y1 = min(footer_y, max(rect.y1 for rect in final_prompt) + 6)
                     try:
                         save_page_crop(
                             page,
@@ -914,6 +937,43 @@ def extract_exam(prefix, level, year, period, exam_rel, cv_rel):
                             ).save(OUT / question_name)
                             trim_question_bottom_rule(OUT / question_name)
                             context_paths.append(f"exam-snippets/{question_name}")
+
+                        # Havo 2025-I q26: the numbered statements are part of
+                        # the question, but are printed above its score/number
+                        # marker. Build the question crop from the exact first
+                        # statement through the exact final instruction line;
+                        # the general context crop ends before the statements.
+                        if prefix == "ha25t1" and marker["number"] == 26:
+                            statement_hits = page.search_for("Door het inhouden van de adem")
+                            prompt_hits = page.search_for("bijbehorende uitspraak juist of onjuist is.")
+                            if not statement_hits or not prompt_hits:
+                                raise RuntimeError(
+                                    "Could not locate all Havo 2025-I q26 statements and final prompt"
+                                )
+                            statement_top = max(0, min(hit.y0 for hit in statement_hits) - 3)
+                            prompt_bottom = min(
+                                page.rect.height - 12,
+                                max(hit.y1 for hit in prompt_hits) + 6,
+                            )
+                            if prompt_bottom <= statement_top + 100:
+                                raise RuntimeError(
+                                    f"Invalid Havo 2025-I q26 statement crop: "
+                                    f"top={statement_top}, bottom={prompt_bottom}"
+                                )
+                            page.get_pixmap(
+                                matrix=fitz.Matrix(1.8, 1.8),
+                                clip=fitz.Rect(0, statement_top, page.rect.width, prompt_bottom),
+                                alpha=False,
+                            ).save(OUT / question_name)
+                            question_crop = Image.open(OUT / question_name)
+                            try:
+                                if question_crop.height < 180:
+                                    raise RuntimeError(
+                                        f"Havo 2025-I q26 crop omits its three statements: "
+                                        f"{question_crop.width}x{question_crop.height}"
+                                    )
+                            finally:
+                                question_crop.close()
                         if context_paths:
                             context_record["images"] = context_paths
                     if (prefix, marker["number"]) == ("ha25t2", 9):
