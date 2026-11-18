@@ -302,7 +302,7 @@ const assert = require("node:assert/strict");
     const q26QuestionImage = page.locator(".exam-snippets img").nth(1);
     await q26QuestionImage.evaluate(img => img.decode());
     const q26QuestionDimensions = await q26QuestionImage.evaluate(img => ({width:img.naturalWidth,height:img.naturalHeight}));
-    assert.ok(q26QuestionDimensions.width > 500 && q26QuestionDimensions.height > 120,
+    assert.ok(q26QuestionDimensions.width > 500 && q26QuestionDimensions.height > 300,
       "Vraag 26 moet de drie genummerde uitspraken én de vraaginstructie bevatten; alleen de instructieregel is onvoldoende");
 
     await page.locator("#questionType").selectOption("mcq");
