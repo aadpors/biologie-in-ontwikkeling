@@ -15,6 +15,20 @@ const assert = require("node:assert/strict");
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
     assert.match(await page.locator("#count").innerText(), /519 vragen/);
 
+    // Cards stay grouped by exam (year, time period, level), then follow original question order.
+    const sortedCards = await page.evaluate(() => getFiltered().map(q => ({ year: Number(q.year), period: Number(q.period), level: q.level, n: Number(q.n) })));
+    const levelOrder = { Havo: 0, Vwo: 1 };
+    const sortKey = q => [q.year, q.period, levelOrder[q.level], q.n];
+    for (let i = 1; i < sortedCards.length; i++) {
+      const previous = sortKey(sortedCards[i - 1]);
+      const current = sortKey(sortedCards[i]);
+      let comparison = 0;
+      for (let j = 0; j < previous.length; j++) {
+        if (previous[j] !== current[j]) { comparison = previous[j] - current[j]; break; }
+      }
+      assert.ok(comparison <= 0, `Kaartvolgorde wijkt af bij positie ${i}: ${JSON.stringify(sortedCards[i - 1])} → ${JSON.stringify(sortedCards[i])}`);
+    }
+
     // Filters combine correctly and reset restores the full question set.
     await page.locator("#level").selectOption("Havo");
     await page.locator("#year").selectOption("2026");
