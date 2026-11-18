@@ -63,7 +63,7 @@ const assert = require("node:assert/strict");
     await page.locator("#questionType").selectOption("open");
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 30); render(); });
     assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 3);
-    assert.match(await page.locator(".binary-choice-table tbody").innerText(), /Isa[\\s\\S]*Kate[\\s\\S]*Mounir/);
+    assert.match((await page.locator(".binary-choice-table tbody").innerText()).replace(/\\s+/g, " "), /Isa[\\s\\S]*Kate[\\s\\S]*Mounir/);
 
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 28); render(); });
     assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 1);
