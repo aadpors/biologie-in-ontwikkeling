@@ -1518,8 +1518,10 @@
     "period": "1",
     "n": 34,
     "page": 14,
-    "image": "exam-snippets/context-ha25t1-q33-complete.jpg",
+    "image": "exam-snippets/context-ha25t1-q30-complete.jpg",
     "images": [
+      "exam-snippets/context-ha25t1-q30-complete.jpg",
+      "exam-snippets/context-ha25t1-q32-complete.jpg",
       "exam-snippets/context-ha25t1-q33-complete.jpg",
       "exam-snippets/question-ha25t1-34-only.jpg"
     ]
