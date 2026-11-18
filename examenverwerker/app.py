@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from engine import analyze_pdf, detect_question_candidates, learn_decision
+from engine import analyze_pdf, detect_question_candidates, learn_decision, render_page
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -271,6 +271,37 @@ class ExamApp:
             self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
         ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
         ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
+        ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
+
+    def preview_candidate(self, rows, tree, parent):
+        selected=tree.selection()
+        if not selected:
+            messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een kandidaat.")
+            return
+        row=rows[int(selected[0])]
+        doc=next((d for d in self.data["documenten"] if d["id"]==row.get("document_id")),None)
+        if not doc:
+            messagebox.showerror("Bron ontbreekt","Het bijbehorende bronbestand is niet gevonden.")
+            return
+        source=self.project_dir/"bronnen"/doc["opslagbestand"]
+        target=self.project_dir/"analyse"/f"preview-{doc['id']}-p{row['page']}.png"
+        try:
+            render_page(source,row["page"],target)
+            win=tk.Toplevel(parent); win.title(f"Originele PDF-pagina {row['page']} – {doc['bestand']}")
+            win.geometry("900x800")
+            frame=ttk.Frame(win); frame.pack(fill="both",expand=True)
+            canvas=tk.Canvas(frame,background="#dce3e6")
+            sy=ttk.Scrollbar(frame,orient="vertical",command=canvas.yview)
+            sx=ttk.Scrollbar(frame,orient="horizontal",command=canvas.xview)
+            canvas.configure(yscrollcommand=sy.set,xscrollcommand=sx.set)
+            sy.pack(side="right",fill="y"); sx.pack(side="bottom",fill="x"); canvas.pack(side="left",fill="both",expand=True)
+            photo=tk.PhotoImage(file=str(target))
+            canvas.create_image(0,0,image=photo,anchor="nw")
+            canvas.image=photo
+            canvas.configure(scrollregion=canvas.bbox("all"))
+            ttk.Label(win,text=f"Originele bronpagina · kandidaat vraag {row['number']} · markering is nog niet automatisch goedgekeurd",padding=8).pack(fill="x")
+        except Exception as exc:
+            messagebox.showerror("Voorvertoning mislukt",str(exc))
 
     def selected_doc(self):
         selected = self.table.selection()
