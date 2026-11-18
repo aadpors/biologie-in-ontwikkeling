@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, build_question_record
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, build_question_record, render_composite_crops
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
@@ -465,10 +465,65 @@ class ExamApp:
         for idx,doc in enumerate(appendix_docs):
             appendix_list.insert("end",doc["bestand"])
             if doc.get("opslagbestand") in existing_appendices: appendix_list.selection_set(idx)
-        ttk.Label(outer,text="CV-snippetbestand (voor open vragen verplicht voor export; maak/controleer dit fragment later vanuit het CV)").pack(anchor="w",pady=(8,2))
-        snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("*.png"))
+        ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
+        snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-*.png"))
         cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
-        ttk.Combobox(outer,textvariable=cv_snippet_var,values=[""]+snippet_names,state="readonly").pack(fill="x")
+        cv_snippet_combo=ttk.Combobox(outer,textvariable=cv_snippet_var,values=[""]+snippet_names,state="readonly")
+        cv_snippet_combo.pack(fill="x")
+        def make_cv_snippet():
+            cv_doc=next((d for d in matching if d["bestand"]==cv_choice.get()),None)
+            if not cv_doc:
+                messagebox.showerror("CV ontbreekt","Selecteer eerst het bijbehorende correctievoorschrift.",parent=win)
+                return
+            try:
+                cv_path=self.project_dir/"bronnen"/cv_doc["opslagbestand"]
+                analysis=analyze_pdf(cv_path)
+                anchors=detect_cv_question_numbers(analysis)
+                matches=[x for x in anchors if int(x["number"])==int(row["number"])]
+                if not matches:
+                    messagebox.showwarning("Vraaganker niet gevonden",f"Vraag {row['number']} is niet betrouwbaar als anker herkend in dit CV. Controleer de originele PDF; er wordt geen fragment verzonnen.",parent=win)
+                    return
+                def render_anchor(anchor):
+                    proposals=propose_question_regions(analysis,anchors)
+                    proposal=next((p for p in proposals if p["number"]==int(row["number"]) and p["start_page"]==int(anchor["page"]) and p["source_segments"]),None)
+                    if not proposal:
+                        messagebox.showerror("CV-fragment mislukt","Er kon geen afgebakend fragmentvoorstel worden gemaakt.",parent=win)
+                        return
+                    name=f"cv-{cv_doc['id']}-q{row['number']}-p{anchor['page']}.png"
+                    target=self.project_dir/"snippets"/name
+                    render_composite_crops(cv_path,proposal["source_segments"],target,scale=1.35)
+                    cv_snippet_combo.configure(values=[""]+sorted(set(snippet_names+[name])))
+                    cv_snippet_var.set(name)
+                    self._log(f"CV-fragmentvoorstel gemaakt voor vraag {row['number']} uit {cv_doc['bestand']}; controleer alle beoordelingsregels en paginagrenzen.")
+                    preview=tk.Toplevel(win); preview.title(f"CV-fragment vraag {row['number']} · niet goedgekeurd"); preview.geometry("900x760")
+                    ttk.Label(preview,text="VOORSTEL — controleer of alle beoordelingsregels, punten en aanvullingen compleet zijn.",wraplength=850,padding=8).pack(fill="x")
+                    frame=ttk.Frame(preview); frame.pack(fill="both",expand=True)
+                    canvas=tk.Canvas(frame,background="#dce3e6")
+                    sy=ttk.Scrollbar(frame,orient="vertical",command=canvas.yview)
+                    sx=ttk.Scrollbar(frame,orient="horizontal",command=canvas.xview)
+                    canvas.configure(yscrollcommand=sy.set,xscrollcommand=sx.set)
+                    sy.pack(side="right",fill="y"); sx.pack(side="bottom",fill="x"); canvas.pack(side="left",fill="both",expand=True)
+                    photo=tk.PhotoImage(file=str(target)); canvas.create_image(0,0,image=photo,anchor="nw")
+                    canvas.image=photo; canvas.configure(scrollregion=canvas.bbox("all"))
+                if len(matches)==1:
+                    render_anchor(matches[0])
+                else:
+                    picker=tk.Toplevel(win); picker.title("Kies CV-anker"); picker.transient(win)
+                    ttk.Label(picker,text=f"Vraag {row['number']} komt op meerdere pagina's voor. Kies het juiste beoordelingsmodelanker.",padding=8).pack(anchor="w")
+                    choices=tk.Listbox(picker,width=90,height=min(8,len(matches)))
+                    choices.pack(fill="both",expand=True,padx=8,pady=8)
+                    for item in matches: choices.insert("end",f"Pagina {item['page']} · {item['line']}")
+                    def choose():
+                        selection=choices.curselection()
+                        if not selection: return
+                        anchor=matches[selection[0]]
+                        picker.destroy()
+                        render_anchor(anchor)
+                    ttk.Button(picker,text="Gebruik geselecteerd anker",command=choose).pack(pady=(0,8))
+            except Exception as exc:
+                self._error("CV-fragment maken",exc)
+                messagebox.showerror("CV-fragment mislukt",str(exc),parent=win)
+        ttk.Button(outer,text="CV-fragment uit origineel correctievoorschrift maken",command=make_cv_snippet).pack(anchor="w",pady=(4,2))
         def save_draft():
             try:
                 meta={key:var.get().strip() for key,var in values.items()}
