@@ -10,17 +10,10 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata
 
 APP_VERSION = "0.2.0"
 PROJECT_FILE = "project.json"
-DOC_TYPES = {
-    "opgaven": ["opgaven", "opgave", "vragenboekje", "examenopgaven"],
-    "correctievoorschrift": ["correctievoorschrift", "correctievoorschr", "antwoordmodel", "beoordelingsmodel"],
-    "uitwerkbijlage": ["uitwerkbijlage", "uitwerkblad"],
-    "aanvulling": ["aanvulling", "aanvullingen", "erratum", "errata"],
-}
-
 
 def now():
     return datetime.now().astimezone().isoformat(timespec="seconds")
@@ -33,38 +26,6 @@ def sha256(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
-
-def classify(filename: str, text: str):
-    hay = (filename + " " + text[:12000]).lower()
-    scores = {}
-    for kind, terms in DOC_TYPES.items():
-        scores[kind] = sum(2 if term in filename.lower() else 1 for term in terms if term in hay)
-    lower=filename.lower()
-    if re.search(r"-(?:o)(?:-|\.pdf$)",lower): scores["opgaven"] += 3
-    if re.search(r"-(?:c)(?:-|\.pdf$)",lower): scores["correctievoorschrift"] += 3
-    if re.search(r"-(?:c)-a\d",lower): scores["aanvulling"] += 5
-    if "uitwerkbijlage" in lower or "uitwerkbijlage" in hay: scores["uitwerkbijlage"] += 5
-    best = max(scores, key=scores.get)
-    ordered = sorted(scores.values(), reverse=True)
-    confidence = 0.96 if ordered[0] >= 4 and ordered[0] > ordered[1] else (
-        0.78 if ordered[0] > ordered[1] else 0.35
-    )
-    if ordered[0] == 0:
-        return "onbekend", 0.0, scores
-    return best, confidence, scores
-
-
-
-def infer_exam_metadata(filename: str):
-    name=Path(filename).stem.lower()
-    m=re.search(r"(?:^|[-_])(ha|vw)[-_]1018[-_]a[-_](\d{2})[-_](\d+)[-_]([oc])(?:[-_]|$)",name)
-    if not m:
-        m=re.search(r"(ha|vw)[-_]?(\d{2})t(\d+)",name)
-    if not m: return {}
-    level="Havo" if m.group(1)=="ha" else "Vwo"
-    year="20"+m.group(2)
-    period=m.group(3)
-    return {"level":level,"year":year,"period":str(int(period)),"confidence":0.96,"source":"bestandsnaam"}
 
 def extract_pdf(path: Path):
     try:
@@ -206,7 +167,7 @@ class ExamApp:
                 shutil.copy2(source, target)
                 extracted = extract_pdf(target)
                 all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
-                kind, confidence, scores = classify(source.name, all_text)
+                kind, confidence, scores = classify_document_role(source.name, all_text)
                 exam_meta = infer_exam_metadata(source.name) if kind=="opgaven" else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
                        "exam_metadata": exam_meta,
