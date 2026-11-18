@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, build_question_record, render_composite_crops
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops
 
 APP_VERSION = "0.3.0"
 PROJECT_FILE = "project.json"
@@ -188,7 +188,7 @@ class ExamApp:
                 extracted = extract_pdf(target)
                 all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
                 kind, confidence, scores = classify_document_role(source.name, all_text)
-                exam_meta = infer_exam_metadata(source.name) if kind in ("opgaven", "correctievoorschrift") else {}
+                exam_meta = infer_exam_metadata(source.name) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
                        "exam_metadata": exam_meta,
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
@@ -458,13 +458,22 @@ class ExamApp:
         cv_choice=tk.StringVar(value=(current or {}).get("cv_display_name",cv_names[0] if len(cv_names)==1 else ""))
         ttk.Combobox(outer,textvariable=cv_choice,values=cv_names,state="readonly").pack(fill="x")
         ttk.Label(outer,text="Uitwerkbijlagen (selecteer alle bijlagen waarnaar deze vraag verwijst)").pack(anchor="w",pady=(8,2))
-        appendix_docs=[d for d in docs if d.get("type_voorstel")=="uitwerkbijlage"]
+        appendix_docs=match_exam_documents(source_doc,[d for d in docs if d.get("type_voorstel")=="uitwerkbijlage"])
+        ttk.Label(outer,text="Uitwerkbijlagen van ditzelfde examen (selecteer alle bijlagen waarnaar deze vraag verwijst)").pack(anchor="w",pady=(8,2))
         appendix_list=tk.Listbox(outer,selectmode="multiple",height=min(4,max(2,len(appendix_docs))))
         appendix_list.pack(fill="x")
         existing_appendices=set((current or {}).get("uitwerkbijlagen",[]))
         for idx,doc in enumerate(appendix_docs):
             appendix_list.insert("end",doc["bestand"])
             if doc.get("opslagbestand") in existing_appendices: appendix_list.selection_set(idx)
+        amendment_docs=match_exam_documents(source_doc,[d for d in docs if d.get("type_voorstel")=="aanvulling"])
+        ttk.Label(outer,text="Officiële aanvullingen op het correctievoorschrift van ditzelfde examen (selecteer alle)").pack(anchor="w",pady=(8,2))
+        amendment_list=tk.Listbox(outer,selectmode="multiple",height=min(4,max(2,len(amendment_docs))))
+        amendment_list.pack(fill="x")
+        existing_amendments=set((current or {}).get("cv_amendment_pdfs",[]))
+        for idx,doc in enumerate(amendment_docs):
+            amendment_list.insert("end",doc["bestand"])
+            if doc.get("opslagbestand") in existing_amendments: amendment_list.selection_set(idx)
         ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
         snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-*.png"))
         cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
@@ -558,6 +567,7 @@ class ExamApp:
                                "snippet_files":list(row.get("snippet_proposal_files",[])),
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
+                               "cv_amendment_pdfs":[amendment_docs[i]["opslagbestand"] for i in amendment_list.curselection()],
                                "candidate_document_id":row.get("document_id"),
                                "source_match_human_confirmed":True,
                                "cv_match_human_confirmed":True,
