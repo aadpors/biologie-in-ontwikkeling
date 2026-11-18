@@ -32,8 +32,8 @@ const assert = require("node:assert/strict");
 
     // Shared context is carried forward to every follow-up card, then reset at a new context heading.
     const contextAudit = await page.evaluate(() => {
-      const get = id => questions.find(q => q.id === id);
-      return { first: get('ha24t1-open-1')?.repeatedContext || '', followup: get('ha24t1-mcq-2')?.repeatedContext || '', laterFollowup: get('ha24t1-open-3')?.repeatedContext || '', nextContext: get('ha24t1-open-10')?.repeatedContext || '', questionCount: questions.filter(q => !q.repeatedContext).length };
+      const get = n => questions.find(q => q.level === 'Havo' && q.year === '2024' && q.period === '1' && Number(q.n) === n);
+      return { first: get(1)?.repeatedContext || '', followup: get(2)?.repeatedContext || '', laterFollowup: get(3)?.repeatedContext || '', nextContext: get(10)?.repeatedContext || '', questionCount: questions.filter(q => !q.repeatedContext).length };
     });
     assert.match(contextAudit.first, /Een nieuwe hartklep/);
     assert.match(contextAudit.followup, /Een nieuwe hartklep/);
