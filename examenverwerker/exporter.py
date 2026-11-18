@@ -45,8 +45,12 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             errors.append({"id":rid,"error":"opgavenbron_ontbreekt"})
         if not r.get("cv_pdf") or not (project_dir/"bronnen"/r["cv_pdf"]).is_file():
             errors.append({"id":rid,"error":"correctievoorschrift_ontbreekt"})
-        if not r.get("snippet_file") or not (project_dir/"snippets"/r["snippet_file"]).is_file():
+        snippet_files=r.get("snippet_files") or ([r["snippet_file"]] if r.get("snippet_file") else [])
+        if not snippet_files:
             errors.append({"id":rid,"error":"snippet_ontbreekt"})
+        for snippet in snippet_files:
+            if not (project_dir/"snippets"/snippet).is_file():
+                errors.append({"id":rid,"error":f"snippet_ontbreekt:{snippet}"})
         if not r.get("question_text"):
             errors.append({"id":rid,"error":"vraagtekst_ontbreekt"})
         if rid in seen: errors.append({"id":rid,"error":"dubbel_id"})
@@ -70,13 +74,14 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         source_name=r["source_pdf"]; cv_name=r["cv_pdf"]
         source_target=_copy_source(project_dir,source_name,exam_dir)
         cv_target=_copy_source(project_dir,cv_name,exam_dir)
-        snippet_name=r["snippet_file"]
-        shutil.copy2(project_dir/"snippets"/snippet_name,snippet_dir/snippet_name)
+        snippet_names=r.get("snippet_files") or [r["snippet_file"]]
+        for snippet_name in snippet_names:
+            shutil.copy2(project_dir/"snippets"/snippet_name,snippet_dir/snippet_name)
         row={"id":r["id"],"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
              "n":int(r["number"]),"points":int(meta["points"]),"page":int(r["source_page"]),
              "theme":meta["theme"],"concept":meta["concept"],"end":meta["end"],
              "focus":meta["focus"],"source":r.get("source_context",""),"q":r["question_text"],
-             "image":f"exam-snippets/{snippet_name}","images":[f"exam-snippets/{snippet_name}"],
+             "image":f"exam-snippets/{snippet_names[0]}","images":[f"exam-snippets/{name}" for name in snippet_names],
              "pdf":f"examens/{source_target.name}","cv":f"examens/{cv_target.name}",
              "questionType":meta["questionType"]}
         if meta["questionType"]=="mcq":
@@ -91,7 +96,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
             appendix.append({"file":f"examens/{dest.name}","sha256":sha256(dest)})
         manifest.append({"id":r["id"],"source_sha256":sha256(project_dir/"bronnen"/source_name),
                          "cv_sha256":sha256(project_dir/"bronnen"/cv_name),
-                         "snippet_sha256":sha256(project_dir/"snippets"/snippet_name),
+                         "snippet_sha256":[sha256(project_dir/"snippets"/name) for name in snippet_names],
                          "uitwerkbijlagen":appendix,"human_approved":True})
     (output_dir/"exam-mcq.json").write_text(json.dumps(mcq,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-open.json").write_text(json.dumps(opened,ensure_ascii=False,indent=2),encoding="utf-8")
