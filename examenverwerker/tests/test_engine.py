@@ -124,6 +124,13 @@ class EngineTests(unittest.TestCase):
         checklist["appendices"]=True
         self.assertEqual(review_checklist_errors(record,checklist),[])
 
+    def test_source_reanalysis_invalidates_old_record_approval(self):
+        record={"exam":{"questionType":"open"},"question_text":"Leg uit.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
+                "snippet_files":["q.png"],"cv_snippet_file":"cv-q1.png","source_analysis_invalidated":True}
+        checklist={"question_text":True,"question_type":True,"points":True,"cv_alignment":True,
+                   "images_and_context":True,"appendices":True,"cv_addenda":True}
+        self.assertIn("bron_opnieuw_geanalyseerd_record_opnieuw_samenstellen",review_checklist_errors(record,checklist))
+
     def test_open_question_cannot_be_approved_without_cv_snippet(self):
         record={"exam":{"questionType":"open"},"question_text":"Leg uit.","source_pdf":"o.pdf","cv_pdf":"c.pdf",
                 "snippet_files":["q.png"]}
