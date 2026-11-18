@@ -132,7 +132,21 @@ for (const [index, question] of examQuestions.entries()) {
 for (const [index, context] of examContexts.entries()) {
   const where = `exam-contexts.json context ${index + 1}`;
   assertSnippetExists(context.image, where);
-  for (const path of context.images || []) assertSnippetExists(path, where);
+  const images = context.images || [];
+  assert.ok(images.length >= 2, `${where}: zowel een contextafbeelding als een afzonderlijke vraagafbeelding zijn vereist`);
+  for (const path of images) assertSnippetExists(path, where);
+  assert.notEqual(images[0], images.at(-1), `${where}: context en vraag mogen niet dezelfde uitsnede zijn`);
+}
+// Every one of the 519 indexed questions must have a matching image-based
+// context record. This prevents OCR text from silently replacing source art.
+for (const [index, question] of [...examQuestions, ...openExamQuestions].entries()) {
+  const context = examContexts.find(item =>
+    item.level === question.level && item.year === question.year &&
+    item.period === question.period && item.n === question.n
+  );
+  assert.ok(context, `examenvraag ${index + 1}: contextrecord ontbreekt`);
+  assert.ok((context.images || []).length >= 2,
+    `examenvraag ${index + 1}: oorspronkelijke context moet als afbeelding beschikbaar zijn`);
 }
 
 assert.ok(Array.isArray(publications), 'publicaties.json moet een array bevatten');
