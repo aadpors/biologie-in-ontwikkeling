@@ -296,7 +296,7 @@ class ExamApp:
         for i,row in enumerate(rows):
             learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
             suggestion=learned.get("suggestion")
-            hint=("Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
+            hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
             if learned.get("support",0): hint+=f" ({learned['support']}×)"
             tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",row.get("line"),hint,row.get("status")))
         ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Jouw beoordeling wordt lokaal als leerdata opgeslagen.",wraplength=850).pack(anchor="w",padx=12,pady=(0,8))
