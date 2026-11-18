@@ -21,7 +21,7 @@ def main():
         try:
             analysis=analyze_pdf(path)
             text_pages=sum(bool(p["text"].strip()) for p in analysis["pages"])
-            item={"file":path.name,"pages":analysis["page_count"],"pages_with_text":text_pages,
+            item={"file":path.name,"pages":analysis["page_count"],"pages_with_text":text_pages,"ocr_required":text_pages==0,
                   "sha256":analysis["sha256"],"role":"other","candidate_count":None}
             match=PATTERN.match(path.name)
             if match:
@@ -34,7 +34,7 @@ def main():
             elif "-c" in path.stem.lower(): item["role"]="correctievoorschrift"
             elif "-u" in path.stem.lower(): item["role"]="uitwerkbijlage"
             if item["pages"]<1: failures.append(f"{path.name}: geen pagina's")
-            if text_pages==0: failures.append(f"{path.name}: geen tekstlaag; OCR is nodig")
+
             rows.append(item)
         except Exception as exc:
             failures.append(f"{path.name}: {exc}")
