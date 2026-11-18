@@ -79,7 +79,7 @@ def main():
     q32 = by_id.get("ha25t1-open-32")
     if not q30 or not q32:
         raise ValueError("Havo 2025-I q34: required study and heredity context records missing")
-    q34["source"] = "\\n\\n".join(
+    q34["source"] = "\n\n".join(
         record["source"].strip()
         for record in (q30, q32, q33)
         if record.get("source")
