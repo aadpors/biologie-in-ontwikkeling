@@ -31,6 +31,15 @@ for (const year of discoveredExamYears) {
   assert.ok(examYears.has(year), `Meerkeuzevragen voor beschikbaar examenjaar ${year} ontbreken`);
 }
 assert.ok(examPage.includes('/^\\d+$/'), 'Binaire tabellen tonen bij genummerde uitspraken niet uitsluitend het uitspraaknummer');
+const havo2025Question26 = openExamQuestions.find(question => question.id === 'ha25t1-open-26');
+assert.ok(havo2025Question26, 'Havo 2025-I vraag 26 ontbreekt');
+assert.ok(!havo2025Question26.source.includes('Hieronder staan drie uitspraken'), 'De inleiding van vraag 26 staat nog ten onrechte in de context');
+assert.ok(havo2025Question26.q.startsWith('Hieronder staan drie uitspraken.'), 'De inleiding van vraag 26 moet bij de vraagtekst staan');
+assert.deepEqual(
+  havo2025Question26.images,
+  ['exam-snippets/context-ha25t1-q26-context.svg', 'exam-snippets/question-ha25t1-26-with-intro.svg'],
+  'Havo 2025-I vraag 26 moet een contextuitsnede zonder vraaginleiding en een vraaguitsnede met vraaginleiding tonen'
+);
 const havo2025Question32 = openExamQuestions.find(question => question.id === 'ha25t1-open-32');
 assert.ok(havo2025Question32, 'Havo 2025-I vraag 32 ontbreekt');
 assert.deepEqual(
