@@ -21,8 +21,23 @@ const assert = require("node:assert/strict");
       total: questions.filter(q => q.binaryChoice).length,
       malformed: questions.filter(q => q.binaryChoice && (!q.binaryChoice.rows.length || q.binaryChoice.rows.some(row => !row.text))).map(q => q.id)
     }));
-    assert.equal(binaryInventory.total, 71, "Alle genummerde juist/onjuist- en wel/niet-vragen plus de benoemde en enkelvoudige binaire vraag moeten worden herkend");
+    assert.equal(binaryInventory.total, 72, "Alle genummerde juist/onjuist- en wel/niet-vragen, de tabelvraag en de benoemde en enkelvoudige binaire vraag moeten worden herkend");
     assert.deepEqual(binaryInventory.malformed, [], "Elke binaire keuzerij moet een uitspraak bevatten");
+    const binaryKeyAudit = await page.evaluate(() => {
+      const binary = questions.filter(q => q.binaryChoice);
+      return {
+        total: binary.length,
+        missing: binary.filter(q => !Array.isArray(q.binaryCorrect) || q.binaryCorrect.length !== q.binaryChoice.rows.length || !Array.isArray(q.binaryScoreMap)).map(q => q.id),
+        wrongMax: binary.filter(q => q.binaryScoreMap?.at(-1) !== q.points).map(q => q.id)
+      };
+    });
+    assert.equal(binaryKeyAudit.total, 72);
+    assert.deepEqual(binaryKeyAudit.missing, [], "Elke binaire vraag moet een antwoordmodel en puntenschaal uit het officiële CV hebben");
+    assert.deepEqual(binaryKeyAudit.wrongMax, [], "De maximale score moet overeenkomen met het officiële CV");
+    const legacyBinaryKeys = await page.evaluate(() => ["vw25-14","vw25t2-8","ha24-8","vw24-1","vw24t2-2"].map(id => ({id,found:questions.some(q=>q.id===id&&Array.isArray(q.binaryCorrect)&&q.binaryCorrect.length===q.binaryChoice?.rows.length)})));
+    assert.deepEqual(legacyBinaryKeys.filter(x=>!x.found), [], "De oudere, handmatig ingevoerde binaire kaarten moeten eveneens hun officiële antwoordmodel behouden");
+
+
 
     await page.locator("#level").selectOption("Vwo");
     await page.locator("#year").selectOption("2024");
@@ -68,9 +83,60 @@ const assert = require("node:assert/strict");
     await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 28); render(); });
     assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 1);
     assert.equal(await page.locator(".binary-explanation textarea").count(), 1);
+    assert.equal(await page.locator("#toggleCv").isDisabled(), true, "CV-knop moet geblokkeerd blijven totdat de uitleg is ingevuld");
+    await page.locator('.binary-choice-table [data-binary-row="0"] input[value="left"]').check();
+    assert.equal(await page.locator("#toggleCv").isDisabled(), true, "Alleen de binaire keuze is onvoldoende wanneer het CV ook een toelichting vereist");
+    await page.locator(".binary-explanation textarea").fill("Het supplement is gemaakt door bacteriën en er zijn geen dieren gebruikt.");
+    assert.equal(await page.locator("#toggleCv").isDisabled(), false);
+    assert.match(await page.locator("#binaryFeedback").innerText(), /1 van 1 punten/);
+
     await page.locator("#reset").click();
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("519"));
 
+
+    // Official CV scoring: three statements, threshold partial credit, CV gate and completion.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2024");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 8); render(); });
+    const cvGate = page.locator("#toggleCv");
+    assert.equal(await cvGate.isDisabled(), true, "CV-knop mag niet actief zijn vóór beantwoording");
+    const havoBinary = await page.evaluate(() => ({id:getFiltered()[currentIndex].id,correct:getFiltered()[currentIndex].binaryCorrect}));
+    for (let i=0;i<havoBinary.correct.length;i++) {
+      const value=i===2?(havoBinary.correct[i]==="left"?"right":"left"):havoBinary.correct[i];
+      await page.locator('.binary-choice-table [data-binary-row="'+i+'"] input[value="'+value+'"]').check();
+    }
+    assert.equal(await cvGate.isDisabled(), false, "CV-knop moet actief worden na invullen van alle uitspraken");
+    assert.match(await page.locator("#binaryFeedback").innerText(), /1 van 2 punten/, "CvTE-score: bij twee van drie juiste uitspraken is één punt toegekend");
+    await cvGate.click();
+    const cvViewed = await page.evaluate(id => JSON.parse(localStorage.getItem("bioExamCvViewedV1")||"{}")[id],havoBinary.id);
+    assert.equal(cvViewed,true,"Openen van het CV moet de vraag als gemaakt registreren");
+    assert.match(await page.locator("#selectionProgress").innerText(), /Gemaakt: 1 \/ .*punten: 1 \/ 2/);
+
+    // The 2x2 digestion table awards one point per fully correct location pair.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 29); render(); });
+    assert.equal(await page.locator(".binary-choice-table tbody tr").count(), 4);
+    const tableKey = await page.evaluate(() => getFiltered()[currentIndex].binaryCorrect);
+    for (let i=0;i<4;i++) {
+      const value=i<2?tableKey[i]:(i===2?(tableKey[i]==="left"?"right":"left"):tableKey[i]);
+      await page.locator('.binary-choice-table [data-binary-row="'+i+'"] input[value="'+value+'"]').check();
+    }
+    assert.match(await page.locator("#binaryFeedback").innerText(), /1 van 2 punten/, "De tabelvraag kent één punt per volledig juiste locatiecombinatie toe");
+
+    // Named binary statements use the same official automatic marking.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2026");
+    await page.locator("#period").selectOption("2");
+    await page.locator("#questionType").selectOption("open");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 30); render(); });
+    const namedKey = await page.evaluate(() => getFiltered()[currentIndex].binaryCorrect);
+    for (let i=0;i<3;i++) await page.locator('.binary-choice-table [data-binary-row="'+i+'"] input[value="'+namedKey[i]+'"]').check();
+    assert.match(await page.locator("#binaryFeedback").innerText(), /2 van 2 punten/);
 
     // Cards stay grouped by exam (year, time period, level), then follow original question order.
     const sortedCards = await page.evaluate(() => getFiltered().map(q => ({ year: Number(q.year), period: Number(q.period), level: q.level, n: Number(q.n) })));
