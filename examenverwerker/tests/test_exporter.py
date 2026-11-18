@@ -8,7 +8,8 @@ class ExportTests(unittest.TestCase):
         for name in ("opgaven.pdf","cv.pdf","uitwerkbijlage.pdf","aanvulling.pdf"):
             (project/"bronnen"/name).write_bytes(b"%PDF-original-"+name.encode())
         (project/"snippets"/"vraag1.png").write_bytes(b"PNG-snippet")
-        (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")\n        (project/"snippets"/"cv-amend1.png").write_bytes(b"CV-amendment-snippet")
+        (project/"snippets"/"cv1.jpg").write_bytes(b"CV-snippet")
+        (project/"snippets"/"cv-amend1.png").write_bytes(b"CV-amendment-snippet")
         record={
             "id":"ha26t1-open-1","status":"goedgekeurd","approved_by_human":True,
             "exam":{"level":"Havo","year":"2026","period":"1","points":2,"theme":"Ecologie",
