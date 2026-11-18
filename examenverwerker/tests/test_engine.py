@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -26,6 +26,9 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(got[0]["number"],7)
         self.assertEqual(got[0]["page"],1)
         self.assertEqual(got[0]["next_line"],"Beschrijf de oorzaak.")
+    def test_question_pattern_key_distinguishes_layouts(self):
+        self.assertEqual(question_pattern_key({"line":"4. Beschrijf dit.","next_line":""}),"question_start:numbered_line_with_text")
+        self.assertEqual(question_pattern_key({"line":"4.","next_line":"Beschrijf dit."}),"question_start:standalone_number_then_text")
     def test_learning_requires_repeated_support_and_never_autoplays(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)
