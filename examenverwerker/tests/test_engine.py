@@ -20,6 +20,15 @@ class EngineTests(unittest.TestCase):
         got=match_correction_documents(op,cvs)
         self.assertEqual([x["bestand"] for x in got],["ha-1018-a-26-1-c.pdf"])
 
+    def test_correction_scheme_matching_uses_confirmed_per_document_identity(self):
+        identity={"level":"Vwo","year":"2025","period":"2","source":"handmatig_bevestigd"}
+        op={"bestand":"opgaven-hernoemd.pdf","exam_metadata":identity}
+        cvs=[
+            {"bestand":"cv-ander-examen.pdf","exam_metadata":{"level":"Vwo","year":"2025","period":"1"}},
+            {"bestand":"cv-hernoemd.pdf","exam_metadata":identity}
+        ]
+        self.assertEqual([x["bestand"] for x in match_correction_documents(op,cvs)],["cv-hernoemd.pdf"])
+
     def test_question_candidates_keep_repeated_numbers(self):
         a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\\nBeschrijf de functie van dit orgaan."}]},
                     {"page":2,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,140,14],"text":"1. Welke stof wordt gevormd?"}],"text":"1. Welke stof wordt gevormd?"}]}]}
