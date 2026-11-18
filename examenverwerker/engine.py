@@ -315,6 +315,28 @@ def validate_website_records(mcq: list, opened: list, contexts: list) -> list[di
         keys.add(key)
     return errors
 
+def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
+    """Return blockers before a human can explicitly approve a draft question."""
+    required=["question_text","question_type","points","cv_alignment","images_and_context","appendices"]
+    if (record.get("exam") or {}).get("questionType")=="mcq":
+        required.append("answer_options")
+    if record.get("cv_amendment_pdfs"):
+        required.append("cv_addenda")
+    missing=[key for key in required if checklist.get(key) is not True]
+    errors=[f"controle_niet_afgevinkt:{key}" for key in missing]
+    if not str(record.get("question_text","")).strip():
+        errors.append("vraagtekst_ontbreekt")
+    if not record.get("source_pdf") or not record.get("cv_pdf"):
+        errors.append("opgaven_of_cv_niet_gekoppeld")
+    if not record.get("snippet_files") and not record.get("snippet_file"):
+        errors.append("vraagfragment_ontbreekt")
+    if (record.get("exam") or {}).get("questionType")=="open" and not (
+        record.get("cv_snippet_file") or record.get("cv_snippet_files")
+    ):
+        errors.append("cv_fragment_ontbreekt")
+    return errors
+
+
 def build_question_record(meta: dict, candidate: dict, question_text: str, source_pdf: str, cv_pdf: str) -> dict:
     """Create a review record; never an approved website record."""
     level_prefix="ha" if meta.get("level")=="Havo" else "vw"
