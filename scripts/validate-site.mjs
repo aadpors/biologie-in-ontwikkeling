@@ -135,7 +135,7 @@ for (const [index, context] of examContexts.entries()) {
   const images = context.images || [];
   const hasSeparateContextAndQuestion = images.length >= 2 && images[0] !== images.at(-1);
   const hasSingleCompleteSourcePage = images.length === 1 &&
-    /question-complete-.*\\.jpg$/i.test(images[0]);
+    /question-complete-.*\.jpg$/i.test(images[0]);
   assert.ok(hasSeparateContextAndQuestion || hasSingleCompleteSourcePage,
     `${where}: aparte context-/vraagafbeeldingen of één volledige bronpagina ontbreken`);
   for (const path of images) assertSnippetExists(path, where);
@@ -151,7 +151,7 @@ for (const [index, question] of [...examQuestions, ...openExamQuestions].entries
   const images = context.images || [];
   const hasSeparateContextAndQuestion = images.length >= 2 && images[0] !== images.at(-1);
   const hasSingleCompleteSourcePage = images.length === 1 &&
-    /question-complete-.*\\.jpg$/i.test(images[0]);
+    /question-complete-.*\.jpg$/i.test(images[0]);
   assert.ok(hasSeparateContextAndQuestion || hasSingleCompleteSourcePage,
     `examenvraag ${index + 1}: context moet als uitsnede of volledige bronpagina beschikbaar zijn`);
 }
