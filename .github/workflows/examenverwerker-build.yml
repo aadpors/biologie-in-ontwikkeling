@@ -8,6 +8,10 @@ on:
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
   workflow_dispatch:
 
+concurrency:
+  group: examenverwerker-build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: windows-latest
