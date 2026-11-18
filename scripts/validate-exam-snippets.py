@@ -99,6 +99,52 @@ for filename, label in DATASETS:
             except Exception as exc:
                 errors.append(f"{label} {qid}: ongeldige afbeelding {rel}: {exc}")
 
+# Regression: a lead-in introducing numbered statements belongs to the
+# question, never to its general context. This scans every generated exam card,
+# not only individually named exceptions.
+list_heading_re = __import__("re").compile(
+    r"^\\s*(?:hieronder|hierna)\\s+(?:staan|staat|is|zijn|volgt|volgen|wordt|worden)\\b",
+    __import__("re").I,
+)
+numbered_item_re = __import__("re").compile(r"^\\s*([1-4])(?:[.)]\\s+|\\s+\\S)")
+for filename in ("exam-mcq.json", "exam-open.json"):
+    records = json.loads((ROOT / filename).read_text(encoding="utf-8"))
+    for record in records:
+        source_lines = [line.strip() for line in str(record.get("source", "")).splitlines() if line.strip()]
+        question_text = str(record.get("q", ""))
+        for index, line in enumerate(source_lines):
+            if not list_heading_re.match(line):
+                continue
+            following = source_lines[index + 1:index + 18]
+            numbers = {
+                int(match.group(1))
+                for item in following
+                if (match := numbered_item_re.match(item))
+            }
+            if len(numbers) >= 2:
+                errors.append(
+                    f"{filename} {record.get('id')}: vraaginleiding met genummerde uitspraken staat nog in de algemene context: {line}"
+                )
+                if line not in question_text:
+                    errors.append(
+                        f"{filename} {record.get('id')}: verplaatste vraaginleiding ontbreekt in het vraagveld: {line}"
+                    )
+
+# Havo 2025-I question 26 is the original reported regression and must remain
+# correct after the generalized extraction pass.
+q26_regression = next(
+    (q for q in json.loads((ROOT / "exam-open.json").read_text(encoding="utf-8"))
+     if q.get("id") == "ha25t1-open-26"),
+    None,
+)
+if q26_regression:
+    if "Hieronder staan drie uitspraken." in str(q26_regression.get("source", "")):
+        errors.append("Havo 2025-I vraag 26: de vraaginleiding staat nog in source/context")
+    if "Hieronder staan drie uitspraken." not in str(q26_regression.get("q", "")):
+        errors.append("Havo 2025-I vraag 26: de vraaginleiding ontbreekt in de vraag")
+    if q26_regression.get("images", [])[-1:] != ["exam-snippets/question-ha25t1-26-only.jpg"]:
+        errors.append("Havo 2025-I vraag 26: de vraagafbeelding is niet als laatste afbeelding gekoppeld")
+
 # Audit the lower edge of every generated question crop.
 for image_path in sorted((ROOT / "exam-snippets").glob("question-*.jpg")):
     try:
