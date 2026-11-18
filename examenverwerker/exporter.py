@@ -30,16 +30,28 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
             if meta.get(field) in (None,""): errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
         if meta.get("questionType") not in ("mcq","open"): errors.append({"id":rid,"error":"vraagtype_onbekend"})
+        if meta.get("level") not in ("Havo","Vwo"): errors.append({"id":rid,"error":"niveau_onbekend"})
+        if not str(meta.get("year","")).isdigit() or len(str(meta.get("year","")))!=4: errors.append({"id":rid,"error":"jaartal_ongeldig"})
+        if str(meta.get("period")) not in ("1","2","3"): errors.append({"id":rid,"error":"tijdvak_ongeldig"})
+        try:
+            if int(meta.get("points",-1)) < 0: raise ValueError()
+        except (TypeError,ValueError): errors.append({"id":rid,"error":"puntenaantal_ongeldig"})
         if not r.get("id"): errors.append({"id":rid,"error":"id_ontbreekt"})
-        if r.get("number") is None or r.get("source_page") is None: errors.append({"id":rid,"error":"vraagnummer_of_bronpagina_ontbreekt"})
-        if meta.get("questionType")=="mcq" and (not r.get("options") or not r.get("correct")):
-            errors.append({"id":rid,"error":"meerkeuzeopties_of_correct_antwoord_ontbreekt"})
+        if not isinstance(r.get("number"),int) or r["number"]<1 or not isinstance(r.get("source_page"),int) or r["source_page"]<1:
+            errors.append({"id":rid,"error":"vraagnummer_of_bronpagina_ongeldig"})
+        if meta.get("questionType")=="mcq":
+            options=r.get("options") or []
+            keys={o.get("key") for o in options if isinstance(o,dict)}
+            if len(options)<2 or not r.get("correct") or r.get("correct") not in keys:
+                errors.append({"id":rid,"error":"meerkeuzeopties_of_correct_antwoord_ongeldig"})
         for field,label in (("source_pdf","opgavenbron_ontbreekt"),("cv_pdf","correctievoorschrift_ontbreekt")):
             if not r.get(field) or not (project_dir/"bronnen"/r[field]).is_file(): errors.append({"id":rid,"error":label})
         snippets=r.get("snippet_files") or ([r["snippet_file"]] if r.get("snippet_file") else [])
         if not snippets: errors.append({"id":rid,"error":"snippet_ontbreekt"})
         for name in snippets:
-            if not (project_dir/"snippets"/name).is_file(): errors.append({"id":rid,"error":f"snippet_ontbreekt:{name}"})
+            if Path(name).name!=name:
+                errors.append({"id":rid,"error":"ongeldig_snippetpad"})
+            elif not (project_dir/"snippets"/name).is_file(): errors.append({"id":rid,"error":f"snippet_ontbreekt:{name}"})
         if meta.get("questionType")=="open":
             cv_snippets=r.get("cv_snippet_files") or ([r["cv_snippet_file"]] if r.get("cv_snippet_file") else [])
             if len(cv_snippets)!=1:
@@ -52,7 +64,9 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         if rid in seen: errors.append({"id":rid,"error":"dubbel_id"})
         seen.add(rid)
         for ref in r.get("uitwerkbijlagen",[]):
-            if not (project_dir/"bronnen"/ref).is_file(): errors.append({"id":rid,"error":f"uitwerkbijlage_ontbreekt:{ref}"})
+            if Path(ref).name!=ref:
+                errors.append({"id":rid,"error":"ongeldig_bijlagepad"})
+            elif not (project_dir/"bronnen"/ref).is_file(): errors.append({"id":rid,"error":f"uitwerkbijlage_ontbreekt:{ref}"})
     return errors
 
 def export_approved_records(records: list[dict], project_dir: Path, output_dir: Path):
