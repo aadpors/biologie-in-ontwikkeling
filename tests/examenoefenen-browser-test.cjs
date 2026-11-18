@@ -16,6 +16,27 @@ const assert = require("node:assert/strict");
     assert.match(await page.locator("#count").innerText(), /519 vragen/);
     await page.waitForFunction(() => typeof questions !== "undefined" && questions.length === 519 && questions.every(q => typeof q.repeatedContext === "string"));
 
+    // Every question with a source-page context image must render that image,
+    // not duplicate the same context as extracted text. Regression: Havo 2025-I Q27.
+    await page.locator("#level").selectOption("Havo");
+    await page.locator("#year").selectOption("2025");
+    await page.locator("#period").selectOption("1");
+    await page.locator("#questionType").selectOption("mcq");
+    await page.evaluate(() => { currentIndex = getFiltered().findIndex(q => Number(q.n) === 27); render(); });
+    await page.waitForFunction(() => [...document.querySelectorAll(".exam-snippets img")].length >= 2);
+    assert.equal(await page.locator(".sourceblock").count(), 0,
+      "Havo 2025-I vraag 27: de algemene context moet als oorspronkelijke afbeelding worden getoond, niet als geëxtraheerde tekst");
+    assert.equal(await page.locator(".exam-snippets img").count(), 2,
+      "Havo 2025-I vraag 27: zowel context- als vraagafbeelding moeten zichtbaar zijn");
+    const contextImageAudit = await page.evaluate(() => ({
+      total: questions.length,
+      withImageContext: questions.filter(q => (q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\.jpg$/i.test(q.images[0]))).length,
+      missingImageContext: questions.filter(q => !((q.images || []).length >= 2 || ((q.images || []).length === 1 && /question-complete-.*\.jpg$/i.test(q.images[0])))).map(q => q.id)
+    }));
+    assert.equal(contextImageAudit.total, 519);
+    assert.deepEqual(contextImageAudit.missingImageContext, [],
+      "Alle examenvragen moeten een afzonderlijke context- en vraagafbeelding hebben");
+
     // Binary statement questions use one mutually exclusive radio pair per row.
     const binaryInventory = await page.evaluate(() => ({
       total: questions.filter(q => q.binaryChoice).length,
