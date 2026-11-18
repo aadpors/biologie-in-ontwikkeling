@@ -163,6 +163,13 @@ function getBinaryChoiceDefinition(q){
   if(rows.length===3&&rows.every(row=>row.text))return {labels,rows};
   return null;
  }
+ if(q.id==="ha25t1-open-26"){
+  return {labels:["Juist","Onjuist"],rows:[
+   {label:"1",text:"Door het inhouden van de adem wordt het restvolume van de longen groter."},
+   {label:"2",text:"De duiker raakt buiten bewustzijn, doordat de O2-concentratie in zijn bloed te laag wordt."},
+   {label:"3",text:"De ademprikkel blijft uit, omdat de CO2-concentratie in het bloed hoog is."}
+  ]};
+ }
  if(/koolhydraatvertering[\s\S]*eiwitvertering/i.test(prompt)){
   return {labels:["Wel","Geen"],rows:[
    {label:"In de pouch",text:"Koolhydraatvertering"},
