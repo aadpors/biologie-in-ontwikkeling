@@ -770,7 +770,7 @@ class ExamApp:
         # Continue across document boundaries instead of silently returning to
         # the first candidate when the current PDF has been fully reviewed.
         next_row = next((item for item in self.data.get("vraagkandidaten", [])
-                         if item.get("human_decision") is None), None)
+                         if item is not row and item.get("human_decision") is None), None)
         if next_row and next_row.get("document_id") != self._workspace_doc_id:
             self._workspace_doc_id = next_row.get("document_id")
             self._workspace_selected = None
@@ -780,6 +780,12 @@ class ExamApp:
             next_index = next((i for i, item in enumerate(self._workspace_rows)
                                if item.get("id") == next_row.get("id")), 0)
             self._workspace_refresh_candidates(next_index)
+        elif decision is None:
+            current_index = next((i for i, item in enumerate(self._workspace_rows)
+                                  if item.get("id") == row.get("id")), 0)
+            self._workspace_refresh_candidates(current_index)
+            self.status.configure(text="Deze vraagstart blijft open voor latere nacontrole.")
+            self._workflow_refresh()
         else:
             self._workspace_refresh_candidates(0)
             self.status.configure(text="Alle vraagstarts in dit examen zijn beoordeeld. De volgende stap is het afbakenen van de examenstructuur.")
