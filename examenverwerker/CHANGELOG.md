@@ -1,3 +1,10 @@
+## 0.11.0
+- Vraagstartcontrole vernieuwd: kandidaten en vraagtekst staan naast elkaar in één doorlopend werkvenster; bevestigen/afwijzen opent geen apart venster per vraag.
+- Na iedere beslissing springt de controle automatisch naar de volgende nog niet beoordeelde kandidaat.
+- Projecten worden automatisch aangemaakt in `projecten/` binnen de programmamap; geen map- of naamdialoog meer.
+- Bulkimport gebruikt dezelfde programmamap-root en groepeert examens onder `projecten/<jaar>/<niveau>-tijdvak-<nummer>/`.
+- Foutafhandeling bij projectaanmaak verbeterd en de programmamap wordt expliciet als opslaglocatie gebruikt.
+
 ## 0.10.1
 - Metadata-controle toont het originele voorblad naast de automatisch herkende document- en examenvelden.
 - Dit geldt zowel voor bulkimport als voor document- en projectmetadata in bestaande projecten.
