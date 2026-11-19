@@ -247,8 +247,7 @@ class ExamApp:
             for document in self.data.get("documenten", []):
                 if document.get("type_voorstel") in ("opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"):
                     document["exam_metadata"]=dict(identity)
-            for record in self.data.get("vraagrecords", []):
-                exam=record.setdefault("exam", {})
+            for record in self.data.get("vraagrecords", []):                exam=record.setdefault("exam", {})
                 exam.update({"level":identity["level"],"year":identity["year"],"period":identity["period"]})
                 record["source_match_human_confirmed"]=True
                 record["cv_match_human_confirmed"]=True
@@ -344,7 +343,8 @@ class ExamApp:
                 matching_cvs = match_correction_documents(doc, cv_docs)
                 if len(matching_cvs) == 1:
                     cv_doc = matching_cvs[0]
-                    cv_analysis = analyze_pdf(cv_path)
+                    cv_source = self.project_dir / "bronnen" / cv_doc["opslagbestand"]
+                    cv_analysis = analyze_pdf(cv_source)
                     cv_candidates = detect_cv_question_numbers(cv_analysis)
                     # A well-populated CV gives a useful independent signal for
                     # suspicious source-line numbers; it never auto-rejects a start.
@@ -497,8 +497,7 @@ class ExamApp:
             item=rows[int(selected[0])]
             key=f"{item.get('document_id')}|{item.get('number')}|{item.get('page')}|{float(item.get('bbox',[0,0])[1]):.1f}"
             item["status"]="controle_nodig"
-            item["human_decision"]=None
-            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
+            item["human_decision"]=None            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
             item.pop("suppressed_by",None)
             self.data["onderdrukte_vraagkandidaten"]=[x for x in self.data.get("onderdrukte_vraagkandidaten",[]) if x is not item]
             self.data.setdefault("vraagkandidaten",[]).append(item)
@@ -747,8 +746,7 @@ class ExamApp:
                 canvas.configure(scrollregion=(0,0,image_width,image_height))
                 selection_start=None
                 selection_lines=None
-                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")
-            def change_crop_page(delta):
+                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")            def change_crop_page(delta):
                 page_var.set(max(1,min(page_count,int(page_var.get())+delta)))
                 show_crop_page()
             def start_crop(event):
@@ -997,8 +995,7 @@ class ExamApp:
                 if structure is None and self.data.get("exam_structure", {}).get("document_id") == source_doc["id"]:
                     structure = self.data.get("exam_structure")
                 structure_errors = validate_exam_structure(structure, source_doc["id"], source_doc["sha256"], confirmed_numbers) if structure else ["structuur_niet_ingesteld"]
-                missing_regions = missing_question_regions(structure, [int(row["number"])])
-                if structure_errors or missing_regions:
+                missing_regions = missing_question_regions(structure, [int(row["number"])])                if structure_errors or missing_regions:
                     raise ValueError("Baken eerst het vraagfragment voor deze vraag af in 'Examenstructuur bewerken'. " +
                                      ("Structuurcontrole: " + ", ".join(structure_errors) if structure_errors else "Vraagfragment ontbreekt."))
                 linkage = fragments_for_question(structure, row["number"])
@@ -1247,8 +1244,7 @@ class ExamApp:
                             target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-cv-{cv_index}.png"
                             render_composite_crops(cv_path,proposal["source_segments"],target,scale=1.0)
                             preview_specs.append((f"Origineel CV · vraag {record['number']} · anker pagina {anchor['page']}",target,None,None))
-                except Exception as exc:
-                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
+                except Exception as exc:                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
         for idx,name in enumerate(record.get("snippet_files") or ([record["snippet_file"]] if record.get("snippet_file") else []),1):
             preview_specs.append((f"Handmatig afgebakend vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
         for idx,asset in enumerate(record.get("context_asset_files", []),1):
@@ -1497,8 +1493,7 @@ class ExamApp:
             return
         self._open_structure_editor(source_docs[0])
 
-    def _open_structure_editor(self, doc):
-        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
+    def _open_structure_editor(self, doc):        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
         if not candidates:
             messagebox.showwarning("Eerst vraagstarts analyseren", "Analyseer eerst de vraagstarts van deze opgaven-PDF en controleer de kandidaten.")
             return
@@ -1747,8 +1742,7 @@ class ExamApp:
         def delete_fragment():
             sel = fragment_tree.selection()
             if not sel: return
-            index = int(sel[0])
-            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
+            index = int(sel[0])            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
             fragments.pop(index); refresh_fragment_list(); save_structure()
         def load_selected_fragment(_event=None):
             load_span_for_page(); redraw_guides()
@@ -1997,8 +1991,7 @@ class ExamApp:
             return
         analysis = self.project_dir / "analyse" / f"{doc['id']}.json"
         extracted = json.loads(analysis.read_text(encoding="utf-8"))
-        preview = tk.Toplevel(self.root)
-        preview.title(doc["bestand"])
+        preview = tk.Toplevel(self.root)        preview.title(doc["bestand"])
         preview.geometry("850x620")
         header = ttk.Frame(preview, padding=12)
         header.pack(fill="x")
