@@ -164,7 +164,11 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "cv_amendment_snippet_sha256":sha256(project_dir/"snippets"/r["cv_amendment_snippet_file"]) if r.get("cv_amendment_snippet_file") else None,
                          "uitwerkbijlagen":[{"file":name,"sha256":sha256(output_dir/name)} for name in appendix],
                          "cv_amendment_pdfs":[{"file":name,"sha256":sha256(output_dir/name)} for name in cv_amendments],
-                         "human_approved":True})
+                         "human_approved":True,
+                         "exam_structure_status":r.get("exam_structure_status", "structuur_niet_ingesteld"),
+                         "exam_structure_fragment_ids":r.get("exam_structure_fragment_ids", []),
+                         "question_region_page_spans":r.get("question_region_page_spans", []),
+                         "context_region_fragments":r.get("context_region_fragments", [])})
     (output_dir/"exam-mcq.json").write_text(json.dumps(mcq,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-open.json").write_text(json.dumps(opened,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-contexts.json").write_text(json.dumps(contexts,ensure_ascii=False,indent=2),encoding="utf-8")
