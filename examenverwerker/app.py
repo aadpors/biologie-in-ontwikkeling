@@ -16,7 +16,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.12.0"
+APP_VERSION = "0.13.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -171,6 +171,16 @@ class ExamApp:
         ]
         for label, callback, style in actions:
             ttk.Button(toolbar, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
+
+        correction_bar = ttk.Frame(shell, style="App.TFrame")
+        correction_bar.pack(fill="x", pady=(0, 7))
+        ttk.Button(correction_bar, text="Correcties uit Biologie-controle importeren",
+                   command=self._workspace_import_corrections).pack(side="left", padx=(0, 5))
+        ttk.Button(correction_bar, text="Beoordelingen exporteren",
+                   command=self._workspace_export_corrections).pack(side="left")
+        ttk.Label(correction_bar,
+                  text="Bewaart besluiten, notities, vraagnummercorrecties en exacte PDF-posities.",
+                  style="Muted.TLabel").pack(side="left", padx=10)
 
         workspace = ttk.Panedwindow(shell, orient="horizontal")
         workspace.pack(fill="both", expand=True)
