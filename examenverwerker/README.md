@@ -58,7 +58,7 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 ## Werkwijze
 1. Kies **Examens in bulk importeren** en selecteer alle beschikbare PDF’s, ook als ze uit verschillende jaren, niveaus en tijdvakken komen.
 2. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak). De applicatie maakt daarna automatisch de mapstructuur onder `examens/` aan.
-3. Het eerste aangemaakte examen wordt direct geopend in de geïntegreerde werkruimte; de overige examens open je via de examenbibliotheek.
+3. Het eerste aangemaakte examen wordt direct geopend in de geïntegreerde werkruimte. Na afronding leidt de vervolgstap je naar het volgende examen uit dezelfde importbatch. De batch wordt in het importmanifest bewaard, zodat deze volgorde ook na het herstarten van de applicatie beschikbaar blijft. In de examenbibliotheek kun je bovendien direct **Volgend openstaand examen** openen.
 4. Laat vraagstarts analyseren.
 5. Bekijk kandidaten in de geïntegreerde werkruimte op de originele PDF-pagina. Bevestig, wijs af of markeer twijfel; pas vraagnummer, vraagtekst en notities direct aan. Ontbrekende vraagstarts kun je op de PDF aanwijzen. Alle kandidaten moeten een menselijke beslissing hebben.
 6. Open 'Examenstructuur bewerken' voor iedere opgaven-PDF. Maak voor elke vraag een vraagfragment en leg contextinleidingen, vraagcontexten en tussenliggende contexten vast. Koppel ieder contextfragment aan de juiste vragen.
