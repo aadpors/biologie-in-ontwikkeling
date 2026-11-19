@@ -405,8 +405,8 @@ class ExamApp:
             groups, unassigned = group_exam_documents(documents)
             for index, doc in enumerate(documents):
                 meta = doc.get("exam_metadata") or {}
-                uncertain = doc.get("type_zekerheid", 0) < 0.9 or (
-                    meta.get("source") == "eerste_pdf_paginas" and meta.get("confidence", 0) < 0.9)
+                uncertain = (doc.get("type_zekerheid", 0) < 0.9
+                             or float(meta.get("confidence", 0) or 0) < 0.9)
                 state = "Handmatig controleren" if uncertain or not meta else "Voorstel controleren"
                 if not meta:
                     state = "Metadata ontbreekt"
