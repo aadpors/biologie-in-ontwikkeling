@@ -223,6 +223,103 @@ def detect_question_candidates(analysis: dict) -> list[dict]:
     analysis["suppressed_question_candidates"]=suppressed
     return sorted(kept,key=lambda x:(int(x["page"]),float(x["bbox"][1]),float(x["bbox"][0])))
 
+
+def propose_context_fragments(analysis: dict, candidates: list[dict]) -> list[dict]:
+    """Suggest full-width context bands around figures/tables and their captions.
+
+    The proposal is deliberately conservative: it only uses visual objects
+    inventoried from the source PDF, joins nearby captions, and links each band
+    to the closest confirmed question anchor. Every result remains unapproved.
+    """
+    anchors = sorted(
+        [row for row in candidates if row.get("human_decision") is True],
+        key=lambda row: (int(row.get("page", 1)), float((row.get("bbox") or [0, 0])[1]))
+    )
+    if not anchors:
+        return []
+    proposals = []
+    for page in analysis.get("pages", []):
+        page_no = int(page.get("page", 0) or 0)
+        page_height = float(page.get("height", 0) or 0)
+        page_width = float(page.get("width", 0) or 0)
+        if page_no < 1 or page_height <= 0 or page_width <= 0:
+            continue
+        assets = []
+        for asset in page.get("visual_assets", []):
+            bbox = asset.get("bbox") or []
+            if len(bbox) != 4:
+                continue
+            x0, y0, x1, y1 = (float(value) for value in bbox)
+            if x1 - x0 < 18 or y1 - y0 < 12:
+                continue
+            assets.append({"top": max(0.0, y0 - 7.0), "bottom": min(page_height, y1 + 7.0),
+                           "asset_ids": [asset.get("id")], "caption": False})
+        if not assets:
+            continue
+        captions = []
+        for block in page.get("blocks", []):
+            for line in block.get("lines", []):
+                text = str(line.get("text", "")).strip()
+                bbox = line.get("bbox") or []
+                if len(bbox) != 4 or not FIGURE_RE.search(text):
+                    continue
+                captions.append({"top": float(bbox[1]), "bottom": float(bbox[3]),
+                                 "text": text, "caption": True})
+        for caption in captions:
+            nearest = min(assets, key=lambda asset: min(
+                abs(caption["top"] - asset["bottom"]),
+                abs(asset["top"] - caption["bottom"])
+            ))
+            gap = max(0.0, max(caption["top"] - nearest["bottom"],
+                               nearest["top"] - caption["bottom"]))
+            if gap <= 70:
+                nearest["top"] = max(0.0, min(nearest["top"], caption["top"] - 3.0))
+                nearest["bottom"] = min(page_height, max(nearest["bottom"], caption["bottom"] + 3.0))
+                nearest["caption"] = True
+                nearest.setdefault("caption_text", []).append(caption["text"])
+
+        assets.sort(key=lambda item: item["top"])
+        clusters = []
+        for asset in assets:
+            if clusters and asset["top"] <= clusters[-1]["bottom"] + 18:
+                cluster = clusters[-1]
+                cluster["bottom"] = max(cluster["bottom"], asset["bottom"])
+                cluster["asset_ids"].extend(asset["asset_ids"])
+                cluster["caption"] = cluster["caption"] or asset["caption"]
+                cluster.setdefault("caption_text", []).extend(asset.get("caption_text", []))
+            else:
+                clusters.append(dict(asset))
+        for index, cluster in enumerate(clusters, 1):
+            if cluster["bottom"] - cluster["top"] < 12:
+                continue
+            same_page = [row for row in anchors if int(row.get("page", 0)) == page_no]
+            preceding = [row for row in same_page
+                         if float((row.get("bbox") or [0, 0])[1]) <= cluster["bottom"]]
+            if preceding:
+                linked = max(preceding, key=lambda row: float((row.get("bbox") or [0, 0])[1]))
+            else:
+                following = [row for row in anchors if int(row.get("page", 0)) > page_no]
+                linked = min(following, key=lambda row: int(row.get("page", 0))) if following else anchors[-1]
+            top = max(0.0, min(1.0, cluster["top"] / page_height))
+            bottom = max(0.0, min(1.0, cluster["bottom"] / page_height))
+            if bottom - top < 0.005:
+                continue
+            proposals.append({
+                "id": f"voorstel-context-{page_no}-{index}-{linked.get('number')}",
+                "type": "vraagcontext",
+                "page_spans": [{"page": page_no, "top": round(top, 6), "bottom": round(bottom, 6)}],
+                "question_numbers": [int(linked["number"])],
+                "status": "automatisch_voorstel_nog_te_controleren",
+                "confidence": 0.82 if cluster["caption"] else 0.68,
+                "evidence": {
+                    "visual_assets": [value for value in cluster["asset_ids"] if value],
+                    "captions": cluster.get("caption_text", []),
+                    "reason": "Afbeelding, schema of tabel met nabijgelegen bijschrift"
+                    if cluster["caption"] else "Visueel object in de buurt van een bevestigde vraagstart",
+                },
+            })
+    return proposals
+
 def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.25):
     """Render a full original page for human visual review."""
     import pymupdf as fitz
