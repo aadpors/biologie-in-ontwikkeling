@@ -16,7 +16,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.10.1"
+APP_VERSION = "0.11.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -722,7 +722,7 @@ class ExamApp:
             widget.pack(anchor="w",fill="x")
 
         def save():
-            if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
+            if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
                 messagebox.showerror("Examengegevens onvolledig","Controleer niveau, jaartal en tijdvak aan de hand van het voorblad.",parent=win); return
             identity={"level":level.get(),"year":year.get().strip(),"period":period.get(),"confidence":1.0,"source":"handmatig_bevestigd"}
             self.data["exam_metadata"]=identity
@@ -2658,7 +2658,7 @@ class ExamApp:
             old = doc["type_voorstel"]
             new = choice.get()
             if new in ("opgaven","correctievoorschrift","uitwerkbijlage","aanvulling"):
-                if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
+                if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
                     messagebox.showerror("Examenidentiteit onvolledig","Controleer niveau, jaartal en tijdvak.",parent=win)
                     return
                 doc["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),
