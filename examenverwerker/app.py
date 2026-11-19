@@ -700,11 +700,11 @@ class ExamApp:
             self._error("Correcties importeren", exc)
             messagebox.showerror("Importeren mislukt", str(exc), parent=self.root)
 
-    def _workspace_apply_saved_corrections(self):
+    def _workspace_apply_saved_corrections(self, target_rows=None):
         """Apply imported Biologie-controle corrections to the current candidate set."""
         if not self.data:
             return
-        rows = self.data.setdefault("vraagkandidaten", [])
+        rows = target_rows if target_rows is not None else self.data.setdefault("vraagkandidaten", [])
         for document_state in self.data.get("biologie_controle_correcties", []):
             filename = document_state.get("bestand")
             doc = next((d for d in self.data.get("documenten", []) if d.get("bestand") == filename), None)
@@ -801,7 +801,7 @@ class ExamApp:
                 match["number"] = old.get("number")
             if old.get("manual_position_confirmed") and old.get("bbox"):
                 match["bbox"] = list(old["bbox"])
-        self._workspace_apply_saved_corrections()
+        self._workspace_apply_saved_corrections(candidates)
         return candidates
 
     def _workspace_export_corrections(self):
@@ -1385,6 +1385,7 @@ class ExamApp:
         cv_docs = [d for d in self.data["documenten"] if d.get("type_voorstel") == "correctievoorschrift"]
         total = 0
         comparisons = {}
+        previous_candidates = list(self.data.get("vraagkandidaten", []))
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
             structures = self.data.setdefault("exam_structures", {})
@@ -1423,6 +1424,11 @@ class ExamApp:
                         still_suppressed.append(item)
                 suppressed=still_suppressed
                 ordered=sorted(candidates,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                for item in ordered:
+                    item.setdefault("original_number", int(item.get("number", 0) or 0))
+                    bbox = item.get("bbox") or [0, 0]
+                    stable_key = f"{doc['id']}|{item['page']}|{item['original_number']}|{float(bbox[0]):.1f}|{float(bbox[1]):.1f}"
+                    item["id"] = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
                 for index,item in enumerate(ordered):
                     following=ordered[index+1] if index+1<len(ordered) else None
                     proposal_text=extract_candidate_text(analysis,item,following)
@@ -1439,7 +1445,7 @@ class ExamApp:
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
                         "vraagtekst_voorstel":proposal_text,"vraagtype_controle":detect_question_type(proposal_text),
                         "vraagtype_status":"controle_nodig","context_verwijzingen":detect_context_references(proposal_text)})
-                candidates=ordered
+                candidates=self._workspace_merge_review_state(doc, ordered, previous_candidates)
                 self.data.setdefault("vraagkandidaten",[])
                 self.data.setdefault("onderdrukte_vraagkandidaten",[])
                 self.data["vraagkandidaten"]=[x for x in self.data["vraagkandidaten"] if x.get("document_id")!=doc["id"]]+candidates
