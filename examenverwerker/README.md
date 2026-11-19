@@ -53,7 +53,7 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 6. Open 'Examenstructuur bewerken' voor iedere opgaven-PDF. Maak voor elke vraag een vraagfragment en leg contextinleidingen, vraagcontexten en tussenliggende contexten vast. Koppel ieder contextfragment aan de juiste vragen.
 7. Maak per vraag een voorlopig snippetvoorstel om mogelijke figuren, tabellen en tekstregio's te inventariseren. Dit zijn alleen kandidaten.
 8. Maak het concept-vraagrecord. Selecteer de juiste CV-PDF en bak het beoordelingsmodel voor die vraag handmatig af. Voeg alle vervolgpagina's toe. Doe hetzelfde voor iedere geselecteerde officiële CV-aanvulling.
-9. Selecteer alleen figuren, tabellen en tekstregio's die aantoonbaar bij de vraag horen. Controleer uitsneden, bijschriften en context. De handmatig afgebakende contextfragmenten en hun tekst worden automatisch gekoppeld.
+9. Selecteer alleen figuren, tabellen en tekstregio's die aantoonbaar bij de vraag horen. Corrigeer of bevestig per geselecteerde figuur/tabel het bijschrift (ook expliciet als er geen bijschrift is). Controleer uitsneden en contexttekst. De handmatig afgebakende contextfragmenten en hun tekst worden automatisch gekoppeld.
 10. Controleer alle pagina's van uitwerkbijlagen en CV-aanvullingen.
 11. Open 'Vraagrecords beoordelen en goedkeuren', vergelijk alle fragmenten met de volledige originele PDF's, vink alleen werkelijk gecontroleerde onderdelen af en keur ieder record expliciet goed.
 12. Maak pas daarna een exportpakket. Ontbrekende of verouderde vraag- en CV-afbakeningen blokkeren export. Dit wijzigt of publiceert niets op de live website.
