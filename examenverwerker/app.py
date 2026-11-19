@@ -390,11 +390,34 @@ class ExamApp:
             label, button, action = (f"Stap 5 · De structuur is vastgelegd. Maak de concept-vraagrecords; nog {len(missing_records)} bevestigde vragen zonder record.", "Volgend vraagrecord maken", self._workflow_make_next_record)
         elif unapproved:
             label, button, action = (f"Stap 6 · {len(records) - len(unapproved)} van {len(records)} vraagrecords goedgekeurd. Rond de inhoudelijke eindcontrole af.", "Eindcontrole openen", self.show_records)
+        elif self.import_batch_index + 1 < len(self.import_batch_paths):
+            label, button, action = (f"Dit examen is verwerkt. Ga door met examen {self.import_batch_index + 2} van {len(self.import_batch_paths)} uit dezelfde importbatch.", "Volgend examen", self._workflow_open_next_exam)
+        elif not records and not confirmed:
+            label, button, action = ("Alle kandidaten zijn afgewezen. Controleer of er een vraagstart ontbreekt of dat dit examen bewust geen vraagrecords bevat.", "Ontbrekende vraag markeren", self._workspace_start_manual_mark)
         else:
             label, button, action = ("Stap 7 · Alle huidige vraagrecords zijn goedgekeurd. Maak het gecontroleerde exportpakket; er wordt niets gepubliceerd.", "Exportpakket maken", self.export_project)
 
         self.workflow_label.configure(text=label)
         self.workflow_button.configure(text=button, command=action)
+
+    def _workflow_open_next_exam(self):
+        if self.import_batch_index + 1 >= len(self.import_batch_paths):
+            return
+        self.import_batch_index += 1
+        self.project_dir = self.import_batch_paths[self.import_batch_index]
+        try:
+            self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
+            self._workspace_doc_id = None
+            self._workspace_selected = None
+            self._workspace_load_global_corrections()
+            self.refresh()
+            meta = self.data.get("exam_metadata", {})
+            self._log(f"Verder met examen {self.import_batch_index + 1}/{len(self.import_batch_paths)}: "
+                      f"{meta.get('level', '')} {meta.get('year', '')} tijdvak {meta.get('period', '')}.")
+        except Exception as exc:
+            self._error("Volgend examen openen", exc)
+            messagebox.showerror("Examen openen mislukt",
+                "Het volgende examen uit de importbatch kon niet worden geopend. De bronbestanden zijn niet gewijzigd.")
 
     def _workflow_focus_next(self):
         if not self.data:
@@ -1276,6 +1299,11 @@ class ExamApp:
                     raise ValueError("Onbekend examenformaat.")
                 self.project_dir = folder
                 self.data = data
+                if folder in self.import_batch_paths:
+                    self.import_batch_index = self.import_batch_paths.index(folder)
+                else:
+                    self.import_batch_paths = []
+                    self.import_batch_index = 0
                 self._workspace_load_global_corrections()
                 self.refresh()
                 self._log(f"Examen geopend: {table.item(selection[0], 'values')[0]}")
