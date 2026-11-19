@@ -1,5 +1,13 @@
 # Wijzigingen
 
+## 0.7.1
+- Alle handmatige uitsneden gebruiken uitsluitend horizontale stroken over de volledige paginabreedte.
+- De strookselectie toont en verplaatst alleen twee horizontale grenzen; verticale grenslijnen zijn verwijderd.
+- De exportcontrole verifieert de volledige paginabreedte en blokkeert nieuwe uitsneden met linker- of rechtermarges.
+- Oude opgeslagen rechthoekige uitsneden blijven leesbaar voor compatibiliteit; nieuwe uitsneden worden alleen als paginabrede strook opgeslagen.
+- Regressietests toegevoegd voor volledige breedte en het afwijzen van verticale uitsnedengrenzen.
+
+
 ## 0.6.0
 - Afzonderlijke visuele vraag/contextstructuur per opgaven-PDF.
 - Versleepbare paginabrede grenzen met genormaliseerde coördinaten.
