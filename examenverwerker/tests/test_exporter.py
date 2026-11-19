@@ -184,6 +184,7 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(context["contextImages"],["exam-snippets/context-figuur.png"])
             self.assertEqual(context["image"],"exam-snippets/context-figuur.png")
             self.assertEqual(context["contextRegions"][0]["text"],"De contexttekst.")
+            self.assertEqual(context["contextText"],"De contexttekst.")
             self.assertEqual(context["contextAssets"][0]["caption"],"Microscopische afbeelding")
             self.assertTrue((out/"exam-snippets"/"context-figuur.png").is_file())
 
