@@ -493,7 +493,8 @@ class ExamApp:
             for document in self.data.get("documenten", []):
                 if document.get("type_voorstel") in ("opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"):
                     document["exam_metadata"]=dict(identity)
-            for record in self.data.get("vraagrecords", []):                exam=record.setdefault("exam", {})
+            for record in self.data.get("vraagrecords", []):
+                exam=record.setdefault("exam", {})
                 exam.update({"level":identity["level"],"year":identity["year"],"period":identity["period"]})
                 record["source_match_human_confirmed"]=True
                 record["cv_match_human_confirmed"]=True
@@ -1490,7 +1491,8 @@ class ExamApp:
                             target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-cv-{cv_index}.png"
                             render_composite_crops(cv_path,proposal["source_segments"],target,scale=1.0)
                             preview_specs.append((f"Origineel CV · vraag {record['number']} · anker pagina {anchor['page']}",target,None,None))
-                except Exception as exc:                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
+                except Exception as exc:
+                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
         for idx,name in enumerate(record.get("snippet_files") or ([record["snippet_file"]] if record.get("snippet_file") else []),1):
             preview_specs.append((f"Handmatig afgebakend vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
         for idx,asset in enumerate(record.get("context_asset_files", []),1):
