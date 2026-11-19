@@ -701,7 +701,7 @@ class ExamApp:
             crop_win.title(f"Figuur of tabel handmatig uitsnijden · vraag {row['number']}")
             crop_win.geometry("1120x850")
             crop_win.transient(win)
-            ttk.Label(crop_win,text="Sleep een rechthoek om de figuur, tabel of afbeelding op de originele pagina. Alleen het geselecteerde brongebied wordt uitgesneden; de PDF blijft ongewijzigd.",
+            ttk.Label(crop_win,text="Sleep verticaal om een horizontale strook over de volledige paginabreedte te selecteren. Er worden geen linker- of rechtergrenzen gebruikt; de PDF blijft ongewijzigd.",
                       wraplength=1080,padding=10).pack(anchor="w")
             controls=ttk.Frame(crop_win,padding=(10,4)); controls.pack(fill="x")
             page_var=tk.IntVar(value=int(row.get("page",1)))
@@ -747,7 +747,7 @@ class ExamApp:
                 canvas.configure(scrollregion=(0,0,image_width,image_height))
                 selection_start=None
                 selection_rect=None
-                crop_status.configure(text=f"Originele pagina {number}. Sleep met de muis een rechthoek rond één figuur of tabel.")
+                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")
             def change_crop_page(delta):
                 page_var.set(max(1,min(page_count,int(page_var.get())+delta)))
                 show_crop_page()
@@ -757,20 +757,19 @@ class ExamApp:
                 y=max(0,min(image_height,canvas.canvasy(event.y)))
                 selection_start=(x,y)
                 if selection_rect: canvas.delete(selection_rect)
-                selection_rect=canvas.create_rectangle(x,y,x,y,outline="black",width=1)
+                selection_rect=canvas.create_rectangle(0,y,image_width,y,outline="black",width=1)
             def drag_crop(event):
                 if selection_start is None or selection_rect is None: return
-                x=max(0,min(image_width,canvas.canvasx(event.x)))
                 y=max(0,min(image_height,canvas.canvasy(event.y)))
-                canvas.coords(selection_rect,selection_start[0],selection_start[1],x,y)
+                canvas.coords(selection_rect,0,selection_start[1],image_width,y)
             def save_manual_crop():
                 if selection_start is None or selection_rect is None:
-                    messagebox.showinfo("Geen uitsnede","Sleep eerst een rechthoek rond een figuur of tabel.",parent=crop_win)
+                    messagebox.showinfo("Geen uitsnede","Sleep eerst verticaal om de boven- en ondergrens van de paginabrede strook te bepalen.",parent=crop_win)
                     return
                 try:
                     coords=canvas.coords(selection_rect)
                     page_no=int(page_var.get())
-                    bbox=pixel_rect_to_pdf_bbox(coords,(image_width,image_height),page_sizes[page_no])
+                    bbox=pixel_rect_to_pdf_bbox([0,coords[1],image_width,coords[3]],(image_width,image_height),page_sizes[page_no])
                     stamp=datetime.now().strftime("%Y%m%d%H%M%S%f")
                     asset_id=f"manual-p{page_no}-{stamp}"
                     name=f"context-manual-{source_doc['id']}-q{row['number']}-{asset_id}.png"
@@ -797,7 +796,7 @@ class ExamApp:
                            "source_document_id":source_doc["id"],"source_sha256":source_doc["sha256"],
                            "source_pdf":source_doc["opslagbestand"],"question_number":int(row["number"]),
                            "fragment_id":fragment_map.get(fragment_var.get()),
-                           "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                           "crop_method":"handmatige_paginabrede_strook_op_originele_pdf",
                            "caption_human_confirmed":False,"status":"handmatig_uitgesneden_bijschrift_te_bevestigen"}
                     context_files.append(asset)
                     row["context_asset_proposal_files"]=[dict(x) for x in context_files]
@@ -815,7 +814,7 @@ class ExamApp:
             canvas.bind("<Button-1>",start_crop)
             canvas.bind("<B1-Motion>",drag_crop)
             actions=ttk.Frame(crop_win,padding=10); actions.pack(fill="x")
-            crop_status=ttk.Label(actions,text="Selecteer een rechthoek op de originele pagina.")
+            crop_status=ttk.Label(actions,text="Selecteer een horizontale strook over de volledige paginabreedte.")
             crop_status.pack(side="left",fill="x",expand=True)
             ttk.Button(actions,text="Uitsnede toevoegen",command=save_manual_crop).pack(side="left",padx=8)
             ttk.Button(actions,text="Sluiten",command=crop_win.destroy).pack(side="right")
