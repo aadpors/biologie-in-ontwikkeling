@@ -10,6 +10,7 @@ Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologi
 - Ontbrekende vraagstarts handmatig aanwijzen op de originele PDF; exacte PDF-punten worden opgeslagen.
 - Correcties uit Biologie-controle v1.0.x importeren en compact exporteren als `biologie-correcties-v1`; handmatige beslissingen en posities blijven bij heranalyse behouden.
 - In één keer examen-PDF’s uit meerdere jaren, havo/vwo en alle tijdvakken importeren; geen vooraf aangemaakte projecten of handmatig gekozen doelmap nodig.
+- Importcontrole in één scherm: PDF-lijst links, geselecteerd voorblad centraal en direct bewerkbare voorgestelde metadata rechts; geen aparte pop-up meer om herkenning per PDF aan te passen.
 - Metadata en documenttypen automatisch voorstellen, alle herkenning vóór import controleren en examens automatisch opslaan onder `examens/<jaar>/<niveau>-tijdvak-<nummer>/`.
 - Een importmanifest bewaren met de projectindeling en waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande examenmappen worden nooit overschreven.
 - Examenprojecten aanmaken, openen en hervatten.
