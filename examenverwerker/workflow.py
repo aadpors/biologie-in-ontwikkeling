@@ -22,10 +22,15 @@ def restore_import_batch(examens_root, current_folder, data: dict,
     manifest_path = root / Path(str(manifest_name)).name
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if manifest.get("schema") != "biologie-examenimport-v1":
+        if not isinstance(manifest, dict) or manifest.get("schema") != "biologie-examenimport-v1":
+            return None
+        entries = manifest.get("projecten", [])
+        if not isinstance(entries, list):
             return None
         paths = []
-        for entry in manifest.get("projecten", []):
+        for entry in entries:
+            if not isinstance(entry, dict):
+                return None
             relative_path = entry.get("pad")
             if not isinstance(relative_path, str) or not relative_path:
                 return None
