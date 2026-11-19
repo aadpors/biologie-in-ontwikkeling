@@ -1,7 +1,7 @@
 import unittest
 
 from structure import make_exam_structure, make_fragment, make_page_span
-from workflow import exam_workflow_state
+from workflow import exam_export_fingerprint, exam_workflow_state
 
 
 def base_exam():
@@ -85,6 +85,32 @@ class ExamWorkflowTests(unittest.TestCase):
             "id": "opgaven-2", "sha256": "second-hash", "type_voorstel": "opgaven"
         })
         self.assertEqual(exam_workflow_state(data)["stage"], "structuur")
+
+    def test_matching_export_fingerprint_marks_exam_complete(self):
+        data = with_valid_structure(base_exam())
+        data["vraagrecords"] = [{
+            "candidate_document_id": "opgaven-1",
+            "number": 1, "source_page": 2, "approved_by_human": True,
+        }]
+        data["export_status"] = {
+            "fingerprint": exam_export_fingerprint(data),
+            "export_dir": "export/test",
+        }
+        self.assertEqual(exam_workflow_state(data)["stage"], "voltooid")
+
+    def test_changed_record_invalidates_previous_export_completion(self):
+        data = with_valid_structure(base_exam())
+        data["vraagrecords"] = [{
+            "candidate_document_id": "opgaven-1",
+            "number": 1, "source_page": 2, "approved_by_human": True,
+            "question_text": "Oorspronkelijke vraag",
+        }]
+        data["export_status"] = {
+            "fingerprint": exam_export_fingerprint(data),
+            "export_dir": "export/test",
+        }
+        data["vraagrecords"][0]["question_text"] = "Gewijzigde vraag"
+        self.assertEqual(exam_workflow_state(data)["stage"], "export")
 
 
 if __name__ == "__main__":
