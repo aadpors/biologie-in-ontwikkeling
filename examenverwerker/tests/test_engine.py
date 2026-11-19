@@ -73,7 +73,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(suppressed[0]["suppressed_by"]["page"],1)
 
     def test_question_candidates_keep_repeated_numbers(self):
-        a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\\nBeschrijf de functie van dit orgaan."}]},
+        a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\nBeschrijf de functie van dit orgaan."}]},
                     {"page":2,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,140,14],"text":"1. Welke stof wordt gevormd?"}],"text":"1. Welke stof wordt gevormd?"}]}]}
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[1,1])
@@ -87,7 +87,7 @@ class EngineTests(unittest.TestCase):
         a={"pages":[{"page":1,"blocks":[{"bbox":[0,0,300,100],"lines":[
             {"bbox":[10,10,20,20],"text":"8."},
             {"bbox":[30,10,250,20],"text":"Welk orgaan produceert dit hormoon?"}
-        ],"text":"8.\\nWelk orgaan produceert dit hormoon?"}]}]}
+        ],"text":"8.\nWelk orgaan produceert dit hormoon?"}]}]}
         got=detect_question_candidates(a)
         self.assertEqual(len(got),1)
         self.assertEqual(got[0]["number"],8)
@@ -101,7 +101,7 @@ class EngineTests(unittest.TestCase):
             {"bbox":[10,100,20,110],"text":"4"},
             {"bbox":[30,100,50,110],"text":"1p"},
             {"bbox":[30,120,200,130],"text":"De vraagtekst volgt hier."}
-        ],"text":"1\\n2\\n3\\nEen doorlopende tekstregel.\\n4\\n1p\\nDe vraagtekst volgt hier."}]}]}
+        ],"text":"1\n2\n3\nEen doorlopende tekstregel.\n4\n1p\nDe vraagtekst volgt hier."}]}]}
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[4])
         self.assertEqual(got[0]["confidence"],0.95)
@@ -233,7 +233,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual([x["number"] for x in got],[4])
 
     def test_cv_anchor_detection(self):
-        a={"pages":[{"page":1,"text":"Vraag 1\\nBeoordelingsmodel\\nVraag 3"}]}
+        a={"pages":[{"page":1,"text":"Vraag 1\nBeoordelingsmodel\nVraag 3"}]}
         got=detect_cv_question_numbers(a)
         self.assertEqual([x["number"] for x in got],[1,3])
 
@@ -255,13 +255,13 @@ class EngineTests(unittest.TestCase):
         self.assertIn("ribosomen",inline["options"][1]["text"])
 
         # Parenthesized and lower-case labels are common in exam layouts/OCR.
-        lower=detect_question_type("(a) mitochondriën\\n(b) ribosomen\\n(c) celkern")
+        lower=detect_question_type("(a) mitochondriën\n(b) ribosomen\n(c) celkern")
         self.assertEqual(lower["type"],"meerkeuze")
         self.assertEqual(lower["option_labels"],["A","B","C"])
         self.assertTrue(lower["options_complete"])
 
         # A label on its own line followed by option text must also be retained.
-        split=detect_question_type("Kies één antwoord.\\nA\\nmitochondriën\\nB\\nribosomen")
+        split=detect_question_type("Kies één antwoord.\nA\nmitochondriën\nB\nribosomen")
         self.assertEqual(split["type"],"meerkeuze")
         self.assertEqual(split["option_labels"],["A","B"])
 
