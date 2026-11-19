@@ -875,6 +875,10 @@ def detect_question_type(text: str) -> dict:
     value = str(text or "").replace("\u00a0", " ")
     normalized_lines = [re.sub(r"[ \t]+", " ", line).strip() for line in value.splitlines()]
     options_by_label = {}
+    inline_pattern = re.compile(
+        r"(?<![A-Za-z0-9])(?:\(([A-Ha-h])\)|([A-Ha-h])[.):])\s*"
+        r"(.+?)(?=(?<![A-Za-z0-9])(?:\([A-Ha-h]\)|[A-Ha-h][.):])\s*|$)"
+    )
 
     def add_option(label: str, option_text: str):
         label = label.upper()
@@ -888,6 +892,11 @@ def detect_question_type(text: str) -> dict:
     line_option = re.compile(r"^\s*(?:\(([A-Ha-h])\)|([A-Ha-h])[.):])\s*(.*?)\s*$")
     standalone_label = re.compile(r"^\s*(?:\(([A-Ha-h])\)|([A-Ha-h])[.):]?)\s*$")
     for index, line in enumerate(normalized_lines):
+        inline_matches = list(inline_pattern.finditer(line)) if "inline_pattern" in locals() else []
+        if len(inline_matches) >= 2:
+            for inline_match in inline_matches:
+                add_option(inline_match.group(1) or inline_match.group(2), inline_match.group(3))
+            continue
         match = line_option.match(line)
         if match and match.group(3):
             add_option(match.group(1) or match.group(2), match.group(3))
@@ -901,10 +910,6 @@ def detect_question_type(text: str) -> dict:
     # 2) Inline extraction: some PDF text layers place A/B/C/D options on one line.
     # Require explicit punctuation and a plausible option body to avoid matching
     # ordinary capital letters in prose.
-    inline_pattern = re.compile(
-        r"(?<![A-Za-z0-9])(?:\(([A-Ha-h])\)|([A-Ha-h])[.):])\s*"
-        r"(.+?)(?=(?<![A-Za-z0-9])(?:\([A-Ha-h]\)|[A-Ha-h][.):])\s*|$)"
-    )
     for line in normalized_lines:
         matches = list(inline_pattern.finditer(line))
         if len(matches) >= 2:
