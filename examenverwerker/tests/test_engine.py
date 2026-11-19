@@ -247,6 +247,28 @@ class EngineTests(unittest.TestCase):
         missing=detect_question_type("Kies het juiste antwoord.\nA. eerste optie\nC. derde optie")
         self.assertFalse(missing["options_complete"])
         self.assertEqual(missing["option_gaps"],["B"])
+        # PDF text extraction can place all options on one line.
+        inline=detect_question_type("Kies het juiste antwoord. A. mitochondriën B. ribosomen C. celkern D. celmembraan")
+        self.assertEqual(inline["type"],"meerkeuze")
+        self.assertEqual(inline["option_labels"],["A","B","C","D"])
+        self.assertTrue(inline["options_complete"])
+        self.assertIn("ribosomen",inline["options"][1]["text"])
+
+        # Parenthesized and lower-case labels are common in exam layouts/OCR.
+        lower=detect_question_type("(a) mitochondriën\\n(b) ribosomen\\n(c) celkern")
+        self.assertEqual(lower["type"],"meerkeuze")
+        self.assertEqual(lower["option_labels"],["A","B","C"])
+        self.assertTrue(lower["options_complete"])
+
+        # A label on its own line followed by option text must also be retained.
+        split=detect_question_type("Kies één antwoord.\\nA\\nmitochondriën\\nB\\nribosomen")
+        self.assertEqual(split["type"],"meerkeuze")
+        self.assertEqual(split["option_labels"],["A","B"])
+
+        # An incidental single letter/label in prose is not sufficient evidence.
+        prose=detect_question_type("A. Beschrijf de functie van mitochondriën.")
+        self.assertEqual(prose["type"],"open")
+
 
     def test_context_assets_link_caption_to_nearby_pdf_image_and_vector(self):
         analysis={"pages":[
