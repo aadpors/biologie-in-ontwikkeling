@@ -5,7 +5,9 @@
 - De bibliotheek toont de concrete eerstvolgende stap per examen en heeft een actie **Volgend openstaand examen**.
 - Een bulkimportbatch wordt vanuit het importmanifest aan ieder aangemaakt examen gekoppeld en na herstart van de applicatie hersteld.
 - Na afronding van een examen kan de gebruiker direct doorgaan met het volgende examen uit dezelfde batch.
-- Regressietests toegevoegd voor alle verwerkingsstappen, verouderde structuren, ontbrekende vraagstarts en menselijke eindgoedkeuring.
+- Na een geslaagde export wordt een inhoudsfingerprint opgeslagen; een gewijzigd examen wordt daardoor niet ten onrechte als afgerond getoond.
+- De batchvolgorde wordt na herstart veilig uit het importmanifest hersteld; paden buiten de examenroot worden geweigerd.
+- Regressietests toegevoegd voor alle verwerkingsstappen, exportvoltooiing, verouderde exports, batchherstel en padbeveiliging.
 
 ## 0.13.1
 - Importcontrole opnieuw ingericht als één werkruimte met PDF-lijst links, voorblad in het midden en bewerkbare metadata rechts.
