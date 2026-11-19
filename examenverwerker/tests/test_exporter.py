@@ -171,7 +171,7 @@ class ExportTests(unittest.TestCase):
             project,record=self.make_fixture(d)
             (project/"snippets"/"context-figuur.png").write_bytes(b"context image")
             record["context_asset_files"]=[{"file":"context-figuur.png","asset_id":"p2-image-1",
-                "page":2,"caption":"Microscopische afbeelding","source_document_id":"opgaven-doc-1"}]
+                "page":2,"caption":"Microscopische afbeelding","caption_human_confirmed":True,"source_document_id":"opgaven-doc-1"}]
             record["context_region_fragments"]=[{"id":"context-1","type":"context_intro",
                 "page_spans":[{"page":1,"top":0.1,"bottom":0.3}],"text":"De contexttekst."}]
             out=Path(d)/"out"
@@ -196,6 +196,17 @@ class ExportTests(unittest.TestCase):
             codes=[x["error"] for x in errors]
             self.assertIn("vraagfragment_paginagrenzen_ontbreken",codes)
             self.assertIn("cv_handmatige_afbakening_ontbreekt",codes)
+
+
+    def test_context_asset_with_unconfirmed_caption_is_blocked(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"snippets"/"context.png").write_bytes(b"context")
+            record["context_asset_files"]=[{"file":"context.png","asset_id":"p1-image-1",
+                "caption":"Figuur 1","caption_human_confirmed":False,
+                "source_document_id":"opgaven-doc-1","source_sha256":record["exam_structure_source_sha256"]}]
+            errors=validate_review_records([record],project)
+            self.assertIn("contextbijschrift_niet_handmatig_bevestigd",[x["error"] for x in errors])
 
 
 if __name__=="__main__": unittest.main()
