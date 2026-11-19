@@ -1,0 +1,45 @@
+name: Build portable Windows app
+
+on:
+  push:
+    branches: ["bouw/**"]
+    paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
+  pull_request:
+    paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: examenverwerker-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: examenverwerker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Test against real exam PDFs
+        run: python scripts/benchmark_exams.py
+      - name: Build portable folder
+        run: python -m PyInstaller --noconfirm --clean --windowed --name BiologieExamenverwerker --onedir --collect-all pymupdf app.py
+      - name: Add launch and help files
+        shell: pwsh
+        run: |
+          Copy-Item START.bat dist/BiologieExamenverwerker/START.bat
+          Copy-Item README.md dist/BiologieExamenverwerker/GEBRUIK.md
+          Copy-Item CHANGELOG.md dist/BiologieExamenverwerker/WIJZIGINGEN.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BiologieExamenverwerker-portable-Windows
+          path: examenverwerker/dist/BiologieExamenverwerker/
+          if-no-files-found: error
+          retention-days: 30
