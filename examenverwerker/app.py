@@ -566,6 +566,29 @@ class ExamApp:
         qbox=tk.Text(outer,height=12,wrap="word")
         qbox.pack(fill="both",expand=True)
         qbox.insert("1.0",(current or {}).get("question_text",row.get("vraagtekst_voorstel","")))
+        initial_context_text=(current or {}).get("source_context","")
+        if not initial_context_text:
+            try:
+                candidate_structure=self.data.get("exam_structures",{}).get(source_doc["id"]) or self.data.get("exam_structure")
+                candidate_numbers=sorted({int(x["number"]) for x in self.data.get("vraagkandidaten",[])
+                                          if x.get("document_id")==source_doc["id"] and x.get("human_decision") is True})
+                if candidate_structure and not validate_exam_structure(candidate_structure,source_doc["id"],source_doc["sha256"],candidate_numbers):
+                    linked_context=fragments_for_question(candidate_structure,row["number"]).get("context_fragments",[])
+                    if linked_context:
+                        context_analysis=analyze_pdf(self.project_dir/"bronnen"/source_doc["opslagbestand"])
+                        context_sizes={int(p["page"]):(float(p["width"]),float(p["height"])) for p in context_analysis["pages"]}
+                        context_texts=[]
+                        for fragment in linked_context:
+                            context_segments=page_spans_to_segments(fragment["page_spans"],context_sizes)
+                            found_text=extract_region_text(self.project_dir/"bronnen"/source_doc["opslagbestand"],context_segments)
+                            if found_text: context_texts.append(found_text)
+                        initial_context_text="\\n\\n".join(context_texts)
+            except Exception as exc:
+                self._log(f"Contexttekst kon niet vooraf worden geladen: {exc}")
+        ttk.Label(outer,text="Contexttekst (controleer en corrigeer; leeg laten als de context uitsluitend beeldmateriaal bevat)").pack(anchor="w",pady=(8,2))
+        context_text_box=tk.Text(outer,height=6,wrap="word")
+        context_text_box.pack(fill="x")
+        context_text_box.insert("1.0",initial_context_text)
         ttk.Label(outer,text="Meerkeuzeopties als JSON-lijst (voor open vragen leeg laten). Voorbeeld: [{\"key\":\"A\",\"text\":\"...\"},{\"key\":\"B\",\"text\":\"...\"}]").pack(anchor="w",pady=(8,2))
         detected_options=[{"key":x.get("label"),"text":x.get("text","")} for x in row.get("vraagtype_controle",{}).get("options",[])]
         obox=tk.Text(outer,height=4,wrap="word")
@@ -844,7 +867,7 @@ class ExamApp:
                 context_assets.extend(context_region_files)
                 record.update({"exam":meta,"options":options,"correct":correct,
                                "snippet_file":question_file,"snippet_files":[question_file],
-                               "context_asset_candidates":context_files,"context_asset_files":context_assets,"source_context":"\n\n".join(context_text_parts),
+                               "context_asset_candidates":context_files,"context_asset_files":context_assets,"source_context":context_text_box.get("1.0","end").strip(),"context_text_human_confirmed":True,
                                "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", [])),
                                    "question_numbers":list(x.get("question_numbers", [])),"text":next((y["text"] for y in context_region_files if y["fragment_id"]==x["id"]), "")} for x in context_fragments],
                                "cv_snippet_file":cv_file,"cv_snippet_files":[cv_file],
