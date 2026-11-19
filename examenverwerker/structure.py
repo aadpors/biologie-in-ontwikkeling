@@ -45,6 +45,8 @@ def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[in
         links = default_question_links(fragment_type, confirmed)
     if fragment_type == "vraag" and len(links) != 1:
         raise ValueError("Een vraagfragment moet aan precies één bevestigd vraagnummer gekoppeld zijn.")
+    if fragment_type != "vraag" and not links:
+        raise ValueError("Koppel ieder contextfragment aan minimaal één bevestigd vraagnummer.")
     return {
         "id": str(fragment_id),
         "type": fragment_type,
@@ -96,6 +98,8 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
             errors.append("ongeldige_vraagkoppeling")
         if fragment.get("type") == "vraag" and len(links) != 1:
             errors.append("vraagfragment_moet_een_vraagnummer_hebben")
+        if fragment.get("type") in FRAGMENT_TYPES - {"vraag"} and not links:
+            errors.append("contextfragment_zonder_vraagkoppeling")
         if fragment.get("type") == "vraag" and len(links) == 1:
             number = int(links[0])
             question_fragment_counts[number] = question_fragment_counts.get(number, 0) + 1
