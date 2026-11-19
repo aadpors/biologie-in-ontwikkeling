@@ -36,6 +36,7 @@ jobs:
         run: |
           Copy-Item START.bat dist/BiologieExamenverwerker/START.bat
           Copy-Item README.md dist/BiologieExamenverwerker/GEBRUIK.md
+          Copy-Item CHANGELOG.md dist/BiologieExamenverwerker/WIJZIGINGEN.md
       - uses: actions/upload-artifact@v4
         with:
           name: BiologieExamenverwerker-portable-Windows
