@@ -1,4 +1,4 @@
-# Praktijktestplan — Biologie Examenverwerker 0.6.0
+# Praktijktestplan — Biologie Examenverwerker 0.7.0
 
 Gebruik voor de eerste praktijktest één examen waarvan de opgaven, het correctievoorschrift en eventuele aanvullingen beschikbaar zijn. Test eerst met een kopie van de PDF's en bewaar het project buiten de programmamap.
 
