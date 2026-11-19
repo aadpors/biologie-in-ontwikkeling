@@ -158,7 +158,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         if not snippets: errors.append({"id":rid,"error":"snippet_ontbreekt"})
         if len(snippets) != 1 or snippets[0] != r.get("snippet_file"):
             errors.append({"id":rid,"error":"vraagfragment_bestanden_niet_eenduidig"})
-        if snippets and (project_dir/"snippets"/snippets[0]).is_file():
+        if snippets and Path(str(snippets[0])).name == snippets[0] and (project_dir/"snippets"/snippets[0]).is_file():
             expected_question_hash = r.get("question_region_snippet_sha256")
             if not expected_question_hash or sha256(project_dir/"snippets"/snippets[0]) != expected_question_hash:
                 errors.append({"id":rid,"error":"vraagfragment_render_hash_afwijkend"})
@@ -252,8 +252,8 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         if appendix: row["attachmentPdfs"]=appendix
         contexts.append({"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
                          "n":int(r["number"]),"page":int(r["source_page"]),
-                         "image":context_image_paths[0] if context_image_paths else row["image"],
-                         "images":context_image_paths if context_image_paths else row["images"],
+                         "image":context_image_paths[0] if context_image_paths else "",
+                         "images":context_image_paths,
                          "contextImages":context_image_paths,
                          "contextAssets":[{"image":f"exam-snippets/{x['file']}","caption":x.get("caption"),
                              "page":x.get("page"),"asset_id":x.get("asset_id"),"type":x.get("type"),
