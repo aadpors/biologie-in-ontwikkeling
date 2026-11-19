@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -330,5 +330,20 @@ class EngineTests(unittest.TestCase):
             render_crop(p,1,[60,55,250,90],out)
             self.assertTrue(out.exists())
             self.assertGreater(out.stat().st_size,100)
+
+
+    def test_manual_region_text_extraction_uses_original_pdf_coordinates(self):
+        import pymupdf as fitz
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"region.pdf"
+            doc=fitz.open()
+            page=doc.new_page(width=600,height=800)
+            page.insert_text((50,100),"TEXT INSIDE SELECTION")
+            page.insert_text((50,700),"TEXT OUTSIDE SELECTION")
+            doc.save(path)
+            doc.close()
+            text=extract_region_text(path,[{"page":1,"bbox":[0,50,600,200]}])
+            self.assertIn("TEXT INSIDE SELECTION",text)
+            self.assertNotIn("TEXT OUTSIDE SELECTION",text)
 
 if __name__=="__main__": unittest.main()
