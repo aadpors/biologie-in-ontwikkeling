@@ -6,6 +6,12 @@
 - Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
 - De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
 
+## 0.13.8
+- Meerkeuzeherkenning is robuuster voor PDF-tekstlagen waarin antwoordopties op één regel staan, in kleine letters zijn gezet, tussen haakjes staan of waarbij label en antwoordtekst op aparte regels terechtkomen.
+- Herkenning vereist meerdere verschillende antwoordlabels; één toevallige A-regel leidt niet automatisch tot een meerkeuzeclassificatie.
+- Ontbrekende labels, dubbele labels en onvolledige antwoordreeksen blijven zichtbaar voor controle.
+- Regressietests toegevoegd voor inline opties, kleine letters, gesplitste labels en het voorkomen van fout-positieve meerkeuzeherkenning.
+
 ## 0.13.7
 - De doorlopende PDF-weergave berekent vooraf de positie van alle pagina's, maar rendert alleen de zichtbare pagina's en een beperkte buffer.
 - Het aantal gelijktijdig in het geheugen gehouden pagina-afbeeldingen is begrensd op zes. Eerder bekeken pagina's worden vanuit de tijdelijke PNG-cache hersteld; de scrollbare totaalweergave en vraagmarkeringen blijven behouden.
