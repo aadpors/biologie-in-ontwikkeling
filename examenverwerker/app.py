@@ -883,15 +883,9 @@ class ExamApp:
             ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
 
         def confirm_import():
-            # This final button is the single human approval for the reviewed batch.
-            # Valid proposals are explicitly accepted here; incomplete/invalid
-            # identity or document roles still block the import.
-            for doc in documents:
-                if doc.get("type_voorstel") in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
-                    doc["type_zekerheid"] = 1.0
-                meta = doc.get("exam_metadata") or {}
-                if meta.get("level") in {"Havo", "Vwo"} and re.fullmatch(r"20\d{2}", str(meta.get("year", "")).strip()) and str(meta.get("period", "")) in {"1", "2", "3"}:
-                    doc["exam_metadata"] = {**meta, "confidence": 1.0, "source": "handmatig_bevestigd"}
+            # One final approval for the batch. Do not turn uncertain automated
+            # proposals into human-confirmed data: low-confidence or incomplete
+            # rows must be corrected explicitly in the review table first.
             errors = validate_batch_documents(documents)
             if errors:
                 messagebox.showerror("Eerst herkenning corrigeren",
