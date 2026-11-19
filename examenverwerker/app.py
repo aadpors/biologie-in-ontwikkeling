@@ -994,7 +994,8 @@ class ExamApp:
                 canvas.configure(scrollregion=(0,0,image_width,image_height))
                 selection_start=None
                 selection_lines=None
-                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")            def change_crop_page(delta):
+                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")
+            def change_crop_page(delta):
                 page_var.set(max(1,min(page_count,int(page_var.get())+delta)))
                 show_crop_page()
             def start_crop(event):
