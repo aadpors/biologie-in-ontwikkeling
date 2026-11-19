@@ -47,11 +47,11 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 4. Laat vraagstarts analyseren.
 5. Bekijk kandidaten op de originele pagina en bevestig of wijs ze af.
 6. Bevestig vraagstarts handmatig; maak daarna concept-vraagrecords en controleer de volledige vraagtekst en antwoordopties.
-7. Maak CV-fragmenten vanuit het bijbehorende originele correctievoorschrift; controleer alle pagina's, punten, aanvullingen en beoordelingsregels.
-8. Selecteer alleen figuur-, tabel- en tekstregio's die aantoonbaar bij de vraag horen; controleer bijschriften en context.
-9. Controleer alle pagina's van uitwerkbijlagen en CV-aanvullingen.
-10. Open 'Vraagrecords beoordelen en goedkeuren', vink alleen werkelijk gecontroleerde onderdelen af en keur ieder record expliciet goed.
-11. Maak pas daarna een exportpakket. Dit wijzigt of publiceert niets op de live website.
+8. Maak CV-fragmenten vanuit het bijbehorende originele correctievoorschrift; controleer alle pagina's, punten, aanvullingen en beoordelingsregels.
+9. Selecteer alleen figuur-, tabel- en tekstregio's die aantoonbaar bij de vraag horen; controleer bijschriften en context.
+10. Controleer alle pagina's van uitwerkbijlagen en CV-aanvullingen.
+11. Open 'Vraagrecords beoordelen en goedkeuren', vink alleen werkelijk gecontroleerde onderdelen af en keur ieder record expliciet goed.
+12. Maak pas daarna een exportpakket. Dit wijzigt of publiceert niets op de live website.
 
 ## Betrouwbaarheidsregels
 - Originele PDF's worden nooit aangepast.
