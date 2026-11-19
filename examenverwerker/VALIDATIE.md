@@ -19,6 +19,8 @@ Een examen is pas exporteerbaar wanneer alle verplichte controles groen zijn.
 - Iedere geselecteerde CV-aanvulling is eveneens handmatig aan de juiste vraag gekoppeld en afgebakend.
 - CV-deelvraag en puntenverdeling corresponderen met de opgave.
 - Contextinleiding, vraagcontext en tussenliggende contexten zijn per fragment aan de juiste vragen gekoppeld.
+- Contexttekst is handmatig nagelezen en waar nodig gecorrigeerd.
+- Ieder geselecteerd figuur-/tabelbijschrift is expliciet bevestigd of gecorrigeerd; ook 'geen bijschrift' is een bewuste beslissing.
 - Contexttekst, figuren, tabellen en bijschriften zijn afzonderlijk gecontroleerd en blijven gescheiden van het vraagfragment.
 
 ## Snippets
