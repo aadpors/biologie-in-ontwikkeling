@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -313,6 +313,17 @@ class EngineTests(unittest.TestCase):
             render_composite_crops(p,proposal["source_segments"],out)
             self.assertTrue(out.is_file())
             self.assertGreater(out.stat().st_size,500)
+
+    def test_pdf_page_count_helper(self):
+        import pymupdf as fitz
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"count.pdf"
+            doc=fitz.open()
+            doc.new_page()
+            doc.new_page()
+            doc.save(path)
+            doc.close()
+            self.assertEqual(pdf_page_count(path), 2)
 
     def test_pdf_text_and_exact_crop(self):
         try:
