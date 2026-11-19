@@ -640,6 +640,62 @@ class ExamApp:
             return
         self.create_question_record(self._workspace_rows, self.candidate_tree, self.root)
 
+    def _workspace_merge_correction_entries(self, existing_entries, incoming_entries):
+        """Deduplicate legacy corrections by document and stable correction ID."""
+        by_name = {}
+        for entry in existing_entries or []:
+            if isinstance(entry, dict) and entry.get("bestand"):
+                by_name[str(entry["bestand"])] = {
+                    **entry, "correcties": [dict(c) for c in entry.get("correcties", []) if isinstance(c, dict)]
+                }
+        for entry in incoming_entries or []:
+            if not isinstance(entry, dict) or not entry.get("bestand"):
+                continue
+            name = str(entry["bestand"])
+            target = by_name.setdefault(name, {"bestand": name, "correcties": []})
+            if entry.get("documenttype_handmatig"):
+                target["documenttype_handmatig"] = entry["documenttype_handmatig"]
+            indexed = {str(c.get("id")): c for c in target.get("correcties", []) if c.get("id")}
+            for raw in entry.get("correcties", []):
+                if not isinstance(raw, dict):
+                    continue
+                correction = dict(raw)
+                if not correction.get("id"):
+                    pos = correction.get("positie_pdf_pt") or {}
+                    seed = "|".join(str(correction.get(k, "")) for k in
+                        ("pagina", "oorspronkelijk_nummer", "vraagnummer", "beslissing"))
+                    correction["id"] = hashlib.sha256(
+                        f"{name}|{seed}|{pos.get('x','')}|{pos.get('y','')}".encode("utf-8")
+                    ).hexdigest()[:16]
+                key = str(correction["id"])
+                previous = indexed.get(key, {})
+                combined = {**previous, **correction}
+                if not correction.get("positie_pdf_pt") and previous.get("positie_pdf_pt"):
+                    combined["positie_pdf_pt"] = previous["positie_pdf_pt"]
+                if not correction.get("notitie") and previous.get("notitie"):
+                    combined["notitie"] = previous["notitie"]
+                indexed[key] = combined
+            target["correcties"] = list(indexed.values())
+        return list(by_name.values())
+
+    def _workspace_load_global_corrections(self):
+        """Apply the portable Biologie-controle correction library to whichever exam is opened."""
+        if not self.data:
+            return
+        path = self.knowledge_dir / "biologie-correcties.json"
+        if not path.is_file():
+            return
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if payload.get("formaat") != "biologie-correcties-v1":
+                return
+            # Project-specific decisions take precedence over the older global import.
+            self.data["biologie_controle_correcties"] = self._workspace_merge_correction_entries(
+                payload.get("documenten", []), self.data.get("biologie_controle_correcties", []))
+            self._workspace_apply_saved_corrections()
+        except Exception as exc:
+            self._error("Biologie-controlecorrecties laden", exc)
+
     def _workspace_import_corrections(self):
         """Import the compact biologie-correcties-v1 format without replacing newer decisions."""
         if not self.data or not self.project_dir:
