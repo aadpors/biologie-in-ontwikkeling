@@ -169,8 +169,12 @@ class ExamApp:
             ("Eindcontrole", self.show_records, "Secondary.TButton"),
             ("Exportpakket", self.export_project, "Wine.TButton"),
         ]
-        for label, callback, style in actions:
+        for label, callback, style in actions[:4]:
             ttk.Button(toolbar, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
+        toolbar_secondary = ttk.Frame(shell, style="App.TFrame")
+        toolbar_secondary.pack(fill="x", pady=(0, 6))
+        for label, callback, style in actions[4:]:
+            ttk.Button(toolbar_secondary, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
 
         correction_bar = ttk.Frame(shell, style="App.TFrame")
         correction_bar.pack(fill="x", pady=(0, 7))
@@ -219,7 +223,7 @@ class ExamApp:
         self._workspace_filter = tk.StringVar(value="Alle kandidaten")
         ttk.Label(filter_row, text="Filter").pack(side="left")
         filter_box = ttk.Combobox(filter_row, textvariable=self._workspace_filter,
-            values=["Alle kandidaten", "Nog te beoordelen", "Sterke signalen", "Zwakke signalen", "Dubbele nummers"],
+            values=["Alle kandidaten", "Nog te beoordelen", "Sterke signalen", "Zwakke signalen", "Dubbele nummers", "Niet in CV"],
             state="readonly", width=20)
         filter_box.pack(side="left", padx=5, fill="x", expand=True)
         filter_box.bind("<<ComboboxSelected>>", lambda _e: self._workspace_refresh_candidates())
@@ -283,7 +287,10 @@ class ExamApp:
         ttk.Label(review, text="Vraagtekst / opdrachtformulering").pack(anchor="w")
         self._workspace_text = tk.Text(review, height=12, wrap="word", font=("Segoe UI", 9),
                                        undo=True, padx=7, pady=6)
-        self._workspace_text.pack(fill="both", expand=True, pady=(3, 8))
+        self._workspace_text.pack(fill="both", expand=True, pady=(3, 5))
+        self._workspace_detected_details = ttk.Label(review, text="", style="Muted.TLabel",
+            wraplength=330, justify="left")
+        self._workspace_detected_details.pack(fill="x", pady=(0, 6))
         ttk.Label(review, text="Notitie bij de beoordeling").pack(anchor="w")
         self._workspace_note = tk.Text(review, height=4, wrap="word", font=("Segoe UI", 9),
                                        undo=True, padx=7, pady=5)
@@ -375,6 +382,9 @@ class ExamApp:
         else:
             self._workspace_rows = []
             self._workspace_refresh_candidates()
+            self.pdf_canvas.delete("all")
+            self._workspace_page_label.configure(text="Pagina — / —")
+            self._workspace_summary.configure(text="Dit project bevat nog geen documenten. Voeg PDF's toe of importeer een examen.")
 
     def _workspace_refresh_candidates(self, select_index=None):
         if not hasattr(self, "candidate_tree"):
@@ -395,6 +405,8 @@ class ExamApp:
             rows = [r for r in rows if float(r.get("confidence", 0) or 0) < 0.9]
         elif filter_value == "Dubbele nummers":
             rows = [r for r in rows if number_counts.get(r.get("number"), 0) > 1]
+        elif filter_value == "Niet in CV":
+            rows = [r for r in rows if r.get("cv_number_match") is False]
         self._workspace_rows = rows
         for index, row in enumerate(rows):
             status = row.get("status", "controle_nodig").replace("_", " ")
@@ -438,6 +450,13 @@ class ExamApp:
             f"signaal {float(row.get('confidence',0) or 0):.0%}\n"
             f"{check.get('type','type nog controleren')} · {cv}\n"
             f"{row.get('reason','')}\nStatus: {row.get('status','controle_nodig').replace('_',' ')}"))
+        options = check.get("options", [])
+        option_text = "Antwoordopties: " + (" · ".join(
+            f"{x.get('label','?')} {x.get('text','')}" for x in options) if options else "geen opties herkend")
+        references = row.get("context_verwijzingen", [])
+        reference_text = "Verwijzingen: " + (" · ".join(
+            f"{x.get('kind','')} {x.get('number') or ''}" for x in references) if references else "geen expliciete verwijzingen herkend")
+        self._workspace_detected_details.configure(text=option_text + "\n" + reference_text)
         self._workspace_page = int(row.get("page", 1))
         self._workspace_render_page()
 
