@@ -54,13 +54,14 @@ def default_question_links(fragment_type: str, confirmed_question_numbers: list[
 
 def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[int],
                   confirmed_question_numbers: list[int], fragment_id: str) -> dict:
+    fragment_type = canonical_fragment_type(fragment_type)
     if fragment_type not in FRAGMENT_TYPES:
         raise ValueError("Onbekend fragmenttype.")
     confirmed = sorted({int(n) for n in confirmed_question_numbers})
     links = sorted({int(n) for n in question_numbers})
     if any(n not in confirmed for n in links):
         raise ValueError("Een fragment mag alleen aan bevestigde vraagstarts worden gekoppeld.")
-    if fragment_type == "context_intro" and not links:
+    if fragment_type == "intro" and not links:
         links = default_question_links(fragment_type, confirmed)
     if fragment_type == "vraag" and len(links) != 1:
         raise ValueError("Een vraagfragment moet aan precies één bevestigd vraagnummer gekoppeld zijn.")
