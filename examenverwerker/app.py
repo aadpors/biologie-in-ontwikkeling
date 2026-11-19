@@ -1191,9 +1191,9 @@ class ExamApp:
                     state = "Metadata ontbreekt"
                 tree.insert("", "end", iid=str(index), values=(
                     doc["bestand"], doc.get("type_voorstel", "onbekend"),
-                    f"{doc.get('type_zekerheid', 0):.0%}",
-                    f"{meta.get('confidence', 0):.0%}" if meta else "—", *identity_text(doc),
-                    doc.get("pagina_aantal", 0), state))
+                    meta.get("level", "—") if meta else "—",
+                    meta.get("year", "—") if meta else "—",
+                    meta.get("period", "—") if meta else "—", state))
             summary = []
             for key, items in groups.items():
                 summary.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's")
