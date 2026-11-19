@@ -101,6 +101,8 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":"contextuitsnede_verkeerde_bron"})
             if asset.get("source_sha256") and asset.get("source_sha256") != r.get("exam_structure_source_sha256"):
                 errors.append({"id":rid,"error":"contextuitsnede_bronhash_afwijkend"})
+            if asset.get("asset_id") and asset.get("caption_human_confirmed") is not True:
+                errors.append({"id":rid,"error":"contextbijschrift_niet_handmatig_bevestigd"})
         meta=r.get("exam",{})
         for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
             if meta.get(field) in (None,""): errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
@@ -262,7 +264,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "context_region_fragments":r.get("context_region_fragments", []),
                          "context_asset_files":[{"file":x["file"],"sha256":sha256(project_dir/"snippets"/x["file"]),
                              "asset_id":x.get("asset_id"),"caption":x.get("caption"),"page":x.get("page"),
-                             "fragment_id":x.get("fragment_id"),"type":x.get("type")} for x in context_assets],
+                             "fragment_id":x.get("fragment_id"),"type":x.get("type"),"caption_human_confirmed":x.get("caption_human_confirmed", False)} for x in context_assets],
                          "cv_source_region":r.get("cv_source_region"),
                          "cv_source_region_sha256":sha256(project_dir/"snippets"/cv_region_file) if cv_region_file else None,
                          "cv_amendment_regions":r.get("cv_amendment_regions", [])})
