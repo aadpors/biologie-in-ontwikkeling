@@ -12,7 +12,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors
-from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale
+from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question
 
 APP_VERSION = "0.5.0"
 PROJECT_FILE = "project.json"
@@ -707,11 +707,23 @@ class ExamApp:
                 meta["points"]=int(meta["points"]); meta["questionType"]=qtype
                 candidate=dict(row)
                 record=build_question_record(meta,candidate,qtext,source_doc["opslagbestand"],cv_doc["opslagbestand"])
+                structure = self.data.get("exam_structure")
+                confirmed_numbers = sorted({int(x["number"]) for x in self.data.get("vraagkandidaten", [])
+                                            if x.get("document_id") == source_doc["id"] and x.get("human_decision") is True})
+                structure_errors = validate_exam_structure(structure, source_doc["id"], source_doc["sha256"], confirmed_numbers) if structure else ["structuur_niet_ingesteld"]
+                linkage = fragments_for_question(structure, row["number"]) if not structure_errors else {
+                    "question_fragment": None, "context_fragments": [], "status": "structuur_niet_beschikbaar"}
+                question_fragment = linkage.get("question_fragment")
+                context_fragments = linkage.get("context_fragments", [])
                 record.update({"exam":meta,"options":options,"correct":correct,
                                "snippet_files":list(dict.fromkeys(list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()])),
                                "context_asset_candidates":context_files,
                                "cv_snippet_file":cv_snippet_var.get().strip() or None,
                                "cv_amendment_snippet_file":amendment_snippet_var.get().strip() or None,
+                               "exam_structure_status":linkage.get("status"),
+                               "exam_structure_fragment_ids":[x["id"] for x in ([question_fragment] if question_fragment else []) + context_fragments],
+                               "question_region_page_spans":list(question_fragment.get("page_spans", [])) if question_fragment else [],
+                               "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", []))} for x in context_fragments],
                                "source_analysis_invalidated":False,
                                "approval_revoked_reason":None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
@@ -779,6 +791,11 @@ class ExamApp:
             ttk.Label(outer,text="LET OP: de opgaven-PDF is opnieuw geanalyseerd of de vraagstart is afgewezen. Stel het conceptrecord opnieuw samen vanuit de actuele kandidaat voordat je verdergaat.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
         meta=record.get("exam",{})
         ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        structure_note = record.get("exam_structure_status", "structuur_niet_ingesteld")
+        question_pages = ",".join(str(x.get("page")) for x in record.get("question_region_page_spans", [])) or "geen"
+        context_count = len(record.get("context_region_fragments", []))
+        ttk.Label(outer, text=f"Visuele examenstructuur: {structure_note} · vraagfragmentpagina's: {question_pages} · gekoppelde contextfragmenten: {context_count}",
+                  wraplength=980).pack(anchor="w", pady=(0, 5))
         appendix_candidates=record.get("available_appendix_candidates",[])
         addendum_candidates=record.get("available_cv_amendment_candidates",[])
         ttk.Label(outer,text="Uitwerkbijlagen beschikbaar: "+(", ".join(Path(x).name for x in appendix_candidates) if appendix_candidates else "geen bijbehorende PDF gevonden")+"\nGeselecteerd: "+(", ".join(Path(x).name for x in record.get("uitwerkbijlagen",[])) if record.get("uitwerkbijlagen") else "geen")).pack(anchor="w")
