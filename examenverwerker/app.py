@@ -1239,7 +1239,7 @@ class ExamApp:
                 if kind == "context_intro" and not links: links = question_numbers[:]
                 span = make_page_span(page_var.get(), top_y, bottom_y)
                 fragment = make_fragment(kind, span, links, question_numbers,
-                    f"frag-{doc['id'][:8]}-{len(fragments)+1:03d}")
+                    f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}")
                 fragments.append(fragment)
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(len(fragments)-1))
