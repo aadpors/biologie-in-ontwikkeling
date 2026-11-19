@@ -11,14 +11,15 @@ from batch_import import (
 )
 
 
-def document(name, level="Vwo", year="2026", period="1", role="opgaven", confidence=0.96):
+def document(name, level="Vwo", year="2026", period="1", role="opgaven",
+             confidence=0.96, metadata_confidence=0.96, metadata_source="bestandsnaam"):
     return {
         "bestand": name,
         "type_voorstel": role,
         "type_zekerheid": confidence,
         "exam_metadata": {
             "level": level, "year": year, "period": period,
-            "confidence": 0.96, "source": "bestandsnaam",
+            "confidence": metadata_confidence, "source": metadata_source,
         },
     }
 
@@ -68,6 +69,19 @@ class BatchImportTests(unittest.TestCase):
     def test_unknown_type_and_uncertain_metadata_block_import(self):
         doc = document("unknown.pdf", role="onbekend", confidence=0.35)
         self.assertGreaterEqual(len(validate_batch_documents([doc])), 2)
+
+    def test_low_metadata_confidence_blocks_import_for_any_inference_source(self):
+        for source in ("bestandsnaam", "eerste_pdf_paginas", "pdf_metadata"):
+            with self.subTest(source=source):
+                doc = document("uncertain.pdf", metadata_confidence=0.72,
+                               metadata_source=source)
+                errors = validate_batch_documents([doc])
+                self.assertTrue(any("examenidentiteit is onzeker" in error for error in errors))
+
+    def test_manual_metadata_confirmation_passes_confidence_check(self):
+        doc = document("confirmed.pdf", metadata_confidence=1.0,
+                       metadata_source="handmatig_bevestigd")
+        self.assertEqual(validate_batch_documents([doc]), [])
 
     def test_warnings_do_not_silently_claim_cv_exists(self):
         warnings = batch_document_warnings([document("opgaven.pdf")])
