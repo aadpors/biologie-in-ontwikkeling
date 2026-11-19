@@ -45,3 +45,13 @@ Concept-vraagrecords bewaren na het opslaan ook `exam_structure_status`, `exam_s
 - `cv_amendment_regions`: per geselecteerde officiële aanvulling de vraaggebonden regio, bronhash en gerenderde uitsnede.
 
 De exportpoort blokkeert ontbrekende vraag- of CV-regio's, gewijzigde bronnen, onvolledige addendumafbakening en ongeldige contextbestanden. De oorspronkelijke PDF blijft de primaire bron; geen enkele automatische detectie of AI-voorstel kan deze handmatige afbakening goedkeuren.
+
+
+## Integriteitscontrole en herbeoordeling
+
+- `exam_structure_invalidated`: wordt gezet zodra de vraaggrenzen of contextkoppelingen na het maken van een vraagrecord veranderen.
+- `cv_region_invalidated`: wordt gezet zodra de visuele CV-/aanvullingsregio of de gerenderde uitsnede verandert.
+- `question_region_snippet_sha256`, `cv_source_region_sha256` en `snippet_sha256` per context-/aanvullingsasset: verwachte hashes van de gegenereerde uitsneden. De exportpoort vergelijkt deze met de bestanden op schijf.
+- Bij wijziging worden eerdere goedkeuring en checklistvinkjes ingetrokken. Het vraagrecord moet opnieuw vanuit de actuele grenzen worden samengesteld en volledig worden gecontroleerd.
+
+De bronhashes van opgaven, CV en aanvullingen worden opnieuw gecontroleerd bij het samenstellen van een conceptrecord én bij export. Dit voorkomt dat een bestaande afbakening ongemerkt op een vervangen PDF of een handmatig gewijzigd PNG-bestand wordt toegepast.
