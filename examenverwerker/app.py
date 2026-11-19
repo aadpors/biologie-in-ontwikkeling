@@ -16,7 +16,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.13.0"
+APP_VERSION = "0.13.1"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -1121,21 +1121,59 @@ class ExamApp:
         fit_window(win, 1180, 720, 900, 560)
         win.transient(self.root)
         win.grab_set()
-        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Controleer niveau, jaar, tijdvak en documenttype. Er wordt nog niets verwerkt of verplaatst.",
-                  padding=12, wraplength=1060).pack(anchor="w")
-        columns = ("file", "role", "certainty", "meta_confidence", "level", "year", "period", "pages", "state")
-        tree = ttk.Treeview(win, columns=columns, show="headings", selectmode="browse")
-        headings = [
-            ("file", "Bestand", 280), ("role", "Documenttype", 145), ("certainty", "Typezekerheid", 85),
-            ("meta_confidence", "Metazekerheid", 85), ("level", "Niveau", 70), ("year", "Jaar", 60), ("period", "Tijdvak", 65),
-            ("pages", "Pagina's", 65), ("state", "Controle", 170)]
-        for col, title, width in headings:
+        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Selecteer links een document; controleer het voorblad in het midden en pas de voorgestelde gegevens rechts direct aan.",
+                  padding=12, wraplength=1100).pack(anchor="w")
+        panes = ttk.Panedwindow(win, orient="horizontal")
+        panes.pack(fill="both", expand=True, padx=12, pady=8)
+        list_panel = ttk.LabelFrame(panes, text="GESELECTEERDE PDF'S", padding=7)
+        cover_panel = ttk.LabelFrame(panes, text="VOORBLAD ORIGINELE PDF", padding=7)
+        fields_panel = ttk.LabelFrame(panes, text="VOORGESTELDE METADATA", padding=12)
+        panes.add(list_panel, weight=4)
+        panes.add(cover_panel, weight=6)
+        panes.add(fields_panel, weight=4)
+        columns = ("file", "role", "level", "year", "period", "state")
+        tree = ttk.Treeview(list_panel, columns=columns, show="headings", selectmode="browse")
+        for col, title, width in [
+            ("file", "Bestand", 190), ("role", "Type", 105), ("level", "Niveau", 55),
+            ("year", "Jaar", 48), ("period", "Tv", 32), ("state", "Controle", 115)]
+            :
             tree.heading(col, text=title)
             tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
-        tree.pack(fill="both", expand=True, padx=12, pady=8)
-        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1060)
+        tree.pack(fill="both", expand=True)
+        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1100)
         status.pack(anchor="w")
-
+        preview_temp = tempfile.TemporaryDirectory(prefix="biologie-import-voorbladen-")
+        win._preview_temp = preview_temp
+        preview_label = ttk.Label(cover_panel, text="Selecteer links een PDF om het voorblad te bekijken.",
+                                  anchor="center", justify="center")
+        preview_label.pack(fill="both", expand=True)
+        preview_info = ttk.Label(cover_panel, text="", wraplength=440)
+        preview_info.pack(fill="x", pady=(5, 0))
+        role = tk.StringVar()
+        level = tk.StringVar()
+        year = tk.StringVar()
+        period = tk.StringVar()
+        confidence_label = ttk.Label(fields_panel, text="", wraplength=360, justify="left")
+        confidence_label.pack(anchor="w", pady=(0, 10))
+        fields = [
+            ("Documenttype", role, ttk.Combobox(fields_panel, textvariable=role,
+                values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"],
+                state="readonly", width=25)),
+            ("Niveau", level, ttk.Combobox(fields_panel, textvariable=level,
+                values=["Havo", "Vwo"], state="readonly", width=25)),
+            ("Jaar", year, ttk.Entry(fields_panel, textvariable=year, width=28)),
+            ("Tijdvak", period, ttk.Combobox(fields_panel, textvariable=period,
+                values=["1", "2", "3"], state="readonly", width=25)),
+        ]
+        for label, var, widget in fields:
+            ttk.Label(fields_panel, text=label).pack(anchor="w", pady=(7, 2))
+            widget.pack(anchor="w", fill="x")
+        ttk.Label(fields_panel,
+            text="Controleer de gegevens aan de hand van het voorblad. Lege of onzekere waarden moet je zelf aanvullen. Documenten worden alleen samen gegroepeerd als niveau, jaar en tijdvak exact overeenkomen.",
+            wraplength=360, justify="left").pack(anchor="w", pady=(14, 8))
+        selected_doc = {"index": None}
+        cover_photo = {"image": None}
+        
         def identity_text(doc):
             meta = doc.get("exam_metadata") or {}
             return meta.get("level", ""), meta.get("year", ""), meta.get("period", "")
@@ -1163,94 +1201,68 @@ class ExamApp:
                 summary.append(f"{len(unassigned)} PDF('s) zonder complete examenidentiteit")
             status.configure(text="Automatische groepen: " + ("; ".join(summary) if summary else "nog geen complete groepen"))
 
-        def edit_selected():
+        def load_selected(_event=None):
             selection = tree.selection()
             if not selection:
-                messagebox.showinfo("Selecteer een PDF", "Selecteer eerst een PDF om de herkenning te controleren.", parent=win)
+                selected_doc["index"] = None
                 return
-            doc = documents[int(selection[0])]
+            index = int(selection[0])
+            doc = documents[index]
+            selected_doc["index"] = index
             meta = doc.get("exam_metadata") or {}
-            edit = tk.Toplevel(win)
-            edit.title("Voorblad en automatisch herkende metadata controleren")
-            fit_window(edit, 1080, 760, 820, 560)
-            edit.transient(win)
-            edit.grab_set()
-
-            # The original first page is shown beside the values inferred from
-            # the filename/PDF. Empty values stay empty; never invent defaults.
-            body = ttk.Frame(edit, padding=14)
-            body.pack(fill="both", expand=True)
-            preview_panel = ttk.LabelFrame(body, text="Voorblad van de originele PDF", padding=10)
-            preview_panel.pack(side="left", fill="both", expand=True, padx=(0, 12))
-            fields_panel = ttk.LabelFrame(body, text="Automatisch ingevulde gegevens", padding=14)
-            fields_panel.pack(side="right", fill="y")
-            ttk.Label(fields_panel, text=doc["bestand"], wraplength=390,
-                      font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 10))
-
-            preview_temp = tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
-            preview_path = Path(preview_temp.name) / "voorblad.png"
-            preview_label = ttk.Label(preview_panel, text="Voorblad wordt geladen…", anchor="center")
-            preview_label.pack(fill="both", expand=True)
-            try:
-                render_page(Path(doc["source_path"]), 1, preview_path, scale=0.72)
-                cover_photo = tk.PhotoImage(file=str(preview_path))
-                preview_label.configure(image=cover_photo, text="")
-                preview_label.image = cover_photo
-            except Exception as exc:
-                preview_label.configure(
-                    text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
-                    wraplength=470, justify="center")
-            edit._preview_temp = preview_temp
-
-            role = tk.StringVar(value=doc.get("type_voorstel", "onbekend"))
-            level = tk.StringVar(value=meta.get("level", ""))
-            year = tk.StringVar(value=str(meta.get("year", "")))
-            period = tk.StringVar(value=str(meta.get("period", "")))
-
+            role.set(doc.get("type_voorstel", "onbekend"))
+            level.set(meta.get("level", ""))
+            year.set(str(meta.get("year", "")))
+            period.set(str(meta.get("period", "")))
             confidence = meta.get("confidence")
             source_label = {
-                "bestandsnaam": "Herkenning uit bestandsnaam",
-                "eerste_pdf_paginas": "Herkenning uit tekst op de eerste PDF-pagina's",
-                "handmatig_bevestigd": "Eerder handmatig bevestigd",
-            }.get(meta.get("source"), "Herkenningsbron onbekend")
-            ttk.Label(fields_panel, text=f"Metadata: {float(confidence or 0):.0%} zekerheid · {source_label}",
-                      wraplength=390).pack(anchor="w", pady=(0, 12))
-            fields = [
-                ("Documenttype", role, ttk.Combobox(fields_panel, textvariable=role,
-                    values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"],
-                    state="readonly", width=32)),
-                ("Niveau", level, ttk.Combobox(fields_panel, textvariable=level,
-                    values=["Havo", "Vwo"], state="readonly", width=32)),
-                ("Jaar", year, ttk.Entry(fields_panel, textvariable=year, width=35)),
-                ("Tijdvak", period, ttk.Combobox(fields_panel, textvariable=period,
-                    values=["1", "2", "3"], state="readonly", width=32)),
-            ]
-            for label, var, widget in fields:
-                ttk.Label(fields_panel, text=label).pack(anchor="w", pady=(7, 2))
-                widget.pack(anchor="w", fill="x")
-            ttk.Label(fields_panel,
-                text="Vergelijk de ingevulde gegevens met het zichtbare voorblad. Lege velden zijn niet automatisch afgeleid. Koppel documenten alleen als niveau, jaar en tijdvak exact overeenkomen.",
-                wraplength=390, justify="left").pack(anchor="w", pady=(16, 8))
+                "bestandsnaam": "bestandsnaam",
+                "eerste_pdf_paginas": "tekst op de eerste PDF-pagina's",
+                "handmatig_bevestigd": "eerder handmatig bevestigd",
+            }.get(meta.get("source"), "onbekende bron")
+            confidence_label.configure(text=(
+                f"Herkenningszekerheid metadata: {float(confidence or 0):.0%} · bron: {source_label}\n"
+                f"Documenttypezekerheid: {float(doc.get('type_zekerheid', 0) or 0):.0%}"
+            ))
+            preview_info.configure(text=f"{doc['bestand']} · {doc.get('pagina_aantal', 0)} pagina's")
+            preview_label.configure(image="", text="Voorblad wordt geladen…")
+            cover_photo["image"] = None
+            try:
+                preview_path = Path(preview_temp.name) / f"voorblad-{index}.png"
+                render_page(Path(doc["source_path"]), 1, preview_path, scale=0.82)
+                photo = tk.PhotoImage(file=str(preview_path))
+                cover_photo["image"] = photo
+                preview_label.configure(image=photo, text="")
+            except Exception as exc:
+                preview_label.configure(image="", text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
+                                        wraplength=440)
 
-            def save_edit():
-                if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
-                    messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=edit)
-                    return
-                if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
-                    messagebox.showerror("Examenidentiteit onvolledig", "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=edit)
-                    return
-                doc["type_voorstel"] = role.get()
-                doc["type_zekerheid"] = 1.0
-                doc["exam_metadata"] = {"level": level.get(), "year": year.get().strip(), "period": period.get(),
-                                        "confidence": 1.0, "source": "handmatig_bevestigd"}
-                doc["status"] = "handmatig_bevestigd"
-                refresh_review()
-                edit.destroy()
+        def save_selected():
+            index = selected_doc["index"]
+            if index is None:
+                messagebox.showinfo("Selecteer een PDF", "Selecteer eerst links een PDF.", parent=win)
+                return
+            doc = documents[index]
+            if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=win)
+                return
+            if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
+                messagebox.showerror("Examenidentiteit onvolledig",
+                    "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=win)
+                return
+            doc["type_voorstel"] = role.get()
+            doc["type_zekerheid"] = 1.0
+            doc["exam_metadata"] = {"level": level.get(), "year": year.get().strip(), "period": period.get(),
+                                    "confidence": 1.0, "source": "handmatig_bevestigd"}
+            doc["status"] = "handmatig_bevestigd"
+            refresh_review()
+            tree.selection_set(str(index))
+            tree.focus(str(index))
+            status.configure(text="Wijzigingen opgeslagen voor de geselecteerde PDF. Controleer zo nodig de overige documenten.")
 
-            buttons = ttk.Frame(fields_panel)
-            buttons.pack(fill="x", side="bottom", pady=(16, 0))
-            ttk.Button(buttons, text="Opslaan", command=save_edit, style="Accent.TButton").pack(side="right")
-            ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
+        tree.bind("<<TreeviewSelect>>", load_selected)
+        ttk.Button(fields_panel, text="Wijzigingen toepassen op deze PDF",
+                   command=save_selected, style="Accent.TButton").pack(fill="x", pady=(12, 4))
 
         def confirm_import():
             # One final approval for the batch. Do not turn uncertain automated
@@ -1352,10 +1364,13 @@ class ExamApp:
                 f"Het eerste examen ({self.project_dir.name}) is direct geopend. Je kunt nu de vraagstarts controleren; "
                 "de overige examens open je via Project openen. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
-        ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
         ttk.Button(win, text="Voorstellen akkoord — importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
         ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
         refresh_review()
+        if documents:
+            tree.selection_set("0")
+            tree.focus("0")
+            load_selected()
         self._log(f"Bulkimport voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt. Doelmap: {self.examens_root}")
 
     def add_pdfs(self):
