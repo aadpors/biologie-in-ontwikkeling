@@ -1,6 +1,6 @@
 import unittest
 from structure import (
-    append_page_span, default_question_links, fragments_for_question, make_exam_structure, make_fragment,
+    append_page_span, default_question_links, fragments_for_question, make_cv_fragment, make_exam_structure, make_fragment, missing_question_regions, page_spans_to_segments, validate_cv_fragment,
     make_page_span, mark_structure_stale, validate_exam_structure,
 )
 
@@ -91,6 +91,35 @@ class StructureTests(unittest.TestCase):
         self.assertEqual([x["id"] for x in fragments_for_question(structure, 4)["context_fragments"]], ["intro"])
         self.assertEqual(fragments_for_question(mark_structure_stale(structure, "reanalyse"), 2)["status"],
                          "structuur_niet_beschikbaar")
+
+
+    def test_cv_regions_are_bound_to_exact_source_and_question(self):
+        cv = {"id": "cv-1", "sha256": "cvhash"}
+        fragment = make_cv_fragment(cv, 2, [
+            make_page_span(3, 0.2, 0.8), make_page_span(4, 0.0, 0.4)
+        ])
+        self.assertEqual(validate_cv_fragment(fragment, cv, 2), [])
+        self.assertIn("cv_fragment_bronbestand_gewijzigd",
+                      validate_cv_fragment(fragment, {**cv, "sha256": "new"}, 2))
+        self.assertIn("cv_fragment_verkeerd_vraagnummer",
+                      validate_cv_fragment(fragment, cv, 3))
+        self.assertIn("cv_fragment_verkeerd_documenttype",
+                      validate_cv_fragment(fragment, cv, 2, "aanvulling"))
+
+    def test_normalized_spans_convert_to_full_width_pdf_crops(self):
+        segments = page_spans_to_segments(
+            [{"page": 2, "top": 0.25, "bottom": 0.75}],
+            {2: (600.0, 800.0)}
+        )
+        self.assertEqual(segments, [{"page": 2, "bbox": [0.0, 200.0, 600.0, 600.0]}])
+
+    def test_missing_question_regions_are_detected(self):
+        structure = make_exam_structure(self.doc, [
+            make_fragment("vraag", make_page_span(2, 0.2, 0.8), [1], self.questions, "q1")
+        ], self.questions)
+        self.assertEqual(missing_question_regions(structure, self.questions), [2, 4])
+        self.assertEqual(missing_question_regions(mark_structure_stale(structure, "changed"), self.questions),
+                         self.questions)
 
 
 if __name__ == "__main__":
