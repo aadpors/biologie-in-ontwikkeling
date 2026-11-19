@@ -46,7 +46,8 @@ def make_page_span(page: int, top: Any, bottom: Any) -> dict:
 
 
 def default_question_links(fragment_type: str, confirmed_question_numbers: list[int]) -> list[int]:
-    fragment_type = canonical_fragment_type(fragment_type)\n    if fragment_type not in FRAGMENT_TYPES:
+    fragment_type = canonical_fragment_type(fragment_type)
+    if fragment_type not in FRAGMENT_TYPES:
         raise ValueError("Onbekend fragmenttype.")
     numbers = sorted({int(n) for n in confirmed_question_numbers})
     return numbers if fragment_type == "intro" else []
@@ -111,7 +112,8 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
         if not fid or fid in seen_ids:
             errors.append("fragment_id_ontbreekt_of_dubbel")
         seen_ids.add(fid)
-        fragment_type = canonical_fragment_type(fragment.get("type", ""))\n        if fragment_type not in FRAGMENT_TYPES:
+        fragment_type = canonical_fragment_type(fragment.get("type", ""))
+        if fragment_type not in FRAGMENT_TYPES:
             errors.append("ongeldig_fragmenttype")
         links = fragment.get("question_numbers", [])
         if any(int(n) not in allowed for n in links):
