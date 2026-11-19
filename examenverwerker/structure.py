@@ -5,7 +5,26 @@ from copy import deepcopy
 from typing import Any
 
 STRUCTURE_SCHEMA = "biologie-examenstructuur-v1"
-FRAGMENT_TYPES = {"context_intro", "vraagcontext", "vraag", "tussenliggende_context"}
+FRAGMENT_TYPES = {"intro", "tussen_context", "vraag"}
+LEGACY_FRAGMENT_TYPES = {
+    "context_intro": "intro",
+    "vraagcontext": "tussen_context",
+    "tussenliggende_context": "tussen_context",
+}
+
+
+def canonical_fragment_type(fragment_type: str) -> str:
+    """Map historical fragment labels to the three current, user-facing types."""
+    value = str(fragment_type or "")
+    return LEGACY_FRAGMENT_TYPES.get(value, value)
+
+
+def normalize_fragments(fragments: list[dict]) -> list[dict]:
+    """Return copied fragments with legacy types migrated; all other data is preserved."""
+    normalized = deepcopy(fragments)
+    for fragment in normalized:
+        fragment["type"] = canonical_fragment_type(fragment.get("type", ""))
+    return normalized
 
 
 def normalize_boundary(value: Any) -> float:
@@ -27,10 +46,10 @@ def make_page_span(page: int, top: Any, bottom: Any) -> dict:
 
 
 def default_question_links(fragment_type: str, confirmed_question_numbers: list[int]) -> list[int]:
-    if fragment_type not in FRAGMENT_TYPES:
+    fragment_type = canonical_fragment_type(fragment_type)\n    if fragment_type not in FRAGMENT_TYPES:
         raise ValueError("Onbekend fragmenttype.")
     numbers = sorted({int(n) for n in confirmed_question_numbers})
-    return numbers if fragment_type == "context_intro" else []
+    return numbers if fragment_type == "intro" else []
 
 
 def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[int],
@@ -91,16 +110,16 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
         if not fid or fid in seen_ids:
             errors.append("fragment_id_ontbreekt_of_dubbel")
         seen_ids.add(fid)
-        if fragment.get("type") not in FRAGMENT_TYPES:
+        fragment_type = canonical_fragment_type(fragment.get("type", ""))\n        if fragment_type not in FRAGMENT_TYPES:
             errors.append("ongeldig_fragmenttype")
         links = fragment.get("question_numbers", [])
         if any(int(n) not in allowed for n in links):
             errors.append("ongeldige_vraagkoppeling")
-        if fragment.get("type") == "vraag" and len(links) != 1:
+        if fragment_type == "vraag" and len(links) != 1:
             errors.append("vraagfragment_moet_een_vraagnummer_hebben")
-        if fragment.get("type") in FRAGMENT_TYPES - {"vraag"} and not links:
+        if fragment_type in FRAGMENT_TYPES - {"vraag"} and not links:
             errors.append("contextfragment_zonder_vraagkoppeling")
-        if fragment.get("type") == "vraag" and len(links) == 1:
+        if fragment_type == "vraag" and len(links) == 1:
             number = int(links[0])
             question_fragment_counts[number] = question_fragment_counts.get(number, 0) + 1
         spans = fragment.get("page_spans", [])
@@ -150,7 +169,7 @@ def fragments_for_question(structure: dict | None, question_number: int) -> dict
     linked = [fragment for fragment in structure.get("fragments", [])
               if number in [int(x) for x in fragment.get("question_numbers", [])]]
     question = next((x for x in linked if x.get("type") == "vraag"), None)
-    contexts = [x for x in linked if x.get("type") in {"context_intro", "vraagcontext", "tussenliggende_context"}]
+    contexts = [x for x in linked if canonical_fragment_type(x.get("type", "")) in {"intro", "tussen_context"}]
     return {
         "question_fragment": question,
         "context_fragments": contexts,
