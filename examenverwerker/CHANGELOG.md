@@ -6,6 +6,13 @@
 - Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
 - De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
 
+## 0.13.10
+- De examenstructuur gebruikt voortaan precies drie fragmenttypen: **Intro**, **Tussencontext** en **Vraag**.
+- Introductiefragmenten worden standaard aan alle bevestigde vragen gekoppeld. Tussencontext kan aan één of meer expliciet geselecteerde vragen worden gekoppeld. Een vraagfragment hoort bij precies één vraag.
+- Automatische contextvoorstellen gebruiken voortaan het type Tussencontext.
+- Bestaande projecten met de oude typen `context_intro`, `vraagcontext` en `tussenliggende_context` worden bij openen naar de drie nieuwe typen vertaald. Fragment-ID's, begrenzingen, vraagkoppelingen, bewijs en overige metadata blijven behouden; de oude projectdata wordt niet ter plekke gemuteerd.
+- De structuur-editor toont alleen de drie begrijpelijke Nederlandse typen en licht hun koppelgedrag toe.
+
 ## 0.13.9
 - Vragen worden nu niet uitsluitend op tekst geclassificeerd: de analyse combineert tekstherkenning met de geometrie van rasterafbeeldingen, vectorfiguren en nabijgelegen A-H-labels.
 - Herhaalde, uitgelijnde afbeeldingen binnen één vraaggebied leveren een signaal voor mogelijke afbeeldingsantwoordopties op. Selectieformuleringen in combinatie met visueel materiaal verhogen dit signaal.
