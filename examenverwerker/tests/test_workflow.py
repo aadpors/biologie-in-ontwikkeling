@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from structure import make_exam_structure, make_fragment, make_page_span
-from workflow import exam_export_fingerprint, exam_workflow_state, restore_import_batch
+from exam_workflow import exam_export_fingerprint, exam_workflow_state, restore_import_batch
 
 
 def base_exam():
