@@ -1,3 +1,9 @@
+## 0.10.1
+- Metadata-controle toont het originele voorblad naast de automatisch herkende document- en examenvelden.
+- Dit geldt zowel voor bulkimport als voor document- en projectmetadata in bestaande projecten.
+- Ontbrekende waarden blijven leeg; standaardwaarden worden niet langer als automatische herkenning gepresenteerd.
+- Lage metadatabetrouwbaarheid wordt in de controlelijst als handmatige controle gemarkeerd.
+
 ## 0.10.0
 - Desktopinterface opnieuw vormgegeven met vaste navigatie, gegroepeerde project- en verwerkacties, duidelijke projectstatus en afzonderlijke panelen voor bronbestanden en activiteit.
 - Meer ruimte voor de documentlijst, verbeterde tabelkoppen, afwisselende rijen en horizontale/verticale scrollondersteuning.
