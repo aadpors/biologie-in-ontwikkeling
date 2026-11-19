@@ -115,7 +115,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":"contextuitsnede_bronhash_afwijkend"})
             if asset.get("asset_id") and asset.get("caption_human_confirmed") is not True:
                 errors.append({"id":rid,"error":"contextbijschrift_niet_handmatig_bevestigd"})
-            if asset.get("crop_method") == "handmatige_rechthoek_op_originele_pdf":
+            if asset.get("crop_method") in ("handmatige_rechthoek_op_originele_pdf", "handmatige_paginabrede_strook_op_originele_pdf"):
                 bbox = asset.get("bbox")
                 try:
                     coords = [float(x) for x in bbox]
