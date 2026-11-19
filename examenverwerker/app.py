@@ -12,7 +12,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors
-from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question
+from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 
 APP_VERSION = "0.5.0"
 PROJECT_FILE = "project.json"
@@ -256,8 +256,14 @@ class ExamApp:
         comparisons = {}
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
-            if self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
-                self.data["exam_structure"] = mark_structure_stale(self.data.get("exam_structure"), "De vraaganalyse is opnieuw uitgevoerd; controleer de structuur opnieuw.")
+            structures = self.data.setdefault("exam_structures", {})
+            current_structure = structures.get(doc["id"])
+            if current_structure is None and self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
+                current_structure = self.data.get("exam_structure")
+            if current_structure:
+                structures[doc["id"]] = mark_structure_stale(current_structure, "De vraaganalyse is opnieuw uitgevoerd; controleer de structuur opnieuw.")
+                if self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
+                    self.data["exam_structure"] = structures[doc["id"]]
             try:
                 # Re-analysis changes question boundaries and therefore invalidates
                 # every previously approved record derived from this source PDF.
@@ -1108,7 +1114,10 @@ class ExamApp:
         analysis = analyze_pdf(source)
         page_count = int(analysis["page_count"])
         page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in analysis["pages"]}
-        existing = self.data.get("exam_structure")
+        structures = self.data.setdefault("exam_structures", {})
+        existing = structures.get(doc["id"])
+        if existing is None and self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
+            existing = self.data.get("exam_structure")
         if existing and existing.get("document_id") == doc["id"] and existing.get("source_sha256") == doc["sha256"]:
             fragments = existing.get("fragments", [])
         else:
@@ -1245,6 +1254,8 @@ class ExamApp:
             if errors:
                 messagebox.showerror("Structuur niet opgeslagen", "Controleer eerst:\\n" + "\\n".join(errors), parent=win)
                 return False
+            self.data.setdefault("exam_structures", {})[doc["id"]] = structure
+            # Keep the original single-document key for older project readers.
             self.data["exam_structure"] = structure
             self.save_project()
             self._log(f"Examenstructuur opgeslagen: {len(fragments)} fragment(en), bron {doc['bestand']}.")
