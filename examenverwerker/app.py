@@ -6,6 +6,7 @@ import re
 import shutil
 import sys
 import traceback
+import tempfile
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
@@ -13,8 +14,9 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
+from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.7.1"
+APP_VERSION = "0.12.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -54,69 +56,339 @@ class ExamApp:
         self.project_dir = None
         self.data = None
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
+        self.app_base = app_base
+        self.examens_root = resolve_examens_root(app_base)
         self.knowledge_dir=app_base/"kennisbank"
         self._style()
         self._build()
         self._welcome()
 
     def _style(self):
+        """Warm, card-based interface inspired by the original biology website."""
         style = ttk.Style()
         try:
             style.theme_use("clam")
         except tk.TclError:
             pass
-        style.configure("Title.TLabel", font=("Segoe UI", 20, "bold"), foreground="#741d3b")
-        style.configure("Sub.TLabel", font=("Segoe UI", 10), foreground="#52616b")
-        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"), padding=8)
-        style.configure("Treeview", rowheight=30, font=("Segoe UI", 9))
-        style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
+        self.colors = {
+            "canvas": "#F5F7F7", "surface": "#FFFFFF", "wine": "#741D3B",
+            "wine_dark": "#552039", "wine_soft": "#F7EDF1", "teal": "#168B8B",
+            "teal_dark": "#0F7275", "teal_soft": "#E8F3F2", "orange": "#E89A38",
+            "ink": "#24313B", "muted": "#63717B", "line": "#DCE3E6",
+            "green": "#2D7955", "green_soft": "#EAF2EB", "table_alt": "#F7F9F9"
+        }
+        self.root.configure(background=self.colors["canvas"])
+        style.configure("App.TFrame", background=self.colors["canvas"])
+        style.configure("Card.TFrame", background=self.colors["surface"])
+        style.configure("Title.TLabel", background=self.colors["canvas"],
+                        font=("Segoe UI", 23, "bold"), foreground=self.colors["wine"])
+        style.configure("Section.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 12, "bold"), foreground=self.colors["wine"])
+        style.configure("Muted.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 9), foreground=self.colors["muted"])
+        style.configure("Body.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 10), foreground=self.colors["ink"])
+        style.configure("Metric.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 22, "bold"), foreground=self.colors["wine"])
+        style.configure("MetricCaption.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 9), foreground=self.colors["muted"])
+        style.configure("Project.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 12, "bold"), foreground=self.colors["wine"])
+        style.configure("Status.TLabel", background=self.colors["teal_soft"],
+                        font=("Segoe UI", 9), foreground=self.colors["teal_dark"],
+                        padding=(10, 7))
+        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"),
+                        padding=(15, 10), background=self.colors["teal"],
+                        foreground="#FFFFFF", borderwidth=0, focusthickness=0)
+        style.map("Accent.TButton", background=[("active", self.colors["teal_dark"]),
+                  ("pressed", self.colors["teal_dark"])], foreground=[("disabled", "#D9E5E5")])
+        style.configure("Wine.TButton", font=("Segoe UI", 10, "bold"),
+                        padding=(15, 10), background=self.colors["wine"],
+                        foreground="#FFFFFF", borderwidth=0, focusthickness=0)
+        style.map("Wine.TButton", background=[("active", self.colors["wine_dark"]),
+                  ("pressed", self.colors["wine_dark"])])
+        style.configure("Secondary.TButton", font=("Segoe UI", 9, "bold"),
+                        padding=(11, 8), background="#EEF2F3",
+                        foreground=self.colors["ink"], borderwidth=1,
+                        relief="flat", bordercolor=self.colors["line"])
+        style.map("Secondary.TButton", background=[("active", "#E2EAEC")])
+        style.configure("Notebook", background=self.colors["canvas"], borderwidth=0, tabmargins=(0, 8, 0, 0))
+        style.configure("TNotebook.Tab", font=("Segoe UI", 10, "bold"),
+                        padding=(18, 11), background="#E9EFF0", foreground=self.colors["muted"])
+        style.map("TNotebook.Tab", background=[("selected", self.colors["wine"])],
+                  foreground=[("selected", "#FFFFFF")])
+        style.configure("Treeview", rowheight=36, font=("Segoe UI", 9),
+                        background=self.colors["surface"], fieldbackground=self.colors["surface"],
+                        foreground=self.colors["ink"], borderwidth=0, relief="flat")
+        style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"),
+                        background="#EDF2F3", foreground=self.colors["muted"],
+                        padding=(10, 11), relief="flat")
+        style.map("Treeview", background=[("selected", "#F1DDE5")],
+                  foreground=[("selected", self.colors["ink"])])
+        style.configure("Vertical.TScrollbar", background="#DCE3E6",
+                        troughcolor="#F5F7F7", bordercolor="#F5F7F7", arrowsize=12)
 
     def _build(self):
-        top = ttk.Frame(self.root, padding=(20, 16))
-        top.pack(fill="x")
-        ttk.Label(top, text="Biologie Examenverwerker", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(top, text="Van originele examen-PDF's naar gecontroleerde, publicatieklare vragen.", style="Sub.TLabel").pack(anchor="w", pady=(3, 0))
-        bar = ttk.Frame(self.root, padding=(20, 4))
-        bar.pack(fill="x")
-        self.project_label = ttk.Label(bar, text="Geen project geopend", style="Sub.TLabel")
-        self.project_label.pack(side="left", fill="x", expand=True)
-        ttk.Button(bar, text="Nieuw examenproject", command=self.new_project, style="Accent.TButton").pack(side="left", padx=4)
-        ttk.Button(bar, text="Project openen", command=self.open_project).pack(side="left", padx=4)
-        ttk.Button(bar, text="PDF's toevoegen", command=self.add_pdfs, style="Accent.TButton").pack(side="left", padx=4)
+        """Build a complete, card-based workflow workspace rather than a plain file manager."""
+        self.root.title("Biologie Examenverwerker")
+        self.root.geometry("1380x900")
+        self.root.minsize(1120, 760)
 
-        body = ttk.Frame(self.root, padding=(20, 12))
+        shell = ttk.Frame(self.root, style="App.TFrame")
+        shell.pack(fill="both", expand=True)
+
+        # Brand bar
+        header = tk.Frame(shell, bg="#FFFFFF", height=76,
+                          highlightthickness=1, highlightbackground=self.colors["line"])
+        header.pack(fill="x")
+        header.pack_propagate(False)
+        brand = tk.Frame(header, bg="#FFFFFF")
+        brand.pack(side="left", padx=28, fill="y")
+        mark = tk.Label(brand, text="B", bg=self.colors["wine"], fg="#FFFFFF",
+                        font=("Segoe UI", 18, "bold"), width=2, height=1)
+        mark.pack(side="left", pady=15)
+        brand_text = tk.Frame(brand, bg="#FFFFFF")
+        brand_text.pack(side="left", padx=12, pady=12)
+        tk.Label(brand_text, text="BIOLOGIE EXAMENVERWERKER", bg="#FFFFFF",
+                 fg=self.colors["ink"], font=("Segoe UI", 13, "bold")).pack(anchor="w")
+        tk.Label(brand_text, text="Van originele examen-pdf naar gecontroleerde examenvragen",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
+        tk.Label(header, text="LOKAAL WERKSTATION   ·   OFFLINE STANDAARD   ·   NIET AUTOMATISCH PUBLICEREN",
+                 bg="#FFFFFF", fg=self.colors["muted"],
+                 font=("Segoe UI", 8, "bold")).pack(side="right", padx=28)
+
+        # Burgundy welcome banner, echoing the original website's visual identity
+        hero = tk.Frame(shell, bg=self.colors["wine"], height=126)
+        hero.pack(fill="x")
+        hero.pack_propagate(False)
+        hero_inner = tk.Frame(hero, bg=self.colors["wine"])
+        hero_inner.pack(fill="both", expand=True, padx=34, pady=17)
+        tk.Label(hero_inner, text="EXAMENVERWERKING", bg=self.colors["wine"],
+                 fg="#F3C9D5", font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        tk.Label(hero_inner, text="Van bronbestand naar betrouwbare vraagbank",
+                 bg=self.colors["wine"], fg="#FFFFFF",
+                 font=("Segoe UI", 22, "bold")).pack(anchor="w", pady=(3, 2))
+        tk.Label(hero_inner, text="Importeer, controleer en verrijk examens stap voor stap. Jij houdt de inhoudelijke regie.",
+                 bg=self.colors["wine"], fg="#F8EAF0",
+                 font=("Segoe UI", 10)).pack(anchor="w")
+
+        body = ttk.Frame(shell, style="App.TFrame", padding=(26, 18, 26, 12))
         body.pack(fill="both", expand=True)
-        self.status = ttk.Label(body, text="Begin met een nieuw examenproject of open een bestaand project.", style="Sub.TLabel")
-        self.status.pack(anchor="w", pady=(0, 10))
+        self.notebook = ttk.Notebook(body)
+        self.notebook.pack(fill="both", expand=True)
+
+        overview = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
+        documents = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
+        workflow = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
+        self.notebook.add(overview, text="  Overzicht  ")
+        self.notebook.add(documents, text="  Documenten  ")
+        self.notebook.add(workflow, text="  Verwerkroute  ")
+
+        # OVERVIEW: project identity, progress and large primary actions
+        top = ttk.Frame(overview, style="App.TFrame")
+        top.pack(fill="x", pady=(0, 13))
+        title_col = ttk.Frame(top, style="App.TFrame")
+        title_col.pack(side="left", fill="x", expand=True)
+        ttk.Label(title_col, text="Jouw examenwerkplek", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(title_col, text="Een helder overzicht van wat al is verwerkt en wat nog aandacht vraagt.",
+                  style="Muted.TLabel").pack(anchor="w", pady=(3, 0))
+        ttk.Button(top, text="＋  Meerdere examens importeren",
+                   command=self.import_year_set, style="Accent.TButton").pack(side="right", padx=(10, 0), pady=5)
+        ttk.Button(top, text="Open project", command=self.open_project,
+                   style="Secondary.TButton").pack(side="right", pady=5)
+
+        project = tk.Frame(overview, bg="#FFFFFF", highlightthickness=1,
+                           highlightbackground=self.colors["line"])
+        project.pack(fill="x", pady=(0, 13))
+        project_left = tk.Frame(project, bg="#FFFFFF")
+        project_left.pack(side="left", fill="both", expand=True, padx=18, pady=15)
+        tk.Label(project_left, text="ACTIEF EXAMENPROJECT", bg="#FFFFFF",
+                 fg=self.colors["muted"], font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        self.project_label = ttk.Label(project_left, text="Nog geen project geopend",
+                                       style="Project.TLabel")
+        self.project_label.pack(anchor="w", pady=(4, 5))
+        self.status = ttk.Label(project_left,
+            text="Importeer examens of open een bestaand project om te beginnen.",
+            style="Status.TLabel", wraplength=900)
+        self.status.pack(anchor="w", fill="x")
+        project_actions = tk.Frame(project, bg="#FFFFFF")
+        project_actions.pack(side="right", padx=18, pady=18)
+        ttk.Button(project_actions, text="＋ Nieuw project", command=self.new_project,
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+        ttk.Button(project_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+
+        # Metric cards
+        metrics = ttk.Frame(overview, style="App.TFrame")
+        metrics.pack(fill="x", pady=(0, 13))
+        self.metric_documents = self._metric_card(metrics, "BRONBESTANDEN", "0", "PDF's ingelezen", 0)
+        self.metric_questions = self._metric_card(metrics, "VRAAGSTARTS", "0", "kandidaten gevonden", 1)
+        self.metric_todo = self._metric_card(metrics, "NOG TE CONTROLEREN", "0", "documentherkenningen", 2)
+        self.metric_records = self._metric_card(metrics, "VRAAGRECORDS", "0", "inhoudelijke records", 3)
+
+        # Two-column dashboard: workflow cards and guidance
+        lower = ttk.Frame(overview, style="App.TFrame")
+        lower.pack(fill="both", expand=True)
+        route_card = tk.Frame(lower, bg="#FFFFFF", highlightthickness=1,
+                              highlightbackground=self.colors["line"])
+        route_card.pack(side="left", fill="both", expand=True, padx=(0, 8))
+        route_head = tk.Frame(route_card, bg="#FFFFFF")
+        route_head.pack(fill="x", padx=18, pady=(15, 7))
+        tk.Label(route_head, text="DE VERWERKROUTE", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 12, "bold")).pack(anchor="w")
+        tk.Label(route_head, text="Werk van boven naar beneden. Je kunt stappen opnieuw uitvoeren wanneer nodig.",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
+        steps = [
+            ("01", "Bronbestanden importeren", "Selecteer in één keer examens uit meerdere jaren en niveaus.", self.import_year_set, "Importeren"),
+            ("02", "Documenten en metadata", "Controleer opgaven, correctievoorschriften, tijdvak en jaar.", lambda:self.notebook.select(documents), "Documenten bekijken"),
+            ("03", "Vraagstarts en structuur", "Analyseer de opgaven en controleer de vraag- en contextgrenzen.", self.analyze_questions, "Vraagstarts analyseren"),
+            ("04", "Vragen bevestigen", "Beoordeel kandidaten in één doorlopend overzicht.", self.show_candidates, "Vraagcontrole openen"),
+            ("05", "Inhoudelijke eindcontrole", "Controleer tekst, afbeeldingen, context, CV en bijlagen.", self.show_records, "Eindcontrole openen"),
+        ]
+        for number, heading, description, callback, button_text in steps:
+            card = tk.Frame(route_card, bg="#FFFFFF")
+            card.pack(fill="x", padx=16, pady=5)
+            circle = tk.Label(card, text=number, bg=self.colors["wine_soft"],
+                              fg=self.colors["wine"], font=("Segoe UI", 10, "bold"),
+                              width=4, height=2)
+            circle.pack(side="left", padx=(0, 12))
+            text_col = tk.Frame(card, bg="#FFFFFF")
+            text_col.pack(side="left", fill="x", expand=True)
+            tk.Label(text_col, text=heading, bg="#FFFFFF", fg=self.colors["ink"],
+                     font=("Segoe UI", 10, "bold")).pack(anchor="w")
+            tk.Label(text_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
+                     font=("Segoe UI", 8), wraplength=570, justify="left").pack(anchor="w", pady=(2, 0))
+            ttk.Button(card, text=button_text, command=callback,
+                       style="Secondary.TButton").pack(side="right", padx=(8, 0))
+            ttk.Separator(route_card).pack(fill="x", padx=16, pady=3)
+
+        guide = tk.Frame(lower, bg="#FFFFFF", width=280, highlightthickness=1,
+                         highlightbackground=self.colors["line"])
+        guide.pack(side="right", fill="y", padx=(8, 0))
+        guide.pack_propagate(False)
+        tk.Label(guide, text="GOED OM TE WETEN", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=16, pady=(16, 9))
+        for head, body_text, color in [
+            ("Bron blijft leidend", "Originele examen-pdf's worden bewaard. Tekstherkenning is een voorstel, geen bron.", self.colors["teal"]),
+            ("Geen automatische goedkeuring", "Vraagrecords en afbeeldingen worden pas bruikbaar na jouw volledige controle.", self.colors["orange"]),
+            ("Lokaal en veilig", "Bestanden blijven standaard op deze computer. Er wordt niets automatisch gepubliceerd.", self.colors["green"])
+        ]:
+            block = tk.Frame(guide, bg="#F7F9F9")
+            block.pack(fill="x", padx=13, pady=5)
+            tk.Frame(block, bg=color, width=4).pack(side="left", fill="y")
+            inner = tk.Frame(block, bg="#F7F9F9")
+            inner.pack(side="left", fill="both", expand=True, padx=9, pady=9)
+            tk.Label(inner, text=head, bg="#F7F9F9", fg=self.colors["ink"],
+                     font=("Segoe UI", 9, "bold")).pack(anchor="w")
+            tk.Label(inner, text=body_text, bg="#F7F9F9", fg=self.colors["muted"],
+                     font=("Segoe UI", 8), wraplength=205, justify="left").pack(anchor="w", pady=(3, 0))
+        ttk.Button(guide, text="Exportpakket maken", command=self.export_project,
+                   style="Wine.TButton").pack(fill="x", padx=14, pady=(12, 14))
+
+        # DOCUMENTS: dedicated document library with table and clear actions
+        doc_top = ttk.Frame(documents, style="App.TFrame")
+        doc_top.pack(fill="x", pady=(0, 12))
+        ttk.Label(doc_top, text="Documentbibliotheek", style="Title.TLabel").pack(side="left")
+        ttk.Label(doc_top, text="Controleer de herkenning voordat je de inhoud analyseert.",
+                  style="Muted.TLabel").pack(side="left", padx=16, pady=(10, 0))
+        doc_actions = ttk.Frame(documents, style="App.TFrame")
+        doc_actions.pack(fill="x", pady=(0, 10))
+        ttk.Button(doc_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
+                   style="Accent.TButton").pack(side="left")
+        ttk.Button(doc_actions, text="Document bekijken", command=self.show_document,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(doc_actions, text="Herkenning aanpassen", command=self.correct_type,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(doc_actions, text="Examengegevens controleren", command=self.edit_exam_metadata,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        files_card = tk.Frame(documents, bg="#FFFFFF", highlightthickness=1,
+                              highlightbackground=self.colors["line"])
+        files_card.pack(fill="both", expand=True)
+        files_heading = tk.Frame(files_card, bg="#FFFFFF")
+        files_heading.pack(fill="x", padx=16, pady=(13, 5))
+        tk.Label(files_heading, text="INGELEZEN BRONBESTANDEN", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 10, "bold")).pack(side="left")
+        tk.Label(files_heading, text="Dubbelklik op een regel om de PDF te bekijken",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
+        table_wrap = ttk.Frame(files_card, style="Card.TFrame", padding=(12, 7, 12, 12))
+        table_wrap.pack(fill="both", expand=True)
         columns = ("name", "type", "pages", "confidence", "state")
-        self.table = ttk.Treeview(body, columns=columns, show="headings")
+        self.table = ttk.Treeview(table_wrap, columns=columns, show="headings")
         for col, title, width in [
-            ("name", "Bestand", 360), ("type", "Herkend als", 170),
-            ("pages", "Pagina's", 80), ("confidence", "Zekerheid", 100), ("state", "Status", 170)
+            ("name", "Bestand", 470), ("type", "Herkend documenttype", 210),
+            ("pages", "Pagina's", 90), ("confidence", "Zekerheid", 110), ("state", "Status", 220)
         ]:
             self.table.heading(col, text=title)
             self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
-        self.table.pack(fill="both", expand=True)
+        scrollbar = ttk.Scrollbar(table_wrap, orient="vertical", command=self.table.yview)
+        horizontal = ttk.Scrollbar(table_wrap, orient="horizontal", command=self.table.xview)
+        self.table.configure(yscrollcommand=scrollbar.set, xscrollcommand=horizontal.set)
+        self.table.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        horizontal.pack(fill="x", pady=(2, 0))
+        self.table.tag_configure("odd", background=self.colors["table_alt"])
+        self.table.tag_configure("even", background="#FFFFFF")
         self.table.bind("<Double-1>", self.show_document)
-        foot = ttk.Frame(body)
-        foot.pack(fill="x", pady=(10, 0))
-        ttk.Button(foot, text="Document bekijken", command=self.show_document).pack(side="left")
-        ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)
-        ttk.Button(foot, text="Vraagstarts analyseren", command=self.analyze_questions, style="Accent.TButton").pack(side="left", padx=6)
-        ttk.Button(foot, text="Examenstructuur bewerken", command=self.edit_exam_structure, style="Accent.TButton").pack(side="left", padx=6)
-        ttk.Button(foot, text="Kandidaten bekijken", command=self.show_candidates).pack(side="left")
-        ttk.Button(foot, text="Examengegevens controleren", command=self.edit_exam_metadata).pack(side="left", padx=6)
-        ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
-        workflow=ttk.Frame(body); workflow.pack(fill="x",pady=(8,0))
-        ttk.Button(workflow,text="Vraagrecords beoordelen en goedkeuren",command=self.show_records,style="Accent.TButton").pack(side="left")
-        ttk.Button(workflow,text="Veilig exportpakket maken",command=self.export_project).pack(side="left",padx=8)
-        self.log = tk.Text(body, height=6, wrap="word", font=("Consolas", 9), background="#f5f7f7", relief="flat")
-        self.log.pack(fill="x", pady=(12, 0))
+
+        # WORKFLOW: large task cards grouped by the actual processing stages
+        ttk.Label(workflow, text="Verwerkroute", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(workflow, text="Open een stap wanneer je eraan toe bent. De applicatie bewaart je voortgang lokaal.",
+                  style="Muted.TLabel").pack(anchor="w", pady=(3, 14))
+        stages = [
+            ("01", "Vraagstarts analyseren", "Zoek mogelijke vraagstarts in de opgaven-pdf en vergelijk waar mogelijk met het bijbehorende CV.", "Analyse", self.analyze_questions, self.colors["teal"]),
+            ("02", "Examenstructuur vastleggen", "Controleer paginabereiken, vraaggrenzen en de koppeling met contexten, figuren en tabellen.", "Structuur", self.edit_exam_structure, self.colors["wine"]),
+            ("03", "Vraagstarts bevestigen", "Beoordeel de gevonden kandidaten in een doorlopend controlevenster.", "Controleren", self.show_candidates, self.colors["orange"]),
+            ("04", "Vraagrecords samenstellen", "Maak conceptrecords vanuit bevestigde vraagstarts en controleer de bronfragmenten.", "Samenstellen", self.show_candidates, self.colors["teal"]),
+            ("05", "Inhoudelijke eindcontrole", "Controleer alle tekst, opties, afbeeldingen, contexten, CV en bijlagen per vraag.", "Eindcontrole", self.show_records, self.colors["wine"]),
+            ("06", "Veilig exportpakket", "Maak een lokaal exportpakket. Publiceren naar de website gebeurt nooit automatisch.", "Exporteren", self.export_project, self.colors["green"]),
+        ]
+        for number, heading, description, action_text, callback, color in stages:
+            card = tk.Frame(workflow, bg="#FFFFFF", highlightthickness=1,
+                            highlightbackground=self.colors["line"])
+            card.pack(fill="x", pady=5)
+            tk.Label(card, text=number, bg=color, fg="#FFFFFF",
+                     font=("Segoe UI", 13, "bold"), width=4, height=2).pack(side="left", padx=14, pady=12)
+            content_col = tk.Frame(card, bg="#FFFFFF")
+            content_col.pack(side="left", fill="x", expand=True, padx=4, pady=11)
+            tk.Label(content_col, text=heading, bg="#FFFFFF", fg=self.colors["wine"],
+                     font=("Segoe UI", 11, "bold")).pack(anchor="w")
+            tk.Label(content_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
+                     font=("Segoe UI", 9), wraplength=850, justify="left").pack(anchor="w", pady=(3, 0))
+            ttk.Button(card, text=action_text, command=callback,
+                       style="Accent.TButton" if number in ("01", "03", "05") else "Secondary.TButton").pack(side="right", padx=16, pady=14)
+
+        # Persistent activity feed
+        activity = tk.Frame(shell, bg="#FFFFFF", highlightthickness=1,
+                            highlightbackground=self.colors["line"])
+        activity.pack(fill="x", padx=26, pady=(0, 14))
+        activity_head = tk.Frame(activity, bg="#FFFFFF")
+        activity_head.pack(fill="x", padx=13, pady=(8, 2))
+        tk.Label(activity_head, text="ACTIVITEIT EN MELDINGEN", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 8, "bold")).pack(side="left")
+        tk.Label(activity_head, text="Lokale log · bronbestanden blijven intact",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
+        self.log = tk.Text(activity, height=3, wrap="word", font=("Segoe UI", 9),
+                           background="#FBFCFC", foreground=self.colors["ink"],
+                           insertbackground=self.colors["ink"], relief="flat",
+                           padx=10, pady=6, highlightthickness=0)
+        self.log.pack(fill="x", padx=10, pady=(2, 8))
         self.log.configure(state="disabled")
 
+    def _metric_card(self, parent, heading, value, caption, column):
+        card = tk.Frame(parent, bg="#FFFFFF", highlightthickness=1,
+                        highlightbackground=self.colors["line"])
+        card.grid(row=0, column=column, sticky="nsew", padx=(0 if column == 0 else 6, 0))
+        parent.columnconfigure(column, weight=1, uniform="metrics")
+        tk.Label(card, text=heading, bg="#FFFFFF", fg=self.colors["muted"],
+                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=14, pady=(12, 1))
+        number = ttk.Label(card, text=value, style="Metric.TLabel")
+        number.pack(anchor="w", padx=14)
+        ttk.Label(card, text=caption, style="MetricCaption.TLabel").pack(anchor="w", padx=14, pady=(0, 12))
+        return number
+
     def _welcome(self):
-        self._log("Welkom. Maak een project per examen. Voeg daarna alle beschikbare PDF's toe.")
-        self._log("Tip: selecteer opgaven, correctievoorschrift, uitwerkbijlage en eventuele aanvullingen tegelijk.")
+        self._log("Welkom. Open een bestaand examenproject of selecteer in één keer PDF's van meerdere jaren, niveaus en tijdvakken.")
+        self._log("De software leest de examens uit, groepeert ze automatisch en maakt zelf de examenmappen aan. Je controleert eerst de herkenning.")
 
     def _error(self, context, exc):
         details=traceback.format_exc()
@@ -140,23 +412,28 @@ class ExamApp:
         self.log.configure(state="disabled")
 
     def new_project(self):
-        folder = filedialog.askdirectory(title="Kies of maak een map voor dit examenproject")
-        if not folder:
-            return
-        base = Path(folder)
-        name = simpledialog.askstring("Nieuw examen", "Geef het examen een herkenbare naam:", initialvalue=base.name)
-        if not name:
-            return
-        self.project_dir = base / re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
-        (self.project_dir / "bronnen").mkdir(parents=True, exist_ok=True)
-        (self.project_dir / "analyse").mkdir(exist_ok=True)
-        (self.project_dir / "snippets").mkdir(exist_ok=True)
-        self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
-                     "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
-                     "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
-        self.save_project()
-        self.refresh()
-        self._log(f"Nieuw project aangemaakt: {self.project_dir}")
+        """Create a project automatically inside the portable app's own project root."""
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        name = f"nieuw-project-{stamp}"
+        root = self.app_base / "projecten"
+        self.project_dir = root / name
+        try:
+            self.project_dir.mkdir(parents=True, exist_ok=False)
+            for folder in ("bronnen", "analyse", "snippets", "logs"):
+                (self.project_dir / folder).mkdir(exist_ok=True)
+            self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
+                         "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
+                         "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
+            self.save_project()
+            self.refresh()
+            self._log(f"Nieuw project automatisch aangemaakt: {self.project_dir}")
+        except Exception as exc:
+            self.project_dir = None
+            self.data = None
+            self._error("Nieuw project aanmaken", exc)
+            messagebox.showerror("Project aanmaken mislukt",
+                f"Het project kon niet worden aangemaakt in:\n{root}\n\n"
+                "Controleer of de programmamap schrijfbaar is. Details staan in de map logs.")
 
     def open_project(self):
         filename = filedialog.askopenfilename(title="Open projectbestand", filetypes=[("Examenproject", PROJECT_FILE), ("JSON", "*.json")])
@@ -173,6 +450,291 @@ class ExamApp:
         except Exception as exc:
             self._error("Project openen",exc)
             messagebox.showerror("Project openen mislukt","Dit project kon niet worden geopend. Controleer of het projectbestand geldig is. Details staan in de map logs.")
+
+    def import_year_set(self):
+        """Import arbitrary exams from multiple years without manual folder creation."""
+        files = filedialog.askopenfilenames(
+            title="Selecteer alle examen-PDF's (meerdere jaren, havo/vwo en tijdvakken tegelijk)",
+            filetypes=[("PDF-bestanden", "*.pdf")])
+        if not files:
+            return
+
+        documents = []
+        seen_hashes = set()
+        failures = []
+        for source_name in files:
+            source = Path(source_name)
+            try:
+                digest = sha256(source)
+                if digest in seen_hashes:
+                    self._log(f"Dubbel bestand overgeslagen: {source.name}")
+                    continue
+                seen_hashes.add(digest)
+                extracted = extract_pdf(source)
+                all_text = "\n".join(page["tekst"] for page in extracted["pagina_tekst"])
+                role, role_confidence, role_signals = classify_document_role(source.name, all_text)
+                identity = infer_exam_metadata(source.name, all_text)
+                documents.append({
+                    "id": digest[:16], "bestand": source.name, "source_path": str(source),
+                    "opslagbestand": f"{digest[:12]}-{source.name}", "sha256": digest,
+                    "type_voorstel": role, "type_zekerheid": role_confidence,
+                    "herkenningssignalen": role_signals, "exam_metadata": identity,
+                    "pagina_aantal": extracted["pagina_aantal"], "metadata": extracted["metadata"],
+                    "pagina_zonder_tekst": [p["pagina"] for p in extracted["pagina_tekst"] if p.get("ocr_nodig")],
+                    "ocr_status": "handmatige_ocr_controle_nodig" if any(p.get("ocr_nodig") for p in extracted["pagina_tekst"]) else "tekstlaag_aanwezig",
+                    "_extracted": extracted,
+                })
+            except Exception as exc:
+                failures.append(f"{source.name}: {exc}")
+
+        if failures:
+            messagebox.showerror("Jaarset niet volledig ingelezen",
+                "Er ging iets mis bij het lezen van één of meer PDF's. Er is nog niets geïmporteerd:\n\n" + "\n".join(failures))
+            return
+        if not documents:
+            messagebox.showinfo("Geen nieuwe PDF's", "Er zijn geen unieke PDF-bestanden geselecteerd.")
+            return
+
+        win = tk.Toplevel(self.root)
+        win.title("Examens controleren en automatisch groeperen")
+        win.geometry("1120x650")
+        win.transient(self.root)
+        win.grab_set()
+        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Controleer niveau, jaar, tijdvak en documenttype. Er wordt nog niets verwerkt of verplaatst.",
+                  padding=12, wraplength=1060).pack(anchor="w")
+        columns = ("file", "role", "certainty", "meta_confidence", "level", "year", "period", "pages", "state")
+        tree = ttk.Treeview(win, columns=columns, show="headings", selectmode="browse")
+        headings = [
+            ("file", "Bestand", 280), ("role", "Documenttype", 145), ("certainty", "Typezekerheid", 85),
+            ("meta_confidence", "Metazekerheid", 85), ("level", "Niveau", 70), ("year", "Jaar", 60), ("period", "Tijdvak", 65),
+            ("pages", "Pagina's", 65), ("state", "Controle", 170)]
+        for col, title, width in headings:
+            tree.heading(col, text=title)
+            tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
+        tree.pack(fill="both", expand=True, padx=12, pady=8)
+        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1060)
+        status.pack(anchor="w")
+
+        def identity_text(doc):
+            meta = doc.get("exam_metadata") or {}
+            return meta.get("level", ""), meta.get("year", ""), meta.get("period", "")
+
+        def refresh_review():
+            for item in tree.get_children():
+                tree.delete(item)
+            groups, unassigned = group_exam_documents(documents)
+            for index, doc in enumerate(documents):
+                meta = doc.get("exam_metadata") or {}
+                uncertain = (doc.get("type_zekerheid", 0) < 0.9
+                             or float(meta.get("confidence", 0) or 0) < 0.9)
+                state = "Handmatig controleren" if uncertain or not meta else "Voorstel controleren"
+                if not meta:
+                    state = "Metadata ontbreekt"
+                tree.insert("", "end", iid=str(index), values=(
+                    doc["bestand"], doc.get("type_voorstel", "onbekend"),
+                    f"{doc.get('type_zekerheid', 0):.0%}",
+                    f"{meta.get('confidence', 0):.0%}" if meta else "—", *identity_text(doc),
+                    doc.get("pagina_aantal", 0), state))
+            summary = []
+            for key, items in groups.items():
+                summary.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's")
+            if unassigned:
+                summary.append(f"{len(unassigned)} PDF('s) zonder complete examenidentiteit")
+            status.configure(text="Automatische groepen: " + ("; ".join(summary) if summary else "nog geen complete groepen"))
+
+        def edit_selected():
+            selection = tree.selection()
+            if not selection:
+                messagebox.showinfo("Selecteer een PDF", "Selecteer eerst een PDF om de herkenning te controleren.", parent=win)
+                return
+            doc = documents[int(selection[0])]
+            meta = doc.get("exam_metadata") or {}
+            edit = tk.Toplevel(win)
+            edit.title("Voorblad en automatisch herkende metadata controleren")
+            edit.geometry("1080x760")
+            edit.minsize(900, 650)
+            edit.transient(win)
+            edit.grab_set()
+
+            # The original first page is shown beside the values inferred from
+            # the filename/PDF. Empty values stay empty; never invent defaults.
+            body = ttk.Frame(edit, padding=14)
+            body.pack(fill="both", expand=True)
+            preview_panel = ttk.LabelFrame(body, text="Voorblad van de originele PDF", padding=10)
+            preview_panel.pack(side="left", fill="both", expand=True, padx=(0, 12))
+            fields_panel = ttk.LabelFrame(body, text="Automatisch ingevulde gegevens", padding=14)
+            fields_panel.pack(side="right", fill="y")
+            ttk.Label(fields_panel, text=doc["bestand"], wraplength=390,
+                      font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 10))
+
+            preview_temp = tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
+            preview_path = Path(preview_temp.name) / "voorblad.png"
+            preview_label = ttk.Label(preview_panel, text="Voorblad wordt geladen…", anchor="center")
+            preview_label.pack(fill="both", expand=True)
+            try:
+                render_page(Path(doc["source_path"]), 1, preview_path, scale=0.72)
+                cover_photo = tk.PhotoImage(file=str(preview_path))
+                preview_label.configure(image=cover_photo, text="")
+                preview_label.image = cover_photo
+            except Exception as exc:
+                preview_label.configure(
+                    text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
+                    wraplength=470, justify="center")
+            edit._preview_temp = preview_temp
+
+            role = tk.StringVar(value=doc.get("type_voorstel", "onbekend"))
+            level = tk.StringVar(value=meta.get("level", ""))
+            year = tk.StringVar(value=str(meta.get("year", "")))
+            period = tk.StringVar(value=str(meta.get("period", "")))
+
+            confidence = meta.get("confidence")
+            source_label = {
+                "bestandsnaam": "Herkenning uit bestandsnaam",
+                "eerste_pdf_paginas": "Herkenning uit tekst op de eerste PDF-pagina's",
+                "handmatig_bevestigd": "Eerder handmatig bevestigd",
+            }.get(meta.get("source"), "Herkenningsbron onbekend")
+            ttk.Label(fields_panel, text=f"Metadata: {float(confidence or 0):.0%} zekerheid · {source_label}",
+                      wraplength=390).pack(anchor="w", pady=(0, 12))
+            fields = [
+                ("Documenttype", role, ttk.Combobox(fields_panel, textvariable=role,
+                    values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"],
+                    state="readonly", width=32)),
+                ("Niveau", level, ttk.Combobox(fields_panel, textvariable=level,
+                    values=["Havo", "Vwo"], state="readonly", width=32)),
+                ("Jaar", year, ttk.Entry(fields_panel, textvariable=year, width=35)),
+                ("Tijdvak", period, ttk.Combobox(fields_panel, textvariable=period,
+                    values=["1", "2", "3"], state="readonly", width=32)),
+            ]
+            for label, var, widget in fields:
+                ttk.Label(fields_panel, text=label).pack(anchor="w", pady=(7, 2))
+                widget.pack(anchor="w", fill="x")
+            ttk.Label(fields_panel,
+                text="Vergelijk de ingevulde gegevens met het zichtbare voorblad. Lege velden zijn niet automatisch afgeleid. Koppel documenten alleen als niveau, jaar en tijdvak exact overeenkomen.",
+                wraplength=390, justify="left").pack(anchor="w", pady=(16, 8))
+
+            def save_edit():
+                if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                    messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=edit)
+                    return
+                if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
+                    messagebox.showerror("Examenidentiteit onvolledig", "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=edit)
+                    return
+                doc["type_voorstel"] = role.get()
+                doc["type_zekerheid"] = 1.0
+                doc["exam_metadata"] = {"level": level.get(), "year": year.get().strip(), "period": period.get(),
+                                        "confidence": 1.0, "source": "handmatig_bevestigd"}
+                doc["status"] = "handmatig_bevestigd"
+                refresh_review()
+                edit.destroy()
+
+            buttons = ttk.Frame(fields_panel)
+            buttons.pack(fill="x", side="bottom", pady=(16, 0))
+            ttk.Button(buttons, text="Opslaan", command=save_edit, style="Accent.TButton").pack(side="right")
+            ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
+
+        def confirm_import():
+            errors = validate_batch_documents(documents)
+            if errors:
+                messagebox.showerror("Eerst herkenning corrigeren",
+                    "De jaarset kan nog niet veilig worden geïmporteerd:\n\n" + "\n".join(errors[:20]), parent=win)
+                return
+            groups, unassigned = group_exam_documents(documents)
+            if unassigned:
+                messagebox.showerror("Onvolledige groepering", "Niet alle PDF's hebben een volledige examenidentiteit. Er wordt niets geïmporteerd.", parent=win)
+                return
+            warnings = []
+            for key, items in groups.items():
+                for warning in batch_document_warnings(items):
+                    warnings.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {warning}")
+            warning_text = "\n".join(warnings) if warnings else "Geen ontbrekende opgaven of CV's en geen dubbele hoofd-documenttypen gesignaleerd."
+            summary_text = "\n".join(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's" for key, items in groups.items())
+            if not messagebox.askyesno("Import definitief controleren",
+                f"Er worden {len(groups)} examenprojecten automatisch opgeslagen onder:\\n{self.examens_root}\\n\\n"
+                + summary_text + "\\n\\nWaarschuwingen:\\n" + warning_text
+                + "\\n\\nAlle getoonde metadata en documenttypen zijn door jou gecontroleerd. Doorgaan?", parent=win):
+                return
+            target_root = self.examens_root
+            created = []
+            created_directories = []
+            manifest_path = None
+            try:
+                target_root.mkdir(parents=True, exist_ok=True)
+                manifest = {"schema": "biologie-examenimport-v1", "aangemaakt": now(), "projecten": []}
+                for key, items in sorted(groups.items()):
+                    level_key, year_key, period_key = key
+                    project_name = f"{level_key}-tijdvak-{period_key}"
+                    year_dir = target_root / year_key
+                    if not year_dir.exists():
+                        year_dir.mkdir(parents=True)
+                        created_directories.append(year_dir)
+                    project_dir = year_dir / project_name
+                    project_dir.mkdir(exist_ok=False)
+                    created_directories.append(project_dir)
+                    (project_dir / "bronnen").mkdir()
+                    (project_dir / "analyse").mkdir()
+                    (project_dir / "snippets").mkdir()
+                    confirmed_identity = {"level": "Havo" if level_key == "havo" else "Vwo",
+                                          "year": year_key, "period": period_key,
+                                          "confidence": 1.0, "source": "handmatig_bevestigd"}
+                    project_docs = []
+                    for doc in items:
+                        source = Path(doc["source_path"])
+                        target = project_dir / "bronnen" / doc["opslagbestand"]
+                        shutil.copy2(source, target)
+                        extracted = doc["_extracted"]
+                        (project_dir / "analyse" / f"{doc['id']}.json").write_text(
+                            json.dumps(extracted, ensure_ascii=False, indent=2), encoding="utf-8")
+                        clean_doc = {k: v for k, v in doc.items() if k not in {"source_path", "_extracted"}}
+                        clean_doc["exam_metadata"] = dict(confirmed_identity)
+                        clean_doc["status"] = "handmatig_bevestigd"
+                        project_docs.append(clean_doc)
+                    project_data = {
+                        "schema": "biologie-examenproject-v1", "app_versie": APP_VERSION,
+                        "naam": project_name, "aangemaakt": now(), "bijgewerkt": now(),
+                        "exam_metadata": confirmed_identity, "documenten": project_docs,
+                        "beslissingen": [], "publicatiestatus": "niet_vrijgegeven",
+                        "vraagkandidaten": [], "vraagrecords": [],
+                    }
+                    (project_dir / PROJECT_FILE).write_text(json.dumps(project_data, ensure_ascii=False, indent=2), encoding="utf-8")
+                    created.append(project_dir)
+                    manifest["projecten"].append({
+                        "naam": project_name, "pad": f"{year_key}/{project_name}", "exam_metadata": confirmed_identity,
+                        "documenten": [d["bestand"] for d in project_docs],
+                        "waarschuwingen": batch_document_warnings(items),
+                    })
+                stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                manifest_path = target_root / f"import-{stamp}.json"
+                suffix = 2
+                while manifest_path.exists():
+                    manifest_path = target_root / f"import-{stamp}-{suffix}.json"
+                    suffix += 1
+                manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+            except Exception as exc:
+                if manifest_path and manifest_path.exists():
+                    manifest_path.unlink()
+                for created_path in reversed(created_directories):
+                    shutil.rmtree(created_path, ignore_errors=True)
+                messagebox.showerror("Examens importeren mislukt",
+                    f"Er is een fout opgetreden. Alleen nieuwe mappen uit deze import zijn opgeruimd; bestaande examens zijn niet gewijzigd.\\n\\n{exc}", parent=win)
+                return
+            win.destroy()
+            self.project_dir = None
+            self.data = None
+            self.project_label.configure(text=f"Examens opgeslagen onder: {target_root}")
+            for item in self.table.get_children():
+                self.table.delete(item)
+            self.status.configure(text=f"{len(created)} examenprojecten aangemaakt. Open een project om de inhoudelijke verwerking te starten.")
+            self._log(f"Examens geïmporteerd onder: {target_root}")
+            for project in created:
+                self._log(f"  Project aangemaakt: {project.name}")
+            messagebox.showinfo("Examens geïmporteerd",
+                f"{len(created)} examenprojecten zijn automatisch aangemaakt onder:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
+
+        ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
+        ttk.Button(win, text="Alle voorstellen controleren en examens importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
+        ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
+        refresh_review()
+        self._log(f"Bulkimport voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt. Doelmap: {self.examens_root}")
 
     def add_pdfs(self):
         if not self.data:
@@ -225,21 +787,58 @@ class ExamApp:
             messagebox.showinfo("Eerst een project","Open eerst een examenproject.")
             return
         current=self.data.get("exam_metadata",{})
-        win=tk.Toplevel(self.root); win.title("Examengegevens controleren"); win.transient(self.root); win.grab_set()
-        frame=ttk.Frame(win,padding=18); frame.pack(fill="both",expand=True)
-        ttk.Label(frame,text="Controleer de gegevens die uit de bestandsnaam zijn afgeleid.",wraplength=420).grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,12))
-        ttk.Label(frame,text="Niveau").grid(row=1,column=0,sticky="w",pady=5)
-        level=tk.StringVar(value=current.get("level","Havo"))
-        ttk.Combobox(frame,textvariable=level,values=["Havo","Vwo"],state="readonly",width=18).grid(row=1,column=1,sticky="ew",pady=5)
-        ttk.Label(frame,text="Jaar").grid(row=2,column=0,sticky="w",pady=5)
-        year=tk.StringVar(value=str(current.get("year","2026")))
-        ttk.Entry(frame,textvariable=year,width=20).grid(row=2,column=1,sticky="ew",pady=5)
-        ttk.Label(frame,text="Tijdvak").grid(row=3,column=0,sticky="w",pady=5)
-        period=tk.StringVar(value=str(current.get("period","1")))
-        ttk.Combobox(frame,textvariable=period,values=["1","2","3"],state="readonly",width=18).grid(row=3,column=1,sticky="ew",pady=5)
+        source_doc=next((d for d in self.data.get("documenten",[])
+                         if d.get("type_voorstel")=="opgaven"),None)
+        source=(self.project_dir/"bronnen"/source_doc["opslagbestand"]) if source_doc else None
+
+        win=tk.Toplevel(self.root)
+        win.title("Voorblad en examengegevens controleren")
+        win.geometry("1080x760")
+        win.minsize(900,650)
+        win.transient(self.root)
+        win.grab_set()
+        body=ttk.Frame(win,padding=14); body.pack(fill="both",expand=True)
+        preview_panel=ttk.LabelFrame(body,text="Voorblad van de opgaven-PDF",padding=10)
+        preview_panel.pack(side="left",fill="both",expand=True,padx=(0,12))
+        fields_panel=ttk.LabelFrame(body,text="Automatisch ingevulde examengegevens",padding=14)
+        fields_panel.pack(side="right",fill="y")
+        preview_label=ttk.Label(preview_panel,text="Voeg eerst een opgaven-PDF toe om het voorblad te bekijken.",
+                                anchor="center",wraplength=460,justify="center")
+        preview_label.pack(fill="both",expand=True)
+        preview_temp=tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
+        if source and source.is_file():
+            try:
+                preview_path=Path(preview_temp.name)/"voorblad.png"
+                render_page(source,1,preview_path,scale=0.72)
+                cover_photo=tk.PhotoImage(file=str(preview_path))
+                preview_label.configure(image=cover_photo,text="")
+                preview_label.image=cover_photo
+            except Exception as exc:
+                preview_label.configure(text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}")
+        win._preview_temp=preview_temp
+
+        ttk.Label(fields_panel,text="Controleer de voorgestelde gegevens aan de hand van het voorblad. Lege waarden zijn niet automatisch ingevuld.",
+                  wraplength=390,justify="left").pack(anchor="w",pady=(0,12))
+        if source_doc:
+            ttk.Label(fields_panel,text=f"Bronbestand: {source_doc['bestand']}",wraplength=390,
+                      font=("Segoe UI",9,"bold")).pack(anchor="w",pady=(0,8))
+        else:
+            ttk.Label(fields_panel,text="Geen opgaven-PDF gekoppeld; controleer de gegevens zodra de bron is toegevoegd.",
+                      wraplength=390).pack(anchor="w",pady=(0,8))
+        level=tk.StringVar(value=current.get("level",""))
+        year=tk.StringVar(value=str(current.get("year","")))
+        period=tk.StringVar(value=str(current.get("period","")))
+        for label,var,widget in [
+            ("Niveau",level,ttk.Combobox(fields_panel,textvariable=level,values=["Havo","Vwo"],state="readonly",width=30)),
+            ("Jaar",year,ttk.Entry(fields_panel,width=33)),
+            ("Tijdvak",period,ttk.Combobox(fields_panel,textvariable=period,values=["1","2","3"],state="readonly",width=30))
+        ]:
+            ttk.Label(fields_panel,text=label).pack(anchor="w",pady=(7,2))
+            widget.pack(anchor="w",fill="x")
+
         def save():
-            if not re.fullmatch(r"20\d{2}",year.get().strip()):
-                messagebox.showerror("Ongeldig jaar","Vul een jaartal van vier cijfers in.",parent=win); return
+            if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
+                messagebox.showerror("Examengegevens onvolledig","Controleer niveau, jaartal en tijdvak aan de hand van het voorblad.",parent=win); return
             identity={"level":level.get(),"year":year.get().strip(),"period":period.get(),"confidence":1.0,"source":"handmatig_bevestigd"}
             self.data["exam_metadata"]=identity
             # A project represents one exam: apply the explicit identity to all
@@ -247,7 +846,8 @@ class ExamApp:
             for document in self.data.get("documenten", []):
                 if document.get("type_voorstel") in ("opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"):
                     document["exam_metadata"]=dict(identity)
-            for record in self.data.get("vraagrecords", []):                exam=record.setdefault("exam", {})
+            for record in self.data.get("vraagrecords", []):
+                exam=record.setdefault("exam", {})
                 exam.update({"level":identity["level"],"year":identity["year"],"period":identity["period"]})
                 record["source_match_human_confirmed"]=True
                 record["cv_match_human_confirmed"]=True
@@ -260,8 +860,9 @@ class ExamApp:
                 record["record_review_checklist"]={key:False for key in record.get("record_review_checklist", {})}
             self.save_project(); self._log(f"Examenmetadata bevestigd voor alle documenten: {level.get()} {year.get()} tijdvak {period.get()}.")
             win.destroy()
-        ttk.Button(frame,text="Gegevens opslaan",command=save).grid(row=4,column=0,columnspan=2,sticky="ew",pady=(14,0))
-        frame.columnconfigure(1,weight=1)
+        buttons=ttk.Frame(fields_panel); buttons.pack(fill="x",side="bottom",pady=(16,0))
+        ttk.Button(buttons,text="Gegevens opslaan",command=save,style="Accent.TButton").pack(side="right")
+        ttk.Button(buttons,text="Annuleren",command=win.destroy).pack(side="right",padx=8)
 
     def analyze_questions(self):
         if not self.data:
@@ -374,108 +975,204 @@ class ExamApp:
         messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Per examen is alleen het bijbehorende correctievoorschrift vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
 
     def show_candidates(self):
+        """Review question starts in one continuous workspace, without per-question dialogs."""
         if not self.data:
             return
         rows = self.data.get("vraagkandidaten", [])
         win = tk.Toplevel(self.root)
-        win.title("Mogelijke vraagstarts – altijd controleren")
-        win.geometry("900x580")
-        ttk.Label(win, text=f"{len(rows)} actieve kandidaten. Zwakkere dubbelingen worden apart bewaard en kunnen handmatig worden hersteld.", padding=10).pack(anchor="w")
-        cols=("number","page","confidence","type","options","cv","line","learning","status")
-        tree=ttk.Treeview(win,columns=cols,show="headings")
-        for col,label,width in [("number","Nr.",48),("page","PDF-pagina",78),("confidence","Signaal",68),("type","Vraagtype",105),("options","Opties",65),("cv","CV",88),("line","Gevonden tekst",290),("learning","Leerbank",105),("status","Status",125)]:
-            tree.heading(col,text=label); tree.column(col,width=width)
-        tree.pack(fill="both",expand=True,padx=10,pady=10)
-        for i,row in enumerate(rows):
-            learned=suggest_from_learning(self.knowledge_dir,question_pattern_key(row))
-            suggestion=learned.get("suggestion")
-            hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
-            if learned.get("support",0): hint+=f" ({learned['support']}×)"
-            check=row.get("vraagtype_controle",{})
-            type_label=check.get("type","nog niet bepaald")
-            option_count=len(check.get("options",[]))
-            option_label=f"{option_count} gevonden"
-            if check.get("type")=="meerkeuze" and not check.get("options_complete"):
-                option_label += " – controle"
-            cv_label=("Match" if row.get("cv_number_match") is True else "Niet in CV" if row.get("cv_number_match") is False else "—")
-            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",type_label,option_label,cv_label,row.get("line"),hint,row.get("status")))
-        ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Jouw beoordeling wordt lokaal als leerdata opgeslagen.",wraplength=850).pack(anchor="w",padx=12,pady=(0,8))
-        actions=ttk.Frame(win); actions.pack(fill="x",padx=12,pady=(0,12))
+        win.title("Vraagstarts controleren")
+        win.geometry("1280x820")
+        win.minsize(1040, 680)
+        win.transient(self.root)
+
+        header = ttk.Frame(win, padding=(16, 12))
+        header.pack(fill="x")
+        ttk.Label(header, text=f"{len(rows)} mogelijke vraagstarts",
+                  font=("Segoe UI", 15, "bold")).pack(anchor="w")
+        ttk.Label(header, text="Selecteer links een vraag. Bekijk rechts de tekst, opties en context en bevestig direct. Je blijft in hetzelfde venster.",
+                  wraplength=1180).pack(anchor="w", pady=(4, 0))
+
+        split = ttk.Panedwindow(win, orient="horizontal")
+        split.pack(fill="both", expand=True, padx=14, pady=8)
+        left = ttk.Frame(split, padding=6)
+        right = ttk.Frame(split, padding=10)
+        split.add(left, weight=3)
+        split.add(right, weight=5)
+
+        cols = ("number", "page", "confidence", "type", "cv", "status")
+        tree = ttk.Treeview(left, columns=cols, show="headings", selectmode="browse")
+        for col, label, width in [
+            ("number", "Nr.", 42), ("page", "Pagina", 58), ("confidence", "Signaal", 58),
+            ("type", "Type", 88), ("cv", "CV", 70), ("status", "Beoordeling", 130)
+        ]:
+            tree.heading(col, text=label)
+            tree.column(col, width=width, anchor="center" if col in ("number", "page", "confidence") else "w")
+        yscroll = ttk.Scrollbar(left, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=yscroll.set)
+        tree.pack(side="left", fill="both", expand=True)
+        yscroll.pack(side="right", fill="y")
+
+        ttk.Label(right, text="Geselecteerde vraag", font=("Segoe UI", 12, "bold")).pack(anchor="w")
+        summary = ttk.Label(right, text="Selecteer links een vraagstart.", wraplength=720)
+        summary.pack(anchor="w", pady=(4, 10))
+        ttk.Label(right, text="Gevonden tekst en vraagvoorstel", font=("Segoe UI", 9, "bold")).pack(anchor="w")
+        question_box = tk.Text(right, height=15, wrap="word", font=("Segoe UI", 10))
+        question_box.pack(fill="both", expand=True, pady=(4, 10))
+        question_box.configure(state="disabled")
+
+        details = ttk.Frame(right)
+        details.pack(fill="x")
+        options_box = tk.Text(details, height=6, wrap="word", font=("Segoe UI", 9))
+        options_box.pack(side="left", fill="both", expand=True, padx=(0, 6))
+        context_box = tk.Text(details, height=6, wrap="word", font=("Segoe UI", 9))
+        context_box.pack(side="left", fill="both", expand=True, padx=(6, 0))
+        for box in (options_box, context_box):
+            box.configure(state="disabled")
+
+        footer = ttk.Frame(win, padding=(14, 8))
+        footer.pack(fill="x")
+        status_label = ttk.Label(footer, text="Nog geen vraag geselecteerd.")
+        status_label.pack(side="left")
+
+        selected_index = {"value": None}
+        def set_box(box, text):
+            box.configure(state="normal")
+            box.delete("1.0", "end")
+            box.insert("1.0", text)
+            box.configure(state="disabled")
+
+        def learning_hint(row):
+            learned = suggest_from_learning(self.knowledge_dir, question_pattern_key(row))
+            suggestion = learned.get("suggestion")
+            hint = ("Tegenstrijdig" if learned.get("conflicting") else
+                    "Vraag" if suggestion == "question" else
+                    "Geen vraag" if suggestion == "not_question" else "Geen leeradvies")
+            if learned.get("support", 0):
+                hint += f" ({learned['support']} eerdere keuzes)"
+            return hint
+
+        def refresh_rows(select_index=None):
+            for item in tree.get_children():
+                tree.delete(item)
+            for i, row in enumerate(rows):
+                check = row.get("vraagtype_controle", {})
+                cv_label = ("Match" if row.get("cv_number_match") is True else
+                            "Niet in CV" if row.get("cv_number_match") is False else "—")
+                tree.insert("", "end", iid=str(i), values=(
+                    row.get("number"), row.get("page"), f"{row.get('confidence', 0):.0%}",
+                    check.get("type", "onbekend"), cv_label,
+                    row.get("status", "controle_nodig").replace("_", " ")))
+            if select_index is not None and str(select_index) in tree.get_children():
+                tree.selection_set(str(select_index))
+                tree.focus(str(select_index))
+                tree.see(str(select_index))
+                show_selected()
+
+        def show_selected(_event=None):
+            selection = tree.selection()
+            if not selection:
+                return
+            idx = int(selection[0])
+            selected_index["value"] = idx
+            row = rows[idx]
+            check = row.get("vraagtype_controle", {})
+            summary.configure(text=(
+                f"Vraag {row.get('number')} · PDF-pagina {row.get('page')} · "
+                f"signaal {row.get('confidence', 0):.0%} · "
+                f"status: {row.get('status', 'controle_nodig').replace('_', ' ')}\n"
+                f"Leerbank: {learning_hint(row)}"))
+            set_box(question_box, row.get("vraagtekst_voorstel", "") or
+                    (row.get("line", "") + "\n" + row.get("next_line", "")))
+            options = check.get("options", [])
+            option_lines = [f"{o.get('label')}. {o.get('text')}" for o in options]
+            if check.get("type") == "meerkeuze":
+                option_lines.append(
+                    "Ontbrekende labels: " + (", ".join(check.get("option_gaps", [])) or "geen") +
+                    "\nDubbele labels: " + (", ".join(check.get("duplicate_option_labels", [])) or "geen"))
+            set_box(options_box, "ANTWOORDOPTIES\n" + ("\n".join(option_lines) if option_lines else
+                    "Geen antwoordopties herkend; controleer of dit een open vraag is."))
+            refs = row.get("context_verwijzingen", [])
+            ref_lines = [f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
+            set_box(context_box, "CONTEXTVERWIJZINGEN\n" + ("\n".join(ref_lines) if ref_lines else
+                    "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend."))
+            status_label.configure(text=f"Vraag {row.get('number')} geselecteerd · {idx + 1} van {len(rows)}")
+
         def decide(is_question):
-            selected=tree.selection()
-            if not selected:
-                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een gevonden vraagstart.")
+            idx = selected_index["value"]
+            if idx is None:
+                messagebox.showinfo("Selecteer kandidaat", "Selecteer eerst een vraagstart.", parent=win)
                 return
-            row=rows[int(selected[0])]
-            reason=simpledialog.askstring("Waarom deze keuze?","Korte reden (optioneel):",parent=win) or ""
-            row["status"]="bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
-            row["human_decision"]=bool(is_question)
-            row["decision_reason"]=reason
-            suppression_key=f"{row.get('document_id')}|{row.get('number')}|{row.get('page')}|{float(row.get('bbox',[0,0])[1]):.1f}"
+            row = rows[idx]
+            old_status = row.get("status")
+            row["status"] = "bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
+            row["human_decision"] = bool(is_question)
+            row["decision_reason"] = "Handmatig bevestigd in de doorlopende vraagcontrole."
+            suppression_key = f"{row.get('document_id')}|{row.get('number')}|{row.get('page')}|{float(row.get('bbox',[0,0])[1]):.1f}"
             if not is_question:
-                self.data["restored_suppressed_candidate_keys"]=[x for x in self.data.get("restored_suppressed_candidate_keys",[]) if x!=suppression_key]
-                for record in self.data.get("vraagrecords",[]):
-                    if record.get("candidate_document_id")==row.get("document_id") and record.get("number")==row.get("number") and record.get("source_page")==row.get("page"):
-                        record["approved_by_human"]=False
-                        record["status"]="vraagstart_afgewezen_record_ongeldig"
-                        record["source_analysis_invalidated"]=True
-                        record["approval_revoked_reason"]="De bijbehorende vraagstart is handmatig afgewezen."
-            learn_decision(self.project_dir/"kennisbank",{
-                "pattern_key":question_pattern_key(row),
-                "chosen":"question" if is_question else "not_question",
-                "accepted":True,"scope":"voorstel_voor_toekomstige_herkenning",
-                "document_id":row.get("document_id"),"page":row.get("page"),
-                "candidate_line":row.get("line"),"reason":reason,
-                "human_decision":bool(is_question)})
+                self.data["restored_suppressed_candidate_keys"] = [
+                    x for x in self.data.get("restored_suppressed_candidate_keys", []) if x != suppression_key]
+                for record in self.data.get("vraagrecords", []):
+                    if (record.get("candidate_document_id") == row.get("document_id")
+                        and record.get("number") == row.get("number")
+                        and record.get("source_page") == row.get("page")):
+                        record["approved_by_human"] = False
+                        record["status"] = "vraagstart_afgewezen_record_ongeldig"
+                        record["source_analysis_invalidated"] = True
+                        record["approval_revoked_reason"] = "De bijbehorende vraagstart is handmatig afgewezen."
+            learn_decision(self.knowledge_dir, {
+                "pattern_key": question_pattern_key(row),
+                "chosen": "question" if is_question else "not_question",
+                "accepted": True, "scope": "voorstel_voor_toekomstige_herkenning",
+                "document_id": row.get("document_id"), "page": row.get("page"),
+                "candidate_line": row.get("line"), "reason": row["decision_reason"],
+                "human_decision": bool(is_question)})
             self.save_project()
-            tree.set(selected[0],"status",row["status"])
-            learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
-            suggestion=learned.get("suggestion")
-            hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
-            if learned.get("support",0): hint+=f" ({learned['support']}×)"
-            tree.set(selected[0],"learning",hint)
-            self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
-        def inspect_question():
-            selected=tree.selection()
-            if not selected:
-                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een kandidaat.")
+            tree.set(str(idx), "status", row["status"].replace("_", " "))
+            self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}.")
+            # Move to the next undecided item so a whole exam can be reviewed continuously.
+            next_idx = next((n for n in range(idx + 1, len(rows))
+                             if rows[n].get("human_decision") is None), None)
+            if next_idx is None:
+                next_idx = next((n for n, item in enumerate(rows)
+                                 if item.get("human_decision") is None), None)
+            if next_idx is not None:
+                refresh_rows(next_idx)
+            else:
+                refresh_rows(idx)
+                status_label.configure(text="Alle zichtbare kandidaten zijn beoordeeld. Controleer eventueel onderdrukte dubbelingen.")
+            if old_status == "afgewezen_geen_vraag" and is_question:
+                self._log("Eerder afgewezen vraagstart opnieuw bevestigd.")
+
+        def inspect_original():
+            idx = selected_index["value"]
+            if idx is not None:
+                self.preview_candidate(rows, tree, win)
+
+        def make_record():
+            idx = selected_index["value"]
+            if idx is None:
+                messagebox.showinfo("Selecteer kandidaat", "Selecteer eerst een vraagstart.", parent=win)
                 return
-            row=rows[int(selected[0])]
-            check=row.get("vraagtype_controle",{})
-            detail=tk.Toplevel(win)
-            detail.title(f"Vraag {row.get('number')} – tekst- en optiecontrole")
-            detail.geometry("760x680")
-            ttk.Label(detail,text=f"Voorgesteld vraagtype: {check.get('type','onbekend')}  |  zekerheid: {check.get('confidence',0):.0%}  |  status: altijd handmatig controleren",padding=10).pack(anchor="w")
-            ttk.Label(detail,text="Vraagtekstvoorstel (afbakening kan nog onjuist zijn):",padding=(10,2)).pack(anchor="w")
-            question_box=tk.Text(detail,height=19,wrap="word")
-            question_box.pack(fill="both",expand=True,padx=10,pady=4)
-            question_box.insert("1.0",row.get("vraagtekst_voorstel",""))
-            question_box.configure(state="disabled")
-            ttk.Label(detail,text="Gevonden antwoordopties:",padding=(10,6)).pack(anchor="w")
-            options=check.get("options",[])
-            option_lines=[f"{o.get('label')}. {o.get('text')}" for o in options]
-            if not option_lines:
-                option_lines=["Geen A-H-antwoordopties herkend. Controleer of het een open vraag, juist/onjuist-vraag of wel/niet-vraag is."]
-            ttk.Label(detail,text="\n".join(option_lines),wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
-            if check.get("type")=="meerkeuze":
-                gaps=check.get("option_gaps",[])
-                duplicates=check.get("duplicate_option_labels",[])
-                warning=("Ontbrekende labels: "+(", ".join(gaps) if gaps else "geen")+
-                         " | Dubbele labels: "+(", ".join(duplicates) if duplicates else "geen"))
-                ttk.Label(detail,text=warning,foreground="#9b4d00",wraplength=720,padding=10).pack(anchor="w")
-            refs=row.get("context_verwijzingen",[])
-            ref_lines=[f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
-            ttk.Label(detail,text="Mogelijke verwijzingen naar contextmateriaal:",padding=(10,4)).pack(anchor="w")
-            ttk.Label(detail,text="\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
-            ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
-        suppressed_count=len([x for x in self.data.get("onderdrukte_vraagkandidaten",[])])
-        ttk.Button(actions,text=f"Onderdrukte dubbelingen ({suppressed_count})",command=lambda:self.show_suppressed_candidates(win)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Maak concept-vraagrecord",command=lambda:self.create_question_record(rows,tree,win)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
-        ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
-        ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Voorlopige snippet maken",command=lambda:self.create_snippet_proposal(rows,tree,win)).pack(side="left",padx=8)
+            if rows[idx].get("human_decision") is not True:
+                messagebox.showwarning("Vraagstart eerst bevestigen",
+                    "Bevestig eerst dat dit een echte vraagstart is.", parent=win)
+                return
+            # Existing full record editor remains available after question-start review.
+            self.create_question_record(rows, tree, win)
+
+        tree.bind("<<TreeviewSelect>>", show_selected)
+        ttk.Button(footer, text="Originele pagina", command=inspect_original).pack(side="right", padx=4)
+        ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record).pack(side="right", padx=4)
+        ttk.Button(footer, text="Geen vraag", command=lambda: decide(False)).pack(side="right", padx=4)
+        ttk.Button(footer, text="Bevestig vraag", command=lambda: decide(True), style="Accent.TButton").pack(side="right", padx=4)
+        ttk.Button(footer, text="Onderdrukte dubbelingen",
+                   command=lambda: self.show_suppressed_candidates(win)).pack(side="left", padx=4)
+        if rows:
+            refresh_rows(next((i for i, row in enumerate(rows) if row.get("human_decision") is None), 0))
+        else:
+            set_box(question_box, "Er zijn nog geen vraagstartkandidaten. Voer eerst de vraaganalyse uit.")
+            set_box(options_box, "ANTWOORDOPTIES")
+            set_box(context_box, "CONTEXTVERWIJZINGEN")
 
     def show_suppressed_candidates(self,parent):
         rows=self.data.get("onderdrukte_vraagkandidaten",[])
@@ -497,7 +1194,8 @@ class ExamApp:
             item=rows[int(selected[0])]
             key=f"{item.get('document_id')}|{item.get('number')}|{item.get('page')}|{float(item.get('bbox',[0,0])[1]):.1f}"
             item["status"]="controle_nodig"
-            item["human_decision"]=None            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
+            item["human_decision"]=None
+            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
             item.pop("suppressed_by",None)
             self.data["onderdrukte_vraagkandidaten"]=[x for x in self.data.get("onderdrukte_vraagkandidaten",[]) if x is not item]
             self.data.setdefault("vraagkandidaten",[]).append(item)
@@ -746,7 +1444,8 @@ class ExamApp:
                 canvas.configure(scrollregion=(0,0,image_width,image_height))
                 selection_start=None
                 selection_lines=None
-                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")            def change_crop_page(delta):
+                crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")
+            def change_crop_page(delta):
                 page_var.set(max(1,min(page_count,int(page_var.get())+delta)))
                 show_crop_page()
             def start_crop(event):
@@ -995,7 +1694,8 @@ class ExamApp:
                 if structure is None and self.data.get("exam_structure", {}).get("document_id") == source_doc["id"]:
                     structure = self.data.get("exam_structure")
                 structure_errors = validate_exam_structure(structure, source_doc["id"], source_doc["sha256"], confirmed_numbers) if structure else ["structuur_niet_ingesteld"]
-                missing_regions = missing_question_regions(structure, [int(row["number"])])                if structure_errors or missing_regions:
+                missing_regions = missing_question_regions(structure, [int(row["number"])])
+                if structure_errors or missing_regions:
                     raise ValueError("Baken eerst het vraagfragment voor deze vraag af in 'Examenstructuur bewerken'. " +
                                      ("Structuurcontrole: " + ", ".join(structure_errors) if structure_errors else "Vraagfragment ontbreekt."))
                 linkage = fragments_for_question(structure, row["number"])
@@ -1244,7 +1944,8 @@ class ExamApp:
                             target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-cv-{cv_index}.png"
                             render_composite_crops(cv_path,proposal["source_segments"],target,scale=1.0)
                             preview_specs.append((f"Origineel CV · vraag {record['number']} · anker pagina {anchor['page']}",target,None,None))
-                except Exception as exc:                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
+                except Exception as exc:
+                    self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
         for idx,name in enumerate(record.get("snippet_files") or ([record["snippet_file"]] if record.get("snippet_file") else []),1):
             preview_specs.append((f"Handmatig afgebakend vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
         for idx,asset in enumerate(record.get("context_asset_files", []),1):
@@ -1493,7 +2194,8 @@ class ExamApp:
             return
         self._open_structure_editor(source_docs[0])
 
-    def _open_structure_editor(self, doc):        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
+    def _open_structure_editor(self, doc):
+        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
         if not candidates:
             messagebox.showwarning("Eerst vraagstarts analyseren", "Analyseer eerst de vraagstarts van deze opgaven-PDF en controleer de kandidaten.")
             return
@@ -1742,7 +2444,8 @@ class ExamApp:
         def delete_fragment():
             sel = fragment_tree.selection()
             if not sel: return
-            index = int(sel[0])            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
+            index = int(sel[0])
+            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
             fragments.pop(index); refresh_fragment_list(); save_structure()
         def load_selected_fragment(_event=None):
             load_span_for_page(); redraw_guides()
@@ -1991,7 +2694,8 @@ class ExamApp:
             return
         analysis = self.project_dir / "analyse" / f"{doc['id']}.json"
         extracted = json.loads(analysis.read_text(encoding="utf-8"))
-        preview = tk.Toplevel(self.root)        preview.title(doc["bestand"])
+        preview = tk.Toplevel(self.root)
+        preview.title(doc["bestand"])
         preview.geometry("850x620")
         header = ttk.Frame(preview, padding=12)
         header.pack(fill="x")
@@ -2013,27 +2717,58 @@ class ExamApp:
             return
         choices = ["opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling", "onbekend"]
         initial = doc.get("exam_metadata") or infer_exam_metadata(doc.get("bestand","")) or self.data.get("exam_metadata",{})
+        source = self.project_dir / "bronnen" / doc["opslagbestand"]
+        if not source.is_file():
+            messagebox.showerror("Bronbestand ontbreekt", "De oorspronkelijke PDF kan niet worden gevonden. Voeg het bestand opnieuw toe.")
+            return
+
         win = tk.Toplevel(self.root)
-        win.title("Documenttype en examenidentiteit bevestigen")
+        win.title("Voorblad en documentmetadata controleren")
+        win.geometry("1080x760")
+        win.minsize(900, 650)
         win.transient(self.root)
         win.grab_set()
-        frame=ttk.Frame(win,padding=16); frame.pack(fill="both",expand=True)
-        ttk.Label(frame, text=f"Document: {doc['bestand']}",wraplength=520).grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,8))
-        ttk.Label(frame, text="Documenttype").grid(row=1,column=0,sticky="w",pady=5)
+        body = ttk.Frame(win, padding=14)
+        body.pack(fill="both", expand=True)
+        preview_panel = ttk.LabelFrame(body, text="Voorblad van de originele PDF", padding=10)
+        preview_panel.pack(side="left", fill="both", expand=True, padx=(0, 12))
+        fields_panel = ttk.LabelFrame(body, text="Automatisch ingevulde gegevens", padding=14)
+        fields_panel.pack(side="right", fill="y")
+        ttk.Label(fields_panel, text=f"Document: {doc['bestand']}", wraplength=390,
+                  font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 10))
+
+        preview_temp = tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
+        preview_path = Path(preview_temp.name) / "voorblad.png"
+        preview_label = ttk.Label(preview_panel, text="Voorblad wordt geladen…", anchor="center")
+        preview_label.pack(fill="both", expand=True)
+        try:
+            render_page(source, 1, preview_path, scale=0.72)
+            cover_photo = tk.PhotoImage(file=str(preview_path))
+            preview_label.configure(image=cover_photo, text="")
+            preview_label.image = cover_photo
+        except Exception as exc:
+            preview_label.configure(text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
+                                     wraplength=470, justify="center")
+        win._preview_temp = preview_temp
+
+        ttk.Label(fields_panel, text="Controleer de waarden aan de hand van het voorblad. Lege waarden zijn niet automatisch afgeleid.",
+                  wraplength=390, justify="left").pack(anchor="w", pady=(0, 12))
+        ttk.Label(fields_panel, text="Documenttype").pack(anchor="w", pady=(5, 2))
         choice = tk.StringVar(value=doc["type_voorstel"])
-        ttk.Combobox(frame, textvariable=choice, values=choices, state="readonly", width=28).grid(row=1,column=1,sticky="ew",pady=5)
-        ttk.Label(frame,text="Examenidentiteit (nodig om opgaven, CV en bijlagen veilig te koppelen)").grid(row=2,column=0,columnspan=2,sticky="w",pady=(12,4))
-        level=tk.StringVar(value=initial.get("level","Havo"))
+        ttk.Combobox(fields_panel, textvariable=choice, values=choices,
+                     state="readonly", width=32).pack(anchor="w", fill="x")
+        ttk.Label(fields_panel,text="Examenidentiteit (nodig om opgaven, CV en bijlagen veilig te koppelen)").pack(anchor="w",pady=(14,4))
+        level=tk.StringVar(value=initial.get("level",""))
         year=tk.StringVar(value=str(initial.get("year","")))
-        period=tk.StringVar(value=str(initial.get("period","1")))
-        for row,label,var,widget in [
-            (3,"Niveau",level,ttk.Combobox(frame,textvariable=level,values=["Havo","Vwo"],state="readonly",width=24)),
-            (4,"Jaar",year,ttk.Entry(frame,textvariable=year,width=27)),
-            (5,"Tijdvak",period,ttk.Combobox(frame,textvariable=period,values=["1","2","3"],state="readonly",width=24))
+        period=tk.StringVar(value=str(initial.get("period","")))
+        for label,var,widget in [
+            ("Niveau",level,ttk.Combobox(fields_panel,textvariable=level,values=["Havo","Vwo"],state="readonly",width=30)),
+            ("Jaar",year,ttk.Entry(fields_panel,width=33)),
+            ("Tijdvak",period,ttk.Combobox(fields_panel,textvariable=period,values=["1","2","3"],state="readonly",width=30))
         ]:
-            ttk.Label(frame,text=label).grid(row=row,column=0,sticky="w",pady=4)
-            widget.grid(row=row,column=1,sticky="ew",pady=4)
-        ttk.Label(frame,text="Controleer dit per PDF. De bestandsnaam of projectmetadata kan onjuist zijn; alleen opslaan betekent dat jij de identiteit van dit document bevestigt.",wraplength=520).grid(row=6,column=0,columnspan=2,sticky="w",pady=(10,4))
+            ttk.Label(fields_panel,text=label).pack(anchor="w",pady=(7,2))
+            widget.pack(anchor="w",fill="x")
+
         def apply():
             old = doc["type_voorstel"]
             new = choice.get()
@@ -2058,10 +2793,10 @@ class ExamApp:
             self.refresh()
             self._log(f"Herkenning en examenidentiteit bevestigd: {doc['bestand']} → {new} ({doc.get('exam_metadata',{}).get('level','')} {doc.get('exam_metadata',{}).get('year','')} tijdvak {doc.get('exam_metadata',{}).get('period','')}).")
             win.destroy()
-        buttons=ttk.Frame(frame); buttons.grid(row=7,column=0,columnspan=2,sticky="ew",pady=(12,0))
-        ttk.Button(buttons,text="Bevestigen",command=apply).pack(side="right")
+
+        buttons=ttk.Frame(fields_panel); buttons.pack(fill="x",side="bottom",pady=(16,0))
+        ttk.Button(buttons,text="Bevestigen",command=apply,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Annuleren",command=win.destroy).pack(side="right",padx=8)
-        frame.columnconfigure(1,weight=1)
 
     def save_project(self):
         if not self.data or not self.project_dir:
@@ -2075,17 +2810,31 @@ class ExamApp:
     def refresh(self):
         for item in self.table.get_children():
             self.table.delete(item)
-        if not self.data:
-            return
-        for idx, doc in enumerate(self.data["documenten"]):
+        documents = self.data.get("documenten", []) if self.data else []
+        records = self.data.get("vraagrecords", []) if self.data else []
+        candidates = self.data.get("vraagkandidaten", []) if self.data else []
+        todo = sum(d.get("status") == "controle_nodig" for d in documents)
+        for idx, doc in enumerate(documents):
             self.table.insert("", "end", iid=str(idx), values=(
-                doc["bestand"], doc["type_voorstel"], doc["pagina_aantal"],
-                f"{doc['type_zekerheid']:.0%}", doc["status"].replace("_", " ")
-            ))
-        count = len(self.data["documenten"])
-        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])
-        candidates = len(self.data.get("vraagkandidaten", []))
-        self.status.configure(text=f"{count} document(en) opgenomen · {candidates} vraagstartkandidaten · {todo} documentherkenningen vragen controle · publicatie geblokkeerd.")
+                doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
+                doc.get("pagina_aantal", "—"),
+                f"{doc.get('type_zekerheid', 0):.0%}",
+                str(doc.get("status", "onbekend")).replace("_", " ")
+            ), tags=("even" if idx % 2 == 0 else "odd",))
+        if self.data:
+            self.project_label.configure(text=self.data.get("naam") or
+                (self.project_dir.name if self.project_dir else "Actief project"))
+        else:
+            self.project_label.configure(text="Nog geen project geopend")
+        self.metric_documents.configure(text=str(len(documents)))
+        self.metric_questions.configure(text=str(len(candidates)))
+        self.metric_todo.configure(text=str(todo))
+        self.metric_records.configure(text=str(len(records)))
+        self.status.configure(text=(
+            f"{len(documents)} bronbestanden · {len(candidates)} vraagstartkandidaten · "
+            f"{todo} documentherkenningen vragen controle · niets wordt automatisch gepubliceerd."
+            if self.data else "Importeer examens of open een bestaand project om te beginnen."
+        ))
 
 def main():
     root = tk.Tk()

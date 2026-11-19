@@ -3,6 +3,9 @@
 Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologie-examens. De bestaande website en examendata worden niet gewijzigd.
 
 ## Wat deze ontwikkelversie al kan
+- In één keer examen-PDF’s uit meerdere jaren, havo/vwo en alle tijdvakken importeren; geen vooraf aangemaakte projecten of handmatig gekozen doelmap nodig.
+- Metadata en documenttypen automatisch voorstellen, alle herkenning vóór import controleren en examens automatisch opslaan onder `examens/<jaar>/<niveau>-tijdvak-<nummer>/`.
+- Een importmanifest bewaren met de projectindeling en waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande examenmappen worden nooit overschreven.
 - Examenprojecten aanmaken, openen en hervatten.
 - Originele PDF's ongewijzigd opnemen en SHA-256-dedupliceren.
 - Documenttypen voorstellen: opgaven, correctievoorschrift, uitwerkbijlage en aanvulling.
@@ -46,9 +49,9 @@ De doelcomputer heeft daarna geen Python-installatie of administratorrechten nod
 Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 
 ## Werkwijze
-1. Maak één project per examen.
-2. Voeg alle beschikbare PDF's tegelijk toe.
-3. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak).
+1. Kies **Examens in bulk importeren** en selecteer alle beschikbare PDF’s, ook als ze uit verschillende jaren, niveaus en tijdvakken komen.
+2. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak). De applicatie maakt daarna automatisch de mapstructuur onder `examens/` aan.
+3. Open het aangemaakte examenproject om de inhoudelijke verwerking te starten.
 4. Laat vraagstarts analyseren.
 5. Bekijk kandidaten op de originele pagina en bevestig of wijs iedere kandidaat af. Alle kandidaten moeten een menselijke beslissing hebben.
 6. Open 'Examenstructuur bewerken' voor iedere opgaven-PDF. Maak voor elke vraag een vraagfragment en leg contextinleidingen, vraagcontexten en tussenliggende contexten vast. Koppel ieder contextfragment aan de juiste vragen.
