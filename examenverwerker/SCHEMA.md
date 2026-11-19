@@ -29,3 +29,6 @@ De bestaande velden in `exam-mcq.json`, `exam-open.json` en `exam-contexts.json`
 - `page_spans[]`: paginanummer plus genormaliseerde verticale grenzen `top` en `bottom` tussen 0 en 1. Iedere pagina van een doorlopend fragment heeft eigen grenzen.
 
 Een contextinleiding wordt standaard aan alle bevestigde vragen gekoppeld. Een vraagfragment moet precies één vraagnummer hebben. De editor gebruikt uitsluitend een visuele grijsmarkering buiten twee dunne zwarte horizontale lijnen; de originele PDF wordt nooit gewijzigd. De structuur blijft concept totdat de verdere inhoudelijke en visuele controles zijn uitgevoerd.
+
+
+Concept-vraagrecords bewaren na het opslaan ook `exam_structure_status`, `exam_structure_fragment_ids`, `question_region_page_spans` en `context_region_fragments`. Dezelfde gegevens gaan mee in het lokale exportmanifest, zodat de handmatig afgebakende bronregio's en vraagkoppelingen niet verloren gaan bij het maken van een exportpakket. Ze vervangen de bestaande websitevelden niet.
