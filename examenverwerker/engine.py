@@ -708,3 +708,24 @@ def detect_question_type(text: str) -> dict:
     return {"type": qtype, "subtype": subtype, "options": [], "option_labels": [],
             "options_complete": None, "option_gaps": [], "duplicate_option_labels": [],
             "confidence": confidence, "status": "controle_nodig"}
+
+
+def extract_region_text(pdf_path: Path, segments: list[dict]) -> str:
+    """Extract selectable source text inside manually bounded PDF regions, page by page."""
+    import pymupdf as fitz
+    if not segments:
+        return ""
+    source = fitz.open(pdf_path)
+    try:
+        parts = []
+        for segment in sorted(segments, key=lambda x: int(x["page"])):
+            page_no = int(segment["page"])
+            if not 1 <= page_no <= len(source):
+                raise ValueError(f"Ongeldig paginanummer voor tekstextractie: {page_no}")
+            rect = fitz.Rect(segment["bbox"]) & source[page_no - 1].rect
+            text = source[page_no - 1].get_text("text", clip=rect, sort=True).strip()
+            if text:
+                parts.append(f"[Pagina {page_no}]\n{text}")
+        return "\n\n".join(parts)
+    finally:
+        source.close()
