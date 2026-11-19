@@ -138,6 +138,9 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                     asset_question_number = -1
                 if asset_question_number != int(r.get("number", 0)):
                     errors.append({"id":rid,"error":"handmatige_contextuitsnede_verkeerd_vraagnummer"})
+                if (asset.get("fragment_id") is not None
+                        and asset.get("fragment_id") not in r.get("exam_structure_fragment_ids", [])):
+                    errors.append({"id":rid,"error":"handmatige_contextuitsnede_verkeerd_contextfragment"})
             if name and (project_dir/"snippets"/str(name)).is_file():
                 if not asset.get("snippet_sha256") or sha256(project_dir/"snippets"/str(name)) != asset.get("snippet_sha256"):
                     errors.append({"id":rid,"error":"contextuitsnede_hash_afwijkend"})
