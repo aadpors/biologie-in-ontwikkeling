@@ -108,6 +108,10 @@ class ExamApp:
                         font=("Segoe UI", 9), foreground=self.colors["muted"])
         style.configure("Project.TLabel", background=self.colors["surface"],
                         font=("Segoe UI", 12, "bold"), foreground=self.colors["wine"])
+        style.configure("WorkflowTitle.TLabel", background=self.colors["canvas"],
+                        font=("Segoe UI", 9, "bold"), foreground=self.colors["wine"])
+        style.configure("WorkflowText.TLabel", background=self.colors["canvas"],
+                        font=("Segoe UI", 9), foreground=self.colors["muted"])
         style.configure("Status.TLabel", background=self.colors["teal_soft"],
                         font=("Segoe UI", 9), foreground=self.colors["teal_dark"],
                         padding=(10, 7))
@@ -181,9 +185,9 @@ class ExamApp:
         # layout intact while making the hand-off between processing stages explicit.
         workflow_bar = ttk.Frame(shell, style="App.TFrame")
         workflow_bar.pack(fill="x", pady=(0, 7))
-        ttk.Label(workflow_bar, text="VERVOLG", style="Section.TLabel").pack(side="left", padx=(2, 10))
+        ttk.Label(workflow_bar, text="VERVOLG", style="WorkflowTitle.TLabel").pack(side="left", padx=(2, 10))
         self.workflow_label = ttk.Label(workflow_bar, text="Importeer een examen om te beginnen.",
-                                        style="Muted.TLabel")
+                                        style="WorkflowText.TLabel")
         self.workflow_label.pack(side="left", fill="x", expand=True)
         self.workflow_button = ttk.Button(workflow_bar, text="Examens importeren",
                                           command=self.import_year_set, style="Accent.TButton")
