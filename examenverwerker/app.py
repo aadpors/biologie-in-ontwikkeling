@@ -12,7 +12,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
@@ -2062,7 +2062,7 @@ class ExamApp:
                 for index,item in enumerate(ordered):
                     following=ordered[index+1] if index+1<len(ordered) else None
                     proposal_text=extract_candidate_text(analysis,item,following)
-                    type_check=detect_question_type(proposal_text)
+                    type_check=classify_question_with_visuals(analysis,item,following,proposal_text)
                     context_refs=detect_context_references(proposal_text)
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
                         "vraagtekst_voorstel":proposal_text,"vraagtype_controle":type_check,
@@ -2073,7 +2073,7 @@ class ExamApp:
                     following=next((x for x in ordered if (int(x["page"]),float(x.get("bbox",[0,0])[1]))>item_order),None)
                     proposal_text=extract_candidate_text(analysis,item,following)
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
-                        "vraagtekst_voorstel":proposal_text,"vraagtype_controle":detect_question_type(proposal_text),
+                        "vraagtekst_voorstel":proposal_text,"vraagtype_controle":classify_question_with_visuals(analysis,item,following,proposal_text),
                         "vraagtype_status":"controle_nodig","context_verwijzingen":detect_context_references(proposal_text)})
                 candidates=self._workspace_merge_review_state(doc, ordered, previous_candidates)
                 self.data.setdefault("vraagkandidaten",[])
