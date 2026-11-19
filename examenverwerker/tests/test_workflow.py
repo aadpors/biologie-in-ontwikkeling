@@ -127,6 +127,15 @@ class ExamWorkflowTests(unittest.TestCase):
             self.assertIsNone(restore_import_batch(
                 root, outside, {"import_batch_manifest": "import-batch.json"}))
 
+    def test_malformed_batch_manifest_is_ignored_safely(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "import-batch.json").write_text(
+                json.dumps({"schema": "biologie-examenimport-v1", "projecten": ["bad-entry"]}),
+                encoding="utf-8")
+            self.assertIsNone(restore_import_batch(
+                root, root / "missing", {"import_batch_manifest": "import-batch.json"}))
+
     def test_matching_export_fingerprint_marks_exam_complete(self):
         data = with_valid_structure(base_exam())
         data["vraagrecords"] = [{
