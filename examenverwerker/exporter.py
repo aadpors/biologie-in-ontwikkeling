@@ -79,6 +79,8 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         cv_region_file = r.get("cv_source_region_file")
         if not cv_region_file or Path(str(cv_region_file)).name != cv_region_file or not (project_dir/"snippets"/str(cv_region_file)).is_file():
             errors.append({"id":rid,"error":"cv_handmatige_uitsnede_ontbreekt"})
+        elif not r.get("cv_source_region_sha256") or sha256(project_dir/"snippets"/cv_region_file) != r.get("cv_source_region_sha256"):
+            errors.append({"id":rid,"error":"cv_handmatige_uitsnede_hash_afwijkend"})
         selected_addenda = set(r.get("cv_amendment_pdfs", []))
         addendum_regions = r.get("cv_amendment_regions", [])
         covered_addenda = set()
@@ -91,6 +93,8 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             snippet = item.get("snippet_file", "")
             if not snippet or Path(str(snippet)).name != snippet or not (project_dir/"snippets"/str(snippet)).is_file():
                 errors.append({"id":rid,"error":"cv_aanvulling_handmatige_uitsnede_ontbreekt"})
+            elif not item.get("snippet_sha256") or sha256(project_dir/"snippets"/snippet) != item.get("snippet_sha256"):
+                errors.append({"id":rid,"error":"cv_aanvulling_uitsnede_hash_afwijkend"})
             source_name = str(item.get("source_pdf", ""))
             source = project_dir/"bronnen"/source_name if Path(source_name).name == source_name else None
             if source is None or not source.is_file() or sha256(source) != item.get("source_sha256"):
@@ -107,6 +111,9 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":"contextuitsnede_bronhash_afwijkend"})
             if asset.get("asset_id") and asset.get("caption_human_confirmed") is not True:
                 errors.append({"id":rid,"error":"contextbijschrift_niet_handmatig_bevestigd"})
+            if name and (project_dir/"snippets"/str(name)).is_file():
+                if not asset.get("snippet_sha256") or sha256(project_dir/"snippets"/str(name)) != asset.get("snippet_sha256"):
+                    errors.append({"id":rid,"error":"contextuitsnede_hash_afwijkend"})
         meta=r.get("exam",{})
         for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
             if meta.get(field) in (None,""): errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
@@ -145,6 +152,12 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             if not r.get(field) or Path(str(r.get(field,""))).name!=r.get(field) or not (project_dir/"bronnen"/r[field]).is_file(): errors.append({"id":rid,"error":label})
         snippets=r.get("snippet_files") or ([r["snippet_file"]] if r.get("snippet_file") else [])
         if not snippets: errors.append({"id":rid,"error":"snippet_ontbreekt"})
+        if len(snippets) != 1 or snippets[0] != r.get("snippet_file"):
+            errors.append({"id":rid,"error":"vraagfragment_bestanden_niet_eenduidig"})
+        if snippets and (project_dir/"snippets"/snippets[0]).is_file():
+            expected_question_hash = r.get("question_region_snippet_sha256")
+            if not expected_question_hash or sha256(project_dir/"snippets"/snippets[0]) != expected_question_hash:
+                errors.append({"id":rid,"error":"vraagfragment_render_hash_afwijkend"})
         for name in snippets:
             if Path(name).name!=name:
                 errors.append({"id":rid,"error":"ongeldig_snippetpad"})
