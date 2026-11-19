@@ -236,6 +236,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                              "page":x.get("page"),"asset_id":x.get("asset_id"),"type":x.get("type"),
                              "fragment_id":x.get("fragment_id")} for x in context_assets],
                          "contextRegions":r.get("context_region_fragments", []),
+                         "contextText":r.get("source_context", ""),
                          "questionImage":row["image"],"questionImages":row["images"]})
         if meta["questionType"]=="mcq":
             row["options"]=r["options"]; row["correct"]=r["correct"]; mcq.append(row)
