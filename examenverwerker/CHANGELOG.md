@@ -1,3 +1,11 @@
+# Wijzigingen
+
+## 0.13.1
+- Importcontrole opnieuw ingericht als één werkruimte met PDF-lijst links, voorblad in het midden en bewerkbare metadata rechts.
+- Bij selectie van een PDF wordt het voorblad direct getoond en worden de voorgestelde documentrol, niveau, jaar en tijdvak geladen.
+- Metadata kunnen direct in het rechterpaneel worden aangepast en per PDF worden toegepast; de aparte pop-up voor herkenningscorrectie is vervallen.
+- Batchvalidatie en één finale importbevestiging blijven behouden.
+
 ## 0.13.0
 - Hoofdinterface herbouwd als geïntegreerde examenwerkplek: documentlijst en vraagkandidaten links, originele PDF groot in beeld en beoordelingsvelden direct naast de bron.
 - PDF-navigatie en zoom met rode markering van de exacte kandidaatpositie.
