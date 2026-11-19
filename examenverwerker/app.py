@@ -188,12 +188,15 @@ class ExamApp:
         self.notebook = ttk.Notebook(body)
         self.notebook.pack(fill="both", expand=True)
 
-        overview = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
-        documents = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
-        workflow = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
-        self.notebook.add(overview, text="  Overzicht  ")
-        self.notebook.add(documents, text="  Documenten  ")
-        self.notebook.add(workflow, text="  Verwerkroute  ")
+        overview_page = ttk.Frame(self.notebook, style="App.TFrame")
+        documents_page = ttk.Frame(self.notebook, style="App.TFrame")
+        workflow_page = ttk.Frame(self.notebook, style="App.TFrame")
+        self.notebook.add(overview_page, text="  Overzicht  ")
+        self.notebook.add(documents_page, text="  Documenten  ")
+        self.notebook.add(workflow_page, text="  Verwerkroute  ")
+        overview = self._scrollable_tab(overview_page)
+        documents = self._scrollable_tab(documents_page)
+        workflow = self._scrollable_tab(workflow_page)
 
         # OVERVIEW: project identity, progress and large primary actions
         top = ttk.Frame(overview, style="App.TFrame")
@@ -384,6 +387,22 @@ class ExamApp:
                            padx=10, pady=6, highlightthickness=0)
         self.log.pack(fill="x", padx=10, pady=(2, 8))
         self.log.configure(state="disabled")
+
+    def _scrollable_tab(self, parent):
+        """Return a vertically scrollable content frame for a notebook tab."""
+        holder = ttk.Frame(parent, style="App.TFrame")
+        holder.pack(fill="both", expand=True)
+        canvas = tk.Canvas(holder, background=self.colors["canvas"], highlightthickness=0)
+        scrollbar = ttk.Scrollbar(holder, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        content = ttk.Frame(canvas, style="App.TFrame", padding=4)
+        window_id = canvas.create_window((0, 0), window=content, anchor="nw")
+        content.bind("<Configure>", lambda _event: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda event: canvas.itemconfigure(window_id, width=event.width))
+        canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(int(-event.delta / 120), "units"))
+        return content
 
     def _metric_card(self, parent, heading, value, caption, column):
         card = tk.Frame(parent, bg="#FFFFFF", highlightthickness=1,
@@ -650,7 +669,7 @@ class ExamApp:
                 if doc.get("type_voorstel") in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
                     doc["type_zekerheid"] = 1.0
                 meta = doc.get("exam_metadata") or {}
-                if meta.get("level") in {"Havo", "Vwo"} and re.fullmatch(r"20\\d{2}", str(meta.get("year", "")).strip()) and str(meta.get("period", "")) in {"1", "2", "3"}:
+                if meta.get("level") in {"Havo", "Vwo"} and re.fullmatch(r"20\d{2}", str(meta.get("year", "")).strip()) and str(meta.get("period", "")) in {"1", "2", "3"}:
                     doc["exam_metadata"] = {**meta, "confidence": 1.0, "source": "handmatig_bevestigd"}
             errors = validate_batch_documents(documents)
             if errors:
