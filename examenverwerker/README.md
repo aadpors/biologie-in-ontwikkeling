@@ -18,6 +18,7 @@ Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologi
 - Volledige CV-antwoorden over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
 - Een expliciete menselijke eindcontrole uitvoeren met checklist, visuele bronvoorbeelden en herroepbare goedkeuring.
 - Per opgaven-PDF een afzonderlijke visuele structuur vastleggen, met volledige paginabrede vraag- en contextgrenzen.
+- Alle handmatige uitsneden zijn horizontale stroken over de volledige paginabreedte; alleen boven- en ondergrens zijn instelbaar, nooit linker- of rechtergrenzen.
 - Per vraag het originele correctievoorschrift én geselecteerde officiële aanvullingen met dezelfde versleepbare grenzen afbakenen.
 - Vraag-, context-, CV- en aanvullingsuitsneden rechtstreeks uit de oorspronkelijke PDF's renderen; contextafbeeldingen en bijschriften gescheiden houden van de vraagafbeelding.
 - Selecteerbare contexttekst uit handmatig begrensde bronregio's bewaren.
