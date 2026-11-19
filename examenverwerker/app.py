@@ -565,6 +565,7 @@ class ExamApp:
             row["vraagtype_controle"] = detect_question_type(prompt)
             row["context_verwijzingen"] = detect_context_references(prompt)
             self.data.setdefault("vraagkandidaten", []).append(row)
+            self._workspace_store_candidate_correction(row)
             self._workspace_mark_mode = False
             self.pdf_canvas.configure(cursor="crosshair")
             self.save_project()
@@ -593,6 +594,7 @@ class ExamApp:
         row["vraagtype_controle"] = detect_question_type(row["vraagtekst_voorstel"])
         row["context_verwijzingen"] = detect_context_references(row["vraagtekst_voorstel"])
         row["vraagtype_status"] = "controle_nodig"
+        self._workspace_store_candidate_correction(row)
         self.save_project()
         self._workspace_summary.configure(text=f"Vraag {number} opgeslagen. Tekst en notitie zijn bewaard in het project.")
         self._workspace_refresh_candidates(self.candidate_tree.index(self.candidate_tree.selection()[0])
@@ -619,6 +621,7 @@ class ExamApp:
                 "document_id": row.get("document_id"), "page": row.get("page"),
                 "candidate_line": row.get("line"), "reason": row["decision_reason"],
                 "human_decision": bool(decision)})
+        self._workspace_store_candidate_correction(row)
         self.save_project()
         self._log(f"Vraagstart {row.get('number')} op pagina {row.get('page')}: {row['status']}.")
         next_index = next((i for i,r in enumerate(self._workspace_rows)
@@ -639,6 +642,41 @@ class ExamApp:
                 "Bevestig eerst dat dit een echte vraagstart is. Handmatig toegevoegde vragen zijn al expliciet bevestigd.")
             return
         self.create_question_record(self._workspace_rows, self.candidate_tree, self.root)
+
+    def _workspace_store_candidate_correction(self, row):
+        """Persist the latest human decision in the project correction ledger."""
+        if not self.data or not row:
+            return
+        doc = next((d for d in self.data.get("documenten", [])
+                    if d.get("id") == row.get("document_id")), None)
+        if not doc:
+            return
+        decision = row.get("human_decision")
+        changed_number = row.get("number") != row.get("original_number", row.get("number"))
+        has_review = (decision is not None or row.get("status") == "twijfel_handmatige_nacontrole"
+            or row.get("manual_added") or row.get("review_note") or changed_number
+            or row.get("manual_position_confirmed"))
+        if not has_review:
+            return
+        position = {}
+        if row.get("bbox") and len(row["bbox"]) >= 2:
+            position = {"x": round(float(row["bbox"][0]), 2), "y": round(float(row["bbox"][1]), 2)}
+        correction_id = str(row.get("legacy_correction_id") or row.get("id") or hashlib.sha256(
+            f"{doc.get('id')}|{row.get('page')}|{row.get('original_number',row.get('number'))}|{position}".encode("utf-8")
+        ).hexdigest()[:16])
+        row["legacy_correction_id"] = correction_id
+        correction = {
+            "id": correction_id, "pagina": int(row.get("page", 0) or 0),
+            "vraagnummer": int(row.get("number", 0) or 0),
+            "oorspronkelijk_nummer": int(row.get("original_number", row.get("number", 0)) or 0),
+            "beslissing": "vraag" if decision is True else ("geen_vraag" if decision is False else "open"),
+            "notitie": row.get("review_note") or row.get("decision_reason") or "",
+            "positie_pdf_pt": position,
+            "handmatig_toegevoegd": bool(row.get("manual_added", False))
+        }
+        self.data["biologie_controle_correcties"] = self._workspace_merge_correction_entries(
+            self.data.get("biologie_controle_correcties", []),
+            [{"bestand": doc.get("bestand"), "correcties": [correction]}])
 
     def _workspace_merge_correction_entries(self, existing_entries, incoming_entries):
         """Deduplicate legacy corrections by document and stable correction ID."""
@@ -928,6 +966,8 @@ class ExamApp:
         try:
             exported_text = json.dumps(payload, ensure_ascii=False, indent=2)
             Path(output).write_text(exported_text, encoding="utf-8")
+            self.data["biologie_controle_correcties"] = list(by_name.values())
+            self.save_project()
             global_path.parent.mkdir(parents=True, exist_ok=True)
             global_path.write_text(exported_text, encoding="utf-8")
             self._log(f"Biologie-controlecorrecties geëxporteerd: {output}; centrale correctiebibliotheek bijgewerkt.")
