@@ -986,6 +986,7 @@ class ExamApp:
             self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
                          "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
                          "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
+            self._workspace_load_global_corrections()
             self.save_project()
             self.refresh()
             self._log(f"Nieuw project automatisch aangemaakt: {self.project_dir}")
@@ -1007,6 +1008,7 @@ class ExamApp:
                 raise ValueError("Dit is geen herkenbaar examenprojectbestand.")
             self.project_dir = Path(filename).parent
             self.data = data
+            self._workspace_load_global_corrections()
             self.refresh()
             self._log(f"Project geopend: {self.project_dir}")
         except Exception as exc:
@@ -1282,6 +1284,7 @@ class ExamApp:
             # All other imported exam projects remain available under the same root.
             self.project_dir = created[0]
             self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
+            self._workspace_load_global_corrections()
             self.refresh()
             self._log(f"Examens geïmporteerd onder: {target_root}")
             for project in created:
@@ -1340,6 +1343,7 @@ class ExamApp:
                 added += 1
             except Exception as exc:
                 self._error(f"PDF toevoegen ({source.name})",exc)
+        self._workspace_load_global_corrections()
         self.save_project()
         self.refresh()
         self.status.configure(text=f"{added} PDF('s) toegevoegd. Controleer de voorgestelde documenttypen.")
