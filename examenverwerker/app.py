@@ -767,6 +767,9 @@ class ExamApp:
         self.save_project()
         self._log(f"Vraagstart {row.get('number')} op pagina {row.get('page')}: {row['status']}.")
 
+        # The queue covers every candidate, so do not let a local filter hide
+        # the next item or cause the interface to jump to an unrelated row.
+        self._workspace_filter.set("Alle kandidaten")
         # Continue across document boundaries instead of silently returning to
         # the first candidate when the current PDF has been fully reviewed.
         next_row = next((item for item in self.data.get("vraagkandidaten", [])
