@@ -22,6 +22,24 @@ class ExportTests(unittest.TestCase):
                 "cv_alignment":True,"images_and_context":True,"appendices":True,"cv_addenda":True},
             "uitwerkbijlagen":["uitwerkbijlage.pdf"]
         }
+        import hashlib
+        digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+        record.update({
+            "exam_structure_status":"gekoppeld",
+            "exam_structure_document_id":"opgaven-doc-1",
+            "exam_structure_source_sha256":digest(project/"bronnen"/"opgaven.pdf"),
+            "question_region_page_spans":[{"page":2,"top":0.1,"bottom":0.9}],
+            "cv_source_document_id":"cv-doc-1",
+            "cv_source_sha256":digest(project/"bronnen"/"cv.pdf"),
+            "cv_source_region":{"id":"cv-cv-doc-1-q1","document_id":"cv-doc-1",
+                "source_sha256":digest(project/"bronnen"/"cv.pdf"),"document_role":"correctievoorschrift",
+                "question_number":1,"page_spans":[{"page":1,"top":0.1,"bottom":0.9}]},
+            "cv_source_region_file":"cv1.jpg",
+            "cv_snippet_file":"cv1.jpg",
+            "cv_snippet_files":["cv1.jpg"],
+            "context_asset_files":[],
+            "cv_amendment_regions":[],
+        })
         return project,record
 
     def test_unapproved_record_is_blocked(self):
@@ -34,8 +52,15 @@ class ExportTests(unittest.TestCase):
     def test_complete_cv_addendum_pdf_is_preserved_in_export(self):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
+            import hashlib
+            amendment_hash=hashlib.sha256((project/"bronnen"/"aanvulling.pdf").read_bytes()).hexdigest()
             record["cv_amendment_pdfs"]=["aanvulling.pdf"]
             record["cv_amendment_snippet_file"]="cv-amend1.png"
+            record["cv_amendment_snippet_files"]=["cv-amend1.png"]
+            record["cv_amendment_regions"]=[{"document_id":"amend-doc","source_pdf":"aanvulling.pdf",
+                "source_sha256":amendment_hash,"snippet_file":"cv-amend1.png",
+                "fragment":{"id":"cv-amend-doc-q1","document_id":"amend-doc","source_sha256":amendment_hash,
+                    "document_role":"aanvulling","question_number":1,"page_spans":[{"page":1,"top":0.1,"bottom":0.9}]}}]
             out=Path(d)/"out"
             result=export_approved_records([record],project,out)
             self.assertTrue(result["ok"],result)
