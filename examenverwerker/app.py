@@ -345,10 +345,17 @@ class ExamApp:
             batch_name = f"jaarset-{years[0]}" if len(years) == 1 else "jaarset-meerdere-jaren"
             target_root = Path(destination) / batch_name
             if target_root.exists():
-                target_root = Path(destination) / f"{batch_name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+                stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                target_root = Path(destination) / f"{batch_name}-{stamp}"
+                suffix = 2
+                while target_root.exists():
+                    target_root = Path(destination) / f"{batch_name}-{stamp}-{suffix}"
+                    suffix += 1
             created = []
+            created_root = False
             try:
                 target_root.mkdir(parents=True, exist_ok=False)
+                created_root = True
                 manifest = {"schema": "biologie-examenjaarset-v1", "aangemaakt": now(), "projecten": []}
                 for key, items in sorted(groups.items()):
                     level_key, year_key, period_key = key
@@ -388,7 +395,8 @@ class ExamApp:
                     })
                 (target_root / "jaarset.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
             except Exception as exc:
-                shutil.rmtree(target_root, ignore_errors=True)
+                if created_root:
+                    shutil.rmtree(target_root, ignore_errors=True)
                 messagebox.showerror("Jaarset importeren mislukt",
                     f"Er is een fout opgetreden. De onvolledige jaarsetmap is verwijderd; bestaande projecten zijn niet gewijzigd.\n\n{exc}", parent=win)
                 return
