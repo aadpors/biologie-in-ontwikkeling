@@ -3,6 +3,8 @@
 Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologie-examens. De bestaande website en examendata worden niet gewijzigd.
 
 ## Wat deze ontwikkelversie al kan
+- Een complete jaarset in één keer importeren zonder vooraf projecten aan te maken; havo/vwo, jaar en tijdvak automatisch groeperen, documenttypen voorstellen en alle herkenning vóór import controleren. Per examen wordt daarna een standaard projectmap aangemaakt; bestaande projecten worden niet overschreven.
+- Een jaarset-manifest bewaren met de projectindeling en waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten.
 - Examenprojecten aanmaken, openen en hervatten.
 - Originele PDF's ongewijzigd opnemen en SHA-256-dedupliceren.
 - Documenttypen voorstellen: opgaven, correctievoorschrift, uitwerkbijlage en aanvulling.
