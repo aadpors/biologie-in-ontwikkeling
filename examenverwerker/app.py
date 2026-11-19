@@ -973,6 +973,10 @@ class ExamApp:
         ttk.Label(outer,text="Controleer de volledige originele bron en het correctievoorschrift. Vink pas daarna de onderdelen af.",wraplength=980).pack(anchor="w")
         if record.get("source_analysis_invalidated") is True:
             ttk.Label(outer,text="LET OP: de opgaven-PDF is opnieuw geanalyseerd of de vraagstart is afgewezen. Stel het conceptrecord opnieuw samen vanuit de actuele kandidaat voordat je verdergaat.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
+        if record.get("exam_structure_invalidated") is True:
+            ttk.Label(outer,text="LET OP: de handmatige vraag- of contextgrenzen zijn gewijzigd. Sla dit vraagrecord opnieuw op vanuit de actuele structuur en voer de eindcontrole opnieuw uit.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
+        if record.get("cv_region_invalidated") is True:
+            ttk.Label(outer,text="LET OP: de handmatige CV-/aanvullingsafbakening is gewijzigd. Sla dit vraagrecord opnieuw op en voer de eindcontrole opnieuw uit.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
         meta=record.get("exam",{})
         ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
         structure_note = record.get("exam_structure_status", "structuur_niet_ingesteld")
