@@ -165,4 +165,35 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(exported["context_region_fragments"],record["context_region_fragments"])
 
 
+    def test_context_images_are_exported_separately_from_question_images(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"snippets"/"context-figuur.png").write_bytes(b"context image")
+            record["context_asset_files"]=[{"file":"context-figuur.png","asset_id":"p2-image-1",
+                "page":2,"caption":"Microscopische afbeelding","source_document_id":"opgaven-doc-1"}]
+            record["context_region_fragments"]=[{"id":"context-1","type":"context_intro",
+                "page_spans":[{"page":1,"top":0.1,"bottom":0.3}],"text":"De contexttekst."}]
+            out=Path(d)/"out"
+            result=export_approved_records([record],project,out)
+            self.assertTrue(result["ok"],result)
+            import json
+            question=json.loads((out/"exam-open.json").read_text(encoding="utf-8"))[0]
+            context=json.loads((out/"exam-contexts.json").read_text(encoding="utf-8"))[0]
+            self.assertEqual(question["images"],["exam-snippets/vraag1.png"])
+            self.assertEqual(context["contextImages"],["exam-snippets/context-figuur.png"])
+            self.assertEqual(context["image"],"exam-snippets/context-figuur.png")
+            self.assertEqual(context["contextRegions"][0]["text"],"De contexttekst.")
+            self.assertTrue((out/"exam-snippets"/"context-figuur.png").is_file())
+
+    def test_export_blocks_missing_manual_question_or_cv_region(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["question_region_page_spans"]=[]
+            record["cv_source_region"]=None
+            errors=validate_review_records([record],project)
+            codes=[x["error"] for x in errors]
+            self.assertIn("vraagfragment_paginagrenzen_ontbreken",codes)
+            self.assertIn("cv_handmatige_afbakening_ontbreekt",codes)
+
+
 if __name__=="__main__": unittest.main()
