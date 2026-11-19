@@ -16,7 +16,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.11.0"
+APP_VERSION = "0.12.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -2810,17 +2810,31 @@ class ExamApp:
     def refresh(self):
         for item in self.table.get_children():
             self.table.delete(item)
-        if not self.data:
-            return
-        for idx, doc in enumerate(self.data["documenten"]):
+        documents = self.data.get("documenten", []) if self.data else []
+        records = self.data.get("vraagrecords", []) if self.data else []
+        candidates = self.data.get("vraagkandidaten", []) if self.data else []
+        todo = sum(d.get("status") == "controle_nodig" for d in documents)
+        for idx, doc in enumerate(documents):
             self.table.insert("", "end", iid=str(idx), values=(
-                doc["bestand"], doc["type_voorstel"], doc["pagina_aantal"],
-                f"{doc['type_zekerheid']:.0%}", doc["status"].replace("_", " ")
+                doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
+                doc.get("pagina_aantal", "—"),
+                f"{doc.get('type_zekerheid', 0):.0%}",
+                str(doc.get("status", "onbekend")).replace("_", " ")
             ), tags=("even" if idx % 2 == 0 else "odd",))
-        count = len(self.data["documenten"])
-        todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])
-        candidates = len(self.data.get("vraagkandidaten", []))
-        self.status.configure(text=f"{count} document(en) opgenomen · {candidates} vraagstartkandidaten · {todo} documentherkenningen vragen controle · publicatie geblokkeerd.")
+        if self.data:
+            self.project_label.configure(text=self.data.get("naam") or
+                (self.project_dir.name if self.project_dir else "Actief project"))
+        else:
+            self.project_label.configure(text="Nog geen project geopend")
+        self.metric_documents.configure(text=str(len(documents)))
+        self.metric_questions.configure(text=str(len(candidates)))
+        self.metric_todo.configure(text=str(todo))
+        self.metric_records.configure(text=str(len(records)))
+        self.status.configure(text=(
+            f"{len(documents)} bronbestanden · {len(candidates)} vraagstartkandidaten · "
+            f"{todo} documentherkenningen vragen controle · niets wordt automatisch gepubliceerd."
+            if self.data else "Importeer examens of open een bestaand project om te beginnen."
+        ))
 
 def main():
     root = tk.Tk()
