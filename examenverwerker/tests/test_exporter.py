@@ -26,7 +26,8 @@ class ExportTests(unittest.TestCase):
         digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
         record.update({
             "exam_structure_status":"gekoppeld",
-            "exam_structure_document_id":"opgaven-doc-1",\n            "question_region_fragment_id":"q1","exam_structure_fragment_ids":["q1"],"exam_structure_question_number":1,
+            "exam_structure_document_id":"opgaven-doc-1",
+            "question_region_fragment_id":"q1","exam_structure_fragment_ids":["q1"],"exam_structure_question_number":1,
             "exam_structure_source_sha256":digest(project/"bronnen"/"opgaven.pdf"),
             "question_region_page_spans":[{"page":2,"top":0.1,"bottom":0.9}],
             "cv_source_document_id":"cv-doc-1",
