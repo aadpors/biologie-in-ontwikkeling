@@ -256,7 +256,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "images":context_image_paths,
                          "contextImages":context_image_paths,
                          "contextAssets":[{"image":f"exam-snippets/{x['file']}","caption":x.get("caption"),
-                             "page":x.get("page"),"asset_id":x.get("asset_id"),"type":x.get("type"),
+                             "page":x.get("page"),"asset_id":x.get("asset_id"),"asset_kind":x.get("asset_kind"),"type":x.get("type"),
                              "fragment_id":x.get("fragment_id")} for x in context_assets],
                          "contextRegions":r.get("context_region_fragments", []),
                          "contextText":r.get("source_context", ""),
