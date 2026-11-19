@@ -15,7 +15,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents
 
-APP_VERSION = "0.8.0"
+APP_VERSION = "0.9.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -55,6 +55,12 @@ class ExamApp:
         self.project_dir = None
         self.data = None
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
+        self.app_base = app_base
+        preferred_examens_root = app_base.parent / "examens"
+        local_examens_root = app_base / "examens"
+        self.examens_root = (preferred_examens_root if preferred_examens_root.exists()
+                             else local_examens_root if local_examens_root.exists()
+                             else preferred_examens_root)
         self.knowledge_dir=app_base/"kennisbank"
         self._style()
         self._build()
@@ -84,7 +90,7 @@ class ExamApp:
         ttk.Button(bar, text="Nieuw examenproject", command=self.new_project, style="Accent.TButton").pack(side="left", padx=4)
         ttk.Button(bar, text="Project openen", command=self.open_project).pack(side="left", padx=4)
         ttk.Button(bar, text="PDF's toevoegen", command=self.add_pdfs, style="Accent.TButton").pack(side="left", padx=4)
-        ttk.Button(bar, text="Jaarset importeren", command=self.import_year_set, style="Accent.TButton").pack(side="left", padx=4)
+        ttk.Button(bar, text="Examens in bulk importeren", command=self.import_year_set, style="Accent.TButton").pack(side="left", padx=4)
 
         body = ttk.Frame(self.root, padding=(20, 12))
         body.pack(fill="both", expand=True)
@@ -117,8 +123,8 @@ class ExamApp:
         self.log.configure(state="disabled")
 
     def _welcome(self):
-        self._log("Welkom. Open een bestaand examenproject, of importeer in één keer een complete jaarset.")
-        self._log("Bij jaarset-import groepeert de software PDF's automatisch op havo/vwo, jaar en tijdvak; je controleert eerst alle voorstellen.")
+        self._log("Welkom. Open een bestaand examenproject of selecteer in één keer PDF's van meerdere jaren, niveaus en tijdvakken.")
+        self._log("De software leest de examens uit, groepeert ze automatisch en maakt zelf de examenmappen aan. Je controleert eerst de herkenning.")
 
     def _error(self, context, exc):
         details=traceback.format_exc()
@@ -177,14 +183,11 @@ class ExamApp:
             messagebox.showerror("Project openen mislukt","Dit project kon niet worden geopend. Controleer of het projectbestand geldig is. Details staan in de map logs.")
 
     def import_year_set(self):
-        """Import a complete year set without requiring pre-created exam projects."""
+        """Import arbitrary exams from multiple years without manual folder creation."""
         files = filedialog.askopenfilenames(
-            title="Selecteer alle examen-PDF's van het jaar (havo en vwo, alle tijdvakken)",
+            title="Selecteer alle examen-PDF's (meerdere jaren, havo/vwo en tijdvakken tegelijk)",
             filetypes=[("PDF-bestanden", "*.pdf")])
         if not files:
-            return
-        destination = filedialog.askdirectory(title="Kies de map waarin de gecontroleerde jaarset moet worden opgeslagen")
-        if not destination:
             return
 
         documents = []
@@ -224,7 +227,7 @@ class ExamApp:
             return
 
         win = tk.Toplevel(self.root)
-        win.title("Jaarset controleren en automatisch groeperen")
+        win.title("Examens controleren en automatisch groeperen")
         win.geometry("1120x650")
         win.transient(self.root)
         win.grab_set()
@@ -337,32 +340,29 @@ class ExamApp:
                     warnings.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {warning}")
             warning_text = "\n".join(warnings) if warnings else "Geen ontbrekende opgaven of CV's en geen dubbele hoofd-documenttypen gesignaleerd."
             summary_text = "\n".join(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's" for key, items in groups.items())
-            if not messagebox.askyesno("Jaarset definitief controleren",
-                f"Er worden {len(groups)} examenprojecten aangemaakt in een nieuwe jaarsetmap.\n\n"
-                + summary_text + "\n\nWaarschuwingen:\n" + warning_text
-                + "\n\nAlle getoonde metadata en documenttypen zijn door jou gecontroleerd. Doorgaan?", parent=win):
+            if not messagebox.askyesno("Import definitief controleren",
+                f"Er worden {len(groups)} examenprojecten automatisch opgeslagen onder:\\n{self.examens_root}\\n\\n"
+                + summary_text + "\\n\\nWaarschuwingen:\\n" + warning_text
+                + "\\n\\nAlle getoonde metadata en documenttypen zijn door jou gecontroleerd. Doorgaan?", parent=win):
                 return
-            years = sorted({key[1] for key in groups})
-            batch_name = f"jaarset-{years[0]}" if len(years) == 1 else "jaarset-meerdere-jaren"
-            target_root = Path(destination) / batch_name
-            if target_root.exists():
-                stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-                target_root = Path(destination) / f"{batch_name}-{stamp}"
-                suffix = 2
-                while target_root.exists():
-                    target_root = Path(destination) / f"{batch_name}-{stamp}-{suffix}"
-                    suffix += 1
+            target_root = self.examens_root
             created = []
-            created_root = False
+            created_directories = []
+            manifest_path = None
             try:
-                target_root.mkdir(parents=True, exist_ok=False)
-                created_root = True
-                manifest = {"schema": "biologie-examenjaarset-v1", "aangemaakt": now(), "projecten": []}
+                target_root.mkdir(parents=True, exist_ok=True)
+                manifest = {"schema": "biologie-examenimport-v1", "aangemaakt": now(), "projecten": []}
                 for key, items in sorted(groups.items()):
                     level_key, year_key, period_key = key
-                    project_name = f"{level_key}-{year_key}-tijdvak-{period_key}"
-                    project_dir = target_root / project_name
-                    (project_dir / "bronnen").mkdir(parents=True)
+                    project_name = f"{level_key}-tijdvak-{period_key}"
+                    year_dir = target_root / year_key
+                    if not year_dir.exists():
+                        year_dir.mkdir(parents=True)
+                        created_directories.append(year_dir)
+                    project_dir = year_dir / project_name
+                    project_dir.mkdir(exist_ok=False)
+                    created_directories.append(project_dir)
+                    (project_dir / "bronnen").mkdir()
                     (project_dir / "analyse").mkdir()
                     (project_dir / "snippets").mkdir()
                     confirmed_identity = {"level": "Havo" if level_key == "havo" else "Vwo",
@@ -390,35 +390,43 @@ class ExamApp:
                     (project_dir / PROJECT_FILE).write_text(json.dumps(project_data, ensure_ascii=False, indent=2), encoding="utf-8")
                     created.append(project_dir)
                     manifest["projecten"].append({
-                        "naam": project_name, "pad": project_name, "exam_metadata": confirmed_identity,
+                        "naam": project_name, "pad": f"{year_key}/{project_name}", "exam_metadata": confirmed_identity,
                         "documenten": [d["bestand"] for d in project_docs],
                         "waarschuwingen": batch_document_warnings(items),
                     })
-                (target_root / "jaarset.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+                stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                manifest_path = target_root / f"import-{stamp}.json"
+                suffix = 2
+                while manifest_path.exists():
+                    manifest_path = target_root / f"import-{stamp}-{suffix}.json"
+                    suffix += 1
+                manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
             except Exception as exc:
-                if created_root:
-                    shutil.rmtree(target_root, ignore_errors=True)
-                messagebox.showerror("Jaarset importeren mislukt",
-                    f"Er is een fout opgetreden. De onvolledige jaarsetmap is verwijderd; bestaande projecten zijn niet gewijzigd.\n\n{exc}", parent=win)
+                if manifest_path and manifest_path.exists():
+                    manifest_path.unlink()
+                for created_path in reversed(created_directories):
+                    shutil.rmtree(created_path, ignore_errors=True)
+                messagebox.showerror("Examens importeren mislukt",
+                    f"Er is een fout opgetreden. Alleen nieuwe mappen uit deze import zijn opgeruimd; bestaande examens zijn niet gewijzigd.\\n\\n{exc}", parent=win)
                 return
             win.destroy()
             self.project_dir = None
             self.data = None
-            self.project_label.configure(text=f"Jaarset geïmporteerd: {target_root}")
+            self.project_label.configure(text=f"Examens opgeslagen onder: {target_root}")
             for item in self.table.get_children():
                 self.table.delete(item)
             self.status.configure(text=f"{len(created)} examenprojecten aangemaakt. Open een project om de inhoudelijke verwerking te starten.")
-            self._log(f"Jaarset geïmporteerd: {target_root}")
+            self._log(f"Examens geïmporteerd onder: {target_root}")
             for project in created:
                 self._log(f"  Project aangemaakt: {project.name}")
-            messagebox.showinfo("Jaarset geïmporteerd",
-                f"{len(created)} examenprojecten zijn aangemaakt in:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
+            messagebox.showinfo("Examens geïmporteerd",
+                f"{len(created)} examenprojecten zijn automatisch aangemaakt onder:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
         ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
-        ttk.Button(win, text="Alle voorstellen controleren en jaarset importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
+        ttk.Button(win, text="Alle voorstellen controleren en examens importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
         ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
         refresh_review()
-        self._log(f"Jaarset voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt.")
+        self._log(f"Bulkimport voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt. Doelmap: {self.examens_root}")
 
     def add_pdfs(self):
         if not self.data:
