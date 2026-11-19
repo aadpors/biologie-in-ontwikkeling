@@ -529,8 +529,10 @@ class ExamApp:
                 self._workspace_mark_mode = False
                 return
             prompt = simpledialog.askstring("Vraagtekst", "Voer de vraag of opdrachtformulering in (je kunt deze later verder aanvullen):", parent=self.root) or ""
+            stable_key = f"{doc['id']}|{self._workspace_page}|{int(number)}|{x:.1f}|{y:.1f}"
             row = {
-                "number": int(number), "page": int(self._workspace_page),
+                "id": hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16],
+                "number": int(number), "original_number": int(number), "page": int(self._workspace_page),
                 "bbox": [round(x,2), round(y,2), round(x+24,2), round(y+18,2)],
                 "line": f"{number}.", "next_line": prompt, "confidence": 1.0,
                 "status": "handmatig_toegevoegd", "human_decision": True,
