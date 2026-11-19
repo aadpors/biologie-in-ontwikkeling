@@ -907,9 +907,9 @@ class ExamApp:
         cv_snippet=record.get("cv_snippet_file")
         if cv_snippet:
             preview_specs.append(("CV-fragmentvoorstel",self.project_dir/"snippets"/cv_snippet,None,None))
-        amendment_snippet=record.get("cv_amendment_snippet_file")
-        if amendment_snippet:
-            preview_specs.append(("Fragment uit officiële CV-aanvulling",self.project_dir/"snippets"/amendment_snippet,None,None))
+        amendment_snippets=record.get("cv_amendment_snippet_files") or ([record["cv_amendment_snippet_file"]] if record.get("cv_amendment_snippet_file") else [])
+        for amendment_index, amendment_snippet in enumerate(amendment_snippets, 1):
+            preview_specs.append((f"Handmatig afgebakende CV-aanvulling {amendment_index}",self.project_dir/"snippets"/amendment_snippet,None,None))
         if not cv_snippet:
             # MCQ records do not require a website CV image, but the reviewer
             # must still see the official answer-key region before approval.
@@ -928,7 +928,10 @@ class ExamApp:
                 except Exception as exc:
                     self._log(f"CV-voorvertoning niet beschikbaar voor {record.get('id')}: {exc}")
         for idx,name in enumerate(record.get("snippet_files") or ([record["snippet_file"]] if record.get("snippet_file") else []),1):
-            preview_specs.append((f"Vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
+            preview_specs.append((f"Handmatig afgebakend vraagfragment {idx}",self.project_dir/"snippets"/name,None,None))
+        for idx,asset in enumerate(record.get("context_asset_files", []),1):
+            preview_specs.append((f"Contextfiguur/-tabel {idx} · pagina {asset.get('page', 'meerdere')} · {asset.get('caption') or asset.get('type') or asset.get('asset_id') or ''}",
+                                  self.project_dir/"snippets"/asset["file"],None,None))
         for idx,name in enumerate(record.get("uitwerkbijlagen",[]),1):
             appendix=self.project_dir/"bronnen"/name
             if appendix.is_file():
