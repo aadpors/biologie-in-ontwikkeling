@@ -518,6 +518,26 @@ class ExamApp:
         ttk.Button(buttons,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left")
         ttk.Button(buttons,text="Herstel geselecteerde kandidaat",command=restore).pack(side="right")
 
+    def _scrollable_form(self, window, padding=12):
+        """Create a vertically scrollable form so long exam records remain usable on laptop screens."""
+        shell = ttk.Frame(window)
+        shell.pack(fill="both", expand=True)
+        canvas = tk.Canvas(shell, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(shell, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        content = ttk.Frame(canvas, padding=padding)
+        window_id = canvas.create_window((0, 0), window=content, anchor="nw")
+        def update_scroll_region(_event=None):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+        def resize_content(event):
+            canvas.itemconfigure(window_id, width=event.width)
+        content.bind("<Configure>", update_scroll_region)
+        canvas.bind("<Configure>", resize_content)
+        canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
+        return content
+
     def create_question_record(self, rows, tree, parent):
         selected=tree.selection()
         if not selected:
@@ -541,7 +561,7 @@ class ExamApp:
         initial_meta=source_doc.get("exam_metadata") or self.data.get("exam_metadata") or infer_exam_metadata(source_doc.get("bestand",""))
         win=tk.Toplevel(parent); win.title(f"Concept-vraagrecord · vraag {row.get('number')}"); win.geometry("900x820")
         win.transient(parent); win.grab_set()
-        outer=ttk.Frame(win,padding=14); outer.pack(fill="both",expand=True)
+        outer=self._scrollable_form(win,padding=14)
         ttk.Label(outer,text="CONCEPT — NIET GOEDGEKEURD VOOR PUBLICATIE",foreground="#9b4d00").pack(anchor="w")
         ttk.Label(outer,text="Controleer de tekst, het vraagtype, de punten, de context en de bijlagen aan de hand van de originele PDF en het officiële correctievoorschrift.",wraplength=850).pack(anchor="w",pady=(4,10))
         meta_frame=ttk.LabelFrame(outer,text="Examen- en vraaggegevens",padding=8); meta_frame.pack(fill="x")
@@ -944,7 +964,7 @@ class ExamApp:
     def review_question_record(self,record,parent):
         win=tk.Toplevel(parent); win.title(f"Eindcontrole · {record.get('id')}"); win.geometry("1040x850")
         win.transient(parent)
-        outer=ttk.Frame(win,padding=12); outer.pack(fill="both",expand=True)
+        outer=self._scrollable_form(win,padding=12)
         ttk.Label(outer,text="Controleer de volledige originele bron en het correctievoorschrift. Vink pas daarna de onderdelen af.",wraplength=980).pack(anchor="w")
         if record.get("source_analysis_invalidated") is True:
             ttk.Label(outer,text="LET OP: de opgaven-PDF is opnieuw geanalyseerd of de vraagstart is afgewezen. Stel het conceptrecord opnieuw samen vanuit de actuele kandidaat voordat je verdergaat.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
@@ -973,8 +993,9 @@ class ExamApp:
             option_text="\n".join(f"{x.get('key')}. {x.get('text')}" for x in record.get("options",[]))
             ttk.Label(outer,text=f"Antwoordopties en opgegeven sleutel ({record.get('correct','')})").pack(anchor="w",pady=(5,0))
             ttk.Label(outer,text=option_text or "Geen opties vastgelegd",wraplength=980,justify="left").pack(anchor="w")
-        files_frame=ttk.LabelFrame(outer,text="Bronmateriaal en voorlopige uitsneden — visueel nalopen",padding=6)
+        files_frame=ttk.LabelFrame(outer,text="Bronmateriaal en voorlopige uitsneden — visueel nalopen",padding=6,height=360)
         files_frame.pack(fill="both",expand=True,pady=(8,6))
+        files_frame.pack_propagate(False)
         image_frame=ttk.Frame(files_frame); image_frame.pack(fill="both",expand=True)
         canvas=tk.Canvas(image_frame,background="#e8ecee")
         sy=ttk.Scrollbar(image_frame,orient="vertical",command=canvas.yview)
