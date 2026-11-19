@@ -1429,10 +1429,18 @@ class ExamApp:
         fit_window(win, 1180, 720, 900, 560)
         win.transient(self.root)
         win.grab_set()
-        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Selecteer links een document; controleer het voorblad in het midden en pas de voorgestelde gegevens rechts direct aan.",
-                  padding=12, wraplength=1100).pack(anchor="w")
-        panes = ttk.Panedwindow(win, orient="horizontal")
-        panes.pack(fill="both", expand=True, padx=12, pady=8)
+        # Use a grid-based shell with a dedicated, non-expanding footer row.
+        # Packing the expanding Panedwindow before the footer allowed it to
+        # consume the available cavity and push the action buttons out of view.
+        shell = ttk.Frame(win, padding=0)
+        shell.pack(fill="both", expand=True)
+        shell.columnconfigure(0, weight=1)
+        shell.rowconfigure(1, weight=1)
+        intro = ttk.Label(shell, text=f"{len(documents)} unieke PDF's gevonden. Selecteer links een document; controleer het voorblad in het midden en pas de voorgestelde gegevens rechts direct aan.",
+                          padding=12, wraplength=1100)
+        intro.grid(row=0, column=0, sticky="ew")
+        panes = ttk.Panedwindow(shell, orient="horizontal")
+        panes.grid(row=1, column=0, sticky="nsew", padx=12, pady=(0, 8))
         list_panel = ttk.LabelFrame(panes, text="GESELECTEERDE PDF'S", padding=7)
         cover_panel = ttk.LabelFrame(panes, text="VOORBLAD ORIGINELE PDF", padding=7)
         fields_panel = ttk.LabelFrame(panes, text="VOORGESTELDE METADATA", padding=12)
@@ -1447,8 +1455,9 @@ class ExamApp:
             tree.heading(col, text=title)
             tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
         tree.pack(fill="both", expand=True)
-        footer = ttk.Frame(win, padding=(12, 8))
-        footer.pack(side="bottom", fill="x")
+        footer = ttk.Frame(shell, padding=(12, 8))
+        footer.grid(row=2, column=0, sticky="ew")
+        footer.columnconfigure(0, weight=1)
         status = ttk.Label(footer, text="", wraplength=760)
         status.pack(side="left", fill="x", expand=True)
         preview_temp = tempfile.TemporaryDirectory(prefix="biologie-import-voorbladen-")
