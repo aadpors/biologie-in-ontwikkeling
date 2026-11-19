@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 
+
 def resolve_examens_root(app_base: Path) -> Path:
     """Use the existing examens folder next to the app, or create that default later."""
     app_base = Path(app_base)
@@ -62,7 +63,11 @@ def batch_document_warnings(documents: list[dict]) -> list[str]:
 
 
 def validate_batch_documents(documents: list[dict]) -> list[str]:
-    """Return blocking errors; warnings are reported separately."""
+    """Return blocking errors; warnings are reported separately.
+
+    Both role and identity confidence must be high enough, regardless of the
+    inference source. Manual review is represented explicitly with confidence 1.
+    """
     errors = []
     for document in documents:
         filename = document.get("bestand", "Onbekend bestand")
@@ -75,6 +80,8 @@ def validate_batch_documents(documents: list[dict]) -> list[str]:
         if float(document.get("type_zekerheid", 0) or 0) < 0.9:
             errors.append(f"{filename}: documenttype is onzeker; bevestig of corrigeer dit eerst.")
         meta = document.get("exam_metadata") or {}
-        if meta.get("source") == "eerste_pdf_paginas" and float(meta.get("confidence", 0) or 0) < 0.9:
+        if float(meta.get("confidence", 0) or 0) < 0.9:
             errors.append(f"{filename}: examenidentiteit is onzeker; bevestig deze handmatig.")
+        if meta.get("source") == "handmatig_bevestigd" and identity is None:
+            errors.append(f"{filename}: handmatig bevestigde examenidentiteit is ongeldig.")
     return errors
