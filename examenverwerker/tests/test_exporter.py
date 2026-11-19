@@ -234,4 +234,16 @@ class ExportTests(unittest.TestCase):
             self.assertIn("cv_handmatige_uitsnede_hash_afwijkend",codes)
 
 
+    def test_question_images_are_not_misreported_as_context_images(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            result=export_approved_records([record],project,Path(d)/"out")
+            self.assertTrue(result["ok"],result)
+            import json
+            context=json.loads((Path(d)/"out"/"exam-contexts.json").read_text(encoding="utf-8"))[0]
+            self.assertEqual(context["image"],"")
+            self.assertEqual(context["images"],[])
+            self.assertEqual(context["questionImage"],"exam-snippets/vraag1.png")
+
+
 if __name__=="__main__": unittest.main()
