@@ -1,5 +1,12 @@
 # Wijzigingen
 
+## 0.13.2
+- Verwerkingsstatus van ieder examen wordt centraal en zonder Tkinter-afhankelijkheden afgeleid; dezelfde regels sturen de hoofdwerkruimte en de examenbibliotheek aan.
+- De bibliotheek toont de concrete eerstvolgende stap per examen en heeft een actie **Volgend openstaand examen**.
+- Een bulkimportbatch wordt vanuit het importmanifest aan ieder aangemaakt examen gekoppeld en na herstart van de applicatie hersteld.
+- Na afronding van een examen kan de gebruiker direct doorgaan met het volgende examen uit dezelfde batch.
+- Regressietests toegevoegd voor alle verwerkingsstappen, verouderde structuren, ontbrekende vraagstarts en menselijke eindgoedkeuring.
+
 ## 0.13.1
 - Importcontrole opnieuw ingericht als één werkruimte met PDF-lijst links, voorblad in het midden en bewerkbare metadata rechts.
 - Bij selectie van een PDF wordt het voorblad direct getoond en worden de voorgestelde documentrol, niveau, jaar en tijdvak geladen.
