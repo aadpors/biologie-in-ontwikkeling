@@ -905,7 +905,7 @@ class ExamApp:
                                "exam_structure_fragment_ids":[question_fragment["id"]]+[x["id"] for x in context_fragments],
                                "question_region_fragment_id":question_fragment["id"],"exam_structure_question_number":int(row["number"]),
                                "question_region_page_spans":list(question_fragment.get("page_spans", [])),
-                               "source_analysis_invalidated":False,"approval_revoked_reason":None,
+                               "source_analysis_invalidated":False,"exam_structure_invalidated":False,"cv_region_invalidated":False,"approval_revoked_reason":None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
                                "cv_amendment_pdfs":[d["opslagbestand"] for d in selected_amendment_docs],
                                "available_appendix_candidates":[d["opslagbestand"] for d in appendix_docs],
@@ -1328,9 +1328,10 @@ class ExamApp:
         if existing is None and self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
             existing = self.data.get("exam_structure")
         if existing and existing.get("document_id") == doc["id"] and existing.get("source_sha256") == doc["sha256"]:
-            fragments = existing.get("fragments", [])
+            fragments = json.loads(json.dumps(existing.get("fragments", []), ensure_ascii=False))
         else:
             fragments = []
+        original_structure_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
         win = tk.Toplevel(self.root); win.title(f"Examenstructuur · {doc['bestand']}"); win.geometry("1280x900")
         win.transient(self.root)
         header = ttk.Frame(win, padding=(12, 8)); header.pack(fill="x")
@@ -1463,16 +1464,29 @@ class ExamApp:
                 fragment_tree.insert("", "end", iid=str(index), text=frag.get("id", f"Fragment {index+1}"),
                     values=(frag.get("type"), pages, links))
         def save_structure():
+            nonlocal original_structure_signature
             current = selected_fragment()
             if current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
                 span = make_page_span(displayed_page, top_y, bottom_y)
                 current["page_spans"] = [span if int(x["page"]) == span["page"] else dict(x)
                                          for x in current["page_spans"]]
+            new_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
+            structure_changed = new_signature != original_structure_signature
             structure = make_exam_structure(doc, fragments, question_numbers)
             errors = validate_exam_structure(structure, doc["id"], doc["sha256"], question_numbers)
             if errors:
                 messagebox.showerror("Structuur niet opgeslagen", "Controleer eerst:\\n" + "\\n".join(errors), parent=win)
                 return False
+            if structure_changed:
+                for record in self.data.get("vraagrecords", []):
+                    if record.get("candidate_document_id") == doc["id"]:
+                        record["exam_structure_invalidated"] = True
+                        record["approved_by_human"] = False
+                        record["status"] = "structuur_opnieuw_te_controleren"
+                        record["approved_at"] = None
+                        record["approval_revoked_reason"] = "Vraag-/contextgrenzen of koppelingen zijn gewijzigd; stel dit vraagrecord opnieuw samen."
+                        record["record_review_checklist"] = {key: False for key in record.get("record_review_checklist", {})}
+                original_structure_signature = new_signature
             self.data.setdefault("exam_structures", {})[doc["id"]] = structure
             # Keep the original single-document key for older project readers.
             self.data["exam_structure"] = structure
