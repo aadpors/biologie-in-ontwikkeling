@@ -14,8 +14,12 @@ Een examen is pas exporteerbaar wanneer alle verplichte controles groen zijn.
 - Nummering uniek en in de juiste volgorde; afwijkingen verklaard.
 - Geen ontbrekende, dubbele of per ongeluk als vraag herkende paginanummers.
 - Vraagtekst, antwoordopties, punten en bronverwijzingen compleet.
+- Iedere vraag heeft exact één handmatig afgebakend vraagfragment; nummering en bronhash komen overeen.
+- Het bijbehorende CV heeft per vraag een handmatig afgebakend fragment; alle vervolgpagina's en puntenregels zijn meegenomen.
+- Iedere geselecteerde CV-aanvulling is eveneens handmatig aan de juiste vraag gekoppeld en afgebakend.
 - CV-deelvraag en puntenverdeling corresponderen met de opgave.
-- Contexten en figuren over pagina's heen correct gekoppeld.
+- Contextinleiding, vraagcontext en tussenliggende contexten zijn per fragment aan de juiste vragen gekoppeld.
+- Contexttekst, figuren, tabellen en bijschriften zijn afzonderlijk gecontroleerd en blijven gescheiden van het vraagfragment.
 
 ## Snippets
 - Iedere snippet komt rechtstreeks uit de originele PDF.
