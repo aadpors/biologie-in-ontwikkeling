@@ -36,7 +36,10 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         # Publication requires source-faithful manual regions, not only the old
         # automatically proposed question/CV snippets.
         source_name = r.get("source_pdf", "")
-        if r.get("exam_structure_status") != "gekoppeld" or not r.get("exam_structure_document_id") or not r.get("exam_structure_source_sha256"):
+        if (r.get("exam_structure_status") != "gekoppeld" or not r.get("exam_structure_document_id")
+                or not r.get("exam_structure_source_sha256") or not r.get("question_region_fragment_id")
+                or int(r.get("exam_structure_question_number", -1)) != int(r.get("number", 0))
+                or r.get("question_region_fragment_id") not in r.get("exam_structure_fragment_ids", [])):
             errors.append({"id":rid,"error":"handmatige_vraagafbakening_ontbreekt"})
         elif source_name and (project_dir/"bronnen"/source_name).is_file():
             if sha256(project_dir/"bronnen"/source_name) != r.get("exam_structure_source_sha256"):
@@ -87,6 +90,10 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             name = asset.get("file", "")
             if not name or Path(str(name)).name != name or not (project_dir/"snippets"/str(name)).is_file():
                 errors.append({"id":rid,"error":"contextuitsnede_ontbreekt"})
+            if asset.get("source_document_id") and asset.get("source_document_id") != r.get("exam_structure_document_id"):
+                errors.append({"id":rid,"error":"contextuitsnede_verkeerde_bron"})
+            if asset.get("source_sha256") and asset.get("source_sha256") != r.get("exam_structure_source_sha256"):
+                errors.append({"id":rid,"error":"contextuitsnede_bronhash_afwijkend"})
         meta=r.get("exam",{})
         for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
             if meta.get(field) in (None,""): errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
@@ -235,6 +242,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "snippet_sha256":[sha256(project_dir/"snippets"/name) for name in snippet_names],
                          "cv_snippet_sha256":sha256(project_dir/"snippets"/(r.get("cv_snippet_files") or [r.get("cv_snippet_file")])[0]) if meta["questionType"]=="open" else None,
                          "cv_amendment_snippet_sha256":sha256(project_dir/"snippets"/r["cv_amendment_snippet_file"]) if r.get("cv_amendment_snippet_file") else None,
+                         "cv_amendment_snippet_sha256s":[sha256(project_dir/"snippets"/name) for name in amendment_files],
                          "uitwerkbijlagen":[{"file":name,"sha256":sha256(output_dir/name)} for name in appendix],
                          "cv_amendment_pdfs":[{"file":name,"sha256":sha256(output_dir/name)} for name in cv_amendments],
                          "human_approved":True,
