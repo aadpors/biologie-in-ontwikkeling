@@ -13,7 +13,7 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
-from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents
+from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
 APP_VERSION = "0.9.0"
 PROJECT_FILE = "project.json"
@@ -56,11 +56,7 @@ class ExamApp:
         self.data = None
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
         self.app_base = app_base
-        preferred_examens_root = app_base.parent / "examens"
-        local_examens_root = app_base / "examens"
-        self.examens_root = (preferred_examens_root if preferred_examens_root.exists()
-                             else local_examens_root if local_examens_root.exists()
-                             else preferred_examens_root)
+        self.examens_root = resolve_examens_root(app_base)
         self.knowledge_dir=app_base/"kennisbank"
         self._style()
         self._build()
