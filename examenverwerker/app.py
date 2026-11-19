@@ -63,59 +63,217 @@ class ExamApp:
         self._welcome()
 
     def _style(self):
+        """Consistent desktop design: calm workspace, clear hierarchy and restrained burgundy accent."""
         style = ttk.Style()
         try:
             style.theme_use("clam")
         except tk.TclError:
             pass
-        style.configure("Title.TLabel", font=("Segoe UI", 20, "bold"), foreground="#741d3b")
-        style.configure("Sub.TLabel", font=("Segoe UI", 10), foreground="#52616b")
-        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"), padding=8)
-        style.configure("Treeview", rowheight=30, font=("Segoe UI", 9))
-        style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"))
+
+        self.colors = {
+            "canvas": "#F4F2F4", "surface": "#FFFFFF", "sidebar": "#261D25",
+            "sidebar_hover": "#3A2A36", "accent": "#762342", "accent_hover": "#8E3152",
+            "accent_soft": "#F4E9ED", "text": "#29242A", "muted": "#716A72",
+            "line": "#E7E1E6", "table_alt": "#FAF8FA", "success": "#32745B",
+        }
+        self.root.configure(background=self.colors["canvas"])
+        style.configure("App.TFrame", background=self.colors["canvas"])
+        style.configure("Surface.TFrame", background=self.colors["surface"])
+        style.configure("Sidebar.TFrame", background=self.colors["sidebar"])
+        style.configure("Title.TLabel", background=self.colors["canvas"],
+                        font=("Segoe UI", 22, "bold"), foreground=self.colors["text"])
+        style.configure("Subtitle.TLabel", background=self.colors["canvas"],
+                        font=("Segoe UI", 10), foreground=self.colors["muted"])
+        style.configure("CardTitle.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 11, "bold"), foreground=self.colors["text"])
+        style.configure("CardHint.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 9), foreground=self.colors["muted"])
+        style.configure("Project.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 10, "bold"), foreground=self.colors["accent"])
+        style.configure("Status.TLabel", background=self.colors["accent_soft"],
+                        font=("Segoe UI", 9), foreground=self.colors["accent"], padding=(10, 7))
+        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"),
+                        padding=(14, 10), background=self.colors["accent"],
+                        foreground="#FFFFFF", borderwidth=0, focusthickness=0)
+        style.map("Accent.TButton",
+                  background=[("active", self.colors["accent_hover"]), ("pressed", self.colors["accent_hover"])],
+                  foreground=[("disabled", "#D9CDD2")])
+        style.configure("Secondary.TButton", font=("Segoe UI", 9, "bold"),
+                        padding=(11, 8), background="#F3EFF2",
+                        foreground=self.colors["text"], borderwidth=1,
+                        relief="flat", bordercolor=self.colors["line"])
+        style.map("Secondary.TButton", background=[("active", "#EAE2E7")])
+        style.configure("Nav.TButton", font=("Segoe UI", 10), padding=(12, 10),
+                        anchor="w", background=self.colors["sidebar"],
+                        foreground="#F6EFF3", borderwidth=0, focusthickness=0)
+        style.map("Nav.TButton", background=[("active", self.colors["sidebar_hover"])],
+                  foreground=[("active", "#FFFFFF")])
+        style.configure("Treeview", rowheight=34, font=("Segoe UI", 9),
+                        background=self.colors["surface"], fieldbackground=self.colors["surface"],
+                        foreground=self.colors["text"], borderwidth=0, relief="flat")
+        style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"),
+                        background="#F6F3F5", foreground=self.colors["muted"],
+                        padding=(9, 10), relief="flat")
+        style.map("Treeview", background=[("selected", "#EEDFE6")],
+                  foreground=[("selected", self.colors["text"])])
+        style.configure("Vertical.TScrollbar", background="#E5DFE4",
+                        troughcolor="#F7F5F7", bordercolor="#F7F5F7", arrowsize=12)
 
     def _build(self):
-        top = ttk.Frame(self.root, padding=(20, 16))
-        top.pack(fill="x")
-        ttk.Label(top, text="Biologie Examenverwerker", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(top, text="Van originele examen-PDF's naar gecontroleerde, publicatieklare vragen.", style="Sub.TLabel").pack(anchor="w", pady=(3, 0))
-        bar = ttk.Frame(self.root, padding=(20, 4))
-        bar.pack(fill="x")
-        self.project_label = ttk.Label(bar, text="Geen project geopend", style="Sub.TLabel")
-        self.project_label.pack(side="left", fill="x", expand=True)
-        ttk.Button(bar, text="Nieuw examenproject", command=self.new_project, style="Accent.TButton").pack(side="left", padx=4)
-        ttk.Button(bar, text="Project openen", command=self.open_project).pack(side="left", padx=4)
-        ttk.Button(bar, text="PDF's toevoegen", command=self.add_pdfs, style="Accent.TButton").pack(side="left", padx=4)
-        ttk.Button(bar, text="Examens in bulk importeren", command=self.import_year_set, style="Accent.TButton").pack(side="left", padx=4)
+        self.root.title("Biologie Examenverwerker")
+        self.root.geometry("1280x820")
+        self.root.minsize(1040, 680)
 
-        body = ttk.Frame(self.root, padding=(20, 12))
-        body.pack(fill="both", expand=True)
-        self.status = ttk.Label(body, text="Begin met een nieuw examenproject of open een bestaand project.", style="Sub.TLabel")
-        self.status.pack(anchor="w", pady=(0, 10))
+        shell = ttk.Frame(self.root, style="App.TFrame")
+        shell.pack(fill="both", expand=True)
+
+        # Brand header
+        header = tk.Frame(shell, bg="#FFFFFF", height=82,
+                          highlightthickness=1, highlightbackground=self.colors["line"])
+        header.pack(fill="x")
+        header.pack_propagate(False)
+        brand = tk.Frame(header, bg="#FFFFFF")
+        brand.pack(side="left", fill="y", padx=26)
+        mark = tk.Label(brand, text="B", bg=self.colors["accent"], fg="#FFFFFF",
+                        font=("Segoe UI", 17, "bold"), width=2, height=1)
+        mark.pack(side="left", pady=17)
+        brand_text = tk.Frame(brand, bg="#FFFFFF")
+        brand_text.pack(side="left", padx=12, pady=13)
+        tk.Label(brand_text, text="BIOLOGIE EXAMENVERWERKER", bg="#FFFFFF",
+                 fg=self.colors["text"], font=("Segoe UI", 13, "bold")).pack(anchor="w")
+        tk.Label(brand_text, text="Van originele pdf naar gecontroleerde examenvragen",
+                 bg="#FFFFFF", fg=self.colors["muted"],
+                 font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
+        tk.Label(header, text="LOKAAL WERKSTATION  ·  GEEN AUTOMATISCHE PUBLICATIE",
+                 bg="#FFFFFF", fg=self.colors["muted"],
+                 font=("Segoe UI", 8, "bold")).pack(side="right", padx=28)
+
+        content = ttk.Frame(shell, style="App.TFrame")
+        content.pack(fill="both", expand=True)
+
+        # Dark navigation rail
+        sidebar = ttk.Frame(content, style="Sidebar.TFrame", width=226)
+        sidebar.pack(side="left", fill="y")
+        sidebar.pack_propagate(False)
+        tk.Label(sidebar, text="WERKRUIMTE", bg=self.colors["sidebar"], fg="#BFAEB8",
+                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(24, 10))
+        ttk.Button(sidebar, text="＋  Meerdere examens importeren",
+                   command=self.import_year_set, style="Accent.TButton").pack(fill="x", padx=13, pady=(0, 14))
+        ttk.Separator(sidebar).pack(fill="x", padx=16, pady=5)
+        tk.Label(sidebar, text="PROJECTEN", bg=self.colors["sidebar"], fg="#BFAEB8",
+                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(15, 7))
+        ttk.Button(sidebar, text="▣  Project openen", command=self.open_project,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Button(sidebar, text="＋  Nieuw examenproject", command=self.new_project,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Button(sidebar, text="⇧  Pdf's toevoegen", command=self.add_pdfs,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Separator(sidebar).pack(fill="x", padx=16, pady=13)
+        tk.Label(sidebar, text="VERWERKSTAPPEN", bg=self.colors["sidebar"], fg="#BFAEB8",
+                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(2, 7))
+        ttk.Button(sidebar, text="01  Vraagstarts analyseren", command=self.analyze_questions,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Button(sidebar, text="02  Examenstructuur bewerken", command=self.edit_exam_structure,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Button(sidebar, text="03  Kandidaten bekijken", command=self.show_candidates,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Button(sidebar, text="04  Vraagrecords beoordelen", command=self.show_records,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        ttk.Separator(sidebar).pack(fill="x", padx=16, pady=13)
+        ttk.Button(sidebar, text="✓  Veilig exportpakket maken", command=self.export_project,
+                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        tk.Label(sidebar, text="Offline standaard · bronbestanden blijven intact",
+                 bg=self.colors["sidebar"], fg="#BFAEB8", justify="left",
+                 wraplength=185, font=("Segoe UI", 8)).pack(side="bottom", anchor="w", padx=18, pady=18)
+
+        # Main work area
+        workspace = ttk.Frame(content, style="App.TFrame", padding=(25, 23))
+        workspace.pack(side="left", fill="both", expand=True)
+        heading = ttk.Frame(workspace, style="App.TFrame")
+        heading.pack(fill="x", pady=(0, 17))
+        heading_left = ttk.Frame(heading, style="App.TFrame")
+        heading_left.pack(side="left", fill="x", expand=True)
+        ttk.Label(heading_left, text="Examenbibliotheek", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(heading_left, text="Beheer bronbestanden en doorloop de inhoudelijke controles.",
+                  style="Subtitle.TLabel").pack(anchor="w", pady=(4, 0))
+
+        project_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(16, 13))
+        project_card.pack(fill="x", pady=(0, 14))
+        ttk.Label(project_card, text="HUIDIG PROJECT", style="CardHint.TLabel").pack(anchor="w")
+        self.project_label = ttk.Label(project_card, text="Geen project geopend",
+                                       style="Project.TLabel")
+        self.project_label.pack(anchor="w", pady=(4, 0))
+        self.status = ttk.Label(project_card,
+            text="Importeer meerdere examens of open een bestaand project om te beginnen.",
+            style="Status.TLabel", wraplength=900)
+        self.status.pack(anchor="w", fill="x", pady=(10, 0))
+
+        # Source document table in a distinct card
+        files_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(16, 14))
+        files_card.pack(fill="both", expand=True)
+        files_heading = ttk.Frame(files_card, style="Surface.TFrame")
+        files_heading.pack(fill="x", pady=(0, 10))
+        ttk.Label(files_heading, text="Bronbestanden", style="CardTitle.TLabel").pack(side="left")
+        ttk.Label(files_heading, text="Dubbelklik op een bestand om de bronpagina's te bekijken.",
+                  style="CardHint.TLabel").pack(side="right")
+        table_wrap = ttk.Frame(files_card, style="Surface.TFrame")
+        table_wrap.pack(fill="both", expand=True)
         columns = ("name", "type", "pages", "confidence", "state")
-        self.table = ttk.Treeview(body, columns=columns, show="headings")
+        self.table = ttk.Treeview(table_wrap, columns=columns, show="headings")
         for col, title, width in [
-            ("name", "Bestand", 360), ("type", "Herkend als", 170),
-            ("pages", "Pagina's", 80), ("confidence", "Zekerheid", 100), ("state", "Status", 170)
+            ("name", "Bestand", 430), ("type", "Herkend documenttype", 190),
+            ("pages", "Pagina's", 85), ("confidence", "Zekerheid", 100), ("state", "Status", 180)
         ]:
             self.table.heading(col, text=title)
             self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
-        self.table.pack(fill="both", expand=True)
+        scrollbar = ttk.Scrollbar(table_wrap, orient="vertical", command=self.table.yview)
+        self.table.configure(yscrollcommand=scrollbar.set)
+        self.table.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        self.table.tag_configure("odd", background=self.colors["table_alt"])
+        self.table.tag_configure("even", background=self.colors["surface"])
         self.table.bind("<Double-1>", self.show_document)
-        foot = ttk.Frame(body)
-        foot.pack(fill="x", pady=(10, 0))
-        ttk.Button(foot, text="Document bekijken", command=self.show_document).pack(side="left")
-        ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)
-        ttk.Button(foot, text="Vraagstarts analyseren", command=self.analyze_questions, style="Accent.TButton").pack(side="left", padx=6)
-        ttk.Button(foot, text="Examenstructuur bewerken", command=self.edit_exam_structure, style="Accent.TButton").pack(side="left", padx=6)
-        ttk.Button(foot, text="Kandidaten bekijken", command=self.show_candidates).pack(side="left")
-        ttk.Button(foot, text="Examengegevens controleren", command=self.edit_exam_metadata).pack(side="left", padx=6)
-        ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
-        workflow=ttk.Frame(body); workflow.pack(fill="x",pady=(8,0))
-        ttk.Button(workflow,text="Vraagrecords beoordelen en goedkeuren",command=self.show_records,style="Accent.TButton").pack(side="left")
-        ttk.Button(workflow,text="Veilig exportpakket maken",command=self.export_project).pack(side="left",padx=8)
-        self.log = tk.Text(body, height=6, wrap="word", font=("Consolas", 9), background="#f5f7f7", relief="flat")
-        self.log.pack(fill="x", pady=(12, 0))
+
+        # Quick actions and activity panel
+        actions = ttk.Frame(workspace, style="App.TFrame")
+        actions.pack(fill="x", pady=(13, 0))
+        ttk.Button(actions, text="Document bekijken", command=self.show_document,
+                   style="Secondary.TButton").pack(side="left", padx=(0, 7))
+        ttk.Button(actions, text="Herkenning aanpassen", command=self.correct_type,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(actions, text="Examengegevens controleren", command=self.edit_exam_metadata,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(actions, text="Voortgang opslaan", command=self.save_project,
+                   style="Accent.TButton").pack(side="right")
+
+        workflow_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(15, 10))
+        workflow_card.pack(fill="x", pady=(12, 0))
+        workflow_row = ttk.Frame(workflow_card, style="Surface.TFrame")
+        workflow_row.pack(fill="x")
+        ttk.Label(workflow_row, text="VERWERKROUTE", style="CardHint.TLabel").pack(side="left", padx=(0, 15))
+        ttk.Button(workflow_row, text="Vraagstarts", command=self.analyze_questions,
+                   style="Secondary.TButton").pack(side="left", padx=4)
+        ttk.Button(workflow_row, text="Structuur", command=self.edit_exam_structure,
+                   style="Secondary.TButton").pack(side="left", padx=4)
+        ttk.Button(workflow_row, text="Kandidaten", command=self.show_candidates,
+                   style="Secondary.TButton").pack(side="left", padx=4)
+        ttk.Button(workflow_row, text="Beoordelen", command=self.show_records,
+                   style="Secondary.TButton").pack(side="left", padx=4)
+        ttk.Button(workflow_row, text="Exporteren", command=self.export_project,
+                   style="Secondary.TButton").pack(side="left", padx=4)
+
+        log_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(14, 9))
+        log_card.pack(fill="x", pady=(12, 0))
+        log_header = ttk.Frame(log_card, style="Surface.TFrame")
+        log_header.pack(fill="x")
+        ttk.Label(log_header, text="Activiteit en meldingen", style="CardTitle.TLabel").pack(side="left")
+        ttk.Label(log_header, text="Lokale log", style="CardHint.TLabel").pack(side="right")
+        self.log = tk.Text(log_card, height=4, wrap="word", font=("Segoe UI", 9),
+                           background="#FBFAFB", foreground=self.colors["text"],
+                           insertbackground=self.colors["text"], relief="flat",
+                           padx=9, pady=7, highlightthickness=1,
+                           highlightbackground=self.colors["line"])
+        self.log.pack(fill="x", pady=(7, 0))
         self.log.configure(state="disabled")
 
     def _welcome(self):
