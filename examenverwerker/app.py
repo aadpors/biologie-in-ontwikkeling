@@ -16,7 +16,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.12.0"
+APP_VERSION = "0.13.1"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -141,252 +141,841 @@ class ExamApp:
                         troughcolor="#F5F7F7", bordercolor="#F5F7F7", arrowsize=12)
 
     def _build(self):
-        """Build a complete, card-based workflow workspace rather than a plain file manager."""
+        """Integrated examination workbench: source PDF, documents, candidates and review."""
         self.root.title("Biologie Examenverwerker")
-        fit_window(self.root, 1380, 900, 900, 620)
-
-        shell = ttk.Frame(self.root, style="App.TFrame")
+        fit_window(self.root, 1440, 920, 980, 640)
+        shell = ttk.Frame(self.root, style="App.TFrame", padding=10)
         shell.pack(fill="both", expand=True)
 
-        # Brand bar
-        header = tk.Frame(shell, bg="#FFFFFF", height=62,
-                          highlightthickness=1, highlightbackground=self.colors["line"])
-        header.pack(fill="x")
-        header.pack_propagate(False)
-        brand = tk.Frame(header, bg="#FFFFFF")
-        brand.pack(side="left", padx=28, fill="y")
-        mark = tk.Label(brand, text="B", bg=self.colors["wine"], fg="#FFFFFF",
-                        font=("Segoe UI", 18, "bold"), width=2, height=1)
-        mark.pack(side="left", pady=15)
-        brand_text = tk.Frame(brand, bg="#FFFFFF")
-        brand_text.pack(side="left", padx=12, pady=12)
-        tk.Label(brand_text, text="BIOLOGIE EXAMENVERWERKER", bg="#FFFFFF",
-                 fg=self.colors["ink"], font=("Segoe UI", 13, "bold")).pack(anchor="w")
-        tk.Label(brand_text, text="Van originele examen-pdf naar gecontroleerde examenvragen",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
-        tk.Label(header, text="LOKAAL WERKSTATION   ·   OFFLINE STANDAARD   ·   NIET AUTOMATISCH PUBLICEREN",
-                 bg="#FFFFFF", fg=self.colors["muted"],
-                 font=("Segoe UI", 8, "bold")).pack(side="right", padx=28)
+        header = ttk.Frame(shell, style="App.TFrame")
+        header.pack(fill="x", pady=(0, 8))
+        brand = ttk.Frame(header, style="App.TFrame")
+        brand.pack(side="left", fill="x", expand=True)
+        ttk.Label(brand, text="BIOLOGIE EXAMENVERWERKER", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(brand, text="Werkruimte voor volledige, visueel gecontroleerde examenverwerking",
+                  style="Muted.TLabel").pack(anchor="w", pady=(1, 0))
+        self.project_label = ttk.Label(header, text="Nog geen examen geopend", style="Project.TLabel")
+        self.project_label.pack(side="right", padx=10)
 
-        # Burgundy welcome banner, echoing the original website's visual identity
-        hero = tk.Frame(shell, bg=self.colors["wine"], height=98)
-        hero.pack(fill="x")
-        hero.pack_propagate(False)
-        hero_inner = tk.Frame(hero, bg=self.colors["wine"])
-        hero_inner.pack(fill="both", expand=True, padx=34, pady=17)
-        tk.Label(hero_inner, text="EXAMENVERWERKING", bg=self.colors["wine"],
-                 fg="#F3C9D5", font=("Segoe UI", 8, "bold")).pack(anchor="w")
-        tk.Label(hero_inner, text="Van bronbestand naar betrouwbare vraagbank",
-                 bg=self.colors["wine"], fg="#FFFFFF",
-                 font=("Segoe UI", 18, "bold")).pack(anchor="w", pady=(2, 1))
-        tk.Label(hero_inner, text="Importeer, controleer en verrijk examens stap voor stap. Jij houdt de inhoudelijke regie.",
-                 bg=self.colors["wine"], fg="#F8EAF0",
-                 font=("Segoe UI", 10)).pack(anchor="w")
-
-        body = ttk.Frame(shell, style="App.TFrame", padding=(16, 10, 16, 6))
-        body.pack(fill="both", expand=True)
-        self.notebook = ttk.Notebook(body)
-        self.notebook.pack(fill="both", expand=True)
-
-        overview_page = ttk.Frame(self.notebook, style="App.TFrame")
-        documents_page = ttk.Frame(self.notebook, style="App.TFrame")
-        workflow_page = ttk.Frame(self.notebook, style="App.TFrame")
-        self.notebook.add(overview_page, text="  Overzicht  ")
-        self.notebook.add(documents_page, text="  Documenten  ")
-        self.notebook.add(workflow_page, text="  Verwerkroute  ")
-        overview = self._scrollable_tab(overview_page)
-        documents = self._scrollable_tab(documents_page)
-        workflow = self._scrollable_tab(workflow_page)
-
-        # OVERVIEW: project identity, progress and large primary actions
-        top = ttk.Frame(overview, style="App.TFrame")
-        top.pack(fill="x", pady=(0, 13))
-        title_col = ttk.Frame(top, style="App.TFrame")
-        title_col.pack(side="left", fill="x", expand=True)
-        ttk.Label(title_col, text="Jouw examenwerkplek", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(title_col, text="Een helder overzicht van wat al is verwerkt en wat nog aandacht vraagt.",
-                  style="Muted.TLabel").pack(anchor="w", pady=(3, 0))
-        ttk.Button(top, text="＋  Meerdere examens importeren",
-                   command=self.import_year_set, style="Accent.TButton").pack(side="right", padx=(10, 0), pady=5)
-        ttk.Button(top, text="Open project", command=self.open_project,
-                   style="Secondary.TButton").pack(side="right", pady=5)
-
-        project = tk.Frame(overview, bg="#FFFFFF", highlightthickness=1,
-                           highlightbackground=self.colors["line"])
-        project.pack(fill="x", pady=(0, 13))
-        project_left = tk.Frame(project, bg="#FFFFFF")
-        project_left.pack(side="left", fill="both", expand=True, padx=18, pady=15)
-        tk.Label(project_left, text="ACTIEF EXAMENPROJECT", bg="#FFFFFF",
-                 fg=self.colors["muted"], font=("Segoe UI", 8, "bold")).pack(anchor="w")
-        self.project_label = ttk.Label(project_left, text="Nog geen project geopend",
-                                       style="Project.TLabel")
-        self.project_label.pack(anchor="w", pady=(4, 5))
-        self.status = ttk.Label(project_left,
-            text="Importeer examens of open een bestaand project om te beginnen.",
-            style="Status.TLabel", wraplength=900)
-        self.status.pack(anchor="w", fill="x")
-        project_actions = tk.Frame(project, bg="#FFFFFF")
-        project_actions.pack(side="right", padx=18, pady=18)
-        ttk.Button(project_actions, text="＋ Nieuw project", command=self.new_project,
-                   style="Secondary.TButton").pack(fill="x", pady=3)
-        ttk.Button(project_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
-                   style="Secondary.TButton").pack(fill="x", pady=3)
-
-        # Metric cards
-        metrics = ttk.Frame(overview, style="App.TFrame")
-        metrics.pack(fill="x", pady=(0, 13))
-        self.metric_documents = self._metric_card(metrics, "BRONBESTANDEN", "0", "PDF's ingelezen", 0)
-        self.metric_questions = self._metric_card(metrics, "VRAAGSTARTS", "0", "kandidaten gevonden", 1)
-        self.metric_todo = self._metric_card(metrics, "NOG TE CONTROLEREN", "0", "documentherkenningen", 2)
-        self.metric_records = self._metric_card(metrics, "VRAAGRECORDS", "0", "inhoudelijke records", 3)
-
-        # Two-column dashboard: workflow cards and guidance
-        lower = ttk.Frame(overview, style="App.TFrame")
-        lower.pack(fill="both", expand=True)
-        route_card = tk.Frame(lower, bg="#FFFFFF", highlightthickness=1,
-                              highlightbackground=self.colors["line"])
-        route_card.pack(side="left", fill="both", expand=True, padx=(0, 8))
-        route_head = tk.Frame(route_card, bg="#FFFFFF")
-        route_head.pack(fill="x", padx=18, pady=(15, 7))
-        tk.Label(route_head, text="DE VERWERKROUTE", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 12, "bold")).pack(anchor="w")
-        tk.Label(route_head, text="Werk van boven naar beneden. Je kunt stappen opnieuw uitvoeren wanneer nodig.",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
-        steps = [
-            ("01", "Bronbestanden importeren", "Selecteer in één keer examens uit meerdere jaren en niveaus.", self.import_year_set, "Importeren"),
-            ("02", "Documenten en metadata", "Controleer opgaven, correctievoorschriften, tijdvak en jaar.", lambda:self.notebook.select(documents), "Documenten bekijken"),
-            ("03", "Vraagstarts en structuur", "Analyseer de opgaven en controleer de vraag- en contextgrenzen.", self.analyze_questions, "Vraagstarts analyseren"),
-            ("04", "Vragen bevestigen", "Beoordeel kandidaten in één doorlopend overzicht.", self.show_candidates, "Vraagcontrole openen"),
-            ("05", "Inhoudelijke eindcontrole", "Controleer tekst, afbeeldingen, context, CV en bijlagen.", self.show_records, "Eindcontrole openen"),
+        toolbar = ttk.Frame(shell, style="App.TFrame")
+        toolbar.pack(fill="x", pady=(0, 8))
+        actions = [
+            ("Nieuw project", self.new_project, "Secondary.TButton"),
+            ("Project openen", self.open_project, "Secondary.TButton"),
+            ("＋ Examens importeren", self.import_year_set, "Accent.TButton"),
+            ("Vraagstarts analyseren", self.analyze_questions, "Secondary.TButton"),
+            ("Structuur bewerken", self.edit_exam_structure, "Secondary.TButton"),
+            ("Vraagrecord maken", self._workspace_create_record, "Secondary.TButton"),
+            ("Eindcontrole", self.show_records, "Secondary.TButton"),
+            ("Exportpakket", self.export_project, "Wine.TButton"),
         ]
-        for number, heading, description, callback, button_text in steps:
-            card = tk.Frame(route_card, bg="#FFFFFF")
-            card.pack(fill="x", padx=16, pady=5)
-            circle = tk.Label(card, text=number, bg=self.colors["wine_soft"],
-                              fg=self.colors["wine"], font=("Segoe UI", 10, "bold"),
-                              width=4, height=2)
-            circle.pack(side="left", padx=(0, 12))
-            text_col = tk.Frame(card, bg="#FFFFFF")
-            text_col.pack(side="left", fill="x", expand=True)
-            tk.Label(text_col, text=heading, bg="#FFFFFF", fg=self.colors["ink"],
-                     font=("Segoe UI", 10, "bold")).pack(anchor="w")
-            tk.Label(text_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
-                     font=("Segoe UI", 8), wraplength=570, justify="left").pack(anchor="w", pady=(2, 0))
-            ttk.Button(card, text=button_text, command=callback,
-                       style="Secondary.TButton").pack(side="right", padx=(8, 0))
-            ttk.Separator(route_card).pack(fill="x", padx=16, pady=3)
+        for label, callback, style in actions[:4]:
+            ttk.Button(toolbar, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
+        toolbar_secondary = ttk.Frame(shell, style="App.TFrame")
+        toolbar_secondary.pack(fill="x", pady=(0, 6))
+        for label, callback, style in actions[4:]:
+            ttk.Button(toolbar_secondary, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
 
-        guide = tk.Frame(lower, bg="#FFFFFF", width=280, highlightthickness=1,
-                         highlightbackground=self.colors["line"])
-        guide.pack(side="right", fill="y", padx=(8, 0))
-        guide.pack_propagate(False)
-        tk.Label(guide, text="GOED OM TE WETEN", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=16, pady=(16, 9))
-        for head, body_text, color in [
-            ("Bron blijft leidend", "Originele examen-pdf's worden bewaard. Tekstherkenning is een voorstel, geen bron.", self.colors["teal"]),
-            ("Geen automatische goedkeuring", "Vraagrecords en afbeeldingen worden pas bruikbaar na jouw volledige controle.", self.colors["orange"]),
-            ("Lokaal en veilig", "Bestanden blijven standaard op deze computer. Er wordt niets automatisch gepubliceerd.", self.colors["green"])
-        ]:
-            block = tk.Frame(guide, bg="#F7F9F9")
-            block.pack(fill="x", padx=13, pady=5)
-            tk.Frame(block, bg=color, width=4).pack(side="left", fill="y")
-            inner = tk.Frame(block, bg="#F7F9F9")
-            inner.pack(side="left", fill="both", expand=True, padx=9, pady=9)
-            tk.Label(inner, text=head, bg="#F7F9F9", fg=self.colors["ink"],
-                     font=("Segoe UI", 9, "bold")).pack(anchor="w")
-            tk.Label(inner, text=body_text, bg="#F7F9F9", fg=self.colors["muted"],
-                     font=("Segoe UI", 8), wraplength=205, justify="left").pack(anchor="w", pady=(3, 0))
-        ttk.Button(guide, text="Exportpakket maken", command=self.export_project,
-                   style="Wine.TButton").pack(fill="x", padx=14, pady=(12, 14))
+        correction_bar = ttk.Frame(shell, style="App.TFrame")
+        correction_bar.pack(fill="x", pady=(0, 7))
+        ttk.Button(correction_bar, text="Correcties uit Biologie-controle importeren",
+                   command=self._workspace_import_corrections).pack(side="left", padx=(0, 5))
+        ttk.Button(correction_bar, text="Beoordelingen exporteren",
+                   command=self._workspace_export_corrections).pack(side="left")
+        ttk.Label(correction_bar,
+                  text="Bewaart besluiten, notities, vraagnummercorrecties en exacte PDF-posities.",
+                  style="Muted.TLabel").pack(side="left", padx=10)
 
-        # DOCUMENTS: dedicated document library with table and clear actions
-        doc_top = ttk.Frame(documents, style="App.TFrame")
-        doc_top.pack(fill="x", pady=(0, 12))
-        ttk.Label(doc_top, text="Documentbibliotheek", style="Title.TLabel").pack(side="left")
-        ttk.Label(doc_top, text="Controleer de herkenning voordat je de inhoud analyseert.",
-                  style="Muted.TLabel").pack(side="left", padx=16, pady=(10, 0))
-        doc_actions = ttk.Frame(documents, style="App.TFrame")
-        doc_actions.pack(fill="x", pady=(0, 10))
-        ttk.Button(doc_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
-                   style="Accent.TButton").pack(side="left")
-        ttk.Button(doc_actions, text="Document bekijken", command=self.show_document,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        ttk.Button(doc_actions, text="Herkenning aanpassen", command=self.correct_type,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        ttk.Button(doc_actions, text="Examengegevens controleren", command=self.edit_exam_metadata,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        files_card = tk.Frame(documents, bg="#FFFFFF", highlightthickness=1,
-                              highlightbackground=self.colors["line"])
-        files_card.pack(fill="both", expand=True)
-        files_heading = tk.Frame(files_card, bg="#FFFFFF")
-        files_heading.pack(fill="x", padx=16, pady=(13, 5))
-        tk.Label(files_heading, text="INGELEZEN BRONBESTANDEN", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 10, "bold")).pack(side="left")
-        tk.Label(files_heading, text="Dubbelklik op een regel om de PDF te bekijken",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
-        table_wrap = ttk.Frame(files_card, style="Card.TFrame", padding=(12, 7, 12, 12))
-        table_wrap.pack(fill="both", expand=True)
-        columns = ("name", "type", "pages", "confidence", "state")
-        self.table = ttk.Treeview(table_wrap, columns=columns, show="headings")
-        for col, title, width in [
-            ("name", "Bestand", 470), ("type", "Herkend documenttype", 210),
-            ("pages", "Pagina's", 90), ("confidence", "Zekerheid", 110), ("state", "Status", 220)
+        workspace = ttk.Panedwindow(shell, orient="horizontal")
+        workspace.pack(fill="both", expand=True)
+        left = ttk.Frame(workspace, style="App.TFrame", padding=(0, 0, 6, 0))
+        right = ttk.Frame(workspace, style="App.TFrame", padding=(6, 0, 0, 0))
+        workspace.add(left, weight=3)
+        workspace.add(right, weight=8)
+
+        # Left column: source documents and question candidates.
+        docs_card = ttk.LabelFrame(left, text="DOCUMENTEN", padding=7)
+        docs_card.pack(fill="both", expand=True, pady=(0, 7))
+        doc_actions = ttk.Frame(docs_card)
+        doc_actions.pack(fill="x", pady=(0, 5))
+        ttk.Button(doc_actions, text="PDF's toevoegen", command=self.add_pdfs).pack(side="left")
+        ttk.Button(doc_actions, text="Type corrigeren", command=self.correct_type).pack(side="left", padx=4)
+        ttk.Button(doc_actions, text="Metadata", command=self.edit_exam_metadata).pack(side="left")
+        doc_cols = ("name", "type", "pages", "state")
+        self.table = ttk.Treeview(docs_card, columns=doc_cols, show="headings", height=7, selectmode="browse")
+        for col, label, width in [
+            ("name", "Bestand", 210), ("type", "Type", 105),
+            ("pages", "Pag.", 42), ("state", "Status", 105)
         ]:
-            self.table.heading(col, text=title)
-            self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
-        scrollbar = ttk.Scrollbar(table_wrap, orient="vertical", command=self.table.yview)
-        horizontal = ttk.Scrollbar(table_wrap, orient="horizontal", command=self.table.xview)
-        self.table.configure(yscrollcommand=scrollbar.set, xscrollcommand=horizontal.set)
+            self.table.heading(col, text=label)
+            self.table.column(col, width=width, minwidth=35, anchor="w" if col in ("name", "type", "state") else "center")
+        doc_scroll = ttk.Scrollbar(docs_card, orient="vertical", command=self.table.yview)
+        self.table.configure(yscrollcommand=doc_scroll.set)
         self.table.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        horizontal.pack(fill="x", pady=(2, 0))
-        self.table.tag_configure("odd", background=self.colors["table_alt"])
-        self.table.tag_configure("even", background="#FFFFFF")
+        doc_scroll.pack(side="right", fill="y")
+        self.table.bind("<<TreeviewSelect>>", self._workspace_document_selected)
         self.table.bind("<Double-1>", self.show_document)
 
-        # WORKFLOW: large task cards grouped by the actual processing stages
-        ttk.Label(workflow, text="Verwerkroute", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(workflow, text="Open een stap wanneer je eraan toe bent. De applicatie bewaart je voortgang lokaal.",
-                  style="Muted.TLabel").pack(anchor="w", pady=(3, 14))
-        stages = [
-            ("01", "Vraagstarts analyseren", "Zoek mogelijke vraagstarts in de opgaven-pdf en vergelijk waar mogelijk met het bijbehorende CV.", "Analyse", self.analyze_questions, self.colors["teal"]),
-            ("02", "Examenstructuur vastleggen", "Controleer paginabereiken, vraaggrenzen en de koppeling met contexten, figuren en tabellen.", "Structuur", self.edit_exam_structure, self.colors["wine"]),
-            ("03", "Vraagstarts bevestigen", "Beoordeel de gevonden kandidaten in een doorlopend controlevenster.", "Controleren", self.show_candidates, self.colors["orange"]),
-            ("04", "Vraagrecords samenstellen", "Maak conceptrecords vanuit bevestigde vraagstarts en controleer de bronfragmenten.", "Samenstellen", self.show_candidates, self.colors["teal"]),
-            ("05", "Inhoudelijke eindcontrole", "Controleer alle tekst, opties, afbeeldingen, contexten, CV en bijlagen per vraag.", "Eindcontrole", self.show_records, self.colors["wine"]),
-            ("06", "Veilig exportpakket", "Maak een lokaal exportpakket. Publiceren naar de website gebeurt nooit automatisch.", "Exporteren", self.export_project, self.colors["green"]),
-        ]
-        for number, heading, description, action_text, callback, color in stages:
-            card = tk.Frame(workflow, bg="#FFFFFF", highlightthickness=1,
-                            highlightbackground=self.colors["line"])
-            card.pack(fill="x", pady=5)
-            tk.Label(card, text=number, bg=color, fg="#FFFFFF",
-                     font=("Segoe UI", 13, "bold"), width=4, height=2).pack(side="left", padx=14, pady=12)
-            content_col = tk.Frame(card, bg="#FFFFFF")
-            content_col.pack(side="left", fill="x", expand=True, padx=4, pady=11)
-            tk.Label(content_col, text=heading, bg="#FFFFFF", fg=self.colors["wine"],
-                     font=("Segoe UI", 11, "bold")).pack(anchor="w")
-            tk.Label(content_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
-                     font=("Segoe UI", 9), wraplength=850, justify="left").pack(anchor="w", pady=(3, 0))
-            ttk.Button(card, text=action_text, command=callback,
-                       style="Accent.TButton" if number in ("01", "03", "05") else "Secondary.TButton").pack(side="right", padx=16, pady=14)
+        candidates_card = ttk.LabelFrame(left, text="VRAAGSTARTS EN CONTROLE", padding=7)
+        candidates_card.pack(fill="both", expand=True)
+        filter_row = ttk.Frame(candidates_card)
+        filter_row.pack(fill="x", pady=(0, 5))
+        self._workspace_filter = tk.StringVar(value="Alle kandidaten")
+        ttk.Label(filter_row, text="Filter").pack(side="left")
+        filter_box = ttk.Combobox(filter_row, textvariable=self._workspace_filter,
+            values=["Alle kandidaten", "Nog te beoordelen", "Sterke signalen", "Zwakke signalen", "Dubbele nummers", "Niet in CV"],
+            state="readonly", width=20)
+        filter_box.pack(side="left", padx=5, fill="x", expand=True)
+        filter_box.bind("<<ComboboxSelected>>", lambda _e: self._workspace_refresh_candidates())
+        candidate_cols = ("number", "page", "signal", "status")
+        self.candidate_tree = ttk.Treeview(candidates_card, columns=candidate_cols, show="headings",
+                                            height=12, selectmode="browse")
+        for col, label, width in [
+            ("number", "Nr.", 42), ("page", "Pag.", 48), ("signal", "Signaal", 62), ("status", "Beoordeling", 145)
+        ]:
+            self.candidate_tree.heading(col, text=label)
+            self.candidate_tree.column(col, width=width, minwidth=32,
+                anchor="center" if col in ("number", "page", "signal") else "w")
+        candidate_scroll = ttk.Scrollbar(candidates_card, orient="vertical", command=self.candidate_tree.yview)
+        self.candidate_tree.configure(yscrollcommand=candidate_scroll.set)
+        self.candidate_tree.pack(side="left", fill="both", expand=True)
+        candidate_scroll.pack(side="right", fill="y")
+        self.candidate_tree.bind("<<TreeviewSelect>>", self._workspace_candidate_selected)
 
-        # Persistent activity feed
-        activity = tk.Frame(shell, bg="#FFFFFF", highlightthickness=1,
-                            highlightbackground=self.colors["line"])
-        activity.pack(fill="x", padx=26, pady=(0, 14))
-        activity_head = tk.Frame(activity, bg="#FFFFFF")
-        activity_head.pack(fill="x", padx=13, pady=(8, 2))
-        tk.Label(activity_head, text="ACTIVITEIT EN MELDINGEN", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 8, "bold")).pack(side="left")
-        tk.Label(activity_head, text="Lokale log · bronbestanden blijven intact",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
-        self.log = tk.Text(activity, height=2, wrap="word", font=("Segoe UI", 8),
+        # Right column: original PDF at full working size and persistent review controls.
+        right_split = ttk.Panedwindow(right, orient="horizontal")
+        right_split.pack(fill="both", expand=True)
+        viewer = ttk.LabelFrame(right_split, text="ORIGINELE PDF · BRON VAN WAARHEID", padding=7)
+        review = ttk.LabelFrame(right_split, text="VRAAGCONTROLE", padding=9)
+        right_split.add(viewer, weight=7)
+        right_split.add(review, weight=3)
+
+        page_toolbar = ttk.Frame(viewer)
+        page_toolbar.pack(fill="x", pady=(0, 5))
+        ttk.Button(page_toolbar, text="◀", width=3, command=lambda: self._workspace_change_page(-1)).pack(side="left")
+        self._workspace_page_label = ttk.Label(page_toolbar, text="Pagina — / —")
+        self._workspace_page_label.pack(side="left", padx=8)
+        ttk.Button(page_toolbar, text="▶", width=3, command=lambda: self._workspace_change_page(1)).pack(side="left")
+        ttk.Separator(page_toolbar, orient="vertical").pack(side="left", fill="y", padx=8)
+        ttk.Button(page_toolbar, text="−", width=3, command=lambda: self._workspace_zoom_by(0.8)).pack(side="left")
+        ttk.Button(page_toolbar, text="100%", command=self._workspace_reset_zoom).pack(side="left", padx=3)
+        ttk.Button(page_toolbar, text="+", width=3, command=lambda: self._workspace_zoom_by(1.25)).pack(side="left")
+        ttk.Button(page_toolbar, text="Markeer ontbrekende vraag", command=self._workspace_start_manual_mark).pack(side="right")
+        canvas_wrap = ttk.Frame(viewer)
+        canvas_wrap.pack(fill="both", expand=True)
+        self.pdf_canvas = tk.Canvas(canvas_wrap, background="#DCE2E5", highlightthickness=0,
+                                    cursor="crosshair")
+        pdf_y = ttk.Scrollbar(canvas_wrap, orient="vertical", command=self.pdf_canvas.yview)
+        pdf_x = ttk.Scrollbar(viewer, orient="horizontal", command=self.pdf_canvas.xview)
+        self.pdf_canvas.configure(yscrollcommand=pdf_y.set, xscrollcommand=pdf_x.set)
+        self.pdf_canvas.pack(side="left", fill="both", expand=True)
+        pdf_y.pack(side="right", fill="y")
+        pdf_x.pack(fill="x")
+        self.pdf_canvas.bind("<Button-1>", self._workspace_canvas_click)
+        self.pdf_canvas.bind("<MouseWheel>", lambda e: self.pdf_canvas.yview_scroll(int(-e.delta / 120), "units"))
+
+        self._workspace_summary = ttk.Label(review, text="Selecteer een document of vraagstart.",
+                                            style="Body.TLabel", wraplength=330, justify="left")
+        self._workspace_summary.pack(fill="x", anchor="w", pady=(0, 8))
+        number_row = ttk.Frame(review)
+        number_row.pack(fill="x", pady=(0, 5))
+        ttk.Label(number_row, text="Vraagnummer").pack(side="left")
+        self._workspace_number = tk.StringVar()
+        ttk.Entry(number_row, textvariable=self._workspace_number, width=7).pack(side="left", padx=6)
+        ttk.Button(number_row, text="Opslaan", command=self._workspace_save_candidate).pack(side="right")
+
+        ttk.Label(review, text="Vraagtekst / opdrachtformulering").pack(anchor="w")
+        self._workspace_text = tk.Text(review, height=12, wrap="word", font=("Segoe UI", 9),
+                                       undo=True, padx=7, pady=6)
+        self._workspace_text.pack(fill="both", expand=True, pady=(3, 5))
+        self._workspace_detected_details = ttk.Label(review, text="", style="Muted.TLabel",
+            wraplength=330, justify="left")
+        self._workspace_detected_details.pack(fill="x", pady=(0, 6))
+        ttk.Label(review, text="Notitie bij de beoordeling").pack(anchor="w")
+        self._workspace_note = tk.Text(review, height=4, wrap="word", font=("Segoe UI", 9),
+                                       undo=True, padx=7, pady=5)
+        self._workspace_note.pack(fill="x", pady=(3, 8))
+        ttk.Button(review, text="Tekst en notitie bewaren", command=self._workspace_save_candidate,
+                   style="Secondary.TButton").pack(fill="x", pady=(0, 8))
+        ttk.Separator(review).pack(fill="x", pady=5)
+        ttk.Label(review, text="Beoordeel deze vraagstart").pack(anchor="w", pady=(0, 5))
+        ttk.Button(review, text="✓  Dit is een vraag", command=lambda: self._workspace_decide(True),
+                   style="Accent.TButton").pack(fill="x", pady=3)
+        ttk.Button(review, text="✕  Geen vraag", command=lambda: self._workspace_decide(False),
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+        ttk.Button(review, text="?  Twijfel / later beoordelen", command=lambda: self._workspace_decide(None),
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+        ttk.Button(review, text="Concept-vraagrecord samenstellen",
+                   command=self._workspace_create_record, style="Wine.TButton").pack(fill="x", pady=(10, 3))
+        ttk.Button(review, text="Onderdrukte nummerkandidaten bekijken",
+                   command=lambda: self.show_suppressed_candidates(self.root)).pack(fill="x", pady=3)
+
+        footer = ttk.Frame(shell, style="App.TFrame")
+        footer.pack(fill="x", pady=(7, 0))
+        self.status = ttk.Label(footer, text="Importeer examens of open een bestaand project.", style="Status.TLabel")
+        self.status.pack(side="left", fill="x", expand=True)
+        log_frame = ttk.LabelFrame(shell, text="ACTIVITEIT EN MELDINGEN", padding=(7, 4))
+        log_frame.pack(fill="x", pady=(6, 0))
+        self.log = tk.Text(log_frame, height=3, wrap="word", font=("Segoe UI", 8),
                            background="#FBFCFC", foreground=self.colors["ink"],
-                           insertbackground=self.colors["ink"], relief="flat",
-                           padx=10, pady=6, highlightthickness=0)
-        self.log.pack(fill="x", padx=10, pady=(2, 8))
+                           insertbackground=self.colors["ink"], relief="flat", padx=7, pady=4)
+        self.log.pack(fill="x")
         self.log.configure(state="disabled")
+
+        self._workspace_temp = tempfile.TemporaryDirectory(prefix="biologie-werkruimte-")
+        self._workspace_zoom = 1.0
+        self._workspace_scale = 1.0
+        self._workspace_photo = None
+        self._workspace_doc_id = None
+        self._workspace_page = 1
+        self._workspace_rows = []
+        self._workspace_selected = None
+        self._workspace_mark_mode = False
+        self.root.after(150, self._workspace_refresh)
+
+    def _workspace_doc(self):
+        if not self.data:
+            return None
+        return next((d for d in self.data.get("documenten", [])
+                     if d.get("id") == self._workspace_doc_id), None)
+
+    def _workspace_document_selected(self, _event=None):
+        if not self.data or not self.table.selection():
+            return
+        index = int(self.table.selection()[0])
+        docs = self.data.get("documenten", [])
+        if index >= len(docs):
+            return
+        doc = docs[index]
+        self._workspace_doc_id = doc.get("id")
+        self._workspace_page = 1
+        self._workspace_selected = None
+        self._workspace_refresh_candidates()
+        self._workspace_render_page()
+
+    def _workspace_refresh(self):
+        if not self.data:
+            self._workspace_rows = []
+            self._workspace_refresh_candidates()
+            self._workspace_summary.configure(text="Selecteer of importeer een examen. De originele PDF verschijnt hier.")
+            self.pdf_canvas.delete("all")
+            self._workspace_page_label.configure(text="Pagina — / —")
+            return
+        docs = self.data.get("documenten", [])
+        if not self._workspace_doc_id or not any(d.get("id") == self._workspace_doc_id for d in docs):
+            preferred = next((d for d in docs if d.get("type_voorstel") == "opgaven"), docs[0] if docs else None)
+            self._workspace_doc_id = preferred.get("id") if preferred else None
+        if self._workspace_doc_id:
+            for item in self.table.get_children():
+                self.table.delete(item)
+            for index, doc in enumerate(docs):
+                self.table.insert("", "end", iid=str(index), values=(
+                    doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
+                    doc.get("pagina_aantal", "—"), str(doc.get("status", "onbekend")).replace("_", " ")))
+            target = next((str(i) for i,d in enumerate(docs) if d.get("id")==self._workspace_doc_id), None)
+            if target and target in self.table.get_children():
+                self.table.selection_set(target)
+                self.table.focus(target)
+            self._workspace_refresh_candidates()
+            if self._workspace_selected is None:
+                self._workspace_render_page()
+        else:
+            self._workspace_rows = []
+            self._workspace_refresh_candidates()
+            self.pdf_canvas.delete("all")
+            self._workspace_page_label.configure(text="Pagina — / —")
+            self._workspace_summary.configure(text="Dit project bevat nog geen documenten. Voeg PDF's toe of importeer een examen.")
+
+    def _workspace_refresh_candidates(self, select_index=None):
+        if not hasattr(self, "candidate_tree"):
+            return
+        for item in self.candidate_tree.get_children():
+            self.candidate_tree.delete(item)
+        all_rows = (self.data or {}).get("vraagkandidaten", [])
+        rows = [r for r in all_rows if r.get("document_id") == self._workspace_doc_id]
+        filter_value = self._workspace_filter.get() if hasattr(self, "_workspace_filter") else "Alle kandidaten"
+        number_counts = {}
+        for row in rows:
+            number_counts[row.get("number")] = number_counts.get(row.get("number"), 0) + 1
+        if filter_value == "Nog te beoordelen":
+            rows = [r for r in rows if r.get("human_decision") is None]
+        elif filter_value == "Sterke signalen":
+            rows = [r for r in rows if float(r.get("confidence", 0) or 0) >= 0.9]
+        elif filter_value == "Zwakke signalen":
+            rows = [r for r in rows if float(r.get("confidence", 0) or 0) < 0.9]
+        elif filter_value == "Dubbele nummers":
+            rows = [r for r in rows if number_counts.get(r.get("number"), 0) > 1]
+        elif filter_value == "Niet in CV":
+            rows = [r for r in rows if r.get("cv_number_match") is False]
+        self._workspace_rows = rows
+        for index, row in enumerate(rows):
+            status = row.get("status", "controle_nodig").replace("_", " ")
+            self.candidate_tree.insert("", "end", iid=str(index), values=(
+                row.get("number", "—"), row.get("page", "—"),
+                f"{float(row.get('confidence', 0) or 0):.0%}", status))
+        if rows:
+            if select_index is None:
+                select_index = next((i for i,r in enumerate(rows) if r.get("human_decision") is None), 0)
+            select_index = max(0, min(int(select_index), len(rows)-1))
+            self.candidate_tree.selection_set(str(select_index))
+            self.candidate_tree.focus(str(select_index))
+            self.candidate_tree.see(str(select_index))
+            self._workspace_candidate_selected()
+        else:
+            self._workspace_selected = None
+            self._workspace_summary.configure(text="Geen vraagkandidaten voor dit document of deze filter. Je kunt op de PDF een ontbrekende vraag handmatig aanwijzen.")
+            self._workspace_text.delete("1.0", "end")
+            self._workspace_note.delete("1.0", "end")
+            self._workspace_number.set("")
+            self._workspace_render_page()
+
+    def _workspace_candidate_selected(self, _event=None):
+        if not self.candidate_tree.selection():
+            return
+        index = int(self.candidate_tree.selection()[0])
+        if index >= len(self._workspace_rows):
+            return
+        row = self._workspace_rows[index]
+        self._workspace_selected = row
+        self._workspace_number.set(str(row.get("number", "")))
+        self._workspace_text.delete("1.0", "end")
+        self._workspace_text.insert("1.0", row.get("vraagtekst_voorstel", "") or "")
+        self._workspace_note.delete("1.0", "end")
+        self._workspace_note.insert("1.0", row.get("review_note", "") or "")
+        check = row.get("vraagtype_controle", {})
+        cv = "CV-match" if row.get("cv_number_match") is True else (
+            "Nummer niet in CV" if row.get("cv_number_match") is False else "CV niet beschikbaar")
+        self._workspace_summary.configure(text=(
+            f"Vraag {row.get('number')} · PDF-pagina {row.get('page')} · "
+            f"signaal {float(row.get('confidence',0) or 0):.0%}\n"
+            f"{check.get('type','type nog controleren')} · {cv}\n"
+            f"{row.get('reason','')}\nStatus: {row.get('status','controle_nodig').replace('_',' ')}"))
+        options = check.get("options", [])
+        option_text = "Antwoordopties: " + (" · ".join(
+            f"{x.get('label','?')} {x.get('text','')}" for x in options) if options else "geen opties herkend")
+        references = row.get("context_verwijzingen", [])
+        reference_text = "Verwijzingen: " + (" · ".join(
+            f"{x.get('kind','')} {x.get('number') or ''}" for x in references) if references else "geen expliciete verwijzingen herkend")
+        self._workspace_detected_details.configure(text=option_text + "\n" + reference_text)
+        self._workspace_page = int(row.get("page", 1))
+        self._workspace_render_page()
+
+    def _workspace_render_page(self):
+        doc = self._workspace_doc()
+        if not doc:
+            return
+        source = self.project_dir / "bronnen" / doc["opslagbestand"]
+        if not source.is_file():
+            self.pdf_canvas.delete("all")
+            self._workspace_summary.configure(text="Het bronbestand ontbreekt; herstel de originele PDF voordat je verdergaat.")
+            return
+        try:
+            import pymupdf as fitz
+            pdf = fitz.open(source)
+            page_count = len(pdf)
+            if not page_count:
+                pdf.close()
+                raise ValueError("PDF bevat geen pagina's.")
+            self._workspace_page = max(1, min(self._workspace_page, page_count))
+            page_rect = pdf[self._workspace_page-1].rect
+            page_width, page_height = float(page_rect.width), float(page_rect.height)
+            pdf.close()
+            canvas_width = max(420, self.pdf_canvas.winfo_width()-30)
+            fit_scale = min(1.35, canvas_width / page_width)
+            scale = max(0.45, fit_scale * self._workspace_zoom)
+            output = Path(self._workspace_temp.name) / f"{doc['id']}-pagina-{self._workspace_page}-{scale:.3f}.png"
+            render_page(source, self._workspace_page, output, scale=scale)
+            photo = tk.PhotoImage(file=str(output))
+            self._workspace_photo = photo
+            self._workspace_scale = scale
+            self.pdf_canvas.delete("all")
+            self.pdf_canvas.create_image(0, 0, image=photo, anchor="nw", tags=("page",))
+            self.pdf_canvas.configure(scrollregion=(0, 0, photo.width(), photo.height()))
+            row = self._workspace_selected
+            if row and int(row.get("page", 0) or 0) == self._workspace_page and row.get("bbox"):
+                x0,y0,x1,y1 = [float(x)*scale for x in row["bbox"]]
+                self.pdf_canvas.create_rectangle(x0-5,y0-4,x1+5,y1+4,
+                    outline="#D71920", width=3, tags=("marker",))
+                self.pdf_canvas.create_text(x0+5,y0-13,text=f"Vraag {row.get('number')}",
+                    anchor="sw",fill="#D71920",font=("Segoe UI",11,"bold"),tags=("marker",))
+                self.pdf_canvas.yview_moveto(max(0, (y0-120) / max(1, photo.height())))
+            self._workspace_page_label.configure(text=f"Pagina {self._workspace_page} / {page_count}")
+            if self._workspace_mark_mode:
+                self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de PDF.")
+        except Exception as exc:
+            self._error("Originele PDF weergeven", exc)
+
+    def _workspace_change_page(self, delta):
+        self._workspace_page += int(delta)
+        self._workspace_render_page()
+
+    def _workspace_zoom_by(self, factor):
+        self._workspace_zoom = max(0.55, min(2.5, self._workspace_zoom * factor))
+        self._workspace_render_page()
+
+    def _workspace_reset_zoom(self):
+        self._workspace_zoom = 1.0
+        self._workspace_render_page()
+
+    def _workspace_start_manual_mark(self):
+        if not self._workspace_doc() or self._workspace_doc().get("type_voorstel") != "opgaven":
+            messagebox.showinfo("Selecteer opgaven-PDF", "Selecteer eerst het opgavenbestand waarin een vraag ontbreekt.")
+            return
+        self._workspace_mark_mode = True
+        self.pdf_canvas.configure(cursor="crosshair")
+        self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de originele PDF.")
+
+    def _workspace_canvas_click(self, event):
+        if not self._workspace_mark_mode:
+            return
+        doc = self._workspace_doc()
+        if not doc:
+            return
+        try:
+            import pymupdf as fitz
+            source = self.project_dir / "bronnen" / doc["opslagbestand"]
+            pdf = fitz.open(source)
+            page = pdf[self._workspace_page-1]
+            px = self.pdf_canvas.canvasx(event.x)
+            py = self.pdf_canvas.canvasy(event.y)
+            x, y = px / self._workspace_scale, py / self._workspace_scale
+            if x < 0 or y < 0 or x > page.rect.width or y > page.rect.height:
+                pdf.close()
+                return
+            pdf.close()
+            number = simpledialog.askinteger("Ontbrekende vraag", "Welk vraagnummer ontbreekt?", minvalue=1, maxvalue=60, parent=self.root)
+            if number is None:
+                self._workspace_mark_mode = False
+                return
+            prompt = simpledialog.askstring("Vraagtekst", "Voer de vraag of opdrachtformulering in (je kunt deze later verder aanvullen):", parent=self.root) or ""
+            stable_key = f"{doc['id']}|{self._workspace_page}|{int(number)}|{x:.1f}|{y:.1f}"
+            row = {
+                "id": hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16],
+                "number": int(number), "original_number": int(number), "page": int(self._workspace_page),
+                "bbox": [round(x,2), round(y,2), round(x+24,2), round(y+18,2)],
+                "line": f"{number}.", "next_line": prompt, "confidence": 1.0,
+                "status": "handmatig_toegevoegd", "human_decision": True,
+                "manual_added": True, "manual_position_confirmed": True,
+                "reason": "Handmatig op de originele PDF-pagina toegevoegd.",
+                "vraagtekst_voorstel": prompt, "vraagtype_status": "controle_nodig",
+                "review_note": "Handmatig toegevoegd; controleer de volledige vraaggrens en context."
+            }
+            row["document_id"] = doc["id"]
+            row["bestand"] = doc["bestand"]
+            row["vraagtype_controle"] = detect_question_type(prompt)
+            row["context_verwijzingen"] = detect_context_references(prompt)
+            self.data.setdefault("vraagkandidaten", []).append(row)
+            self._workspace_store_candidate_correction(row)
+            self._workspace_mark_mode = False
+            self.pdf_canvas.configure(cursor="crosshair")
+            self.save_project()
+            self._workspace_filter.set("Alle kandidaten")
+            self._workspace_refresh_candidates(len(self._workspace_rows))
+            self._log(f"Vraag {number} handmatig toegevoegd op PDF-pagina {self._workspace_page}, positie x={x:.1f}, y={y:.1f} pt.")
+        except Exception as exc:
+            self._workspace_mark_mode = False
+            self._error("Ontbrekende vraag handmatig markeren", exc)
+
+    def _workspace_save_candidate(self):
+        row = self._workspace_selected
+        if not row:
+            messagebox.showinfo("Geen vraag geselecteerd", "Selecteer eerst een vraagkandidaat.")
+            return
+        try:
+            number = int(self._workspace_number.get().strip())
+            if not 1 <= number <= 60:
+                raise ValueError
+        except ValueError:
+            messagebox.showerror("Ongeldig vraagnummer", "Gebruik een vraagnummer van 1 tot en met 60.")
+            return
+        row.setdefault("original_number", row.get("number"))
+        row["number"] = number
+        row["vraagtekst_voorstel"] = self._workspace_text.get("1.0", "end-1c").strip()
+        row["review_note"] = self._workspace_note.get("1.0", "end-1c").strip()
+        row["vraagtype_controle"] = detect_question_type(row["vraagtekst_voorstel"])
+        row["context_verwijzingen"] = detect_context_references(row["vraagtekst_voorstel"])
+        row["vraagtype_status"] = "controle_nodig"
+        self._workspace_store_candidate_correction(row)
+        self.save_project()
+        self._workspace_summary.configure(text=f"Vraag {number} opgeslagen. Tekst en notitie zijn bewaard in het project.")
+        self._workspace_refresh_candidates(self.candidate_tree.index(self.candidate_tree.selection()[0])
+            if self.candidate_tree.selection() else 0)
+        self._log(f"Vraag {number}: nummer, vraagtekst en notitie opgeslagen.")
+
+    def _workspace_decide(self, decision):
+        row = self._workspace_selected
+        if not row:
+            messagebox.showinfo("Geen vraag geselecteerd", "Selecteer eerst een vraagkandidaat.")
+            return
+        if decision is None:
+            row["human_decision"] = None
+            row["status"] = "twijfel_handmatige_nacontrole"
+            row["decision_reason"] = "Handmatig als twijfel gemarkeerd."
+        else:
+            row["human_decision"] = bool(decision)
+            row["status"] = "bevestigd_vraagstart" if decision else "afgewezen_geen_vraag"
+            row["decision_reason"] = "Handmatig beoordeeld in de geïntegreerde werkruimte."
+            learn_decision(self.knowledge_dir, {
+                "pattern_key": question_pattern_key(row),
+                "chosen": "question" if decision else "not_question",
+                "accepted": True, "scope": "voorstel_voor_toekomstige_herkenning",
+                "document_id": row.get("document_id"), "page": row.get("page"),
+                "candidate_line": row.get("line"), "reason": row["decision_reason"],
+                "human_decision": bool(decision)})
+        self._workspace_store_candidate_correction(row)
+        self.save_project()
+        self._log(f"Vraagstart {row.get('number')} op pagina {row.get('page')}: {row['status']}.")
+        next_index = next((i for i,r in enumerate(self._workspace_rows)
+                           if r is not row and r.get("human_decision") is None), None)
+        self._workspace_refresh_candidates(next_index if next_index is not None else 0)
+
+    def _workspace_create_record(self):
+        if not self._workspace_rows:
+            messagebox.showinfo("Geen kandidaten", "Analyseer eerst de opgaven-PDF en selecteer een vraagstart.")
+            return
+        if not self.candidate_tree.selection():
+            messagebox.showinfo("Selecteer een vraag", "Selecteer eerst een kandidaat.")
+            return
+        index = int(self.candidate_tree.selection()[0])
+        row = self._workspace_rows[index]
+        if row.get("human_decision") is not True:
+            messagebox.showwarning("Vraagstart eerst bevestigen",
+                "Bevestig eerst dat dit een echte vraagstart is. Handmatig toegevoegde vragen zijn al expliciet bevestigd.")
+            return
+        self.create_question_record(self._workspace_rows, self.candidate_tree, self.root)
+
+    def _workspace_store_candidate_correction(self, row):
+        """Persist the latest human decision in the project correction ledger."""
+        if not self.data or not row:
+            return
+        doc = next((d for d in self.data.get("documenten", [])
+                    if d.get("id") == row.get("document_id")), None)
+        if not doc:
+            return
+        decision = row.get("human_decision")
+        changed_number = row.get("number") != row.get("original_number", row.get("number"))
+        has_review = (decision is not None or row.get("status") == "twijfel_handmatige_nacontrole"
+            or row.get("manual_added") or row.get("review_note") or changed_number
+            or row.get("manual_position_confirmed"))
+        if not has_review:
+            return
+        position = {}
+        if row.get("bbox") and len(row["bbox"]) >= 2:
+            position = {"x": round(float(row["bbox"][0]), 2), "y": round(float(row["bbox"][1]), 2)}
+        correction_id = str(row.get("legacy_correction_id") or row.get("id") or hashlib.sha256(
+            f"{doc.get('id')}|{row.get('page')}|{row.get('original_number',row.get('number'))}|{position}".encode("utf-8")
+        ).hexdigest()[:16])
+        row["legacy_correction_id"] = correction_id
+        correction = {
+            "id": correction_id, "pagina": int(row.get("page", 0) or 0),
+            "vraagnummer": int(row.get("number", 0) or 0),
+            "oorspronkelijk_nummer": int(row.get("original_number", row.get("number", 0)) or 0),
+            "beslissing": "vraag" if decision is True else ("geen_vraag" if decision is False else "open"),
+            "notitie": row.get("review_note") or row.get("decision_reason") or "",
+            "positie_pdf_pt": position,
+            "handmatig_toegevoegd": bool(row.get("manual_added", False))
+        }
+        self.data["biologie_controle_correcties"] = self._workspace_merge_correction_entries(
+            self.data.get("biologie_controle_correcties", []),
+            [{"bestand": doc.get("bestand"), "correcties": [correction]}])
+
+    def _workspace_merge_correction_entries(self, existing_entries, incoming_entries):
+        """Deduplicate legacy corrections by document and stable correction ID."""
+        by_name = {}
+        for entry in existing_entries or []:
+            if isinstance(entry, dict) and entry.get("bestand"):
+                by_name[str(entry["bestand"])] = {
+                    **entry, "correcties": [dict(c) for c in entry.get("correcties", []) if isinstance(c, dict)]
+                }
+        for entry in incoming_entries or []:
+            if not isinstance(entry, dict) or not entry.get("bestand"):
+                continue
+            name = str(entry["bestand"])
+            target = by_name.setdefault(name, {"bestand": name, "correcties": []})
+            if entry.get("documenttype_handmatig"):
+                target["documenttype_handmatig"] = entry["documenttype_handmatig"]
+            indexed = {str(c.get("id")): c for c in target.get("correcties", []) if c.get("id")}
+            for raw in entry.get("correcties", []):
+                if not isinstance(raw, dict):
+                    continue
+                correction = dict(raw)
+                if not correction.get("id"):
+                    pos = correction.get("positie_pdf_pt") or {}
+                    seed = "|".join(str(correction.get(k, "")) for k in
+                        ("pagina", "oorspronkelijk_nummer", "vraagnummer", "beslissing"))
+                    correction["id"] = hashlib.sha256(
+                        f"{name}|{seed}|{pos.get('x','')}|{pos.get('y','')}".encode("utf-8")
+                    ).hexdigest()[:16]
+                key = str(correction["id"])
+                previous = indexed.get(key, {})
+                combined = {**previous, **correction}
+                if not correction.get("positie_pdf_pt") and previous.get("positie_pdf_pt"):
+                    combined["positie_pdf_pt"] = previous["positie_pdf_pt"]
+                if not correction.get("notitie") and previous.get("notitie"):
+                    combined["notitie"] = previous["notitie"]
+                indexed[key] = combined
+            target["correcties"] = list(indexed.values())
+        return list(by_name.values())
+
+    def _workspace_load_global_corrections(self):
+        """Apply the portable Biologie-controle correction library to whichever exam is opened."""
+        if not self.data:
+            return
+        path = self.knowledge_dir / "biologie-correcties.json"
+        if not path.is_file():
+            return
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            if payload.get("formaat") != "biologie-correcties-v1":
+                return
+            # Project-specific decisions take precedence over the older global import.
+            self.data["biologie_controle_correcties"] = self._workspace_merge_correction_entries(
+                payload.get("documenten", []), self.data.get("biologie_controle_correcties", []))
+            self._workspace_apply_saved_corrections()
+            self.save_project()
+        except Exception as exc:
+            self._error("Biologie-controlecorrecties laden", exc)
+
+    def _workspace_import_corrections(self):
+        """Import the compact biologie-correcties-v1 format without replacing newer decisions."""
+        if not self.data or not self.project_dir:
+            messagebox.showinfo("Eerst een examen openen", "Open eerst het examenproject waarin je de correcties wilt bewaren.")
+            return
+        filename = filedialog.askopenfilename(
+            title="Importeer correcties uit Biologie-controle",
+            filetypes=[("Biologie-controle correcties", "*.json"), ("JSON-bestanden", "*.json")])
+        if not filename:
+            return
+        try:
+            payload = json.loads(Path(filename).read_text(encoding="utf-8"))
+            if payload.get("formaat") != "biologie-correcties-v1":
+                raise ValueError("Dit bestand heeft niet het formaat biologie-correcties-v1.")
+            imported = payload.get("documenten")
+            if not isinstance(imported, list):
+                raise ValueError("Het correctiebestand bevat geen geldige documentenlijst.")
+            global_path = self.knowledge_dir / "biologie-correcties.json"
+            global_entries = []
+            if global_path.is_file():
+                global_payload = json.loads(global_path.read_text(encoding="utf-8"))
+                if global_payload.get("formaat") == "biologie-correcties-v1":
+                    global_entries = global_payload.get("documenten", [])
+            # Preserve the current project's earlier imported decisions, then
+            # let the newly selected correction file update the global library.
+            global_entries = self._workspace_merge_correction_entries(
+                global_entries, self.data.get("biologie_controle_correcties", []))
+            global_entries = self._workspace_merge_correction_entries(global_entries, imported)
+            global_path.parent.mkdir(parents=True, exist_ok=True)
+            global_path.write_text(json.dumps({
+                "formaat": "biologie-correcties-v1", "app_versie": APP_VERSION,
+                "aangemaakt": now(),
+                "aantal_correcties": sum(len(x.get("correcties", [])) for x in global_entries),
+                "documenten": global_entries,
+                "toelichting": "Draagbare correctiebibliotheek uit Biologie-controle; geen PDF-inhoud."
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.data["biologie_controle_correcties"] = global_entries
+            current_names = {d.get("bestand") for d in self.data.get("documenten", [])}
+            unmatched = [x.get("bestand") for x in global_entries if x.get("bestand") not in current_names]
+            applied = sum(len(x.get("correcties", [])) for x in global_entries
+                          if x.get("bestand") in current_names)
+            self._workspace_apply_saved_corrections()
+            self.save_project()
+            self.refresh()
+            self._log(f"Biologie-controlecorrecties geïmporteerd uit {Path(filename).name}; {applied} correcties beschikbaar in dit project en de centrale correctiebibliotheek.")
+            if unmatched:
+                self._log("Correcties voor nog niet gekoppelde documenten bewaard: " + ", ".join(unmatched))
+            messagebox.showinfo("Correcties geïmporteerd",
+                f"De correcties zijn samengevoegd en in de centrale correctiebibliotheek én dit project bewaard.\n"
+                f"Ze worden automatisch toegepast wanneer je de bijbehorende examenprojecten opent.\n\n"
+                f"Niet gekoppelde bestanden: {len(unmatched)}", parent=self.root)
+        except Exception as exc:
+            self._error("Correcties importeren", exc)
+            messagebox.showerror("Importeren mislukt", str(exc), parent=self.root)
+
+    def _workspace_apply_saved_corrections(self, target_rows=None):
+        """Apply imported Biologie-controle corrections to the current candidate set."""
+        if not self.data:
+            return
+        rows = target_rows if target_rows is not None else self.data.setdefault("vraagkandidaten", [])
+        for document_state in self.data.get("biologie_controle_correcties", []):
+            filename = document_state.get("bestand")
+            doc = next((d for d in self.data.get("documenten", []) if d.get("bestand") == filename), None)
+            if not doc:
+                continue
+            manual_role = document_state.get("documenttype_handmatig")
+            if manual_role in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                doc["type_voorstel"] = manual_role
+                doc["documenttype_handmatig"] = manual_role
+                doc["type_zekerheid"] = 1.0
+                doc["status"] = "handmatig_bevestigd"
+            current = [r for r in rows if r.get("document_id") == doc.get("id")]
+            for correction in document_state.get("correcties", []):
+                page_no = int(correction.get("pagina", 0) or 0)
+                original_number = int(correction.get("oorspronkelijk_nummer",
+                    correction.get("vraagnummer", 0)) or 0)
+                position = correction.get("positie_pdf_pt") or {}
+                x = position.get("x")
+                y = position.get("y")
+                candidate = next((r for r in current if str(r.get("id")) == str(correction.get("id"))), None)
+                if candidate is None:
+                    def close_match(r):
+                        if int(r.get("page", 0) or 0) != page_no:
+                            return False
+                        number_match = int(r.get("original_number", r.get("number", 0)) or 0) == original_number
+                        if x is not None and y is not None and r.get("bbox"):
+                            return number_match and abs(float(r["bbox"][0])-float(x)) <= 8 and abs(float(r["bbox"][1])-float(y)) <= 8
+                        return number_match
+                    candidate = next((r for r in current if close_match(r)), None)
+                if candidate is None and correction.get("handmatig_toegevoegd"):
+                    if x is None or y is None:
+                        continue
+                    candidate = {
+                        "id": str(correction.get("id")),
+                        "document_id": doc["id"], "bestand": doc["bestand"],
+                        "number": int(correction.get("vraagnummer", original_number) or original_number),
+                        "original_number": original_number, "page": page_no,
+                        "bbox": [float(x), float(y), float(x)+24, float(y)+18],
+                        "line": "", "next_line": "", "confidence": 1.0,
+                        "status": "handmatig_toegevoegd", "manual_added": True,
+                        "manual_position_confirmed": True, "vraagtekst_voorstel": "",
+                        "vraagtype_status": "controle_nodig", "review_note": "",
+                        "vraagtype_controle": {"type": "onbekend", "options": []},
+                        "context_verwijzingen": []
+                    }
+                    rows.append(candidate)
+                    current.append(candidate)
+                if candidate is None:
+                    continue
+                candidate["legacy_correction_id"] = str(correction.get("id"))
+                candidate.setdefault("original_number", original_number)
+                if correction.get("vraagnummer") is not None:
+                    candidate["number"] = int(correction["vraagnummer"])
+                if x is not None and y is not None:
+                    bbox = candidate.get("bbox") or [float(x), float(y), float(x)+24, float(y)+18]
+                    width = max(12.0, float(bbox[2])-float(bbox[0]))
+                    height = max(10.0, float(bbox[3])-float(bbox[1]))
+                    candidate["bbox"] = [float(x), float(y), float(x)+width, float(y)+height]
+                    candidate["manual_position_confirmed"] = True
+                candidate["manual_added"] = bool(correction.get("handmatig_toegevoegd", candidate.get("manual_added", False)))
+                candidate["review_note"] = correction.get("notitie", candidate.get("review_note", ""))
+                decision = correction.get("beslissing", "open")
+                if decision == "vraag":
+                    candidate["human_decision"] = True
+                    candidate["status"] = "bevestigd_vraagstart"
+                elif decision == "geen_vraag":
+                    candidate["human_decision"] = False
+                    candidate["status"] = "afgewezen_geen_vraag"
+                else:
+                    candidate["human_decision"] = None
+                    candidate["status"] = "twijfel_handmatige_nacontrole"
+
+    def _workspace_merge_review_state(self, doc, candidates, previous_candidates):
+        """Keep human decisions and manually added positions when analysis is rerun."""
+        for old in previous_candidates:
+            if old.get("document_id") != doc.get("id"):
+                continue
+            match = next((r for r in candidates if r.get("id") == old.get("id")), None)
+            if match is None:
+                old_bbox = old.get("bbox") or []
+                match = next((r for r in candidates
+                    if int(r.get("page", 0) or 0) == int(old.get("page", 0) or 0)
+                    and int(r.get("number", 0) or 0) == int(old.get("original_number", old.get("number", 0)) or 0)
+                    and len(old_bbox) >= 2 and r.get("bbox")
+                    and abs(float(r["bbox"][0])-float(old_bbox[0])) <= 8
+                    and abs(float(r["bbox"][1])-float(old_bbox[1])) <= 8), None)
+            if match is None and old.get("manual_added"):
+                candidates.append(dict(old))
+                continue
+            if match is None:
+                continue
+            for key in ("human_decision", "review_note", "manual_added",
+                        "manual_position_confirmed", "legacy_correction_id", "decision_reason"):
+                if key in old:
+                    match[key] = old[key]
+            if old.get("human_decision") is not None or old.get("status") == "twijfel_handmatige_nacontrole":
+                match["status"] = old.get("status", match.get("status"))
+            if old.get("number") != old.get("original_number", old.get("number")):
+                match["original_number"] = old.get("original_number", old.get("number"))
+                match["number"] = old.get("number")
+            if old.get("manual_position_confirmed") and old.get("bbox"):
+                match["bbox"] = list(old["bbox"])
+        self._workspace_apply_saved_corrections(candidates)
+        return candidates
+
+    def _workspace_export_corrections(self):
+        if not self.data or not self.project_dir:
+            messagebox.showinfo("Eerst een examen openen", "Open eerst een examenproject.")
+            return
+        output = filedialog.asksaveasfilename(
+            title="Exporteer Biologie-controlecorrecties",
+            defaultextension=".json", initialfile="biologie-correcties.json",
+            filetypes=[("JSON-bestanden", "*.json")])
+        if not output:
+            return
+        global_path = self.knowledge_dir / "biologie-correcties.json"
+        global_entries = []
+        if global_path.is_file():
+            try:
+                global_payload = json.loads(global_path.read_text(encoding="utf-8"))
+                if global_payload.get("formaat") == "biologie-correcties-v1":
+                    global_entries = global_payload.get("documenten", [])
+            except Exception:
+                global_entries = []
+        by_name = self._workspace_merge_correction_entries(
+            global_entries, self.data.get("biologie_controle_correcties", []))
+        for doc in self.data.get("documenten", []):
+            group = by_name.setdefault(doc.get("bestand"), {
+                "bestand": doc.get("bestand"), "correcties": []})
+            if doc.get("documenttype_handmatig"):
+                group["documenttype_handmatig"] = doc["documenttype_handmatig"]
+            existing = {str(c.get("id")): c for c in group.get("correcties", [])
+                        if isinstance(c, dict) and c.get("id")}
+            for row in self.data.get("vraagkandidaten", []):
+                if row.get("document_id") != doc.get("id"):
+                    continue
+                decision = row.get("human_decision")
+                changed_number = row.get("number") != row.get("original_number", row.get("number"))
+                has_review = (decision is not None or row.get("status") == "twijfel_handmatige_nacontrole"
+                    or row.get("manual_added") or row.get("review_note") or changed_number
+                    or row.get("manual_position_confirmed"))
+                if not has_review:
+                    continue
+                pos = {}
+                if row.get("bbox") and len(row["bbox"]) >= 2:
+                    pos = {"x": round(float(row["bbox"][0]), 2), "y": round(float(row["bbox"][1]), 2)}
+                correction_id = str(row.get("legacy_correction_id") or row.get("id") or hashlib.sha256(
+                    f"{doc.get('id')}|{row.get('page')}|{row.get('original_number',row.get('number'))}|{pos}".encode("utf-8")
+                ).hexdigest()[:16])
+                decision_text = "vraag" if decision is True else ("geen_vraag" if decision is False else "open")
+                correction = {
+                    "id": correction_id, "pagina": int(row.get("page", 0) or 0),
+                    "vraagnummer": int(row.get("number", 0) or 0),
+                    "oorspronkelijk_nummer": int(row.get("original_number", row.get("number", 0)) or 0),
+                    "beslissing": decision_text,
+                    "notitie": row.get("review_note") or row.get("decision_reason") or "",
+                    "positie_pdf_pt": pos,
+                    "handmatig_toegevoegd": bool(row.get("manual_added", False))
+                }
+                existing[correction_id] = {**existing.get(correction_id, {}), **correction}
+            group["correcties"] = list(existing.values())
+        payload = {
+            "formaat": "biologie-correcties-v1", "app_versie": APP_VERSION,
+            "aangemaakt": now(),
+            "aantal_correcties": sum(len(x.get("correcties", [])) for x in by_name.values()),
+            "documenten": list(by_name.values()),
+            "toelichting": "Alleen handmatige beoordelingen en correcties; geen PDF-inhoud of afbeeldingen."
+        }
+        try:
+            exported_text = json.dumps(payload, ensure_ascii=False, indent=2)
+            Path(output).write_text(exported_text, encoding="utf-8")
+            self.data["biologie_controle_correcties"] = list(by_name.values())
+            self.save_project()
+            global_path.parent.mkdir(parents=True, exist_ok=True)
+            global_path.write_text(exported_text, encoding="utf-8")
+            self._log(f"Biologie-controlecorrecties geëxporteerd: {output}; centrale correctiebibliotheek bijgewerkt.")
+            messagebox.showinfo("Correcties geëxporteerd", "De correcties zijn veilig als compact JSON-bestand opgeslagen.", parent=self.root)
+        except Exception as exc:
+            self._error("Correcties exporteren", exc)
+            messagebox.showerror("Exporteren mislukt", str(exc), parent=self.root)
 
     def _scrollable_tab(self, parent):
         """Return a vertically scrollable content frame for a notebook tab."""
@@ -454,6 +1043,7 @@ class ExamApp:
             self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
                          "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
                          "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
+            self._workspace_load_global_corrections()
             self.save_project()
             self.refresh()
             self._log(f"Nieuw project automatisch aangemaakt: {self.project_dir}")
@@ -475,6 +1065,7 @@ class ExamApp:
                 raise ValueError("Dit is geen herkenbaar examenprojectbestand.")
             self.project_dir = Path(filename).parent
             self.data = data
+            self._workspace_load_global_corrections()
             self.refresh()
             self._log(f"Project geopend: {self.project_dir}")
         except Exception as exc:
@@ -530,21 +1121,58 @@ class ExamApp:
         fit_window(win, 1180, 720, 900, 560)
         win.transient(self.root)
         win.grab_set()
-        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Controleer niveau, jaar, tijdvak en documenttype. Er wordt nog niets verwerkt of verplaatst.",
-                  padding=12, wraplength=1060).pack(anchor="w")
-        columns = ("file", "role", "certainty", "meta_confidence", "level", "year", "period", "pages", "state")
-        tree = ttk.Treeview(win, columns=columns, show="headings", selectmode="browse")
-        headings = [
-            ("file", "Bestand", 280), ("role", "Documenttype", 145), ("certainty", "Typezekerheid", 85),
-            ("meta_confidence", "Metazekerheid", 85), ("level", "Niveau", 70), ("year", "Jaar", 60), ("period", "Tijdvak", 65),
-            ("pages", "Pagina's", 65), ("state", "Controle", 170)]
-        for col, title, width in headings:
+        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Selecteer links een document; controleer het voorblad in het midden en pas de voorgestelde gegevens rechts direct aan.",
+                  padding=12, wraplength=1100).pack(anchor="w")
+        panes = ttk.Panedwindow(win, orient="horizontal")
+        panes.pack(fill="both", expand=True, padx=12, pady=8)
+        list_panel = ttk.LabelFrame(panes, text="GESELECTEERDE PDF'S", padding=7)
+        cover_panel = ttk.LabelFrame(panes, text="VOORBLAD ORIGINELE PDF", padding=7)
+        fields_panel = ttk.LabelFrame(panes, text="VOORGESTELDE METADATA", padding=12)
+        panes.add(list_panel, weight=4)
+        panes.add(cover_panel, weight=6)
+        panes.add(fields_panel, weight=4)
+        columns = ("file", "role", "level", "year", "period", "state")
+        tree = ttk.Treeview(list_panel, columns=columns, show="headings", selectmode="browse")
+        for col, title, width in [
+            ("file", "Bestand", 190), ("role", "Type", 105), ("level", "Niveau", 55),
+            ("year", "Jaar", 48), ("period", "Tv", 32), ("state", "Controle", 115)]:
             tree.heading(col, text=title)
             tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
-        tree.pack(fill="both", expand=True, padx=12, pady=8)
-        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1060)
+        tree.pack(fill="both", expand=True)
+        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1100)
         status.pack(anchor="w")
-
+        preview_temp = tempfile.TemporaryDirectory(prefix="biologie-import-voorbladen-")
+        win._preview_temp = preview_temp
+        preview_label = ttk.Label(cover_panel, text="Selecteer links een PDF om het voorblad te bekijken.",
+                                  anchor="center", justify="center")
+        preview_label.pack(fill="both", expand=True)
+        preview_info = ttk.Label(cover_panel, text="", wraplength=440)
+        preview_info.pack(fill="x", pady=(5, 0))
+        role = tk.StringVar()
+        level = tk.StringVar()
+        year = tk.StringVar()
+        period = tk.StringVar()
+        confidence_label = ttk.Label(fields_panel, text="", wraplength=360, justify="left")
+        confidence_label.pack(anchor="w", pady=(0, 10))
+        fields = [
+            ("Documenttype", role, ttk.Combobox(fields_panel, textvariable=role,
+                values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"],
+                state="readonly", width=25)),
+            ("Niveau", level, ttk.Combobox(fields_panel, textvariable=level,
+                values=["Havo", "Vwo"], state="readonly", width=25)),
+            ("Jaar", year, ttk.Entry(fields_panel, textvariable=year, width=28)),
+            ("Tijdvak", period, ttk.Combobox(fields_panel, textvariable=period,
+                values=["1", "2", "3"], state="readonly", width=25)),
+        ]
+        for label, var, widget in fields:
+            ttk.Label(fields_panel, text=label).pack(anchor="w", pady=(7, 2))
+            widget.pack(anchor="w", fill="x")
+        ttk.Label(fields_panel,
+            text="Controleer de gegevens aan de hand van het voorblad. Lege of onzekere waarden moet je zelf aanvullen. Documenten worden alleen samen gegroepeerd als niveau, jaar en tijdvak exact overeenkomen.",
+            wraplength=360, justify="left").pack(anchor="w", pady=(14, 8))
+        selected_doc = {"index": None}
+        cover_photo = {"image": None}
+        
         def identity_text(doc):
             meta = doc.get("exam_metadata") or {}
             return meta.get("level", ""), meta.get("year", ""), meta.get("period", "")
@@ -562,9 +1190,9 @@ class ExamApp:
                     state = "Metadata ontbreekt"
                 tree.insert("", "end", iid=str(index), values=(
                     doc["bestand"], doc.get("type_voorstel", "onbekend"),
-                    f"{doc.get('type_zekerheid', 0):.0%}",
-                    f"{meta.get('confidence', 0):.0%}" if meta else "—", *identity_text(doc),
-                    doc.get("pagina_aantal", 0), state))
+                    meta.get("level", "—") if meta else "—",
+                    meta.get("year", "—") if meta else "—",
+                    meta.get("period", "—") if meta else "—", state))
             summary = []
             for key, items in groups.items():
                 summary.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's")
@@ -572,105 +1200,73 @@ class ExamApp:
                 summary.append(f"{len(unassigned)} PDF('s) zonder complete examenidentiteit")
             status.configure(text="Automatische groepen: " + ("; ".join(summary) if summary else "nog geen complete groepen"))
 
-        def edit_selected():
+        def load_selected(_event=None):
             selection = tree.selection()
             if not selection:
-                messagebox.showinfo("Selecteer een PDF", "Selecteer eerst een PDF om de herkenning te controleren.", parent=win)
+                selected_doc["index"] = None
                 return
-            doc = documents[int(selection[0])]
+            index = int(selection[0])
+            doc = documents[index]
+            selected_doc["index"] = index
             meta = doc.get("exam_metadata") or {}
-            edit = tk.Toplevel(win)
-            edit.title("Voorblad en automatisch herkende metadata controleren")
-            fit_window(edit, 1080, 760, 820, 560)
-            edit.transient(win)
-            edit.grab_set()
-
-            # The original first page is shown beside the values inferred from
-            # the filename/PDF. Empty values stay empty; never invent defaults.
-            body = ttk.Frame(edit, padding=14)
-            body.pack(fill="both", expand=True)
-            preview_panel = ttk.LabelFrame(body, text="Voorblad van de originele PDF", padding=10)
-            preview_panel.pack(side="left", fill="both", expand=True, padx=(0, 12))
-            fields_panel = ttk.LabelFrame(body, text="Automatisch ingevulde gegevens", padding=14)
-            fields_panel.pack(side="right", fill="y")
-            ttk.Label(fields_panel, text=doc["bestand"], wraplength=390,
-                      font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 10))
-
-            preview_temp = tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
-            preview_path = Path(preview_temp.name) / "voorblad.png"
-            preview_label = ttk.Label(preview_panel, text="Voorblad wordt geladen…", anchor="center")
-            preview_label.pack(fill="both", expand=True)
-            try:
-                render_page(Path(doc["source_path"]), 1, preview_path, scale=0.72)
-                cover_photo = tk.PhotoImage(file=str(preview_path))
-                preview_label.configure(image=cover_photo, text="")
-                preview_label.image = cover_photo
-            except Exception as exc:
-                preview_label.configure(
-                    text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
-                    wraplength=470, justify="center")
-            edit._preview_temp = preview_temp
-
-            role = tk.StringVar(value=doc.get("type_voorstel", "onbekend"))
-            level = tk.StringVar(value=meta.get("level", ""))
-            year = tk.StringVar(value=str(meta.get("year", "")))
-            period = tk.StringVar(value=str(meta.get("period", "")))
-
+            role.set(doc.get("type_voorstel", "onbekend"))
+            level.set(meta.get("level", ""))
+            year.set(str(meta.get("year", "")))
+            period.set(str(meta.get("period", "")))
             confidence = meta.get("confidence")
             source_label = {
-                "bestandsnaam": "Herkenning uit bestandsnaam",
-                "eerste_pdf_paginas": "Herkenning uit tekst op de eerste PDF-pagina's",
-                "handmatig_bevestigd": "Eerder handmatig bevestigd",
-            }.get(meta.get("source"), "Herkenningsbron onbekend")
-            ttk.Label(fields_panel, text=f"Metadata: {float(confidence or 0):.0%} zekerheid · {source_label}",
-                      wraplength=390).pack(anchor="w", pady=(0, 12))
-            fields = [
-                ("Documenttype", role, ttk.Combobox(fields_panel, textvariable=role,
-                    values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"],
-                    state="readonly", width=32)),
-                ("Niveau", level, ttk.Combobox(fields_panel, textvariable=level,
-                    values=["Havo", "Vwo"], state="readonly", width=32)),
-                ("Jaar", year, ttk.Entry(fields_panel, textvariable=year, width=35)),
-                ("Tijdvak", period, ttk.Combobox(fields_panel, textvariable=period,
-                    values=["1", "2", "3"], state="readonly", width=32)),
-            ]
-            for label, var, widget in fields:
-                ttk.Label(fields_panel, text=label).pack(anchor="w", pady=(7, 2))
-                widget.pack(anchor="w", fill="x")
-            ttk.Label(fields_panel,
-                text="Vergelijk de ingevulde gegevens met het zichtbare voorblad. Lege velden zijn niet automatisch afgeleid. Koppel documenten alleen als niveau, jaar en tijdvak exact overeenkomen.",
-                wraplength=390, justify="left").pack(anchor="w", pady=(16, 8))
+                "bestandsnaam": "bestandsnaam",
+                "eerste_pdf_paginas": "tekst op de eerste PDF-pagina's",
+                "handmatig_bevestigd": "eerder handmatig bevestigd",
+            }.get(meta.get("source"), "onbekende bron")
+            confidence_label.configure(text=(
+                f"Herkenningszekerheid metadata: {float(confidence or 0):.0%} · bron: {source_label}\n"
+                f"Documenttypezekerheid: {float(doc.get('type_zekerheid', 0) or 0):.0%}"
+            ))
+            preview_info.configure(text=f"{doc['bestand']} · {doc.get('pagina_aantal', 0)} pagina's")
+            preview_label.configure(image="", text="Voorblad wordt geladen…")
+            cover_photo["image"] = None
+            try:
+                preview_path = Path(preview_temp.name) / f"voorblad-{index}.png"
+                render_page(Path(doc["source_path"]), 1, preview_path, scale=0.82)
+                photo = tk.PhotoImage(file=str(preview_path))
+                cover_photo["image"] = photo
+                preview_label.configure(image=photo, text="")
+            except Exception as exc:
+                preview_label.configure(image="", text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
+                                        wraplength=440)
 
-            def save_edit():
-                if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
-                    messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=edit)
-                    return
-                if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
-                    messagebox.showerror("Examenidentiteit onvolledig", "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=edit)
-                    return
-                doc["type_voorstel"] = role.get()
-                doc["type_zekerheid"] = 1.0
-                doc["exam_metadata"] = {"level": level.get(), "year": year.get().strip(), "period": period.get(),
-                                        "confidence": 1.0, "source": "handmatig_bevestigd"}
-                doc["status"] = "handmatig_bevestigd"
-                refresh_review()
-                edit.destroy()
+        def save_selected():
+            index = selected_doc["index"]
+            if index is None:
+                messagebox.showinfo("Selecteer een PDF", "Selecteer eerst links een PDF.", parent=win)
+                return
+            doc = documents[index]
+            if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=win)
+                return
+            if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
+                messagebox.showerror("Examenidentiteit onvolledig",
+                    "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=win)
+                return
+            doc["type_voorstel"] = role.get()
+            doc["type_zekerheid"] = 1.0
+            doc["exam_metadata"] = {"level": level.get(), "year": year.get().strip(), "period": period.get(),
+                                    "confidence": 1.0, "source": "handmatig_bevestigd"}
+            doc["status"] = "handmatig_bevestigd"
+            refresh_review()
+            tree.selection_set(str(index))
+            tree.focus(str(index))
+            status.configure(text="Wijzigingen opgeslagen voor de geselecteerde PDF. Controleer zo nodig de overige documenten.")
 
-            buttons = ttk.Frame(fields_panel)
-            buttons.pack(fill="x", side="bottom", pady=(16, 0))
-            ttk.Button(buttons, text="Opslaan", command=save_edit, style="Accent.TButton").pack(side="right")
-            ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
+        tree.bind("<<TreeviewSelect>>", load_selected)
+        ttk.Button(fields_panel, text="Wijzigingen toepassen op deze PDF",
+                   command=save_selected, style="Accent.TButton").pack(fill="x", pady=(12, 4))
 
         def confirm_import():
-            # This final button is the single human approval for the reviewed batch.
-            # Valid proposals are explicitly accepted here; incomplete/invalid
-            # identity or document roles still block the import.
-            for doc in documents:
-                if doc.get("type_voorstel") in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
-                    doc["type_zekerheid"] = 1.0
-                meta = doc.get("exam_metadata") or {}
-                if meta.get("level") in {"Havo", "Vwo"} and re.fullmatch(r"20\d{2}", str(meta.get("year", "")).strip()) and str(meta.get("period", "")) in {"1", "2", "3"}:
-                    doc["exam_metadata"] = {**meta, "confidence": 1.0, "source": "handmatig_bevestigd"}
+            # One final approval for the batch. Do not turn uncertain automated
+            # proposals into human-confirmed data: low-confidence or incomplete
+            # rows must be corrected explicitly in the review table first.
             errors = validate_batch_documents(documents)
             if errors:
                 messagebox.showerror("Eerst herkenning corrigeren",
@@ -751,22 +1347,29 @@ class ExamApp:
                     f"Er is een fout opgetreden. Alleen nieuwe mappen uit deze import zijn opgeruimd; bestaande examens zijn niet gewijzigd.\\n\\n{exc}", parent=win)
                 return
             win.destroy()
-            self.project_dir = None
-            self.data = None
-            self.project_label.configure(text=f"Examens opgeslagen onder: {target_root}")
-            for item in self.table.get_children():
-                self.table.delete(item)
-            self.status.configure(text=f"{len(created)} examenprojecten aangemaakt. Open een project om de inhoudelijke verwerking te starten.")
+            # Open the first exam immediately so the user can start the full
+            # review workflow without having to locate project.json manually.
+            # All other imported exam projects remain available under the same root.
+            self.project_dir = created[0]
+            self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
+            self._workspace_load_global_corrections()
+            self.refresh()
             self._log(f"Examens geïmporteerd onder: {target_root}")
             for project in created:
                 self._log(f"  Project aangemaakt: {project.name}")
+            self._log(f"Eerste examen automatisch geopend: {self.project_dir.name}")
             messagebox.showinfo("Examens geïmporteerd",
-                f"{len(created)} examenprojecten zijn automatisch aangemaakt onder:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
+                f"{len(created)} examenprojecten zijn aangemaakt onder:\n{target_root}\n\n"
+                f"Het eerste examen ({self.project_dir.name}) is direct geopend. Je kunt nu de vraagstarts controleren; "
+                "de overige examens open je via Project openen. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
-        ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
         ttk.Button(win, text="Voorstellen akkoord — importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
         ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
         refresh_review()
+        if documents:
+            tree.selection_set("0")
+            tree.focus("0")
+            load_selected()
         self._log(f"Bulkimport voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt. Doelmap: {self.examens_root}")
 
     def add_pdfs(self):
@@ -811,6 +1414,7 @@ class ExamApp:
                 added += 1
             except Exception as exc:
                 self._error(f"PDF toevoegen ({source.name})",exc)
+        self._workspace_load_global_corrections()
         self.save_project()
         self.refresh()
         self.status.configure(text=f"{added} PDF('s) toegevoegd. Controleer de voorgestelde documenttypen.")
@@ -907,6 +1511,7 @@ class ExamApp:
         cv_docs = [d for d in self.data["documenten"] if d.get("type_voorstel") == "correctievoorschrift"]
         total = 0
         comparisons = {}
+        previous_candidates = list(self.data.get("vraagkandidaten", []))
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
             structures = self.data.setdefault("exam_structures", {})
@@ -945,6 +1550,11 @@ class ExamApp:
                         still_suppressed.append(item)
                 suppressed=still_suppressed
                 ordered=sorted(candidates,key=lambda x:(int(x["page"]),float(x.get("bbox",[0,0])[1])))
+                for item in ordered:
+                    item.setdefault("original_number", int(item.get("number", 0) or 0))
+                    bbox = item.get("bbox") or [0, 0]
+                    stable_key = f"{doc['id']}|{item['page']}|{item['original_number']}|{float(bbox[0]):.1f}|{float(bbox[1]):.1f}"
+                    item["id"] = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
                 for index,item in enumerate(ordered):
                     following=ordered[index+1] if index+1<len(ordered) else None
                     proposal_text=extract_candidate_text(analysis,item,following)
@@ -961,7 +1571,7 @@ class ExamApp:
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
                         "vraagtekst_voorstel":proposal_text,"vraagtype_controle":detect_question_type(proposal_text),
                         "vraagtype_status":"controle_nodig","context_verwijzingen":detect_context_references(proposal_text)})
-                candidates=ordered
+                candidates=self._workspace_merge_review_state(doc, ordered, previous_candidates)
                 self.data.setdefault("vraagkandidaten",[])
                 self.data.setdefault("onderdrukte_vraagkandidaten",[])
                 self.data["vraagkandidaten"]=[x for x in self.data["vraagkandidaten"] if x.get("document_id")!=doc["id"]]+candidates
@@ -2810,6 +3420,7 @@ class ExamApp:
                 doc["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),
                                       "confidence":1.0,"source":"handmatig_bevestigd"}
             doc["type_voorstel"] = new
+            doc["documenttype_handmatig"] = new
             doc["type_zekerheid"] = 1.0
             doc["status"] = "handmatig_bevestigd"
             self.data["beslissingen"].append({"document_id": doc["id"], "van": old, "naar": new, "tijd": now(), "reden": "handmatige bevestiging documenttype en examenidentiteit"})
@@ -2839,33 +3450,34 @@ class ExamApp:
         self.project_label.configure(text=f"Project: {self.data['naam']}  ·  {self.project_dir}")
 
     def refresh(self):
-        for item in self.table.get_children():
-            self.table.delete(item)
+        """Refresh document inventory, review queue and project progress."""
         documents = self.data.get("documenten", []) if self.data else []
-        records = self.data.get("vraagrecords", []) if self.data else []
         candidates = self.data.get("vraagkandidaten", []) if self.data else []
-        todo = sum(d.get("status") == "controle_nodig" for d in documents)
-        for idx, doc in enumerate(documents):
-            self.table.insert("", "end", iid=str(idx), values=(
-                doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
-                doc.get("pagina_aantal", "—"),
-                f"{doc.get('type_zekerheid', 0):.0%}",
-                str(doc.get("status", "onbekend")).replace("_", " ")
-            ), tags=("even" if idx % 2 == 0 else "odd",))
-        if self.data:
-            self.project_label.configure(text=self.data.get("naam") or
-                (self.project_dir.name if self.project_dir else "Actief project"))
-        else:
-            self.project_label.configure(text="Nog geen project geopend")
-        self.metric_documents.configure(text=str(len(documents)))
-        self.metric_questions.configure(text=str(len(candidates)))
-        self.metric_todo.configure(text=str(todo))
-        self.metric_records.configure(text=str(len(records)))
-        self.status.configure(text=(
-            f"{len(documents)} bronbestanden · {len(candidates)} vraagstartkandidaten · "
-            f"{todo} documentherkenningen vragen controle · niets wordt automatisch gepubliceerd."
-            if self.data else "Importeer examens of open een bestaand project om te beginnen."
-        ))
+        records = self.data.get("vraagrecords", []) if self.data else []
+        if hasattr(self, "project_label"):
+            self.project_label.configure(text=(
+                self.data.get("naam") or (self.project_dir.name if self.project_dir else "Actief project")
+                if self.data else "Nog geen examen geopend"))
+        if hasattr(self, "table"):
+            for item in self.table.get_children():
+                self.table.delete(item)
+            for index, doc in enumerate(documents):
+                self.table.insert("", "end", iid=str(index), values=(
+                    doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
+                    doc.get("pagina_aantal", "—"), str(doc.get("status", "onbekend")).replace("_", " ")))
+        if hasattr(self, "status"):
+            undecided = sum(row.get("human_decision") is None for row in candidates)
+            confirmed = sum(row.get("human_decision") is True for row in candidates)
+            rejected = sum(row.get("human_decision") is False for row in candidates)
+            unapproved_records = sum(not row.get("approved_by_human", False) for row in records)
+            self.status.configure(text=(
+                f"{len(documents)} documenten · {len(candidates)} vraagstarts "
+                f"({confirmed} bevestigd, {rejected} afgewezen, {undecided} open) · "
+                f"{len(records)} vraagrecords ({unapproved_records} nog niet goedgekeurd) · "
+                "originele PDF's blijven leidend; niets wordt automatisch gepubliceerd."
+                if self.data else "Importeer examens of open een bestaand project om te beginnen."))
+        if hasattr(self, "candidate_tree") and hasattr(self, "_workspace_temp"):
+            self._workspace_refresh()
 
 def main():
     root = tk.Tk()

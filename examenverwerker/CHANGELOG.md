@@ -1,3 +1,22 @@
+# Wijzigingen
+
+## 0.13.1
+- Importcontrole opnieuw ingericht als één werkruimte met PDF-lijst links, voorblad in het midden en bewerkbare metadata rechts.
+- Bij selectie van een PDF wordt het voorblad direct getoond en worden de voorgestelde documentrol, niveau, jaar en tijdvak geladen.
+- Metadata kunnen direct in het rechterpaneel worden aangepast en per PDF worden toegepast; de aparte pop-up voor herkenningscorrectie is vervallen.
+- Batchvalidatie en één finale importbevestiging blijven behouden.
+
+## 0.13.0
+- Hoofdinterface herbouwd als geïntegreerde examenwerkplek: documentlijst en vraagkandidaten links, originele PDF groot in beeld en beoordelingsvelden direct naast de bron.
+- PDF-navigatie en zoom met rode markering van de exacte kandidaatpositie.
+- Kandidaten direct beoordelen als vraag, geen vraag of twijfel; vraagnummer, vraagtekst en notities zijn meteen aanpasbaar en worden in het project bewaard.
+- Filters voor nog te beoordelen kandidaten, sterke/zwakke signalen en dubbele nummers.
+- Ontbrekende vraagstarts kunnen op de exacte positie in de originele PDF worden toegevoegd; de PDF-coördinaten worden bewaard.
+- Correcties uit Biologie-controle v1.0.x kunnen worden geïmporteerd en als compact `biologie-correcties-v1` JSON-bestand worden geëxporteerd; de centrale correctiebibliotheek wordt automatisch op alle examenprojecten toegepast.
+- Handmatige besluiten, vraagnummercorrecties, notities en posities blijven behouden bij heranalyse; handmatig toegevoegde vragen worden niet stilzwijgend verwijderd.
+- Na bulkimport opent het eerste aangemaakte examen automatisch in de werkruimte.
+- Onzekere documentrollen en metadata worden niet automatisch als menselijk bevestigd opgeslagen; correctie blijft verplicht vóór import.
+
 ## 0.12.0
 - Volledig nieuw dashboard in plaats van de eerdere bestandsbeheerindeling: burgundy welkomstbanner, herkenbare kleuraccenten en ruime kaarten, geïnspireerd op de oorspronkelijke website.
 - Overzicht, documentbibliotheek en verwerkroute zijn gescheiden in eigen tabbladen.
