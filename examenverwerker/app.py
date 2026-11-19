@@ -732,9 +732,9 @@ class ExamApp:
             photo=None
             image_width=image_height=1
             selection_start=None
-            selection_rect=None
+            selection_lines=None
             def show_crop_page():
-                nonlocal photo,image_width,image_height,selection_start,selection_rect
+                nonlocal photo,image_width,image_height,selection_start,selection_lines
                 number=max(1,min(page_count,int(page_var.get())))
                 page_var.set(number)
                 target=self.project_dir/"analyse"/f"manual-context-{source_doc['id']}-p{number}.png"
@@ -746,30 +746,34 @@ class ExamApp:
                 canvas.image=photo
                 canvas.configure(scrollregion=(0,0,image_width,image_height))
                 selection_start=None
-                selection_rect=None
+                selection_lines=None
                 crop_status.configure(text=f"Originele pagina {number}. Sleep verticaal over de figuur of tabel; de strook loopt over de volledige paginabreedte.")
             def change_crop_page(delta):
                 page_var.set(max(1,min(page_count,int(page_var.get())+delta)))
                 show_crop_page()
             def start_crop(event):
-                nonlocal selection_start,selection_rect
-                x=max(0,min(image_width,canvas.canvasx(event.x)))
+                nonlocal selection_start,selection_lines
                 y=max(0,min(image_height,canvas.canvasy(event.y)))
-                selection_start=(x,y)
-                if selection_rect: canvas.delete(selection_rect)
-                selection_rect=canvas.create_rectangle(0,y,image_width,y,outline="black",width=1)
+                selection_start=y
+                if selection_lines:
+                    for line_id in selection_lines: canvas.delete(line_id)
+                selection_lines=[
+                    canvas.create_line(0,y,image_width,y,fill="black",width=2),
+                    canvas.create_line(0,y,image_width,y,fill="black",width=2)
+                ]
             def drag_crop(event):
-                if selection_start is None or selection_rect is None: return
+                if selection_start is None or selection_lines is None: return
                 y=max(0,min(image_height,canvas.canvasy(event.y)))
-                canvas.coords(selection_rect,0,selection_start[1],image_width,y)
+                canvas.coords(selection_lines[1],0,y,image_width,y)
             def save_manual_crop():
-                if selection_start is None or selection_rect is None:
+                if selection_start is None or selection_lines is None:
                     messagebox.showinfo("Geen uitsnede","Sleep eerst verticaal om de boven- en ondergrens van de paginabrede strook te bepalen.",parent=crop_win)
                     return
                 try:
-                    coords=canvas.coords(selection_rect)
+                    end_y=canvas.coords(selection_lines[1])[1]
+                    top_y,bottom_y=sorted((float(selection_start),float(end_y)))
                     page_no=int(page_var.get())
-                    bbox=pixel_rect_to_pdf_bbox([0,coords[1],image_width,coords[3]],(image_width,image_height),page_sizes[page_no])
+                    bbox=pixel_rect_to_pdf_bbox([0,top_y,image_width,bottom_y],(image_width,image_height),page_sizes[page_no])
                     stamp=datetime.now().strftime("%Y%m%d%H%M%S%f")
                     asset_id=f"manual-p{page_no}-{stamp}"
                     name=f"context-manual-{source_doc['id']}-q{row['number']}-{asset_id}.png"
@@ -806,9 +810,10 @@ class ExamApp:
                     context_caption_var.set("")
                     self.save_project()
                     crop_status.configure(text=f"Uitsnede toegevoegd: pagina {page_no}. Bevestig het bijschrift in het hoofdvenster.")
-                    if selection_rect: canvas.delete(selection_rect)
+                    if selection_lines:
+                        for line_id in selection_lines: canvas.delete(line_id)
                     selection_start=None
-                    selection_rect=None
+                    selection_lines=None
                 except Exception as exc:
                     messagebox.showerror("Uitsnede niet opgeslagen",str(exc),parent=crop_win)
             canvas.bind("<Button-1>",start_crop)
