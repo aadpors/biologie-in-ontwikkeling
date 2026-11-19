@@ -1,10 +1,13 @@
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from batch_import import (
     batch_document_warnings,
     exam_identity_key,
     group_exam_documents,
     validate_batch_documents,
+    resolve_examens_root,
 )
 
 
@@ -21,6 +24,28 @@ def document(name, level="Vwo", year="2026", period="1", role="opgaven", confide
 
 
 class BatchImportTests(unittest.TestCase):
+    def test_default_examens_root_prefers_existing_sibling_folder(self):
+        with TemporaryDirectory() as temp:
+            base = Path(temp) / "portable-app"
+            base.mkdir()
+            expected = Path(temp) / "examens"
+            expected.mkdir()
+            self.assertEqual(resolve_examens_root(base), expected)
+
+    def test_default_examens_root_uses_existing_local_folder_as_fallback(self):
+        with TemporaryDirectory() as temp:
+            base = Path(temp) / "portable-app"
+            base.mkdir()
+            expected = base / "examens"
+            expected.mkdir()
+            self.assertEqual(resolve_examens_root(base), expected)
+
+    def test_default_examens_root_does_not_require_precreation(self):
+        with TemporaryDirectory() as temp:
+            base = Path(temp) / "portable-app"
+            base.mkdir()
+            self.assertEqual(resolve_examens_root(base), Path(temp) / "examens")
+
     def test_groups_only_exact_level_year_period(self):
         docs = [
             document("vwo-o.pdf"),
