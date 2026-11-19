@@ -610,7 +610,7 @@ class ExamApp:
         self._workspace_render_page()
 
     def _workspace_render_page(self):
-        """Render the selected source PDF as one vertically scrollable document."""
+        """Lay out the complete PDF, but keep only nearby pages as Tk images in memory."""
         doc = self._workspace_doc()
         if not doc:
             return
@@ -621,53 +621,78 @@ class ExamApp:
             return
         try:
             import pymupdf as fitz
-            pdf = fitz.open(source)
-            page_count = len(pdf)
-            if not page_count:
-                pdf.close()
-                raise ValueError("PDF bevat geen pagina's.")
-            canvas_width = max(420, self.pdf_canvas.winfo_width()-30)
-            first_rect = pdf[0].rect
-            fit_scale = min(1.35, canvas_width / float(first_rect.width))
-            scale = max(0.45, fit_scale * self._workspace_zoom)
-            pdf.close()
+            with fitz.open(source) as pdf:
+                page_count = len(pdf)
+                if not page_count:
+                    raise ValueError("PDF bevat geen pagina's.")
+                canvas_width = max(420, self.pdf_canvas.winfo_width() - 30)
+                fit_scale = min(1.35, canvas_width / float(pdf[0].rect.width))
+                scale = max(0.45, fit_scale * self._workspace_zoom)
+                page_dimensions = {
+                    page_no: (
+                        max(1, int(round(float(page.rect.width) * scale))),
+                        max(1, int(round(float(page.rect.height) * scale))),
+                    )
+                    for page_no, page in enumerate(pdf, start=1)
+                }
+
             self._workspace_scale = scale
             self._workspace_page_offsets = {}
             self._workspace_page_heights = {}
-            self._workspace_photos = []
+            self._workspace_page_specs = {}
+            self._workspace_page_placeholders = {}
+            self._workspace_page_image_items = {}
+            self._workspace_photos = {}
             self.pdf_canvas.delete("all")
             y_offset = 0
+            max_page_width = canvas_width
             for page_no in range(1, page_count + 1):
+                width, height = page_dimensions[page_no]
                 output = Path(self._workspace_temp.name) / f"{doc['id']}-doorlopend-p{page_no}-{scale:.3f}.png"
-                if not output.is_file():
-                    render_page(source, page_no, output, scale=scale)
-                photo = tk.PhotoImage(file=str(output))
-                self._workspace_photos.append(photo)
                 self._workspace_page_offsets[page_no] = y_offset
-                self._workspace_page_heights[page_no] = photo.height()
-                self.pdf_canvas.create_image(0, y_offset, image=photo, anchor="nw", tags=("page", f"page-{page_no}"))
-                # Subtle separator between source pages.
-                y_offset += photo.height()
+                self._workspace_page_heights[page_no] = height
+                self._workspace_page_specs[page_no] = {
+                    "output": output, "width": width, "height": height,
+                }
+                max_page_width = max(max_page_width, width)
+                placeholder = self.pdf_canvas.create_rectangle(
+                    0, y_offset, width, y_offset + height,
+                    fill="white", outline="#C5CDD1", tags=("page-placeholder", f"page-{page_no}")
+                )
+                label = self.pdf_canvas.create_text(
+                    width / 2, y_offset + height / 2, text=f"Pagina {page_no} wordt geladen…",
+                    fill="#718087", font=("Segoe UI", 10),
+                    tags=("page-placeholder", f"page-{page_no}")
+                )
+                self._workspace_page_placeholders[page_no] = (placeholder, label)
+                y_offset += height
                 if page_no < page_count:
-                    self.pdf_canvas.create_line(0, y_offset + 3, max(photo.width(), canvas_width), y_offset + 3,
-                                                fill="#9AA7AD", dash=(3, 4))
+                    self.pdf_canvas.create_line(
+                        0, y_offset + 3, max(width, canvas_width), y_offset + 3,
+                        fill="#9AA7AD", dash=(3, 4), tags=("page-separator",)
+                    )
                     y_offset += 8
-            self.pdf_canvas.configure(scrollregion=(0, 0, canvas_width, y_offset))
-            self._workspace_photo = self._workspace_photos[0] if self._workspace_photos else None
+
+            self.pdf_canvas.configure(scrollregion=(0, 0, max_page_width, y_offset))
             for candidate in self.data.get("vraagkandidaten", []):
                 if candidate.get("document_id") != doc["id"] or not candidate.get("bbox"):
                     continue
                 page_no = int(candidate.get("page", 1))
                 if page_no not in self._workspace_page_offsets:
                     continue
-                x0, y0, x1, y1 = [float(x) * scale for x in candidate["bbox"]]
+                x0, y0, x1, y1 = [float(value) * scale for value in candidate["bbox"]]
                 top = self._workspace_page_offsets[page_no] + y0
                 selected = candidate is self._workspace_selected
                 color = "#D71920" if selected else "#168B8B"
-                self.pdf_canvas.create_rectangle(x0-5, top-4, x1+5, top+max(18, (y1-y0))+4,
-                    outline=color, width=3 if selected else 1, tags=("marker",))
-                self.pdf_canvas.create_text(x0+5, top-13, text=f"Vraag {candidate.get('number')}",
-                    anchor="sw", fill=color, font=("Segoe UI", 10, "bold"), tags=("marker",))
+                self.pdf_canvas.create_rectangle(
+                    x0 - 5, top - 4, x1 + 5, top + max(18, (y1 - y0)) + 4,
+                    outline=color, width=3 if selected else 1, tags=("marker",)
+                )
+                self.pdf_canvas.create_text(
+                    x0 + 5, top - 13, text=f"Vraag {candidate.get('number')}",
+                    anchor="sw", fill=color, font=("Segoe UI", 10, "bold"), tags=("marker",)
+                )
+
             row = self._workspace_selected
             if row:
                 page_no = int(row.get("page", 1))
@@ -678,8 +703,101 @@ class ExamApp:
             self._workspace_page_label.configure(text=f"Doorlopend · {page_count} pagina's")
             if self._workspace_mark_mode:
                 self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de doorlopende PDF.")
+            self._workspace_render_visible_pages()
         except Exception as exc:
             self._error("Originele PDF weergeven", exc)
+
+    def _workspace_render_visible_pages(self):
+        """Render nearby pages on demand and cap live Tk PhotoImages to six."""
+        specs = getattr(self, "_workspace_page_specs", {})
+        if not specs or not self.pdf_canvas.winfo_exists():
+            return
+        try:
+            viewport_top = self.pdf_canvas.canvasy(0)
+            viewport_height = max(1, self.pdf_canvas.winfo_height())
+            viewport_bottom = viewport_top + viewport_height
+            margin = max(280, int(viewport_height * 0.75))
+            wanted = {
+                page_no for page_no, top in self._workspace_page_offsets.items()
+                if top + self._workspace_page_heights[page_no] >= viewport_top - margin
+                and top <= viewport_bottom + margin
+            }
+            if not wanted:
+                wanted = {int(getattr(self, "_workspace_page", 1))}
+            wanted = {page_no for page_no in wanted if page_no in specs}
+
+            doc = self._workspace_doc()
+            if not doc:
+                return
+            source = self.project_dir / "bronnen" / doc["opslagbestand"]
+            for page_no in sorted(wanted):
+                if page_no in self._workspace_photos:
+                    continue
+                spec = specs[page_no]
+                try:
+                    if not spec["output"].is_file():
+                        render_page(source, page_no, spec["output"], scale=self._workspace_scale)
+                    photo = tk.PhotoImage(file=str(spec["output"]))
+                    self._workspace_photos[page_no] = photo
+                    for item in self._workspace_page_placeholders.pop(page_no, ()):
+                        self.pdf_canvas.delete(item)
+                    image_item = self.pdf_canvas.create_image(
+                        0, self._workspace_page_offsets[page_no],
+                        image=photo, anchor="nw", tags=("page-image", f"page-{page_no}")
+                    )
+                    self.pdf_canvas.tag_lower(image_item)
+                    self._workspace_page_image_items[page_no] = image_item
+                except Exception as page_error:
+                    for item in self._workspace_page_placeholders.get(page_no, ()):
+                        if self.pdf_canvas.type(item) == "text":
+                            self.pdf_canvas.itemconfigure(item, text=f"Pagina {page_no} kon niet worden geladen")
+                    self._log(f"Pagina {page_no} kon niet worden weergegeven: {page_error}")
+
+            # Keep visible pages plus a small buffer; evicted pages remain as
+            # lightweight placeholders and can be restored instantly from PNG cache.
+            keep = set(wanted)
+            if len(keep) > 6:
+                keep = set(sorted(keep, key=lambda n: abs(
+                    (self._workspace_page_offsets[n] + self._workspace_page_heights[n] / 2)
+                    - (viewport_top + viewport_height / 2)
+                ))[:6])
+            for page_no in list(self._workspace_photos):
+                if page_no in keep:
+                    continue
+                image_item = self._workspace_page_image_items.pop(page_no, None)
+                if image_item is not None:
+                    self.pdf_canvas.delete(image_item)
+                self._workspace_photos.pop(page_no, None)
+                spec = specs[page_no]
+                top = self._workspace_page_offsets[page_no]
+                rect = self.pdf_canvas.create_rectangle(
+                    0, top, spec["width"], top + spec["height"],
+                    fill="white", outline="#C5CDD1", tags=("page-placeholder", f"page-{page_no}")
+                )
+                label = self.pdf_canvas.create_text(
+                    spec["width"] / 2, top + spec["height"] / 2,
+                    text=f"Pagina {page_no} wordt geladen…", fill="#718087",
+                    font=("Segoe UI", 10), tags=("page-placeholder", f"page-{page_no}")
+                )
+                self._workspace_page_placeholders[page_no] = (rect, label)
+        except (tk.TclError, KeyError, AttributeError):
+            # A document can be switched or the window closed during an idle callback.
+            return
+
+    def _workspace_scroll_changed(self, first, last):
+        """Keep the scrollbar synchronized and schedule lazy page rendering."""
+        scrollbar = getattr(self, "_workspace_y_scrollbar", None)
+        if scrollbar is not None:
+            scrollbar.set(first, last)
+        if getattr(self, "_workspace_page_specs", None) and not getattr(self, "_workspace_render_pending", False):
+            self._workspace_render_pending = True
+            def render_after_scroll():
+                self._workspace_render_pending = False
+                self._workspace_render_visible_pages()
+            try:
+                self.root.after_idle(render_after_scroll)
+            except tk.TclError:
+                self._workspace_render_pending = False
 
     def _workspace_change_page(self, delta):
         self._workspace_page = max(1, self._workspace_page + int(delta))
