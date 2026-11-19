@@ -1443,7 +1443,7 @@ class ExamApp:
                     values=(frag.get("type"), pages, links))
         def save_structure():
             current = selected_fragment()
-            if current and any(int(x["page"]) == int(page_var.get()) for x in current.get("page_spans", [])):
+            if current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
                 span = make_page_span(displayed_page, top_y, bottom_y)
                 current["page_spans"] = [span if int(x["page"]) == span["page"] else dict(x)
                                          for x in current["page_spans"]]
@@ -1480,7 +1480,7 @@ class ExamApp:
             try:
                 updated = dict(frag)
                 spans = [dict(x) for x in frag.get("page_spans", [])]
-                span = make_page_span(page_var.get(), top_y, bottom_y)
+                span = make_page_span(displayed_page, top_y, bottom_y)
                 existing_index = next((i for i, item in enumerate(spans) if int(item["page"]) == span["page"]), None)
                 if existing_index is None:
                     spans.append(span)
