@@ -122,5 +122,15 @@ class StructureTests(unittest.TestCase):
                          self.questions)
 
 
+    def test_changed_numbering_and_duplicate_question_regions_are_rejected(self):
+        first = make_fragment("vraag", make_page_span(1, 0.1, 0.4), [1], self.questions, "q1a")
+        second = make_fragment("vraag", make_page_span(2, 0.1, 0.4), [1], self.questions, "q1b")
+        structure = make_exam_structure(self.doc, [first, second], self.questions)
+        errors = validate_exam_structure(structure, "doc-123", "abc123", self.questions)
+        self.assertIn("meerdere_vraagfragmenten_voor_een_vraag", errors)
+        self.assertIn("bevestigde_vraagnummering_gewijzigd",
+                      validate_exam_structure(structure, "doc-123", "abc123", [1, 2]))
+
+
 if __name__ == "__main__":
     unittest.main()
