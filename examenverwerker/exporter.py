@@ -125,6 +125,12 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                                   coords[2] > coords[0] and coords[3] > coords[1])
                 except (TypeError, ValueError):
                     valid_bbox = False
+                if asset.get("crop_method") == "handmatige_paginabrede_strook_op_originele_pdf":
+                    try:
+                        page_width = float(asset.get("page_size", [])[0])
+                        valid_bbox = valid_bbox and abs(coords[0]) <= 0.01 and abs(coords[2] - page_width) <= 0.01
+                    except (TypeError, ValueError, IndexError):
+                        valid_bbox = False
                 if not valid_bbox:
                     errors.append({"id":rid,"error":"handmatige_contextuitsnede_geometrie_ongeldig"})
                 if (asset.get("source_document_id") != r.get("exam_structure_document_id")
