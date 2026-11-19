@@ -36,11 +36,17 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
         # Publication requires source-faithful manual regions, not only the old
         # automatically proposed question/CV snippets.
         source_name = r.get("source_pdf", "")
+        try:
+            structure_question_number = int(r.get("exam_structure_question_number", -1))
+        except (TypeError, ValueError):
+            structure_question_number = -1
         if (r.get("exam_structure_status") != "gekoppeld" or not r.get("exam_structure_document_id")
                 or not r.get("exam_structure_source_sha256") or not r.get("question_region_fragment_id")
-                or int(r.get("exam_structure_question_number", -1)) != int(r.get("number", 0))
+                or structure_question_number != int(r.get("number", 0))
                 or r.get("question_region_fragment_id") not in r.get("exam_structure_fragment_ids", [])):
             errors.append({"id":rid,"error":"handmatige_vraagafbakening_ontbreekt"})
+        elif Path(str(source_name)).name != source_name:
+            errors.append({"id":rid,"error":"ongeldig_opgavenbronpad"})
         elif source_name and (project_dir/"bronnen"/source_name).is_file():
             if sha256(project_dir/"bronnen"/source_name) != r.get("exam_structure_source_sha256"):
                 errors.append({"id":rid,"error":"vraagafbakening_bronbestand_gewijzigd"})
@@ -64,7 +70,7 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             for region_error in validate_cv_fragment(cv_region, cv_identity, r.get("number", 0), "correctievoorschrift"):
                 errors.append({"id":rid,"error":region_error})
             cv_file = r.get("cv_pdf", "")
-            if cv_file and (project_dir/"bronnen"/cv_file).is_file() and sha256(project_dir/"bronnen"/cv_file) != r.get("cv_source_sha256"):
+            if cv_file and Path(str(cv_file)).name == cv_file and (project_dir/"bronnen"/cv_file).is_file() and sha256(project_dir/"bronnen"/cv_file) != r.get("cv_source_sha256"):
                 errors.append({"id":rid,"error":"cv_afbakening_bronbestand_gewijzigd"})
         cv_region_file = r.get("cv_source_region_file")
         if not cv_region_file or Path(str(cv_region_file)).name != cv_region_file or not (project_dir/"snippets"/str(cv_region_file)).is_file():
@@ -81,8 +87,9 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             snippet = item.get("snippet_file", "")
             if not snippet or Path(str(snippet)).name != snippet or not (project_dir/"snippets"/str(snippet)).is_file():
                 errors.append({"id":rid,"error":"cv_aanvulling_handmatige_uitsnede_ontbreekt"})
-            source = project_dir/"bronnen"/str(item.get("source_pdf", ""))
-            if not source.is_file() or sha256(source) != item.get("source_sha256"):
+            source_name = str(item.get("source_pdf", ""))
+            source = project_dir/"bronnen"/source_name if Path(source_name).name == source_name else None
+            if source is None or not source.is_file() or sha256(source) != item.get("source_sha256"):
                 errors.append({"id":rid,"error":"cv_aanvulling_afbakening_bronbestand_gewijzigd"})
         if selected_addenda - covered_addenda:
             errors.append({"id":rid,"error":"niet_alle_geselecteerde_cv_aanvullingen_visueel_afgebakend"})
