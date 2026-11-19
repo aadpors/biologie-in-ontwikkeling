@@ -803,7 +803,6 @@ class ExamApp:
                     row["context_asset_proposal_files"]=[dict(x) for x in context_files]
                     context_list.insert("end",f"Pagina {page_no} · {kind_var.get()} · bijschrift nog bevestigen · {name}")
                     new_index=context_list.size()-1
-                    context_list.selection_clear(0,"end")
                     context_list.selection_set(new_index)
                     context_caption_var.set("")
                     self.save_project()
