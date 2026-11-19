@@ -223,7 +223,8 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         else:
             opened.append(row)
             cv_name_snippet=(r.get("cv_snippet_files") or [r["cv_snippet_file"]])[0]
-            shutil.copy2(project_dir/"snippets"/cv_name_snippet,snippet_dir/cv_name_snippet)
+            if cv_name_snippet != cv_region_file:
+                shutil.copy2(project_dir/"snippets"/cv_name_snippet,snippet_dir/cv_name_snippet)
             cv_item={"id":r["id"],"question":int(r["number"]),"pdf":f"examens/{cv_target.name}","output":cv_name_snippet}
             if amendment_files:
                 cv_item["amendment_output"]=amendment_files[0]
