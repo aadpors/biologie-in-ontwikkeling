@@ -6,6 +6,7 @@ import re
 import shutil
 import sys
 import traceback
+import tempfile
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
@@ -429,27 +430,67 @@ class ExamApp:
             doc = documents[int(selection[0])]
             meta = doc.get("exam_metadata") or {}
             edit = tk.Toplevel(win)
-            edit.title("Documentherkenning controleren")
+            edit.title("Voorblad en automatisch herkende metadata controleren")
+            edit.geometry("1080x760")
+            edit.minsize(900, 650)
             edit.transient(win)
             edit.grab_set()
-            frame = ttk.Frame(edit, padding=16)
-            frame.pack(fill="both", expand=True)
-            ttk.Label(frame, text=doc["bestand"], wraplength=430).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 10))
+
+            # The original first page is shown beside the values inferred from
+            # the filename/PDF. Empty values stay empty; never invent defaults.
+            body = ttk.Frame(edit, padding=14)
+            body.pack(fill="both", expand=True)
+            preview_panel = ttk.LabelFrame(body, text="Voorblad van de originele PDF", padding=10)
+            preview_panel.pack(side="left", fill="both", expand=True, padx=(0, 12))
+            fields_panel = ttk.LabelFrame(body, text="Automatisch ingevulde gegevens", padding=14)
+            fields_panel.pack(side="right", fill="y")
+            ttk.Label(fields_panel, text=doc["bestand"], wraplength=390,
+                      font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 10))
+
+            preview_temp = tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
+            preview_path = Path(preview_temp.name) / "voorblad.png"
+            preview_label = ttk.Label(preview_panel, text="Voorblad wordt geladen…", anchor="center")
+            preview_label.pack(fill="both", expand=True)
+            try:
+                render_page(Path(doc["source_path"]), 1, preview_path, scale=0.72)
+                cover_photo = tk.PhotoImage(file=str(preview_path))
+                preview_label.configure(image=cover_photo, text="")
+                preview_label.image = cover_photo
+            except Exception as exc:
+                preview_label.configure(
+                    text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
+                    wraplength=470, justify="center")
+            edit._preview_temp = preview_temp
+
             role = tk.StringVar(value=doc.get("type_voorstel", "onbekend"))
-            level = tk.StringVar(value=meta.get("level", "Vwo"))
+            level = tk.StringVar(value=meta.get("level", ""))
             year = tk.StringVar(value=str(meta.get("year", "")))
-            period = tk.StringVar(value=str(meta.get("period", "1")))
+            period = tk.StringVar(value=str(meta.get("period", "")))
+
+            confidence = meta.get("confidence")
+            source_label = {
+                "bestandsnaam": "Herkenning uit bestandsnaam",
+                "eerste_pdf_paginas": "Herkenning uit tekst op de eerste PDF-pagina's",
+                "handmatig_bevestigd": "Eerder handmatig bevestigd",
+            }.get(meta.get("source"), "Herkenningsbron onbekend")
+            ttk.Label(fields_panel, text=f"Metadata: {float(confidence or 0):.0%} zekerheid · {source_label}",
+                      wraplength=390).pack(anchor="w", pady=(0, 12))
             fields = [
-                (1, "Documenttype", role, ttk.Combobox(frame, textvariable=role, values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"], state="readonly", width=27)),
-                (2, "Niveau", level, ttk.Combobox(frame, textvariable=level, values=["Havo", "Vwo"], state="readonly", width=27)),
-                (3, "Jaar", year, ttk.Entry(frame, textvariable=year, width=30)),
-                (4, "Tijdvak", period, ttk.Combobox(frame, textvariable=period, values=["1", "2", "3"], state="readonly", width=27)),
+                ("Documenttype", role, ttk.Combobox(fields_panel, textvariable=role,
+                    values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"],
+                    state="readonly", width=32)),
+                ("Niveau", level, ttk.Combobox(fields_panel, textvariable=level,
+                    values=["Havo", "Vwo"], state="readonly", width=32)),
+                ("Jaar", year, ttk.Entry(fields_panel, textvariable=year, width=35)),
+                ("Tijdvak", period, ttk.Combobox(fields_panel, textvariable=period,
+                    values=["1", "2", "3"], state="readonly", width=32)),
             ]
-            for row, label, var, widget in fields:
-                ttk.Label(frame, text=label).grid(row=row, column=0, sticky="w", pady=5)
-                widget.grid(row=row, column=1, sticky="ew", pady=5)
-            ttk.Label(frame, text="Controleer dit aan de hand van de PDF. De software koppelt uitsluitend documenten met exact hetzelfde niveau, jaar en tijdvak.",
-                      wraplength=440).grid(row=5, column=0, columnspan=2, sticky="w", pady=(10, 4))
+            for label, var, widget in fields:
+                ttk.Label(fields_panel, text=label).pack(anchor="w", pady=(7, 2))
+                widget.pack(anchor="w", fill="x")
+            ttk.Label(fields_panel,
+                text="Vergelijk de ingevulde gegevens met het zichtbare voorblad. Lege velden zijn niet automatisch afgeleid. Koppel documenten alleen als niveau, jaar en tijdvak exact overeenkomen.",
+                wraplength=390, justify="left").pack(anchor="w", pady=(16, 8))
 
             def save_edit():
                 if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
@@ -466,11 +507,10 @@ class ExamApp:
                 refresh_review()
                 edit.destroy()
 
-            buttons = ttk.Frame(frame)
-            buttons.grid(row=6, column=0, columnspan=2, sticky="e", pady=(12, 0))
-            ttk.Button(buttons, text="Opslaan", command=save_edit).pack(side="right")
+            buttons = ttk.Frame(fields_panel)
+            buttons.pack(fill="x", side="bottom", pady=(16, 0))
+            ttk.Button(buttons, text="Opslaan", command=save_edit, style="Accent.TButton").pack(side="right")
             ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
-            frame.columnconfigure(1, weight=1)
 
         def confirm_import():
             errors = validate_batch_documents(documents)
