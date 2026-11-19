@@ -304,4 +304,26 @@ class ExportTests(unittest.TestCase):
 
 
 
+    def test_manual_context_crop_cannot_reference_an_unlinked_context_fragment(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"snippets"/"manual-context.png").write_bytes(b"manual crop")
+            import hashlib
+            record["context_asset_files"]=[{
+                "file":"manual-context.png",
+                "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
+                "asset_id":"manual-p2-link","asset_kind":"figuur","type":"figuur",
+                "page":2,"bbox":[25,40,310,420],
+                "source_document_id":record["exam_structure_document_id"],
+                "source_sha256":record["exam_structure_source_sha256"],
+                "source_pdf":record["source_pdf"],"question_number":record["number"],
+                "fragment_id":"context-fragment-not-linked",
+                "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                "caption_human_confirmed":True,
+            }]
+            codes=[x["error"] for x in validate_review_records([record],project)]
+            self.assertIn("handmatige_contextuitsnede_verkeerd_contextfragment",codes)
+
+
+
 if __name__=="__main__": unittest.main()
