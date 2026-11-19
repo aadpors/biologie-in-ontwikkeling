@@ -12,8 +12,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors
+from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale
 
-APP_VERSION = "0.4.0"
+APP_VERSION = "0.5.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -102,6 +103,7 @@ class ExamApp:
         ttk.Button(foot, text="Document bekijken", command=self.show_document).pack(side="left")
         ttk.Button(foot, text="Herkenning aanpassen", command=self.correct_type).pack(side="left", padx=6)
         ttk.Button(foot, text="Vraagstarts analyseren", command=self.analyze_questions, style="Accent.TButton").pack(side="left", padx=6)
+        ttk.Button(foot, text="Examenstructuur bewerken", command=self.edit_exam_structure, style="Accent.TButton").pack(side="left", padx=6)
         ttk.Button(foot, text="Kandidaten bekijken", command=self.show_candidates).pack(side="left")
         ttk.Button(foot, text="Examengegevens controleren", command=self.edit_exam_metadata).pack(side="left", padx=6)
         ttk.Button(foot, text="Voortgang opslaan", command=self.save_project).pack(side="right")
@@ -254,6 +256,8 @@ class ExamApp:
         comparisons = {}
         for doc in docs:
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
+            if self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
+                self.data["exam_structure"] = mark_structure_stale(self.data.get("exam_structure"), "De vraaganalyse is opnieuw uitgevoerd; controleer de structuur opnieuw.")
             try:
                 # Re-analysis changes question boundaries and therefore invalidates
                 # every previously approved record derived from this source PDF.
@@ -1043,6 +1047,251 @@ class ExamApp:
         except Exception as exc:
             self._error("Originele PDF-pagina tonen",exc)
             messagebox.showerror("Voorvertoning mislukt","Deze pagina kon niet worden getoond. Controleer of de PDF nog in de projectmap staat. Details staan in logs.")
+
+
+    def edit_exam_structure(self):
+        """Visually define full-width page spans after explicit question-number review."""
+        if not self.data:
+            messagebox.showinfo("Eerst een project", "Open eerst een examenproject.")
+            return
+        source_docs = [d for d in self.data.get("documenten", []) if d.get("type_voorstel") == "opgaven"]
+        if not source_docs:
+            messagebox.showinfo("Geen opgaven-PDF", "Voeg eerst de opgaven-PDF toe en bevestig het documenttype.")
+            return
+        if len(source_docs) > 1:
+            chooser = tk.Toplevel(self.root); chooser.title("Kies opgaven-PDF"); chooser.transient(self.root)
+            ttk.Label(chooser, text="Kies het examen waarvan je de structuur wilt afbakenen.", padding=10).pack(anchor="w")
+            listing = tk.Listbox(chooser, width=72, height=min(8, len(source_docs)))
+            listing.pack(fill="both", expand=True, padx=10, pady=8)
+            for doc in source_docs: listing.insert("end", doc["bestand"])
+            def open_chosen():
+                sel = listing.curselection()
+                if not sel: return
+                doc = source_docs[sel[0]]; chooser.destroy(); self._open_structure_editor(doc)
+            ttk.Button(chooser, text="Open editor", command=open_chosen).pack(pady=(0,10))
+            return
+        self._open_structure_editor(source_docs[0])
+
+    def _open_structure_editor(self, doc):
+        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
+        if not candidates:
+            messagebox.showwarning("Eerst vraagstarts analyseren", "Analyseer eerst de vraagstarts van deze opgaven-PDF en controleer de kandidaten.")
+            return
+        unresolved = [x for x in candidates if x.get("human_decision") not in (True, False)]
+        if unresolved:
+            messagebox.showwarning("Vraagnummering nog niet bevestigd",
+                f"Er zijn nog {len(unresolved)} vraagstartkandidaten zonder menselijke beslissing. Beoordeel eerst alle gevonden nummers (vraagstart of geen vraag). De contexteditor blijft tot die tijd geblokkeerd.")
+            self.show_candidates()
+            return
+        question_numbers = sorted({int(x["number"]) for x in candidates if x.get("human_decision") is True})
+        if not question_numbers:
+            messagebox.showwarning("Geen bevestigde vragen", "Er is nog geen enkele vraagstart bevestigd.")
+            return
+        source = self.project_dir / "bronnen" / doc["opslagbestand"]
+        analysis = analyze_pdf(source)
+        page_count = int(analysis["page_count"])
+        page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in analysis["pages"]}
+        existing = self.data.get("exam_structure")
+        if existing and existing.get("document_id") == doc["id"] and existing.get("source_sha256") == doc["sha256"]:
+            fragments = existing.get("fragments", [])
+        else:
+            fragments = []
+        win = tk.Toplevel(self.root); win.title(f"Examenstructuur · {doc['bestand']}"); win.geometry("1280x900")
+        win.transient(self.root)
+        header = ttk.Frame(win, padding=(12, 8)); header.pack(fill="x")
+        ttk.Label(header, text="Eerst de vraagnummering bevestigd; nu context- en vraagfragmenten afbakenen.",
+                  font=("Segoe UI", 10, "bold")).pack(anchor="w")
+        ttk.Label(header, text="Sleep de dunne zwarte lijnen. Binnen de lijnen blijft de PDF wit; erbuiten ligt een doorschijnende lichtgrijze markering. De bron-PDF wordt nooit aangepast.",
+                  wraplength=1180).pack(anchor="w", pady=(3, 0))
+        body = ttk.Frame(win, padding=8); body.pack(fill="both", expand=True)
+        left = ttk.Frame(body, width=245); left.pack(side="left", fill="y", padx=(0, 10))
+        right = ttk.Frame(body); right.pack(side="left", fill="both", expand=True)
+        ttk.Label(left, text="Fragmenttype").pack(anchor="w")
+        type_var = tk.StringVar(value="context_intro")
+        type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
+            values=["context_intro", "vraagcontext", "vraag", "tussenliggende_context"], width=25)
+        type_box.pack(fill="x", pady=(2, 8))
+        ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
+        qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
+        qlist.pack(fill="x", pady=(2, 8))
+        for number in question_numbers: qlist.insert("end", f"Vraag {number}")
+        def set_default_links(*_):
+            qlist.selection_clear(0, "end")
+            if type_var.get() == "context_intro":
+                for i in range(qlist.size()): qlist.selection_set(i)
+        type_box.bind("<<ComboboxSelected>>", set_default_links)
+        set_default_links()
+        ttk.Label(left, text="Bestaande fragmenten").pack(anchor="w", pady=(4, 2))
+        fragment_tree = ttk.Treeview(left, columns=("type", "pages", "links"), show="tree headings", height=12)
+        fragment_tree.heading("#0", text="Fragment")
+        fragment_tree.heading("type", text="Type"); fragment_tree.column("type", width=85)
+        fragment_tree.heading("pages", text="Pagina's"); fragment_tree.column("pages", width=55)
+        fragment_tree.heading("links", text="Vragen"); fragment_tree.column("links", width=65)
+        fragment_tree.pack(fill="both", expand=True)
+        ttk.Label(left, text="Tip: maak een fragment op de eerste pagina en voeg daarna de volgende pagina's in oplopende volgorde toe.",
+                  wraplength=230).pack(anchor="w", pady=8)
+        nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
+        page_var = tk.IntVar(value=1)
+        ttk.Button(nav, text="◀", width=3, command=lambda: change_page(-1)).pack(side="left")
+        ttk.Label(nav, text="Pagina").pack(side="left", padx=(8, 3))
+        page_spin = tk.Spinbox(nav, from_=1, to=page_count, textvariable=page_var, width=5, command=lambda: show_page())
+        page_spin.pack(side="left")
+        ttk.Label(nav, text=f"van {page_count}").pack(side="left", padx=(4, 12))
+        frame = ttk.Frame(right); frame.pack(fill="both", expand=True)
+        canvas = tk.Canvas(frame, background="white", highlightthickness=1, highlightbackground="#b8b8b8")
+        sy = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+        sx = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+        canvas.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
+        sy.pack(side="right", fill="y"); sx.pack(side="bottom", fill="x"); canvas.pack(side="left", fill="both", expand=True)
+        actions = ttk.Frame(right); actions.pack(fill="x", pady=(8, 0))
+        top_y, bottom_y = 0.06, 0.94
+        photo = None
+        page_image_width = 1
+        page_image_height = 1
+        drag_target = None
+        top_line = bottom_line = None
+        overlay_items = []
+        def selected_links():
+            return [question_numbers[i] for i in qlist.curselection()]
+        def selected_fragment():
+            sel = fragment_tree.selection()
+            return fragments[int(sel[0])] if sel else None
+        def redraw_guides():
+            nonlocal top_line, bottom_line, overlay_items
+            for item in overlay_items:
+                canvas.delete(item)
+            overlay_items = []
+            if photo is None: return
+            y0, y1 = top_y * page_image_height, bottom_y * page_image_height
+            overlay_items.append(canvas.create_rectangle(0, 0, page_image_width, y0,
+                fill="#c8c8c8", stipple="gray50", outline=""))
+            overlay_items.append(canvas.create_rectangle(0, y1, page_image_width, page_image_height,
+                fill="#c8c8c8", stipple="gray50", outline=""))
+            if top_line: canvas.delete(top_line)
+            if bottom_line: canvas.delete(bottom_line)
+            top_line = canvas.create_line(0, y0, page_image_width, y0, fill="black", width=1)
+            bottom_line = canvas.create_line(0, y1, page_image_width, y1, fill="black", width=1)
+            canvas.tag_raise(top_line); canvas.tag_raise(bottom_line)
+            canvas.configure(scrollregion=(0, 0, page_image_width, page_image_height))
+        def load_span_for_page():
+            nonlocal top_y, bottom_y
+            frag = selected_fragment()
+            span = next((x for x in (frag or {}).get("page_spans", []) if int(x["page"]) == page_var.get()), None)
+            if span:
+                top_y, bottom_y = float(span["top"]), float(span["bottom"])
+            else:
+                top_y, bottom_y = 0.06, 0.94
+        def show_page():
+            nonlocal photo, page_image_width, page_image_height
+            try:
+                number = max(1, min(page_count, int(page_var.get())))
+            except (ValueError, tk.TclError):
+                number = 1
+            page_var.set(number)
+            target = self.project_dir / "analyse" / f"structuur-{doc['id']}-p{number}.png"
+            render_page(source, number, target, scale=1.05)
+            photo = tk.PhotoImage(file=str(target))
+            page_image_width, page_image_height = photo.width(), photo.height()
+            canvas.delete("all")
+            canvas.create_image(0, 0, image=photo, anchor="nw")
+            canvas.image = photo
+            load_span_for_page()
+            redraw_guides()
+        def change_page(delta):
+            page_var.set(max(1, min(page_count, int(page_var.get()) + delta)))
+            show_page()
+        def on_press(event):
+            nonlocal drag_target
+            y = canvas.canvasy(event.y)
+            top_px, bottom_px = top_y * page_image_height, bottom_y * page_image_height
+            if abs(y - top_px) <= 12: drag_target = "top"
+            elif abs(y - bottom_px) <= 12: drag_target = "bottom"
+            else: drag_target = None
+        def on_drag(event):
+            nonlocal top_y, bottom_y
+            if not drag_target: return
+            y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y))) / page_image_height
+            if drag_target == "top": top_y = min(y, bottom_y - 0.01)
+            else: bottom_y = max(y, top_y + 0.01)
+            redraw_guides()
+        canvas.bind("<Button-1>", on_press); canvas.bind("<B1-Motion>", on_drag)
+        def refresh_fragment_list():
+            for iid in fragment_tree.get_children(): fragment_tree.delete(iid)
+            for index, frag in enumerate(fragments):
+                pages = ",".join(str(x["page"]) for x in frag.get("page_spans", []))
+                links = ",".join(str(x) for x in frag.get("question_numbers", []))
+                fragment_tree.insert("", "end", iid=str(index), text=frag.get("id", f"Fragment {index+1}"),
+                    values=(frag.get("type"), pages, links))
+        def save_structure():
+            structure = make_exam_structure(doc, fragments, question_numbers)
+            errors = validate_exam_structure(structure, doc["id"], doc["sha256"], question_numbers)
+            if errors:
+                messagebox.showerror("Structuur niet opgeslagen", "Controleer eerst:\\n" + "\\n".join(errors), parent=win)
+                return False
+            self.data["exam_structure"] = structure
+            self.save_project()
+            self._log(f"Examenstructuur opgeslagen: {len(fragments)} fragment(en), bron {doc['bestand']}.")
+            return True
+        def create_fragment():
+            try:
+                kind = type_var.get()
+                links = selected_links()
+                if kind == "context_intro" and not links: links = question_numbers[:]
+                span = make_page_span(page_var.get(), top_y, bottom_y)
+                fragment = make_fragment(kind, span, links, question_numbers,
+                    f"frag-{doc['id'][:8]}-{len(fragments)+1:03d}")
+                fragments.append(fragment)
+                refresh_fragment_list()
+                fragment_tree.selection_set(str(len(fragments)-1))
+                save_structure()
+            except Exception as exc:
+                messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
+        def append_page():
+            frag = selected_fragment()
+            if not frag:
+                messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waaraan je deze pagina wilt toevoegen.", parent=win)
+                return
+            try:
+                updated = append_page_span(frag, make_page_span(page_var.get(), top_y, bottom_y))
+                fragments[int(fragment_tree.selection()[0])] = updated
+                refresh_fragment_list()
+                fragment_tree.selection_set(str(fragments.index(updated)))
+                save_structure()
+            except Exception as exc:
+                messagebox.showerror("Pagina niet toegevoegd", str(exc), parent=win)
+        def delete_fragment():
+            sel = fragment_tree.selection()
+            if not sel: return
+            index = int(sel[0])
+            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
+            fragments.pop(index); refresh_fragment_list(); save_structure()
+        def load_selected_fragment(_event=None):
+            load_span_for_page(); redraw_guides()
+            frag = selected_fragment()
+            if frag:
+                type_var.set(frag.get("type", "vraagcontext"))
+                qlist.selection_clear(0, "end")
+                for i, number in enumerate(question_numbers):
+                    if number in frag.get("question_numbers", []): qlist.selection_set(i)
+        def update_links():
+            frag = selected_fragment()
+            if not frag: return
+            frag["question_numbers"] = selected_links()
+            if frag.get("type") == "context_intro" and not frag["question_numbers"]:
+                frag["question_numbers"] = question_numbers[:]
+                messagebox.showinfo("Inleiding", "De contextinleiding is standaard aan alle bevestigde vragen gekoppeld.", parent=win)
+            save_structure(); refresh_fragment_list()
+        fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
+        ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
+        ttk.Button(actions, text="Pagina toevoegen aan geselecteerd fragment", command=append_page).pack(side="left", padx=8)
+        ttk.Button(actions, text="Koppeling opslaan", command=update_links).pack(side="left")
+        ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
+        ttk.Button(actions, text="Structuur opslaan en sluiten", command=lambda: (save_structure(), win.destroy())).pack(side="right")
+        refresh_fragment_list()
+        if fragments: fragment_tree.selection_set("0")
+        page_spin.bind("<Return>", lambda _e: show_page())
+        page_spin.bind("<FocusOut>", lambda _e: show_page())
+        show_page()
 
     def selected_doc(self):
         selected = self.table.selection()
