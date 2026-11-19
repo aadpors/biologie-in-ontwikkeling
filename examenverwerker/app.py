@@ -2244,7 +2244,8 @@ class ExamApp:
             return
         analysis = self.project_dir / "analyse" / f"{doc['id']}.json"
         extracted = json.loads(analysis.read_text(encoding="utf-8"))
-        preview = tk.Toplevel(self.root)        preview.title(doc["bestand"])
+        preview = tk.Toplevel(self.root)
+        preview.title(doc["bestand"])
         preview.geometry("850x620")
         header = ttk.Frame(preview, padding=12)
         header.pack(fill="x")
