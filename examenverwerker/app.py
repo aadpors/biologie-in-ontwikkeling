@@ -1757,10 +1757,16 @@ class ExamApp:
         def update_links():
             frag = selected_fragment()
             if not frag: return
-            frag["question_numbers"] = selected_links()
-            if frag.get("type") == "context_intro" and not frag["question_numbers"]:
-                frag["question_numbers"] = question_numbers[:]
-                messagebox.showinfo("Inleiding", "De contextinleiding is standaard aan alle bevestigde vragen gekoppeld.", parent=win)
+            links = selected_links()
+            if frag.get("type") != "vraag" and not links:
+                if frag.get("type") == "context_intro":
+                    links = question_numbers[:]
+                    messagebox.showinfo("Inleiding", "De contextinleiding is standaard aan alle bevestigde vragen gekoppeld.", parent=win)
+                else:
+                    messagebox.showwarning("Context zonder vraagkoppeling",
+                        "Koppel dit contextfragment aan minimaal één vraag. Anders zou het materiaal bij geen enkele vraag worden getoond.", parent=win)
+                    return
+            frag["question_numbers"] = links
             save_structure(); refresh_fragment_list()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
