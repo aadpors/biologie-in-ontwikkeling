@@ -11,7 +11,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 
 APP_VERSION = "0.5.0"
@@ -782,22 +782,27 @@ class ExamApp:
                 context_fragments = linkage.get("context_fragments", [])
                 context_assets = [dict(context_files[i]) for i in context_list.curselection()]
                 context_region_files = []
+                context_text_parts = []
                 for context_fragment in context_fragments:
                     region_file = f"context-region-{source_doc['id']}-{context_fragment['id']}.png"
                     segments = page_spans_to_segments(context_fragment["page_spans"], source_sizes)
                     render_composite_crops(self.project_dir / "bronnen" / source_doc["opslagbestand"],
                                            segments, self.project_dir / "snippets" / region_file, scale=1.25)
+                    region_text = extract_region_text(self.project_dir / "bronnen" / source_doc["opslagbestand"], segments)
+                    if region_text:
+                        context_text_parts.append(region_text)
                     context_region_files.append({"file": region_file, "fragment_id": context_fragment["id"],
                         "type": context_fragment["type"], "page_spans": list(context_fragment["page_spans"]),
                         "question_numbers": list(context_fragment.get("question_numbers", [])),
-                        "source_document_id": source_doc["id"], "source_pdf": source_doc["opslagbestand"],
-                        "source_sha256": source_doc["sha256"], "caption": "Handmatig afgebakende context"})
+                        "text": region_text, "source_document_id": source_doc["id"],
+                        "source_pdf": source_doc["opslagbestand"], "source_sha256": source_doc["sha256"],
+                        "caption": "Handmatig afgebakende context"})
                 context_assets.extend(context_region_files)
                 record.update({"exam":meta,"options":options,"correct":correct,
                                "snippet_file":question_file,"snippet_files":[question_file],
-                               "context_asset_candidates":context_files,"context_asset_files":context_assets,
+                               "context_asset_candidates":context_files,"context_asset_files":context_assets,"source_context":"\n\n".join(context_text_parts),
                                "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", [])),
-                                   "question_numbers":list(x.get("question_numbers", []))} for x in context_fragments],
+                                   "question_numbers":list(x.get("question_numbers", [])),"text":next((y["text"] for y in context_region_files if y["fragment_id"]==x["id"]), "")} for x in context_fragments],
                                "cv_snippet_file":cv_file,"cv_snippet_files":[cv_file],
                                "cv_source_region":cv_region,"cv_source_region_file":cv_file,"cv_source_document_id":cv_doc["id"],"cv_source_sha256":cv_doc["sha256"],
                                "cv_amendment_snippet_files":[x["snippet_file"] for x in amendment_regions],
