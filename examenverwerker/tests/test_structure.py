@@ -1,7 +1,7 @@
 import unittest
 from structure import (
     append_page_span, default_question_links, fragments_for_question, make_cv_fragment, make_exam_structure, make_fragment, missing_question_regions, page_spans_to_segments, validate_cv_fragment,
-    make_page_span, mark_structure_stale, validate_exam_structure,
+    make_page_span, mark_structure_stale, validate_exam_structure, normalize_fragments, FRAGMENT_TYPES,
 )
 
 
@@ -23,6 +23,21 @@ class StructureTests(unittest.TestCase):
         fragment = make_fragment("context_intro", make_page_span(1, 0.1, 0.8), [],
                                  self.questions, "intro")
         self.assertEqual(fragment["question_numbers"], self.questions)
+        self.assertEqual(fragment["type"], "intro")
+
+
+    def test_only_three_fragment_types_are_exposed_and_legacy_projects_migrate(self):
+        self.assertEqual(FRAGMENT_TYPES, {"intro", "tussen_context", "vraag"})
+        legacy = [
+            {"id": "a", "type": "context_intro", "question_numbers": [1]},
+            {"id": "b", "type": "vraagcontext", "question_numbers": [1]},
+            {"id": "c", "type": "tussenliggende_context", "question_numbers": [2]},
+        ]
+        migrated = normalize_fragments(legacy)
+        self.assertEqual([x["type"] for x in migrated],
+                         ["intro", "tussen_context", "tussen_context"])
+        self.assertEqual([x["type"] for x in legacy],
+                         ["context_intro", "vraagcontext", "tussenliggende_context"])
 
     def test_question_fragment_requires_exactly_one_confirmed_question(self):
         with self.assertRaises(ValueError):
