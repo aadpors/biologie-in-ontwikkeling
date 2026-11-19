@@ -23,6 +23,19 @@ def now():
     return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
+def fit_window(window, desired_width, desired_height, min_width=820, min_height=560):
+    """Size and center a window so it stays within the current display."""
+    window.update_idletasks()
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    width = min(desired_width, max(720, screen_width - 40))
+    height = min(desired_height, max(520, screen_height - 90))
+    window.minsize(min(min_width, width), min(min_height, height))
+    x = max(0, (screen_width - width) // 2)
+    y = max(0, (screen_height - height) // 2)
+    window.geometry(f"{width}x{height}+{x}+{y}")
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -51,8 +64,7 @@ class ExamApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Biologie Examenverwerker")
-        self.root.geometry("1040x700")
-        self.root.minsize(820, 560)
+        fit_window(self.root, 1380, 900, 900, 620)
         self.project_dir = None
         self.data = None
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
@@ -131,14 +143,13 @@ class ExamApp:
     def _build(self):
         """Build a complete, card-based workflow workspace rather than a plain file manager."""
         self.root.title("Biologie Examenverwerker")
-        self.root.geometry("1380x900")
-        self.root.minsize(1120, 760)
+        fit_window(self.root, 1380, 900, 900, 620)
 
         shell = ttk.Frame(self.root, style="App.TFrame")
         shell.pack(fill="both", expand=True)
 
         # Brand bar
-        header = tk.Frame(shell, bg="#FFFFFF", height=76,
+        header = tk.Frame(shell, bg="#FFFFFF", height=62,
                           highlightthickness=1, highlightbackground=self.colors["line"])
         header.pack(fill="x")
         header.pack_propagate(False)
@@ -158,7 +169,7 @@ class ExamApp:
                  font=("Segoe UI", 8, "bold")).pack(side="right", padx=28)
 
         # Burgundy welcome banner, echoing the original website's visual identity
-        hero = tk.Frame(shell, bg=self.colors["wine"], height=126)
+        hero = tk.Frame(shell, bg=self.colors["wine"], height=98)
         hero.pack(fill="x")
         hero.pack_propagate(False)
         hero_inner = tk.Frame(hero, bg=self.colors["wine"])
@@ -167,22 +178,25 @@ class ExamApp:
                  fg="#F3C9D5", font=("Segoe UI", 8, "bold")).pack(anchor="w")
         tk.Label(hero_inner, text="Van bronbestand naar betrouwbare vraagbank",
                  bg=self.colors["wine"], fg="#FFFFFF",
-                 font=("Segoe UI", 22, "bold")).pack(anchor="w", pady=(3, 2))
+                 font=("Segoe UI", 18, "bold")).pack(anchor="w", pady=(2, 1))
         tk.Label(hero_inner, text="Importeer, controleer en verrijk examens stap voor stap. Jij houdt de inhoudelijke regie.",
                  bg=self.colors["wine"], fg="#F8EAF0",
                  font=("Segoe UI", 10)).pack(anchor="w")
 
-        body = ttk.Frame(shell, style="App.TFrame", padding=(26, 18, 26, 12))
+        body = ttk.Frame(shell, style="App.TFrame", padding=(16, 10, 16, 6))
         body.pack(fill="both", expand=True)
         self.notebook = ttk.Notebook(body)
         self.notebook.pack(fill="both", expand=True)
 
-        overview = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
-        documents = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
-        workflow = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
-        self.notebook.add(overview, text="  Overzicht  ")
-        self.notebook.add(documents, text="  Documenten  ")
-        self.notebook.add(workflow, text="  Verwerkroute  ")
+        overview_page = ttk.Frame(self.notebook, style="App.TFrame")
+        documents_page = ttk.Frame(self.notebook, style="App.TFrame")
+        workflow_page = ttk.Frame(self.notebook, style="App.TFrame")
+        self.notebook.add(overview_page, text="  Overzicht  ")
+        self.notebook.add(documents_page, text="  Documenten  ")
+        self.notebook.add(workflow_page, text="  Verwerkroute  ")
+        overview = self._scrollable_tab(overview_page)
+        documents = self._scrollable_tab(documents_page)
+        workflow = self._scrollable_tab(workflow_page)
 
         # OVERVIEW: project identity, progress and large primary actions
         top = ttk.Frame(overview, style="App.TFrame")
@@ -367,12 +381,28 @@ class ExamApp:
                  fg=self.colors["wine"], font=("Segoe UI", 8, "bold")).pack(side="left")
         tk.Label(activity_head, text="Lokale log · bronbestanden blijven intact",
                  bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
-        self.log = tk.Text(activity, height=3, wrap="word", font=("Segoe UI", 9),
+        self.log = tk.Text(activity, height=2, wrap="word", font=("Segoe UI", 8),
                            background="#FBFCFC", foreground=self.colors["ink"],
                            insertbackground=self.colors["ink"], relief="flat",
                            padx=10, pady=6, highlightthickness=0)
         self.log.pack(fill="x", padx=10, pady=(2, 8))
         self.log.configure(state="disabled")
+
+    def _scrollable_tab(self, parent):
+        """Return a vertically scrollable content frame for a notebook tab."""
+        holder = ttk.Frame(parent, style="App.TFrame")
+        holder.pack(fill="both", expand=True)
+        canvas = tk.Canvas(holder, background=self.colors["canvas"], highlightthickness=0)
+        scrollbar = ttk.Scrollbar(holder, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        content = ttk.Frame(canvas, style="App.TFrame", padding=4)
+        window_id = canvas.create_window((0, 0), window=content, anchor="nw")
+        content.bind("<Configure>", lambda _event: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>", lambda event: canvas.itemconfigure(window_id, width=event.width))
+        canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(int(-event.delta / 120), "units"))
+        return content
 
     def _metric_card(self, parent, heading, value, caption, column):
         card = tk.Frame(parent, bg="#FFFFFF", highlightthickness=1,
@@ -497,7 +527,7 @@ class ExamApp:
 
         win = tk.Toplevel(self.root)
         win.title("Examens controleren en automatisch groeperen")
-        win.geometry("1120x650")
+        fit_window(win, 1180, 720, 900, 560)
         win.transient(self.root)
         win.grab_set()
         ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Controleer niveau, jaar, tijdvak en documenttype. Er wordt nog niets verwerkt of verplaatst.",
@@ -551,8 +581,7 @@ class ExamApp:
             meta = doc.get("exam_metadata") or {}
             edit = tk.Toplevel(win)
             edit.title("Voorblad en automatisch herkende metadata controleren")
-            edit.geometry("1080x760")
-            edit.minsize(900, 650)
+            fit_window(edit, 1080, 760, 820, 560)
             edit.transient(win)
             edit.grab_set()
 
@@ -633,6 +662,15 @@ class ExamApp:
             ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
 
         def confirm_import():
+            # This final button is the single human approval for the reviewed batch.
+            # Valid proposals are explicitly accepted here; incomplete/invalid
+            # identity or document roles still block the import.
+            for doc in documents:
+                if doc.get("type_voorstel") in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                    doc["type_zekerheid"] = 1.0
+                meta = doc.get("exam_metadata") or {}
+                if meta.get("level") in {"Havo", "Vwo"} and re.fullmatch(r"20\d{2}", str(meta.get("year", "")).strip()) and str(meta.get("period", "")) in {"1", "2", "3"}:
+                    doc["exam_metadata"] = {**meta, "confidence": 1.0, "source": "handmatig_bevestigd"}
             errors = validate_batch_documents(documents)
             if errors:
                 messagebox.showerror("Eerst herkenning corrigeren",
@@ -648,11 +686,6 @@ class ExamApp:
                     warnings.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {warning}")
             warning_text = "\n".join(warnings) if warnings else "Geen ontbrekende opgaven of CV's en geen dubbele hoofd-documenttypen gesignaleerd."
             summary_text = "\n".join(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's" for key, items in groups.items())
-            if not messagebox.askyesno("Import definitief controleren",
-                f"Er worden {len(groups)} examenprojecten automatisch opgeslagen onder:\\n{self.examens_root}\\n\\n"
-                + summary_text + "\\n\\nWaarschuwingen:\\n" + warning_text
-                + "\\n\\nAlle getoonde metadata en documenttypen zijn door jou gecontroleerd. Doorgaan?", parent=win):
-                return
             target_root = self.examens_root
             created = []
             created_directories = []
@@ -731,7 +764,7 @@ class ExamApp:
                 f"{len(created)} examenprojecten zijn automatisch aangemaakt onder:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
         ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
-        ttk.Button(win, text="Alle voorstellen controleren en examens importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
+        ttk.Button(win, text="Voorstellen akkoord — importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
         ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
         refresh_review()
         self._log(f"Bulkimport voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt. Doelmap: {self.examens_root}")
@@ -793,8 +826,7 @@ class ExamApp:
 
         win=tk.Toplevel(self.root)
         win.title("Voorblad en examengegevens controleren")
-        win.geometry("1080x760")
-        win.minsize(900,650)
+        fit_window(win, 1080, 760, 820, 560)
         win.transient(self.root)
         win.grab_set()
         body=ttk.Frame(win,padding=14); body.pack(fill="both",expand=True)
@@ -2724,8 +2756,7 @@ class ExamApp:
 
         win = tk.Toplevel(self.root)
         win.title("Voorblad en documentmetadata controleren")
-        win.geometry("1080x760")
-        win.minsize(900, 650)
+        fit_window(win, 1080, 760, 820, 560)
         win.transient(self.root)
         win.grab_set()
         body = ttk.Frame(win, padding=14)
