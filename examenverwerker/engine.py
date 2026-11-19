@@ -320,44 +320,112 @@ def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, s
 
 
 def question_pattern_key(candidate: dict) -> str:
-    line=str(candidate.get("line","")).strip()
-    if re.match(r"^\d{1,2}[.)]\s+\S",line):
-        return "question_start:numbered_line_with_text"
-    if re.fullmatch(r"\d{1,2}[.)]?",line) and candidate.get("next_line"):
-        return "question_start:standalone_number_then_text"
-    return "question_start:other_number_pattern"
+    """Build a privacy-safe, normalized feature signature for reusable learning.
+
+    Exact question text, question number, page and coordinates are deliberately
+    excluded: they are exam-specific and would cause memorisation rather than learning.
+    """
+    line = re.sub(r"\s+", " ", str(candidate.get("line", "")).strip().lower())
+    following = re.sub(r"\s+", " ", str(candidate.get("next_line", "")).strip().lower())
+    standalone = bool(re.fullmatch(r"\d{1,2}[.)]?", line))
+    inline = bool(re.match(r"^\d{1,2}[.)]\s+\S", line))
+    points = bool(re.search(r"\b\d{1,2}\s*(?:p|pt|punt|punten)\b", following))
+    cue_words = r"\b(verklaar|beschrijf|noem|geef|welk|welke|wat|wie|waar|waarom|waardoor|waarin|waarmee|wanneer|hoe|bereken|noteer|leg|toon|gebruik|kies|bepaal|licht toe|beargumenteer|leid af|selecteer)\b"
+    cue = "instruction" if re.search(cue_words, line + " " + following, re.I) else "none"
+    if re.match(r"^[a-h][.)]\s+", following):
+        following_kind = "option"
+    elif following and re.fullmatch(r"\d{1,2}\s*(?:p|pt|punt|punten)", following, re.I):
+        following_kind = "points"
+    elif following:
+        following_kind = "text"
+    else:
+        following_kind = "empty"
+    shape = "inline" if inline else "standalone" if standalone else "other"
+    return f"qstart:v2:shape={shape}|cue={cue}|points={int(points)}|next={following_kind}"
+
 
 def learn_decision(knowledge_dir: Path, decision: dict):
-    knowledge_dir.mkdir(parents=True,exist_ok=True)
-    path=knowledge_dir/"decisions.jsonl"
-    record={"created_at":datetime.now().astimezone().isoformat(timespec="seconds"),**decision}
-    with path.open("a",encoding="utf-8") as f: f.write(json.dumps(record,ensure_ascii=False)+"\n")
+    """Append an auditable human decision; machine suggestions never become labels."""
+    knowledge_dir.mkdir(parents=True, exist_ok=True)
+    path = knowledge_dir / "decisions.jsonl"
+    record = {"created_at": datetime.now().astimezone().isoformat(timespec="seconds"), **decision}
+    with path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, ensure_ascii=False) + "\n")
     return record
 
+
 def load_decisions(knowledge_dir: Path) -> list[dict]:
-    path=knowledge_dir/"decisions.jsonl"
-    if not path.exists(): return []
-    rows=[]
+    path = knowledge_dir / "decisions.jsonl"
+    if not path.exists():
+        return []
+    rows = []
     for line in path.read_text(encoding="utf-8").splitlines():
-        try: rows.append(json.loads(line))
-        except json.JSONDecodeError: continue
+        try:
+            item = json.loads(line)
+            if isinstance(item, dict):
+                rows.append(item)
+        except json.JSONDecodeError:
+            # A truncated final line must not make the complete knowledge base unusable.
+            continue
     return rows
 
+
 def suggest_from_learning(knowledge_dir: Path, key: str) -> dict:
-    """Only return patterns backed by repeated decisions; never auto-apply."""
-    matches=[d for d in load_decisions(knowledge_dir) if d.get("pattern_key")==key and d.get("accepted") is True]
-    counts={}
-    for d in matches:
-        value=json.dumps(d.get("chosen"),sort_keys=True,ensure_ascii=False)
-        counts[value]=counts.get(value,0)+1
-    if not counts: return {"suggestion":None,"support":0,"auto_apply":False}
-    winner=max(counts,key=counts.get)
-    support=counts[winner]
-    competing=max((n for value,n in counts.items() if value!=winner),default=0)
-    # One decision is not a reusable pattern; ties are conflicting evidence.
-    if support < 2 or competing > 0:
-        return {"suggestion":None,"support":support,"conflicting":competing>0,"auto_apply":False}
-    return {"suggestion":json.loads(winner),"support":support,"conflicting":False,"auto_apply":False}
+    """Suggest a label only after consistent evidence from independent exam PDFs.
+
+    Decisions from one document count once. A minimum of three independent
+    documents and 80% agreement are required; conflicting or weak evidence is
+    exposed as such. The result is advice only and is never auto-applied.
+    """
+    latest_by_document = {}
+    legacy_support = 0
+    for decision in load_decisions(knowledge_dir):
+        if decision.get("pattern_key") != key or decision.get("accepted") is not True:
+            continue
+        chosen = decision.get("chosen")
+        if chosen not in {"question", "not_question"}:
+            continue
+        document_id = str(decision.get("document_id") or "")
+        if not document_id:
+            legacy_support += 1
+            continue
+        candidate_key = (
+            document_id,
+            str(decision.get("candidate_id") or decision.get("candidate_line") or ""),
+            str(decision.get("page") or ""),
+        )
+        latest_by_document[candidate_key] = decision
+
+    # Legacy records without a document identity are intentionally not allowed
+    # to establish a reusable rule: they cannot prove independent exam support.
+    per_document = {}
+    for decision in latest_by_document.values():
+        doc_id = str(decision.get("document_id"))
+        per_document.setdefault(doc_id, []).append(decision.get("chosen"))
+    votes = {"question": 0, "not_question": 0}
+    for labels in per_document.values():
+        # Multiple reviewed candidates in one exam contribute one exam-level vote.
+        for label in set(labels):
+            votes[label] += 1
+    total = sum(votes.values())
+    if total == 0:
+        return {"suggestion": None, "support": 0, "document_support": 0,
+                "confidence": 0.0, "conflicting": False, "auto_apply": False}
+    winner = max(votes, key=votes.get)
+    support = votes[winner]
+    confidence = support / total
+    enough_independent_evidence = support >= 3 and len(per_document) >= 3
+    consistent = confidence >= 0.8
+    suggestion = winner if enough_independent_evidence and consistent else None
+    return {
+        "suggestion": suggestion,
+        "support": support,
+        "document_support": len(per_document),
+        "confidence": round(confidence, 3),
+        "conflicting": not consistent,
+        "legacy_records_ignored": legacy_support,
+        "auto_apply": False,
+    }
 
 def validate_website_records(mcq: list, opened: list, contexts: list) -> list[dict]:
     errors=[]
