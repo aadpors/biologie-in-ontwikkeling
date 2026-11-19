@@ -744,7 +744,8 @@ class ExamApp:
             item=rows[int(selected[0])]
             key=f"{item.get('document_id')}|{item.get('number')}|{item.get('page')}|{float(item.get('bbox',[0,0])[1]):.1f}"
             item["status"]="controle_nodig"
-            item["human_decision"]=None            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
+            item["human_decision"]=None
+            item["reason"]="Handmatig hersteld uit onderdrukte dubbelingen; controleer de originele pagina."
             item.pop("suppressed_by",None)
             self.data["onderdrukte_vraagkandidaten"]=[x for x in self.data.get("onderdrukte_vraagkandidaten",[]) if x is not item]
             self.data.setdefault("vraagkandidaten",[]).append(item)
@@ -1242,7 +1243,8 @@ class ExamApp:
                 if structure is None and self.data.get("exam_structure", {}).get("document_id") == source_doc["id"]:
                     structure = self.data.get("exam_structure")
                 structure_errors = validate_exam_structure(structure, source_doc["id"], source_doc["sha256"], confirmed_numbers) if structure else ["structuur_niet_ingesteld"]
-                missing_regions = missing_question_regions(structure, [int(row["number"])])                if structure_errors or missing_regions:
+                missing_regions = missing_question_regions(structure, [int(row["number"])])
+                if structure_errors or missing_regions:
                     raise ValueError("Baken eerst het vraagfragment voor deze vraag af in 'Examenstructuur bewerken'. " +
                                      ("Structuurcontrole: " + ", ".join(structure_errors) if structure_errors else "Vraagfragment ontbreekt."))
                 linkage = fragments_for_question(structure, row["number"])
@@ -1991,7 +1993,8 @@ class ExamApp:
         def delete_fragment():
             sel = fragment_tree.selection()
             if not sel: return
-            index = int(sel[0])            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
+            index = int(sel[0])
+            if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
             fragments.pop(index); refresh_fragment_list(); save_structure()
         def load_selected_fragment(_event=None):
             load_span_for_page(); redraw_guides()
