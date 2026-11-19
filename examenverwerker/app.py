@@ -1757,22 +1757,27 @@ class ExamApp:
         def update_links():
             frag = selected_fragment()
             if not frag: return
+            new_type = type_var.get()
             links = selected_links()
-            if frag.get("type") != "vraag" and not links:
-                if frag.get("type") == "context_intro":
+            if new_type == "vraag" and len(links) != 1:
+                messagebox.showwarning("Vraagfragment", "Een vraagfragment moet aan precies één vraagnummer gekoppeld zijn.", parent=win)
+                return
+            if new_type != "vraag" and not links:
+                if new_type == "context_intro":
                     links = question_numbers[:]
                     messagebox.showinfo("Inleiding", "De contextinleiding is standaard aan alle bevestigde vragen gekoppeld.", parent=win)
                 else:
                     messagebox.showwarning("Context zonder vraagkoppeling",
                         "Koppel dit contextfragment aan minimaal één vraag. Anders zou het materiaal bij geen enkele vraag worden getoond.", parent=win)
                     return
+            frag["type"] = new_type
             frag["question_numbers"] = links
             save_structure(); refresh_fragment_list()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
         ttk.Button(actions, text="Huidige paginagrens bijwerken", command=update_page_span).pack(side="left", padx=8)
         ttk.Button(actions, text="Pagina toevoegen aan geselecteerd fragment", command=append_page).pack(side="left", padx=8)
-        ttk.Button(actions, text="Koppeling opslaan", command=update_links).pack(side="left")
+        ttk.Button(actions, text="Fragmenttype en koppeling opslaan", command=update_links).pack(side="left")
         ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
         def save_and_close():
             if save_structure():
