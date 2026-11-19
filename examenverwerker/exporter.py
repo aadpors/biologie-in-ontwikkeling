@@ -290,9 +290,9 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "question_region_page_spans":r.get("question_region_page_spans", []),
                          "context_region_fragments":r.get("context_region_fragments", []),
                          "context_asset_files":[{"file":x["file"],"sha256":sha256(project_dir/"snippets"/x["file"]),
-                             "asset_id":x.get("asset_id"),"caption":x.get("caption"),"page":x.get("page"),
+                             "asset_id":x.get("asset_id"),"asset_kind":x.get("asset_kind"),"caption":x.get("caption"),"page":x.get("page"),
                              "fragment_id":x.get("fragment_id"),"type":x.get("type"),"source_document_id":x.get("source_document_id"),
-                             "source_sha256":x.get("source_sha256"),"caption_human_confirmed":x.get("caption_human_confirmed", False)} for x in context_assets],
+                             "source_sha256":x.get("source_sha256"),"source_pdf":x.get("source_pdf"),"bbox":x.get("bbox"),\n                             "snippet_sha256":x.get("snippet_sha256"),"caption_human_confirmed":x.get("caption_human_confirmed", False)} for x in context_assets],
                          "cv_source_region":r.get("cv_source_region"),
                          "cv_source_region_sha256":sha256(project_dir/"snippets"/cv_region_file) if cv_region_file else None,
                          "cv_amendment_regions":r.get("cv_amendment_regions", [])})
