@@ -5,7 +5,23 @@ unit-tested independently from the desktop UI.
 """
 from __future__ import annotations
 
+import hashlib
+import json
+
 from structure import validate_exam_structure
+
+
+def exam_export_fingerprint(data: dict) -> str:
+    """Hash all source and reviewed data that an export package depends on."""
+    payload = {
+        "documenten": data.get("documenten", []),
+        "vraagkandidaten": data.get("vraagkandidaten", []),
+        "exam_structures": data.get("exam_structures", {}),
+        "exam_structure": data.get("exam_structure", {}),
+        "vraagrecords": data.get("vraagrecords", []),
+    }
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def exam_workflow_state(data: dict) -> dict:
@@ -84,5 +100,10 @@ def exam_workflow_state(data: dict) -> dict:
         return {"stage": "ontbrekende_vragen", "label": "Controleer ontbrekende vraagstarts",
                 "action": "Er zijn geen vraagrecords; controleer of er vragen ontbreken."}
 
-    return {"stage": "export", "label": "Klaar voor export",
+    fingerprint = exam_export_fingerprint(data)
+    export_status = data.get("export_status") or {}
+    if export_status.get("fingerprint") == fingerprint:
+        return {"stage": "voltooid", "label": "Exportpakket gemaakt",
+                "action": "Het gecontroleerde exportpakket is aangemaakt; er is niets gepubliceerd."}
+    return {"stage": "export", "label": "Exportpakket maken",
             "action": "Maak het gecontroleerde exportpakket."}
