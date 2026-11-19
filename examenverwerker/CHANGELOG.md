@@ -6,6 +6,13 @@
 - Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
 - De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
 
+## 0.13.6
+- Vraagstartleren gebruikt genormaliseerde layout-/taalfeatures in plaats van alleen twee grove patroonklassen; exacte vraagtekst, nummer en PDF-positie worden niet in de leersleutel opgenomen.
+- Een leeradvies vereist nu minimaal drie onafhankelijke examen-PDF's en ten minste 80% overeenstemming. Herhaalde keuzes binnen één PDF tellen niet als onafhankelijke examens; conflicten blijven zichtbaar en niets wordt automatisch toegepast.
+- De structuurvoorstellen bevatten naast vraagbanden ook afzonderlijke, controleerbare contextvoorstellen rond gedetecteerde afbeeldingen, schema's, tabellen en bijschriften.
+- De structuur-editor toont per voorstel de zekerheid en de herkenningsreden, zodat duidelijk is waarop de koppeling is gebaseerd.
+- Regressietests toegevoegd voor generaliseerbare leersleutels, onafhankelijke examensteun, conflicterende feedback en contextvoorstellen uit visuele PDF-elementen.
+
 # Wijzigingen
 
 ## 0.13.2
