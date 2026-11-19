@@ -1,5 +1,14 @@
 # Wijzigingen
 
+## 0.8.0
+- Jaarset-import toegevoegd zonder vooraf projecten aan te maken: selecteer alle examen-PDF's van een jaar in één keer.
+- Automatische groepering op exacte combinatie van niveau, jaar en tijdvak; havo en vwo en alle tijdvakken blijven strikt gescheiden.
+- Controlevenster toont per PDF documenttype, herkenningszekerheid, niveau, jaar, tijdvak en pagina-aantal; onzekere of ontbrekende herkenning moet handmatig worden gecorrigeerd.
+- Import maakt pas na expliciete bevestiging afzonderlijke, bestaande-compatibele examenprojecten aan en bewaart een jaarset-manifest.
+- Waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande projecten worden niet overschreven.
+- Tests toegevoegd voor exacte groepering, onvolledige metadata en importblokkades.
+
+
 ## 0.7.1
 - Alle handmatige uitsneden gebruiken uitsluitend horizontale stroken over de volledige paginabreedte.
 - De strookselectie toont en verplaatst alleen twee horizontale grenzen; verticale grenslijnen zijn verwijderd.
