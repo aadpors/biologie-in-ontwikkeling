@@ -344,7 +344,7 @@ class ExamApp:
                 matching_cvs = match_correction_documents(doc, cv_docs)
                 if len(matching_cvs) == 1:
                     cv_doc = matching_cvs[0]
-                    cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
+                    cv_analysis = analyze_pdf(cv_path)
                     cv_candidates = detect_cv_question_numbers(cv_analysis)
                     # A well-populated CV gives a useful independent signal for
                     # suspicious source-line numbers; it never auto-rejects a start.
@@ -840,7 +840,13 @@ class ExamApp:
                 cv_errors = validate_cv_fragment(cv_region or {}, cv_doc, row["number"], "correctievoorschrift")
                 if cv_errors:
                     raise ValueError("Baken eerst het volledige correctievoorschrift voor deze vraag handmatig af. " + ", ".join(cv_errors))
-                source_analysis = analyze_pdf(self.project_dir / "bronnen" / source_doc["opslagbestand"])
+                source_path = self.project_dir / "bronnen" / source_doc["opslagbestand"]
+                if not source_path.is_file() or sha256(source_path) != source_doc["sha256"]:
+                    raise ValueError("De opgaven-PDF is gewijzigd sinds de vraagstructuur is opgeslagen. Voeg de juiste bron opnieuw toe en analyseer opnieuw.")
+                cv_path = self.project_dir / "bronnen" / cv_doc["opslagbestand"]
+                if not cv_path.is_file() or sha256(cv_path) != cv_doc["sha256"]:
+                    raise ValueError("Het geselecteerde correctievoorschrift is gewijzigd sinds de CV-afbakening. Voeg de juiste PDF opnieuw toe.")
+                source_analysis = analyze_pdf(source_path)
                 source_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in source_analysis["pages"]}
                 question_segments = page_spans_to_segments(question_fragment["page_spans"], source_sizes)
                 question_file = f"question-{source_doc['id']}-q{row['number']}-manual.png"
@@ -860,7 +866,10 @@ class ExamApp:
                     errors = validate_cv_fragment(region or {}, amendment_doc, row["number"], "aanvulling")
                     if errors:
                         raise ValueError(f"Baken ook de geselecteerde CV-aanvulling {amendment_doc['bestand']} handmatig af voor vraag {row['number']}. " + ", ".join(errors))
-                    amend_analysis = analyze_pdf(self.project_dir / "bronnen" / amendment_doc["opslagbestand"])
+                    amendment_path = self.project_dir / "bronnen" / amendment_doc["opslagbestand"]
+                    if not amendment_path.is_file() or sha256(amendment_path) != amendment_doc["sha256"]:
+                        raise ValueError(f"De geselecteerde CV-aanvulling {amendment_doc['bestand']} is gewijzigd sinds de afbakening.")
+                    amend_analysis = analyze_pdf(amendment_path)
                     amend_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in amend_analysis["pages"]}
                     amend_segments = page_spans_to_segments(region["page_spans"], amend_sizes)
                     amend_file = f"cv-amend-{amendment_doc['id']}-q{row['number']}-handmatig.png"
