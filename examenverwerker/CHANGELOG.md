@@ -1,3 +1,7 @@
+## 0.13.3
+- Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
+- De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
+
 # Wijzigingen
 
 ## 0.13.2
