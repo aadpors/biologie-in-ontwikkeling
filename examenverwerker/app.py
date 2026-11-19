@@ -1019,7 +1019,8 @@ class ExamApp:
                     render_crop(source,int(asset["page"]),asset["bbox"],target,scale=1.8)
                     context_files.append({"file":name,"page":asset["page"],"caption":asset.get("caption"),
                                           "asset_id":asset_id,"asset_kind":asset.get("asset_kind","source_text"),
-                                          "status":"handmatige_controle_verplicht"})
+                                          "bbox":list(asset["bbox"]),"source_document_id":doc["id"],
+                                          "source_sha256":doc["sha256"],"status":"handmatige_controle_verplicht"})
             row["context_asset_proposal_files"]=context_files
             self.save_project()
             win=tk.Toplevel(parent); win.title(f"Voorlopig fragment vraag {row['number']}"); win.geometry("900x800")
