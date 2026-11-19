@@ -3060,33 +3060,34 @@ class ExamApp:
         self.project_label.configure(text=f"Project: {self.data['naam']}  ·  {self.project_dir}")
 
     def refresh(self):
-        for item in self.table.get_children():
-            self.table.delete(item)
+        """Refresh document inventory, review queue and project progress."""
         documents = self.data.get("documenten", []) if self.data else []
-        records = self.data.get("vraagrecords", []) if self.data else []
         candidates = self.data.get("vraagkandidaten", []) if self.data else []
-        todo = sum(d.get("status") == "controle_nodig" for d in documents)
-        for idx, doc in enumerate(documents):
-            self.table.insert("", "end", iid=str(idx), values=(
-                doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
-                doc.get("pagina_aantal", "—"),
-                f"{doc.get('type_zekerheid', 0):.0%}",
-                str(doc.get("status", "onbekend")).replace("_", " ")
-            ), tags=("even" if idx % 2 == 0 else "odd",))
-        if self.data:
-            self.project_label.configure(text=self.data.get("naam") or
-                (self.project_dir.name if self.project_dir else "Actief project"))
-        else:
-            self.project_label.configure(text="Nog geen project geopend")
-        self.metric_documents.configure(text=str(len(documents)))
-        self.metric_questions.configure(text=str(len(candidates)))
-        self.metric_todo.configure(text=str(todo))
-        self.metric_records.configure(text=str(len(records)))
-        self.status.configure(text=(
-            f"{len(documents)} bronbestanden · {len(candidates)} vraagstartkandidaten · "
-            f"{todo} documentherkenningen vragen controle · niets wordt automatisch gepubliceerd."
-            if self.data else "Importeer examens of open een bestaand project om te beginnen."
-        ))
+        records = self.data.get("vraagrecords", []) if self.data else []
+        if hasattr(self, "project_label"):
+            self.project_label.configure(text=(
+                self.data.get("naam") or (self.project_dir.name if self.project_dir else "Actief project")
+                if self.data else "Nog geen examen geopend"))
+        if hasattr(self, "table"):
+            for item in self.table.get_children():
+                self.table.delete(item)
+            for index, doc in enumerate(documents):
+                self.table.insert("", "end", iid=str(index), values=(
+                    doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
+                    doc.get("pagina_aantal", "—"), str(doc.get("status", "onbekend")).replace("_", " ")))
+        if hasattr(self, "status"):
+            undecided = sum(row.get("human_decision") is None for row in candidates)
+            confirmed = sum(row.get("human_decision") is True for row in candidates)
+            rejected = sum(row.get("human_decision") is False for row in candidates)
+            unapproved_records = sum(not row.get("approved_by_human", False) for row in records)
+            self.status.configure(text=(
+                f"{len(documents)} documenten · {len(candidates)} vraagstarts "
+                f"({confirmed} bevestigd, {rejected} afgewezen, {undecided} open) · "
+                f"{len(records)} vraagrecords ({unapproved_records} nog niet goedgekeurd) · "
+                "originele PDF's blijven leidend; niets wordt automatisch gepubliceerd."
+                if self.data else "Importeer examens of open een bestaand project om te beginnen."))
+        if hasattr(self, "candidate_tree") and hasattr(self, "_workspace_temp"):
+            self._workspace_refresh()
 
 def main():
     root = tk.Tk()
