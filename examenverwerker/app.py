@@ -17,7 +17,7 @@ from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.13.8"
+APP_VERSION = "0.13.9"
 PROJECT_FILE = "project.json"
 
 def now():
