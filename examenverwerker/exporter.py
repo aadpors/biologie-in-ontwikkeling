@@ -33,6 +33,10 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             errors.append({"id":rid,"error":review_error})
         if r.get("source_analysis_invalidated") is True:
             errors.append({"id":rid,"error":"bron_analyse_verouderd"})
+        if r.get("exam_structure_invalidated") is True:
+            errors.append({"id":rid,"error":"vraag_contextstructuur_gewijzigd_record_opnieuw_samenstellen"})
+        if r.get("cv_region_invalidated") is True:
+            errors.append({"id":rid,"error":"cv_regio_gewijzigd_record_opnieuw_samenstellen"})
         # Publication requires source-faithful manual regions, not only the old
         # automatically proposed question/CV snippets.
         source_name = r.get("source_pdf", "")
