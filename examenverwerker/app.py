@@ -203,6 +203,9 @@ class ExamApp:
                        "metadata": extracted["metadata"],
                        "pagina_zonder_tekst": [p["pagina"] for p in extracted["pagina_tekst"] if p.get("ocr_nodig")],
                        "ocr_status": "handmatige_ocr_controle_nodig" if any(p.get("ocr_nodig") for p in extracted["pagina_tekst"]) else "tekstlaag_aanwezig"}
+                confirmed_identity=self.data.get("exam_metadata", {})
+                if confirmed_identity.get("source") == "handmatig_bevestigd" and kind in ("opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"):
+                    doc["exam_metadata"]=dict(confirmed_identity)
                 (self.project_dir / "analyse" / f"{digest[:16]}.json").write_text(
                     json.dumps(extracted, ensure_ascii=False, indent=2), encoding="utf-8")
                 self.data["documenten"].append(doc)
