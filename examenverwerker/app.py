@@ -822,6 +822,20 @@ class ExamApp:
             page_spin.configure(command=show_crop_page)
             page_spin.bind("<Return>",lambda _e:show_crop_page())
             show_crop_page()
+        def remove_context_assets():
+            selected=list(context_list.curselection())
+            if not selected:
+                messagebox.showinfo("Geen uitsnede geselecteerd","Selecteer eerst één of meer uitsneden die je uit dit vraagrecord wilt verwijderen.",parent=win)
+                return
+            if not messagebox.askyesno("Uitsneden verwijderen",f"Verwijder {len(selected)} geselecteerde contextuitsnede(n) uit dit vraagrecord? De originele PDF blijft behouden.",parent=win):
+                return
+            for index in reversed(selected):
+                context_files.pop(index)
+                context_list.delete(index)
+            row["context_asset_proposal_files"]=[dict(x) for x in context_files]
+            context_caption_var.set("")
+            self.save_project()
+        ttk.Button(outer,text="Geselecteerde contextuitsnede(n) verwijderen",command=remove_context_assets).pack(anchor="w",pady=(2,4))
         ttk.Button(outer,text="Figuur/tabel handmatig uitsnijden uit originele PDF",command=add_manual_context_crop).pack(anchor="w",pady=(2,6))
 
         ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
