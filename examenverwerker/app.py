@@ -987,9 +987,25 @@ class ExamApp:
         if source.is_file():
             target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-opgaven.png"
             preview_specs.append(("Originele opgavenpagina",source,int(record.get("source_page",1)),target))
+            shown_source_pages={int(record.get("source_page",1))}
+            source_page_numbers={int(x["page"]) for x in record.get("question_region_page_spans", [])}
+            for fragment in record.get("context_region_fragments", []):
+                source_page_numbers.update(int(x["page"]) for x in fragment.get("page_spans", []))
+            for asset in record.get("context_asset_files", []):
+                if asset.get("source_document_id")==record.get("exam_structure_document_id") and asset.get("page"):
+                    source_page_numbers.add(int(asset["page"]))
+            for page_no in sorted(source_page_numbers-shown_source_pages):
+                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-opgaven-p{page_no}.png"
+                preview_specs.append((f"Originele opgavenpagina {page_no}",source,page_no,target))
         cv_snippet=record.get("cv_snippet_file")
         if cv_snippet:
-            preview_specs.append(("CV-fragmentvoorstel",self.project_dir/"snippets"/cv_snippet,None,None))
+            preview_specs.append(("Handmatig afgebakend CV-fragment",self.project_dir/"snippets"/cv_snippet,None,None))
+        cv_path=self.project_dir/"bronnen"/str(record.get("cv_pdf",""))
+        if cv_path.is_file():
+            for cv_index,span in enumerate(record.get("cv_source_region", {}).get("page_spans", []),1):
+                page_no=int(span["page"])
+                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-cv-origineel-p{page_no}.png"
+                preview_specs.append((f"Originele CV-pagina {page_no} (afgebakende regio {cv_index})",cv_path,page_no,target))
         amendment_snippets=record.get("cv_amendment_snippet_files") or ([record["cv_amendment_snippet_file"]] if record.get("cv_amendment_snippet_file") else [])
         for amendment_index, amendment_snippet in enumerate(amendment_snippets, 1):
             preview_specs.append((f"Handmatig afgebakende CV-aanvulling {amendment_index}",self.project_dir/"snippets"/amendment_snippet,None,None))
