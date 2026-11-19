@@ -972,17 +972,20 @@ class ExamApp:
                     f"Er is een fout opgetreden. Alleen nieuwe mappen uit deze import zijn opgeruimd; bestaande examens zijn niet gewijzigd.\\n\\n{exc}", parent=win)
                 return
             win.destroy()
-            self.project_dir = None
-            self.data = None
-            self.project_label.configure(text=f"Examens opgeslagen onder: {target_root}")
-            for item in self.table.get_children():
-                self.table.delete(item)
-            self.status.configure(text=f"{len(created)} examenprojecten aangemaakt. Open een project om de inhoudelijke verwerking te starten.")
+            # Open the first exam immediately so the user can start the full
+            # review workflow without having to locate project.json manually.
+            # All other imported exam projects remain available under the same root.
+            self.project_dir = created[0]
+            self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
+            self.refresh()
             self._log(f"Examens geïmporteerd onder: {target_root}")
             for project in created:
                 self._log(f"  Project aangemaakt: {project.name}")
+            self._log(f"Eerste examen automatisch geopend: {self.project_dir.name}")
             messagebox.showinfo("Examens geïmporteerd",
-                f"{len(created)} examenprojecten zijn automatisch aangemaakt onder:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
+                f"{len(created)} examenprojecten zijn aangemaakt onder:\n{target_root}\n\n"
+                f"Het eerste examen ({self.project_dir.name}) is direct geopend. Je kunt nu de vraagstarts controleren; "
+                "de overige examens open je via Project openen. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
         ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
         ttk.Button(win, text="Voorstellen akkoord — importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
