@@ -582,7 +582,7 @@ class ExamApp:
                             context_segments=page_spans_to_segments(fragment["page_spans"],context_sizes)
                             found_text=extract_region_text(self.project_dir/"bronnen"/source_doc["opslagbestand"],context_segments)
                             if found_text: context_texts.append(found_text)
-                        initial_context_text="\\n\\n".join(context_texts)
+                        initial_context_text="\n\n".join(context_texts)
             except Exception as exc:
                 self._log(f"Contexttekst kon niet vooraf worden geladen: {exc}")
         ttk.Label(outer,text="Contexttekst (controleer en corrigeer; leeg laten als de context uitsluitend beeldmateriaal bevat)").pack(anchor="w",pady=(8,2))
