@@ -865,11 +865,17 @@ class ExamApp:
             filetypes=[("JSON-bestanden", "*.json")])
         if not output:
             return
-        by_name = {}
-        for saved in self.data.get("biologie_controle_correcties", []):
-            if saved.get("bestand"):
-                by_name[saved["bestand"]] = dict(saved)
-                by_name[saved["bestand"]]["correcties"] = list(saved.get("correcties", []))
+        global_path = self.knowledge_dir / "biologie-correcties.json"
+        global_entries = []
+        if global_path.is_file():
+            try:
+                global_payload = json.loads(global_path.read_text(encoding="utf-8"))
+                if global_payload.get("formaat") == "biologie-correcties-v1":
+                    global_entries = global_payload.get("documenten", [])
+            except Exception:
+                global_entries = []
+        by_name = self._workspace_merge_correction_entries(
+            global_entries, self.data.get("biologie_controle_correcties", []))
         for doc in self.data.get("documenten", []):
             group = by_name.setdefault(doc.get("bestand"), {
                 "bestand": doc.get("bestand"), "correcties": []})
@@ -913,8 +919,11 @@ class ExamApp:
             "toelichting": "Alleen handmatige beoordelingen en correcties; geen PDF-inhoud of afbeeldingen."
         }
         try:
-            Path(output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-            self._log(f"Biologie-controlecorrecties geëxporteerd: {output}")
+            exported_text = json.dumps(payload, ensure_ascii=False, indent=2)
+            Path(output).write_text(exported_text, encoding="utf-8")
+            global_path.parent.mkdir(parents=True, exist_ok=True)
+            global_path.write_text(exported_text, encoding="utf-8")
+            self._log(f"Biologie-controlecorrecties geëxporteerd: {output}; centrale correctiebibliotheek bijgewerkt.")
             messagebox.showinfo("Correcties geëxporteerd", "De correcties zijn veilig als compact JSON-bestand opgeslagen.", parent=self.root)
         except Exception as exc:
             self._error("Correcties exporteren", exc)
