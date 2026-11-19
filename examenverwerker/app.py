@@ -297,23 +297,28 @@ class ExamApp:
         self.log.configure(state="disabled")
 
     def new_project(self):
-        folder = filedialog.askdirectory(title="Kies of maak een map voor dit examenproject")
-        if not folder:
-            return
-        base = Path(folder)
-        name = simpledialog.askstring("Nieuw examen", "Geef het examen een herkenbare naam:", initialvalue=base.name)
-        if not name:
-            return
-        self.project_dir = base / re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-")
-        (self.project_dir / "bronnen").mkdir(parents=True, exist_ok=True)
-        (self.project_dir / "analyse").mkdir(exist_ok=True)
-        (self.project_dir / "snippets").mkdir(exist_ok=True)
-        self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
-                     "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
-                     "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
-        self.save_project()
-        self.refresh()
-        self._log(f"Nieuw project aangemaakt: {self.project_dir}")
+        """Create a project automatically inside the portable app's own project root."""
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        name = f"nieuw-project-{stamp}"
+        root = self.app_base / "projecten"
+        self.project_dir = root / name
+        try:
+            self.project_dir.mkdir(parents=True, exist_ok=False)
+            for folder in ("bronnen", "analyse", "snippets", "logs"):
+                (self.project_dir / folder).mkdir(exist_ok=True)
+            self.data = {"schema": "biologie-examenproject-v1", "app_versie": APP_VERSION, "naam": name,
+                         "aangemaakt": now(), "bijgewerkt": now(), "documenten": [], "beslissingen": [],
+                         "publicatiestatus": "niet_vrijgegeven", "vraagkandidaten": []}
+            self.save_project()
+            self.refresh()
+            self._log(f"Nieuw project automatisch aangemaakt: {self.project_dir}")
+        except Exception as exc:
+            self.project_dir = None
+            self.data = None
+            self._error("Nieuw project aanmaken", exc)
+            messagebox.showerror("Project aanmaken mislukt",
+                f"Het project kon niet worden aangemaakt in:\n{root}\n\n"
+                "Controleer of de programmamap schrijfbaar is. Details staan in de map logs.")
 
     def open_project(self):
         filename = filedialog.askopenfilename(title="Open projectbestand", filetypes=[("Examenproject", PROJECT_FILE), ("JSON", "*.json")])
@@ -855,108 +860,204 @@ class ExamApp:
         messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Per examen is alleen het bijbehorende correctievoorschrift vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
 
     def show_candidates(self):
+        """Review question starts in one continuous workspace, without per-question dialogs."""
         if not self.data:
             return
         rows = self.data.get("vraagkandidaten", [])
         win = tk.Toplevel(self.root)
-        win.title("Mogelijke vraagstarts – altijd controleren")
-        win.geometry("900x580")
-        ttk.Label(win, text=f"{len(rows)} actieve kandidaten. Zwakkere dubbelingen worden apart bewaard en kunnen handmatig worden hersteld.", padding=10).pack(anchor="w")
-        cols=("number","page","confidence","type","options","cv","line","learning","status")
-        tree=ttk.Treeview(win,columns=cols,show="headings")
-        for col,label,width in [("number","Nr.",48),("page","PDF-pagina",78),("confidence","Signaal",68),("type","Vraagtype",105),("options","Opties",65),("cv","CV",88),("line","Gevonden tekst",290),("learning","Leerbank",105),("status","Status",125)]:
-            tree.heading(col,text=label); tree.column(col,width=width)
-        tree.pack(fill="both",expand=True,padx=10,pady=10)
-        for i,row in enumerate(rows):
-            learned=suggest_from_learning(self.knowledge_dir,question_pattern_key(row))
-            suggestion=learned.get("suggestion")
-            hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
-            if learned.get("support",0): hint+=f" ({learned['support']}×)"
-            check=row.get("vraagtype_controle",{})
-            type_label=check.get("type","nog niet bepaald")
-            option_count=len(check.get("options",[]))
-            option_label=f"{option_count} gevonden"
-            if check.get("type")=="meerkeuze" and not check.get("options_complete"):
-                option_label += " – controle"
-            cv_label=("Match" if row.get("cv_number_match") is True else "Niet in CV" if row.get("cv_number_match") is False else "—")
-            tree.insert("", "end", iid=str(i), values=(row.get("number"),row.get("page"),f"{row.get('confidence',0):.0%}",type_label,option_label,cv_label,row.get("line"),hint,row.get("status")))
-        ttk.Label(win,text="Een nummerpatroon is geen bewijs dat het een examenvraag is. Jouw beoordeling wordt lokaal als leerdata opgeslagen.",wraplength=850).pack(anchor="w",padx=12,pady=(0,8))
-        actions=ttk.Frame(win); actions.pack(fill="x",padx=12,pady=(0,12))
+        win.title("Vraagstarts controleren")
+        win.geometry("1280x820")
+        win.minsize(1040, 680)
+        win.transient(self.root)
+
+        header = ttk.Frame(win, padding=(16, 12))
+        header.pack(fill="x")
+        ttk.Label(header, text=f"{len(rows)} mogelijke vraagstarts",
+                  font=("Segoe UI", 15, "bold")).pack(anchor="w")
+        ttk.Label(header, text="Selecteer links een vraag. Bekijk rechts de tekst, opties en context en bevestig direct. Je blijft in hetzelfde venster.",
+                  wraplength=1180).pack(anchor="w", pady=(4, 0))
+
+        split = ttk.Panedwindow(win, orient="horizontal")
+        split.pack(fill="both", expand=True, padx=14, pady=8)
+        left = ttk.Frame(split, padding=6)
+        right = ttk.Frame(split, padding=10)
+        split.add(left, weight=3)
+        split.add(right, weight=5)
+
+        cols = ("number", "page", "confidence", "type", "cv", "status")
+        tree = ttk.Treeview(left, columns=cols, show="headings", selectmode="browse")
+        for col, label, width in [
+            ("number", "Nr.", 42), ("page", "Pagina", 58), ("confidence", "Signaal", 58),
+            ("type", "Type", 88), ("cv", "CV", 70), ("status", "Beoordeling", 130)
+        ]:
+            tree.heading(col, text=label)
+            tree.column(col, width=width, anchor="center" if col in ("number", "page", "confidence") else "w")
+        yscroll = ttk.Scrollbar(left, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=yscroll.set)
+        tree.pack(side="left", fill="both", expand=True)
+        yscroll.pack(side="right", fill="y")
+
+        ttk.Label(right, text="Geselecteerde vraag", font=("Segoe UI", 12, "bold")).pack(anchor="w")
+        summary = ttk.Label(right, text="Selecteer links een vraagstart.", wraplength=720)
+        summary.pack(anchor="w", pady=(4, 10))
+        ttk.Label(right, text="Gevonden tekst en vraagvoorstel", font=("Segoe UI", 9, "bold")).pack(anchor="w")
+        question_box = tk.Text(right, height=15, wrap="word", font=("Segoe UI", 10))
+        question_box.pack(fill="both", expand=True, pady=(4, 10))
+        question_box.configure(state="disabled")
+
+        details = ttk.Frame(right)
+        details.pack(fill="x")
+        options_box = tk.Text(details, height=6, wrap="word", font=("Segoe UI", 9))
+        options_box.pack(side="left", fill="both", expand=True, padx=(0, 6))
+        context_box = tk.Text(details, height=6, wrap="word", font=("Segoe UI", 9))
+        context_box.pack(side="left", fill="both", expand=True, padx=(6, 0))
+        for box in (options_box, context_box):
+            box.configure(state="disabled")
+
+        footer = ttk.Frame(win, padding=(14, 8))
+        footer.pack(fill="x")
+        status_label = ttk.Label(footer, text="Nog geen vraag geselecteerd.")
+        status_label.pack(side="left")
+
+        selected_index = {"value": None}
+        def set_box(box, text):
+            box.configure(state="normal")
+            box.delete("1.0", "end")
+            box.insert("1.0", text)
+            box.configure(state="disabled")
+
+        def learning_hint(row):
+            learned = suggest_from_learning(self.knowledge_dir, question_pattern_key(row))
+            suggestion = learned.get("suggestion")
+            hint = ("Tegenstrijdig" if learned.get("conflicting") else
+                    "Vraag" if suggestion == "question" else
+                    "Geen vraag" if suggestion == "not_question" else "Geen leeradvies")
+            if learned.get("support", 0):
+                hint += f" ({learned['support']} eerdere keuzes)"
+            return hint
+
+        def refresh_rows(select_index=None):
+            for item in tree.get_children():
+                tree.delete(item)
+            for i, row in enumerate(rows):
+                check = row.get("vraagtype_controle", {})
+                cv_label = ("Match" if row.get("cv_number_match") is True else
+                            "Niet in CV" if row.get("cv_number_match") is False else "—")
+                tree.insert("", "end", iid=str(i), values=(
+                    row.get("number"), row.get("page"), f"{row.get('confidence', 0):.0%}",
+                    check.get("type", "onbekend"), cv_label,
+                    row.get("status", "controle_nodig").replace("_", " ")))
+            if select_index is not None and str(select_index) in tree.get_children():
+                tree.selection_set(str(select_index))
+                tree.focus(str(select_index))
+                tree.see(str(select_index))
+                show_selected()
+
+        def show_selected(_event=None):
+            selection = tree.selection()
+            if not selection:
+                return
+            idx = int(selection[0])
+            selected_index["value"] = idx
+            row = rows[idx]
+            check = row.get("vraagtype_controle", {})
+            summary.configure(text=(
+                f"Vraag {row.get('number')} · PDF-pagina {row.get('page')} · "
+                f"signaal {row.get('confidence', 0):.0%} · "
+                f"status: {row.get('status', 'controle_nodig').replace('_', ' ')}\n"
+                f"Leerbank: {learning_hint(row)}"))
+            set_box(question_box, row.get("vraagtekst_voorstel", "") or
+                    (row.get("line", "") + "\n" + row.get("next_line", "")))
+            options = check.get("options", [])
+            option_lines = [f"{o.get('label')}. {o.get('text')}" for o in options]
+            if check.get("type") == "meerkeuze":
+                option_lines.append(
+                    "Ontbrekende labels: " + (", ".join(check.get("option_gaps", [])) or "geen") +
+                    "\nDubbele labels: " + (", ".join(check.get("duplicate_option_labels", [])) or "geen"))
+            set_box(options_box, "ANTWOORDOPTIES\n" + ("\n".join(option_lines) if option_lines else
+                    "Geen antwoordopties herkend; controleer of dit een open vraag is."))
+            refs = row.get("context_verwijzingen", [])
+            ref_lines = [f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
+            set_box(context_box, "CONTEXTVERWIJZINGEN\n" + ("\n".join(ref_lines) if ref_lines else
+                    "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend."))
+            status_label.configure(text=f"Vraag {row.get('number')} geselecteerd · {idx + 1} van {len(rows)}")
+
         def decide(is_question):
-            selected=tree.selection()
-            if not selected:
-                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een gevonden vraagstart.")
+            idx = selected_index["value"]
+            if idx is None:
+                messagebox.showinfo("Selecteer kandidaat", "Selecteer eerst een vraagstart.", parent=win)
                 return
-            row=rows[int(selected[0])]
-            reason=simpledialog.askstring("Waarom deze keuze?","Korte reden (optioneel):",parent=win) or ""
-            row["status"]="bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
-            row["human_decision"]=bool(is_question)
-            row["decision_reason"]=reason
-            suppression_key=f"{row.get('document_id')}|{row.get('number')}|{row.get('page')}|{float(row.get('bbox',[0,0])[1]):.1f}"
+            row = rows[idx]
+            old_status = row.get("status")
+            row["status"] = "bevestigd_vraagstart" if is_question else "afgewezen_geen_vraag"
+            row["human_decision"] = bool(is_question)
+            row["decision_reason"] = "Handmatig bevestigd in de doorlopende vraagcontrole."
+            suppression_key = f"{row.get('document_id')}|{row.get('number')}|{row.get('page')}|{float(row.get('bbox',[0,0])[1]):.1f}"
             if not is_question:
-                self.data["restored_suppressed_candidate_keys"]=[x for x in self.data.get("restored_suppressed_candidate_keys",[]) if x!=suppression_key]
-                for record in self.data.get("vraagrecords",[]):
-                    if record.get("candidate_document_id")==row.get("document_id") and record.get("number")==row.get("number") and record.get("source_page")==row.get("page"):
-                        record["approved_by_human"]=False
-                        record["status"]="vraagstart_afgewezen_record_ongeldig"
-                        record["source_analysis_invalidated"]=True
-                        record["approval_revoked_reason"]="De bijbehorende vraagstart is handmatig afgewezen."
-            learn_decision(self.project_dir/"kennisbank",{
-                "pattern_key":question_pattern_key(row),
-                "chosen":"question" if is_question else "not_question",
-                "accepted":True,"scope":"voorstel_voor_toekomstige_herkenning",
-                "document_id":row.get("document_id"),"page":row.get("page"),
-                "candidate_line":row.get("line"),"reason":reason,
-                "human_decision":bool(is_question)})
+                self.data["restored_suppressed_candidate_keys"] = [
+                    x for x in self.data.get("restored_suppressed_candidate_keys", []) if x != suppression_key]
+                for record in self.data.get("vraagrecords", []):
+                    if (record.get("candidate_document_id") == row.get("document_id")
+                        and record.get("number") == row.get("number")
+                        and record.get("source_page") == row.get("page")):
+                        record["approved_by_human"] = False
+                        record["status"] = "vraagstart_afgewezen_record_ongeldig"
+                        record["source_analysis_invalidated"] = True
+                        record["approval_revoked_reason"] = "De bijbehorende vraagstart is handmatig afgewezen."
+            learn_decision(self.knowledge_dir, {
+                "pattern_key": question_pattern_key(row),
+                "chosen": "question" if is_question else "not_question",
+                "accepted": True, "scope": "voorstel_voor_toekomstige_herkenning",
+                "document_id": row.get("document_id"), "page": row.get("page"),
+                "candidate_line": row.get("line"), "reason": row["decision_reason"],
+                "human_decision": bool(is_question)})
             self.save_project()
-            tree.set(selected[0],"status",row["status"])
-            learned=suggest_from_learning(self.project_dir/"kennisbank",question_pattern_key(row))
-            suggestion=learned.get("suggestion")
-            hint=("Tegenstrijdig" if learned.get("conflicting") else "Vraag" if suggestion=="question" else "Geen vraag" if suggestion=="not_question" else "—")
-            if learned.get("support",0): hint+=f" ({learned['support']}×)"
-            tree.set(selected[0],"learning",hint)
-            self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}. Beslissing opgeslagen in de lokale leerbank.")
-        def inspect_question():
-            selected=tree.selection()
-            if not selected:
-                messagebox.showinfo("Selecteer kandidaat","Selecteer eerst een kandidaat.")
+            tree.set(str(idx), "status", row["status"].replace("_", " "))
+            self._log(f"Kandidaat vraag {row['number']} op pagina {row['page']}: {row['status']}.")
+            # Move to the next undecided item so a whole exam can be reviewed continuously.
+            next_idx = next((n for n in range(idx + 1, len(rows))
+                             if rows[n].get("human_decision") is None), None)
+            if next_idx is None:
+                next_idx = next((n for n, item in enumerate(rows)
+                                 if item.get("human_decision") is None), None)
+            if next_idx is not None:
+                refresh_rows(next_idx)
+            else:
+                refresh_rows(idx)
+                status_label.configure(text="Alle zichtbare kandidaten zijn beoordeeld. Controleer eventueel onderdrukte dubbelingen.")
+            if old_status == "afgewezen_geen_vraag" and is_question:
+                self._log("Eerder afgewezen vraagstart opnieuw bevestigd.")
+
+        def inspect_original():
+            idx = selected_index["value"]
+            if idx is not None:
+                self.preview_candidate(rows, tree, win)
+
+        def make_record():
+            idx = selected_index["value"]
+            if idx is None:
+                messagebox.showinfo("Selecteer kandidaat", "Selecteer eerst een vraagstart.", parent=win)
                 return
-            row=rows[int(selected[0])]
-            check=row.get("vraagtype_controle",{})
-            detail=tk.Toplevel(win)
-            detail.title(f"Vraag {row.get('number')} – tekst- en optiecontrole")
-            detail.geometry("760x680")
-            ttk.Label(detail,text=f"Voorgesteld vraagtype: {check.get('type','onbekend')}  |  zekerheid: {check.get('confidence',0):.0%}  |  status: altijd handmatig controleren",padding=10).pack(anchor="w")
-            ttk.Label(detail,text="Vraagtekstvoorstel (afbakening kan nog onjuist zijn):",padding=(10,2)).pack(anchor="w")
-            question_box=tk.Text(detail,height=19,wrap="word")
-            question_box.pack(fill="both",expand=True,padx=10,pady=4)
-            question_box.insert("1.0",row.get("vraagtekst_voorstel",""))
-            question_box.configure(state="disabled")
-            ttk.Label(detail,text="Gevonden antwoordopties:",padding=(10,6)).pack(anchor="w")
-            options=check.get("options",[])
-            option_lines=[f"{o.get('label')}. {o.get('text')}" for o in options]
-            if not option_lines:
-                option_lines=["Geen A-H-antwoordopties herkend. Controleer of het een open vraag, juist/onjuist-vraag of wel/niet-vraag is."]
-            ttk.Label(detail,text="\n".join(option_lines),wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
-            if check.get("type")=="meerkeuze":
-                gaps=check.get("option_gaps",[])
-                duplicates=check.get("duplicate_option_labels",[])
-                warning=("Ontbrekende labels: "+(", ".join(gaps) if gaps else "geen")+
-                         " | Dubbele labels: "+(", ".join(duplicates) if duplicates else "geen"))
-                ttk.Label(detail,text=warning,foreground="#9b4d00",wraplength=720,padding=10).pack(anchor="w")
-            refs=row.get("context_verwijzingen",[])
-            ref_lines=[f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
-            ttk.Label(detail,text="Mogelijke verwijzingen naar contextmateriaal:",padding=(10,4)).pack(anchor="w")
-            ttk.Label(detail,text="\n".join(ref_lines) if ref_lines else "Geen expliciete figuur-, tabel-, bron- of tekstverwijzing herkend.",wraplength=720,justify="left",padding=(12,2)).pack(anchor="w")
-            ttk.Label(detail,text="Dit is een automatische aanwijzing, geen inhoudelijke beoordeling. Controleer de originele PDF, alle opties en de aansluiting op het correctievoorschrift.",wraplength=720,padding=10).pack(anchor="w")
-        suppressed_count=len([x for x in self.data.get("onderdrukte_vraagkandidaten",[])])
-        ttk.Button(actions,text=f"Onderdrukte dubbelingen ({suppressed_count})",command=lambda:self.show_suppressed_candidates(win)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Maak concept-vraagrecord",command=lambda:self.create_question_record(rows,tree,win)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Bekijk vraag en opties",command=inspect_question).pack(side="left",padx=8)
-        ttk.Button(actions,text="Bevestig vraagstart",command=lambda:decide(True)).pack(side="left")
-        ttk.Button(actions,text="Geen vraag",command=lambda:decide(False)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Originele pagina bekijken",command=lambda:self.preview_candidate(rows,tree,win)).pack(side="left",padx=8)
-        ttk.Button(actions,text="Voorlopige snippet maken",command=lambda:self.create_snippet_proposal(rows,tree,win)).pack(side="left",padx=8)
+            if rows[idx].get("human_decision") is not True:
+                messagebox.showwarning("Vraagstart eerst bevestigen",
+                    "Bevestig eerst dat dit een echte vraagstart is.", parent=win)
+                return
+            # Existing full record editor remains available after question-start review.
+            self.create_question_record(rows, tree, win)
+
+        tree.bind("<<TreeviewSelect>>", show_selected)
+        ttk.Button(footer, text="Originele pagina", command=inspect_original).pack(side="right", padx=4)
+        ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record).pack(side="right", padx=4)
+        ttk.Button(footer, text="Geen vraag", command=lambda: decide(False)).pack(side="right", padx=4)
+        ttk.Button(footer, text="Bevestig vraag", command=lambda: decide(True), style="Accent.TButton").pack(side="right", padx=4)
+        ttk.Button(footer, text="Onderdrukte dubbelingen",
+                   command=lambda: self.show_suppressed_candidates(win)).pack(side="left", padx=4)
+        if rows:
+            refresh_rows(next((i for i, row in enumerate(rows) if row.get("human_decision") is None), 0))
+        else:
+            set_box(question_box, "Er zijn nog geen vraagstartkandidaten. Voer eerst de vraaganalyse uit.")
+            set_box(options_box, "ANTWOORDOPTIES")
+            set_box(context_box, "CONTEXTVERWIJZINGEN")
 
     def show_suppressed_candidates(self,parent):
         rows=self.data.get("onderdrukte_vraagkandidaten",[])
