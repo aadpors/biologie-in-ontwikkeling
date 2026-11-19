@@ -250,6 +250,10 @@ class ExamApp:
             for record in self.data.get("vraagrecords", []):
                 exam=record.setdefault("exam", {})
                 exam.update({"level":identity["level"],"year":identity["year"],"period":identity["period"]})
+                record["source_match_human_confirmed"]=True
+                record["cv_match_human_confirmed"]=True
+                record["appendix_match_human_confirmed"]=True
+                record["cv_amendment_match_human_confirmed"]=True
                 record["approved_by_human"]=False
                 record["status"]="controle_nodig"
                 record["approved_at"]=None
