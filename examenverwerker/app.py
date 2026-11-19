@@ -286,12 +286,14 @@ class ExamApp:
                                     cursor="crosshair")
         pdf_y = ttk.Scrollbar(canvas_wrap, orient="vertical", command=self.pdf_canvas.yview)
         pdf_x = ttk.Scrollbar(viewer, orient="horizontal", command=self.pdf_canvas.xview)
-        self.pdf_canvas.configure(yscrollcommand=pdf_y.set, xscrollcommand=pdf_x.set)
+        self._workspace_y_scrollbar = pdf_y
+        self.pdf_canvas.configure(yscrollcommand=self._workspace_scroll_changed, xscrollcommand=pdf_x.set)
         self.pdf_canvas.pack(side="left", fill="both", expand=True)
         pdf_y.pack(side="right", fill="y")
         pdf_x.pack(fill="x")
         self.pdf_canvas.bind("<Button-1>", self._workspace_canvas_click)
         self.pdf_canvas.bind("<MouseWheel>", lambda e: self.pdf_canvas.yview_scroll(int(-e.delta / 120), "units"))
+        self.pdf_canvas.bind("<Configure>", lambda _event: self.root.after_idle(self._workspace_render_visible_pages))
 
         self._workspace_summary = ttk.Label(review, text="Selecteer een document of vraagstart.",
                                             style="Body.TLabel", wraplength=330, justify="left")
