@@ -4,6 +4,7 @@ import hashlib, json, shutil
 from pathlib import Path
 from datetime import datetime
 from engine import infer_exam_metadata, review_checklist_errors
+from structure import make_page_span, validate_cv_fragment
 
 def sha256(path: Path):
     h=hashlib.sha256()
@@ -32,6 +33,60 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             errors.append({"id":rid,"error":review_error})
         if r.get("source_analysis_invalidated") is True:
             errors.append({"id":rid,"error":"bron_analyse_verouderd"})
+        # Publication requires source-faithful manual regions, not only the old
+        # automatically proposed question/CV snippets.
+        source_name = r.get("source_pdf", "")
+        if r.get("exam_structure_status") != "gekoppeld" or not r.get("exam_structure_document_id") or not r.get("exam_structure_source_sha256"):
+            errors.append({"id":rid,"error":"handmatige_vraagafbakening_ontbreekt"})
+        elif source_name and (project_dir/"bronnen"/source_name).is_file():
+            if sha256(project_dir/"bronnen"/source_name) != r.get("exam_structure_source_sha256"):
+                errors.append({"id":rid,"error":"vraagafbakening_bronbestand_gewijzigd"})
+        spans = r.get("question_region_page_spans", [])
+        if not spans:
+            errors.append({"id":rid,"error":"vraagfragment_paginagrenzen_ontbreken"})
+        previous_page = 0
+        for span in spans:
+            try:
+                clean = make_page_span(span["page"], span["top"], span["bottom"])
+                if clean["page"] <= previous_page:
+                    errors.append({"id":rid,"error":"vraagfragment_paginagrenzen_niet_oplopend"})
+                previous_page = clean["page"]
+            except (KeyError, TypeError, ValueError):
+                errors.append({"id":rid,"error":"vraagfragment_paginagrens_ongeldig"})
+        cv_region = r.get("cv_source_region")
+        if not isinstance(cv_region, dict):
+            errors.append({"id":rid,"error":"cv_handmatige_afbakening_ontbreekt"})
+        else:
+            cv_identity = {"id":r.get("cv_source_document_id"),"sha256":r.get("cv_source_sha256")}
+            for region_error in validate_cv_fragment(cv_region, cv_identity, r.get("number", 0), "correctievoorschrift"):
+                errors.append({"id":rid,"error":region_error})
+            cv_file = r.get("cv_pdf", "")
+            if cv_file and (project_dir/"bronnen"/cv_file).is_file() and sha256(project_dir/"bronnen"/cv_file) != r.get("cv_source_sha256"):
+                errors.append({"id":rid,"error":"cv_afbakening_bronbestand_gewijzigd"})
+        cv_region_file = r.get("cv_source_region_file")
+        if not cv_region_file or Path(str(cv_region_file)).name != cv_region_file or not (project_dir/"snippets"/str(cv_region_file)).is_file():
+            errors.append({"id":rid,"error":"cv_handmatige_uitsnede_ontbreekt"})
+        selected_addenda = set(r.get("cv_amendment_pdfs", []))
+        addendum_regions = r.get("cv_amendment_regions", [])
+        covered_addenda = set()
+        for item in addendum_regions:
+            region = item.get("fragment", {})
+            identity = {"id":item.get("document_id"),"sha256":item.get("source_sha256")}
+            for region_error in validate_cv_fragment(region, identity, r.get("number", 0), "aanvulling"):
+                errors.append({"id":rid,"error":region_error})
+            covered_addenda.add(item.get("source_pdf"))
+            snippet = item.get("snippet_file", "")
+            if not snippet or Path(str(snippet)).name != snippet or not (project_dir/"snippets"/str(snippet)).is_file():
+                errors.append({"id":rid,"error":"cv_aanvulling_handmatige_uitsnede_ontbreekt"})
+            source = project_dir/"bronnen"/str(item.get("source_pdf", ""))
+            if not source.is_file() or sha256(source) != item.get("source_sha256"):
+                errors.append({"id":rid,"error":"cv_aanvulling_afbakening_bronbestand_gewijzigd"})
+        if selected_addenda - covered_addenda:
+            errors.append({"id":rid,"error":"niet_alle_geselecteerde_cv_aanvullingen_visueel_afgebakend"})
+        for asset in r.get("context_asset_files", []):
+            name = asset.get("file", "")
+            if not name or Path(str(name)).name != name or not (project_dir/"snippets"/str(name)).is_file():
+                errors.append({"id":rid,"error":"contextuitsnede_ontbreekt"})
         meta=r.get("exam",{})
         for field in ("level","year","period","points","theme","concept","end","focus","questionType"):
             if meta.get(field) in (None,""): errors.append({"id":rid,"error":f"examenmetadata_ontbreekt:{field}"})
@@ -126,9 +181,21 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         snippet_names=r.get("snippet_files") or [r["snippet_file"]]
         for name in snippet_names:
             shutil.copy2(project_dir/"snippets"/name,snippet_dir/name)
-        amendment=r.get("cv_amendment_snippet_file")
-        if amendment:
-            shutil.copy2(project_dir/"snippets"/amendment,snippet_dir/amendment)
+        context_assets = r.get("context_asset_files", [])
+        context_image_paths = []
+        for asset in context_assets:
+            name = asset["file"]
+            if name not in [Path(x).name for x in context_image_paths]:
+                shutil.copy2(project_dir/"snippets"/name, snippet_dir/name)
+                context_image_paths.append(f"exam-snippets/{name}")
+        cv_region_file = r.get("cv_source_region_file")
+        if cv_region_file and cv_region_file not in snippet_names:
+            shutil.copy2(project_dir/"snippets"/cv_region_file, snippet_dir/cv_region_file)
+        amendment_files = list(r.get("cv_amendment_snippet_files") or
+                               ([r["cv_amendment_snippet_file"]] if r.get("cv_amendment_snippet_file") else []))
+        for amendment_file in amendment_files:
+            if amendment_file not in snippet_names and amendment_file != cv_region_file:
+                shutil.copy2(project_dir/"snippets"/amendment_file, snippet_dir/amendment_file)
         row={"id":r["id"],"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
              "n":int(r["number"]),"points":int(meta["points"]),"page":int(r["source_page"]),
              "theme":meta["theme"],"concept":meta["concept"],"end":meta["end"],"focus":meta["focus"],
@@ -146,7 +213,11 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         if appendix: row["attachmentPdfs"]=appendix
         contexts.append({"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
                          "n":int(r["number"]),"page":int(r["source_page"]),
-                         "image":row["image"],"images":row["images"]})
+                         "image":context_image_paths[0] if context_image_paths else row["image"],
+                         "images":context_image_paths if context_image_paths else row["images"],
+                         "contextImages":context_image_paths,
+                         "contextRegions":r.get("context_region_fragments", []),
+                         "questionImage":row["image"],"questionImages":row["images"]})
         if meta["questionType"]=="mcq":
             row["options"]=r["options"]; row["correct"]=r["correct"]; mcq.append(row)
         else:
@@ -154,8 +225,9 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
             cv_name_snippet=(r.get("cv_snippet_files") or [r["cv_snippet_file"]])[0]
             shutil.copy2(project_dir/"snippets"/cv_name_snippet,snippet_dir/cv_name_snippet)
             cv_item={"id":r["id"],"question":int(r["number"]),"pdf":f"examens/{cv_target.name}","output":cv_name_snippet}
-            if amendment:
-                cv_item["amendment_output"]=amendment
+            if amendment_files:
+                cv_item["amendment_output"]=amendment_files[0]
+                cv_item["amendment_outputs"]=amendment_files
             cv_manifest.append(cv_item)
         manifest.append({"id":r["id"],"source_sha256":sha256(project_dir/"bronnen"/source_name),
                          "cv_sha256":sha256(project_dir/"bronnen"/cv_name),
@@ -168,7 +240,13 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "exam_structure_status":r.get("exam_structure_status", "structuur_niet_ingesteld"),
                          "exam_structure_fragment_ids":r.get("exam_structure_fragment_ids", []),
                          "question_region_page_spans":r.get("question_region_page_spans", []),
-                         "context_region_fragments":r.get("context_region_fragments", [])})
+                         "context_region_fragments":r.get("context_region_fragments", []),
+                         "context_asset_files":[{"file":x["file"],"sha256":sha256(project_dir/"snippets"/x["file"]),
+                             "asset_id":x.get("asset_id"),"caption":x.get("caption"),"page":x.get("page"),
+                             "fragment_id":x.get("fragment_id"),"type":x.get("type")} for x in context_assets],
+                         "cv_source_region":r.get("cv_source_region"),
+                         "cv_source_region_sha256":sha256(project_dir/"snippets"/cv_region_file) if cv_region_file else None,
+                         "cv_amendment_regions":r.get("cv_amendment_regions", [])})
     (output_dir/"exam-mcq.json").write_text(json.dumps(mcq,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-open.json").write_text(json.dumps(opened,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-contexts.json").write_text(json.dumps(contexts,ensure_ascii=False,indent=2),encoding="utf-8")
