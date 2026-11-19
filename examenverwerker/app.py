@@ -610,6 +610,7 @@ class ExamApp:
         self._workspace_render_page()
 
     def _workspace_render_page(self):
+        """Render the selected source PDF as one vertically scrollable document."""
         doc = self._workspace_doc()
         if not doc:
             return
@@ -625,32 +626,57 @@ class ExamApp:
             if not page_count:
                 pdf.close()
                 raise ValueError("PDF bevat geen pagina's.")
-            self._workspace_page = max(1, min(self._workspace_page, page_count))
-            page_rect = pdf[self._workspace_page-1].rect
-            page_width, page_height = float(page_rect.width), float(page_rect.height)
-            pdf.close()
             canvas_width = max(420, self.pdf_canvas.winfo_width()-30)
-            fit_scale = min(1.35, canvas_width / page_width)
+            first_rect = pdf[0].rect
+            fit_scale = min(1.35, canvas_width / float(first_rect.width))
             scale = max(0.45, fit_scale * self._workspace_zoom)
-            output = Path(self._workspace_temp.name) / f"{doc['id']}-pagina-{self._workspace_page}-{scale:.3f}.png"
-            render_page(source, self._workspace_page, output, scale=scale)
-            photo = tk.PhotoImage(file=str(output))
-            self._workspace_photo = photo
+            pdf.close()
             self._workspace_scale = scale
+            self._workspace_page_offsets = {}
+            self._workspace_page_heights = {}
+            self._workspace_photos = []
             self.pdf_canvas.delete("all")
-            self.pdf_canvas.create_image(0, 0, image=photo, anchor="nw", tags=("page",))
-            self.pdf_canvas.configure(scrollregion=(0, 0, photo.width(), photo.height()))
+            y_offset = 0
+            for page_no in range(1, page_count + 1):
+                output = Path(self._workspace_temp.name) / f"{doc['id']}-doorlopend-p{page_no}-{scale:.3f}.png"
+                render_page(source, page_no, output, scale=scale)
+                photo = tk.PhotoImage(file=str(output))
+                self._workspace_photos.append(photo)
+                self._workspace_page_offsets[page_no] = y_offset
+                self._workspace_page_heights[page_no] = photo.height()
+                self.pdf_canvas.create_image(0, y_offset, image=photo, anchor="nw", tags=("page", f"page-{page_no}"))
+                # Subtle separator between source pages.
+                y_offset += photo.height()
+                if page_no < page_count:
+                    self.pdf_canvas.create_line(0, y_offset + 3, max(photo.width(), canvas_width), y_offset + 3,
+                                                fill="#9AA7AD", dash=(3, 4))
+                    y_offset += 8
+            self.pdf_canvas.configure(scrollregion=(0, 0, canvas_width, y_offset))
+            self._workspace_photo = self._workspace_photos[0] if self._workspace_photos else None
+            for candidate in self.data.get("vraagkandidaten", []):
+                if candidate.get("document_id") != doc["id"] or not candidate.get("bbox"):
+                    continue
+                page_no = int(candidate.get("page", 1))
+                if page_no not in self._workspace_page_offsets:
+                    continue
+                x0, y0, x1, y1 = [float(x) * scale for x in candidate["bbox"]]
+                top = self._workspace_page_offsets[page_no] + y0
+                selected = candidate is self._workspace_selected
+                color = "#D71920" if selected else "#168B8B"
+                self.pdf_canvas.create_rectangle(x0-5, top-4, x1+5, top+max(18, (y1-y0))+4,
+                    outline=color, width=3 if selected else 1, tags=("marker",))
+                self.pdf_canvas.create_text(x0+5, top-13, text=f"Vraag {candidate.get('number')}",
+                    anchor="sw", fill=color, font=("Segoe UI", 10, "bold"), tags=("marker",))
             row = self._workspace_selected
-            if row and int(row.get("page", 0) or 0) == self._workspace_page and row.get("bbox"):
-                x0,y0,x1,y1 = [float(x)*scale for x in row["bbox"]]
-                self.pdf_canvas.create_rectangle(x0-5,y0-4,x1+5,y1+4,
-                    outline="#D71920", width=3, tags=("marker",))
-                self.pdf_canvas.create_text(x0+5,y0-13,text=f"Vraag {row.get('number')}",
-                    anchor="sw",fill="#D71920",font=("Segoe UI",11,"bold"),tags=("marker",))
-                self.pdf_canvas.yview_moveto(max(0, (y0-120) / max(1, photo.height())))
-            self._workspace_page_label.configure(text=f"Pagina {self._workspace_page} / {page_count}")
+            if row:
+                page_no = int(row.get("page", 1))
+                if page_no in self._workspace_page_offsets:
+                    target_y = self._workspace_page_offsets[page_no] + float((row.get("bbox") or [0, 0])[1]) * scale
+                    self.pdf_canvas.yview_moveto(max(0, target_y / max(1, y_offset)))
+                    self._workspace_page = page_no
+            self._workspace_page_label.configure(text=f"Doorlopend · {page_count} pagina's")
             if self._workspace_mark_mode:
-                self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de PDF.")
+                self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de doorlopende PDF.")
         except Exception as exc:
             self._error("Originele PDF weergeven", exc)
 
@@ -3221,6 +3247,48 @@ class ExamApp:
             fragments = json.loads(json.dumps(existing.get("fragments", []), ensure_ascii=False))
         else:
             fragments = []
+        # Seed the editor with a transparent, editable proposal derived from the
+        # confirmed question starts. Each question gets a full-width region from
+        # its start to the next confirmed start; the leading area is proposed as
+        # an introduction linked to all questions. Nothing is auto-approved.
+        if not fragments:
+            ordered = sorted(
+                [x for x in candidates if x.get("human_decision") is True],
+                key=lambda x: (int(x.get("page", 1)), float((x.get("bbox") or [0, 0])[1]))
+            )
+            starts = []
+            for item in ordered:
+                page_no = int(item.get("page", 1))
+                bbox = item.get("bbox") or [0, 0, 0, 0]
+                height = page_sizes.get(page_no, (1.0, 1.0))[1]
+                y = max(0.0, min(1.0, float(bbox[1]) / max(1.0, height)))
+                starts.append((page_no, y, int(item["number"])))
+            if starts:
+                first_page, first_y, _ = starts[0]
+                if first_page == 1 and first_y > 0.02:
+                    fragments.append({
+                        "id": f"voorstel-intro-{doc['id'][:8]}",
+                        "type": "context_intro",
+                        "page_spans": [{"page": 1, "top": 0.0, "bottom": round(first_y, 6)}],
+                        "question_numbers": question_numbers[:],
+                        "status": "automatisch_voorstel_nog_te_controleren",
+                    })
+                for index, (start_page, start_y, number) in enumerate(starts):
+                    next_start = starts[index + 1] if index + 1 < len(starts) else (page_count + 1, 0.0, None)
+                    spans = []
+                    for page_no in range(start_page, min(page_count, next_start[0]) + 1):
+                        page_top = start_y if page_no == start_page else 0.0
+                        page_bottom = next_start[1] if page_no == next_start[0] else 1.0
+                        if page_bottom - page_top >= 0.005:
+                            spans.append({"page": page_no, "top": round(page_top, 6), "bottom": round(page_bottom, 6)})
+                    if spans:
+                        fragments.append({
+                            "id": f"voorstel-vraag-{doc['id'][:6]}-{number}",
+                            "type": "vraag",
+                            "page_spans": spans,
+                            "question_numbers": [number],
+                            "status": "automatisch_voorstel_nog_te_controleren",
+                        })
         original_structure_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
         win = tk.Toplevel(self.root); win.title(f"Examenstructuur · {doc['bestand']}"); win.geometry("1280x900")
         win.transient(self.root)
