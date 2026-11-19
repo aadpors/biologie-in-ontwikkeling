@@ -1197,6 +1197,15 @@ class ExamApp:
             messagebox.showwarning("Geen bevestigde vragen", "Er is nog geen enkele vraagstart bevestigd.")
             return
         source = self.project_dir / "bronnen" / doc["opslagbestand"]
+        if not source.is_file() or sha256(source) != doc.get("sha256"):
+            structures = self.data.setdefault("exam_structures", {})
+            old_structure = structures.get(doc["id"]) or self.data.get("exam_structure")
+            if old_structure and old_structure.get("document_id") == doc["id"]:
+                structures[doc["id"]] = mark_structure_stale(old_structure, "De bron-PDF wijkt af van de vastgelegde SHA-256.")
+                self.data["exam_structure"] = structures[doc["id"]]
+                self.save_project()
+            messagebox.showerror("Bronbestand gewijzigd", "De oorspronkelijke opgaven-PDF is gewijzigd of ontbreekt. De bestaande afbakening is ongeldig verklaard. Voeg de juiste PDF opnieuw toe en analyseer opnieuw.")
+            return
         analysis = analyze_pdf(source)
         page_count = int(analysis["page_count"])
         page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in analysis["pages"]}
@@ -1310,6 +1319,9 @@ class ExamApp:
             load_span_for_page()
             redraw_guides()
         def change_page(delta):
+            frag = selected_fragment()
+            if frag and any(int(x["page"]) == int(page_var.get()) for x in frag.get("page_spans", [])):
+                update_page_span()
             page_var.set(max(1, min(page_count, int(page_var.get()) + delta)))
             show_page()
         def on_press(event):
@@ -1335,6 +1347,11 @@ class ExamApp:
                 fragment_tree.insert("", "end", iid=str(index), text=frag.get("id", f"Fragment {index+1}"),
                     values=(frag.get("type"), pages, links))
         def save_structure():
+            current = selected_fragment()
+            if current and any(int(x["page"]) == int(page_var.get()) for x in current.get("page_spans", [])):
+                span = make_page_span(page_var.get(), top_y, bottom_y)
+                current["page_spans"] = [span if int(x["page"]) == span["page"] else dict(x)
+                                         for x in current["page_spans"]]
             structure = make_exam_structure(doc, fragments, question_numbers)
             errors = validate_exam_structure(structure, doc["id"], doc["sha256"], question_numbers)
             if errors:
@@ -1429,15 +1446,20 @@ class ExamApp:
         ttk.Button(actions, text="Structuur opslaan en sluiten", command=save_and_close).pack(side="right")
         refresh_fragment_list()
         if fragments: fragment_tree.selection_set("0")
-        page_spin.bind("<Return>", lambda _e: show_page())
-        page_spin.bind("<FocusOut>", lambda _e: show_page())
+        def jump_question_page(_event=None):
+            current = selected_fragment()
+            if current and any(int(x["page"]) == int(page_var.get()) for x in current.get("page_spans", [])):
+                update_page_span()
+            show_page()
+        page_spin.bind("<Return>", jump_question_page)
+        page_spin.bind("<FocusOut>", jump_question_page)
         show_page()
 
     def open_cv_region_editor(self, record, cv_doc, on_saved=None):
         """Manually delimit a question's correction-scheme region on the untouched source PDF."""
         source = self.project_dir / "bronnen" / cv_doc["opslagbestand"]
-        if not source.is_file():
-            messagebox.showerror("CV ontbreekt", "De oorspronkelijke CV-PDF is niet gevonden.")
+        if not source.is_file() or sha256(source) != cv_doc.get("sha256"):
+            messagebox.showerror("CV-bron gewijzigd", "De oorspronkelijke CV-PDF ontbreekt of is gewijzigd. Voeg het juiste bestand opnieuw toe voordat je grenzen vastlegt.")
             return
         role = cv_doc.get("type_voorstel", "correctievoorschrift")
         if role not in ("correctievoorschrift", "aanvulling"):
