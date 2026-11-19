@@ -249,4 +249,56 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(context["questionImage"],"exam-snippets/vraag1.png")
 
 
+    def test_manual_context_crop_provenance_is_validated_and_exported(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"snippets"/"manual-context.png").write_bytes(b"manual crop")
+            import hashlib, json
+            asset={
+                "file":"manual-context.png",
+                "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
+                "asset_id":"manual-p2-001","asset_kind":"figuur","type":"figuur",
+                "page":2,"bbox":[25.0,40.0,310.0,420.0],
+                "source_document_id":record["exam_structure_document_id"],
+                "source_sha256":record["exam_structure_source_sha256"],
+                "source_pdf":record["source_pdf"],"question_number":record["number"],
+                "fragment_id":"context-fragment-1",
+                "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                "caption":"Figuur bij de context","caption_human_confirmed":True,
+            }
+            record["context_asset_files"]=[asset]
+            self.assertEqual(validate_review_records([record],project),[])
+            out=Path(d)/"out"
+            result=export_approved_records([record],project,out)
+            self.assertTrue(result["ok"],result)
+            context=json.loads((out/"exam-contexts.json").read_text(encoding="utf-8"))[0]
+            manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(context["contextAssets"][0]["question_number"],record["number"])
+            self.assertEqual(context["contextAssets"][0]["crop_method"],"handmatige_rechthoek_op_originele_pdf")
+            exported=manifest["records"][0]["context_asset_files"][0]
+            self.assertEqual(exported["bbox"],asset["bbox"])
+            self.assertEqual(exported["fragment_id"],"context-fragment-1")
+            self.assertEqual(exported["source_sha256"],record["exam_structure_source_sha256"])
+
+    def test_manual_context_crop_with_bad_geometry_or_missing_provenance_is_blocked(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"snippets"/"manual-context.png").write_bytes(b"manual crop")
+            import hashlib
+            record["context_asset_files"]=[{
+                "file":"manual-context.png",
+                "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
+                "asset_id":"manual-p2-bad","page":2,"bbox":[200,100,100,300],
+                "source_document_id":record["exam_structure_document_id"],
+                "source_sha256":record["exam_structure_source_sha256"],
+                "question_number":record["number"],
+                "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                "caption_human_confirmed":True,
+            }]
+            codes=[x["error"] for x in validate_review_records([record],project)]
+            self.assertIn("handmatige_contextuitsnede_geometrie_ongeldig",codes)
+            self.assertIn("handmatige_contextuitsnede_herkomst_ontbreekt",codes)
+
+
+
 if __name__=="__main__": unittest.main()
