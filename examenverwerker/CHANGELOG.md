@@ -1,3 +1,7 @@
+## 0.13.4
+- Importdialoog gebruikt nu een grid-indeling met een vaste onderste actiebalk. De knoppen **Annuleren** en **Opslaan en doorgaan naar examenverwerking** blijven zichtbaar, ook wanneer het middenpaneel uitrekt.
+- Versienummer verhoogd voor de gecorrigeerde Windows-build.
+
 ## 0.13.3
 - Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
 - De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
