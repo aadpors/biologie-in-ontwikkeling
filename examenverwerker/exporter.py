@@ -273,10 +273,16 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
             dest=_copy_source(project_dir,ref,exam_dir)
             cv_amendments.append(f"examens/{dest.name}")
         if appendix: row["attachmentPdfs"]=appendix
+        # The current website consumes only "image" and "images" from
+        # exam-contexts.json. Preserve its established order: context assets
+        # first, the question crop last (the last image is labelled as the
+        # original question in examenoefenen.html).
+        question_image_paths = [f"exam-snippets/{name}" for name in snippet_names]
+        website_image_paths = context_image_paths + question_image_paths
         contexts.append({"level":meta["level"],"year":str(meta["year"]),"period":str(meta["period"]),
                          "n":int(r["number"]),"page":int(r["source_page"]),
-                         "image":context_image_paths[0] if context_image_paths else "",
-                         "images":context_image_paths,
+                         "image":website_image_paths[0] if website_image_paths else "",
+                         "images":website_image_paths,
                          "contextImages":context_image_paths,
                          "contextAssets":[{"image":f"exam-snippets/{x['file']}","caption":x.get("caption"),
                              "page":x.get("page"),"asset_id":x.get("asset_id"),"asset_kind":x.get("asset_kind"),"type":x.get("type"),
