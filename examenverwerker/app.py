@@ -67,6 +67,8 @@ class ExamApp:
         fit_window(self.root, 1380, 900, 900, 620)
         self.project_dir = None
         self.data = None
+        self.import_batch_paths = []
+        self.import_batch_index = 0
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
         self.app_base = app_base
         self.examens_root = resolve_examens_root(app_base)
@@ -171,9 +173,21 @@ class ExamApp:
         for label, callback, style in actions[:4]:
             ttk.Button(toolbar, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
         toolbar_secondary = ttk.Frame(shell, style="App.TFrame")
-        toolbar_secondary.pack(fill="x", pady=(0, 6))
+        toolbar_secondary.pack(fill="x", pady=(0, 5))
         for label, callback, style in actions[4:]:
             ttk.Button(toolbar_secondary, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
+
+        # A compact, contextual next-step strip keeps the original workbench
+        # layout intact while making the hand-off between processing stages explicit.
+        workflow_bar = ttk.Frame(shell, style="App.TFrame")
+        workflow_bar.pack(fill="x", pady=(0, 7))
+        ttk.Label(workflow_bar, text="VERVOLG", style="Section.TLabel").pack(side="left", padx=(2, 10))
+        self.workflow_label = ttk.Label(workflow_bar, text="Importeer een examen om te beginnen.",
+                                        style="Muted.TLabel")
+        self.workflow_label.pack(side="left", fill="x", expand=True)
+        self.workflow_button = ttk.Button(workflow_bar, text="Examens importeren",
+                                          command=self.import_year_set, style="Accent.TButton")
+        self.workflow_button.pack(side="right")
 
         correction_bar = ttk.Frame(shell, style="App.TFrame")
         correction_bar.pack(fill="x", pady=(0, 7))
@@ -331,6 +345,98 @@ class ExamApp:
         self._workspace_selected = None
         self._workspace_mark_mode = False
         self.root.after(150, self._workspace_refresh)
+
+    def _workflow_refresh(self):
+        """Derive the next safe processing action from the current exam's actual state."""
+        if not hasattr(self, "workflow_button"):
+            return
+        if not self.data:
+            self.workflow_label.configure(text="Stap 1 · Importeer examens en controleer per PDF het voorblad, niveau, jaar, tijdvak en documenttype.")
+            self.workflow_button.configure(text="Examens importeren", command=self.import_year_set)
+            return
+
+        documents = self.data.get("documenten", [])
+        source_docs = [d for d in documents if d.get("type_voorstel") == "opgaven"]
+        candidates = [r for r in self.data.get("vraagkandidaten", [])]
+        undecided = [r for r in candidates if r.get("human_decision") is None]
+        confirmed = [r for r in candidates if r.get("human_decision") is True]
+        structures = self.data.get("exam_structures", {})
+        missing_structures = [d for d in source_docs if not (
+            structures.get(d.get("id")) or
+            (self.data.get("exam_structure", {}).get("document_id") == d.get("id"))
+        )]
+        records = self.data.get("vraagrecords", [])
+        def has_record(candidate):
+            return any(
+                record.get("candidate_document_id") == candidate.get("document_id")
+                and int(record.get("number", -1) or -1) == int(candidate.get("number", -2) or -2)
+                and int(record.get("source_page", -1) or -1) == int(candidate.get("page", -2) or -2)
+                for record in records
+            )
+        missing_records = [r for r in confirmed if not has_record(r)]
+        unapproved = [r for r in records if not r.get("approved_by_human", False)]
+
+        if not documents:
+            label, button, action = ("Stap 1 · Voeg de examen-PDF's toe en controleer de herkenning.", "Examens importeren", self.import_year_set)
+        elif not source_docs:
+            label, button, action = ("Stap 1 · Wijs het documenttype 'opgaven' toe aan de juiste PDF voordat de vraaganalyse kan starten.", "Documenttype corrigeren", self.correct_type)
+        elif not candidates:
+            label, button, action = ("Stap 2 · De documenten zijn ingelezen. Analyseer nu de opgaven-PDF('s) om alle mogelijke vraagstarts klaar te zetten.", "Vraagstarts analyseren", self.analyze_questions)
+        elif undecided:
+            label, button, action = (f"Stap 3 · Beoordeel alle vraagstarts op de originele PDF. Nog {len(undecided)} van {len(candidates)} kandidaten open.", "Verder met vraagcontrole", self._workflow_focus_next)
+        elif missing_structures:
+            label, button, action = (f"Stap 4 · Alle vraagstarts zijn beoordeeld. Baken nu vraag- en contextgrenzen af ({len(missing_structures)} opgaven-PDF('s) te doen).", "Structuur afbakenen", self.edit_exam_structure)
+        elif missing_records:
+            label, button, action = (f"Stap 5 · De structuur is vastgelegd. Maak de concept-vraagrecords; nog {len(missing_records)} bevestigde vragen zonder record.", "Volgend vraagrecord maken", self._workflow_make_next_record)
+        elif unapproved:
+            label, button, action = (f"Stap 6 · {len(records) - len(unapproved)} van {len(records)} vraagrecords goedgekeurd. Rond de inhoudelijke eindcontrole af.", "Eindcontrole openen", self.show_records)
+        else:
+            label, button, action = ("Stap 7 · Alle huidige vraagrecords zijn goedgekeurd. Maak het gecontroleerde exportpakket; er wordt niets gepubliceerd.", "Exportpakket maken", self.export_project)
+
+        self.workflow_label.configure(text=label)
+        self.workflow_button.configure(text=button, command=action)
+
+    def _workflow_focus_next(self):
+        if not self.data:
+            return
+        row = next((r for r in self.data.get("vraagkandidaten", [])
+                    if r.get("human_decision") is None), None)
+        if row is None:
+            self._workflow_refresh()
+            return
+        self._workspace_filter.set("Alle kandidaten")
+        if row.get("document_id") != self._workspace_doc_id:
+            self._workspace_doc_id = row.get("document_id")
+            self._workspace_selected = None
+            self._workspace_refresh()
+        else:
+            index = next((i for i, item in enumerate(self._workspace_rows)
+                          if item.get("id") == row.get("id")), 0)
+            self._workspace_refresh_candidates(index)
+
+    def _workflow_make_next_record(self):
+        if not self.data:
+            return
+        records = self.data.get("vraagrecords", [])
+        candidate = next((row for row in self.data.get("vraagkandidaten", [])
+            if row.get("human_decision") is True and not any(
+                record.get("candidate_document_id") == row.get("document_id")
+                and int(record.get("number", -1) or -1) == int(row.get("number", -2) or -2)
+                and int(record.get("source_page", -1) or -1) == int(row.get("page", -2) or -2)
+                for record in records)), None)
+        if candidate is None:
+            self._workflow_refresh()
+            return
+        self._workspace_filter.set("Alle kandidaten")
+        if candidate.get("document_id") != self._workspace_doc_id:
+            self._workspace_doc_id = candidate.get("document_id")
+            self._workspace_selected = None
+            self._workspace_refresh()
+        else:
+            index = next((i for i, item in enumerate(self._workspace_rows)
+                          if item.get("id") == candidate.get("id")), 0)
+            self._workspace_refresh_candidates(index)
+        self._workspace_create_record()
 
     def _workspace_doc(self):
         if not self.data:
@@ -624,9 +730,24 @@ class ExamApp:
         self._workspace_store_candidate_correction(row)
         self.save_project()
         self._log(f"Vraagstart {row.get('number')} op pagina {row.get('page')}: {row['status']}.")
-        next_index = next((i for i,r in enumerate(self._workspace_rows)
-                           if r is not row and r.get("human_decision") is None), None)
-        self._workspace_refresh_candidates(next_index if next_index is not None else 0)
+
+        # Continue across document boundaries instead of silently returning to
+        # the first candidate when the current PDF has been fully reviewed.
+        next_row = next((item for item in self.data.get("vraagkandidaten", [])
+                         if item.get("human_decision") is None), None)
+        if next_row and next_row.get("document_id") != self._workspace_doc_id:
+            self._workspace_doc_id = next_row.get("document_id")
+            self._workspace_selected = None
+            self._workspace_filter.set("Alle kandidaten")
+            self._workspace_refresh()
+        elif next_row:
+            next_index = next((i for i, item in enumerate(self._workspace_rows)
+                               if item.get("id") == next_row.get("id")), 0)
+            self._workspace_refresh_candidates(next_index)
+        else:
+            self._workspace_refresh_candidates(0)
+            self.status.configure(text="Alle vraagstarts in dit examen zijn beoordeeld. De volgende stap is het afbakenen van de examenstructuur.")
+            self._workflow_refresh()
 
     def _workspace_create_record(self):
         if not self._workspace_rows:
@@ -1455,6 +1576,8 @@ class ExamApp:
             # Open the first exam immediately so the user can start the full
             # review workflow without having to locate project.json manually.
             # All other imported exam projects remain available under the same root.
+            self.import_batch_paths = list(created)
+            self.import_batch_index = 0
             self.project_dir = created[0]
             self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
             self._workspace_load_global_corrections()
@@ -3553,6 +3676,7 @@ class ExamApp:
         temp.write_text(json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8")
         temp.replace(self.project_dir / PROJECT_FILE)
         self.project_label.configure(text=f"Examen: {self.data.get('naam', self.project_dir.name if self.project_dir else '')}")
+        self._workflow_refresh()
 
     def refresh(self):
         """Refresh document inventory, review queue and project progress."""
@@ -3583,6 +3707,7 @@ class ExamApp:
                 if self.data else "Importeer examens of kies een bestaand examen uit de bibliotheek om te beginnen."))
         if hasattr(self, "candidate_tree") and hasattr(self, "_workspace_temp"):
             self._workspace_refresh()
+        self._workflow_refresh()
 
 def main():
     root = tk.Tk()
