@@ -262,12 +262,12 @@ class ExportTests(unittest.TestCase):
                 "file":"manual-context.png",
                 "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
                 "asset_id":"manual-p2-001","asset_kind":"figuur","type":"figuur",
-                "page":2,"bbox":[25.0,40.0,310.0,420.0],
+                "page":2,"bbox":[0.0,40.0,595.0,420.0],
                 "source_document_id":record["exam_structure_document_id"],
                 "source_sha256":record["exam_structure_source_sha256"],
                 "source_pdf":record["source_pdf"],"question_number":record["number"],
                 "fragment_id":"intro-1",
-                "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                "crop_method":"handmatige_paginabrede_strook_op_originele_pdf",
                 "caption":"Figuur bij de context","caption_human_confirmed":True,
             }
             record["context_asset_files"]=[asset]
@@ -278,7 +278,7 @@ class ExportTests(unittest.TestCase):
             context=json.loads((out/"exam-contexts.json").read_text(encoding="utf-8"))[0]
             manifest=json.loads((out/"manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(context["contextAssets"][0]["question_number"],record["number"])
-            self.assertEqual(context["contextAssets"][0]["crop_method"],"handmatige_rechthoek_op_originele_pdf")
+            self.assertEqual(context["contextAssets"][0]["crop_method"],"handmatige_paginabrede_strook_op_originele_pdf")
             exported=manifest["records"][0]["context_asset_files"][0]
             self.assertEqual(exported["bbox"],asset["bbox"])
             self.assertEqual(exported["fragment_id"],"intro-1")
@@ -296,7 +296,7 @@ class ExportTests(unittest.TestCase):
                 "source_document_id":record["exam_structure_document_id"],
                 "source_sha256":record["exam_structure_source_sha256"],
                 "question_number":record["number"],
-                "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                "crop_method":"handmatige_paginabrede_strook_op_originele_pdf",
                 "caption_human_confirmed":True,
             }]
             codes=[x["error"] for x in validate_review_records([record],project)]
@@ -314,12 +314,12 @@ class ExportTests(unittest.TestCase):
                 "file":"manual-context.png",
                 "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
                 "asset_id":"manual-p2-link","asset_kind":"figuur","type":"figuur",
-                "page":2,"bbox":[25,40,310,420],
+                "page":2,"bbox":[0,40,595,420],
                 "source_document_id":record["exam_structure_document_id"],
                 "source_sha256":record["exam_structure_source_sha256"],
                 "source_pdf":record["source_pdf"],"question_number":record["number"],
                 "fragment_id":"context-fragment-not-linked",
-                "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                "crop_method":"handmatige_paginabrede_strook_op_originele_pdf",
                 "caption_human_confirmed":True,
             }]
             codes=[x["error"] for x in validate_review_records([record],project)]
