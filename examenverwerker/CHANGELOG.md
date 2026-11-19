@@ -6,7 +6,8 @@
 - Een bulkimportbatch wordt vanuit het importmanifest aan ieder aangemaakt examen gekoppeld en na herstart van de applicatie hersteld.
 - Na afronding van een examen kan de gebruiker direct doorgaan met het volgende examen uit dezelfde batch.
 - Na een geslaagde export wordt een inhoudsfingerprint opgeslagen; een gewijzigd examen wordt daardoor niet ten onrechte als afgerond getoond.
-- De batchvolgorde wordt na herstart veilig uit het importmanifest hersteld; paden buiten de examenroot worden geweigerd.
+- De batchvolgorde wordt na herstart veilig uit het importmanifest hersteld; ongeldige regels en paden buiten de examenroot worden geweigerd.
+- Als het volgende examen niet kan worden geopend, blijven de huidige werkruimte en batchpositie behouden.
 - Regressietests toegevoegd voor alle verwerkingsstappen, exportvoltooiing, verouderde exports, batchherstel en padbeveiliging.
 
 ## 0.13.1
