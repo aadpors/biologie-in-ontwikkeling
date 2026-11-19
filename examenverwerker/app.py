@@ -17,7 +17,7 @@ from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragmen
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.13.9"
+APP_VERSION = "0.13.10"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -3469,9 +3469,9 @@ class ExamApp:
         type_var = tk.StringVar(value="Intro")
         type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
             values=list(fragment_type_ids), width=25)
+        type_box.pack(fill="x", pady=(2, 4))
         ttk.Label(left, text="Intro: geldt voor alle vragen. Tussencontext: koppel aan één of meer vragen. Vraag: precies één vraagblok.",
                   wraplength=230, justify="left").pack(anchor="w", pady=(0, 8))
-        type_box.pack(fill="x", pady=(2, 8))
         ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
         qlist.pack(fill="x", pady=(2, 8))
