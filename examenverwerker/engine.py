@@ -256,6 +256,28 @@ def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Pat
         doc.close()
 
 
+def pixel_rect_to_pdf_bbox(pixel_bbox: list[float], image_size: tuple[int, int],
+                           page_size: tuple[float, float]) -> list[float]:
+    """Convert a rectangle drawn on a rendered full-page image to PDF points."""
+    if len(pixel_bbox) != 4 or len(image_size) != 2 or len(page_size) != 2:
+        raise ValueError("De uitsnedegegevens zijn onvolledig.")
+    image_width, image_height = (float(x) for x in image_size)
+    page_width, page_height = (float(x) for x in page_size)
+    if min(image_width, image_height, page_width, page_height) <= 0:
+        raise ValueError("De pagina-afmetingen zijn ongeldig.")
+    x0, y0, x1, y1 = (float(x) for x in pixel_bbox)
+    left, right = sorted((max(0.0, min(image_width, x0)), max(0.0, min(image_width, x1))))
+    top, bottom = sorted((max(0.0, min(image_height, y0)), max(0.0, min(image_height, y1))))
+    if right - left < 3 or bottom - top < 3:
+        raise ValueError("Selecteer een duidelijk zichtbare figuur- of tabelregio.")
+    sx, sy = page_width / image_width, page_height / image_height
+    bbox = [round(left * sx, 2), round(top * sy, 2),
+            round(right * sx, 2), round(bottom * sy, 2)]
+    if bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
+        raise ValueError("De geselecteerde uitsnede is te klein.")
+    return bbox
+
+
 def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, scale: float = 1.5):
     """Render multiple page regions into one tall PNG, preserving CV answers across pages."""
     import pymupdf as fitz
