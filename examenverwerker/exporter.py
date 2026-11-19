@@ -101,6 +101,10 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":"cv_aanvulling_afbakening_bronbestand_gewijzigd"})
         if selected_addenda - covered_addenda:
             errors.append({"id":rid,"error":"niet_alle_geselecteerde_cv_aanvullingen_visueel_afgebakend"})
+        declared_amendment_snippets = sorted(r.get("cv_amendment_snippet_files", []))
+        region_amendment_snippets = sorted(x.get("snippet_file", "") for x in addendum_regions)
+        if declared_amendment_snippets != region_amendment_snippets:
+            errors.append({"id":rid,"error":"cv_aanvulling_snippets_komen_niet_overeen_met_afgebakende_regios"})
         for asset in r.get("context_asset_files", []):
             name = asset.get("file", "")
             if not name or Path(str(name)).name != name or not (project_dir/"snippets"/str(name)).is_file():
@@ -166,6 +170,8 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
             cv_snippets=r.get("cv_snippet_files") or ([r["cv_snippet_file"]] if r.get("cv_snippet_file") else [])
             if len(cv_snippets)!=1:
                 errors.append({"id":rid,"error":"exact_een_cv_snippet_verplicht_voor_huidige_website"})
+            if len(cv_snippets)==1 and cv_snippets[0] != cv_region_file:
+                errors.append({"id":rid,"error":"website_cv_snippet_is_niet_de_handmatig_afgebakende_regio"})
             for name in cv_snippets:
                 if Path(name).name!=name: errors.append({"id":rid,"error":"ongeldig_cv_snippetpad"})
                 elif not (project_dir/"snippets"/name).is_file(): errors.append({"id":rid,"error":f"cv_snippet_ontbreekt:{name}"})
