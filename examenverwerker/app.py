@@ -154,14 +154,13 @@ class ExamApp:
         ttk.Label(brand, text="BIOLOGIE EXAMENVERWERKER", style="Title.TLabel").pack(anchor="w")
         ttk.Label(brand, text="Werkruimte voor volledige, visueel gecontroleerde examenverwerking",
                   style="Muted.TLabel").pack(anchor="w", pady=(1, 0))
-        self.project_label = ttk.Label(header, text="Nog geen examen geopend", style="Project.TLabel")
+        self.project_label = ttk.Label(header, text="Kies een examen uit de bibliotheek", style="Project.TLabel")
         self.project_label.pack(side="right", padx=10)
 
         toolbar = ttk.Frame(shell, style="App.TFrame")
         toolbar.pack(fill="x", pady=(0, 8))
         actions = [
-            ("Nieuw project", self.new_project, "Secondary.TButton"),
-            ("Project openen", self.open_project, "Secondary.TButton"),
+            ("Examenbibliotheek", self.open_project, "Secondary.TButton"),
             ("＋ Examens importeren", self.import_year_set, "Accent.TButton"),
             ("Vraagstarts analyseren", self.analyze_questions, "Secondary.TButton"),
             ("Structuur bewerken", self.edit_exam_structure, "Secondary.TButton"),
@@ -198,7 +197,7 @@ class ExamApp:
         docs_card.pack(fill="both", expand=True, pady=(0, 7))
         doc_actions = ttk.Frame(docs_card)
         doc_actions.pack(fill="x", pady=(0, 5))
-        ttk.Button(doc_actions, text="PDF's toevoegen", command=self.add_pdfs).pack(side="left")
+        ttk.Button(doc_actions, text="Aanvullende PDF's", command=self.add_pdfs).pack(side="left")
         ttk.Button(doc_actions, text="Type corrigeren", command=self.correct_type).pack(side="left", padx=4)
         ttk.Button(doc_actions, text="Metadata", command=self.edit_exam_metadata).pack(side="left")
         doc_cols = ("name", "type", "pages", "state")
@@ -1006,8 +1005,9 @@ class ExamApp:
         return number
 
     def _welcome(self):
-        self._log("Welkom. Open een bestaand examenproject of selecteer in één keer PDF's van meerdere jaren, niveaus en tijdvakken.")
-        self._log("De software leest de examens uit, groepeert ze automatisch en maakt zelf de examenmappen aan. Je controleert eerst de herkenning.")
+        self._log("Welkom. Beheer examens vanuit de examenbibliotheek; projecten en mappen worden automatisch geregeld.")
+        self._log("Importeer meerdere PDF's tegelijk. Controleer de voorgestelde metadata en documentrollen één keer en start daarna direct met de inhoudelijke controle.")
+        self.root.after(150, self.open_project)
 
     def _error(self, context, exc):
         details=traceback.format_exc()
@@ -1056,21 +1056,126 @@ class ExamApp:
                 "Controleer of de programmamap schrijfbaar is. Details staan in de map logs.")
 
     def open_project(self):
-        filename = filedialog.askopenfilename(title="Open projectbestand", filetypes=[("Examenproject", PROJECT_FILE), ("JSON", "*.json")])
-        if not filename:
-            return
-        try:
-            data = json.loads(Path(filename).read_text(encoding="utf-8"))
-            if data.get("schema") != "biologie-examenproject-v1":
-                raise ValueError("Dit is geen herkenbaar examenprojectbestand.")
-            self.project_dir = Path(filename).parent
-            self.data = data
-            self._workspace_load_global_corrections()
-            self.refresh()
-            self._log(f"Project geopend: {self.project_dir}")
-        except Exception as exc:
-            self._error("Project openen",exc)
-            messagebox.showerror("Project openen mislukt","Dit project kon niet worden geopend. Controleer of het projectbestand geldig is. Details staan in de map logs.")
+        """Open the exam library; internal project folders remain an implementation detail."""
+        win = tk.Toplevel(self.root)
+        win.title("Examenbibliotheek")
+        fit_window(win, 900, 620, 720, 480)
+        win.transient(self.root)
+        win.grab_set()
+
+        shell = ttk.Frame(win, padding=16)
+        shell.pack(fill="both", expand=True)
+        ttk.Label(shell, text="Examenbibliotheek", font=("Segoe UI", 20, "bold"),
+                  foreground=self.colors["wine"]).pack(anchor="w")
+        ttk.Label(shell, text="Kies een examen om verder te werken. Je voortgang en beoordelingen worden automatisch bewaard.",
+                  wraplength=820).pack(anchor="w", pady=(3, 12))
+
+        columns = ("exam", "documents", "questions", "progress", "updated")
+        table = ttk.Treeview(shell, columns=columns, show="headings", selectmode="browse")
+        for col, label, width in [
+            ("exam", "Examen", 260), ("documents", "PDF's", 70),
+            ("questions", "Vraagstarts", 95), ("progress", "Voortgang", 180),
+            ("updated", "Laatst gewijzigd", 150)
+        ]:
+            table.heading(col, text=label)
+            table.column(col, width=width, anchor="w" if col in ("exam", "progress") else "center")
+        list_wrap = ttk.Frame(shell)
+        list_wrap.pack(fill="both", expand=True)
+        scroll = ttk.Scrollbar(list_wrap, orient="vertical", command=table.yview)
+        table.configure(yscrollcommand=scroll.set)
+        table.pack(in_=list_wrap, side="left", fill="both", expand=True)
+        scroll.pack(in_=list_wrap, side="right", fill="y")
+
+        paths = {}
+        roots = [self.examens_root, self.app_base / "projecten"]
+        discovered = []
+        seen = set()
+        for root in roots:
+            if not root.exists():
+                continue
+            try:
+                manifests = sorted(root.rglob(PROJECT_FILE), key=lambda p: p.stat().st_mtime, reverse=True)
+            except OSError:
+                manifests = []
+            for manifest_path in manifests:
+                folder = manifest_path.parent
+                if folder in seen:
+                    continue
+                seen.add(folder)
+                try:
+                    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+                    if data.get("schema") != "biologie-examenproject-v1":
+                        continue
+                    meta = data.get("exam_metadata") or {}
+                    level = meta.get("level", "")
+                    year = str(meta.get("year", ""))
+                    period = str(meta.get("period", ""))
+                    exam_name = " · ".join(x for x in [
+                        f"{level} {year}".strip(), f"Tijdvak {period}" if period else ""
+                    ] if x) or data.get("naam", folder.name)
+                    docs = data.get("documenten", [])
+                    candidates = data.get("vraagkandidaten", [])
+                    decided = sum(c.get("human_decision") is not None for c in candidates)
+                    progress = f"{decided}/{len(candidates)} vraagstarts beoordeeld" if candidates else "Nog niet geanalyseerd"
+                    updated = data.get("bijgewerkt", "")
+                    if updated:
+                        try:
+                            updated = datetime.fromisoformat(updated).astimezone().strftime("%d-%m-%Y %H:%M")
+                        except Exception:
+                            updated = updated[:16].replace("T", " ")
+                    discovered.append((year, level, period, folder, exam_name, len(docs), len(candidates), progress, updated))
+                except Exception as exc:
+                    self._log(f"Examenmap overgeslagen in bibliotheek ({folder.name}): {exc}")
+
+        discovered.sort(key=lambda row: (row[0], row[1], row[2], row[4]), reverse=True)
+        for index, row in enumerate(discovered):
+            _year, _level, _period, folder, exam_name, doc_count, q_count, progress, updated = row
+            iid = str(index)
+            paths[iid] = folder
+            table.insert("", "end", iid=iid, values=(exam_name, doc_count, q_count, progress, updated))
+
+        footer = ttk.Frame(shell)
+        footer.pack(fill="x", pady=(12, 0))
+        note = (f"{len(discovered)} examens beschikbaar. Selecteer een examen of importeer een nieuwe set."
+                if discovered else "De bibliotheek is nog leeg. Importeer je eerste examen-PDF's om te beginnen.")
+        ttk.Label(footer, text=note, foreground=self.colors["muted"]).pack(side="left")
+
+        def open_selected(_event=None):
+            selection = table.selection()
+            if not selection:
+                messagebox.showinfo("Kies een examen", "Selecteer eerst een examen in de bibliotheek.", parent=win)
+                return
+            folder = paths.get(selection[0])
+            if not folder:
+                return
+            try:
+                manifest_path = folder / PROJECT_FILE
+                data = json.loads(manifest_path.read_text(encoding="utf-8"))
+                if data.get("schema") != "biologie-examenproject-v1":
+                    raise ValueError("Onbekend examenformaat.")
+                self.project_dir = folder
+                self.data = data
+                self._workspace_load_global_corrections()
+                self.refresh()
+                self._log(f"Examen geopend: {table.item(selection[0], 'values')[0]}")
+                win.destroy()
+            except Exception as exc:
+                self._error("Examen openen", exc)
+                messagebox.showerror("Examen openen mislukt",
+                    "Dit examen kon niet worden geopend. De gegevens zijn niet gewijzigd.", parent=win)
+
+        table.bind("<Double-1>", open_selected)
+        buttons = ttk.Frame(shell)
+        buttons.pack(fill="x", pady=(12, 0))
+        ttk.Button(buttons, text="＋ Nieuwe examens importeren",
+                   command=lambda: (win.destroy(), self.import_year_set()),
+                   style="Accent.TButton").pack(side="left")
+        ttk.Button(buttons, text="Examen openen", command=open_selected,
+                   style="Wine.TButton").pack(side="right")
+        ttk.Button(buttons, text="Sluiten", command=win.destroy).pack(side="right", padx=8)
+        if discovered:
+            table.selection_set("0")
+            table.focus("0")
 
     def import_year_set(self):
         """Import arbitrary exams from multiple years without manual folder creation."""
@@ -1356,12 +1461,12 @@ class ExamApp:
             self.refresh()
             self._log(f"Examens geïmporteerd onder: {target_root}")
             for project in created:
-                self._log(f"  Project aangemaakt: {project.name}")
-            self._log(f"Eerste examen automatisch geopend: {self.project_dir.name}")
+                self._log(f"  Examen toegevoegd aan bibliotheek: {project.name}")
+            self._log(f"Eerste examen direct geopend: {self.project_dir.name}")
             messagebox.showinfo("Examens geïmporteerd",
-                f"{len(created)} examenprojecten zijn aangemaakt onder:\n{target_root}\n\n"
-                f"Het eerste examen ({self.project_dir.name}) is direct geopend. Je kunt nu de vraagstarts controleren; "
-                "de overige examens open je via Project openen. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
+                f"{len(created)} examens zijn toegevoegd aan de examenbibliotheek.\n\n"
+                f"Het eerste examen ({self.project_dir.name}) is direct geopend. De overige examens vind je in de bibliotheek. "
+                "De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
         ttk.Button(win, text="Voorstellen akkoord — importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
         ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
@@ -1374,7 +1479,7 @@ class ExamApp:
 
     def add_pdfs(self):
         if not self.data:
-            messagebox.showinfo("Eerst een project", "Maak eerst een nieuw examenproject of open een bestaand project.")
+            messagebox.showinfo("Eerst een examen openen", "Kies eerst een examen uit de examenbibliotheek of importeer nieuwe examens.")
             return
         files = filedialog.askopenfilenames(title="Selecteer de examen-PDF's", filetypes=[("PDF-bestanden", "*.pdf")])
         if not files:
@@ -3447,7 +3552,7 @@ class ExamApp:
         temp = self.project_dir / (PROJECT_FILE + ".tmp")
         temp.write_text(json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8")
         temp.replace(self.project_dir / PROJECT_FILE)
-        self.project_label.configure(text=f"Project: {self.data['naam']}  ·  {self.project_dir}")
+        self.project_label.configure(text=f"Examen: {self.data.get('naam', self.project_dir.name if self.project_dir else '')}")
 
     def refresh(self):
         """Refresh document inventory, review queue and project progress."""
@@ -3456,8 +3561,8 @@ class ExamApp:
         records = self.data.get("vraagrecords", []) if self.data else []
         if hasattr(self, "project_label"):
             self.project_label.configure(text=(
-                self.data.get("naam") or (self.project_dir.name if self.project_dir else "Actief project")
-                if self.data else "Nog geen examen geopend"))
+                f"Examen: {self.data.get('naam') or (self.project_dir.name if self.project_dir else '')}"
+                if self.data else "Kies een examen uit de bibliotheek"))
         if hasattr(self, "table"):
             for item in self.table.get_children():
                 self.table.delete(item)
@@ -3475,7 +3580,7 @@ class ExamApp:
                 f"({confirmed} bevestigd, {rejected} afgewezen, {undecided} open) · "
                 f"{len(records)} vraagrecords ({unapproved_records} nog niet goedgekeurd) · "
                 "originele PDF's blijven leidend; niets wordt automatisch gepubliceerd."
-                if self.data else "Importeer examens of open een bestaand project om te beginnen."))
+                if self.data else "Importeer examens of kies een bestaand examen uit de bibliotheek om te beginnen."))
         if hasattr(self, "candidate_tree") and hasattr(self, "_workspace_temp"):
             self._workspace_refresh()
 
