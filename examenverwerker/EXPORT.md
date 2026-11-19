@@ -37,3 +37,6 @@ De uitvoermap moet nieuw of leeg zijn. De exporter overschrijft nooit bestaande 
 Vraagafbeeldingen in `exam-open.json` zijn uitsluitend de handmatig begrensde vraagregio's. Contextafbeeldingen worden apart opgenomen in `exam-contexts.json` (`contextImages` en `contextAssets`), met bijschriften en eventuele tekstregio's. Het manifest bewaart de exacte genormaliseerde paginagrenzen en bronhashes. De oorspronkelijke PDF's blijven volledig beschikbaar in `examens/`.
 
 Bij contextfiguren en -tabellen wordt de caption afzonderlijk bewaard. Een automatische caption is slechts een voorstel; de gebruiker moet deze bevestigen of corrigeren voordat export mogelijk is. Een ontbrekend bijschrift kan expliciet als zodanig worden bevestigd.
+
+
+Voor compatibiliteit met de huidige `examenoefenen.html` bevat `exam-contexts.json` per vraag `images` in deze vaste volgorde: eerst alle geselecteerde contextuitsneden, daarna de handmatig afgebakende vraaguitsnede als laatste afbeelding. De website gebruikt de laatste afbeelding als de oorspronkelijke vraag en eerdere afbeeldingen als context. `contextImages` blijft daarnaast als expliciete context-only lijst beschikbaar voor toekomstige weergaven.
