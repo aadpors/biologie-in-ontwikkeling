@@ -11,10 +11,10 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 
-APP_VERSION = "0.6.0"
+APP_VERSION = "0.7.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -643,7 +643,18 @@ class ExamApp:
         for idx,doc in enumerate(amendment_docs):
             amendment_list.insert("end",doc["bestand"])
             if doc.get("opslagbestand") in existing_amendments: amendment_list.selection_set(idx)
-        context_files=row.get("context_asset_proposal_files",[])
+        context_files=[dict(x) for x in row.get("context_asset_proposal_files",[])]
+        # Keep manually selected/cropped context assets available when an existing
+        # draft is reopened; derived full context-region renders are rebuilt below.
+        known_context_files={x.get("file") for x in context_files}
+        for saved_asset in (current or {}).get("context_asset_files", []):
+            if saved_asset.get("asset_id") and saved_asset.get("file") not in known_context_files:
+                context_files.append(dict(saved_asset))
+                known_context_files.add(saved_asset.get("file"))
+        context_structure = (self.data.get("exam_structures", {}).get(source_doc["id"])
+                             or self.data.get("exam_structure"))
+        context_fragments_for_editor = fragments_for_question(context_structure, row["number"]).get("context_fragments", [])
+
         ttk.Label(outer,text="Extra figuur-/tabeluitsneden die bij deze vraag horen (selecteer alleen de juiste; controleer bijschriften en context)").pack(anchor="w",pady=(8,2))
         context_list=tk.Listbox(outer,selectmode="multiple",height=min(5,max(2,len(context_files))))
         context_list.pack(fill="x")
@@ -672,7 +683,132 @@ class ExamApp:
             context_list.selection_set(index)
             messagebox.showinfo("Bijschrift bevestigd","Het bijschrift (of het ontbreken ervan) is voor deze uitsnede bevestigd.",parent=win)
         context_list.bind("<<ListboxSelect>>",load_context_caption)
+
         ttk.Button(outer,text="Bijschrift bevestigen voor geselecteerde uitsnede",command=confirm_context_caption).pack(anchor="w",pady=(2,6))
+        def add_manual_context_crop():
+            source_path=self.project_dir/"bronnen"/source_doc["opslagbestand"]
+            if not source_path.is_file() or sha256(source_path)!=source_doc.get("sha256"):
+                messagebox.showerror("Opgavenbron gewijzigd","De originele opgaven-PDF ontbreekt of is gewijzigd. Voeg de juiste PDF opnieuw toe.",parent=win)
+                return
+            try:
+                source_analysis=analyze_pdf(source_path)
+                page_count=int(source_analysis["page_count"])
+                page_sizes={int(p["page"]):(float(p["width"]),float(p["height"])) for p in source_analysis["pages"]}
+            except Exception as exc:
+                messagebox.showerror("PDF niet beschikbaar",str(exc),parent=win)
+                return
+            crop_win=tk.Toplevel(win)
+            crop_win.title(f"Figuur of tabel handmatig uitsnijden · vraag {row['number']}")
+            crop_win.geometry("1120x850")
+            crop_win.transient(win)
+            ttk.Label(crop_win,text="Sleep een rechthoek om de figuur, tabel of afbeelding op de originele pagina. Alleen het geselecteerde brongebied wordt uitgesneden; de PDF blijft ongewijzigd.",
+                      wraplength=1080,padding=10).pack(anchor="w")
+            controls=ttk.Frame(crop_win,padding=(10,4)); controls.pack(fill="x")
+            page_var=tk.IntVar(value=int(row.get("page",1)))
+            ttk.Button(controls,text="◀",command=lambda:change_crop_page(-1)).pack(side="left")
+            ttk.Label(controls,text="Pagina").pack(side="left",padx=(8,3))
+            page_spin=tk.Spinbox(controls,from_=1,to=page_count,textvariable=page_var,width=5)
+            page_spin.pack(side="left")
+            ttk.Label(controls,text=f"van {page_count}").pack(side="left",padx=(4,12))
+            ttk.Button(controls,text="▶",command=lambda:change_crop_page(1)).pack(side="left")
+            kind_var=tk.StringVar(value="figuur")
+            ttk.Label(controls,text="Soort").pack(side="left",padx=(18,4))
+            ttk.Combobox(controls,textvariable=kind_var,values=["figuur","tabel","grafiek","afbeelding","bron","overig"],state="readonly",width=14).pack(side="left")
+            fragment_labels=["Vraag zelf / niet aan context gekoppeld"]
+            fragment_map={fragment_labels[0]:None}
+            for fragment in context_fragments_for_editor:
+                label=f"{fragment.get('type')} · {', '.join(str(x['page']) for x in fragment.get('page_spans',[])) or 'geen pagina'} · {fragment.get('id')}"
+                fragment_labels.append(label)
+                fragment_map[label]=fragment.get("id")
+            fragment_var=tk.StringVar(value=fragment_labels[1] if len(fragment_labels)>1 else fragment_labels[0])
+            ttk.Label(controls,text="Contextkoppeling").pack(side="left",padx=(14,4))
+            ttk.Combobox(controls,textvariable=fragment_var,values=fragment_labels,state="readonly",width=35).pack(side="left",fill="x",expand=True)
+            frame=ttk.Frame(crop_win); frame.pack(fill="both",expand=True,padx=10,pady=4)
+            canvas=tk.Canvas(frame,background="white",highlightthickness=1,highlightbackground="#b8b8b8")
+            sy=ttk.Scrollbar(frame,orient="vertical",command=canvas.yview)
+            sx=ttk.Scrollbar(frame,orient="horizontal",command=canvas.xview)
+            canvas.configure(yscrollcommand=sy.set,xscrollcommand=sx.set)
+            sy.pack(side="right",fill="y"); sx.pack(side="bottom",fill="x"); canvas.pack(side="left",fill="both",expand=True)
+            photo=None
+            image_width=image_height=1
+            selection_start=None
+            selection_rect=None
+            def show_crop_page():
+                nonlocal photo,image_width,image_height,selection_start,selection_rect
+                number=max(1,min(page_count,int(page_var.get())))
+                page_var.set(number)
+                target=self.project_dir/"analyse"/f"manual-context-{source_doc['id']}-p{number}.png"
+                render_page(source_path,number,target,scale=1.15)
+                photo=tk.PhotoImage(file=str(target))
+                image_width,image_height=photo.width(),photo.height()
+                canvas.delete("all")
+                canvas.create_image(0,0,image=photo,anchor="nw")
+                canvas.image=photo
+                canvas.configure(scrollregion=(0,0,image_width,image_height))
+                selection_start=None
+                selection_rect=None
+                crop_status.configure(text=f"Originele pagina {number}. Sleep met de muis een rechthoek rond één figuur of tabel.")
+            def change_crop_page(delta):
+                page_var.set(max(1,min(page_count,int(page_var.get())+delta)))
+                show_crop_page()
+            def start_crop(event):
+                nonlocal selection_start,selection_rect
+                x=max(0,min(image_width,canvas.canvasx(event.x)))
+                y=max(0,min(image_height,canvas.canvasy(event.y)))
+                selection_start=(x,y)
+                if selection_rect: canvas.delete(selection_rect)
+                selection_rect=canvas.create_rectangle(x,y,x,y,outline="black",width=1)
+            def drag_crop(event):
+                if selection_start is None or selection_rect is None: return
+                x=max(0,min(image_width,canvas.canvasx(event.x)))
+                y=max(0,min(image_height,canvas.canvasy(event.y)))
+                canvas.coords(selection_rect,selection_start[0],selection_start[1],x,y)
+            def save_manual_crop():
+                if selection_start is None or selection_rect is None:
+                    messagebox.showinfo("Geen uitsnede","Sleep eerst een rechthoek rond een figuur of tabel.",parent=crop_win)
+                    return
+                try:
+                    coords=canvas.coords(selection_rect)
+                    page_no=int(page_var.get())
+                    bbox=pixel_rect_to_pdf_bbox(coords,(image_width,image_height),page_sizes[page_no])
+                    stamp=datetime.now().strftime("%Y%m%d%H%M%S%f")
+                    asset_id=f"manual-p{page_no}-{stamp}"
+                    name=f"context-manual-{source_doc['id']}-q{row['number']}-{asset_id}.png"
+                    target=self.project_dir/"snippets"/name
+                    crop_info=render_crop(source_path,page_no,bbox,target,scale=1.8)
+                    asset={"file":name,"page":page_no,"caption":None,"asset_id":asset_id,
+                           "asset_kind":kind_var.get(),"type":kind_var.get(),"bbox":list(crop_info["bbox"]),
+                           "source_document_id":source_doc["id"],"source_sha256":source_doc["sha256"],
+                           "source_pdf":source_doc["opslagbestand"],"question_number":int(row["number"]),
+                           "fragment_id":fragment_map.get(fragment_var.get()),
+                           "crop_method":"handmatige_rechthoek_op_originele_pdf",
+                           "caption_human_confirmed":False,"status":"handmatig_uitgesneden_bijschrift_te_bevestigen"}
+                    context_files.append(asset)
+                    row["context_asset_proposal_files"]=[dict(x) for x in context_files]
+                    context_list.insert("end",f"Pagina {page_no} · {kind_var.get()} · bijschrift nog bevestigen · {name}")
+                    new_index=context_list.size()-1
+                    context_list.selection_clear(0,"end")
+                    context_list.selection_set(new_index)
+                    context_caption_var.set("")
+                    self.save_project()
+                    crop_status.configure(text=f"Uitsnede toegevoegd: pagina {page_no}. Bevestig het bijschrift in het hoofdvenster.")
+                    if selection_rect: canvas.delete(selection_rect)
+                    selection_start=None
+                    selection_rect=None
+                except Exception as exc:
+                    messagebox.showerror("Uitsnede niet opgeslagen",str(exc),parent=crop_win)
+            canvas.bind("<Button-1>",start_crop)
+            canvas.bind("<B1-Motion>",drag_crop)
+            actions=ttk.Frame(crop_win,padding=10); actions.pack(fill="x")
+            crop_status=ttk.Label(actions,text="Selecteer een rechthoek op de originele pagina.")
+            crop_status.pack(side="left",fill="x",expand=True)
+            ttk.Button(actions,text="Uitsnede toevoegen",command=save_manual_crop).pack(side="left",padx=8)
+            ttk.Button(actions,text="Sluiten",command=crop_win.destroy).pack(side="right")
+            page_spin.configure(command=show_crop_page)
+            page_spin.bind("<Return>",lambda _e:show_crop_page())
+            show_crop_page()
+        ttk.Button(outer,text="Figuur/tabel handmatig uitsnijden uit originele PDF",command=add_manual_context_crop).pack(anchor="w",pady=(2,6))
+
         ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
         snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-*.png"))
         cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
@@ -903,6 +1039,7 @@ class ExamApp:
                         "caption": "Handmatig afgebakende context",
                         "snippet_sha256": sha256(self.project_dir / "snippets" / region_file)})
                 context_assets.extend(context_region_files)
+                row["context_asset_proposal_files"]=[dict(x) for x in context_files]
                 record.update({"exam":meta,"options":options,"correct":correct,
                                "snippet_file":question_file,"snippet_files":[question_file],"question_region_snippet_sha256":question_file_hash,
                                "context_asset_candidates":context_files,"context_asset_files":context_assets,"source_context":context_text_box.get("1.0","end").strip(),"context_text_human_confirmed":True,
