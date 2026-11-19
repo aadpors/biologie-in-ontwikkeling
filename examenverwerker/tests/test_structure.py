@@ -1,6 +1,6 @@
 import unittest
 from structure import (
-    append_page_span, default_question_links, make_exam_structure, make_fragment,
+    append_page_span, default_question_links, fragments_for_question, make_exam_structure, make_fragment,
     make_page_span, mark_structure_stale, validate_exam_structure,
 )
 
@@ -74,6 +74,22 @@ class StructureTests(unittest.TestCase):
         errors = validate_exam_structure(structure, "doc-123", "abc123", self.questions)
         self.assertIn("ongeldige_vraagkoppeling", errors)
         self.assertIn("fragment_zonder_paginagrenzen", errors)
+
+
+    def test_question_retrieves_its_question_region_and_shared_context(self):
+        intro = make_fragment("context_intro", make_page_span(1, 0.05, 0.2),
+                              [], self.questions, "intro")
+        question = make_fragment("vraag", make_page_span(2, 0.2, 0.8),
+                                 [2], self.questions, "question-2")
+        specific = make_fragment("vraagcontext", make_page_span(2, 0.05, 0.18),
+                                 [2], self.questions, "context-2")
+        structure = make_exam_structure(self.doc, [intro, question, specific], self.questions)
+        result = fragments_for_question(structure, 2)
+        self.assertEqual(result["question_fragment"]["id"], "question-2")
+        self.assertEqual({x["id"] for x in result["context_fragments"]}, {"intro", "context-2"})
+        self.assertEqual(fragments_for_question(structure, 4)["status"], "geen_fragmenten_gekoppeld")
+        self.assertEqual(fragments_for_question(mark_structure_stale(structure, "reanalyse"), 2)["status"],
+                         "structuur_niet_beschikbaar")
 
 
 if __name__ == "__main__":
