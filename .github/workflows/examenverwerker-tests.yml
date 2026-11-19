@@ -2,7 +2,7 @@ name: Examenverwerker tests
 
 on:
   push:
-    branches: [main, "bouw/**"]
+    branches: [main, "bouw/**", "verbeter/**"]
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-tests.yml"]
   pull_request:
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-tests.yml"]
