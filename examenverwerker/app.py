@@ -3399,7 +3399,7 @@ class ExamApp:
         if existing is None and self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
             existing = self.data.get("exam_structure")
         if existing and existing.get("document_id") == doc["id"] and existing.get("source_sha256") == doc["sha256"]:
-            fragments = json.loads(json.dumps(existing.get("fragments", []), ensure_ascii=False))
+            fragments = normalize_fragments(existing.get("fragments", []))
         else:
             fragments = []
         # Seed the editor with a transparent, editable proposal derived from the
@@ -3423,7 +3423,7 @@ class ExamApp:
                 if first_page == 1 and first_y > 0.02:
                     fragments.append({
                         "id": f"voorstel-intro-{doc['id'][:8]}",
-                        "type": "context_intro",
+                        "type": "intro",
                         "page_spans": [{"page": 1, "top": 0.0, "bottom": round(first_y, 6)}],
                         "question_numbers": question_numbers[:],
                         "status": "automatisch_voorstel_nog_te_controleren",
@@ -3464,9 +3464,9 @@ class ExamApp:
         left = ttk.Frame(body, width=245); left.pack(side="left", fill="y", padx=(0, 10))
         right = ttk.Frame(body); right.pack(side="left", fill="both", expand=True)
         ttk.Label(left, text="Fragmenttype").pack(anchor="w")
-        type_var = tk.StringVar(value="context_intro")
+        type_var = tk.StringVar(value="intro")
         type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
-            values=["context_intro", "vraagcontext", "vraag", "tussenliggende_context"], width=25)
+            values=["intro", "tussen_context", "vraag"], width=25)
         type_box.pack(fill="x", pady=(2, 8))
         ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
@@ -3474,7 +3474,7 @@ class ExamApp:
         for number in question_numbers: qlist.insert("end", f"Vraag {number}")
         def set_default_links(*_):
             qlist.selection_clear(0, "end")
-            if type_var.get() == "context_intro":
+            if type_var.get() == "intro":
                 for i in range(qlist.size()): qlist.selection_set(i)
         type_box.bind("<<ComboboxSelected>>", set_default_links)
         set_default_links()
@@ -3625,7 +3625,7 @@ class ExamApp:
             try:
                 kind = type_var.get()
                 links = selected_links()
-                if kind == "context_intro" and not links: links = question_numbers[:]
+                if kind == "intro" and not links: links = question_numbers[:]
                 span = make_page_span(displayed_page, top_y, bottom_y)
                 fragment = make_fragment(kind, span, links, question_numbers,
                     f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}")
@@ -3680,7 +3680,7 @@ class ExamApp:
             load_span_for_page(); redraw_guides()
             frag = selected_fragment()
             if frag:
-                type_var.set(frag.get("type", "vraagcontext"))
+                type_var.set(canonical_fragment_type(frag.get("type", "tussen_context")))
                 qlist.selection_clear(0, "end")
                 for i, number in enumerate(question_numbers):
                     if number in frag.get("question_numbers", []): qlist.selection_set(i)
@@ -3702,7 +3702,7 @@ class ExamApp:
                 messagebox.showwarning("Vraagfragment", "Een vraagfragment moet aan precies één vraagnummer gekoppeld zijn.", parent=win)
                 return
             if new_type != "vraag" and not links:
-                if new_type == "context_intro":
+                if new_type == "intro":
                     links = question_numbers[:]
                     messagebox.showinfo("Inleiding", "De contextinleiding is standaard aan alle bevestigde vragen gekoppeld.", parent=win)
                 else:
