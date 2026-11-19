@@ -115,6 +115,28 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                 errors.append({"id":rid,"error":"contextuitsnede_bronhash_afwijkend"})
             if asset.get("asset_id") and asset.get("caption_human_confirmed") is not True:
                 errors.append({"id":rid,"error":"contextbijschrift_niet_handmatig_bevestigd"})
+            if asset.get("crop_method") == "handmatige_rechthoek_op_originele_pdf":
+                bbox = asset.get("bbox")
+                try:
+                    coords = [float(x) for x in bbox]
+                    page_no = int(asset.get("page", 0))
+                    valid_bbox = (len(coords) == 4 and page_no >= 1 and
+                                  coords[0] >= 0 and coords[1] >= 0 and
+                                  coords[2] > coords[0] and coords[3] > coords[1])
+                except (TypeError, ValueError):
+                    valid_bbox = False
+                if not valid_bbox:
+                    errors.append({"id":rid,"error":"handmatige_contextuitsnede_geometrie_ongeldig"})
+                if (asset.get("source_document_id") != r.get("exam_structure_document_id")
+                        or asset.get("source_sha256") != r.get("exam_structure_source_sha256")
+                        or not asset.get("source_pdf") or Path(str(asset.get("source_pdf"))).name != asset.get("source_pdf")):
+                    errors.append({"id":rid,"error":"handmatige_contextuitsnede_herkomst_ontbreekt"})
+                try:
+                    asset_question_number = int(asset.get("question_number", -1))
+                except (TypeError, ValueError):
+                    asset_question_number = -1
+                if asset_question_number != int(r.get("number", 0)):
+                    errors.append({"id":rid,"error":"handmatige_contextuitsnede_verkeerd_vraagnummer"})
             if name and (project_dir/"snippets"/str(name)).is_file():
                 if not asset.get("snippet_sha256") or sha256(project_dir/"snippets"/str(name)) != asset.get("snippet_sha256"):
                     errors.append({"id":rid,"error":"contextuitsnede_hash_afwijkend"})
@@ -257,7 +279,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "contextImages":context_image_paths,
                          "contextAssets":[{"image":f"exam-snippets/{x['file']}","caption":x.get("caption"),
                              "page":x.get("page"),"asset_id":x.get("asset_id"),"asset_kind":x.get("asset_kind"),"type":x.get("type"),
-                             "fragment_id":x.get("fragment_id")} for x in context_assets],
+                             "fragment_id":x.get("fragment_id"),"question_number":x.get("question_number"),"crop_method":x.get("crop_method")} for x in context_assets],
                          "contextRegions":r.get("context_region_fragments", []),
                          "contextText":r.get("source_context", ""),
                          "questionImage":row["image"],"questionImages":row["images"]})
@@ -293,7 +315,7 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                              "asset_id":x.get("asset_id"),"asset_kind":x.get("asset_kind"),"caption":x.get("caption"),"page":x.get("page"),
                              "fragment_id":x.get("fragment_id"),"type":x.get("type"),"source_document_id":x.get("source_document_id"),
                              "source_sha256":x.get("source_sha256"),"source_pdf":x.get("source_pdf"),"bbox":x.get("bbox"),
-                             "snippet_sha256":x.get("snippet_sha256"),"caption_human_confirmed":x.get("caption_human_confirmed", False)} for x in context_assets],
+                             "snippet_sha256":x.get("snippet_sha256"),"caption_human_confirmed":x.get("caption_human_confirmed", False),"question_number":x.get("question_number"),"crop_method":x.get("crop_method")} for x in context_assets],
                          "cv_source_region":r.get("cv_source_region"),
                          "cv_source_region_sha256":sha256(project_dir/"snippets"/cv_region_file) if cv_region_file else None,
                          "cv_amendment_regions":r.get("cv_amendment_regions", [])})
