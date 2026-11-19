@@ -6,6 +6,7 @@ py -3.12 -m PyInstaller --noconfirm --clean --windowed --name BiologieExamenverw
 copy /Y START.bat dist\BiologieExamenverwerker\START.bat >nul
 copy /Y README.md dist\BiologieExamenverwerker\GEBRUIK.md >nul
 copy /Y CHANGELOG.md dist\BiologieExamenverwerker\WIJZIGINGEN.md >nul
+copy /Y TESTPLAN.md dist\BiologieExamenverwerker\TESTPLAN.md >nul
 echo.
 echo Portable programma staat in: %CD%\dist\BiologieExamenverwerker
 echo Kopieer de volledige map naar een USB-stick of gewenste map.
