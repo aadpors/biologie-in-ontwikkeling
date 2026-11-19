@@ -132,5 +132,18 @@ class StructureTests(unittest.TestCase):
                       validate_exam_structure(structure, "doc-123", "abc123", [1, 2]))
 
 
+    def test_context_fragments_must_link_to_at_least_one_question(self):
+        with self.assertRaises(ValueError):
+            make_fragment("vraagcontext", make_page_span(1, 0.1, 0.8), [],
+                          self.questions, "unlinked-context")
+        fragment = make_fragment("vraagcontext", make_page_span(1, 0.1, 0.8),
+                                 [1], self.questions, "context")
+        fragment["question_numbers"] = []
+        structure = make_exam_structure(self.doc, [fragment], self.questions)
+        self.assertIn("contextfragment_zonder_vraagkoppeling",
+                      validate_exam_structure(structure, "doc-123", "abc123", self.questions))
+
+
+
 if __name__ == "__main__":
     unittest.main()
