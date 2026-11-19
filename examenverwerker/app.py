@@ -3464,9 +3464,13 @@ class ExamApp:
         left = ttk.Frame(body, width=245); left.pack(side="left", fill="y", padx=(0, 10))
         right = ttk.Frame(body); right.pack(side="left", fill="both", expand=True)
         ttk.Label(left, text="Fragmenttype").pack(anchor="w")
-        type_var = tk.StringVar(value="intro")
+        fragment_type_ids = {"Intro": "intro", "Tussencontext": "tussen_context", "Vraag": "vraag"}
+        fragment_type_labels = {value: key for key, value in fragment_type_ids.items()}
+        type_var = tk.StringVar(value="Intro")
         type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
-            values=["intro", "tussen_context", "vraag"], width=25)
+            values=list(fragment_type_ids), width=25)
+        ttk.Label(left, text="Intro: geldt voor alle vragen. Tussencontext: koppel aan één of meer vragen. Vraag: precies één vraagblok.",
+                  wraplength=230, justify="left").pack(anchor="w", pady=(0, 8))
         type_box.pack(fill="x", pady=(2, 8))
         ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
@@ -3474,7 +3478,7 @@ class ExamApp:
         for number in question_numbers: qlist.insert("end", f"Vraag {number}")
         def set_default_links(*_):
             qlist.selection_clear(0, "end")
-            if type_var.get() == "intro":
+            if type_var.get() == "Intro":
                 for i in range(qlist.size()): qlist.selection_set(i)
         type_box.bind("<<ComboboxSelected>>", set_default_links)
         set_default_links()
@@ -3589,8 +3593,8 @@ class ExamApp:
                 links = ",".join(str(x) for x in frag.get("question_numbers", []))
                 confidence = frag.get("confidence")
                 confidence_label = f"{float(confidence):.0%}" if isinstance(confidence, (int, float)) else "—"
-                fragment_tree.insert("", "end", iid=str(index), text=frag.get("type", f"Fragment {index+1}"),
-                    values=(frag.get("type"), pages, links, confidence_label))
+                fragment_tree.insert("", "end", iid=str(index), text=fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), f"Fragment {index+1}"),
+                    values=(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), "Onbekend"), pages, links, confidence_label))
         def save_structure():
             nonlocal original_structure_signature
             current = selected_fragment()
@@ -3623,7 +3627,7 @@ class ExamApp:
             return True
         def create_fragment():
             try:
-                kind = type_var.get()
+                kind = fragment_type_ids[type_var.get()]
                 links = selected_links()
                 if kind == "intro" and not links: links = question_numbers[:]
                 span = make_page_span(displayed_page, top_y, bottom_y)
@@ -3680,7 +3684,7 @@ class ExamApp:
             load_span_for_page(); redraw_guides()
             frag = selected_fragment()
             if frag:
-                type_var.set(canonical_fragment_type(frag.get("type", "tussen_context")))
+                type_var.set(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "tussen_context")), "Tussencontext"))
                 qlist.selection_clear(0, "end")
                 for i, number in enumerate(question_numbers):
                     if number in frag.get("question_numbers", []): qlist.selection_set(i)
@@ -3689,14 +3693,14 @@ class ExamApp:
                 certainty = f" · zekerheid {float(confidence):.0%}" if isinstance(confidence, (int, float)) else ""
                 reason = evidence.get("reason") or "Handmatig afgebakend; controleer de inhoud en koppeling."
                 captions = evidence.get("captions") or []
-                detail = f"{frag.get('type', 'Fragment')}{certainty}\\n{reason}"
+                detail = f"{fragment_type_labels.get(canonical_fragment_type(frag.get('type', '')), 'Fragment')}{certainty}\\n{reason}"
                 if captions:
                     detail += "\\nBijschrift: " + " · ".join(captions[:2])
                 fragment_info.configure(text=detail)
         def update_links():
             frag = selected_fragment()
             if not frag: return
-            new_type = type_var.get()
+            new_type = fragment_type_ids[type_var.get()]
             links = selected_links()
             if new_type == "vraag" and len(links) != 1:
                 messagebox.showwarning("Vraagfragment", "Een vraagfragment moet aan precies één vraagnummer gekoppeld zijn.", parent=win)
