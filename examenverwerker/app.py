@@ -710,10 +710,17 @@ class ExamApp:
             import pymupdf as fitz
             source = self.project_dir / "bronnen" / doc["opslagbestand"]
             pdf = fitz.open(source)
-            page = pdf[self._workspace_page-1]
             px = self.pdf_canvas.canvasx(event.x)
             py = self.pdf_canvas.canvasy(event.y)
-            x, y = px / self._workspace_scale, py / self._workspace_scale
+            page_no = next((n for n, top in sorted(getattr(self, "_workspace_page_offsets", {}).items())
+                            if top <= py < top + self._workspace_page_heights.get(n, 0)), None)
+            if page_no is None:
+                pdf.close()
+                return
+            self._workspace_page = page_no
+            page = pdf[page_no-1]
+            page_top = self._workspace_page_offsets[page_no]
+            x, y = px / self._workspace_scale, (py - page_top) / self._workspace_scale
             if x < 0 or y < 0 or x > page.rect.width or y > page.rect.height:
                 pdf.close()
                 return
