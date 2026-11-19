@@ -230,6 +230,9 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                          "image":context_image_paths[0] if context_image_paths else row["image"],
                          "images":context_image_paths if context_image_paths else row["images"],
                          "contextImages":context_image_paths,
+                         "contextAssets":[{"image":f"exam-snippets/{x['file']}","caption":x.get("caption"),
+                             "page":x.get("page"),"asset_id":x.get("asset_id"),"type":x.get("type"),
+                             "fragment_id":x.get("fragment_id")} for x in context_assets],
                          "contextRegions":r.get("context_region_fragments", []),
                          "questionImage":row["image"],"questionImages":row["images"]})
         if meta["questionType"]=="mcq":
