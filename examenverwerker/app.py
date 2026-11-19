@@ -141,252 +141,473 @@ class ExamApp:
                         troughcolor="#F5F7F7", bordercolor="#F5F7F7", arrowsize=12)
 
     def _build(self):
-        """Build a complete, card-based workflow workspace rather than a plain file manager."""
+        """Integrated examination workbench: source PDF, documents, candidates and review."""
         self.root.title("Biologie Examenverwerker")
-        fit_window(self.root, 1380, 900, 900, 620)
-
-        shell = ttk.Frame(self.root, style="App.TFrame")
+        fit_window(self.root, 1440, 920, 980, 640)
+        shell = ttk.Frame(self.root, style="App.TFrame", padding=10)
         shell.pack(fill="both", expand=True)
 
-        # Brand bar
-        header = tk.Frame(shell, bg="#FFFFFF", height=62,
-                          highlightthickness=1, highlightbackground=self.colors["line"])
-        header.pack(fill="x")
-        header.pack_propagate(False)
-        brand = tk.Frame(header, bg="#FFFFFF")
-        brand.pack(side="left", padx=28, fill="y")
-        mark = tk.Label(brand, text="B", bg=self.colors["wine"], fg="#FFFFFF",
-                        font=("Segoe UI", 18, "bold"), width=2, height=1)
-        mark.pack(side="left", pady=15)
-        brand_text = tk.Frame(brand, bg="#FFFFFF")
-        brand_text.pack(side="left", padx=12, pady=12)
-        tk.Label(brand_text, text="BIOLOGIE EXAMENVERWERKER", bg="#FFFFFF",
-                 fg=self.colors["ink"], font=("Segoe UI", 13, "bold")).pack(anchor="w")
-        tk.Label(brand_text, text="Van originele examen-pdf naar gecontroleerde examenvragen",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
-        tk.Label(header, text="LOKAAL WERKSTATION   ·   OFFLINE STANDAARD   ·   NIET AUTOMATISCH PUBLICEREN",
-                 bg="#FFFFFF", fg=self.colors["muted"],
-                 font=("Segoe UI", 8, "bold")).pack(side="right", padx=28)
+        header = ttk.Frame(shell, style="App.TFrame")
+        header.pack(fill="x", pady=(0, 8))
+        brand = ttk.Frame(header, style="App.TFrame")
+        brand.pack(side="left", fill="x", expand=True)
+        ttk.Label(brand, text="BIOLOGIE EXAMENVERWERKER", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(brand, text="Werkruimte voor volledige, visueel gecontroleerde examenverwerking",
+                  style="Muted.TLabel").pack(anchor="w", pady=(1, 0))
+        self.project_label = ttk.Label(header, text="Nog geen examen geopend", style="Project.TLabel")
+        self.project_label.pack(side="right", padx=10)
 
-        # Burgundy welcome banner, echoing the original website's visual identity
-        hero = tk.Frame(shell, bg=self.colors["wine"], height=98)
-        hero.pack(fill="x")
-        hero.pack_propagate(False)
-        hero_inner = tk.Frame(hero, bg=self.colors["wine"])
-        hero_inner.pack(fill="both", expand=True, padx=34, pady=17)
-        tk.Label(hero_inner, text="EXAMENVERWERKING", bg=self.colors["wine"],
-                 fg="#F3C9D5", font=("Segoe UI", 8, "bold")).pack(anchor="w")
-        tk.Label(hero_inner, text="Van bronbestand naar betrouwbare vraagbank",
-                 bg=self.colors["wine"], fg="#FFFFFF",
-                 font=("Segoe UI", 18, "bold")).pack(anchor="w", pady=(2, 1))
-        tk.Label(hero_inner, text="Importeer, controleer en verrijk examens stap voor stap. Jij houdt de inhoudelijke regie.",
-                 bg=self.colors["wine"], fg="#F8EAF0",
-                 font=("Segoe UI", 10)).pack(anchor="w")
-
-        body = ttk.Frame(shell, style="App.TFrame", padding=(16, 10, 16, 6))
-        body.pack(fill="both", expand=True)
-        self.notebook = ttk.Notebook(body)
-        self.notebook.pack(fill="both", expand=True)
-
-        overview_page = ttk.Frame(self.notebook, style="App.TFrame")
-        documents_page = ttk.Frame(self.notebook, style="App.TFrame")
-        workflow_page = ttk.Frame(self.notebook, style="App.TFrame")
-        self.notebook.add(overview_page, text="  Overzicht  ")
-        self.notebook.add(documents_page, text="  Documenten  ")
-        self.notebook.add(workflow_page, text="  Verwerkroute  ")
-        overview = self._scrollable_tab(overview_page)
-        documents = self._scrollable_tab(documents_page)
-        workflow = self._scrollable_tab(workflow_page)
-
-        # OVERVIEW: project identity, progress and large primary actions
-        top = ttk.Frame(overview, style="App.TFrame")
-        top.pack(fill="x", pady=(0, 13))
-        title_col = ttk.Frame(top, style="App.TFrame")
-        title_col.pack(side="left", fill="x", expand=True)
-        ttk.Label(title_col, text="Jouw examenwerkplek", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(title_col, text="Een helder overzicht van wat al is verwerkt en wat nog aandacht vraagt.",
-                  style="Muted.TLabel").pack(anchor="w", pady=(3, 0))
-        ttk.Button(top, text="＋  Meerdere examens importeren",
-                   command=self.import_year_set, style="Accent.TButton").pack(side="right", padx=(10, 0), pady=5)
-        ttk.Button(top, text="Open project", command=self.open_project,
-                   style="Secondary.TButton").pack(side="right", pady=5)
-
-        project = tk.Frame(overview, bg="#FFFFFF", highlightthickness=1,
-                           highlightbackground=self.colors["line"])
-        project.pack(fill="x", pady=(0, 13))
-        project_left = tk.Frame(project, bg="#FFFFFF")
-        project_left.pack(side="left", fill="both", expand=True, padx=18, pady=15)
-        tk.Label(project_left, text="ACTIEF EXAMENPROJECT", bg="#FFFFFF",
-                 fg=self.colors["muted"], font=("Segoe UI", 8, "bold")).pack(anchor="w")
-        self.project_label = ttk.Label(project_left, text="Nog geen project geopend",
-                                       style="Project.TLabel")
-        self.project_label.pack(anchor="w", pady=(4, 5))
-        self.status = ttk.Label(project_left,
-            text="Importeer examens of open een bestaand project om te beginnen.",
-            style="Status.TLabel", wraplength=900)
-        self.status.pack(anchor="w", fill="x")
-        project_actions = tk.Frame(project, bg="#FFFFFF")
-        project_actions.pack(side="right", padx=18, pady=18)
-        ttk.Button(project_actions, text="＋ Nieuw project", command=self.new_project,
-                   style="Secondary.TButton").pack(fill="x", pady=3)
-        ttk.Button(project_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
-                   style="Secondary.TButton").pack(fill="x", pady=3)
-
-        # Metric cards
-        metrics = ttk.Frame(overview, style="App.TFrame")
-        metrics.pack(fill="x", pady=(0, 13))
-        self.metric_documents = self._metric_card(metrics, "BRONBESTANDEN", "0", "PDF's ingelezen", 0)
-        self.metric_questions = self._metric_card(metrics, "VRAAGSTARTS", "0", "kandidaten gevonden", 1)
-        self.metric_todo = self._metric_card(metrics, "NOG TE CONTROLEREN", "0", "documentherkenningen", 2)
-        self.metric_records = self._metric_card(metrics, "VRAAGRECORDS", "0", "inhoudelijke records", 3)
-
-        # Two-column dashboard: workflow cards and guidance
-        lower = ttk.Frame(overview, style="App.TFrame")
-        lower.pack(fill="both", expand=True)
-        route_card = tk.Frame(lower, bg="#FFFFFF", highlightthickness=1,
-                              highlightbackground=self.colors["line"])
-        route_card.pack(side="left", fill="both", expand=True, padx=(0, 8))
-        route_head = tk.Frame(route_card, bg="#FFFFFF")
-        route_head.pack(fill="x", padx=18, pady=(15, 7))
-        tk.Label(route_head, text="DE VERWERKROUTE", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 12, "bold")).pack(anchor="w")
-        tk.Label(route_head, text="Werk van boven naar beneden. Je kunt stappen opnieuw uitvoeren wanneer nodig.",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
-        steps = [
-            ("01", "Bronbestanden importeren", "Selecteer in één keer examens uit meerdere jaren en niveaus.", self.import_year_set, "Importeren"),
-            ("02", "Documenten en metadata", "Controleer opgaven, correctievoorschriften, tijdvak en jaar.", lambda:self.notebook.select(documents), "Documenten bekijken"),
-            ("03", "Vraagstarts en structuur", "Analyseer de opgaven en controleer de vraag- en contextgrenzen.", self.analyze_questions, "Vraagstarts analyseren"),
-            ("04", "Vragen bevestigen", "Beoordeel kandidaten in één doorlopend overzicht.", self.show_candidates, "Vraagcontrole openen"),
-            ("05", "Inhoudelijke eindcontrole", "Controleer tekst, afbeeldingen, context, CV en bijlagen.", self.show_records, "Eindcontrole openen"),
+        toolbar = ttk.Frame(shell, style="App.TFrame")
+        toolbar.pack(fill="x", pady=(0, 8))
+        actions = [
+            ("Nieuw project", self.new_project, "Secondary.TButton"),
+            ("Project openen", self.open_project, "Secondary.TButton"),
+            ("＋ Examens importeren", self.import_year_set, "Accent.TButton"),
+            ("Vraagstarts analyseren", self.analyze_questions, "Secondary.TButton"),
+            ("Structuur bewerken", self.edit_exam_structure, "Secondary.TButton"),
+            ("Vraagrecord maken", self._workspace_create_record, "Secondary.TButton"),
+            ("Eindcontrole", self.show_records, "Secondary.TButton"),
+            ("Exportpakket", self.export_project, "Wine.TButton"),
         ]
-        for number, heading, description, callback, button_text in steps:
-            card = tk.Frame(route_card, bg="#FFFFFF")
-            card.pack(fill="x", padx=16, pady=5)
-            circle = tk.Label(card, text=number, bg=self.colors["wine_soft"],
-                              fg=self.colors["wine"], font=("Segoe UI", 10, "bold"),
-                              width=4, height=2)
-            circle.pack(side="left", padx=(0, 12))
-            text_col = tk.Frame(card, bg="#FFFFFF")
-            text_col.pack(side="left", fill="x", expand=True)
-            tk.Label(text_col, text=heading, bg="#FFFFFF", fg=self.colors["ink"],
-                     font=("Segoe UI", 10, "bold")).pack(anchor="w")
-            tk.Label(text_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
-                     font=("Segoe UI", 8), wraplength=570, justify="left").pack(anchor="w", pady=(2, 0))
-            ttk.Button(card, text=button_text, command=callback,
-                       style="Secondary.TButton").pack(side="right", padx=(8, 0))
-            ttk.Separator(route_card).pack(fill="x", padx=16, pady=3)
+        for label, callback, style in actions:
+            ttk.Button(toolbar, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
 
-        guide = tk.Frame(lower, bg="#FFFFFF", width=280, highlightthickness=1,
-                         highlightbackground=self.colors["line"])
-        guide.pack(side="right", fill="y", padx=(8, 0))
-        guide.pack_propagate(False)
-        tk.Label(guide, text="GOED OM TE WETEN", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=16, pady=(16, 9))
-        for head, body_text, color in [
-            ("Bron blijft leidend", "Originele examen-pdf's worden bewaard. Tekstherkenning is een voorstel, geen bron.", self.colors["teal"]),
-            ("Geen automatische goedkeuring", "Vraagrecords en afbeeldingen worden pas bruikbaar na jouw volledige controle.", self.colors["orange"]),
-            ("Lokaal en veilig", "Bestanden blijven standaard op deze computer. Er wordt niets automatisch gepubliceerd.", self.colors["green"])
-        ]:
-            block = tk.Frame(guide, bg="#F7F9F9")
-            block.pack(fill="x", padx=13, pady=5)
-            tk.Frame(block, bg=color, width=4).pack(side="left", fill="y")
-            inner = tk.Frame(block, bg="#F7F9F9")
-            inner.pack(side="left", fill="both", expand=True, padx=9, pady=9)
-            tk.Label(inner, text=head, bg="#F7F9F9", fg=self.colors["ink"],
-                     font=("Segoe UI", 9, "bold")).pack(anchor="w")
-            tk.Label(inner, text=body_text, bg="#F7F9F9", fg=self.colors["muted"],
-                     font=("Segoe UI", 8), wraplength=205, justify="left").pack(anchor="w", pady=(3, 0))
-        ttk.Button(guide, text="Exportpakket maken", command=self.export_project,
-                   style="Wine.TButton").pack(fill="x", padx=14, pady=(12, 14))
+        workspace = ttk.Panedwindow(shell, orient="horizontal")
+        workspace.pack(fill="both", expand=True)
+        left = ttk.Frame(workspace, style="App.TFrame", padding=(0, 0, 6, 0))
+        right = ttk.Frame(workspace, style="App.TFrame", padding=(6, 0, 0, 0))
+        workspace.add(left, weight=3)
+        workspace.add(right, weight=8)
 
-        # DOCUMENTS: dedicated document library with table and clear actions
-        doc_top = ttk.Frame(documents, style="App.TFrame")
-        doc_top.pack(fill="x", pady=(0, 12))
-        ttk.Label(doc_top, text="Documentbibliotheek", style="Title.TLabel").pack(side="left")
-        ttk.Label(doc_top, text="Controleer de herkenning voordat je de inhoud analyseert.",
-                  style="Muted.TLabel").pack(side="left", padx=16, pady=(10, 0))
-        doc_actions = ttk.Frame(documents, style="App.TFrame")
-        doc_actions.pack(fill="x", pady=(0, 10))
-        ttk.Button(doc_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
-                   style="Accent.TButton").pack(side="left")
-        ttk.Button(doc_actions, text="Document bekijken", command=self.show_document,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        ttk.Button(doc_actions, text="Herkenning aanpassen", command=self.correct_type,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        ttk.Button(doc_actions, text="Examengegevens controleren", command=self.edit_exam_metadata,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        files_card = tk.Frame(documents, bg="#FFFFFF", highlightthickness=1,
-                              highlightbackground=self.colors["line"])
-        files_card.pack(fill="both", expand=True)
-        files_heading = tk.Frame(files_card, bg="#FFFFFF")
-        files_heading.pack(fill="x", padx=16, pady=(13, 5))
-        tk.Label(files_heading, text="INGELEZEN BRONBESTANDEN", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 10, "bold")).pack(side="left")
-        tk.Label(files_heading, text="Dubbelklik op een regel om de PDF te bekijken",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
-        table_wrap = ttk.Frame(files_card, style="Card.TFrame", padding=(12, 7, 12, 12))
-        table_wrap.pack(fill="both", expand=True)
-        columns = ("name", "type", "pages", "confidence", "state")
-        self.table = ttk.Treeview(table_wrap, columns=columns, show="headings")
-        for col, title, width in [
-            ("name", "Bestand", 470), ("type", "Herkend documenttype", 210),
-            ("pages", "Pagina's", 90), ("confidence", "Zekerheid", 110), ("state", "Status", 220)
+        # Left column: source documents and question candidates.
+        docs_card = ttk.LabelFrame(left, text="DOCUMENTEN", padding=7)
+        docs_card.pack(fill="both", expand=True, pady=(0, 7))
+        doc_actions = ttk.Frame(docs_card)
+        doc_actions.pack(fill="x", pady=(0, 5))
+        ttk.Button(doc_actions, text="PDF's toevoegen", command=self.add_pdfs).pack(side="left")
+        ttk.Button(doc_actions, text="Type corrigeren", command=self.correct_type).pack(side="left", padx=4)
+        ttk.Button(doc_actions, text="Metadata", command=self.edit_exam_metadata).pack(side="left")
+        doc_cols = ("name", "type", "pages", "state")
+        self.table = ttk.Treeview(docs_card, columns=doc_cols, show="headings", height=7, selectmode="browse")
+        for col, label, width in [
+            ("name", "Bestand", 210), ("type", "Type", 105),
+            ("pages", "Pag.", 42), ("state", "Status", 105)
         ]:
-            self.table.heading(col, text=title)
-            self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
-        scrollbar = ttk.Scrollbar(table_wrap, orient="vertical", command=self.table.yview)
-        horizontal = ttk.Scrollbar(table_wrap, orient="horizontal", command=self.table.xview)
-        self.table.configure(yscrollcommand=scrollbar.set, xscrollcommand=horizontal.set)
+            self.table.heading(col, text=label)
+            self.table.column(col, width=width, minwidth=35, anchor="w" if col in ("name", "type", "state") else "center")
+        doc_scroll = ttk.Scrollbar(docs_card, orient="vertical", command=self.table.yview)
+        self.table.configure(yscrollcommand=doc_scroll.set)
         self.table.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        horizontal.pack(fill="x", pady=(2, 0))
-        self.table.tag_configure("odd", background=self.colors["table_alt"])
-        self.table.tag_configure("even", background="#FFFFFF")
+        doc_scroll.pack(side="right", fill="y")
+        self.table.bind("<<TreeviewSelect>>", self._workspace_document_selected)
         self.table.bind("<Double-1>", self.show_document)
 
-        # WORKFLOW: large task cards grouped by the actual processing stages
-        ttk.Label(workflow, text="Verwerkroute", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(workflow, text="Open een stap wanneer je eraan toe bent. De applicatie bewaart je voortgang lokaal.",
-                  style="Muted.TLabel").pack(anchor="w", pady=(3, 14))
-        stages = [
-            ("01", "Vraagstarts analyseren", "Zoek mogelijke vraagstarts in de opgaven-pdf en vergelijk waar mogelijk met het bijbehorende CV.", "Analyse", self.analyze_questions, self.colors["teal"]),
-            ("02", "Examenstructuur vastleggen", "Controleer paginabereiken, vraaggrenzen en de koppeling met contexten, figuren en tabellen.", "Structuur", self.edit_exam_structure, self.colors["wine"]),
-            ("03", "Vraagstarts bevestigen", "Beoordeel de gevonden kandidaten in een doorlopend controlevenster.", "Controleren", self.show_candidates, self.colors["orange"]),
-            ("04", "Vraagrecords samenstellen", "Maak conceptrecords vanuit bevestigde vraagstarts en controleer de bronfragmenten.", "Samenstellen", self.show_candidates, self.colors["teal"]),
-            ("05", "Inhoudelijke eindcontrole", "Controleer alle tekst, opties, afbeeldingen, contexten, CV en bijlagen per vraag.", "Eindcontrole", self.show_records, self.colors["wine"]),
-            ("06", "Veilig exportpakket", "Maak een lokaal exportpakket. Publiceren naar de website gebeurt nooit automatisch.", "Exporteren", self.export_project, self.colors["green"]),
-        ]
-        for number, heading, description, action_text, callback, color in stages:
-            card = tk.Frame(workflow, bg="#FFFFFF", highlightthickness=1,
-                            highlightbackground=self.colors["line"])
-            card.pack(fill="x", pady=5)
-            tk.Label(card, text=number, bg=color, fg="#FFFFFF",
-                     font=("Segoe UI", 13, "bold"), width=4, height=2).pack(side="left", padx=14, pady=12)
-            content_col = tk.Frame(card, bg="#FFFFFF")
-            content_col.pack(side="left", fill="x", expand=True, padx=4, pady=11)
-            tk.Label(content_col, text=heading, bg="#FFFFFF", fg=self.colors["wine"],
-                     font=("Segoe UI", 11, "bold")).pack(anchor="w")
-            tk.Label(content_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
-                     font=("Segoe UI", 9), wraplength=850, justify="left").pack(anchor="w", pady=(3, 0))
-            ttk.Button(card, text=action_text, command=callback,
-                       style="Accent.TButton" if number in ("01", "03", "05") else "Secondary.TButton").pack(side="right", padx=16, pady=14)
+        candidates_card = ttk.LabelFrame(left, text="VRAAGSTARTS EN CONTROLE", padding=7)
+        candidates_card.pack(fill="both", expand=True)
+        filter_row = ttk.Frame(candidates_card)
+        filter_row.pack(fill="x", pady=(0, 5))
+        self._workspace_filter = tk.StringVar(value="Alle kandidaten")
+        ttk.Label(filter_row, text="Filter").pack(side="left")
+        filter_box = ttk.Combobox(filter_row, textvariable=self._workspace_filter,
+            values=["Alle kandidaten", "Nog te beoordelen", "Sterke signalen", "Zwakke signalen", "Dubbele nummers"],
+            state="readonly", width=20)
+        filter_box.pack(side="left", padx=5, fill="x", expand=True)
+        filter_box.bind("<<ComboboxSelected>>", lambda _e: self._workspace_refresh_candidates())
+        candidate_cols = ("number", "page", "signal", "status")
+        self.candidate_tree = ttk.Treeview(candidates_card, columns=candidate_cols, show="headings",
+                                            height=12, selectmode="browse")
+        for col, label, width in [
+            ("number", "Nr.", 42), ("page", "Pag.", 48), ("signal", "Signaal", 62), ("status", "Beoordeling", 145)
+        ]:
+            self.candidate_tree.heading(col, text=label)
+            self.candidate_tree.column(col, width=width, minwidth=32,
+                anchor="center" if col in ("number", "page", "signal") else "w")
+        candidate_scroll = ttk.Scrollbar(candidates_card, orient="vertical", command=self.candidate_tree.yview)
+        self.candidate_tree.configure(yscrollcommand=candidate_scroll.set)
+        self.candidate_tree.pack(side="left", fill="both", expand=True)
+        candidate_scroll.pack(side="right", fill="y")
+        self.candidate_tree.bind("<<TreeviewSelect>>", self._workspace_candidate_selected)
 
-        # Persistent activity feed
-        activity = tk.Frame(shell, bg="#FFFFFF", highlightthickness=1,
-                            highlightbackground=self.colors["line"])
-        activity.pack(fill="x", padx=26, pady=(0, 14))
-        activity_head = tk.Frame(activity, bg="#FFFFFF")
-        activity_head.pack(fill="x", padx=13, pady=(8, 2))
-        tk.Label(activity_head, text="ACTIVITEIT EN MELDINGEN", bg="#FFFFFF",
-                 fg=self.colors["wine"], font=("Segoe UI", 8, "bold")).pack(side="left")
-        tk.Label(activity_head, text="Lokale log · bronbestanden blijven intact",
-                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
-        self.log = tk.Text(activity, height=2, wrap="word", font=("Segoe UI", 8),
+        # Right column: original PDF at full working size and persistent review controls.
+        right_split = ttk.Panedwindow(right, orient="horizontal")
+        right_split.pack(fill="both", expand=True)
+        viewer = ttk.LabelFrame(right_split, text="ORIGINELE PDF · BRON VAN WAARHEID", padding=7)
+        review = ttk.LabelFrame(right_split, text="VRAAGCONTROLE", padding=9)
+        right_split.add(viewer, weight=7)
+        right_split.add(review, weight=3)
+
+        page_toolbar = ttk.Frame(viewer)
+        page_toolbar.pack(fill="x", pady=(0, 5))
+        ttk.Button(page_toolbar, text="◀", width=3, command=lambda: self._workspace_change_page(-1)).pack(side="left")
+        self._workspace_page_label = ttk.Label(page_toolbar, text="Pagina — / —")
+        self._workspace_page_label.pack(side="left", padx=8)
+        ttk.Button(page_toolbar, text="▶", width=3, command=lambda: self._workspace_change_page(1)).pack(side="left")
+        ttk.Separator(page_toolbar, orient="vertical").pack(side="left", fill="y", padx=8)
+        ttk.Button(page_toolbar, text="−", width=3, command=lambda: self._workspace_zoom_by(0.8)).pack(side="left")
+        ttk.Button(page_toolbar, text="100%", command=self._workspace_reset_zoom).pack(side="left", padx=3)
+        ttk.Button(page_toolbar, text="+", width=3, command=lambda: self._workspace_zoom_by(1.25)).pack(side="left")
+        ttk.Button(page_toolbar, text="Markeer ontbrekende vraag", command=self._workspace_start_manual_mark).pack(side="right")
+        canvas_wrap = ttk.Frame(viewer)
+        canvas_wrap.pack(fill="both", expand=True)
+        self.pdf_canvas = tk.Canvas(canvas_wrap, background="#DCE2E5", highlightthickness=0,
+                                    cursor="crosshair")
+        pdf_y = ttk.Scrollbar(canvas_wrap, orient="vertical", command=self.pdf_canvas.yview)
+        pdf_x = ttk.Scrollbar(viewer, orient="horizontal", command=self.pdf_canvas.xview)
+        self.pdf_canvas.configure(yscrollcommand=pdf_y.set, xscrollcommand=pdf_x.set)
+        self.pdf_canvas.pack(side="left", fill="both", expand=True)
+        pdf_y.pack(side="right", fill="y")
+        pdf_x.pack(fill="x")
+        self.pdf_canvas.bind("<Button-1>", self._workspace_canvas_click)
+        self.pdf_canvas.bind("<MouseWheel>", lambda e: self.pdf_canvas.yview_scroll(int(-e.delta / 120), "units"))
+
+        self._workspace_summary = ttk.Label(review, text="Selecteer een document of vraagstart.",
+                                            style="Body.TLabel", wraplength=330, justify="left")
+        self._workspace_summary.pack(fill="x", anchor="w", pady=(0, 8))
+        number_row = ttk.Frame(review)
+        number_row.pack(fill="x", pady=(0, 5))
+        ttk.Label(number_row, text="Vraagnummer").pack(side="left")
+        self._workspace_number = tk.StringVar()
+        ttk.Entry(number_row, textvariable=self._workspace_number, width=7).pack(side="left", padx=6)
+        ttk.Button(number_row, text="Opslaan", command=self._workspace_save_candidate).pack(side="right")
+
+        ttk.Label(review, text="Vraagtekst / opdrachtformulering").pack(anchor="w")
+        self._workspace_text = tk.Text(review, height=12, wrap="word", font=("Segoe UI", 9),
+                                       undo=True, padx=7, pady=6)
+        self._workspace_text.pack(fill="both", expand=True, pady=(3, 8))
+        ttk.Label(review, text="Notitie bij de beoordeling").pack(anchor="w")
+        self._workspace_note = tk.Text(review, height=4, wrap="word", font=("Segoe UI", 9),
+                                       undo=True, padx=7, pady=5)
+        self._workspace_note.pack(fill="x", pady=(3, 8))
+        ttk.Button(review, text="Tekst en notitie bewaren", command=self._workspace_save_candidate,
+                   style="Secondary.TButton").pack(fill="x", pady=(0, 8))
+        ttk.Separator(review).pack(fill="x", pady=5)
+        ttk.Label(review, text="Beoordeel deze vraagstart").pack(anchor="w", pady=(0, 5))
+        ttk.Button(review, text="✓  Dit is een vraag", command=lambda: self._workspace_decide(True),
+                   style="Accent.TButton").pack(fill="x", pady=3)
+        ttk.Button(review, text="✕  Geen vraag", command=lambda: self._workspace_decide(False),
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+        ttk.Button(review, text="?  Twijfel / later beoordelen", command=lambda: self._workspace_decide(None),
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+        ttk.Button(review, text="Concept-vraagrecord samenstellen",
+                   command=self._workspace_create_record, style="Wine.TButton").pack(fill="x", pady=(10, 3))
+        ttk.Button(review, text="Onderdrukte nummerkandidaten bekijken",
+                   command=lambda: self.show_suppressed_candidates(self.root)).pack(fill="x", pady=3)
+
+        footer = ttk.Frame(shell, style="App.TFrame")
+        footer.pack(fill="x", pady=(7, 0))
+        self.status = ttk.Label(footer, text="Importeer examens of open een bestaand project.", style="Status.TLabel")
+        self.status.pack(side="left", fill="x", expand=True)
+        log_frame = ttk.LabelFrame(shell, text="ACTIVITEIT EN MELDINGEN", padding=(7, 4))
+        log_frame.pack(fill="x", pady=(6, 0))
+        self.log = tk.Text(log_frame, height=3, wrap="word", font=("Segoe UI", 8),
                            background="#FBFCFC", foreground=self.colors["ink"],
-                           insertbackground=self.colors["ink"], relief="flat",
-                           padx=10, pady=6, highlightthickness=0)
-        self.log.pack(fill="x", padx=10, pady=(2, 8))
+                           insertbackground=self.colors["ink"], relief="flat", padx=7, pady=4)
+        self.log.pack(fill="x")
         self.log.configure(state="disabled")
+
+        self._workspace_temp = tempfile.TemporaryDirectory(prefix="biologie-werkruimte-")
+        self._workspace_zoom = 1.0
+        self._workspace_scale = 1.0
+        self._workspace_photo = None
+        self._workspace_doc_id = None
+        self._workspace_page = 1
+        self._workspace_rows = []
+        self._workspace_selected = None
+        self._workspace_mark_mode = False
+        self.root.after(150, self._workspace_refresh)
+
+    def _workspace_doc(self):
+        if not self.data:
+            return None
+        return next((d for d in self.data.get("documenten", [])
+                     if d.get("id") == self._workspace_doc_id), None)
+
+    def _workspace_document_selected(self, _event=None):
+        if not self.data or not self.table.selection():
+            return
+        index = int(self.table.selection()[0])
+        docs = self.data.get("documenten", [])
+        if index >= len(docs):
+            return
+        doc = docs[index]
+        self._workspace_doc_id = doc.get("id")
+        self._workspace_page = 1
+        self._workspace_selected = None
+        self._workspace_refresh_candidates()
+        self._workspace_render_page()
+
+    def _workspace_refresh(self):
+        if not self.data:
+            self._workspace_rows = []
+            self._workspace_refresh_candidates()
+            self._workspace_summary.configure(text="Selecteer of importeer een examen. De originele PDF verschijnt hier.")
+            self.pdf_canvas.delete("all")
+            self._workspace_page_label.configure(text="Pagina — / —")
+            return
+        docs = self.data.get("documenten", [])
+        if not self._workspace_doc_id or not any(d.get("id") == self._workspace_doc_id for d in docs):
+            preferred = next((d for d in docs if d.get("type_voorstel") == "opgaven"), docs[0] if docs else None)
+            self._workspace_doc_id = preferred.get("id") if preferred else None
+        if self._workspace_doc_id:
+            for item in self.table.get_children():
+                self.table.delete(item)
+            for index, doc in enumerate(docs):
+                self.table.insert("", "end", iid=str(index), values=(
+                    doc.get("bestand", ""), doc.get("type_voorstel", "onbekend"),
+                    doc.get("pagina_aantal", "—"), str(doc.get("status", "onbekend")).replace("_", " ")))
+            target = next((str(i) for i,d in enumerate(docs) if d.get("id")==self._workspace_doc_id), None)
+            if target and target in self.table.get_children():
+                self.table.selection_set(target)
+                self.table.focus(target)
+            self._workspace_refresh_candidates()
+            if self._workspace_selected is None:
+                self._workspace_render_page()
+        else:
+            self._workspace_rows = []
+            self._workspace_refresh_candidates()
+
+    def _workspace_refresh_candidates(self, select_index=None):
+        if not hasattr(self, "candidate_tree"):
+            return
+        for item in self.candidate_tree.get_children():
+            self.candidate_tree.delete(item)
+        all_rows = (self.data or {}).get("vraagkandidaten", [])
+        rows = [r for r in all_rows if r.get("document_id") == self._workspace_doc_id]
+        filter_value = self._workspace_filter.get() if hasattr(self, "_workspace_filter") else "Alle kandidaten"
+        number_counts = {}
+        for row in rows:
+            number_counts[row.get("number")] = number_counts.get(row.get("number"), 0) + 1
+        if filter_value == "Nog te beoordelen":
+            rows = [r for r in rows if r.get("human_decision") is None]
+        elif filter_value == "Sterke signalen":
+            rows = [r for r in rows if float(r.get("confidence", 0) or 0) >= 0.9]
+        elif filter_value == "Zwakke signalen":
+            rows = [r for r in rows if float(r.get("confidence", 0) or 0) < 0.9]
+        elif filter_value == "Dubbele nummers":
+            rows = [r for r in rows if number_counts.get(r.get("number"), 0) > 1]
+        self._workspace_rows = rows
+        for index, row in enumerate(rows):
+            status = row.get("status", "controle_nodig").replace("_", " ")
+            self.candidate_tree.insert("", "end", iid=str(index), values=(
+                row.get("number", "—"), row.get("page", "—"),
+                f"{float(row.get('confidence', 0) or 0):.0%}", status))
+        if rows:
+            if select_index is None:
+                select_index = next((i for i,r in enumerate(rows) if r.get("human_decision") is None), 0)
+            select_index = max(0, min(int(select_index), len(rows)-1))
+            self.candidate_tree.selection_set(str(select_index))
+            self.candidate_tree.focus(str(select_index))
+            self.candidate_tree.see(str(select_index))
+            self._workspace_candidate_selected()
+        else:
+            self._workspace_selected = None
+            self._workspace_summary.configure(text="Geen vraagkandidaten voor dit document of deze filter. Je kunt op de PDF een ontbrekende vraag handmatig aanwijzen.")
+            self._workspace_text.delete("1.0", "end")
+            self._workspace_note.delete("1.0", "end")
+            self._workspace_number.set("")
+            self._workspace_render_page()
+
+    def _workspace_candidate_selected(self, _event=None):
+        if not self.candidate_tree.selection():
+            return
+        index = int(self.candidate_tree.selection()[0])
+        if index >= len(self._workspace_rows):
+            return
+        row = self._workspace_rows[index]
+        self._workspace_selected = row
+        self._workspace_number.set(str(row.get("number", "")))
+        self._workspace_text.delete("1.0", "end")
+        self._workspace_text.insert("1.0", row.get("vraagtekst_voorstel", "") or "")
+        self._workspace_note.delete("1.0", "end")
+        self._workspace_note.insert("1.0", row.get("review_note", "") or "")
+        check = row.get("vraagtype_controle", {})
+        cv = "CV-match" if row.get("cv_number_match") is True else (
+            "Nummer niet in CV" if row.get("cv_number_match") is False else "CV niet beschikbaar")
+        self._workspace_summary.configure(text=(
+            f"Vraag {row.get('number')} · PDF-pagina {row.get('page')} · "
+            f"signaal {float(row.get('confidence',0) or 0):.0%}\n"
+            f"{check.get('type','type nog controleren')} · {cv}\n"
+            f"{row.get('reason','')}\nStatus: {row.get('status','controle_nodig').replace('_',' ')}"))
+        self._workspace_page = int(row.get("page", 1))
+        self._workspace_render_page()
+
+    def _workspace_render_page(self):
+        doc = self._workspace_doc()
+        if not doc:
+            return
+        source = self.project_dir / "bronnen" / doc["opslagbestand"]
+        if not source.is_file():
+            self.pdf_canvas.delete("all")
+            self._workspace_summary.configure(text="Het bronbestand ontbreekt; herstel de originele PDF voordat je verdergaat.")
+            return
+        try:
+            import pymupdf as fitz
+            pdf = fitz.open(source)
+            page_count = len(pdf)
+            if not page_count:
+                pdf.close()
+                raise ValueError("PDF bevat geen pagina's.")
+            self._workspace_page = max(1, min(self._workspace_page, page_count))
+            page_rect = pdf[self._workspace_page-1].rect
+            page_width, page_height = float(page_rect.width), float(page_rect.height)
+            pdf.close()
+            canvas_width = max(420, self.pdf_canvas.winfo_width()-30)
+            fit_scale = min(1.35, canvas_width / page_width)
+            scale = max(0.45, fit_scale * self._workspace_zoom)
+            output = Path(self._workspace_temp.name) / f"{doc['id']}-pagina-{self._workspace_page}-{scale:.3f}.png"
+            render_page(source, self._workspace_page, output, scale=scale)
+            photo = tk.PhotoImage(file=str(output))
+            self._workspace_photo = photo
+            self._workspace_scale = scale
+            self.pdf_canvas.delete("all")
+            self.pdf_canvas.create_image(0, 0, image=photo, anchor="nw", tags=("page",))
+            self.pdf_canvas.configure(scrollregion=(0, 0, photo.width(), photo.height()))
+            row = self._workspace_selected
+            if row and int(row.get("page", 0) or 0) == self._workspace_page and row.get("bbox"):
+                x0,y0,x1,y1 = [float(x)*scale for x in row["bbox"]]
+                self.pdf_canvas.create_rectangle(x0-5,y0-4,x1+5,y1+4,
+                    outline="#D71920", width=3, tags=("marker",))
+                self.pdf_canvas.create_text(x0+5,y0-13,text=f"Vraag {row.get('number')}",
+                    anchor="sw",fill="#D71920",font=("Segoe UI",11,"bold"),tags=("marker",))
+                self.pdf_canvas.yview_moveto(max(0, (y0-120) / max(1, photo.height())))
+            self._workspace_page_label.configure(text=f"Pagina {self._workspace_page} / {page_count}")
+            if self._workspace_mark_mode:
+                self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de PDF.")
+        except Exception as exc:
+            self._error("Originele PDF weergeven", exc)
+
+    def _workspace_change_page(self, delta):
+        self._workspace_page += int(delta)
+        self._workspace_render_page()
+
+    def _workspace_zoom_by(self, factor):
+        self._workspace_zoom = max(0.55, min(2.5, self._workspace_zoom * factor))
+        self._workspace_render_page()
+
+    def _workspace_reset_zoom(self):
+        self._workspace_zoom = 1.0
+        self._workspace_render_page()
+
+    def _workspace_start_manual_mark(self):
+        if not self._workspace_doc() or self._workspace_doc().get("type_voorstel") != "opgaven":
+            messagebox.showinfo("Selecteer opgaven-PDF", "Selecteer eerst het opgavenbestand waarin een vraag ontbreekt.")
+            return
+        self._workspace_mark_mode = True
+        self.pdf_canvas.configure(cursor="crosshair")
+        self.status.configure(text="Klik op de exacte positie van de ontbrekende vraag in de originele PDF.")
+
+    def _workspace_canvas_click(self, event):
+        if not self._workspace_mark_mode:
+            return
+        doc = self._workspace_doc()
+        if not doc:
+            return
+        try:
+            import pymupdf as fitz
+            source = self.project_dir / "bronnen" / doc["opslagbestand"]
+            pdf = fitz.open(source)
+            page = pdf[self._workspace_page-1]
+            px = self.pdf_canvas.canvasx(event.x)
+            py = self.pdf_canvas.canvasy(event.y)
+            x, y = px / self._workspace_scale, py / self._workspace_scale
+            if x < 0 or y < 0 or x > page.rect.width or y > page.rect.height:
+                pdf.close()
+                return
+            pdf.close()
+            number = simpledialog.askinteger("Ontbrekende vraag", "Welk vraagnummer ontbreekt?", minvalue=1, maxvalue=60, parent=self.root)
+            if number is None:
+                self._workspace_mark_mode = False
+                return
+            prompt = simpledialog.askstring("Vraagtekst", "Voer de vraag of opdrachtformulering in (je kunt deze later verder aanvullen):", parent=self.root) or ""
+            row = {
+                "number": int(number), "page": int(self._workspace_page),
+                "bbox": [round(x,2), round(y,2), round(x+24,2), round(y+18,2)],
+                "line": f"{number}.", "next_line": prompt, "confidence": 1.0,
+                "status": "handmatig_toegevoegd", "human_decision": True,
+                "manual_added": True, "manual_position_confirmed": True,
+                "reason": "Handmatig op de originele PDF-pagina toegevoegd.",
+                "vraagtekst_voorstel": prompt, "vraagtype_status": "controle_nodig",
+                "review_note": "Handmatig toegevoegd; controleer de volledige vraaggrens en context."
+            }
+            row["document_id"] = doc["id"]
+            row["bestand"] = doc["bestand"]
+            row["vraagtype_controle"] = detect_question_type(prompt)
+            row["context_verwijzingen"] = detect_context_references(prompt)
+            self.data.setdefault("vraagkandidaten", []).append(row)
+            self._workspace_mark_mode = False
+            self.pdf_canvas.configure(cursor="crosshair")
+            self.save_project()
+            self._workspace_filter.set("Alle kandidaten")
+            self._workspace_refresh_candidates(len(self._workspace_rows))
+            self._log(f"Vraag {number} handmatig toegevoegd op PDF-pagina {self._workspace_page}, positie x={x:.1f}, y={y:.1f} pt.")
+        except Exception as exc:
+            self._workspace_mark_mode = False
+            self._error("Ontbrekende vraag handmatig markeren", exc)
+
+    def _workspace_save_candidate(self):
+        row = self._workspace_selected
+        if not row:
+            messagebox.showinfo("Geen vraag geselecteerd", "Selecteer eerst een vraagkandidaat.")
+            return
+        try:
+            number = int(self._workspace_number.get().strip())
+            if not 1 <= number <= 60:
+                raise ValueError
+        except ValueError:
+            messagebox.showerror("Ongeldig vraagnummer", "Gebruik een vraagnummer van 1 tot en met 60.")
+            return
+        row["number"] = number
+        row["vraagtekst_voorstel"] = self._workspace_text.get("1.0", "end-1c").strip()
+        row["review_note"] = self._workspace_note.get("1.0", "end-1c").strip()
+        row["vraagtype_controle"] = detect_question_type(row["vraagtekst_voorstel"])
+        row["context_verwijzingen"] = detect_context_references(row["vraagtekst_voorstel"])
+        row["vraagtype_status"] = "controle_nodig"
+        self.save_project()
+        self._workspace_summary.configure(text=f"Vraag {number} opgeslagen. Tekst en notitie zijn bewaard in het project.")
+        self._workspace_refresh_candidates(self.candidate_tree.index(self.candidate_tree.selection()[0])
+            if self.candidate_tree.selection() else 0)
+        self._log(f"Vraag {number}: nummer, vraagtekst en notitie opgeslagen.")
+
+    def _workspace_decide(self, decision):
+        row = self._workspace_selected
+        if not row:
+            messagebox.showinfo("Geen vraag geselecteerd", "Selecteer eerst een vraagkandidaat.")
+            return
+        if decision is None:
+            row["human_decision"] = None
+            row["status"] = "twijfel_handmatige_nacontrole"
+            row["decision_reason"] = "Handmatig als twijfel gemarkeerd."
+        else:
+            row["human_decision"] = bool(decision)
+            row["status"] = "bevestigd_vraagstart" if decision else "afgewezen_geen_vraag"
+            row["decision_reason"] = "Handmatig beoordeeld in de geïntegreerde werkruimte."
+            learn_decision(self.knowledge_dir, {
+                "pattern_key": question_pattern_key(row),
+                "chosen": "question" if decision else "not_question",
+                "accepted": True, "scope": "voorstel_voor_toekomstige_herkenning",
+                "document_id": row.get("document_id"), "page": row.get("page"),
+                "candidate_line": row.get("line"), "reason": row["decision_reason"],
+                "human_decision": bool(decision)})
+        self.save_project()
+        self._log(f"Vraagstart {row.get('number')} op pagina {row.get('page')}: {row['status']}.")
+        next_index = next((i for i,r in enumerate(self._workspace_rows)
+                           if r is not row and r.get("human_decision") is None), None)
+        self._workspace_refresh_candidates(next_index if next_index is not None else 0)
+
+    def _workspace_create_record(self):
+        if not self._workspace_rows:
+            messagebox.showinfo("Geen kandidaten", "Analyseer eerst de opgaven-PDF en selecteer een vraagstart.")
+            return
+        if not self.candidate_tree.selection():
+            messagebox.showinfo("Selecteer een vraag", "Selecteer eerst een kandidaat.")
+            return
+        index = int(self.candidate_tree.selection()[0])
+        row = self._workspace_rows[index]
+        if row.get("human_decision") is not True:
+            messagebox.showwarning("Vraagstart eerst bevestigen",
+                "Bevestig eerst dat dit een echte vraagstart is. Handmatig toegevoegde vragen zijn al expliciet bevestigd.")
+            return
+        self.create_question_record(self._workspace_rows, self.candidate_tree, self.root)
 
     def _scrollable_tab(self, parent):
         """Return a vertically scrollable content frame for a notebook tab."""
