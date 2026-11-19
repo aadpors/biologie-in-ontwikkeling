@@ -114,12 +114,17 @@ def exam_workflow_state(data: dict) -> dict:
     records = data.get("vraagrecords", []) or []
 
     def has_record(candidate):
-        return any(
-            record.get("candidate_document_id") == candidate.get("document_id")
-            and record.get("number") == candidate.get("number")
-            and record.get("source_page") == candidate.get("page")
-            for record in records
-        )
+        for record in records:
+            if record.get("candidate_document_id") != candidate.get("document_id"):
+                continue
+            try:
+                same_number = int(record.get("number")) == int(candidate.get("number"))
+                same_page = int(record.get("source_page")) == int(candidate.get("page"))
+            except (TypeError, ValueError):
+                continue
+            if same_number and same_page:
+                return True
+        return False
 
     missing_records = [row for row in confirmed if not has_record(row)]
     if missing_records:
