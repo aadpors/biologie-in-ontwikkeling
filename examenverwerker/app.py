@@ -713,65 +713,39 @@ class ExamApp:
             imported = payload.get("documenten")
             if not isinstance(imported, list):
                 raise ValueError("Het correctiebestand bevat geen geldige documentenlijst.")
-            stored = self.data.setdefault("biologie_controle_correcties", [])
-            merged = {}
-            for item in stored:
-                if isinstance(item, dict) and item.get("bestand"):
-                    merged[item["bestand"]] = dict(item)
-            applied = 0
-            unmatched = []
-            for incoming in imported:
-                if not isinstance(incoming, dict) or not incoming.get("bestand"):
-                    continue
-                name = str(incoming["bestand"])
-                target = merged.setdefault(name, {"bestand": name, "correcties": []})
-                if incoming.get("documenttype_handmatig") in {
-                    "opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"
-                }:
-                    target["documenttype_handmatig"] = incoming["documenttype_handmatig"]
-                    for doc in self.data.get("documenten", []):
-                        if doc.get("bestand") == name:
-                            doc["type_voorstel"] = incoming["documenttype_handmatig"]
-                            doc["type_zekerheid"] = 1.0
-                            doc["status"] = "handmatig_bevestigd"
-                            doc["documenttype_handmatig"] = incoming["documenttype_handmatig"]
-                            applied += 1
-                existing = {str(c.get("id")): c for c in target.get("correcties", [])
-                            if isinstance(c, dict) and c.get("id")}
-                for correction in incoming.get("correcties", []):
-                    if not isinstance(correction, dict):
-                        continue
-                    correction = dict(correction)
-                    if not correction.get("id"):
-                        identity = "|".join(str(correction.get(k, "")) for k in
-                            ("pagina", "oorspronkelijk_nummer", "vraagnummer", "beslissing"))
-                        pos = correction.get("positie_pdf_pt") or {}
-                        correction["id"] = hashlib.sha256(
-                            f"{name}|{identity}|{pos.get('x','')}|{pos.get('y','')}".encode("utf-8")
-                        ).hexdigest()[:16]
-                    key = str(correction["id"])
-                    previous = existing.get(key, {})
-                    # Newer explicit decisions win; preserve an exact position and note
-                    # when the incoming patch omits them.
-                    combined = {**previous, **correction}
-                    if not combined.get("positie_pdf_pt") and previous.get("positie_pdf_pt"):
-                        combined["positie_pdf_pt"] = previous["positie_pdf_pt"]
-                    if not combined.get("notitie") and previous.get("notitie"):
-                        combined["notitie"] = previous["notitie"]
-                    existing[key] = combined
-                target["correcties"] = list(existing.values())
-                if not any(d.get("bestand") == name for d in self.data.get("documenten", [])):
-                    unmatched.append(name)
-            self.data["biologie_controle_correcties"] = list(merged.values())
+            global_path = self.knowledge_dir / "biologie-correcties.json"
+            global_entries = []
+            if global_path.is_file():
+                global_payload = json.loads(global_path.read_text(encoding="utf-8"))
+                if global_payload.get("formaat") == "biologie-correcties-v1":
+                    global_entries = global_payload.get("documenten", [])
+            # Preserve the current project's earlier imported decisions, then
+            # let the newly selected correction file update the global library.
+            global_entries = self._workspace_merge_correction_entries(
+                global_entries, self.data.get("biologie_controle_correcties", []))
+            global_entries = self._workspace_merge_correction_entries(global_entries, imported)
+            global_path.parent.mkdir(parents=True, exist_ok=True)
+            global_path.write_text(json.dumps({
+                "formaat": "biologie-correcties-v1", "app_versie": APP_VERSION,
+                "aangemaakt": now(),
+                "aantal_correcties": sum(len(x.get("correcties", [])) for x in global_entries),
+                "documenten": global_entries,
+                "toelichting": "Draagbare correctiebibliotheek uit Biologie-controle; geen PDF-inhoud."
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.data["biologie_controle_correcties"] = global_entries
+            current_names = {d.get("bestand") for d in self.data.get("documenten", [])}
+            unmatched = [x.get("bestand") for x in global_entries if x.get("bestand") not in current_names]
+            applied = sum(len(x.get("correcties", [])) for x in global_entries
+                          if x.get("bestand") in current_names)
             self._workspace_apply_saved_corrections()
             self.save_project()
             self.refresh()
-            self._log(f"Biologie-controlecorrecties geïmporteerd uit {Path(filename).name}; {applied} documentcorrecties toegepast.")
+            self._log(f"Biologie-controlecorrecties geïmporteerd uit {Path(filename).name}; {applied} correcties beschikbaar in dit project en de centrale correctiebibliotheek.")
             if unmatched:
                 self._log("Correcties voor nog niet gekoppelde documenten bewaard: " + ", ".join(unmatched))
             messagebox.showinfo("Correcties geïmporteerd",
-                f"De correcties zijn samengevoegd en in het project bewaard.\n"
-                f"Documenten zonder overeenkomst zijn niet weggegooid; ze blijven in het project opgeslagen.\n\n"
+                f"De correcties zijn samengevoegd en in de centrale correctiebibliotheek én dit project bewaard.\n"
+                f"Ze worden automatisch toegepast wanneer je de bijbehorende examenprojecten opent.\n\n"
                 f"Niet gekoppelde bestanden: {len(unmatched)}", parent=self.root)
         except Exception as exc:
             self._error("Correcties importeren", exc)
