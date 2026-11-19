@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments, classify_question_with_visuals
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -329,6 +329,53 @@ class EngineTests(unittest.TestCase):
         first={"number":1,"page":1,"bbox":[0,10,10,20]}
         second={"number":2,"page":1,"bbox":[0,50,100,60]}
         self.assertEqual(extract_candidate_text(analysis,first,second),"1.\nGebruik figuur 2.")
+
+
+    def test_visual_answer_options_are_flagged_as_possible_multiple_choice(self):
+        import pymupdf as fitz
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"visual-options.pdf"
+            doc=fitz.open()
+            page=doc.new_page(width=600,height=800)
+            page.insert_text((50,60),"Kies het juiste antwoord.",fontsize=11)
+            pix=fitz.Pixmap(fitz.csRGB,fitz.IRect(0,0,40,40),0)
+            pix.clear_with(180)
+            for x in (60,180,300,420):
+                page.insert_image(fitz.Rect(x,120,x+70,190),pixmap=pix)
+            page.insert_text((60,210),"A",fontsize=10)
+            page.insert_text((180,210),"B",fontsize=10)
+            page.insert_text((300,210),"C",fontsize=10)
+            page.insert_text((420,210),"D",fontsize=10)
+            doc.save(path); doc.close()
+            analysis=analyze_pdf(path)
+            candidate={"page":1,"bbox":[40,45,80,65]}
+            check=classify_question_with_visuals(analysis,candidate,None,
+                                                 "Kies het juiste antwoord.")
+            self.assertEqual(check["type"],"mogelijk_visuele_meerkeuze")
+            self.assertEqual(check["visual_detection"]["status"],
+                             "waarschijnlijke_visuele_meerkeuze")
+            self.assertGreaterEqual(check["visual_detection"]["raster_image_count"],4)
+            self.assertTrue(check["visual_detection"]["requires_visual_review"])
+
+    def test_single_illustration_is_not_misclassified_as_visual_multiple_choice(self):
+        import pymupdf as fitz
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"illustration.pdf"
+            doc=fitz.open()
+            page=doc.new_page(width=600,height=800)
+            page.insert_text((50,60),"Beschrijf wat je ziet.",fontsize=11)
+            pix=fitz.Pixmap(fitz.csRGB,fitz.IRect(0,0,40,40),0)
+            pix.clear_with(180)
+            page.insert_image(fitz.Rect(60,120,260,300),pixmap=pix)
+            doc.save(path); doc.close()
+            analysis=analyze_pdf(path)
+            candidate={"page":1,"bbox":[40,45,80,65]}
+            check=classify_question_with_visuals(analysis,candidate,None,
+                                                 "Beschrijf wat je ziet.")
+            self.assertEqual(check["type"],"open")
+            self.assertEqual(check["visual_detection"]["status"],
+                             "visueel_materiaal_bij_vraag")
+            self.assertTrue(check.get("visual_material_present"))
 
     def test_pdf_analysis_inventories_raster_and_vector_visual_assets(self):
         try:
