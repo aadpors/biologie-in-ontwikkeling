@@ -2,7 +2,7 @@ name: Build portable Windows app
 
 on:
   push:
-    branches: ["bouw/**"]
+    branches: ["bouw/**", "verbeter/**"]
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
   pull_request:
     paths: ["examenverwerker/**", ".github/workflows/examenverwerker-build.yml"]
