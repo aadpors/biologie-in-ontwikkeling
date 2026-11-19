@@ -619,6 +619,256 @@ class ExamApp:
             return
         self.create_question_record(self._workspace_rows, self.candidate_tree, self.root)
 
+    def _workspace_import_corrections(self):
+        """Import the compact biologie-correcties-v1 format without replacing newer decisions."""
+        if not self.data or not self.project_dir:
+            messagebox.showinfo("Eerst een examen openen", "Open eerst het examenproject waarin je de correcties wilt bewaren.")
+            return
+        filename = filedialog.askopenfilename(
+            title="Importeer correcties uit Biologie-controle",
+            filetypes=[("Biologie-controle correcties", "*.json"), ("JSON-bestanden", "*.json")])
+        if not filename:
+            return
+        try:
+            payload = json.loads(Path(filename).read_text(encoding="utf-8"))
+            if payload.get("formaat") != "biologie-correcties-v1":
+                raise ValueError("Dit bestand heeft niet het formaat biologie-correcties-v1.")
+            imported = payload.get("documenten")
+            if not isinstance(imported, list):
+                raise ValueError("Het correctiebestand bevat geen geldige documentenlijst.")
+            stored = self.data.setdefault("biologie_controle_correcties", [])
+            merged = {}
+            for item in stored:
+                if isinstance(item, dict) and item.get("bestand"):
+                    merged[item["bestand"]] = dict(item)
+            applied = 0
+            unmatched = []
+            for incoming in imported:
+                if not isinstance(incoming, dict) or not incoming.get("bestand"):
+                    continue
+                name = str(incoming["bestand"])
+                target = merged.setdefault(name, {"bestand": name, "correcties": []})
+                if incoming.get("documenttype_handmatig") in {
+                    "opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"
+                }:
+                    target["documenttype_handmatig"] = incoming["documenttype_handmatig"]
+                    for doc in self.data.get("documenten", []):
+                        if doc.get("bestand") == name:
+                            doc["type_voorstel"] = incoming["documenttype_handmatig"]
+                            doc["type_zekerheid"] = 1.0
+                            doc["status"] = "handmatig_bevestigd"
+                            doc["documenttype_handmatig"] = incoming["documenttype_handmatig"]
+                            applied += 1
+                existing = {str(c.get("id")): c for c in target.get("correcties", [])
+                            if isinstance(c, dict) and c.get("id")}
+                for correction in incoming.get("correcties", []):
+                    if not isinstance(correction, dict):
+                        continue
+                    correction = dict(correction)
+                    if not correction.get("id"):
+                        identity = "|".join(str(correction.get(k, "")) for k in
+                            ("pagina", "oorspronkelijk_nummer", "vraagnummer", "beslissing"))
+                        pos = correction.get("positie_pdf_pt") or {}
+                        correction["id"] = hashlib.sha256(
+                            f"{name}|{identity}|{pos.get('x','')}|{pos.get('y','')}".encode("utf-8")
+                        ).hexdigest()[:16]
+                    key = str(correction["id"])
+                    previous = existing.get(key, {})
+                    # Newer explicit decisions win; preserve an exact position and note
+                    # when the incoming patch omits them.
+                    combined = {**previous, **correction}
+                    if not combined.get("positie_pdf_pt") and previous.get("positie_pdf_pt"):
+                        combined["positie_pdf_pt"] = previous["positie_pdf_pt"]
+                    if not combined.get("notitie") and previous.get("notitie"):
+                        combined["notitie"] = previous["notitie"]
+                    existing[key] = combined
+                target["correcties"] = list(existing.values())
+                if not any(d.get("bestand") == name for d in self.data.get("documenten", [])):
+                    unmatched.append(name)
+            self.data["biologie_controle_correcties"] = list(merged.values())
+            self._workspace_apply_saved_corrections()
+            self.save_project()
+            self.refresh()
+            self._log(f"Biologie-controlecorrecties geïmporteerd uit {Path(filename).name}; {applied} documentcorrecties toegepast.")
+            if unmatched:
+                self._log("Correcties voor nog niet gekoppelde documenten bewaard: " + ", ".join(unmatched))
+            messagebox.showinfo("Correcties geïmporteerd",
+                f"De correcties zijn samengevoegd en in het project bewaard.\n"
+                f"Documenten zonder overeenkomst zijn niet weggegooid; ze blijven in het project opgeslagen.\n\n"
+                f"Niet gekoppelde bestanden: {len(unmatched)}", parent=self.root)
+        except Exception as exc:
+            self._error("Correcties importeren", exc)
+            messagebox.showerror("Importeren mislukt", str(exc), parent=self.root)
+
+    def _workspace_apply_saved_corrections(self):
+        """Apply imported Biologie-controle corrections to the current candidate set."""
+        if not self.data:
+            return
+        rows = self.data.setdefault("vraagkandidaten", [])
+        for document_state in self.data.get("biologie_controle_correcties", []):
+            filename = document_state.get("bestand")
+            doc = next((d for d in self.data.get("documenten", []) if d.get("bestand") == filename), None)
+            if not doc:
+                continue
+            current = [r for r in rows if r.get("document_id") == doc.get("id")]
+            for correction in document_state.get("correcties", []):
+                page_no = int(correction.get("pagina", 0) or 0)
+                original_number = int(correction.get("oorspronkelijk_nummer",
+                    correction.get("vraagnummer", 0)) or 0)
+                position = correction.get("positie_pdf_pt") or {}
+                x = position.get("x")
+                y = position.get("y")
+                candidate = next((r for r in current if str(r.get("id")) == str(correction.get("id"))), None)
+                if candidate is None:
+                    def close_match(r):
+                        if int(r.get("page", 0) or 0) != page_no:
+                            return False
+                        number_match = int(r.get("original_number", r.get("number", 0)) or 0) == original_number
+                        if x is not None and y is not None and r.get("bbox"):
+                            return number_match and abs(float(r["bbox"][0])-float(x)) <= 8 and abs(float(r["bbox"][1])-float(y)) <= 8
+                        return number_match
+                    candidate = next((r for r in current if close_match(r)), None)
+                if candidate is None and correction.get("handmatig_toegevoegd"):
+                    if x is None or y is None:
+                        continue
+                    candidate = {
+                        "id": str(correction.get("id")),
+                        "document_id": doc["id"], "bestand": doc["bestand"],
+                        "number": int(correction.get("vraagnummer", original_number) or original_number),
+                        "original_number": original_number, "page": page_no,
+                        "bbox": [float(x), float(y), float(x)+24, float(y)+18],
+                        "line": "", "next_line": "", "confidence": 1.0,
+                        "status": "handmatig_toegevoegd", "manual_added": True,
+                        "manual_position_confirmed": True, "vraagtekst_voorstel": "",
+                        "vraagtype_status": "controle_nodig", "review_note": "",
+                        "vraagtype_controle": {"type": "onbekend", "options": []},
+                        "context_verwijzingen": []
+                    }
+                    rows.append(candidate)
+                    current.append(candidate)
+                if candidate is None:
+                    continue
+                candidate["legacy_correction_id"] = str(correction.get("id"))
+                candidate.setdefault("original_number", original_number)
+                if correction.get("vraagnummer") is not None:
+                    candidate["number"] = int(correction["vraagnummer"])
+                if x is not None and y is not None:
+                    bbox = candidate.get("bbox") or [float(x), float(y), float(x)+24, float(y)+18]
+                    width = max(12.0, float(bbox[2])-float(bbox[0]))
+                    height = max(10.0, float(bbox[3])-float(bbox[1]))
+                    candidate["bbox"] = [float(x), float(y), float(x)+width, float(y)+height]
+                    candidate["manual_position_confirmed"] = True
+                candidate["manual_added"] = bool(correction.get("handmatig_toegevoegd", candidate.get("manual_added", False)))
+                candidate["review_note"] = correction.get("notitie", candidate.get("review_note", ""))
+                decision = correction.get("beslissing", "open")
+                if decision == "vraag":
+                    candidate["human_decision"] = True
+                    candidate["status"] = "bevestigd_vraagstart"
+                elif decision == "geen_vraag":
+                    candidate["human_decision"] = False
+                    candidate["status"] = "afgewezen_geen_vraag"
+                else:
+                    candidate["human_decision"] = None
+                    candidate["status"] = "twijfel_handmatige_nacontrole"
+
+    def _workspace_merge_review_state(self, doc, candidates, previous_candidates):
+        """Keep human decisions and manually added positions when analysis is rerun."""
+        for old in previous_candidates:
+            if old.get("document_id") != doc.get("id"):
+                continue
+            match = next((r for r in candidates if r.get("id") == old.get("id")), None)
+            if match is None:
+                old_bbox = old.get("bbox") or []
+                match = next((r for r in candidates
+                    if int(r.get("page", 0) or 0) == int(old.get("page", 0) or 0)
+                    and int(r.get("number", 0) or 0) == int(old.get("original_number", old.get("number", 0)) or 0)
+                    and len(old_bbox) >= 2 and r.get("bbox")
+                    and abs(float(r["bbox"][0])-float(old_bbox[0])) <= 8
+                    and abs(float(r["bbox"][1])-float(old_bbox[1])) <= 8), None)
+            if match is None and old.get("manual_added"):
+                candidates.append(dict(old))
+                continue
+            if match is None:
+                continue
+            for key in ("human_decision", "review_note", "manual_added",
+                        "manual_position_confirmed", "legacy_correction_id", "decision_reason"):
+                if key in old:
+                    match[key] = old[key]
+            if old.get("human_decision") is not None or old.get("status") == "twijfel_handmatige_nacontrole":
+                match["status"] = old.get("status", match.get("status"))
+            if old.get("number") != old.get("original_number", old.get("number")):
+                match["original_number"] = old.get("original_number", old.get("number"))
+                match["number"] = old.get("number")
+            if old.get("manual_position_confirmed") and old.get("bbox"):
+                match["bbox"] = list(old["bbox"])
+        self._workspace_apply_saved_corrections()
+        return candidates
+
+    def _workspace_export_corrections(self):
+        if not self.data or not self.project_dir:
+            messagebox.showinfo("Eerst een examen openen", "Open eerst een examenproject.")
+            return
+        output = filedialog.asksaveasfilename(
+            title="Exporteer Biologie-controlecorrecties",
+            defaultextension=".json", initialfile="biologie-correcties.json",
+            filetypes=[("JSON-bestanden", "*.json")])
+        if not output:
+            return
+        by_name = {}
+        for saved in self.data.get("biologie_controle_correcties", []):
+            if saved.get("bestand"):
+                by_name[saved["bestand"]] = dict(saved)
+                by_name[saved["bestand"]]["correcties"] = list(saved.get("correcties", []))
+        for doc in self.data.get("documenten", []):
+            group = by_name.setdefault(doc.get("bestand"), {
+                "bestand": doc.get("bestand"), "correcties": []})
+            if doc.get("documenttype_handmatig"):
+                group["documenttype_handmatig"] = doc["documenttype_handmatig"]
+            existing = {str(c.get("id")): c for c in group.get("correcties", [])
+                        if isinstance(c, dict) and c.get("id")}
+            for row in self.data.get("vraagkandidaten", []):
+                if row.get("document_id") != doc.get("id"):
+                    continue
+                decision = row.get("human_decision")
+                changed_number = row.get("number") != row.get("original_number", row.get("number"))
+                has_review = (decision is not None or row.get("status") == "twijfel_handmatige_nacontrole"
+                    or row.get("manual_added") or row.get("review_note") or changed_number
+                    or row.get("manual_position_confirmed"))
+                if not has_review:
+                    continue
+                pos = {}
+                if row.get("bbox") and len(row["bbox"]) >= 2:
+                    pos = {"x": round(float(row["bbox"][0]), 2), "y": round(float(row["bbox"][1]), 2)}
+                correction_id = str(row.get("legacy_correction_id") or row.get("id") or hashlib.sha256(
+                    f"{doc.get('id')}|{row.get('page')}|{row.get('original_number',row.get('number'))}|{pos}".encode("utf-8")
+                ).hexdigest()[:16])
+                decision_text = "vraag" if decision is True else ("geen_vraag" if decision is False else "open")
+                correction = {
+                    "id": correction_id, "pagina": int(row.get("page", 0) or 0),
+                    "vraagnummer": int(row.get("number", 0) or 0),
+                    "oorspronkelijk_nummer": int(row.get("original_number", row.get("number", 0)) or 0),
+                    "beslissing": decision_text,
+                    "notitie": row.get("review_note") or row.get("decision_reason") or "",
+                    "positie_pdf_pt": pos,
+                    "handmatig_toegevoegd": bool(row.get("manual_added", False))
+                }
+                existing[correction_id] = {**existing.get(correction_id, {}), **correction}
+            group["correcties"] = list(existing.values())
+        payload = {
+            "formaat": "biologie-correcties-v1", "app_versie": APP_VERSION,
+            "aangemaakt": now(),
+            "aantal_correcties": sum(len(x.get("correcties", [])) for x in by_name.values()),
+            "documenten": list(by_name.values()),
+            "toelichting": "Alleen handmatige beoordelingen en correcties; geen PDF-inhoud of afbeeldingen."
+        }
+        try:
+            Path(output).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            self._log(f"Biologie-controlecorrecties geëxporteerd: {output}")
+            messagebox.showinfo("Correcties geëxporteerd", "De correcties zijn veilig als compact JSON-bestand opgeslagen.", parent=self.root)
+        except Exception as exc:
+            self._error("Correcties exporteren", exc)
+            messagebox.showerror("Exporteren mislukt", str(exc), parent=self.root)
+
     def _scrollable_tab(self, parent):
         """Return a vertically scrollable content frame for a notebook tab."""
         holder = ttk.Frame(parent, style="App.TFrame")
