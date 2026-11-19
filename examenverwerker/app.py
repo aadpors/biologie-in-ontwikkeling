@@ -734,31 +734,86 @@ class ExamApp:
                 meta["points"]=int(meta["points"]); meta["questionType"]=qtype
                 candidate=dict(row)
                 record=build_question_record(meta,candidate,qtext,source_doc["opslagbestand"],cv_doc["opslagbestand"])
-                structure = self.data.get("exam_structure")
                 confirmed_numbers = sorted({int(x["number"]) for x in self.data.get("vraagkandidaten", [])
                                             if x.get("document_id") == source_doc["id"] and x.get("human_decision") is True})
+                structure = self.data.setdefault("exam_structures", {}).get(source_doc["id"])
+                if structure is None and self.data.get("exam_structure", {}).get("document_id") == source_doc["id"]:
+                    structure = self.data.get("exam_structure")
                 structure_errors = validate_exam_structure(structure, source_doc["id"], source_doc["sha256"], confirmed_numbers) if structure else ["structuur_niet_ingesteld"]
-                linkage = fragments_for_question(structure, row["number"]) if not structure_errors else {
-                    "question_fragment": None, "context_fragments": [], "status": "structuur_niet_beschikbaar"}
+                missing_regions = missing_question_regions(structure, [int(row["number"])])
+                if structure_errors or missing_regions:
+                    raise ValueError("Baken eerst het vraagfragment voor deze vraag af in 'Examenstructuur bewerken'. " +
+                                     ("Structuurcontrole: " + ", ".join(structure_errors) if structure_errors else "Vraagfragment ontbreekt."))
+                linkage = fragments_for_question(structure, row["number"])
                 question_fragment = linkage.get("question_fragment")
+                if not question_fragment:
+                    raise ValueError("Er is nog geen handmatig afgebakend vraagfragment voor deze vraag.")
+                cv_region = self.data.get("cv_regions", {}).get(cv_doc["id"], {}).get(str(row["number"]))
+                cv_errors = validate_cv_fragment(cv_region or {}, cv_doc, row["number"], "correctievoorschrift")
+                if cv_errors:
+                    raise ValueError("Baken eerst het volledige correctievoorschrift voor deze vraag handmatig af. " + ", ".join(cv_errors))
+                source_analysis = analyze_pdf(self.project_dir / "bronnen" / source_doc["opslagbestand"])
+                source_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in source_analysis["pages"]}
+                question_segments = page_spans_to_segments(question_fragment["page_spans"], source_sizes)
+                question_file = f"question-{source_doc['id']}-q{row['number']}-manual.png"
+                render_composite_crops(self.project_dir / "bronnen" / source_doc["opslagbestand"],
+                                       question_segments, self.project_dir / "snippets" / question_file, scale=1.45)
+                cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
+                cv_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in cv_analysis["pages"]}
+                cv_segments = page_spans_to_segments(cv_region["page_spans"], cv_sizes)
+                cv_file = f"cv-{cv_doc['id']}-q{row['number']}-handmatig.png"
+                render_composite_crops(self.project_dir / "bronnen" / cv_doc["opslagbestand"],
+                                       cv_segments, self.project_dir / "snippets" / cv_file, scale=1.35)
+                selected_amendment_docs = [amendment_docs[i] for i in amendment_list.curselection()]
+                amendment_regions = []
+                for amendment_doc in selected_amendment_docs:
+                    region = self.data.get("cv_regions", {}).get(amendment_doc["id"], {}).get(str(row["number"]))
+                    errors = validate_cv_fragment(region or {}, amendment_doc, row["number"], "aanvulling")
+                    if errors:
+                        raise ValueError(f"Baken ook de geselecteerde CV-aanvulling {amendment_doc['bestand']} handmatig af voor vraag {row['number']}. " + ", ".join(errors))
+                    amend_analysis = analyze_pdf(self.project_dir / "bronnen" / amendment_doc["opslagbestand"])
+                    amend_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in amend_analysis["pages"]}
+                    amend_segments = page_spans_to_segments(region["page_spans"], amend_sizes)
+                    amend_file = f"cv-amend-{amendment_doc['id']}-q{row['number']}-handmatig.png"
+                    render_composite_crops(self.project_dir / "bronnen" / amendment_doc["opslagbestand"],
+                                           amend_segments, self.project_dir / "snippets" / amend_file, scale=1.35)
+                    amendment_regions.append({"document_id": amendment_doc["id"], "source_pdf": amendment_doc["opslagbestand"],
+                                              "source_sha256": amendment_doc["sha256"], "fragment": region, "snippet_file": amend_file})
                 context_fragments = linkage.get("context_fragments", [])
+                context_assets = [dict(context_files[i]) for i in context_list.curselection()]
+                context_region_files = []
+                for context_fragment in context_fragments:
+                    region_file = f"context-region-{source_doc['id']}-{context_fragment['id']}.png"
+                    segments = page_spans_to_segments(context_fragment["page_spans"], source_sizes)
+                    render_composite_crops(self.project_dir / "bronnen" / source_doc["opslagbestand"],
+                                           segments, self.project_dir / "snippets" / region_file, scale=1.25)
+                    context_region_files.append({"file": region_file, "fragment_id": context_fragment["id"],
+                        "type": context_fragment["type"], "page_spans": list(context_fragment["page_spans"]),
+                        "question_numbers": list(context_fragment.get("question_numbers", [])),
+                        "source_document_id": source_doc["id"], "source_pdf": source_doc["opslagbestand"],
+                        "source_sha256": source_doc["sha256"], "caption": "Handmatig afgebakende context"})
+                context_assets.extend(context_region_files)
                 record.update({"exam":meta,"options":options,"correct":correct,
-                               "snippet_files":list(dict.fromkeys(list(row.get("snippet_proposal_files",[]))+[context_files[i]["file"] for i in context_list.curselection()])),
-                               "context_asset_candidates":context_files,
-                               "cv_snippet_file":cv_snippet_var.get().strip() or None,
-                               "cv_amendment_snippet_file":amendment_snippet_var.get().strip() or None,
-                               "exam_structure_status":linkage.get("status"),
-                               "exam_structure_fragment_ids":[x["id"] for x in ([question_fragment] if question_fragment else []) + context_fragments],
-                               "question_region_page_spans":list(question_fragment.get("page_spans", [])) if question_fragment else [],
-                               "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", []))} for x in context_fragments],
-                               "source_analysis_invalidated":False,
-                               "approval_revoked_reason":None,
+                               "snippet_file":question_file,"snippet_files":[question_file],
+                               "context_asset_candidates":context_files,"context_asset_files":context_assets,
+                               "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", [])),
+                                   "question_numbers":list(x.get("question_numbers", []))} for x in context_fragments],
+                               "cv_snippet_file":cv_file,"cv_snippet_files":[cv_file],
+                               "cv_source_region":cv_region,"cv_source_region_file":cv_file,
+                               "cv_amendment_snippet_files":[x["snippet_file"] for x in amendment_regions],
+                               "cv_amendment_snippet_file":amendment_regions[0]["snippet_file"] if amendment_regions else None,
+                               "cv_amendment_regions":amendment_regions,
+                               "exam_structure_status":"gekoppeld",
+                               "exam_structure_document_id":source_doc["id"],
+                               "exam_structure_source_sha256":source_doc["sha256"],
+                               "exam_structure_fragment_ids":[question_fragment["id"]]+[x["id"] for x in context_fragments],
+                               "question_region_page_spans":list(question_fragment.get("page_spans", [])),
+                               "source_analysis_invalidated":False,"approval_revoked_reason":None,
                                "uitwerkbijlagen":[appendix_docs[i]["opslagbestand"] for i in appendix_list.curselection()],
-                               "cv_amendment_pdfs":[amendment_docs[i]["opslagbestand"] for i in amendment_list.curselection()],
+                               "cv_amendment_pdfs":[d["opslagbestand"] for d in selected_amendment_docs],
                                "available_appendix_candidates":[d["opslagbestand"] for d in appendix_docs],
                                "available_cv_amendment_candidates":[d["opslagbestand"] for d in amendment_docs],
-                               "appendix_match_human_confirmed":True,
-                               "cv_amendment_match_human_confirmed":True,
+                               "appendix_match_human_confirmed":True,"cv_amendment_match_human_confirmed":True,
                                "candidate_document_id":row.get("document_id"),
                                "source_match_human_confirmed":(source_doc.get("exam_metadata") or {}).get("source")=="handmatig_bevestigd",
                                "cv_match_human_confirmed":(cv_doc.get("exam_metadata") or {}).get("source")=="handmatig_bevestigd",
@@ -766,7 +821,7 @@ class ExamApp:
                                "status":"controle_nodig","approved_by_human":False,
                                "record_review_checklist":{"question_text":False,"question_type":False,"points":False,
                                    "answer_options":False,"cv_alignment":False,"images_and_context":False,
-                                   "appendices":False}})
+                                   "appendices":False,"cv_addenda":False}})
                 record["source_page"]=int(row["page"])
                 records=self.data.setdefault("vraagrecords",[])
                 old_index=next((i for i,x in enumerate(records) if x.get("candidate_document_id")==row.get("document_id") and x.get("number")==row.get("number") and x.get("source_page")==row.get("page")),None)
