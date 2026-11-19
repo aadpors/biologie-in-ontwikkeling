@@ -866,39 +866,102 @@ def detect_context_references(text: str) -> list[dict]:
 
 
 def detect_question_type(text: str) -> dict:
-    """Heuristic question-format detection; returns reviewable signals, not truth."""
-    value = str(text or "")
-    options = []
-    for line in value.splitlines():
-        match = re.match(r"^\s*(?:\(([A-H])\)|([A-H])[.):])\s+(.+)$", line)
+    """Detect question formats from selectable PDF text, including common layout/OCR variants.
+
+    Option labels may be on separate lines, inline with other options, wrapped
+    onto a following line, or extracted as lower-case labels. Two distinct
+    option labels are required; a single incidental 'A.' is not enough.
+    """
+    value = str(text or "").replace("\u00a0", " ")
+    normalized_lines = [re.sub(r"[ \t]+", " ", line).strip() for line in value.splitlines()]
+    options_by_label = {}
+
+    def add_option(label: str, option_text: str):
+        label = label.upper()
+        option_text = re.sub(r"\s+", " ", option_text).strip(" \t:;")
+        if label in "ABCDEFGH" and option_text and len(option_text) > 0:
+            # Prefer the longest capture if the same label occurs in duplicate OCR lines.
+            if label not in options_by_label or len(option_text) > len(options_by_label[label]):
+                options_by_label[label] = option_text
+
+    # 1) Conventional line-start forms: A. text, (A) text, A) text, A: text.
+    line_option = re.compile(r"^\s*(?:\(([A-Ha-h])\)|([A-Ha-h])[.):])\s*(.*?)\s*$")
+    standalone_label = re.compile(r"^\s*(?:\(([A-Ha-h])\)|([A-Ha-h])[.):]?)\s*$")
+    for index, line in enumerate(normalized_lines):
+        match = line_option.match(line)
+        if match and match.group(3):
+            add_option(match.group(1) or match.group(2), match.group(3))
+            continue
+        label_match = standalone_label.match(line)
+        if label_match:
+            following = normalized_lines[index + 1] if index + 1 < len(normalized_lines) else ""
+            if following and not standalone_label.match(following):
+                add_option(label_match.group(1) or label_match.group(2), following)
+
+    # 2) Inline extraction: some PDF text layers place A/B/C/D options on one line.
+    # Require explicit punctuation and a plausible option body to avoid matching
+    # ordinary capital letters in prose.
+    inline_pattern = re.compile(
+        r"(?<![A-Za-z0-9])(?:\(([A-Ha-h])\)|([A-Ha-h])[.):])\s*"
+        r"(.+?)(?=(?<![A-Za-z0-9])(?:\([A-Ha-h]\)|[A-Ha-h][.):])\s*|$)"
+    )
+    for line in normalized_lines:
+        matches = list(inline_pattern.finditer(line))
+        if len(matches) >= 2:
+            for match in matches:
+                add_option(match.group(1) or match.group(2), match.group(3))
+
+    # 3) OCR sometimes drops punctuation but keeps one option per line ("A mitochondria").
+    # Only use this fallback when at least two consecutive labels are present.
+    bare_options = []
+    for line in normalized_lines:
+        match = re.match(r"^\s*([A-Ha-h])\s{1,}(.{2,})$", line)
         if match:
-            label = match.group(1) or match.group(2)
-            option_text = match.group(3).strip()
-            if option_text:
-                options.append({"label": label, "text": option_text})
-    lowered = value.lower()
-    if options:
-        labels = [x["label"] for x in options]
-        last_index = max("ABCDEFGH".index(x) for x in labels)
+            bare_options.append((match.group(1).upper(), match.group(2).strip()))
+    if len(bare_options) >= 2:
+        for label, option_text in bare_options:
+            add_option(label, option_text)
+
+    labels = sorted(options_by_label, key="ABCDEFGH".index)
+    if len(labels) >= 2:
+        options = [{"label": label, "text": options_by_label[label]} for label in labels]
+        last_index = max("ABCDEFGH".index(label) for label in labels)
         expected = list("ABCDEFGH"[:last_index + 1])
         gaps = [label for label in expected if label not in labels]
-        duplicates = sorted({label for label in labels if labels.count(label) > 1})
-        complete = not gaps and not duplicates and len(options) >= 2
-        return {"type": "meerkeuze", "subtype": "enkelvoudige_keuze",
-                "options": options, "option_labels": labels,
-                "options_complete": complete, "option_gaps": gaps,
-                "duplicate_option_labels": duplicates,
-                "confidence": 0.85 if complete else 0.55,
-                "status": "controle_nodig"}
+        # Distinct labels are stored once; repeated source labels are still reported.
+        source_labels = re.findall(
+            r"(?im)^\s*(?:\(([A-Ha-h])\)|([A-Ha-h])[.):])\s+",
+            value
+        )
+        seen_source = [a or b for a, b in source_labels]
+        duplicates = sorted({label.upper() for label in seen_source
+                             if seen_source.count(label) > 1})
+        sequential = labels[0] == "A" and labels == expected
+        confidence = 0.92 if sequential and len(labels) >= 3 else 0.78 if len(labels) >= 2 else 0.55
+        return {
+            "type": "meerkeuze",
+            "subtype": "enkelvoudige_keuze",
+            "options": options,
+            "option_labels": labels,
+            "options_complete": sequential and not duplicates,
+            "option_gaps": gaps,
+            "duplicate_option_labels": duplicates,
+            "confidence": confidence,
+            "status": "controle_nodig",
+        }
+
+    lowered = value.lower()
     if re.search(r"\b(juist|onjuist|waar|niet waar)\b", lowered) and re.search(r"\b(stelling|uitspraken|bewering)\b", lowered):
         qtype, subtype, confidence = "juist_onjuist", "stellingbeoordeling", 0.65
     elif re.search(r"\b(wel of niet|wel/niet|ja of nee|ja/nee)\b", lowered):
         qtype, subtype, confidence = "wel_niet", "binaire_beoordeling", 0.7
     else:
         qtype, subtype, confidence = "open", "open_vraag", 0.55
-    return {"type": qtype, "subtype": subtype, "options": [], "option_labels": [],
-            "options_complete": None, "option_gaps": [], "duplicate_option_labels": [],
-            "confidence": confidence, "status": "controle_nodig"}
+    return {
+        "type": qtype, "subtype": subtype, "options": [], "option_labels": [],
+        "options_complete": None, "option_gaps": [], "duplicate_option_labels": [],
+        "confidence": confidence, "status": "controle_nodig",
+    }
 
 
 def extract_region_text(pdf_path: Path, segments: list[dict]) -> str:
