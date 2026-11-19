@@ -2,6 +2,19 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from pathlib import Path
+
+def resolve_examens_root(app_base: Path) -> Path:
+    """Use the existing examens folder next to the app, or create that default later."""
+    app_base = Path(app_base)
+    preferred = app_base.parent / "examens"
+    local = app_base / "examens"
+    if preferred.is_dir():
+        return preferred
+    if local.is_dir():
+        return local
+    return preferred
+
 
 DOCUMENT_ROLES = {"opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling"}
 IDENTITY_FIELDS = ("level", "year", "period")
