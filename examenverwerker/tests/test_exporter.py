@@ -187,6 +187,8 @@ class ExportTests(unittest.TestCase):
             context=json.loads((out/"exam-contexts.json").read_text(encoding="utf-8"))[0]
             self.assertEqual(question["images"],["exam-snippets/vraag1.png"])
             self.assertEqual(context["contextImages"],["exam-snippets/context-figuur.png"])
+            self.assertEqual(context["images"],["exam-snippets/context-figuur.png","exam-snippets/vraag1.png"])
+            self.assertEqual(context["image"],"exam-snippets/context-figuur.png")
             self.assertEqual(context["image"],"exam-snippets/context-figuur.png")
             self.assertEqual(context["contextRegions"][0]["text"],"De contexttekst.")
             self.assertEqual(context["contextText"],"De contexttekst.")
@@ -244,8 +246,9 @@ class ExportTests(unittest.TestCase):
             self.assertTrue(result["ok"],result)
             import json
             context=json.loads((Path(d)/"out"/"exam-contexts.json").read_text(encoding="utf-8"))[0]
-            self.assertEqual(context["image"],"")
-            self.assertEqual(context["images"],[])
+            self.assertEqual(context["image"],"exam-snippets/vraag1.png")
+            self.assertEqual(context["images"],["exam-snippets/vraag1.png"])
+            self.assertEqual(context["contextImages"],[])
             self.assertEqual(context["questionImage"],"exam-snippets/vraag1.png")
 
 
