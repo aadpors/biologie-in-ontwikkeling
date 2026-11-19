@@ -3306,6 +3306,11 @@ class ExamApp:
                             "page_spans": spans,
                             "question_numbers": [number],
                             "status": "automatisch_voorstel_nog_te_controleren",
+                            "confidence": float(ordered[index].get("confidence", 0.0) or 0.0),
+                            "evidence": {
+                                "reason": "Vraagband afgeleid van de bevestigde vraagstart tot de volgende bevestigde vraagstart",
+                                "source": "vraagstartcontrole",
+                            },
                         })
                 # Supplement broad question bands with focused, evidence-backed
                 # context proposals around actual PDF figures and their captions.
@@ -3337,12 +3342,17 @@ class ExamApp:
         type_box.bind("<<ComboboxSelected>>", set_default_links)
         set_default_links()
         ttk.Label(left, text="Bestaande fragmenten").pack(anchor="w", pady=(4, 2))
-        fragment_tree = ttk.Treeview(left, columns=("type", "pages", "links"), show="tree headings", height=12)
+        fragment_tree = ttk.Treeview(left, columns=("type", "pages", "links", "confidence"), show="tree headings", height=12)
         fragment_tree.heading("#0", text="Fragment")
-        fragment_tree.heading("type", text="Type"); fragment_tree.column("type", width=85)
-        fragment_tree.heading("pages", text="Pagina's"); fragment_tree.column("pages", width=55)
-        fragment_tree.heading("links", text="Vragen"); fragment_tree.column("links", width=65)
+        fragment_tree.column("#0", width=68)
+        fragment_tree.heading("type", text="Type"); fragment_tree.column("type", width=82)
+        fragment_tree.heading("pages", text="Pagina's"); fragment_tree.column("pages", width=48)
+        fragment_tree.heading("links", text="Vragen"); fragment_tree.column("links", width=55)
+        fragment_tree.heading("confidence", text="Zeker"); fragment_tree.column("confidence", width=48, anchor="center")
         fragment_tree.pack(fill="both", expand=True)
+        fragment_info = ttk.Label(left, text="Selecteer een fragment voor de herkenningsreden en het bewijs.",
+                                  wraplength=230, justify="left")
+        fragment_info.pack(fill="x", pady=(5, 2))
         ttk.Label(left, text="Tip: maak een fragment op de eerste pagina en voeg daarna de volgende pagina's in oplopende volgorde toe.",
                   wraplength=230).pack(anchor="w", pady=8)
         nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
@@ -3440,8 +3450,10 @@ class ExamApp:
             for index, frag in enumerate(fragments):
                 pages = ",".join(str(x["page"]) for x in frag.get("page_spans", []))
                 links = ",".join(str(x) for x in frag.get("question_numbers", []))
-                fragment_tree.insert("", "end", iid=str(index), text=frag.get("id", f"Fragment {index+1}"),
-                    values=(frag.get("type"), pages, links))
+                confidence = frag.get("confidence")
+                confidence_label = f"{float(confidence):.0%}" if isinstance(confidence, (int, float)) else "—"
+                fragment_tree.insert("", "end", iid=str(index), text=frag.get("type", f"Fragment {index+1}"),
+                    values=(frag.get("type"), pages, links, confidence_label))
         def save_structure():
             nonlocal original_structure_signature
             current = selected_fragment()
@@ -3535,6 +3547,15 @@ class ExamApp:
                 qlist.selection_clear(0, "end")
                 for i, number in enumerate(question_numbers):
                     if number in frag.get("question_numbers", []): qlist.selection_set(i)
+                evidence = frag.get("evidence") or {}
+                confidence = frag.get("confidence")
+                certainty = f" · zekerheid {float(confidence):.0%}" if isinstance(confidence, (int, float)) else ""
+                reason = evidence.get("reason") or "Handmatig afgebakend; controleer de inhoud en koppeling."
+                captions = evidence.get("captions") or []
+                detail = f"{frag.get('type', 'Fragment')}{certainty}\\n{reason}"
+                if captions:
+                    detail += "\\nBijschrift: " + " · ".join(captions[:2])
+                fragment_info.configure(text=detail)
         def update_links():
             frag = selected_fragment()
             if not frag: return
