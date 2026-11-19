@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -150,6 +150,29 @@ class EngineTests(unittest.TestCase):
             self.assertIsNone(conflict["suggestion"])
             self.assertTrue(conflict["conflicting"])
             self.assertFalse(conflict["auto_apply"])
+
+    def test_context_proposals_use_visual_assets_and_link_to_confirmed_question(self):
+        analysis = {"pages": [{
+            "page": 1, "width": 600, "height": 800,
+            "visual_assets": [{"id": "p1-image-1", "kind": "image", "bbox": [100, 180, 450, 300]}],
+            "blocks": [{"lines": [{"bbox": [110, 302, 250, 318], "text": "Figuur 2. De bouw van een blad"}]}],
+        }]}
+        candidates = [{"number": 2, "page": 1, "bbox": [40, 100, 90, 120], "human_decision": True}]
+        proposals = propose_context_fragments(analysis, candidates)
+        self.assertEqual(len(proposals), 1)
+        proposal = proposals[0]
+        self.assertEqual(proposal["type"], "vraagcontext")
+        self.assertEqual(proposal["question_numbers"], [2])
+        self.assertEqual(proposal["status"], "automatisch_voorstel_nog_te_controleren")
+        self.assertEqual(proposal["confidence"], 0.82)
+        self.assertIn("Figuur 2", proposal["evidence"]["captions"][0])
+
+    def test_context_proposals_do_not_invent_regions_without_visual_assets(self):
+        analysis = {"pages": [{"page": 1, "width": 600, "height": 800,
+                               "visual_assets": [], "blocks": []}]}
+        candidates = [{"number": 1, "page": 1, "bbox": [40, 100, 90, 120],
+                       "human_decision": True}]
+        self.assertEqual(propose_context_fragments(analysis, candidates), [])
 
     def test_duplicate_ids_reported(self):
         row={"id":"same","level":"Havo","year":"2025","period":"1","n":1,"page":1,"q":"x","pdf":"a.pdf","cv":"b.pdf"}
