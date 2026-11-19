@@ -87,7 +87,8 @@ class StructureTests(unittest.TestCase):
         result = fragments_for_question(structure, 2)
         self.assertEqual(result["question_fragment"]["id"], "question-2")
         self.assertEqual({x["id"] for x in result["context_fragments"]}, {"intro", "context-2"})
-        self.assertEqual(fragments_for_question(structure, 4)["status"], "geen_fragmenten_gekoppeld")
+        self.assertEqual(fragments_for_question(structure, 4)["status"], "gekoppeld")
+        self.assertEqual([x["id"] for x in fragments_for_question(structure, 4)["context_fragments"]], ["intro"])
         self.assertEqual(fragments_for_question(mark_structure_stale(structure, "reanalyse"), 2)["status"],
                          "structuur_niet_beschikbaar")
 
