@@ -237,8 +237,22 @@ class ExamApp:
         def save():
             if not re.fullmatch(r"20\d{2}",year.get().strip()):
                 messagebox.showerror("Ongeldig jaar","Vul een jaartal van vier cijfers in.",parent=win); return
-            self.data["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),"confidence":1.0,"source":"handmatig_bevestigd"}
-            self.save_project(); self._log(f"Examenmetadata bevestigd: {level.get()} {year.get()} tijdvak {period.get()}.")
+            identity={"level":level.get(),"year":year.get().strip(),"period":period.get(),"confidence":1.0,"source":"handmatig_bevestigd"}
+            self.data["exam_metadata"]=identity
+            # A project represents one exam: apply the explicit identity to all
+            # attached source documents so exact opgaven/CV/addendum matching works.
+            for document in self.data.get("documenten", []):
+                if document.get("type_voorstel") in ("opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"):
+                    document["exam_metadata"]=dict(identity)
+            for record in self.data.get("vraagrecords", []):
+                exam=record.setdefault("exam", {})
+                exam.update({"level":identity["level"],"year":identity["year"],"period":identity["period"]})
+                record["approved_by_human"]=False
+                record["status"]="controle_nodig"
+                record["approved_at"]=None
+                record["approval_revoked_reason"]="Examenidentiteit handmatig bevestigd of gewijzigd; volledige eindcontrole opnieuw uitvoeren."
+                record["record_review_checklist"]={key:False for key in record.get("record_review_checklist", {})}
+            self.save_project(); self._log(f"Examenmetadata bevestigd voor alle documenten: {level.get()} {year.get()} tijdvak {period.get()}.")
             win.destroy()
         ttk.Button(frame,text="Gegevens opslaan",command=save).grid(row=4,column=0,columnspan=2,sticky="ew",pady=(14,0))
         frame.columnconfigure(1,weight=1)
