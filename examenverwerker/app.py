@@ -1246,7 +1246,7 @@ class ExamApp:
             if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
                 messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=win)
                 return
-            if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
+            if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
                 messagebox.showerror("Examenidentiteit onvolledig",
                     "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=win)
                 return
