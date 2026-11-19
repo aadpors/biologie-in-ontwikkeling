@@ -120,4 +120,24 @@ class ExportTests(unittest.TestCase):
             opened=json.loads((out/"exam-open.json").read_text(encoding="utf-8"))
             self.assertEqual(opened[0]["attachmentPdfs"],["examens/uitwerkbijlage.pdf"])
 
+
+    def test_export_manifest_preserves_manual_exam_structure_regions(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["exam_structure_status"]="gekoppeld"
+            record["exam_structure_fragment_ids"]=["intro-1","question-1"]
+            record["question_region_page_spans"]=[{"page":2,"top":0.2,"bottom":0.8}]
+            record["context_region_fragments"]=[{"id":"intro-1","type":"context_intro",
+                "page_spans":[{"page":1,"top":0.1,"bottom":0.3}]}]
+            result=export_approved_records([record],project,Path(d)/"out")
+            self.assertTrue(result["ok"],result)
+            import json
+            manifest=json.loads((Path(d)/"out"/"manifest.json").read_text(encoding="utf-8"))
+            exported=manifest["records"][0]
+            self.assertEqual(exported["exam_structure_status"],"gekoppeld")
+            self.assertEqual(exported["exam_structure_fragment_ids"],["intro-1","question-1"])
+            self.assertEqual(exported["question_region_page_spans"],record["question_region_page_spans"])
+            self.assertEqual(exported["context_region_fragments"],record["context_region_fragments"])
+
+
 if __name__=="__main__": unittest.main()
