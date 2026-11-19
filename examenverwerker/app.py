@@ -606,7 +606,7 @@ class ExamApp:
             f"{x.get('label','?')} {x.get('text','')}" for x in options) if options else "geen tekstopties herkend")
         visual = check.get("visual_detection", {})
         if visual.get("requires_visual_review"):
-            option_text += (f"\\nVisuele controle: {visual.get('status','beeldmateriaal gevonden').replace('_',' ')}"
+            option_text += (f"\nVisuele controle: {visual.get('status','beeldmateriaal gevonden').replace('_',' ')}"
                             f" · {visual.get('visual_asset_count',0)} beeldelement(en)"
                             f" · labels {', '.join(visual.get('nearby_option_labels',[])) or 'niet als tekst herkend'}")
         references = row.get("context_verwijzingen", [])
@@ -2242,19 +2242,19 @@ class ExamApp:
             if check.get("type") == "meerkeuze":
                 option_lines.append(
                     "Ontbrekende labels: " + (", ".join(check.get("option_gaps", [])) or "geen") +
-                    "\\nDubbele labels: " + (", ".join(check.get("duplicate_option_labels", [])) or "geen"))
+                    "\nDubbele labels: " + (", ".join(check.get("duplicate_option_labels", [])) or "geen"))
             visual = check.get("visual_detection", {})
             if visual.get("requires_visual_review"):
                 option_lines.append(
                     "VISUELE CONTROLE NODIG: " + visual.get("status", "beeldmateriaal gevonden").replace("_", " ") +
-                    f"\\nBeeldelementen: {visual.get('visual_asset_count', 0)}" +
-                    f"\\nRasterafbeeldingen: {visual.get('raster_image_count', 0)}" +
-                    f"\\nNabije labels: {', '.join(visual.get('nearby_option_labels', [])) or 'niet herkend'}" +
-                    "\\nControleer in de PDF of dit contextmateriaal of antwoordalternatieven zijn.")
+                    f"\nBeeldelementen: {visual.get('visual_asset_count', 0)}" +
+                    f"\nRasterafbeeldingen: {visual.get('raster_image_count', 0)}" +
+                    f"\nNabije labels: {', '.join(visual.get('nearby_option_labels', [])) or 'niet herkend'}" +
+                    "\nControleer in de PDF of dit contextmateriaal of antwoordalternatieven zijn.")
             fallback = ("Geen tekstopties herkend. Er is beeldmateriaal gevonden; controleer of de antwoordopties daarin staan."
                         if visual.get("requires_visual_review") else
                         "Geen antwoordopties herkend; controleer of dit een open vraag is.")
-            set_box(options_box, "ANTWOORDOPTIES\\n" + ("\\n".join(option_lines) if option_lines else fallback))
+            set_box(options_box, "ANTWOORDOPTIES\n" + ("\n".join(option_lines) if option_lines else fallback))
             refs = row.get("context_verwijzingen", [])
             ref_lines = [f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
             set_box(context_box, "CONTEXTVERWIJZINGEN\n" + ("\n".join(ref_lines) if ref_lines else
