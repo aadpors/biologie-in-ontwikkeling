@@ -776,6 +776,22 @@ class ExamApp:
                     name=f"context-manual-{source_doc['id']}-q{row['number']}-{asset_id}.png"
                     target=self.project_dir/"snippets"/name
                     crop_info=render_crop(source_path,page_no,bbox,target,scale=1.8)
+                    preview=tk.Toplevel(crop_win)
+                    preview.title(f"Contextuitsnede · pagina {page_no} · vraag {row['number']}")
+                    preview.geometry("760x650")
+                    ttk.Label(preview,text="Voorbeeld van de uitsnede uit de originele PDF. Het bijschrift moet nog in het hoofdvenster worden bevestigd.",
+                              wraplength=720,padding=8).pack(anchor="w")
+                    preview_frame=ttk.Frame(preview); preview_frame.pack(fill="both",expand=True,padx=8,pady=4)
+                    preview_canvas=tk.Canvas(preview_frame,background="white")
+                    preview_sy=ttk.Scrollbar(preview_frame,orient="vertical",command=preview_canvas.yview)
+                    preview_sx=ttk.Scrollbar(preview_frame,orient="horizontal",command=preview_canvas.xview)
+                    preview_canvas.configure(yscrollcommand=preview_sy.set,xscrollcommand=preview_sx.set)
+                    preview_sy.pack(side="right",fill="y"); preview_sx.pack(side="bottom",fill="x")
+                    preview_canvas.pack(side="left",fill="both",expand=True)
+                    preview_photo=tk.PhotoImage(file=str(target))
+                    preview_canvas.create_image(0,0,image=preview_photo,anchor="nw")
+                    preview_canvas.image=preview_photo
+                    preview_canvas.configure(scrollregion=preview_canvas.bbox("all"))
                     asset={"file":name,"page":page_no,"caption":None,"asset_id":asset_id,
                            "asset_kind":kind_var.get(),"type":kind_var.get(),"bbox":list(crop_info["bbox"]),
                            "source_document_id":source_doc["id"],"source_sha256":source_doc["sha256"],
