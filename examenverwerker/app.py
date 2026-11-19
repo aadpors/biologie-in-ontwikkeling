@@ -1741,7 +1741,8 @@ class ExamApp:
             return
         self._open_structure_editor(source_docs[0])
 
-    def _open_structure_editor(self, doc):        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
+    def _open_structure_editor(self, doc):
+        candidates = [x for x in self.data.get("vraagkandidaten", []) if x.get("document_id") == doc["id"]]
         if not candidates:
             messagebox.showwarning("Eerst vraagstarts analyseren", "Analyseer eerst de vraagstarts van deze opgaven-PDF en controleer de kandidaten.")
             return
