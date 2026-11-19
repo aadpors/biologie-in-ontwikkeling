@@ -365,10 +365,19 @@ class ExamApp:
         undecided = [r for r in candidates if r.get("human_decision") is None]
         confirmed = [r for r in candidates if r.get("human_decision") is True]
         structures = self.data.get("exam_structures", {})
-        missing_structures = [d for d in source_docs if not (
-            structures.get(d.get("id")) or
-            (self.data.get("exam_structure", {}).get("document_id") == d.get("id"))
-        )]
+        missing_structures = []
+        for document in source_docs:
+            structure = structures.get(document.get("id"))
+            if structure is None and self.data.get("exam_structure", {}).get("document_id") == document.get("id"):
+                structure = self.data.get("exam_structure")
+            confirmed_numbers = sorted({
+                int(row.get("number")) for row in confirmed
+                if row.get("document_id") == document.get("id") and row.get("number") is not None
+            })
+            if structure is None or validate_exam_structure(
+                structure, document.get("id"), document.get("sha256"), confirmed_numbers
+            ):
+                missing_structures.append(document)
         records = self.data.get("vraagrecords", [])
         def has_record(candidate):
             return any(
