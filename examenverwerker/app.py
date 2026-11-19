@@ -16,7 +16,7 @@ from engine import analyze_pdf, detect_question_candidates, detect_cv_question_n
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 
-APP_VERSION = "0.10.0"
+APP_VERSION = "0.10.1"
 PROJECT_FILE = "project.json"
 
 def now():
