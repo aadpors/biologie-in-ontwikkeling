@@ -969,6 +969,144 @@ def detect_question_type(text: str) -> dict:
     }
 
 
+
+def detect_visual_answer_options(analysis: dict, candidate: dict, following: dict | None = None,
+                                 question_text: str = "") -> dict:
+    """Flag likely image-based answer alternatives without pretending to OCR them.
+
+    Uses PDF image/vector geometry and nearby selectable A-H labels. It deliberately
+    distinguishes strong visual-choice evidence from a generic question illustration.
+    """
+    pages = analysis.get("pages", [])
+    first_page = int(candidate.get("page", 1) or 1)
+    last_page = int(following.get("page", len(pages)) if following else len(pages))
+    start_y = float((candidate.get("bbox") or [0, 0, 0, 0])[1])
+    end_y = float((following.get("bbox") or [0, 0, 0, 0])[1]) if following else None
+    prompt = str(question_text or "").lower()
+    selection_language = bool(re.search(
+        r"\b(kies|selecteer|welke|welk|juist antwoord|beste antwoord|"
+        r"combinatie|antwoordalternatief|antwoordoptie)\b", prompt
+    ))
+    visual = []
+    nearby_labels = set()
+    for page_data in pages:
+        page_no = int(page_data.get("page", 0) or 0)
+        if page_no < first_page or page_no > last_page:
+            continue
+        page_height = float(page_data.get("height", 0) or 0)
+        page_width = float(page_data.get("width", 0) or 0)
+        if page_height <= 0 or page_width <= 0:
+            continue
+        low = start_y if page_no == first_page else 0.0
+        high = end_y if following and page_no == last_page else page_height
+        if high is None:
+            high = page_height
+        if high <= low:
+            continue
+        page_assets = []
+        for asset in page_data.get("visual_assets", []):
+            bbox = asset.get("bbox") or []
+            if len(bbox) != 4:
+                continue
+            x0, y0, x1, y1 = map(float, bbox)
+            overlap = max(0.0, min(y1, high) - max(y0, low))
+            if overlap <= 0 or (x1 - x0) * (y1 - y0) < page_width * page_height * 0.003:
+                continue
+            item = {"page": page_no, "kind": asset.get("kind", "visual"),
+                    "bbox": [round(x0, 2), round(y0, 2), round(x1, 2), round(y1, 2)],
+                    "id": asset.get("id")}
+            page_assets.append(item)
+        if not page_assets:
+            continue
+        for block in page_data.get("blocks", []):
+            for line in block.get("lines", []):
+                text = str(line.get("text", "")).strip()
+                label = re.match(r"^\(?([A-Ha-h])\)?[.):]?\s*$", text)
+                if not label:
+                    continue
+                lb = line.get("bbox") or block.get("bbox") or []
+                if len(lb) != 4:
+                    continue
+                lx, ly = float(lb[0]), float(lb[1])
+                for asset in page_assets:
+                    ax0, ay0, ax1, ay1 = asset["bbox"]
+                    # Option labels are commonly immediately left of, or above,
+                    # a diagram/photo; use a generous but page-relative tolerance.
+                    near = (abs(ly - ay0) <= page_height * 0.07 and
+                            (abs(lx - ax0) <= page_width * 0.16 or
+                             abs(lx - ax1) <= page_width * 0.16))
+                    if near:
+                        nearby_labels.add(label.group(1).upper())
+        visual.extend(page_assets)
+
+    raster_count = sum(1 for item in visual if item["kind"] == "image")
+    vector_count = sum(1 for item in visual if item["kind"] == "vector_region")
+    labels = sorted(nearby_labels, key="ABCDEFGH".index)
+    # Repeated raster choices are strong even if the labels are embedded as pixels.
+    aligned_raster_choices = False
+    raster = [x for x in visual if x["kind"] == "image"]
+    for i, left in enumerate(raster):
+        lx = (left["bbox"][0] + left["bbox"][2]) / 2
+        ly = (left["bbox"][1] + left["bbox"][3]) / 2
+        for right in raster[i + 1:]:
+            rx = (right["bbox"][0] + right["bbox"][2]) / 2
+            ry = (right["bbox"][1] + right["bbox"][3]) / 2
+            if left["page"] == right["page"] and (
+                abs(ly - ry) <= 0.08 * max(1.0, pages[left["page"] - 1]["height"]) or
+                abs(lx - rx) <= 0.08 * max(1.0, pages[left["page"] - 1]["width"])
+            ):
+                aligned_raster_choices = True
+                break
+        if aligned_raster_choices:
+            break
+
+    strong = len(labels) >= 2 or aligned_raster_choices or (
+        selection_language and (raster_count >= 1 or vector_count >= 3)
+    )
+    possible = not strong and bool(visual) and selection_language
+    if strong:
+        status = "waarschijnlijke_visuele_meerkeuze"
+        qtype = "mogelijk_visuele_meerkeuze"
+        confidence = 0.84 if len(labels) >= 2 or aligned_raster_choices else 0.72
+    elif possible:
+        status = "mogelijk_visuele_antwoordopties"
+        qtype = "mogelijk_visuele_meerkeuze"
+        confidence = 0.58
+    elif visual:
+        status = "visueel_materiaal_bij_vraag"
+        qtype = "open_met_visueel_materiaal"
+        confidence = 0.5
+    else:
+        status = "geen_visueel_antwoordmateriaal_gevonden"
+        qtype = None
+        confidence = 0.0
+    return {
+        "type": qtype, "status": status, "confidence": confidence,
+        "visual_asset_count": len(visual), "raster_image_count": raster_count,
+        "vector_region_count": vector_count, "nearby_option_labels": labels,
+        "selection_language": selection_language,
+        "evidence": visual[:20],
+        "requires_visual_review": bool(visual),
+    }
+
+
+def classify_question_with_visuals(analysis: dict, candidate: dict,
+                                   following: dict | None = None,
+                                   question_text: str = "") -> dict:
+    """Combine text-based classification with visual answer-option evidence."""
+    result = detect_question_type(question_text)
+    visual = detect_visual_answer_options(analysis, candidate, following, question_text)
+    result["visual_detection"] = visual
+    if visual["type"] == "mogelijk_visuele_meerkeuze":
+        result["type"] = "mogelijk_visuele_meerkeuze"
+        result["subtype"] = "afbeeldingsopties_controleren"
+        result["confidence"] = max(float(result.get("confidence", 0)), visual["confidence"])
+        result["status"] = "visuele_opties_handmatig_controleren"
+    elif visual["type"] == "open_met_visueel_materiaal":
+        result["visual_material_present"] = True
+        result["visual_review_note"] = "Er staat beeldmateriaal bij deze vraag; controleer of dit context of antwoordopties zijn."
+    return result
+
 def extract_region_text(pdf_path: Path, segments: list[dict]) -> str:
     """Extract selectable source text inside manually bounded PDF regions, page by page."""
     import pymupdf as fitz
