@@ -17,7 +17,7 @@ from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.13.4"
+APP_VERSION = "0.13.5"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -1429,18 +1429,25 @@ class ExamApp:
         fit_window(win, 1180, 720, 900, 560)
         win.transient(self.root)
         win.grab_set()
-        # Use a grid-based shell with a dedicated, non-expanding footer row.
-        # Packing the expanding Panedwindow before the footer allowed it to
-        # consume the available cavity and push the action buttons out of view.
+        # Reserve the action footer before the expanding preview panes.  A
+        # grid row below a Panedwindow can be pushed outside the visible window
+        # when the child panes request their minimum sizes; pack the footer
+        # first and use a fixed grid for its controls so the primary action
+        # cannot disappear below the screen edge.
         shell = ttk.Frame(win, padding=0)
         shell.pack(fill="both", expand=True)
-        shell.columnconfigure(0, weight=1)
-        shell.rowconfigure(1, weight=1)
+        footer = ttk.Frame(shell, padding=(12, 8))
+        footer.pack(side="bottom", fill="x")
+        footer.columnconfigure(0, weight=1)
+        footer.columnconfigure(1, weight=0)
+        footer.columnconfigure(2, weight=0)
+        status = ttk.Label(footer, text="", wraplength=760)
+        status.grid(row=0, column=0, sticky="ew", padx=(0, 12))
         intro = ttk.Label(shell, text=f"{len(documents)} unieke PDF's gevonden. Selecteer links een document; controleer het voorblad in het midden en pas de voorgestelde gegevens rechts direct aan.",
                           padding=12, wraplength=1100)
-        intro.grid(row=0, column=0, sticky="ew")
+        intro.pack(side="top", fill="x")
         panes = ttk.Panedwindow(shell, orient="horizontal")
-        panes.grid(row=1, column=0, sticky="nsew", padx=12, pady=(0, 8))
+        panes.pack(side="top", fill="both", expand=True, padx=12, pady=(0, 8))
         list_panel = ttk.LabelFrame(panes, text="GESELECTEERDE PDF'S", padding=7)
         cover_panel = ttk.LabelFrame(panes, text="VOORBLAD ORIGINELE PDF", padding=7)
         fields_panel = ttk.LabelFrame(panes, text="VOORGESTELDE METADATA", padding=12)
@@ -1455,11 +1462,6 @@ class ExamApp:
             tree.heading(col, text=title)
             tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
         tree.pack(fill="both", expand=True)
-        footer = ttk.Frame(shell, padding=(12, 8))
-        footer.grid(row=2, column=0, sticky="ew")
-        footer.columnconfigure(0, weight=1)
-        status = ttk.Label(footer, text="", wraplength=760)
-        status.pack(side="left", fill="x", expand=True)
         preview_temp = tempfile.TemporaryDirectory(prefix="biologie-import-voorbladen-")
         win._preview_temp = preview_temp
         preview_label = ttk.Label(cover_panel, text="Selecteer links een PDF om het voorblad te bekijken.",
@@ -1695,9 +1697,9 @@ class ExamApp:
                 f"Het eerste examen ({self.project_dir.name}) is direct geopend. De overige examens vind je in de bibliotheek. "
                 "De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
-        ttk.Button(footer, text="Annuleren", command=win.destroy).pack(side="right", padx=(8, 0))
+        ttk.Button(footer, text="Annuleren", command=win.destroy).grid(row=0, column=2, sticky="e", padx=(8, 0))
         ttk.Button(footer, text="Opslaan en doorgaan naar examenverwerking  →",
-                   command=confirm_import, style="Accent.TButton").pack(side="right")
+                   command=confirm_import, style="Accent.TButton").grid(row=0, column=1, sticky="e")
         refresh_review()
         if documents:
             tree.selection_set("0")
