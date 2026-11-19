@@ -143,3 +143,81 @@ def fragments_for_question(structure: dict | None, question_number: int) -> dict
         "context_fragments": contexts,
         "status": "gekoppeld" if question or contexts else "geen_fragmenten_gekoppeld",
     }
+
+
+def make_cv_fragment(document: dict, question_number: int, page_spans: list[dict],
+                     fragment_id: str | None = None, document_role: str = "correctievoorschrift") -> dict:
+    """Create a question-linked visual region in a correction PDF or official addendum."""
+    if document_role not in {"correctievoorschrift", "aanvulling"}:
+        raise ValueError("CV-fragmenten horen bij een correctievoorschrift of officiële aanvulling.")
+    spans = [make_page_span(x["page"], x["top"], x["bottom"]) for x in page_spans]
+    if not spans:
+        raise ValueError("Baken minimaal één CV-paginadeel af.")
+    if [x["page"] for x in spans] != sorted({x["page"] for x in spans}):
+        raise ValueError("CV-pagina's moeten uniek en oplopend zijn.")
+    return {
+        "id": fragment_id or f"cv-{document['id']}-{int(question_number)}",
+        "document_id": document["id"],
+        "source_sha256": document["sha256"],
+        "document_role": document_role,
+        "question_number": int(question_number),
+        "page_spans": spans,
+        "status": "handmatig_afgebakend_nog_te_bevestigen",
+    }
+
+
+def validate_cv_fragment(fragment: dict, document: dict, question_number: int,
+                         document_role: str | None = None) -> list[str]:
+    errors = []
+    if fragment.get("document_id") != document.get("id"):
+        errors.append("cv_fragment_verkeerd_document")
+    if fragment.get("source_sha256") != document.get("sha256"):
+        errors.append("cv_fragment_bronbestand_gewijzigd")
+    if int(fragment.get("question_number", -1)) != int(question_number):
+        errors.append("cv_fragment_verkeerd_vraagnummer")
+    if document_role and fragment.get("document_role") != document_role:
+        errors.append("cv_fragment_verkeerd_documenttype")
+    spans = fragment.get("page_spans", [])
+    if not spans:
+        errors.append("cv_fragment_zonder_paginagrenzen")
+    previous = 0
+    for span in spans:
+        try:
+            clean = make_page_span(span["page"], span["top"], span["bottom"])
+        except (KeyError, TypeError, ValueError):
+            errors.append("cv_fragment_ongeldige_paginagrens")
+            continue
+        if clean["page"] <= previous:
+            errors.append("cv_fragment_paginagrenzen_niet_oplopend")
+        previous = clean["page"]
+    return sorted(set(errors))
+
+
+def page_spans_to_segments(page_spans: list[dict], page_sizes: dict[int, tuple[float, float]]) -> list[dict]:
+    """Convert normalized full-width spans into PDF-point crop segments."""
+    segments = []
+    for span in sorted(page_spans, key=lambda item: int(item["page"])):
+        page = int(span["page"])
+        if page not in page_sizes:
+            raise ValueError(f"Pagina {page} ontbreekt in de bron-PDF.")
+        width, height = page_sizes[page]
+        clean = make_page_span(page, span["top"], span["bottom"])
+        segments.append({
+            "page": page,
+            "bbox": [0.0, round(clean["top"] * height, 2),
+                     round(width, 2), round(clean["bottom"] * height, 2)],
+        })
+    return segments
+
+
+def missing_question_regions(structure: dict | None, question_numbers: list[int]) -> list[int]:
+    """Return confirmed question numbers without a manually defined question region."""
+    if not structure or structure.get("status") == "verouderd" or structure.get("nummering_bevestigd") is not True:
+        return sorted({int(x) for x in question_numbers})
+    covered = {
+        int(fragment["question_numbers"][0])
+        for fragment in structure.get("fragments", [])
+        if fragment.get("type") == "vraag" and len(fragment.get("question_numbers", [])) == 1
+        and fragment.get("page_spans")
+    }
+    return sorted({int(x) for x in question_numbers} - covered)
