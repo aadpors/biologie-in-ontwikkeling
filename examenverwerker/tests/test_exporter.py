@@ -29,13 +29,13 @@ class ExportTests(unittest.TestCase):
             "exam_structure_document_id":"opgaven-doc-1",
             "question_region_fragment_id":"q1","exam_structure_fragment_ids":["q1"],"exam_structure_question_number":1,
             "exam_structure_source_sha256":digest(project/"bronnen"/"opgaven.pdf"),
-            "question_region_page_spans":[{"page":2,"top":0.1,"bottom":0.9}],
+            "question_region_page_spans":[{"page":2,"top":0.1,"bottom":0.9}],\n            "question_region_snippet_sha256":digest(project/"snippets"/"vraag1.png"),
             "cv_source_document_id":"cv-doc-1",
             "cv_source_sha256":digest(project/"bronnen"/"cv.pdf"),
             "cv_source_region":{"id":"cv-cv-doc-1-q1","document_id":"cv-doc-1",
                 "source_sha256":digest(project/"bronnen"/"cv.pdf"),"document_role":"correctievoorschrift",
                 "question_number":1,"page_spans":[{"page":1,"top":0.1,"bottom":0.9}]},
-            "cv_source_region_file":"cv1.jpg",
+            "cv_source_region_file":"cv1.jpg",\n            "cv_source_region_sha256":digest(project/"snippets"/"cv1.jpg"),
             "cv_snippet_file":"cv1.jpg",
             "cv_snippet_files":["cv1.jpg"],
             "context_asset_files":[],
@@ -59,7 +59,7 @@ class ExportTests(unittest.TestCase):
             record["cv_amendment_snippet_file"]="cv-amend1.png"
             record["cv_amendment_snippet_files"]=["cv-amend1.png"]
             record["cv_amendment_regions"]=[{"document_id":"amend-doc","source_pdf":"aanvulling.pdf",
-                "source_sha256":amendment_hash,"snippet_file":"cv-amend1.png",
+                "source_sha256":amendment_hash,"snippet_file":"cv-amend1.png","snippet_sha256":hashlib.sha256((project/"snippets"/"cv-amend1.png").read_bytes()).hexdigest(),
                 "fragment":{"id":"cv-amend-doc-q1","document_id":"amend-doc","source_sha256":amendment_hash,
                     "document_role":"aanvulling","question_number":1,"page_spans":[{"page":1,"top":0.1,"bottom":0.9}]}}]
             out=Path(d)/"out"
@@ -170,7 +170,7 @@ class ExportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
             (project/"snippets"/"context-figuur.png").write_bytes(b"context image")
-            record["context_asset_files"]=[{"file":"context-figuur.png","asset_id":"p2-image-1",
+            record["context_asset_files"]=[{"file":"context-figuur.png","snippet_sha256":hashlib.sha256((project/"snippets"/"context-figuur.png").read_bytes()).hexdigest(),"asset_id":"p2-image-1",
                 "page":2,"caption":"Microscopische afbeelding","caption_human_confirmed":True,"source_document_id":"opgaven-doc-1"}]
             record["context_region_fragments"]=[{"id":"context-1","type":"context_intro",
                 "page_spans":[{"page":1,"top":0.1,"bottom":0.3}],"text":"De contexttekst."}]
@@ -203,7 +203,7 @@ class ExportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             project,record=self.make_fixture(d)
             (project/"snippets"/"context.png").write_bytes(b"context")
-            record["context_asset_files"]=[{"file":"context.png","asset_id":"p1-image-1",
+            record["context_asset_files"]=[{"file":"context.png","snippet_sha256":hashlib.sha256((project/"snippets"/"context.png").read_bytes()).hexdigest(),"asset_id":"p1-image-1",
                 "caption":"Figuur 1","caption_human_confirmed":False,
                 "source_document_id":"opgaven-doc-1","source_sha256":record["exam_structure_source_sha256"]}]
             errors=validate_review_records([record],project)
