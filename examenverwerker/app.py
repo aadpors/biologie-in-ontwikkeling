@@ -1333,15 +1333,37 @@ class ExamApp:
                     "Dit examen kon niet worden geopend. De gegevens zijn niet gewijzigd.", parent=win)
 
         def open_next_incomplete():
-            next_id = next((str(i) for i, row in enumerate(discovered)
-                            if row[7] != "Exportpakket gemaakt"), None)
-            if next_id is None:
-                messagebox.showinfo("Alle examens afgerond",
-                    "Alle examens in de bibliotheek zijn klaar voor export.", parent=win)
+            current = self.project_dir.resolve() if self.project_dir else None
+            ordered = []
+            # Prefer the remaining exams from the active import batch, in the
+            # exact order in which the user confirmed them.
+            if self.import_batch_paths and current in self.import_batch_paths:
+                ordered.extend(self.import_batch_paths[self.import_batch_index + 1:])
+            # Then offer other unfinished exams in the library, never reopening
+            # the currently active exam as the supposed "next" item.
+            ordered.extend(folder for folder in paths.values()
+                           if folder.resolve() != current and folder not in ordered)
+            for folder in ordered:
+                iid = next((key for key, value in paths.items()
+                            if value.resolve() == folder.resolve()), None)
+                if iid is None:
+                    continue
+                row_index = int(iid)
+                if discovered[row_index][7] == "Exportpakket gemaakt":
+                    continue
+                table.selection_set(iid)
+                table.focus(iid)
+                open_selected()
                 return
-            table.selection_set(next_id)
-            table.focus(next_id)
-            open_selected()
+            if current and any(folder.resolve() == current for folder in paths.values()):
+                current_row = next((row for row in discovered if row[3].resolve() == current), None)
+                if current_row and current_row[7] != "Exportpakket gemaakt":
+                    messagebox.showinfo("Geen volgend examen",
+                        "Er is geen ander openstaand examen. Het huidige examen heeft nog werk te doen.",
+                        parent=win)
+                    return
+            messagebox.showinfo("Alle examens afgerond",
+                "Er is geen ander openstaand examen in de bibliotheek.", parent=win)
 
         table.bind("<Double-1>", open_selected)
         buttons = ttk.Frame(shell)
