@@ -175,7 +175,7 @@ class ExportTests(unittest.TestCase):
             project,record=self.make_fixture(d)
             (project/"snippets"/"context-figuur.png").write_bytes(b"context image")
             record["context_asset_files"]=[{"file":"context-figuur.png","snippet_sha256":hashlib.sha256((project/"snippets"/"context-figuur.png").read_bytes()).hexdigest(),"asset_id":"p2-image-1",
-                "page":2,"caption":"Microscopische afbeelding","caption_human_confirmed":True,"source_document_id":"opgaven-doc-1"}]
+                "page":2,"asset_kind":"figure","caption":"Microscopische afbeelding","caption_human_confirmed":True,"source_document_id":"opgaven-doc-1"}]
             record["source_context"]="De contexttekst."
             record["context_region_fragments"]=[{"id":"context-1","type":"context_intro",
                 "page_spans":[{"page":1,"top":0.1,"bottom":0.3}],"text":"De contexttekst."}]
@@ -191,6 +191,7 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(context["contextRegions"][0]["text"],"De contexttekst.")
             self.assertEqual(context["contextText"],"De contexttekst.")
             self.assertEqual(context["contextAssets"][0]["caption"],"Microscopische afbeelding")
+            self.assertEqual(context["contextAssets"][0]["asset_kind"],"figure")
             self.assertTrue((out/"exam-snippets"/"context-figuur.png").is_file())
 
     def test_export_blocks_missing_manual_question_or_cv_region(self):
