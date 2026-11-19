@@ -17,7 +17,7 @@ from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.13.5"
+APP_VERSION = "0.13.6"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -2071,8 +2071,11 @@ class ExamApp:
             hint = ("Tegenstrijdig" if learned.get("conflicting") else
                     "Vraag" if suggestion == "question" else
                     "Geen vraag" if suggestion == "not_question" else "Geen leeradvies")
-            if learned.get("support", 0):
-                hint += f" ({learned['support']} eerdere keuzes)"
+            if learned.get("document_support", 0):
+                hint += (f" ({learned['document_support']} examens · "
+                         f"{learned.get('confidence', 0):.0%} overeenstemming)")
+            elif learned.get("legacy_records_ignored", 0):
+                hint += " (oude keuzes tellen niet mee: examenbron onbekend)"
             return hint
 
         def refresh_rows(select_index=None):
