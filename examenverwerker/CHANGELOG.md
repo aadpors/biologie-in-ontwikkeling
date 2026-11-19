@@ -6,6 +6,14 @@
 - Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
 - De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
 
+## 0.13.9
+- Vragen worden nu niet uitsluitend op tekst geclassificeerd: de analyse combineert tekstherkenning met de geometrie van rasterafbeeldingen, vectorfiguren en nabijgelegen A-H-labels.
+- Herhaalde, uitgelijnde afbeeldingen binnen één vraaggebied leveren een signaal voor mogelijke afbeeldingsantwoordopties op. Selectieformuleringen in combinatie met visueel materiaal verhogen dit signaal.
+- Beeldmateriaal bij een open vraag wordt niet automatisch als meerkeuze aangemerkt: een enkele illustratie zonder selectieformulering blijft een open vraag met visuele context.
+- De hoofdwerkruimte en vraagcontrole tonen expliciet wanneer visuele antwoordopties gecontroleerd moeten worden; bij een mogelijke visuele meerkeuzevraag wordt in de record-editor alvast mcq voorgesteld.
+- De herkenner leest de tekst ín een afbeelding nog niet uit. Bij zulke vragen blijft visuele controle verplicht; er wordt geen antwoordoptietekst verzonnen.
+- Regressietests toegevoegd voor herhaalde afbeeldingsopties en voor het onderscheiden van een gewone illustratie.
+
 ## 0.13.8
 - Meerkeuzeherkenning is robuuster voor PDF-tekstlagen waarin antwoordopties op één regel staan, in kleine letters zijn gezet, tussen haakjes staan of waarbij label en antwoordtekst op aparte regels terechtkomen.
 - Herkenning vereist meerdere verschillende antwoordlabels; één toevallige A-regel leidt niet automatisch tot een meerkeuzeclassificatie.
