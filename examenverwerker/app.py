@@ -588,6 +588,7 @@ class ExamApp:
         except ValueError:
             messagebox.showerror("Ongeldig vraagnummer", "Gebruik een vraagnummer van 1 tot en met 60.")
             return
+        row.setdefault("original_number", row.get("number"))
         row["number"] = number
         row["vraagtekst_voorstel"] = self._workspace_text.get("1.0", "end-1c").strip()
         row["review_note"] = self._workspace_note.get("1.0", "end-1c").strip()
