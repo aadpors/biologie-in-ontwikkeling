@@ -866,7 +866,8 @@ class ExamApp:
                     render_composite_crops(self.project_dir / "bronnen" / amendment_doc["opslagbestand"],
                                            amend_segments, self.project_dir / "snippets" / amend_file, scale=1.35)
                     amendment_regions.append({"document_id": amendment_doc["id"], "source_pdf": amendment_doc["opslagbestand"],
-                                              "source_sha256": amendment_doc["sha256"], "fragment": region, "snippet_file": amend_file})
+                                              "source_sha256": amendment_doc["sha256"], "fragment": region, "snippet_file": amend_file,
+                                              "snippet_sha256": sha256(self.project_dir / "snippets" / amend_file)})
                 context_fragments = linkage.get("context_fragments", [])
                 context_assets = [dict(context_files[i]) for i in context_list.curselection()]
                 unconfirmed_captions=[x for x in context_assets if x.get("asset_id") and x.get("caption_human_confirmed") is not True]
@@ -895,7 +896,7 @@ class ExamApp:
                                "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", [])),
                                    "question_numbers":list(x.get("question_numbers", [])),"text":next((y["text"] for y in context_region_files if y["fragment_id"]==x["id"]), "")} for x in context_fragments],
                                "cv_snippet_file":cv_file,"cv_snippet_files":[cv_file],
-                               "cv_source_region":cv_region,"cv_source_region_file":cv_file,"cv_source_document_id":cv_doc["id"],"cv_source_sha256":cv_doc["sha256"],
+                               "cv_source_region":cv_region,"cv_source_region_file":cv_file,"cv_source_region_sha256":sha256(self.project_dir/"snippets"/cv_file),"cv_source_document_id":cv_doc["id"],"cv_source_sha256":cv_doc["sha256"],
                                "cv_amendment_snippet_files":[x["snippet_file"] for x in amendment_regions],
                                "cv_amendment_snippet_file":amendment_regions[0]["snippet_file"] if amendment_regions else None,
                                "cv_amendment_regions":amendment_regions,
@@ -1721,6 +1722,29 @@ class ExamApp:
                 name = f"{prefix}-{cv_doc['id']}-q{question_number}-handmatig.png"
                 target = self.project_dir / "snippets" / name
                 render_composite_crops(source, segments, target, scale=1.35)
+                rendered_hash = sha256(target)
+                for saved_record in self.data.get("vraagrecords", []):
+                    if int(saved_record.get("number", -1)) != question_number:
+                        continue
+                    if role == "correctievoorschrift":
+                        references_region = (saved_record.get("cv_source_document_id") == cv_doc["id"]
+                            or saved_record.get("cv_pdf") == cv_doc["opslagbestand"])
+                        old_region = saved_record.get("cv_source_region")
+                        old_hash = saved_record.get("cv_source_region_sha256")
+                    else:
+                        old_items = [x for x in saved_record.get("cv_amendment_regions", [])
+                                     if x.get("document_id") == cv_doc["id"]]
+                        references_region = (cv_doc["opslagbestand"] in saved_record.get("cv_amendment_pdfs", [])
+                            or bool(old_items))
+                        old_region = old_items[0].get("fragment") if old_items else None
+                        old_hash = old_items[0].get("snippet_sha256") if old_items else None
+                    if references_region and (old_region != fragment or old_hash != rendered_hash):
+                        saved_record["cv_region_invalidated"] = True
+                        saved_record["approved_by_human"] = False
+                        saved_record["status"] = "cv_fragment_opnieuw_te_controleren"
+                        saved_record["approved_at"] = None
+                        saved_record["approval_revoked_reason"] = "CV-regio of CV-uitsnede gewijzigd; stel het vraagrecord opnieuw samen en voer de eindcontrole opnieuw uit."
+                        saved_record["record_review_checklist"] = {key: False for key in saved_record.get("record_review_checklist", {})}
                 doc_regions[str(question_number)] = fragment
                 self.save_project()
                 if on_saved:
