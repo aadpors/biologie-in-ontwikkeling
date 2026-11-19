@@ -799,7 +799,7 @@ class ExamApp:
                                "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", [])),
                                    "question_numbers":list(x.get("question_numbers", []))} for x in context_fragments],
                                "cv_snippet_file":cv_file,"cv_snippet_files":[cv_file],
-                               "cv_source_region":cv_region,"cv_source_region_file":cv_file,
+                               "cv_source_region":cv_region,"cv_source_region_file":cv_file,"cv_source_document_id":cv_doc["id"],"cv_source_sha256":cv_doc["sha256"],
                                "cv_amendment_snippet_files":[x["snippet_file"] for x in amendment_regions],
                                "cv_amendment_snippet_file":amendment_regions[0]["snippet_file"] if amendment_regions else None,
                                "cv_amendment_regions":amendment_regions,
