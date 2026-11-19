@@ -403,12 +403,15 @@ class ExamApp:
         if next_index >= len(self.import_batch_paths):
             return
         next_project = self.import_batch_paths[next_index]
+        previous = (self.project_dir, self.data, self.import_batch_index,
+                    getattr(self, "_workspace_doc_id", None),
+                    getattr(self, "_workspace_selected", None))
         try:
             next_data = json.loads((next_project / PROJECT_FILE).read_text(encoding="utf-8"))
             if next_data.get("schema") != "biologie-examenproject-v1":
                 raise ValueError("Onbekend examenformaat.")
             # Switch only after the next project has been read and validated;
-            # a damaged/missing project must never silently skip the queue.
+            # roll back the visible workspace too if rendering/loading fails.
             self.project_dir = next_project
             self.data = next_data
             self.import_batch_index = next_index
@@ -420,9 +423,16 @@ class ExamApp:
             self._log(f"Verder met examen {self.import_batch_index + 1}/{len(self.import_batch_paths)}: "
                       f"{meta.get('level', '')} {meta.get('year', '')} tijdvak {meta.get('period', '')}.")
         except Exception as exc:
+            self.project_dir, self.data, self.import_batch_index = previous[:3]
+            self._workspace_doc_id, self._workspace_selected = previous[3:]
+            try:
+                self._workspace_load_global_corrections()
+                self.refresh()
+            except Exception as restore_exc:
+                self._log(f"Herstel van de vorige werkruimte gaf een fout: {restore_exc}")
             self._error("Volgend examen openen", exc)
             messagebox.showerror("Examen openen mislukt",
-                "Het volgende examen kon niet worden geopend. De huidige werkruimte en batchpositie zijn behouden.")
+                "Het volgende examen kon niet worden geopend. De vorige werkruimte en batchpositie zijn hersteld.")
 
     def _workflow_focus_next(self):
         if not self.data:
