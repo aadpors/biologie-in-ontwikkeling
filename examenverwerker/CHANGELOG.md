@@ -1,3 +1,8 @@
+## 0.10.0
+- Desktopinterface opnieuw vormgegeven met vaste navigatie, gegroepeerde project- en verwerkacties, duidelijke projectstatus en afzonderlijke panelen voor bronbestanden en activiteit.
+- Meer ruimte voor de documentlijst, verbeterde tabelkoppen, afwisselende rijen en horizontale/verticale scrollondersteuning.
+- Rustige lichte werkruimte met donker navigatiepaneel en bordeauxrode accenten; bestaande verwerkingsfuncties en veiligheidsregels behouden.
+
 # Wijzigingen
 
 ## 0.9.0
