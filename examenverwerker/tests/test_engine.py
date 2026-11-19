@@ -161,7 +161,7 @@ class EngineTests(unittest.TestCase):
         proposals = propose_context_fragments(analysis, candidates)
         self.assertEqual(len(proposals), 1)
         proposal = proposals[0]
-        self.assertEqual(proposal["type"], "vraagcontext")
+        self.assertEqual(proposal["type"], "tussen_context")
         self.assertEqual(proposal["question_numbers"], [2])
         self.assertEqual(proposal["status"], "automatisch_voorstel_nog_te_controleren")
         self.assertEqual(proposal["confidence"], 0.82)
