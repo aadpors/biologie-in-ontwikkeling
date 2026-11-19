@@ -1623,6 +1623,16 @@ class ExamApp:
                     manifest_path = target_root / f"import-{stamp}-{suffix}.json"
                     suffix += 1
                 manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+                # Persist the batch reference in every project so the queue can
+                # be restored after closing/restarting the desktop application.
+                for project_dir in created:
+                    project_file = project_dir / PROJECT_FILE
+                    saved_data = json.loads(project_file.read_text(encoding="utf-8"))
+                    saved_data["import_batch_manifest"] = manifest_path.name
+                    temp_project_file = project_file.with_suffix(".json.tmp")
+                    temp_project_file.write_text(
+                        json.dumps(saved_data, ensure_ascii=False, indent=2), encoding="utf-8")
+                    temp_project_file.replace(project_file)
             except Exception as exc:
                 if manifest_path and manifest_path.exists():
                     manifest_path.unlink()
@@ -1637,6 +1647,7 @@ class ExamApp:
             # All other imported exam projects remain available under the same root.
             self.import_batch_paths = list(created)
             self.import_batch_index = 0
+            self.import_batch_manifest_path = manifest_path
             self.project_dir = created[0]
             self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
             self._workspace_load_global_corrections()
