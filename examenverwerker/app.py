@@ -15,7 +15,7 @@ from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
-from workflow import exam_workflow_state, exam_export_fingerprint
+from workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
 APP_VERSION = "0.13.2"
 PROJECT_FILE = "project.json"
@@ -386,34 +386,17 @@ class ExamApp:
         self.workflow_button.configure(text=button, command=action)
 
     def _restore_import_batch(self, folder, data):
-        """Restore the batch queue from the manifest saved with an imported exam."""
+        """Restore the import queue, if this exam belongs to a saved batch."""
+        restored = restore_import_batch(self.examens_root, folder, data, PROJECT_FILE)
         self.import_batch_paths = []
         self.import_batch_index = 0
         self.import_batch_manifest_path = None
-        manifest_name = data.get("import_batch_manifest")
-        if not manifest_name:
-            return
-        manifest_path = self.examens_root / Path(manifest_name).name
-        try:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            if manifest.get("schema") != "biologie-examenimport-v1":
-                return
-            root = self.examens_root.resolve()
-            paths = []
-            for entry in manifest.get("projecten", []):
-                candidate = (self.examens_root / entry.get("pad", "")).resolve()
-                if not candidate.is_relative_to(root):
-                    return
-                if (candidate / PROJECT_FILE).is_file():
-                    paths.append(candidate)
-            current = Path(folder).resolve()
-            if current not in paths:
-                return
-            self.import_batch_paths = paths
-            self.import_batch_index = paths.index(current)
-            self.import_batch_manifest_path = manifest_path
-        except (OSError, ValueError, TypeError, json.JSONDecodeError):
-            self._log(f"Importbatch kon niet worden hersteld vanuit {manifest_path.name}.")
+        if restored:
+            self.import_batch_paths = restored["paths"]
+            self.import_batch_index = restored["index"]
+            self.import_batch_manifest_path = restored["manifest_path"]
+        else:
+            self._log("Voor dit examen is geen geldige importbatch beschikbaar; het examen blijft afzonderlijk verwerkbaar.")
 
     def _workflow_open_next_exam(self):
         if self.import_batch_index + 1 >= len(self.import_batch_paths):
