@@ -643,7 +643,17 @@ class ExamApp:
             except Exception as exc:
                 self._error("CV-fragment maken",exc)
                 messagebox.showerror("CV-fragment mislukt",str(exc),parent=win)
-        ttk.Button(outer,text="CV-fragment uit origineel correctievoorschrift maken",command=make_cv_snippet).pack(anchor="w",pady=(4,2))
+        ttk.Button(outer,text="CV-fragment uit origineel correctievoorschrift maken (automatisch voorstel)",command=make_cv_snippet).pack(anchor="w",pady=(4,2))
+        def edit_primary_cv_region():
+            cv_doc = next((d for d in matching if d["bestand"] == cv_choice.get()), None)
+            if not cv_doc:
+                messagebox.showerror("CV ontbreekt", "Selecteer eerst het bijbehorende correctievoorschrift.", parent=win)
+                return
+            def saved(name, fragment):
+                cv_snippet_var.set(name)
+                cv_snippet_combo.configure(values=[""] + sorted(set(list(cv_snippet_combo.cget("values")) + [name])))
+            self.open_cv_region_editor(row, cv_doc, saved)
+        ttk.Button(outer,text="CV handmatig afbakenen op de originele PDF",command=edit_primary_cv_region).pack(anchor="w",pady=(2,4))
         ttk.Label(outer,text="Eventueel fragment uit officiële CV-aanvulling (alleen als die voor deze vraag een wijziging bevat)").pack(anchor="w",pady=(8,2))
         amendment_snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-amend-*.png"))
         amendment_snippet_var=tk.StringVar(value=(current or {}).get("cv_amendment_snippet_file",""))
@@ -682,7 +692,18 @@ class ExamApp:
             except Exception as exc:
                 self._error("CV-aanvullingsfragment maken",exc)
                 messagebox.showerror("Fragment mislukt",str(exc),parent=win)
-        ttk.Button(outer,text="Fragment uit geselecteerde CV-aanvulling maken",command=make_amendment_snippet).pack(anchor="w",pady=(4,2))
+        ttk.Button(outer,text="Fragment uit geselecteerde CV-aanvulling maken (automatisch voorstel)",command=make_amendment_snippet).pack(anchor="w",pady=(4,2))
+        def edit_amendment_region():
+            selected = amendment_list.curselection()
+            if len(selected) != 1:
+                messagebox.showinfo("Selecteer één aanvulling", "Selecteer precies één officiële CV-aanvulling om visueel af te bakenen.", parent=win)
+                return
+            amendment_doc = amendment_docs[selected[0]]
+            def saved(name, fragment):
+                amendment_snippet_var.set(name)
+                amendment_snippet_combo.configure(values=[""] + sorted(set(list(amendment_snippet_combo.cget("values")) + [name])))
+            self.open_cv_region_editor(row, amendment_doc, saved)
+        ttk.Button(outer,text="Geselecteerde CV-aanvulling handmatig afbakenen",command=edit_amendment_region).pack(anchor="w",pady=(2,4))
         def save_draft():
             try:
                 meta={key:var.get().strip() for key,var in values.items()}
