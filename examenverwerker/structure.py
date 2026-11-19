@@ -79,7 +79,11 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
     if structure.get("nummering_bevestigd") is not True:
         errors.append("vraagnummering_niet_bevestigd")
     allowed = set(int(n) for n in confirmed_question_numbers)
+    stored_numbers = {int(n) for n in structure.get("vraag_nummers", [])}
+    if stored_numbers != allowed:
+        errors.append("bevestigde_vraagnummering_gewijzigd")
     seen_ids = set()
+    question_fragment_counts = {}
     for fragment in structure.get("fragments", []):
         fid = fragment.get("id")
         if not fid or fid in seen_ids:
@@ -92,6 +96,9 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
             errors.append("ongeldige_vraagkoppeling")
         if fragment.get("type") == "vraag" and len(links) != 1:
             errors.append("vraagfragment_moet_een_vraagnummer_hebben")
+        if fragment.get("type") == "vraag" and len(links) == 1:
+            number = int(links[0])
+            question_fragment_counts[number] = question_fragment_counts.get(number, 0) + 1
         spans = fragment.get("page_spans", [])
         if not spans:
             errors.append("fragment_zonder_paginagrenzen")
@@ -105,6 +112,8 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
             if clean["page"] <= previous_page:
                 errors.append("paginagrenzen_niet_oplopend")
             previous_page = clean["page"]
+    if any(count > 1 for count in question_fragment_counts.values()):
+        errors.append("meerdere_vraagfragmenten_voor_een_vraag")
     return sorted(set(errors))
 
 
@@ -173,7 +182,11 @@ def validate_cv_fragment(fragment: dict, document: dict, question_number: int,
         errors.append("cv_fragment_verkeerd_document")
     if fragment.get("source_sha256") != document.get("sha256"):
         errors.append("cv_fragment_bronbestand_gewijzigd")
-    if int(fragment.get("question_number", -1)) != int(question_number):
+    try:
+        actual_number = int(fragment.get("question_number", -1))
+    except (TypeError, ValueError):
+        actual_number = -1
+    if actual_number != int(question_number):
         errors.append("cv_fragment_verkeerd_vraagnummer")
     if document_role and fragment.get("document_role") != document_role:
         errors.append("cv_fragment_verkeerd_documenttype")
