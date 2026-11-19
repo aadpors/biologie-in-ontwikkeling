@@ -3,6 +3,12 @@
 Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologie-examens. De bestaande website en examendata worden niet gewijzigd.
 
 ## Wat deze ontwikkelversie al kan
+- Geïntegreerde reviewwerkplek: documentlijst en vraagkandidaten links, grote originele PDF-weergave rechts, beoordelingsvelden en acties direct naast de bron.
+- Kandidaten direct beoordelen als vraag, geen vraag of twijfel; vraagnummer, vraagtekst en notities aanpassen en bewaren.
+- PDF-paginanavigatie en zoom; exacte rode markering van de herkende vraagstart.
+- Filters op nog te beoordelen kandidaten, sterke/zwakke signalen en dubbele nummers.
+- Ontbrekende vraagstarts handmatig aanwijzen op de originele PDF; exacte PDF-punten worden opgeslagen.
+- Correcties uit Biologie-controle v1.0.x importeren en compact exporteren als `biologie-correcties-v1`; handmatige beslissingen en posities blijven bij heranalyse behouden.
 - In één keer examen-PDF’s uit meerdere jaren, havo/vwo en alle tijdvakken importeren; geen vooraf aangemaakte projecten of handmatig gekozen doelmap nodig.
 - Metadata en documenttypen automatisch voorstellen, alle herkenning vóór import controleren en examens automatisch opslaan onder `examens/<jaar>/<niveau>-tijdvak-<nummer>/`.
 - Een importmanifest bewaren met de projectindeling en waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande examenmappen worden nooit overschreven.
@@ -51,9 +57,9 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 ## Werkwijze
 1. Kies **Examens in bulk importeren** en selecteer alle beschikbare PDF’s, ook als ze uit verschillende jaren, niveaus en tijdvakken komen.
 2. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak). De applicatie maakt daarna automatisch de mapstructuur onder `examens/` aan.
-3. Open het aangemaakte examenproject om de inhoudelijke verwerking te starten.
+3. Het eerste aangemaakte examen wordt direct geopend in de geïntegreerde werkruimte; de overige examens open je via Project openen.
 4. Laat vraagstarts analyseren.
-5. Bekijk kandidaten op de originele pagina en bevestig of wijs iedere kandidaat af. Alle kandidaten moeten een menselijke beslissing hebben.
+5. Bekijk kandidaten in de geïntegreerde werkruimte op de originele PDF-pagina. Bevestig, wijs af of markeer twijfel; pas vraagnummer, vraagtekst en notities direct aan. Ontbrekende vraagstarts kun je op de PDF aanwijzen. Alle kandidaten moeten een menselijke beslissing hebben.
 6. Open 'Examenstructuur bewerken' voor iedere opgaven-PDF. Maak voor elke vraag een vraagfragment en leg contextinleidingen, vraagcontexten en tussenliggende contexten vast. Koppel ieder contextfragment aan de juiste vragen.
 7. Maak per vraag een voorlopig snippetvoorstel om mogelijke figuren, tabellen en tekstregio's te inventariseren. Dit zijn alleen kandidaten.
 8. Maak het concept-vraagrecord. Selecteer de juiste CV-PDF en bak het beoordelingsmodel voor die vraag handmatig af. Voeg alle vervolgpagina's toe. Doe hetzelfde voor iedere geselecteerde officiële CV-aanvulling.
