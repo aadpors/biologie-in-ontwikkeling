@@ -66,6 +66,14 @@ class ExamWorkflowTests(unittest.TestCase):
         data = with_valid_structure(base_exam())
         self.assertEqual(exam_workflow_state(data)["stage"], "vraagrecords")
 
+    def test_record_matching_accepts_legacy_string_page_and_number(self):
+        data = with_valid_structure(base_exam())
+        data["vraagrecords"] = [{
+            "candidate_document_id": "opgaven-1",
+            "number": "1", "source_page": "2", "approved_by_human": False,
+        }]
+        self.assertEqual(exam_workflow_state(data)["stage"], "eindcontrole")
+
     def test_record_requires_human_approval(self):
         data = with_valid_structure(base_exam())
         data["vraagrecords"] = [{
