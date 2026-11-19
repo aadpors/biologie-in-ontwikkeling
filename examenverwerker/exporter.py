@@ -129,7 +129,8 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                     errors.append({"id":rid,"error":"handmatige_contextuitsnede_geometrie_ongeldig"})
                 if (asset.get("source_document_id") != r.get("exam_structure_document_id")
                         or asset.get("source_sha256") != r.get("exam_structure_source_sha256")
-                        or not asset.get("source_pdf") or Path(str(asset.get("source_pdf"))).name != asset.get("source_pdf")):
+                        or not asset.get("source_pdf") or Path(str(asset.get("source_pdf"))).name != asset.get("source_pdf")
+                        or asset.get("source_pdf") != r.get("source_pdf")):
                     errors.append({"id":rid,"error":"handmatige_contextuitsnede_herkomst_ontbreekt"})
                 try:
                     asset_question_number = int(asset.get("question_number", -1))
