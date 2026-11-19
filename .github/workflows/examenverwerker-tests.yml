@@ -31,7 +31,7 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - name: Analyseer echte examen-PDFs uit de repository
         run: python scripts/benchmark_exams.py
-      - run: python -m compileall -q app.py engine.py exporter.py ai_adapter.py scripts
+      - run: python -m compileall -q app.py engine.py exporter.py ai_adapter.py structure.py scripts
       - uses: actions/upload-artifact@v4
         if: always()
         with:
