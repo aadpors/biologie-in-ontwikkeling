@@ -17,7 +17,7 @@ from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.13.2"
+APP_VERSION = "0.13.3"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -1447,8 +1447,10 @@ class ExamApp:
             tree.heading(col, text=title)
             tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
         tree.pack(fill="both", expand=True)
-        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1100)
-        status.pack(anchor="w")
+        footer = ttk.Frame(win, padding=(12, 8))
+        footer.pack(side="bottom", fill="x")
+        status = ttk.Label(footer, text="", wraplength=760)
+        status.pack(side="left", fill="x", expand=True)
         preview_temp = tempfile.TemporaryDirectory(prefix="biologie-import-voorbladen-")
         win._preview_temp = preview_temp
         preview_label = ttk.Label(cover_panel, text="Selecteer links een PDF om het voorblad te bekijken.",
@@ -1684,8 +1686,9 @@ class ExamApp:
                 f"Het eerste examen ({self.project_dir.name}) is direct geopend. De overige examens vind je in de bibliotheek. "
                 "De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
 
-        ttk.Button(win, text="Voorstellen akkoord — importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
-        ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
+        ttk.Button(footer, text="Annuleren", command=win.destroy).pack(side="right", padx=(8, 0))
+        ttk.Button(footer, text="Opslaan en doorgaan naar examenverwerking  →",
+                   command=confirm_import, style="Accent.TButton").pack(side="right")
         refresh_review()
         if documents:
             tree.selection_set("0")
