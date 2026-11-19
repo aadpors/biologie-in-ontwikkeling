@@ -169,19 +169,11 @@ class ExamApp:
         ttk.Button(sidebar, text="⇧  Pdf's toevoegen", command=self.add_pdfs,
                    style="Nav.TButton").pack(fill="x", padx=8, pady=2)
         ttk.Separator(sidebar).pack(fill="x", padx=16, pady=13)
-        tk.Label(sidebar, text="VERWERKSTAPPEN", bg=self.colors["sidebar"], fg="#BFAEB8",
+        tk.Label(sidebar, text="WERKWIJZE", bg=self.colors["sidebar"], fg="#BFAEB8",
                  font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(2, 7))
-        ttk.Button(sidebar, text="01  Vraagstarts analyseren", command=self.analyze_questions,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Button(sidebar, text="02  Examenstructuur bewerken", command=self.edit_exam_structure,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Button(sidebar, text="03  Kandidaten bekijken", command=self.show_candidates,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Button(sidebar, text="04  Vraagrecords beoordelen", command=self.show_records,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Separator(sidebar).pack(fill="x", padx=16, pady=13)
-        ttk.Button(sidebar, text="✓  Veilig exportpakket maken", command=self.export_project,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
+        tk.Label(sidebar, text="Doorloop de verwerkroute stap voor stap. Iedere inhoudelijke beslissing blijft bij jou.",
+                 bg=self.colors["sidebar"], fg="#F6EFF3", justify="left",
+                 wraplength=184, font=("Segoe UI", 9)).pack(anchor="w", padx=19, pady=(2, 8))
         tk.Label(sidebar, text="Offline standaard · bronbestanden blijven intact",
                  bg=self.colors["sidebar"], fg="#BFAEB8", justify="left",
                  wraplength=185, font=("Segoe UI", 8)).pack(side="bottom", anchor="w", padx=18, pady=18)
@@ -227,9 +219,11 @@ class ExamApp:
             self.table.heading(col, text=title)
             self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
         scrollbar = ttk.Scrollbar(table_wrap, orient="vertical", command=self.table.yview)
-        self.table.configure(yscrollcommand=scrollbar.set)
+        horizontal = ttk.Scrollbar(files_card, orient="horizontal", command=self.table.xview)
+        self.table.configure(yscrollcommand=scrollbar.set, xscrollcommand=horizontal.set)
         self.table.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
+        horizontal.pack(fill="x", pady=(2, 0))
         self.table.tag_configure("odd", background=self.colors["table_alt"])
         self.table.tag_configure("even", background=self.colors["surface"])
         self.table.bind("<Double-1>", self.show_document)
@@ -2497,7 +2491,7 @@ class ExamApp:
             self.table.insert("", "end", iid=str(idx), values=(
                 doc["bestand"], doc["type_voorstel"], doc["pagina_aantal"],
                 f"{doc['type_zekerheid']:.0%}", doc["status"].replace("_", " ")
-            ))
+            ), tags=("even" if idx % 2 == 0 else "odd",))
         count = len(self.data["documenten"])
         todo = sum(d["status"] == "controle_nodig" for d in self.data["documenten"])
         candidates = len(self.data.get("vraagkandidaten", []))
