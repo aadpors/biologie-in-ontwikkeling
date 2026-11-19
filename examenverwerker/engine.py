@@ -755,3 +755,35 @@ def extract_region_text(pdf_path: Path, segments: list[dict]) -> str:
         return "\n\n".join(parts)
     finally:
         source.close()
+
+
+def pdf_page_count(pdf_path: Path) -> int:
+    """Read only the page count for efficient final-review navigation."""
+    import pymupdf as fitz
+    with fitz.open(pdf_path) as document:
+        return len(document)
+
+
+def pixel_rect_to_pdf_bbox(pixel_bbox, image_size, page_size):
+    """Convert a pixel rectangle to PDF points, clamped to the full page."""
+    try:
+        x0, y0, x1, y1 = (float(value) for value in pixel_bbox)
+        image_width, image_height = (float(value) for value in image_size)
+        page_width, page_height = (float(value) for value in page_size)
+    except (TypeError, ValueError):
+        raise ValueError("Ongeldige uitsnede- of paginagegevens.") from None
+    if image_width <= 0 or image_height <= 0 or page_width <= 0 or page_height <= 0:
+        raise ValueError("Afbeeldings- en pagina-afmetingen moeten groter dan nul zijn.")
+    left, right = sorted((x0, x1))
+    top, bottom = sorted((y0, y1))
+    left = min(max(left, 0.0), image_width)
+    right = min(max(right, 0.0), image_width)
+    top = min(max(top, 0.0), image_height)
+    bottom = min(max(bottom, 0.0), image_height)
+    bbox = [left * page_width / image_width,
+            top * page_height / image_height,
+            right * page_width / image_width,
+            bottom * page_height / image_height]
+    if bbox[2] - bbox[0] < 2.0 or bbox[3] - bbox[1] < 2.0:
+        raise ValueError("De geselecteerde uitsnede is te klein.")
+    return [round(value, 2) for value in bbox]
