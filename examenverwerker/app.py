@@ -712,9 +712,11 @@ class ExamApp:
     def _workspace_render_visible_pages(self):
         """Render nearby pages on demand and cap live Tk PhotoImages to six."""
         specs = getattr(self, "_workspace_page_specs", {})
-        if not specs or not self.pdf_canvas.winfo_exists():
+        if not specs:
             return
         try:
+            if not self.pdf_canvas.winfo_exists():
+                return
             viewport_top = self.pdf_canvas.canvasy(0)
             viewport_height = max(1, self.pdf_canvas.winfo_height())
             viewport_bottom = viewport_top + viewport_height
