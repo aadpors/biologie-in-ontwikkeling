@@ -29,6 +29,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Test against real exam PDFs
         run: python scripts/benchmark_exams.py
+      - name: Verify application imports before packaging
+        run: python -c "import app; from engine import pdf_page_count, pixel_rect_to_pdf_bbox; print('Application imports and required helpers are available')"
       - name: Build portable folder
         run: python -m PyInstaller --noconfirm --clean --windowed --name BiologieExamenverwerker --onedir --collect-all pymupdf app.py
       - name: Add launch and help files
