@@ -1282,44 +1282,7 @@ class ExamApp:
                     ] if x) or data.get("naam", folder.name)
                     docs = data.get("documenten", [])
                     candidates = data.get("vraagkandidaten", [])
-                    decided = sum(c.get("human_decision") is not None for c in candidates)
-                    source_docs = [d for d in docs if d.get("type_voorstel") == "opgaven"]
-                    confirmed = [c for c in candidates if c.get("human_decision") is True]
-                    structures = data.get("exam_structures", {})
-                    structures_ready = all(
-                        (structures.get(d.get("id")) or
-                         (data.get("exam_structure", {}).get("document_id") == d.get("id")
-                          and data.get("exam_structure")))
-                        and not validate_exam_structure(
-                            structures.get(d.get("id")) or data.get("exam_structure"),
-                            d.get("id"), d.get("sha256"),
-                            sorted({int(c.get("number")) for c in confirmed
-                                    if c.get("document_id") == d.get("id") and c.get("number") is not None})
-                        )
-                        for d in source_docs
-                    ) if source_docs else False
-                    records = data.get("vraagrecords", [])
-                    missing_records = sum(not any(
-                        r.get("candidate_document_id") == c.get("document_id")
-                        and r.get("number") == c.get("number")
-                        and r.get("source_page") == c.get("page")
-                        for r in records
-                    ) for c in confirmed)
-                    unapproved = sum(not r.get("approved_by_human", False) for r in records)
-                    if not candidates:
-                        progress = "Vraagstarts nog te analyseren"
-                    elif decided < len(candidates):
-                        progress = f"{decided}/{len(candidates)} vraagstarts beoordeeld"
-                    elif not structures_ready:
-                        progress = "Structuur nog af te bakenen"
-                    elif missing_records:
-                        progress = f"{len(confirmed)-missing_records}/{len(confirmed)} vraagrecords gemaakt"
-                    elif unapproved:
-                        progress = f"Eindcontrole: {len(records)-unapproved}/{len(records)} akkoord"
-                    elif records:
-                        progress = "Klaar voor export"
-                    else:
-                        progress = "Controleer ontbrekende vraagstarts"
+                    progress = exam_workflow_state(data)["label"]
                     updated = data.get("bijgewerkt", "")
                     if updated:
                         try:
@@ -1358,11 +1321,7 @@ class ExamApp:
                     raise ValueError("Onbekend examenformaat.")
                 self.project_dir = folder
                 self.data = data
-                if folder in self.import_batch_paths:
-                    self.import_batch_index = self.import_batch_paths.index(folder)
-                else:
-                    self.import_batch_paths = []
-                    self.import_batch_index = 0
+                self._restore_import_batch(folder, data)
                 self._workspace_load_global_corrections()
                 self.refresh()
                 self._log(f"Examen geopend: {table.item(selection[0], 'values')[0]}")
@@ -1372,12 +1331,25 @@ class ExamApp:
                 messagebox.showerror("Examen openen mislukt",
                     "Dit examen kon niet worden geopend. De gegevens zijn niet gewijzigd.", parent=win)
 
+        def open_next_incomplete():
+            next_id = next((str(i) for i, row in enumerate(discovered)
+                            if row[7] != "Klaar voor export"), None)
+            if next_id is None:
+                messagebox.showinfo("Alle examens afgerond",
+                    "Alle examens in de bibliotheek zijn klaar voor export.", parent=win)
+                return
+            table.selection_set(next_id)
+            table.focus(next_id)
+            open_selected()
+
         table.bind("<Double-1>", open_selected)
         buttons = ttk.Frame(shell)
         buttons.pack(fill="x", pady=(12, 0))
         ttk.Button(buttons, text="＋ Nieuwe examens importeren",
                    command=lambda: (win.destroy(), self.import_year_set()),
                    style="Accent.TButton").pack(side="left")
+        ttk.Button(buttons, text="Volgend openstaand examen", command=open_next_incomplete,
+                   style="Accent.TButton").pack(side="left", padx=(10, 0))
         ttk.Button(buttons, text="Examen openen", command=open_selected,
                    style="Wine.TButton").pack(side="right")
         ttk.Button(buttons, text="Sluiten", command=win.destroy).pack(side="right", padx=8)
