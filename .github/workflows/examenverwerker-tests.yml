@@ -29,6 +29,8 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m pip install -r requirements-dev.txt
       - run: python -m unittest discover -s tests -v
+      - name: Controleer dat de volledige desktopapp importeert
+        run: python -c "import app; from engine import pdf_page_count, pixel_rect_to_pdf_bbox; print('Application import OK')"
       - name: Analyseer echte examen-PDFs uit de repository
         run: python scripts/benchmark_exams.py
       - run: python -m compileall -q app.py engine.py exporter.py ai_adapter.py structure.py scripts
