@@ -1273,7 +1273,43 @@ class ExamApp:
                     docs = data.get("documenten", [])
                     candidates = data.get("vraagkandidaten", [])
                     decided = sum(c.get("human_decision") is not None for c in candidates)
-                    progress = f"{decided}/{len(candidates)} vraagstarts beoordeeld" if candidates else "Nog niet geanalyseerd"
+                    source_docs = [d for d in docs if d.get("type_voorstel") == "opgaven"]
+                    confirmed = [c for c in candidates if c.get("human_decision") is True]
+                    structures = data.get("exam_structures", {})
+                    structures_ready = all(
+                        (structures.get(d.get("id")) or
+                         (data.get("exam_structure", {}).get("document_id") == d.get("id")
+                          and data.get("exam_structure")))
+                        and not validate_exam_structure(
+                            structures.get(d.get("id")) or data.get("exam_structure"),
+                            d.get("id"), d.get("sha256"),
+                            sorted({int(c.get("number")) for c in confirmed
+                                    if c.get("document_id") == d.get("id") and c.get("number") is not None})
+                        )
+                        for d in source_docs
+                    ) if source_docs else False
+                    records = data.get("vraagrecords", [])
+                    missing_records = sum(not any(
+                        r.get("candidate_document_id") == c.get("document_id")
+                        and r.get("number") == c.get("number")
+                        and r.get("source_page") == c.get("page")
+                        for r in records
+                    ) for c in confirmed)
+                    unapproved = sum(not r.get("approved_by_human", False) for r in records)
+                    if not candidates:
+                        progress = "Vraagstarts nog te analyseren"
+                    elif decided < len(candidates):
+                        progress = f"{decided}/{len(candidates)} vraagstarts beoordeeld"
+                    elif not structures_ready:
+                        progress = "Structuur nog af te bakenen"
+                    elif missing_records:
+                        progress = f"{len(confirmed)-missing_records}/{len(confirmed)} vraagrecords gemaakt"
+                    elif unapproved:
+                        progress = f"Eindcontrole: {len(records)-unapproved}/{len(records)} akkoord"
+                    elif records:
+                        progress = "Klaar voor export"
+                    else:
+                        progress = "Controleer ontbrekende vraagstarts"
                     updated = data.get("bijgewerkt", "")
                     if updated:
                         try:
