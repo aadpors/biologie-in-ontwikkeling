@@ -693,6 +693,7 @@ class ExamApp:
             self.data["biologie_controle_correcties"] = self._workspace_merge_correction_entries(
                 payload.get("documenten", []), self.data.get("biologie_controle_correcties", []))
             self._workspace_apply_saved_corrections()
+            self.save_project()
         except Exception as exc:
             self._error("Biologie-controlecorrecties laden", exc)
 
