@@ -959,6 +959,12 @@ class ExamApp:
         qbox=tk.Text(outer,height=6,wrap="word")
         qbox.pack(fill="x")
         qbox.insert("1.0",record.get("question_text","")); qbox.configure(state="disabled")
+        if record.get("source_context"):
+            ttk.Label(outer,text="Gekoppelde contexttekst").pack(anchor="w",pady=(6,0))
+            context_preview=tk.Text(outer,height=5,wrap="word")
+            context_preview.pack(fill="x")
+            context_preview.insert("1.0",record.get("source_context",""))
+            context_preview.configure(state="disabled")
         if meta.get("questionType")=="mcq":
             option_text="\n".join(f"{x.get('key')}. {x.get('text')}" for x in record.get("options",[]))
             ttk.Label(outer,text=f"Antwoordopties en opgegeven sleutel ({record.get('correct','')})").pack(anchor="w",pady=(5,0))
