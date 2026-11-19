@@ -32,3 +32,16 @@ Een contextinleiding wordt standaard aan alle bevestigde vragen gekoppeld. Een v
 
 
 Concept-vraagrecords bewaren na het opslaan ook `exam_structure_status`, `exam_structure_fragment_ids`, `question_region_page_spans` en `context_region_fragments`. Dezelfde gegevens gaan mee in het lokale exportmanifest, zodat de handmatig afgebakende bronregio's en vraagkoppelingen niet verloren gaan bij het maken van een exportpakket. Ze vervangen de bestaande websitevelden niet.
+
+
+## Meerdere documentstructuren en CV-regio's
+
+- `exam_structures[document_id]`: zelfstandige vraag/contextstructuur per opgaven-PDF; de oudere enkelvoudige `exam_structure`-sleutel blijft voor compatibiliteit beschikbaar.
+- `cv_regions[document_id][question_number]`: handmatig afgebakende regio van het bijbehorende correctievoorschrift of een officiële aanvulling, met document-ID, SHA-256, documentrol en genormaliseerde paginagrenzen.
+- `question_region_fragment_id` en `exam_structure_question_number`: expliciete koppeling tussen het vraagrecord en precies het juiste vraagfragment.
+- `cv_source_region` en `cv_source_region_file`: gecontroleerde CV-regio en de rechtstreeks gerenderde uitsnede.
+- `context_asset_files`: geselecteerde figuur-/tabeluitsneden plus handmatig begrensde contextregio's, met bronhash, pagina, bijschrift en fragmentkoppeling. Deze bestanden worden niet langer als vraagafbeeldingen geëxporteerd.
+- `source_context`: selecteerbare tekst die uit de handmatig begrensde contextregio's van de originele PDF is gehaald.
+- `cv_amendment_regions`: per geselecteerde officiële aanvulling de vraaggebonden regio, bronhash en gerenderde uitsnede.
+
+De exportpoort blokkeert ontbrekende vraag- of CV-regio's, gewijzigde bronnen, onvolledige addendumafbakening en ongeldige contextbestanden. De oorspronkelijke PDF blijft de primaire bron; geen enkele automatische detectie of AI-voorstel kan deze handmatige afbakening goedkeuren.
