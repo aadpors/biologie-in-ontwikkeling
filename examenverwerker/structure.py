@@ -127,3 +127,19 @@ def mark_structure_stale(structure: dict | None, reason: str) -> dict | None:
     updated["status"] = "verouderd"
     updated["verouderingsreden"] = str(reason)
     return updated
+
+
+def fragments_for_question(structure: dict | None, question_number: int) -> dict:
+    """Return the manually defined question region and every context fragment linked to it."""
+    if not structure or structure.get("status") == "verouderd" or structure.get("nummering_bevestigd") is not True:
+        return {"question_fragment": None, "context_fragments": [], "status": "structuur_niet_beschikbaar"}
+    number = int(question_number)
+    linked = [fragment for fragment in structure.get("fragments", [])
+              if number in [int(x) for x in fragment.get("question_numbers", [])]]
+    question = next((x for x in linked if x.get("type") == "vraag"), None)
+    contexts = [x for x in linked if x.get("type") in {"context_intro", "vraagcontext", "tussenliggende_context"}]
+    return {
+        "question_fragment": question,
+        "context_fragments": contexts,
+        "status": "gekoppeld" if question or contexts else "geen_fragmenten_gekoppeld",
+    }
