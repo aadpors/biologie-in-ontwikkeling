@@ -1,5 +1,13 @@
 # Wijzigingen
 
+## 0.9.0
+- Bulkimport accepteert in één selectie examens uit meerdere jaren, niveaus en tijdvakken.
+- Geen handmatige keuze of aanmaak van een doelmap meer; de applicatie gebruikt automatisch de bestaande map `examens` naast de programmamap of maakt die standaardlocatie aan.
+- Examens worden rechtstreeks gegroepeerd in `examens/<jaar>/<niveau>-tijdvak-<nummer>/`.
+- Een importmanifest wordt automatisch in de map `examens` opgeslagen.
+- Bestaande examenmappen worden nooit overschreven; bij een botsing wordt de import afgebroken en worden uitsluitend nieuw aangemaakte mappen van die poging opgeruimd.
+- De herkenningscontrole blijft verplicht voor onzekere metadata en documenttypen.
+
 ## 0.8.0
 - Jaarset-import toegevoegd zonder vooraf projecten aan te maken: selecteer alle examen-PDF's van een jaar in één keer.
 - Automatische groepering op exacte combinatie van niveau, jaar en tijdvak; havo en vwo en alle tijdvakken blijven strikt gescheiden.
@@ -7,7 +15,6 @@
 - Import maakt pas na expliciete bevestiging afzonderlijke, bestaande-compatibele examenprojecten aan en bewaart een jaarset-manifest.
 - Waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande projecten worden niet overschreven.
 - Tests toegevoegd voor exacte groepering, onvolledige metadata en importblokkades.
-
 
 ## 0.7.1
 - Alle handmatige uitsneden gebruiken uitsluitend horizontale stroken over de volledige paginabreedte.
