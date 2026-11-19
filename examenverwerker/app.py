@@ -1479,7 +1479,7 @@ class ExamApp:
 
     def add_pdfs(self):
         if not self.data:
-            messagebox.showinfo("Eerst een project", "Maak eerst een nieuw examenproject of open een bestaand project.")
+            messagebox.showinfo("Eerst een examen openen", "Kies eerst een examen uit de examenbibliotheek of importeer nieuwe examens.")
             return
         files = filedialog.askopenfilenames(title="Selecteer de examen-PDF's", filetypes=[("PDF-bestanden", "*.pdf")])
         if not files:
