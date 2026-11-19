@@ -13,7 +13,7 @@ Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologi
 - Importcontrole in één scherm: PDF-lijst links, geselecteerd voorblad centraal en direct bewerkbare voorgestelde metadata rechts; geen aparte pop-up meer om herkenning per PDF aan te passen.
 - Metadata en documenttypen automatisch voorstellen, alle herkenning vóór import controleren en examens automatisch opslaan onder `examens/<jaar>/<niveau>-tijdvak-<nummer>/`.
 - Een importmanifest bewaren met de projectindeling en waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande examenmappen worden nooit overschreven.
-- Examenprojecten aanmaken, openen en hervatten.
+- Examens beheren via de examenbibliotheek; de technische dossierstructuur wordt automatisch beheerd.
 - Originele PDF's ongewijzigd opnemen en SHA-256-dedupliceren.
 - Documenttypen voorstellen: opgaven, correctievoorschrift, uitwerkbijlage en aanvulling.
 - PDF-tekst, metadata, pagina's en geometrie uitlezen.
@@ -58,7 +58,7 @@ Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 ## Werkwijze
 1. Kies **Examens in bulk importeren** en selecteer alle beschikbare PDF’s, ook als ze uit verschillende jaren, niveaus en tijdvakken komen.
 2. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak). De applicatie maakt daarna automatisch de mapstructuur onder `examens/` aan.
-3. Het eerste aangemaakte examen wordt direct geopend in de geïntegreerde werkruimte; de overige examens open je via Project openen.
+3. Het eerste aangemaakte examen wordt direct geopend in de geïntegreerde werkruimte; de overige examens open je via de examenbibliotheek.
 4. Laat vraagstarts analyseren.
 5. Bekijk kandidaten in de geïntegreerde werkruimte op de originele PDF-pagina. Bevestig, wijs af of markeer twijfel; pas vraagnummer, vraagtekst en notities direct aan. Ontbrekende vraagstarts kun je op de PDF aanwijzen. Alle kandidaten moeten een menselijke beslissing hebben.
 6. Open 'Examenstructuur bewerken' voor iedere opgaven-PDF. Maak voor elke vraag een vraagfragment en leg contextinleidingen, vraagcontexten en tussenliggende contexten vast. Koppel ieder contextfragment aan de juiste vragen.
