@@ -791,7 +791,7 @@ class ExamApp:
                     preview_canvas.create_image(0,0,image=preview_photo,anchor="nw")
                     preview_canvas.image=preview_photo
                     preview_canvas.configure(scrollregion=preview_canvas.bbox("all"))
-                    asset={"file":name,"page":page_no,"caption":None,"asset_id":asset_id,
+                    asset={"file":name,"page":page_no,"page_size":[page_sizes[page_no][0],page_sizes[page_no][1]],"caption":None,"asset_id":asset_id,
                            "asset_kind":kind_var.get(),"type":kind_var.get(),"bbox":list(crop_info["bbox"]),
                            "source_document_id":source_doc["id"],"source_sha256":source_doc["sha256"],
                            "source_pdf":source_doc["opslagbestand"],"question_number":int(row["number"]),
