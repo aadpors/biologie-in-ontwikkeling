@@ -2463,32 +2463,63 @@ class ExamApp:
             return
         choices = ["opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling", "onbekend"]
         initial = doc.get("exam_metadata") or infer_exam_metadata(doc.get("bestand","")) or self.data.get("exam_metadata",{})
+        source = self.project_dir / "bronnen" / doc["opslagbestand"]
+        if not source.is_file():
+            messagebox.showerror("Bronbestand ontbreekt", "De oorspronkelijke PDF kan niet worden gevonden. Voeg het bestand opnieuw toe.")
+            return
+
         win = tk.Toplevel(self.root)
-        win.title("Documenttype en examenidentiteit bevestigen")
+        win.title("Voorblad en documentmetadata controleren")
+        win.geometry("1080x760")
+        win.minsize(900, 650)
         win.transient(self.root)
         win.grab_set()
-        frame=ttk.Frame(win,padding=16); frame.pack(fill="both",expand=True)
-        ttk.Label(frame, text=f"Document: {doc['bestand']}",wraplength=520).grid(row=0,column=0,columnspan=2,sticky="w",pady=(0,8))
-        ttk.Label(frame, text="Documenttype").grid(row=1,column=0,sticky="w",pady=5)
+        body = ttk.Frame(win, padding=14)
+        body.pack(fill="both", expand=True)
+        preview_panel = ttk.LabelFrame(body, text="Voorblad van de originele PDF", padding=10)
+        preview_panel.pack(side="left", fill="both", expand=True, padx=(0, 12))
+        fields_panel = ttk.LabelFrame(body, text="Automatisch ingevulde gegevens", padding=14)
+        fields_panel.pack(side="right", fill="y")
+        ttk.Label(fields_panel, text=f"Document: {doc['bestand']}", wraplength=390,
+                  font=("Segoe UI", 10, "bold")).pack(anchor="w", pady=(0, 10))
+
+        preview_temp = tempfile.TemporaryDirectory(prefix="biologie-voorblad-")
+        preview_path = Path(preview_temp.name) / "voorblad.png"
+        preview_label = ttk.Label(preview_panel, text="Voorblad wordt geladen…", anchor="center")
+        preview_label.pack(fill="both", expand=True)
+        try:
+            render_page(source, 1, preview_path, scale=0.72)
+            cover_photo = tk.PhotoImage(file=str(preview_path))
+            preview_label.configure(image=cover_photo, text="")
+            preview_label.image = cover_photo
+        except Exception as exc:
+            preview_label.configure(text=f"Het voorblad kon niet worden weergegeven.\n\n{exc}",
+                                     wraplength=470, justify="center")
+        win._preview_temp = preview_temp
+
+        ttk.Label(fields_panel, text="Controleer de waarden aan de hand van het voorblad. Lege waarden zijn niet automatisch afgeleid.",
+                  wraplength=390, justify="left").pack(anchor="w", pady=(0, 12))
+        ttk.Label(fields_panel, text="Documenttype").pack(anchor="w", pady=(5, 2))
         choice = tk.StringVar(value=doc["type_voorstel"])
-        ttk.Combobox(frame, textvariable=choice, values=choices, state="readonly", width=28).grid(row=1,column=1,sticky="ew",pady=5)
-        ttk.Label(frame,text="Examenidentiteit (nodig om opgaven, CV en bijlagen veilig te koppelen)").grid(row=2,column=0,columnspan=2,sticky="w",pady=(12,4))
-        level=tk.StringVar(value=initial.get("level","Havo"))
+        ttk.Combobox(fields_panel, textvariable=choice, values=choices,
+                     state="readonly", width=32).pack(anchor="w", fill="x")
+        ttk.Label(fields_panel,text="Examenidentiteit (nodig om opgaven, CV en bijlagen veilig te koppelen)").pack(anchor="w",pady=(14,4))
+        level=tk.StringVar(value=initial.get("level",""))
         year=tk.StringVar(value=str(initial.get("year","")))
-        period=tk.StringVar(value=str(initial.get("period","1")))
-        for row,label,var,widget in [
-            (3,"Niveau",level,ttk.Combobox(frame,textvariable=level,values=["Havo","Vwo"],state="readonly",width=24)),
-            (4,"Jaar",year,ttk.Entry(frame,textvariable=year,width=27)),
-            (5,"Tijdvak",period,ttk.Combobox(frame,textvariable=period,values=["1","2","3"],state="readonly",width=24))
+        period=tk.StringVar(value=str(initial.get("period","")))
+        for label,var,widget in [
+            ("Niveau",level,ttk.Combobox(fields_panel,textvariable=level,values=["Havo","Vwo"],state="readonly",width=30)),
+            ("Jaar",year,ttk.Entry(fields_panel,width=33)),
+            ("Tijdvak",period,ttk.Combobox(fields_panel,textvariable=period,values=["1","2","3"],state="readonly",width=30))
         ]:
-            ttk.Label(frame,text=label).grid(row=row,column=0,sticky="w",pady=4)
-            widget.grid(row=row,column=1,sticky="ew",pady=4)
-        ttk.Label(frame,text="Controleer dit per PDF. De bestandsnaam of projectmetadata kan onjuist zijn; alleen opslaan betekent dat jij de identiteit van dit document bevestigt.",wraplength=520).grid(row=6,column=0,columnspan=2,sticky="w",pady=(10,4))
+            ttk.Label(fields_panel,text=label).pack(anchor="w",pady=(7,2))
+            widget.pack(anchor="w",fill="x")
+
         def apply():
             old = doc["type_voorstel"]
             new = choice.get()
             if new in ("opgaven","correctievoorschrift","uitwerkbijlage","aanvulling"):
-                if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
+                if level.get() not in ("Havo","Vwo") or not re.fullmatch(r"20\\d{2}",year.get().strip()) or period.get() not in ("1","2","3"):
                     messagebox.showerror("Examenidentiteit onvolledig","Controleer niveau, jaartal en tijdvak.",parent=win)
                     return
                 doc["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),
@@ -2508,10 +2539,10 @@ class ExamApp:
             self.refresh()
             self._log(f"Herkenning en examenidentiteit bevestigd: {doc['bestand']} → {new} ({doc.get('exam_metadata',{}).get('level','')} {doc.get('exam_metadata',{}).get('year','')} tijdvak {doc.get('exam_metadata',{}).get('period','')}).")
             win.destroy()
-        buttons=ttk.Frame(frame); buttons.grid(row=7,column=0,columnspan=2,sticky="ew",pady=(12,0))
-        ttk.Button(buttons,text="Bevestigen",command=apply).pack(side="right")
+
+        buttons=ttk.Frame(fields_panel); buttons.pack(fill="x",side="bottom",pady=(16,0))
+        ttk.Button(buttons,text="Bevestigen",command=apply,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Annuleren",command=win.destroy).pack(side="right",padx=8)
-        frame.columnconfigure(1,weight=1)
 
     def save_project(self):
         if not self.data or not self.project_dir:
