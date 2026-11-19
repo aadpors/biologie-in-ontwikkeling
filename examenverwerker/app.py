@@ -1079,10 +1079,12 @@ class ExamApp:
         ]:
             table.heading(col, text=label)
             table.column(col, width=width, anchor="w" if col in ("exam", "progress") else "center")
-        scroll = ttk.Scrollbar(shell, orient="vertical", command=table.yview)
+        list_wrap = ttk.Frame(shell)
+        list_wrap.pack(fill="both", expand=True)
+        scroll = ttk.Scrollbar(list_wrap, orient="vertical", command=table.yview)
         table.configure(yscrollcommand=scroll.set)
-        table.pack(side="left", fill="both", expand=True)
-        scroll.pack(side="right", fill="y")
+        table.pack(in_=list_wrap, side="left", fill="both", expand=True)
+        scroll.pack(in_=list_wrap, side="right", fill="y")
 
         paths = {}
         roots = [self.examens_root, self.app_base / "projecten"]
