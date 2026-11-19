@@ -3296,6 +3296,7 @@ class ExamApp:
                 doc["exam_metadata"]={"level":level.get(),"year":year.get().strip(),"period":period.get(),
                                       "confidence":1.0,"source":"handmatig_bevestigd"}
             doc["type_voorstel"] = new
+            doc["documenttype_handmatig"] = new
             doc["type_zekerheid"] = 1.0
             doc["status"] = "handmatig_bevestigd"
             self.data["beslissingen"].append({"document_id": doc["id"], "van": old, "naar": new, "tijd": now(), "reden": "handmatige bevestiging documenttype en examenidentiteit"})
