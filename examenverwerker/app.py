@@ -639,7 +639,8 @@ class ExamApp:
             y_offset = 0
             for page_no in range(1, page_count + 1):
                 output = Path(self._workspace_temp.name) / f"{doc['id']}-doorlopend-p{page_no}-{scale:.3f}.png"
-                render_page(source, page_no, output, scale=scale)
+                if not output.is_file():
+                    render_page(source, page_no, output, scale=scale)
                 photo = tk.PhotoImage(file=str(output))
                 self._workspace_photos.append(photo)
                 self._workspace_page_offsets[page_no] = y_offset
@@ -681,8 +682,15 @@ class ExamApp:
             self._error("Originele PDF weergeven", exc)
 
     def _workspace_change_page(self, delta):
-        self._workspace_page += int(delta)
-        self._workspace_render_page()
+        self._workspace_page = max(1, self._workspace_page + int(delta))
+        offsets = getattr(self, "_workspace_page_offsets", {})
+        heights = getattr(self, "_workspace_page_heights", {})
+        if self._workspace_page in offsets:
+            total = max(1, max((top + heights.get(page, 0) for page, top in offsets.items()), default=1))
+            self.pdf_canvas.yview_moveto(offsets[self._workspace_page] / total)
+            self._workspace_page_label.configure(text=f"Pagina {self._workspace_page} / {len(offsets)}")
+        else:
+            self._workspace_render_page()
 
     def _workspace_zoom_by(self, factor):
         self._workspace_zoom = max(0.55, min(2.5, self._workspace_zoom * factor))
