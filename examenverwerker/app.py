@@ -15,7 +15,7 @@ from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
-from workflow import exam_workflow_state
+from workflow import exam_workflow_state, exam_export_fingerprint
 
 APP_VERSION = "0.13.2"
 PROJECT_FILE = "project.json"
@@ -373,9 +373,10 @@ class ExamApp:
             "vraagrecords": ("Volgend vraagrecord maken", self._workflow_make_next_record),
             "eindcontrole": ("Eindcontrole openen", self.show_records),
             "export": ("Exportpakket maken", self.export_project),
+            "voltooid": ("Examenbibliotheek openen", self.open_project),
         }
         label = state["label"]
-        if state["stage"] == "export" and self.import_batch_index + 1 < len(self.import_batch_paths):
+        if state["stage"] == "voltooid" and self.import_batch_index + 1 < len(self.import_batch_paths):
             label = (f"Dit examen is verwerkt. Ga door met examen "
                      f"{self.import_batch_index + 2} van {len(self.import_batch_paths)} uit dezelfde importbatch.")
             button, action = "Volgend examen", self._workflow_open_next_exam
@@ -1333,7 +1334,7 @@ class ExamApp:
 
         def open_next_incomplete():
             next_id = next((str(i) for i, row in enumerate(discovered)
-                            if row[7] != "Klaar voor export"), None)
+                            if row[7] != "Exportpakket gemaakt"), None)
             if next_id is None:
                 messagebox.showinfo("Alle examens afgerond",
                     "Alle examens in de bibliotheek zijn klaar voor export.", parent=win)
@@ -2986,6 +2987,14 @@ class ExamApp:
                 messagebox.showwarning("Export geblokkeerd",f"Er is niets gepubliceerd. Los eerst deze controles op:\n\n{detail}",parent=self.root)
                 self._log(f"Export geblokkeerd: {len(errors)} validatiefouten.")
                 return
+            self.data["export_status"] = {
+                "fingerprint": exam_export_fingerprint(self.data),
+                "export_dir": str(result["export_dir"]),
+                "aangemaakt": now(),
+                "mcq": result["mcq"],
+                "open": result["open"],
+            }
+            self.save_project()
             self._log(f"Exportpakket gemaakt: {result['mcq']} meerkeuzevragen en {result['open']} open vragen.")
             messagebox.showinfo("Exportpakket klaar",f"Veilig exportpakket gemaakt in:\n{result['export_dir']}\n\nEr is niets naar de live website gepubliceerd.",parent=self.root)
         except Exception as exc:
