@@ -116,22 +116,41 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(got[0]["number"],7)
         self.assertEqual(got[0]["page"],1)
         self.assertEqual(got[0]["next_line"],"Beschrijf de oorzaak.")
-    def test_question_pattern_key_distinguishes_layouts(self):
-        self.assertEqual(question_pattern_key({"line":"4. Beschrijf dit.","next_line":""}),"question_start:numbered_line_with_text")
-        self.assertEqual(question_pattern_key({"line":"4.","next_line":"Beschrijf dit."}),"question_start:standalone_number_then_text")
-    def test_learning_requires_repeated_support_and_never_autoplays(self):
+    def test_question_pattern_key_uses_generalizable_features_not_exam_specific_text(self):
+        inline = question_pattern_key({"line":"4. Beschrijf de functie van dit orgaan.","next_line":"2p"})
+        other_text = question_pattern_key({"line":"19. Beschrijf het proces in deze situatie.","next_line":"3 punten"})
+        standalone = question_pattern_key({"line":"4.","next_line":"Beschrijf de oorzaak."})
+        self.assertEqual(inline, other_text)
+        self.assertIn("shape=inline", inline)
+        self.assertIn("points=1", inline)
+        self.assertIn("shape=standalone", standalone)
+        self.assertNotEqual(inline, standalone)
+
+    def test_learning_requires_three_independent_exams_and_never_auto_applies(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)
-            learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True})
-            self.assertIsNone(suggest_from_learning(p,"layout-a")["suggestion"])
-            learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True})
-            s=suggest_from_learning(p,"layout-a")
-            self.assertEqual(s["suggestion"],"question")
-            self.assertFalse(s["auto_apply"])
-            learn_decision(p,{"pattern_key":"layout-a","chosen":"not_question","accepted":True})
-            tie=suggest_from_learning(p,"layout-a")
-            self.assertIsNone(tie["suggestion"])
-            self.assertTrue(tie["conflicting"])
+            # Repeated corrections in one PDF must not masquerade as independent evidence.
+            for _ in range(5):
+                learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True,
+                                  "document_id":"exam-a","candidate_line":"4. Beschrijf dit","page":1})
+            same_exam=suggest_from_learning(p,"layout-a")
+            self.assertIsNone(same_exam["suggestion"])
+            self.assertEqual(same_exam["document_support"],1)
+            for exam in ("exam-b","exam-c"):
+                learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True,
+                                  "document_id":exam,"candidate_line":"8. Beschrijf dit","page":2})
+            learned=suggest_from_learning(p,"layout-a")
+            self.assertEqual(learned["suggestion"],"question")
+            self.assertEqual(learned["document_support"],3)
+            self.assertEqual(learned["confidence"],1.0)
+            self.assertFalse(learned["auto_apply"])
+            learn_decision(p,{"pattern_key":"layout-a","chosen":"not_question","accepted":True,
+                              "document_id":"exam-d","candidate_line":"9. Bronregel","page":3})
+            conflict=suggest_from_learning(p,"layout-a")
+            self.assertIsNone(conflict["suggestion"])
+            self.assertTrue(conflict["conflicting"])
+            self.assertFalse(conflict["auto_apply"])
+
     def test_duplicate_ids_reported(self):
         row={"id":"same","level":"Havo","year":"2025","period":"1","n":1,"page":1,"q":"x","pdf":"a.pdf","cv":"b.pdf"}
         errors=validate_website_records([row],[row],[])
