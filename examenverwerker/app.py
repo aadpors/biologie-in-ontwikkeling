@@ -399,12 +399,19 @@ class ExamApp:
             self._log("Voor dit examen is geen geldige importbatch beschikbaar; het examen blijft afzonderlijk verwerkbaar.")
 
     def _workflow_open_next_exam(self):
-        if self.import_batch_index + 1 >= len(self.import_batch_paths):
+        next_index = self.import_batch_index + 1
+        if next_index >= len(self.import_batch_paths):
             return
-        self.import_batch_index += 1
-        self.project_dir = self.import_batch_paths[self.import_batch_index]
+        next_project = self.import_batch_paths[next_index]
         try:
-            self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
+            next_data = json.loads((next_project / PROJECT_FILE).read_text(encoding="utf-8"))
+            if next_data.get("schema") != "biologie-examenproject-v1":
+                raise ValueError("Onbekend examenformaat.")
+            # Switch only after the next project has been read and validated;
+            # a damaged/missing project must never silently skip the queue.
+            self.project_dir = next_project
+            self.data = next_data
+            self.import_batch_index = next_index
             self._workspace_doc_id = None
             self._workspace_selected = None
             self._workspace_load_global_corrections()
@@ -415,7 +422,7 @@ class ExamApp:
         except Exception as exc:
             self._error("Volgend examen openen", exc)
             messagebox.showerror("Examen openen mislukt",
-                "Het volgende examen uit de importbatch kon niet worden geopend. De bronbestanden zijn niet gewijzigd.")
+                "Het volgende examen kon niet worden geopend. De huidige werkruimte en batchpositie zijn behouden.")
 
     def _workflow_focus_next(self):
         if not self.data:
