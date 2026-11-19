@@ -13,6 +13,7 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
+from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents
 
 APP_VERSION = "0.7.1"
 PROJECT_FILE = "project.json"
@@ -83,6 +84,7 @@ class ExamApp:
         ttk.Button(bar, text="Nieuw examenproject", command=self.new_project, style="Accent.TButton").pack(side="left", padx=4)
         ttk.Button(bar, text="Project openen", command=self.open_project).pack(side="left", padx=4)
         ttk.Button(bar, text="PDF's toevoegen", command=self.add_pdfs, style="Accent.TButton").pack(side="left", padx=4)
+        ttk.Button(bar, text="Jaarset importeren", command=self.import_year_set, style="Accent.TButton").pack(side="left", padx=4)
 
         body = ttk.Frame(self.root, padding=(20, 12))
         body.pack(fill="both", expand=True)
@@ -115,8 +117,8 @@ class ExamApp:
         self.log.configure(state="disabled")
 
     def _welcome(self):
-        self._log("Welkom. Maak een project per examen. Voeg daarna alle beschikbare PDF's toe.")
-        self._log("Tip: selecteer opgaven, correctievoorschrift, uitwerkbijlage en eventuele aanvullingen tegelijk.")
+        self._log("Welkom. Open een bestaand examenproject, of importeer in één keer een complete jaarset.")
+        self._log("Bij jaarset-import groepeert de software PDF's automatisch op havo/vwo, jaar en tijdvak; je controleert eerst alle voorstellen.")
 
     def _error(self, context, exc):
         details=traceback.format_exc()
@@ -173,6 +175,241 @@ class ExamApp:
         except Exception as exc:
             self._error("Project openen",exc)
             messagebox.showerror("Project openen mislukt","Dit project kon niet worden geopend. Controleer of het projectbestand geldig is. Details staan in de map logs.")
+
+    def import_year_set(self):
+        """Import a complete year set without requiring pre-created exam projects."""
+        files = filedialog.askopenfilenames(
+            title="Selecteer alle examen-PDF's van het jaar (havo en vwo, alle tijdvakken)",
+            filetypes=[("PDF-bestanden", "*.pdf")])
+        if not files:
+            return
+        destination = filedialog.askdirectory(title="Kies de map waarin de gecontroleerde jaarset moet worden opgeslagen")
+        if not destination:
+            return
+
+        documents = []
+        seen_hashes = set()
+        failures = []
+        for source_name in files:
+            source = Path(source_name)
+            try:
+                digest = sha256(source)
+                if digest in seen_hashes:
+                    self._log(f"Dubbel bestand overgeslagen: {source.name}")
+                    continue
+                seen_hashes.add(digest)
+                extracted = extract_pdf(source)
+                all_text = "\n".join(page["tekst"] for page in extracted["pagina_tekst"])
+                role, role_confidence, role_signals = classify_document_role(source.name, all_text)
+                identity = infer_exam_metadata(source.name, all_text)
+                documents.append({
+                    "id": digest[:16], "bestand": source.name, "source_path": str(source),
+                    "opslagbestand": f"{digest[:12]}-{source.name}", "sha256": digest,
+                    "type_voorstel": role, "type_zekerheid": role_confidence,
+                    "herkenningssignalen": role_signals, "exam_metadata": identity,
+                    "pagina_aantal": extracted["pagina_aantal"], "metadata": extracted["metadata"],
+                    "pagina_zonder_tekst": [p["pagina"] for p in extracted["pagina_tekst"] if p.get("ocr_nodig")],
+                    "ocr_status": "handmatige_ocr_controle_nodig" if any(p.get("ocr_nodig") for p in extracted["pagina_tekst"]) else "tekstlaag_aanwezig",
+                    "_extracted": extracted,
+                })
+            except Exception as exc:
+                failures.append(f"{source.name}: {exc}")
+
+        if failures:
+            messagebox.showerror("Jaarset niet volledig ingelezen",
+                "Er ging iets mis bij het lezen van één of meer PDF's. Er is nog niets geïmporteerd:\n\n" + "\n".join(failures))
+            return
+        if not documents:
+            messagebox.showinfo("Geen nieuwe PDF's", "Er zijn geen unieke PDF-bestanden geselecteerd.")
+            return
+
+        win = tk.Toplevel(self.root)
+        win.title("Jaarset controleren en automatisch groeperen")
+        win.geometry("1120x650")
+        win.transient(self.root)
+        win.grab_set()
+        ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Controleer niveau, jaar, tijdvak en documenttype. Er wordt nog niets verwerkt of verplaatst.",
+                  padding=12, wraplength=1060).pack(anchor="w")
+        columns = ("file", "role", "certainty", "level", "year", "period", "pages", "state")
+        tree = ttk.Treeview(win, columns=columns, show="headings", selectmode="browse")
+        headings = [
+            ("file", "Bestand", 300), ("role", "Documenttype", 150), ("certainty", "Zekerheid", 75),
+            ("level", "Niveau", 75), ("year", "Jaar", 65), ("period", "Tijdvak", 65),
+            ("pages", "Pagina's", 65), ("state", "Controle", 170)]
+        for col, title, width in headings:
+            tree.heading(col, text=title)
+            tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
+        tree.pack(fill="both", expand=True, padx=12, pady=8)
+        status = ttk.Label(win, text="", padding=(12, 4), wraplength=1060)
+        status.pack(anchor="w")
+
+        def identity_text(doc):
+            meta = doc.get("exam_metadata") or {}
+            return meta.get("level", ""), meta.get("year", ""), meta.get("period", "")
+
+        def refresh_review():
+            for item in tree.get_children():
+                tree.delete(item)
+            groups, unassigned = group_exam_documents(documents)
+            for index, doc in enumerate(documents):
+                meta = doc.get("exam_metadata") or {}
+                uncertain = doc.get("type_zekerheid", 0) < 0.9 or (
+                    meta.get("source") == "eerste_pdf_paginas" and meta.get("confidence", 0) < 0.9)
+                state = "Handmatig controleren" if uncertain or not meta else "Voorstel controleren"
+                if not meta:
+                    state = "Metadata ontbreekt"
+                tree.insert("", "end", iid=str(index), values=(
+                    doc["bestand"], doc.get("type_voorstel", "onbekend"),
+                    f"{doc.get('type_zekerheid', 0):.0%}", *identity_text(doc),
+                    doc.get("pagina_aantal", 0), state))
+            summary = []
+            for key, items in groups.items():
+                summary.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's")
+            if unassigned:
+                summary.append(f"{len(unassigned)} PDF('s) zonder complete examenidentiteit")
+            status.configure(text="Automatische groepen: " + ("; ".join(summary) if summary else "nog geen complete groepen"))
+
+        def edit_selected():
+            selection = tree.selection()
+            if not selection:
+                messagebox.showinfo("Selecteer een PDF", "Selecteer eerst een PDF om de herkenning te controleren.", parent=win)
+                return
+            doc = documents[int(selection[0])]
+            meta = doc.get("exam_metadata") or {}
+            edit = tk.Toplevel(win)
+            edit.title("Documentherkenning controleren")
+            edit.transient(win)
+            edit.grab_set()
+            frame = ttk.Frame(edit, padding=16)
+            frame.pack(fill="both", expand=True)
+            ttk.Label(frame, text=doc["bestand"], wraplength=430).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 10))
+            role = tk.StringVar(value=doc.get("type_voorstel", "onbekend"))
+            level = tk.StringVar(value=meta.get("level", "Vwo"))
+            year = tk.StringVar(value=str(meta.get("year", "")))
+            period = tk.StringVar(value=str(meta.get("period", "1")))
+            fields = [
+                (1, "Documenttype", role, ttk.Combobox(frame, textvariable=role, values=["opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage", "onbekend"], state="readonly", width=27)),
+                (2, "Niveau", level, ttk.Combobox(frame, textvariable=level, values=["Havo", "Vwo"], state="readonly", width=27)),
+                (3, "Jaar", year, ttk.Entry(frame, textvariable=year, width=30)),
+                (4, "Tijdvak", period, ttk.Combobox(frame, textvariable=period, values=["1", "2", "3"], state="readonly", width=27)),
+            ]
+            for row, label, var, widget in fields:
+                ttk.Label(frame, text=label).grid(row=row, column=0, sticky="w", pady=5)
+                widget.grid(row=row, column=1, sticky="ew", pady=5)
+            ttk.Label(frame, text="Controleer dit aan de hand van de PDF. De software koppelt uitsluitend documenten met exact hetzelfde niveau, jaar en tijdvak.",
+                      wraplength=440).grid(row=5, column=0, columnspan=2, sticky="w", pady=(10, 4))
+
+            def save_edit():
+                if role.get() not in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                    messagebox.showerror("Documenttype ontbreekt", "Kies een geldig documenttype.", parent=edit)
+                    return
+                if level.get() not in {"Havo", "Vwo"} or not re.fullmatch(r"20\d{2}", year.get().strip()) or period.get() not in {"1", "2", "3"}:
+                    messagebox.showerror("Examenidentiteit onvolledig", "Vul niveau, een viercijferig jaar en tijdvak 1, 2 of 3 in.", parent=edit)
+                    return
+                doc["type_voorstel"] = role.get()
+                doc["type_zekerheid"] = 1.0
+                doc["exam_metadata"] = {"level": level.get(), "year": year.get().strip(), "period": period.get(),
+                                        "confidence": 1.0, "source": "handmatig_bevestigd"}
+                doc["status"] = "handmatig_bevestigd"
+                refresh_review()
+                edit.destroy()
+
+            buttons = ttk.Frame(frame)
+            buttons.grid(row=6, column=0, columnspan=2, sticky="e", pady=(12, 0))
+            ttk.Button(buttons, text="Opslaan", command=save_edit).pack(side="right")
+            ttk.Button(buttons, text="Annuleren", command=edit.destroy).pack(side="right", padx=8)
+            frame.columnconfigure(1, weight=1)
+
+        def confirm_import():
+            errors = validate_batch_documents(documents)
+            if errors:
+                messagebox.showerror("Eerst herkenning corrigeren",
+                    "De jaarset kan nog niet veilig worden geïmporteerd:\n\n" + "\n".join(errors[:20]), parent=win)
+                return
+            groups, unassigned = group_exam_documents(documents)
+            if unassigned:
+                messagebox.showerror("Onvolledige groepering", "Niet alle PDF's hebben een volledige examenidentiteit. Er wordt niets geïmporteerd.", parent=win)
+                return
+            warnings = []
+            for key, items in groups.items():
+                for warning in batch_document_warnings(items):
+                    warnings.append(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {warning}")
+            warning_text = "\n".join(warnings) if warnings else "Geen ontbrekende opgaven of CV's en geen dubbele hoofd-documenttypen gesignaleerd."
+            summary_text = "\n".join(f"{key[0].upper()} {key[1]} tijdvak {key[2]}: {len(items)} PDF's" for key, items in groups.items())
+            if not messagebox.askyesno("Jaarset definitief controleren",
+                f"Er worden {len(groups)} examenprojecten aangemaakt in een nieuwe jaarsetmap.\n\n"
+                + summary_text + "\n\nWaarschuwingen:\n" + warning_text
+                + "\n\nAlle getoonde metadata en documenttypen zijn door jou gecontroleerd. Doorgaan?", parent=win):
+                return
+            years = sorted({key[1] for key in groups})
+            batch_name = f"jaarset-{years[0]}" if len(years) == 1 else "jaarset-meerdere-jaren"
+            target_root = Path(destination) / batch_name
+            if target_root.exists():
+                target_root = Path(destination) / f"{batch_name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            created = []
+            try:
+                target_root.mkdir(parents=True, exist_ok=False)
+                manifest = {"schema": "biologie-examenjaarset-v1", "aangemaakt": now(), "projecten": []}
+                for key, items in sorted(groups.items()):
+                    level_key, year_key, period_key = key
+                    project_name = f"{level_key}-{year_key}-tijdvak-{period_key}"
+                    project_dir = target_root / project_name
+                    (project_dir / "bronnen").mkdir(parents=True)
+                    (project_dir / "analyse").mkdir()
+                    (project_dir / "snippets").mkdir()
+                    confirmed_identity = {"level": "Havo" if level_key == "havo" else "Vwo",
+                                          "year": year_key, "period": period_key,
+                                          "confidence": 1.0, "source": "handmatig_bevestigd"}
+                    project_docs = []
+                    for doc in items:
+                        source = Path(doc["source_path"])
+                        target = project_dir / "bronnen" / doc["opslagbestand"]
+                        shutil.copy2(source, target)
+                        extracted = doc["_extracted"]
+                        (project_dir / "analyse" / f"{doc['id']}.json").write_text(
+                            json.dumps(extracted, ensure_ascii=False, indent=2), encoding="utf-8")
+                        clean_doc = {k: v for k, v in doc.items() if k not in {"source_path", "_extracted"}}
+                        clean_doc["exam_metadata"] = dict(confirmed_identity)
+                        clean_doc["status"] = "handmatig_bevestigd"
+                        project_docs.append(clean_doc)
+                    project_data = {
+                        "schema": "biologie-examenproject-v1", "app_versie": APP_VERSION,
+                        "naam": project_name, "aangemaakt": now(), "bijgewerkt": now(),
+                        "exam_metadata": confirmed_identity, "documenten": project_docs,
+                        "beslissingen": [], "publicatiestatus": "niet_vrijgegeven",
+                        "vraagkandidaten": [], "vraagrecords": [],
+                    }
+                    (project_dir / PROJECT_FILE).write_text(json.dumps(project_data, ensure_ascii=False, indent=2), encoding="utf-8")
+                    created.append(project_dir)
+                    manifest["projecten"].append({
+                        "naam": project_name, "pad": project_name, "exam_metadata": confirmed_identity,
+                        "documenten": [d["bestand"] for d in project_docs],
+                        "waarschuwingen": batch_document_warnings(items),
+                    })
+                (target_root / "jaarset.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+            except Exception as exc:
+                shutil.rmtree(target_root, ignore_errors=True)
+                messagebox.showerror("Jaarset importeren mislukt",
+                    f"Er is een fout opgetreden. De onvolledige jaarsetmap is verwijderd; bestaande projecten zijn niet gewijzigd.\n\n{exc}", parent=win)
+                return
+            win.destroy()
+            self.project_dir = None
+            self.data = None
+            self.project_label.configure(text=f"Jaarset geïmporteerd: {target_root}")
+            for item in self.table.get_children():
+                self.table.delete(item)
+            self.status.configure(text=f"{len(created)} examenprojecten aangemaakt. Open een project om de inhoudelijke verwerking te starten.")
+            self._log(f"Jaarset geïmporteerd: {target_root}")
+            for project in created:
+                self._log(f"  Project aangemaakt: {project.name}")
+            messagebox.showinfo("Jaarset geïmporteerd",
+                f"{len(created)} examenprojecten zijn aangemaakt in:\n{target_root}\n\nOpen daarna per examen het projectbestand project.json. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.")
+
+        ttk.Button(win, text="Herkenning geselecteerde PDF aanpassen", command=edit_selected).pack(side="left", padx=12, pady=8)
+        ttk.Button(win, text="Alle voorstellen controleren en jaarset importeren", command=confirm_import, style="Accent.TButton").pack(side="right", padx=12, pady=8)
+        ttk.Button(win, text="Annuleren", command=win.destroy).pack(side="right", pady=8)
+        refresh_review()
+        self._log(f"Jaarset voorbereid voor controle: {len(documents)} unieke PDF's. Nog niets opgeslagen of verwerkt.")
 
     def add_pdfs(self):
         if not self.data:
