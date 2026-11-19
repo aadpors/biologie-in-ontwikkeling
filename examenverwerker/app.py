@@ -303,31 +303,37 @@ class ExamApp:
         ttk.Entry(number_row, textvariable=self._workspace_number, width=7).pack(side="left", padx=6)
         ttk.Button(number_row, text="Opslaan", command=self._workspace_save_candidate).pack(side="right")
 
+        # Keep the decision controls above the expanding text editor.  With
+        # the editor packed first using expand=True, Tk can allocate the whole
+        # short review panel to it and push the approval buttons below the
+        # visible area on ordinary laptop/window sizes.
+        decision_box = ttk.LabelFrame(review, text="BEOORDELING VRAAGSTART", padding=(6, 5))
+        decision_box.pack(side="top", fill="x", pady=(0, 6))
+        decision_row = ttk.Frame(decision_box)
+        decision_row.pack(fill="x")
+        ttk.Button(decision_row, text="✓ Akkoord", command=lambda: self._workspace_decide(True),
+                   style="Accent.TButton").pack(side="left", fill="x", expand=True, padx=(0, 3))
+        ttk.Button(decision_row, text="✕ Geen vraag", command=lambda: self._workspace_decide(False),
+                   style="Secondary.TButton").pack(side="left", fill="x", expand=True, padx=3)
+        ttk.Button(decision_row, text="? Twijfel", command=lambda: self._workspace_decide(None),
+                   style="Secondary.TButton").pack(side="left", fill="x", expand=True, padx=(3, 0))
+        ttk.Button(review, text="Concept-vraagrecord samenstellen",
+                   command=self._workspace_create_record, style="Wine.TButton").pack(side="top", fill="x", pady=(0, 5))
+        ttk.Button(review, text="Onderdrukte nummerkandidaten bekijken",
+                   command=lambda: self.show_suppressed_candidates(self.root)).pack(side="top", fill="x", pady=(0, 5))
         ttk.Label(review, text="Vraagtekst / opdrachtformulering").pack(anchor="w")
-        self._workspace_text = tk.Text(review, height=12, wrap="word", font=("Segoe UI", 9),
+        self._workspace_text = tk.Text(review, height=5, wrap="word", font=("Segoe UI", 9),
                                        undo=True, padx=7, pady=6)
         self._workspace_text.pack(fill="both", expand=True, pady=(3, 5))
         self._workspace_detected_details = ttk.Label(review, text="", style="Muted.TLabel",
             wraplength=330, justify="left")
-        self._workspace_detected_details.pack(fill="x", pady=(0, 6))
+        self._workspace_detected_details.pack(fill="x", pady=(0, 4))
         ttk.Label(review, text="Notitie bij de beoordeling").pack(anchor="w")
-        self._workspace_note = tk.Text(review, height=4, wrap="word", font=("Segoe UI", 9),
+        self._workspace_note = tk.Text(review, height=2, wrap="word", font=("Segoe UI", 9),
                                        undo=True, padx=7, pady=5)
-        self._workspace_note.pack(fill="x", pady=(3, 8))
+        self._workspace_note.pack(fill="x", pady=(3, 4))
         ttk.Button(review, text="Tekst en notitie bewaren", command=self._workspace_save_candidate,
-                   style="Secondary.TButton").pack(fill="x", pady=(0, 8))
-        ttk.Separator(review).pack(fill="x", pady=5)
-        ttk.Label(review, text="Beoordeel deze vraagstart").pack(anchor="w", pady=(0, 5))
-        ttk.Button(review, text="✓  Dit is een vraag", command=lambda: self._workspace_decide(True),
-                   style="Accent.TButton").pack(fill="x", pady=3)
-        ttk.Button(review, text="✕  Geen vraag", command=lambda: self._workspace_decide(False),
-                   style="Secondary.TButton").pack(fill="x", pady=3)
-        ttk.Button(review, text="?  Twijfel / later beoordelen", command=lambda: self._workspace_decide(None),
-                   style="Secondary.TButton").pack(fill="x", pady=3)
-        ttk.Button(review, text="Concept-vraagrecord samenstellen",
-                   command=self._workspace_create_record, style="Wine.TButton").pack(fill="x", pady=(10, 3))
-        ttk.Button(review, text="Onderdrukte nummerkandidaten bekijken",
-                   command=lambda: self.show_suppressed_candidates(self.root)).pack(fill="x", pady=3)
+                   style="Secondary.TButton").pack(side="top", fill="x", pady=(0, 2))
 
         footer = ttk.Frame(shell, style="App.TFrame")
         footer.pack(fill="x", pady=(7, 0))
