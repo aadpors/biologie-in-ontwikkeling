@@ -212,4 +212,25 @@ class ExportTests(unittest.TestCase):
             self.assertIn("contextbijschrift_niet_handmatig_bevestigd",[x["error"] for x in errors])
 
 
+    def test_export_blocks_records_invalidated_by_changed_question_or_cv_regions(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            record["exam_structure_invalidated"]=True
+            record["cv_region_invalidated"]=True
+            errors=validate_review_records([record],project)
+            codes=[x["error"] for x in errors]
+            self.assertIn("vraag_contextstructuur_gewijzigd_record_opnieuw_samenstellen",codes)
+            self.assertIn("cv_regio_gewijzigd_record_opnieuw_samenstellen",codes)
+
+    def test_export_blocks_tampered_manual_question_and_cv_renders(self):
+        with tempfile.TemporaryDirectory() as d:
+            project,record=self.make_fixture(d)
+            (project/"snippets"/"vraag1.png").write_bytes(b"tampered question image")
+            (project/"snippets"/"cv1.jpg").write_bytes(b"tampered CV image")
+            errors=validate_review_records([record],project)
+            codes=[x["error"] for x in errors]
+            self.assertIn("vraagfragment_render_hash_afwijkend",codes)
+            self.assertIn("cv_handmatige_uitsnede_hash_afwijkend",codes)
+
+
 if __name__=="__main__": unittest.main()
