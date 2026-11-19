@@ -1033,6 +1033,13 @@ class ExamApp:
             for asset in record.get("context_asset_files", []):
                 if asset.get("source_document_id")==record.get("exam_structure_document_id") and asset.get("page"):
                     source_page_numbers.add(int(asset["page"]))
+            if source_page_numbers:
+                source_page_count = int(analyze_pdf(source)["page_count"])
+                adjacent_pages = set(source_page_numbers)
+                for page_no in source_page_numbers:
+                    if page_no > 1: adjacent_pages.add(page_no - 1)
+                    if page_no < source_page_count: adjacent_pages.add(page_no + 1)
+                source_page_numbers = adjacent_pages
             for page_no in sorted(source_page_numbers-shown_source_pages):
                 target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-opgaven-p{page_no}.png"
                 preview_specs.append((f"Originele opgavenpagina {page_no}",source,page_no,target))
@@ -1041,10 +1048,17 @@ class ExamApp:
             preview_specs.append(("Handmatig afgebakend CV-fragment",self.project_dir/"snippets"/cv_snippet,None,None))
         cv_path=self.project_dir/"bronnen"/str(record.get("cv_pdf",""))
         if cv_path.is_file():
-            for cv_index,span in enumerate(record.get("cv_source_region", {}).get("page_spans", []),1):
-                page_no=int(span["page"])
+            cv_spans=record.get("cv_source_region", {}).get("page_spans", [])
+            cv_page_count=int(analyze_pdf(cv_path)["page_count"])
+            cv_page_numbers={int(x["page"]) for x in cv_spans}
+            for page_no in list(cv_page_numbers):
+                if page_no > 1: cv_page_numbers.add(page_no - 1)
+                if page_no < cv_page_count: cv_page_numbers.add(page_no + 1)
+            for page_no in sorted(cv_page_numbers):
                 target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-cv-origineel-p{page_no}.png"
-                preview_specs.append((f"Originele CV-pagina {page_no} (afgebakende regio {cv_index})",cv_path,page_no,target))
+                selected = any(int(x["page"]) == page_no for x in cv_spans)
+                label = "afgebakend" if selected else "aangrenzend"
+                preview_specs.append((f"Originele CV-pagina {page_no} ({label})",cv_path,page_no,target))
         amendment_snippets=record.get("cv_amendment_snippet_files") or ([record["cv_amendment_snippet_file"]] if record.get("cv_amendment_snippet_file") else [])
         for amendment_index, amendment_snippet in enumerate(amendment_snippets, 1):
             preview_specs.append((f"Handmatig afgebakende CV-aanvulling {amendment_index}",self.project_dir/"snippets"/amendment_snippet,None,None))
