@@ -262,7 +262,7 @@ class ExportTests(unittest.TestCase):
                 "file":"manual-context.png",
                 "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
                 "asset_id":"manual-p2-001","asset_kind":"figuur","type":"figuur",
-                "page":2,"bbox":[0.0,40.0,595.0,420.0],
+                "page":2,"page_size":[595.0,842.0],"bbox":[0.0,40.0,595.0,420.0],
                 "source_document_id":record["exam_structure_document_id"],
                 "source_sha256":record["exam_structure_source_sha256"],
                 "source_pdf":record["source_pdf"],"question_number":record["number"],
@@ -281,6 +281,8 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(context["contextAssets"][0]["crop_method"],"handmatige_paginabrede_strook_op_originele_pdf")
             exported=manifest["records"][0]["context_asset_files"][0]
             self.assertEqual(exported["bbox"],asset["bbox"])
+            self.assertEqual(exported["bbox"][0],0.0)
+            self.assertEqual(exported["bbox"][2],595.0)
             self.assertEqual(exported["fragment_id"],"intro-1")
             self.assertEqual(exported["source_sha256"],record["exam_structure_source_sha256"])
 
@@ -314,7 +316,7 @@ class ExportTests(unittest.TestCase):
                 "file":"manual-context.png",
                 "snippet_sha256":hashlib.sha256((project/"snippets"/"manual-context.png").read_bytes()).hexdigest(),
                 "asset_id":"manual-p2-link","asset_kind":"figuur","type":"figuur",
-                "page":2,"bbox":[0,40,595,420],
+                "page":2,"page_size":[595,842],"bbox":[0,40,595,420],
                 "source_document_id":record["exam_structure_document_id"],
                 "source_sha256":record["exam_structure_source_sha256"],
                 "source_pdf":record["source_pdf"],"question_number":record["number"],
