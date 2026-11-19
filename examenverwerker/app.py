@@ -1321,6 +1321,155 @@ class ExamApp:
         page_spin.bind("<FocusOut>", lambda _e: show_page())
         show_page()
 
+    def open_cv_region_editor(self, record, cv_doc, on_saved=None):
+        """Manually delimit a question's correction-scheme region on the untouched source PDF."""
+        source = self.project_dir / "bronnen" / cv_doc["opslagbestand"]
+        if not source.is_file():
+            messagebox.showerror("CV ontbreekt", "De oorspronkelijke CV-PDF is niet gevonden.")
+            return
+        role = cv_doc.get("type_voorstel", "correctievoorschrift")
+        if role not in ("correctievoorschrift", "aanvulling"):
+            messagebox.showerror("Verkeerd documenttype", "Kies een correctievoorschrift of officiële aanvulling.")
+            return
+        try:
+            analysis = analyze_pdf(source)
+            page_count = int(analysis["page_count"])
+            page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in analysis["pages"]}
+        except Exception as exc:
+            self._error("CV-pagina's voorbereiden", exc)
+            return
+        question_number = int(record["number"])
+        all_regions = self.data.setdefault("cv_regions", {})
+        doc_regions = all_regions.setdefault(cv_doc["id"], {})
+        existing = doc_regions.get(str(question_number), {})
+        spans = [dict(x) for x in existing.get("page_spans", [])]
+        win = tk.Toplevel(self.root)
+        win.title(f"{'CV-aanvulling' if role == 'aanvulling' else 'Correctievoorschrift'} · vraag {question_number}")
+        win.geometry("1120x850")
+        win.transient(self.root)
+        ttk.Label(win, text=f"Bak de volledige beoordelingsinformatie voor vraag {question_number} af in {cv_doc['bestand']}.",
+                  padding=10, wraplength=1080).pack(anchor="w")
+        ttk.Label(win, text="Gebruik dezelfde twee dunne zwarte lijnen. Buiten de selectie staat een lichte grijze arcering. Neem alle beoordelingsregels, punten en eventuele vervolgpagina's mee.",
+                  padding=(10, 0, 10, 8), wraplength=1080).pack(anchor="w")
+        nav = ttk.Frame(win, padding=(10, 4)); nav.pack(fill="x")
+        page_var = tk.IntVar(value=spans[0]["page"] if spans else 1)
+        ttk.Button(nav, text="◀", command=lambda: change_page(-1)).pack(side="left")
+        ttk.Label(nav, text="Pagina").pack(side="left", padx=6)
+        spin = tk.Spinbox(nav, from_=1, to=page_count, textvariable=page_var, width=5)
+        spin.pack(side="left")
+        ttk.Label(nav, text=f"van {page_count}").pack(side="left", padx=6)
+        ttk.Label(nav, text=f"Afgebakende pagina's: {', '.join(str(x['page']) for x in spans) or 'nog geen'}").pack(side="left", padx=12)
+        frame = ttk.Frame(win); frame.pack(fill="both", expand=True, padx=10, pady=4)
+        canvas = tk.Canvas(frame, background="white", highlightthickness=1, highlightbackground="#b8b8b8")
+        sy = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
+        sx = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
+        canvas.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
+        sy.pack(side="right", fill="y"); sx.pack(side="bottom", fill="x"); canvas.pack(side="left", fill="both", expand=True)
+        photo = None
+        image_width = image_height = 1
+        top_y, bottom_y = 0.06, 0.94
+        drag_target = None
+        line_ids = []
+        shade_ids = []
+        def current_span():
+            return make_page_span(int(page_var.get()), top_y, bottom_y)
+        def store_current_span():
+            span = current_span()
+            spans[:] = [x for x in spans if int(x["page"]) != span["page"]]
+            spans.append(span)
+            spans.sort(key=lambda x: int(x["page"]))
+        def draw_guides():
+            nonlocal line_ids, shade_ids
+            for item in line_ids + shade_ids:
+                canvas.delete(item)
+            line_ids, shade_ids = [], []
+            if photo is None:
+                return
+            y0, y1 = top_y * image_height, bottom_y * image_height
+            shade_ids.append(canvas.create_rectangle(0, 0, image_width, y0, fill="#c8c8c8", stipple="gray50", outline=""))
+            shade_ids.append(canvas.create_rectangle(0, y1, image_width, image_height, fill="#c8c8c8", stipple="gray50", outline=""))
+            line_ids.append(canvas.create_line(0, y0, image_width, y0, fill="black", width=1))
+            line_ids.append(canvas.create_line(0, y1, image_width, y1, fill="black", width=1))
+            for item in line_ids:
+                canvas.tag_raise(item)
+            canvas.configure(scrollregion=(0, 0, image_width, image_height))
+        def show_page():
+            nonlocal photo, image_width, image_height, top_y, bottom_y
+            try:
+                page_no = max(1, min(page_count, int(page_var.get())))
+            except (ValueError, tk.TclError):
+                page_no = 1
+            page_var.set(page_no)
+            saved = next((x for x in spans if int(x["page"]) == page_no), None)
+            top_y, bottom_y = (float(saved["top"]), float(saved["bottom"])) if saved else (0.06, 0.94)
+            target = self.project_dir / "analyse" / f"cv-region-{cv_doc['id']}-p{page_no}.png"
+            render_page(source, page_no, target, scale=1.05)
+            photo = tk.PhotoImage(file=str(target))
+            image_width, image_height = photo.width(), photo.height()
+            canvas.delete("all")
+            canvas.create_image(0, 0, image=photo, anchor="nw")
+            canvas.image = photo
+            draw_guides()
+            page_label.configure(text=f"Afgebakende pagina's: {', '.join(str(x['page']) for x in spans) or 'nog geen'}")
+        def change_page(delta):
+            try:
+                store_current_span()
+                page_var.set(max(1, min(page_count, int(page_var.get()) + delta)))
+                show_page()
+            except Exception as exc:
+                messagebox.showerror("Grens niet opgeslagen", str(exc), parent=win)
+        page_label = ttk.Label(nav, text="")
+        page_label.pack(side="left", padx=10)
+        def on_press(event):
+            nonlocal drag_target
+            y = canvas.canvasy(event.y)
+            drag_target = "top" if abs(y - top_y * image_height) <= 12 else ("bottom" if abs(y - bottom_y * image_height) <= 12 else None)
+        def on_drag(event):
+            nonlocal top_y, bottom_y
+            if not drag_target:
+                return
+            y = max(0.0, min(float(image_height), canvas.canvasy(event.y))) / image_height
+            if drag_target == "top":
+                top_y = min(y, bottom_y - 0.01)
+            else:
+                bottom_y = max(y, top_y + 0.01)
+            draw_guides()
+        canvas.bind("<Button-1>", on_press); canvas.bind("<B1-Motion>", on_drag)
+        actions = ttk.Frame(win, padding=10); actions.pack(fill="x")
+        def save_region():
+            try:
+                store_current_span()
+                fragment = make_cv_fragment(cv_doc, question_number, spans,
+                    document_role=role)
+                errors = validate_cv_fragment(fragment, cv_doc, question_number, role)
+                if errors:
+                    raise ValueError("Controleer de CV-afbakening: " + ", ".join(errors))
+                segments = page_spans_to_segments(spans, page_sizes)
+                prefix = "cv-amend" if role == "aanvulling" else "cv"
+                name = f"{prefix}-{cv_doc['id']}-q{question_number}-handmatig.png"
+                target = self.project_dir / "snippets" / name
+                render_composite_crops(source, segments, target, scale=1.35)
+                doc_regions[str(question_number)] = fragment
+                self.save_project()
+                if on_saved:
+                    on_saved(name, fragment)
+                self._log(f"CV-fragment voor vraag {question_number} handmatig afgebakend uit {cv_doc['bestand']}.")
+                preview = tk.Toplevel(win); preview.title(f"Gecontroleerde CV-uitsnede · vraag {question_number}"); preview.geometry("850x700")
+                p = tk.PhotoImage(file=str(target))
+                c = tk.Canvas(preview, background="white"); c.pack(fill="both", expand=True)
+                c.create_image(0, 0, image=p, anchor="nw"); c.image = p
+                c.configure(scrollregion=c.bbox("all"))
+                messagebox.showinfo("CV-fragment opgeslagen", "De handmatig afgebakende CV-regio en de uitsnede zijn opgeslagen. Controleer de volledige uitsnede in de voorvertoning.", parent=win)
+                win.destroy()
+            except Exception as exc:
+                messagebox.showerror("CV-fragment niet opgeslagen", str(exc), parent=win)
+        ttk.Button(actions, text="Deze pagina toevoegen / bijwerken", command=lambda: (store_current_span(), page_label.configure(text=f"Afgebakende pagina's: {', '.join(str(x['page']) for x in spans)}"))).pack(side="left")
+        ttk.Button(actions, text="CV-fragment opslaan en uitsnede maken", command=save_region).pack(side="left", padx=8)
+        ttk.Button(actions, text="Sluiten", command=win.destroy).pack(side="right")
+        spin.bind("<Return>", lambda _e: show_page())
+        spin.bind("<FocusOut>", lambda _e: show_page())
+        show_page()
+
     def selected_doc(self):
         selected = self.table.selection()
         if not selected or not self.data:
