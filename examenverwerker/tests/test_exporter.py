@@ -265,7 +265,7 @@ class ExportTests(unittest.TestCase):
                 "source_document_id":record["exam_structure_document_id"],
                 "source_sha256":record["exam_structure_source_sha256"],
                 "source_pdf":record["source_pdf"],"question_number":record["number"],
-                "fragment_id":"context-fragment-1",
+                "fragment_id":"intro-1",
                 "crop_method":"handmatige_rechthoek_op_originele_pdf",
                 "caption":"Figuur bij de context","caption_human_confirmed":True,
             }
@@ -280,7 +280,7 @@ class ExportTests(unittest.TestCase):
             self.assertEqual(context["contextAssets"][0]["crop_method"],"handmatige_rechthoek_op_originele_pdf")
             exported=manifest["records"][0]["context_asset_files"][0]
             self.assertEqual(exported["bbox"],asset["bbox"])
-            self.assertEqual(exported["fragment_id"],"context-fragment-1")
+            self.assertEqual(exported["fragment_id"],"intro-1")
             self.assertEqual(exported["source_sha256"],record["exam_structure_source_sha256"])
 
     def test_manual_context_crop_with_bad_geometry_or_missing_provenance_is_blocked(self):
