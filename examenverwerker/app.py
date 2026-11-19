@@ -1351,6 +1351,28 @@ class ExamApp:
                 save_structure()
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
+        def update_page_span():
+            frag = selected_fragment()
+            if not frag:
+                messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waarvan je de huidige paginagrens wilt aanpassen.", parent=win)
+                return
+            try:
+                updated = dict(frag)
+                spans = [dict(x) for x in frag.get("page_spans", [])]
+                span = make_page_span(page_var.get(), top_y, bottom_y)
+                existing_index = next((i for i, item in enumerate(spans) if int(item["page"]) == span["page"]), None)
+                if existing_index is None:
+                    spans.append(span)
+                else:
+                    spans[existing_index] = span
+                spans.sort(key=lambda x: int(x["page"]))
+                updated["page_spans"] = spans
+                fragments[int(fragment_tree.selection()[0])] = updated
+                refresh_fragment_list()
+                fragment_tree.selection_set(str(fragments.index(updated)))
+                save_structure()
+            except Exception as exc:
+                messagebox.showerror("Paginagrens niet bijgewerkt", str(exc), parent=win)
         def append_page():
             frag = selected_fragment()
             if not frag:
@@ -1388,10 +1410,14 @@ class ExamApp:
             save_structure(); refresh_fragment_list()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
+        ttk.Button(actions, text="Huidige paginagrens bijwerken", command=update_page_span).pack(side="left", padx=8)
         ttk.Button(actions, text="Pagina toevoegen aan geselecteerd fragment", command=append_page).pack(side="left", padx=8)
         ttk.Button(actions, text="Koppeling opslaan", command=update_links).pack(side="left")
         ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
-        ttk.Button(actions, text="Structuur opslaan en sluiten", command=lambda: (save_structure(), win.destroy())).pack(side="right")
+        def save_and_close():
+            if save_structure():
+                win.destroy()
+        ttk.Button(actions, text="Structuur opslaan en sluiten", command=save_and_close).pack(side="right")
         refresh_fragment_list()
         if fragments: fragment_tree.selection_set("0")
         page_spin.bind("<Return>", lambda _e: show_page())
