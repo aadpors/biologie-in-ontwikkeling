@@ -7,8 +7,40 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 
 from structure import validate_exam_structure
+
+
+def restore_import_batch(examens_root, current_folder, data: dict,
+                        project_file: str = "project.json"):
+    """Safely restore a batch queue from the manifest linked to an exam project."""
+    manifest_name = data.get("import_batch_manifest")
+    if not manifest_name:
+        return None
+    root = Path(examens_root).resolve()
+    manifest_path = root / Path(str(manifest_name)).name
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("schema") != "biologie-examenimport-v1":
+            return None
+        paths = []
+        for entry in manifest.get("projecten", []):
+            relative_path = entry.get("pad")
+            if not isinstance(relative_path, str) or not relative_path:
+                return None
+            candidate = (root / relative_path).resolve()
+            if not candidate.is_relative_to(root):
+                return None
+            if (candidate / project_file).is_file():
+                paths.append(candidate)
+        current = Path(current_folder).resolve()
+        if current not in paths:
+            return None
+        return {"paths": paths, "index": paths.index(current),
+                "manifest_path": manifest_path}
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return None
 
 
 def exam_export_fingerprint(data: dict) -> str:
