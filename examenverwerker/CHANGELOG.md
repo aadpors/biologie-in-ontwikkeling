@@ -12,3 +12,7 @@
 - Export blokkeert ontbrekende, gewijzigde of verkeerd gekoppelde bronregio's.
 - Auditmanifest bevat bronhashes, fragmentkoppelingen, contextassets en CV-regio's.
 - Extra regressietests voor multi-page fragmenten, bronherkomst, contextscheiding en exportblokkades.
+- Bestaande records worden ongeldig verklaard wanneer vraag-/contextgrenzen of CV-regio's worden gewijzigd.
+- SHA-256-controle van alle gegenereerde vraag-, context-, CV- en aanvullingsuitsneden.
+- Scrollbare formulieren en volledige originele pagina's rond geselecteerde regio's in de eindcontrole.
+- Praktijktestplan toegevoegd aan de portable map.
