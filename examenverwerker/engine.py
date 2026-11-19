@@ -306,7 +306,7 @@ def propose_context_fragments(analysis: dict, candidates: list[dict]) -> list[di
                 continue
             proposals.append({
                 "id": f"voorstel-context-{page_no}-{index}-{linked.get('number')}",
-                "type": "vraagcontext",
+                "type": "tussen_context",
                 "page_spans": [{"page": page_no, "top": round(top, 6), "bottom": round(bottom, 6)}],
                 "question_numbers": [int(linked["number"])],
                 "status": "automatisch_voorstel_nog_te_controleren",
