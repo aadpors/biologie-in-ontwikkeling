@@ -1346,9 +1346,10 @@ class ExamApp:
                   wraplength=230).pack(anchor="w", pady=8)
         nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
         page_var = tk.IntVar(value=1)
+        displayed_page = 1
         ttk.Button(nav, text="◀", width=3, command=lambda: change_page(-1)).pack(side="left")
         ttk.Label(nav, text="Pagina").pack(side="left", padx=(8, 3))
-        page_spin = tk.Spinbox(nav, from_=1, to=page_count, textvariable=page_var, width=5, command=lambda: show_page())
+        page_spin = tk.Spinbox(nav, from_=1, to=page_count, textvariable=page_var, width=5, command=lambda: jump_question_page())
         page_spin.pack(side="left")
         ttk.Label(nav, text=f"van {page_count}").pack(side="left", padx=(4, 12))
         frame = ttk.Frame(right); frame.pack(fill="both", expand=True)
@@ -1396,12 +1397,13 @@ class ExamApp:
             else:
                 top_y, bottom_y = 0.06, 0.94
         def show_page():
-            nonlocal photo, page_image_width, page_image_height
+            nonlocal photo, page_image_width, page_image_height, displayed_page
             try:
                 number = max(1, min(page_count, int(page_var.get())))
             except (ValueError, tk.TclError):
                 number = 1
             page_var.set(number)
+            displayed_page = number
             target = self.project_dir / "analyse" / f"structuur-{doc['id']}-p{number}.png"
             render_page(source, number, target, scale=1.05)
             photo = tk.PhotoImage(file=str(target))
@@ -1413,7 +1415,7 @@ class ExamApp:
             redraw_guides()
         def change_page(delta):
             frag = selected_fragment()
-            if frag and any(int(x["page"]) == int(page_var.get()) for x in frag.get("page_spans", [])):
+            if frag and any(int(x["page"]) == displayed_page for x in frag.get("page_spans", [])):
                 update_page_span()
             page_var.set(max(1, min(page_count, int(page_var.get()) + delta)))
             show_page()
@@ -1442,7 +1444,7 @@ class ExamApp:
         def save_structure():
             current = selected_fragment()
             if current and any(int(x["page"]) == int(page_var.get()) for x in current.get("page_spans", [])):
-                span = make_page_span(page_var.get(), top_y, bottom_y)
+                span = make_page_span(displayed_page, top_y, bottom_y)
                 current["page_spans"] = [span if int(x["page"]) == span["page"] else dict(x)
                                          for x in current["page_spans"]]
             structure = make_exam_structure(doc, fragments, question_numbers)
@@ -1461,7 +1463,7 @@ class ExamApp:
                 kind = type_var.get()
                 links = selected_links()
                 if kind == "context_intro" and not links: links = question_numbers[:]
-                span = make_page_span(page_var.get(), top_y, bottom_y)
+                span = make_page_span(displayed_page, top_y, bottom_y)
                 fragment = make_fragment(kind, span, links, question_numbers,
                     f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}")
                 fragments.append(fragment)
@@ -1498,7 +1500,7 @@ class ExamApp:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waaraan je deze pagina wilt toevoegen.", parent=win)
                 return
             try:
-                updated = append_page_span(frag, make_page_span(page_var.get(), top_y, bottom_y))
+                updated = append_page_span(frag, make_page_span(displayed_page, top_y, bottom_y))
                 fragments[int(fragment_tree.selection()[0])] = updated
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(fragments.index(updated)))
@@ -1541,11 +1543,10 @@ class ExamApp:
         if fragments: fragment_tree.selection_set("0")
         def jump_question_page(_event=None):
             current = selected_fragment()
-            if current and any(int(x["page"]) == int(page_var.get()) for x in current.get("page_spans", [])):
+            if current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
                 update_page_span()
             show_page()
         page_spin.bind("<Return>", jump_question_page)
-        page_spin.bind("<FocusOut>", jump_question_page)
         show_page()
 
     def open_cv_region_editor(self, record, cv_doc, on_saved=None):
@@ -1580,6 +1581,7 @@ class ExamApp:
                   padding=(10, 0, 10, 8), wraplength=1080).pack(anchor="w")
         nav = ttk.Frame(win, padding=(10, 4)); nav.pack(fill="x")
         page_var = tk.IntVar(value=spans[0]["page"] if spans else 1)
+        displayed_page = int(page_var.get())
         ttk.Button(nav, text="◀", command=lambda: change_page(-1)).pack(side="left")
         ttk.Label(nav, text="Pagina").pack(side="left", padx=6)
         spin = tk.Spinbox(nav, from_=1, to=page_count, textvariable=page_var, width=5)
@@ -1596,15 +1598,21 @@ class ExamApp:
         image_width = image_height = 1
         top_y, bottom_y = 0.06, 0.94
         drag_target = None
+        dirty = False
         line_ids = []
         shade_ids = []
         def current_span():
-            return make_page_span(int(page_var.get()), top_y, bottom_y)
-        def store_current_span():
+            return make_page_span(displayed_page, top_y, bottom_y)
+        def store_current_span(force=False):
+            nonlocal dirty
+            existing = any(int(x["page"]) == displayed_page for x in spans)
+            if not force and not dirty and not existing:
+                return
             span = current_span()
             spans[:] = [x for x in spans if int(x["page"]) != span["page"]]
             spans.append(span)
             spans.sort(key=lambda x: int(x["page"]))
+            dirty = False
         def draw_guides():
             nonlocal line_ids, shade_ids
             for item in line_ids + shade_ids:
@@ -1621,12 +1629,13 @@ class ExamApp:
                 canvas.tag_raise(item)
             canvas.configure(scrollregion=(0, 0, image_width, image_height))
         def show_page():
-            nonlocal photo, image_width, image_height, top_y, bottom_y
+            nonlocal photo, image_width, image_height, top_y, bottom_y, displayed_page
             try:
                 page_no = max(1, min(page_count, int(page_var.get())))
             except (ValueError, tk.TclError):
                 page_no = 1
             page_var.set(page_no)
+            displayed_page = page_no
             saved = next((x for x in spans if int(x["page"]) == page_no), None)
             top_y, bottom_y = (float(saved["top"]), float(saved["bottom"])) if saved else (0.06, 0.94)
             target = self.project_dir / "analyse" / f"cv-region-{cv_doc['id']}-p{page_no}.png"
@@ -1641,7 +1650,7 @@ class ExamApp:
         def change_page(delta):
             try:
                 store_current_span()
-                page_var.set(max(1, min(page_count, int(page_var.get()) + delta)))
+                page_var.set(max(1, min(page_count, displayed_page + delta)))
                 show_page()
             except Exception as exc:
                 messagebox.showerror("Grens niet opgeslagen", str(exc), parent=win)
@@ -1652,7 +1661,7 @@ class ExamApp:
             y = canvas.canvasy(event.y)
             drag_target = "top" if abs(y - top_y * image_height) <= 12 else ("bottom" if abs(y - bottom_y * image_height) <= 12 else None)
         def on_drag(event):
-            nonlocal top_y, bottom_y
+            nonlocal top_y, bottom_y, dirty
             if not drag_target:
                 return
             y = max(0.0, min(float(image_height), canvas.canvasy(event.y))) / image_height
@@ -1660,6 +1669,7 @@ class ExamApp:
                 top_y = min(y, bottom_y - 0.01)
             else:
                 bottom_y = max(y, top_y + 0.01)
+            dirty = True
             draw_guides()
         canvas.bind("<Button-1>", on_press); canvas.bind("<B1-Motion>", on_drag)
         actions = ttk.Frame(win, padding=10); actions.pack(fill="x")
@@ -1690,7 +1700,7 @@ class ExamApp:
                 win.destroy()
             except Exception as exc:
                 messagebox.showerror("CV-fragment niet opgeslagen", str(exc), parent=win)
-        ttk.Button(actions, text="Deze pagina toevoegen / bijwerken", command=lambda: (store_current_span(), page_label.configure(text=f"Afgebakende pagina's: {', '.join(str(x['page']) for x in spans)}"))).pack(side="left")
+        ttk.Button(actions, text="Deze pagina toevoegen / bijwerken", command=lambda: (store_current_span(True), page_label.configure(text=f"Afgebakende pagina's: {', '.join(str(x['page']) for x in spans)}"))).pack(side="left")
         ttk.Button(actions, text="CV-fragment opslaan en uitsnede maken", command=save_region).pack(side="left", padx=8)
         ttk.Button(actions, text="Sluiten", command=win.destroy).pack(side="right")
         def jump_to_page(_event=None):
@@ -1699,8 +1709,8 @@ class ExamApp:
                 show_page()
             except Exception as exc:
                 messagebox.showerror("Paginagrens niet opgeslagen", str(exc), parent=win)
+        spin.configure(command=jump_to_page)
         spin.bind("<Return>", jump_to_page)
-        spin.bind("<FocusOut>", jump_to_page)
         show_page()
 
     def selected_doc(self):
