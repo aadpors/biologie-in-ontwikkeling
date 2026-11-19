@@ -230,11 +230,11 @@ class ExamApp:
         win.grab_set()
         ttk.Label(win, text=f"{len(documents)} unieke PDF's gevonden. Controleer niveau, jaar, tijdvak en documenttype. Er wordt nog niets verwerkt of verplaatst.",
                   padding=12, wraplength=1060).pack(anchor="w")
-        columns = ("file", "role", "certainty", "level", "year", "period", "pages", "state")
+        columns = ("file", "role", "certainty", "meta_confidence", "level", "year", "period", "pages", "state")
         tree = ttk.Treeview(win, columns=columns, show="headings", selectmode="browse")
         headings = [
-            ("file", "Bestand", 300), ("role", "Documenttype", 150), ("certainty", "Zekerheid", 75),
-            ("level", "Niveau", 75), ("year", "Jaar", 65), ("period", "Tijdvak", 65),
+            ("file", "Bestand", 280), ("role", "Documenttype", 145), ("certainty", "Typezekerheid", 85),
+            ("meta_confidence", "Metazekerheid", 85), ("level", "Niveau", 70), ("year", "Jaar", 60), ("period", "Tijdvak", 65),
             ("pages", "Pagina's", 65), ("state", "Controle", 170)]
         for col, title, width in headings:
             tree.heading(col, text=title)
@@ -260,7 +260,8 @@ class ExamApp:
                     state = "Metadata ontbreekt"
                 tree.insert("", "end", iid=str(index), values=(
                     doc["bestand"], doc.get("type_voorstel", "onbekend"),
-                    f"{doc.get('type_zekerheid', 0):.0%}", *identity_text(doc),
+                    f"{doc.get('type_zekerheid', 0):.0%}",
+                    f"{meta.get('confidence', 0):.0%}" if meta else "—", *identity_text(doc),
                     doc.get("pagina_aantal", 0), state))
             summary = []
             for key, items in groups.items():
