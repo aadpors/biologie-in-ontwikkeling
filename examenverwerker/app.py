@@ -1135,8 +1135,7 @@ class ExamApp:
         tree = ttk.Treeview(list_panel, columns=columns, show="headings", selectmode="browse")
         for col, title, width in [
             ("file", "Bestand", 190), ("role", "Type", 105), ("level", "Niveau", 55),
-            ("year", "Jaar", 48), ("period", "Tv", 32), ("state", "Controle", 115)]
-            :
+            ("year", "Jaar", 48), ("period", "Tv", 32), ("state", "Controle", 115)]:
             tree.heading(col, text=title)
             tree.column(col, width=width, anchor="w" if col in ("file", "role", "state") else "center")
         tree.pack(fill="both", expand=True)
