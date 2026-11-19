@@ -11,7 +11,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 
 APP_VERSION = "0.6.0"
@@ -1034,7 +1034,7 @@ class ExamApp:
                 if asset.get("source_document_id")==record.get("exam_structure_document_id") and asset.get("page"):
                     source_page_numbers.add(int(asset["page"]))
             if source_page_numbers:
-                source_page_count = int(analyze_pdf(source)["page_count"])
+                source_page_count = pdf_page_count(source)
                 adjacent_pages = set(source_page_numbers)
                 for page_no in source_page_numbers:
                     if page_no > 1: adjacent_pages.add(page_no - 1)
@@ -1049,7 +1049,7 @@ class ExamApp:
         cv_path=self.project_dir/"bronnen"/str(record.get("cv_pdf",""))
         if cv_path.is_file():
             cv_spans=record.get("cv_source_region", {}).get("page_spans", [])
-            cv_page_count=int(analyze_pdf(cv_path)["page_count"])
+            cv_page_count=pdf_page_count(cv_path)
             cv_page_numbers={int(x["page"]) for x in cv_spans}
             for page_no in list(cv_page_numbers):
                 if page_no > 1: cv_page_numbers.add(page_no - 1)
