@@ -6,6 +6,11 @@
 - Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
 - De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
 
+## 0.13.7
+- De doorlopende PDF-weergave berekent vooraf de positie van alle pagina's, maar rendert alleen de zichtbare pagina's en een beperkte buffer.
+- Het aantal gelijktijdig in het geheugen gehouden pagina-afbeeldingen is begrensd op zes. Eerder bekeken pagina's worden vanuit de tijdelijke PNG-cache hersteld; de scrollbare totaalweergave en vraagmarkeringen blijven behouden.
+- Laden gebeurt op basis van scrollpositie en vensterformaat, zodat lange examens niet alle pagina-afbeeldingen tegelijk in Tk-geheugen hoeven te houden.
+
 ## 0.13.6
 - Vraagstartleren gebruikt genormaliseerde layout-/taalfeatures in plaats van alleen twee grove patroonklassen; exacte vraagtekst, nummer en PDF-positie worden niet in de leersleutel opgenomen.
 - Een leeradvies vereist nu minimaal drie onafhankelijke examen-PDF's en ten minste 80% overeenstemming. Herhaalde keuzes binnen één PDF tellen niet als onafhankelijke examens; conflicten blijven zichtbaar en niets wordt automatisch toegepast.
