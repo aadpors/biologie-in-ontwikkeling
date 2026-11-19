@@ -761,6 +761,12 @@ class ExamApp:
             doc = next((d for d in self.data.get("documenten", []) if d.get("bestand") == filename), None)
             if not doc:
                 continue
+            manual_role = document_state.get("documenttype_handmatig")
+            if manual_role in {"opgaven", "correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+                doc["type_voorstel"] = manual_role
+                doc["documenttype_handmatig"] = manual_role
+                doc["type_zekerheid"] = 1.0
+                doc["status"] = "handmatig_bevestigd"
             current = [r for r in rows if r.get("document_id") == doc.get("id")]
             for correction in document_state.get("correcties", []):
                 page_no = int(correction.get("pagina", 0) or 0)
