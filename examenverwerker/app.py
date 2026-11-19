@@ -602,6 +602,30 @@ class ExamApp:
         context_list.pack(fill="x")
         for idx,item in enumerate(context_files):
             context_list.insert("end",f"Pagina {item.get('page')} · {item.get('caption') or item.get('asset_id')} · {item.get('file')}")
+        ttk.Label(outer,text="Bijschrift van de geselecteerde figuur/tabel (leeg laten als er geen bijschrift is)").pack(anchor="w",pady=(6,2))
+        context_caption_var=tk.StringVar(value="")
+        ttk.Entry(outer,textvariable=context_caption_var).pack(fill="x")
+        def load_context_caption(_event=None):
+            selected=context_list.curselection()
+            if len(selected)==1:
+                context_caption_var.set(context_files[selected[0]].get("caption") or "")
+            else:
+                context_caption_var.set("")
+        def confirm_context_caption():
+            selected=context_list.curselection()
+            if len(selected)!=1:
+                messagebox.showinfo("Selecteer één contextuitsnede","Selecteer één figuur of tabel om het bijschrift te bevestigen.",parent=win)
+                return
+            index=selected[0]
+            context_files[index]["caption"]=context_caption_var.get().strip() or None
+            context_files[index]["caption_human_confirmed"]=True
+            context_list.delete(index)
+            item=context_files[index]
+            context_list.insert(index,f"Pagina {item.get('page')} · {item.get('caption') or 'geen bijschrift'} · {item.get('file')}")
+            context_list.selection_set(index)
+            messagebox.showinfo("Bijschrift bevestigd","Het bijschrift (of het ontbreken ervan) is voor deze uitsnede bevestigd.",parent=win)
+        context_list.bind("<<ListboxSelect>>",load_context_caption)
+        ttk.Button(outer,text="Bijschrift bevestigen voor geselecteerde uitsnede",command=confirm_context_caption).pack(anchor="w",pady=(2,6))
         ttk.Label(outer,text="CV-snippetbestand (volledige beoordeling van deze vraag; voor open vragen verplicht voor export)").pack(anchor="w",pady=(8,2))
         snippet_names=sorted(p.name for p in (self.project_dir/"snippets").glob("cv-*.png"))
         cv_snippet_var=tk.StringVar(value=(current or {}).get("cv_snippet_file",""))
@@ -798,6 +822,9 @@ class ExamApp:
                                               "source_sha256": amendment_doc["sha256"], "fragment": region, "snippet_file": amend_file})
                 context_fragments = linkage.get("context_fragments", [])
                 context_assets = [dict(context_files[i]) for i in context_list.curselection()]
+                unconfirmed_captions=[x for x in context_assets if x.get("asset_id") and x.get("caption_human_confirmed") is not True]
+                if unconfirmed_captions:
+                    raise ValueError("Bevestig of corrigeer eerst het bijschrift van iedere geselecteerde figuur-/tabeluitsnede.")
                 context_region_files = []
                 context_text_parts = []
                 for context_fragment in context_fragments:
