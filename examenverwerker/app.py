@@ -1577,8 +1577,14 @@ class ExamApp:
         ttk.Button(actions, text="Deze pagina toevoegen / bijwerken", command=lambda: (store_current_span(), page_label.configure(text=f"Afgebakende pagina's: {', '.join(str(x['page']) for x in spans)}"))).pack(side="left")
         ttk.Button(actions, text="CV-fragment opslaan en uitsnede maken", command=save_region).pack(side="left", padx=8)
         ttk.Button(actions, text="Sluiten", command=win.destroy).pack(side="right")
-        spin.bind("<Return>", lambda _e: show_page())
-        spin.bind("<FocusOut>", lambda _e: show_page())
+        def jump_to_page(_event=None):
+            try:
+                store_current_span()
+                show_page()
+            except Exception as exc:
+                messagebox.showerror("Paginagrens niet opgeslagen", str(exc), parent=win)
+        spin.bind("<Return>", jump_to_page)
+        spin.bind("<FocusOut>", jump_to_page)
         show_page()
 
     def selected_doc(self):
