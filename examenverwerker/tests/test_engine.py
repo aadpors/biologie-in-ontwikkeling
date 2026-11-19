@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -345,5 +345,19 @@ class EngineTests(unittest.TestCase):
             text=extract_region_text(path,[{"page":1,"bbox":[0,50,600,200]}])
             self.assertIn("TEXT INSIDE SELECTION",text)
             self.assertNotIn("TEXT OUTSIDE SELECTION",text)
+
+
+    def test_manual_context_crop_coordinates_map_to_original_pdf(self):
+        bbox = pixel_rect_to_pdf_bbox([100, 200, 500, 700], (1200, 1600), (600, 800))
+        self.assertEqual(bbox, [50.0, 100.0, 250.0, 350.0])
+
+    def test_manual_context_crop_coordinates_are_clamped_and_reject_tiny_regions(self):
+        bbox = pixel_rect_to_pdf_bbox([-20, 100, 1300, 1700], (1200, 1600), (600, 800))
+        self.assertEqual(bbox, [0.0, 50.0, 600.0, 800.0])
+        with self.assertRaises(ValueError):
+            pixel_rect_to_pdf_bbox([10, 10, 12, 40], (1200, 1600), (600, 800))
+        with self.assertRaises(ValueError):
+            pixel_rect_to_pdf_bbox([0, 0, 100, 100], (0, 1600), (600, 800))
+
 
 if __name__=="__main__": unittest.main()
