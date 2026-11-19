@@ -1,3 +1,10 @@
+## 0.12.0
+- Volledig nieuw dashboard in plaats van de eerdere bestandsbeheerindeling: burgundy welkomstbanner, herkenbare kleuraccenten en ruime kaarten, geïnspireerd op de oorspronkelijke website.
+- Overzicht, documentbibliotheek en verwerkroute zijn gescheiden in eigen tabbladen.
+- Startscherm toont direct projectstatus en live aantallen bronbestanden, vraagstartkandidaten, open controles en vraagrecords.
+- Verwerkroute is als visuele stappenlijst opgebouwd met duidelijke acties en korte uitleg per stap.
+- Activiteitenlog blijft onderin permanent zichtbaar; alle bestaande verwerkingsfuncties en veiligheidscontroles blijven behouden.
+
 ## 0.11.0
 - Vraagstartcontrole vernieuwd: kandidaten en vraagtekst staan naast elkaar in één doorlopend werkvenster; bevestigen/afwijzen opent geen apart venster per vraag.
 - Na iedere beslissing springt de controle automatisch naar de volgende nog niet beoordeelde kandidaat.
