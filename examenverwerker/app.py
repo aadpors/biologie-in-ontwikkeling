@@ -846,6 +846,7 @@ class ExamApp:
                 question_file = f"question-{source_doc['id']}-q{row['number']}-manual.png"
                 render_composite_crops(self.project_dir / "bronnen" / source_doc["opslagbestand"],
                                        question_segments, self.project_dir / "snippets" / question_file, scale=1.45)
+                question_file_hash = sha256(self.project_dir / "snippets" / question_file)
                 cv_analysis = analyze_pdf(self.project_dir / "bronnen" / cv_doc["opslagbestand"])
                 cv_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in cv_analysis["pages"]}
                 cv_segments = page_spans_to_segments(cv_region["page_spans"], cv_sizes)
@@ -870,6 +871,8 @@ class ExamApp:
                                               "snippet_sha256": sha256(self.project_dir / "snippets" / amend_file)})
                 context_fragments = linkage.get("context_fragments", [])
                 context_assets = [dict(context_files[i]) for i in context_list.curselection()]
+                for asset in context_assets:
+                    asset["snippet_sha256"] = sha256(self.project_dir / "snippets" / asset["file"])
                 unconfirmed_captions=[x for x in context_assets if x.get("asset_id") and x.get("caption_human_confirmed") is not True]
                 if unconfirmed_captions:
                     raise ValueError("Bevestig of corrigeer eerst het bijschrift van iedere geselecteerde figuur-/tabeluitsnede.")
@@ -888,10 +891,11 @@ class ExamApp:
                         "question_numbers": list(context_fragment.get("question_numbers", [])),
                         "text": region_text, "source_document_id": source_doc["id"],
                         "source_pdf": source_doc["opslagbestand"], "source_sha256": source_doc["sha256"],
-                        "caption": "Handmatig afgebakende context"})
+                        "caption": "Handmatig afgebakende context",
+                        "snippet_sha256": sha256(self.project_dir / "snippets" / region_file)})
                 context_assets.extend(context_region_files)
                 record.update({"exam":meta,"options":options,"correct":correct,
-                               "snippet_file":question_file,"snippet_files":[question_file],
+                               "snippet_file":question_file,"snippet_files":[question_file],"question_region_snippet_sha256":question_file_hash,
                                "context_asset_candidates":context_files,"context_asset_files":context_assets,"source_context":context_text_box.get("1.0","end").strip(),"context_text_human_confirmed":True,
                                "context_region_fragments":[{"id":x["id"],"type":x["type"],"page_spans":list(x.get("page_spans", [])),
                                    "question_numbers":list(x.get("question_numbers", [])),"text":next((y["text"] for y in context_region_files if y["fragment_id"]==x["id"]), "")} for x in context_fragments],
