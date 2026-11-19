@@ -15,6 +15,7 @@ from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox
 from structure import FRAGMENT_TYPES, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
+from workflow import exam_workflow_state
 
 APP_VERSION = "0.13.1"
 PROJECT_FILE = "project.json"
@@ -69,6 +70,7 @@ class ExamApp:
         self.data = None
         self.import_batch_paths = []
         self.import_batch_index = 0
+        self.import_batch_manifest_path = None
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
         self.app_base = app_base
         self.examens_root = resolve_examens_root(app_base)
@@ -351,67 +353,66 @@ class ExamApp:
         self.root.after(150, self._workspace_refresh)
 
     def _workflow_refresh(self):
-        """Derive the next safe processing action from the current exam's actual state."""
+        """Show the next safe action derived from the saved state of this exam."""
         if not hasattr(self, "workflow_button"):
             return
         if not self.data:
-            self.workflow_label.configure(text="Stap 1 · Importeer examens en controleer per PDF het voorblad, niveau, jaar, tijdvak en documenttype.")
+            self.workflow_label.configure(
+                text="Stap 1 · Importeer examens en controleer de metadata per PDF.")
             self.workflow_button.configure(text="Examens importeren", command=self.import_year_set)
             return
 
-        documents = self.data.get("documenten", [])
-        source_docs = [d for d in documents if d.get("type_voorstel") == "opgaven"]
-        candidates = [r for r in self.data.get("vraagkandidaten", [])]
-        undecided = [r for r in candidates if r.get("human_decision") is None]
-        confirmed = [r for r in candidates if r.get("human_decision") is True]
-        structures = self.data.get("exam_structures", {})
-        missing_structures = []
-        for document in source_docs:
-            structure = structures.get(document.get("id"))
-            if structure is None and self.data.get("exam_structure", {}).get("document_id") == document.get("id"):
-                structure = self.data.get("exam_structure")
-            confirmed_numbers = sorted({
-                int(row.get("number")) for row in confirmed
-                if row.get("document_id") == document.get("id") and row.get("number") is not None
-            })
-            if structure is None or validate_exam_structure(
-                structure, document.get("id"), document.get("sha256"), confirmed_numbers
-            ):
-                missing_structures.append(document)
-        records = self.data.get("vraagrecords", [])
-        def has_record(candidate):
-            return any(
-                record.get("candidate_document_id") == candidate.get("document_id")
-                and int(record.get("number", -1) or -1) == int(candidate.get("number", -2) or -2)
-                and int(record.get("source_page", -1) or -1) == int(candidate.get("page", -2) or -2)
-                for record in records
-            )
-        missing_records = [r for r in confirmed if not has_record(r)]
-        unapproved = [r for r in records if not r.get("approved_by_human", False)]
-
-        if not documents:
-            label, button, action = ("Stap 1 · Voeg de examen-PDF's toe en controleer de herkenning.", "Examens importeren", self.import_year_set)
-        elif not source_docs:
-            label, button, action = ("Stap 1 · Wijs het documenttype 'opgaven' toe aan de juiste PDF voordat de vraaganalyse kan starten.", "Documenttype corrigeren", self.correct_type)
-        elif not candidates:
-            label, button, action = ("Stap 2 · De documenten zijn ingelezen. Analyseer nu de opgaven-PDF('s) om alle mogelijke vraagstarts klaar te zetten.", "Vraagstarts analyseren", self.analyze_questions)
-        elif undecided:
-            label, button, action = (f"Stap 3 · Beoordeel alle vraagstarts op de originele PDF. Nog {len(undecided)} van {len(candidates)} kandidaten open.", "Verder met vraagcontrole", self._workflow_focus_next)
-        elif missing_structures:
-            label, button, action = (f"Stap 4 · Alle vraagstarts zijn beoordeeld. Baken nu vraag- en contextgrenzen af ({len(missing_structures)} opgaven-PDF('s) te doen).", "Structuur afbakenen", self.edit_exam_structure)
-        elif missing_records:
-            label, button, action = (f"Stap 5 · De structuur is vastgelegd. Maak de concept-vraagrecords; nog {len(missing_records)} bevestigde vragen zonder record.", "Volgend vraagrecord maken", self._workflow_make_next_record)
-        elif unapproved:
-            label, button, action = (f"Stap 6 · {len(records) - len(unapproved)} van {len(records)} vraagrecords goedgekeurd. Rond de inhoudelijke eindcontrole af.", "Eindcontrole openen", self.show_records)
-        elif not records and not confirmed:
-            label, button, action = ("Alle kandidaten zijn afgewezen. Controleer eerst of er een vraagstart ontbreekt voordat je dit examen afrondt.", "Ontbrekende vraag markeren", self._workspace_start_manual_mark)
-        elif self.import_batch_index + 1 < len(self.import_batch_paths):
-            label, button, action = (f"Dit examen is verwerkt. Ga door met examen {self.import_batch_index + 2} van {len(self.import_batch_paths)} uit dezelfde importbatch.", "Volgend examen", self._workflow_open_next_exam)
+        state = exam_workflow_state(self.data)
+        actions = {
+            "import": ("Examens importeren", self.import_year_set),
+            "documenttype": ("Documenttype corrigeren", self.correct_type),
+            "analyse": ("Vraagstarts analyseren", self.analyze_questions),
+            "vraagstarts": ("Verder met vraagcontrole", self._workflow_focus_next),
+            "ontbrekende_vragen": ("Ontbrekende vraag markeren", self._workspace_start_manual_mark),
+            "structuur": ("Structuur afbakenen", self.edit_exam_structure),
+            "vraagrecords": ("Volgend vraagrecord maken", self._workflow_make_next_record),
+            "eindcontrole": ("Eindcontrole openen", self.show_records),
+            "export": ("Exportpakket maken", self.export_project),
+        }
+        label = state["label"]
+        if state["stage"] == "export" and self.import_batch_index + 1 < len(self.import_batch_paths):
+            label = (f"Dit examen is verwerkt. Ga door met examen "
+                     f"{self.import_batch_index + 2} van {len(self.import_batch_paths)} uit dezelfde importbatch.")
+            button, action = "Volgend examen", self._workflow_open_next_exam
         else:
-            label, button, action = ("Stap 7 · Alle huidige vraagrecords zijn goedgekeurd. Maak het gecontroleerde exportpakket; er wordt niets gepubliceerd.", "Exportpakket maken", self.export_project)
-
-        self.workflow_label.configure(text=label)
+            button, action = actions[state["stage"]]
+        self.workflow_label.configure(text=f"Volgende stap · {label}. {state['action']}")
         self.workflow_button.configure(text=button, command=action)
+
+    def _restore_import_batch(self, folder, data):
+        """Restore the batch queue from the manifest saved with an imported exam."""
+        self.import_batch_paths = []
+        self.import_batch_index = 0
+        self.import_batch_manifest_path = None
+        manifest_name = data.get("import_batch_manifest")
+        if not manifest_name:
+            return
+        manifest_path = self.examens_root / Path(manifest_name).name
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if manifest.get("schema") != "biologie-examenimport-v1":
+                return
+            root = self.examens_root.resolve()
+            paths = []
+            for entry in manifest.get("projecten", []):
+                candidate = (self.examens_root / entry.get("pad", "")).resolve()
+                if not candidate.is_relative_to(root):
+                    return
+                if (candidate / PROJECT_FILE).is_file():
+                    paths.append(candidate)
+            current = Path(folder).resolve()
+            if current not in paths:
+                return
+            self.import_batch_paths = paths
+            self.import_batch_index = paths.index(current)
+            self.import_batch_manifest_path = manifest_path
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            self._log(f"Importbatch kon niet worden hersteld vanuit {manifest_path.name}.")
 
     def _workflow_open_next_exam(self):
         if self.import_batch_index + 1 >= len(self.import_batch_paths):
