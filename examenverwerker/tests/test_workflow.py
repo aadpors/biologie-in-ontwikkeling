@@ -1,7 +1,10 @@
+import json
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from structure import make_exam_structure, make_fragment, make_page_span
-from workflow import exam_export_fingerprint, exam_workflow_state
+from workflow import exam_export_fingerprint, exam_workflow_state, restore_import_batch
 
 
 def base_exam():
@@ -85,6 +88,44 @@ class ExamWorkflowTests(unittest.TestCase):
             "id": "opgaven-2", "sha256": "second-hash", "type_voorstel": "opgaven"
         })
         self.assertEqual(exam_workflow_state(data)["stage"], "structuur")
+
+    def test_import_batch_is_restored_after_restart(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp)
+            first = root / "2025" / "havo-tijdvak-1"
+            second = root / "2026" / "vwo-tijdvak-2"
+            for folder in (first, second):
+                folder.mkdir(parents=True)
+                (folder / "project.json").write_text("{}", encoding="utf-8")
+            manifest = {
+                "schema": "biologie-examenimport-v1",
+                "projecten": [
+                    {"pad": "2025/havo-tijdvak-1"},
+                    {"pad": "2026/vwo-tijdvak-2"},
+                ],
+            }
+            (root / "import-batch.json").write_text(
+                json.dumps(manifest), encoding="utf-8")
+            restored = restore_import_batch(
+                root, second, {"import_batch_manifest": "import-batch.json"})
+            self.assertEqual(restored["paths"], [first.resolve(), second.resolve()])
+            self.assertEqual(restored["index"], 1)
+
+    def test_import_batch_manifest_cannot_escape_exam_root(self):
+        with TemporaryDirectory() as temp:
+            root = Path(temp) / "examens"
+            root.mkdir()
+            outside = Path(temp) / "outside"
+            outside.mkdir()
+            (outside / "project.json").write_text("{}", encoding="utf-8")
+            manifest = {
+                "schema": "biologie-examenimport-v1",
+                "projecten": [{"pad": "../outside"}],
+            }
+            (root / "import-batch.json").write_text(
+                json.dumps(manifest), encoding="utf-8")
+            self.assertIsNone(restore_import_batch(
+                root, outside, {"import_batch_manifest": "import-batch.json"}))
 
     def test_matching_export_fingerprint_marks_exam_complete(self):
         data = with_valid_structure(base_exam())
