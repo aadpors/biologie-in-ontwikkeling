@@ -1573,7 +1573,7 @@ class ExamApp:
         page_spin.pack(side="left")
         ttk.Label(nav, text=f"van {page_count}").pack(side="left", padx=(4, 12))
         frame = ttk.Frame(right); frame.pack(fill="both", expand=True)
-        canvas = tk.Canvas(frame, background="white", highlightthickness=1, highlightbackground="#b8b8b8")
+        canvas = tk.Canvas(frame, background="white", highlightthickness=0)
         sy = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
         sx = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
         canvas.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
