@@ -603,7 +603,12 @@ class ExamApp:
             f"{row.get('reason','')}\nStatus: {row.get('status','controle_nodig').replace('_',' ')}"))
         options = check.get("options", [])
         option_text = "Antwoordopties: " + (" · ".join(
-            f"{x.get('label','?')} {x.get('text','')}" for x in options) if options else "geen opties herkend")
+            f"{x.get('label','?')} {x.get('text','')}" for x in options) if options else "geen tekstopties herkend")
+        visual = check.get("visual_detection", {})
+        if visual.get("requires_visual_review"):
+            option_text += (f"\\nVisuele controle: {visual.get('status','beeldmateriaal gevonden').replace('_',' ')}"
+                            f" · {visual.get('visual_asset_count',0)} beeldelement(en)"
+                            f" · labels {', '.join(visual.get('nearby_option_labels',[])) or 'niet als tekst herkend'}")
         references = row.get("context_verwijzingen", [])
         reference_text = "Verwijzingen: " + (" · ".join(
             f"{x.get('kind','')} {x.get('number') or ''}" for x in references) if references else "geen expliciete verwijzingen herkend")
@@ -2237,9 +2242,19 @@ class ExamApp:
             if check.get("type") == "meerkeuze":
                 option_lines.append(
                     "Ontbrekende labels: " + (", ".join(check.get("option_gaps", [])) or "geen") +
-                    "\nDubbele labels: " + (", ".join(check.get("duplicate_option_labels", [])) or "geen"))
-            set_box(options_box, "ANTWOORDOPTIES\n" + ("\n".join(option_lines) if option_lines else
-                    "Geen antwoordopties herkend; controleer of dit een open vraag is."))
+                    "\\nDubbele labels: " + (", ".join(check.get("duplicate_option_labels", [])) or "geen"))
+            visual = check.get("visual_detection", {})
+            if visual.get("requires_visual_review"):
+                option_lines.append(
+                    "VISUELE CONTROLE NODIG: " + visual.get("status", "beeldmateriaal gevonden").replace("_", " ") +
+                    f"\\nBeeldelementen: {visual.get('visual_asset_count', 0)}" +
+                    f"\\nRasterafbeeldingen: {visual.get('raster_image_count', 0)}" +
+                    f"\\nNabije labels: {', '.join(visual.get('nearby_option_labels', [])) or 'niet herkend'}" +
+                    "\\nControleer in de PDF of dit contextmateriaal of antwoordalternatieven zijn.")
+            fallback = ("Geen tekstopties herkend. Er is beeldmateriaal gevonden; controleer of de antwoordopties daarin staan."
+                        if visual.get("requires_visual_review") else
+                        "Geen antwoordopties herkend; controleer of dit een open vraag is.")
+            set_box(options_box, "ANTWOORDOPTIES\\n" + ("\\n".join(option_lines) if option_lines else fallback))
             refs = row.get("context_verwijzingen", [])
             ref_lines = [f"{x.get('kind')} {x.get('number') or ''}: {x.get('matched_text')}" for x in refs]
             set_box(context_box, "CONTEXTVERWIJZINGEN\n" + ("\n".join(ref_lines) if ref_lines else
@@ -2429,7 +2444,7 @@ class ExamApp:
             widget.grid(row=rr,column=cc+1,sticky="ew",padx=(0,8),pady=4)
         ttk.Label(outer,text="Vraagtype").pack(anchor="w",pady=(8,2))
         detected=row.get("vraagtype_controle",{}).get("type")
-        default_type="mcq" if detected=="meerkeuze" else "open"
+        default_type="mcq" if detected in ("meerkeuze","mogelijk_visuele_meerkeuze") else "open"
         question_type=tk.StringVar(value=(current or {}).get("exam",{}).get("questionType",default_type))
         ttk.Combobox(outer,textvariable=question_type,values=["open","mcq"],state="readonly",width=12).pack(anchor="w")
         ttk.Label(outer,text="Vraagtekst (volledig nalopen en zo nodig corrigeren)").pack(anchor="w",pady=(8,2))
