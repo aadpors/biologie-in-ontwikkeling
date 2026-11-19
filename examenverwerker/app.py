@@ -64,212 +64,327 @@ class ExamApp:
         self._welcome()
 
     def _style(self):
-        """Consistent desktop design: calm workspace, clear hierarchy and restrained burgundy accent."""
+        """Warm, card-based interface inspired by the original biology website."""
         style = ttk.Style()
         try:
             style.theme_use("clam")
         except tk.TclError:
             pass
-
         self.colors = {
-            "canvas": "#F4F2F4", "surface": "#FFFFFF", "sidebar": "#261D25",
-            "sidebar_hover": "#3A2A36", "accent": "#762342", "accent_hover": "#8E3152",
-            "accent_soft": "#F4E9ED", "text": "#29242A", "muted": "#716A72",
-            "line": "#E7E1E6", "table_alt": "#FAF8FA", "success": "#32745B",
+            "canvas": "#F5F7F7", "surface": "#FFFFFF", "wine": "#741D3B",
+            "wine_dark": "#552039", "wine_soft": "#F7EDF1", "teal": "#168B8B",
+            "teal_dark": "#0F7275", "teal_soft": "#E8F3F2", "orange": "#E89A38",
+            "ink": "#24313B", "muted": "#63717B", "line": "#DCE3E6",
+            "green": "#2D7955", "green_soft": "#EAF2EB", "table_alt": "#F7F9F9"
         }
         self.root.configure(background=self.colors["canvas"])
         style.configure("App.TFrame", background=self.colors["canvas"])
-        style.configure("Surface.TFrame", background=self.colors["surface"])
-        style.configure("Sidebar.TFrame", background=self.colors["sidebar"])
+        style.configure("Card.TFrame", background=self.colors["surface"])
         style.configure("Title.TLabel", background=self.colors["canvas"],
-                        font=("Segoe UI", 22, "bold"), foreground=self.colors["text"])
-        style.configure("Subtitle.TLabel", background=self.colors["canvas"],
-                        font=("Segoe UI", 10), foreground=self.colors["muted"])
-        style.configure("CardTitle.TLabel", background=self.colors["surface"],
-                        font=("Segoe UI", 11, "bold"), foreground=self.colors["text"])
-        style.configure("CardHint.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 23, "bold"), foreground=self.colors["wine"])
+        style.configure("Section.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 12, "bold"), foreground=self.colors["wine"])
+        style.configure("Muted.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 9), foreground=self.colors["muted"])
+        style.configure("Body.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 10), foreground=self.colors["ink"])
+        style.configure("Metric.TLabel", background=self.colors["surface"],
+                        font=("Segoe UI", 22, "bold"), foreground=self.colors["wine"])
+        style.configure("MetricCaption.TLabel", background=self.colors["surface"],
                         font=("Segoe UI", 9), foreground=self.colors["muted"])
         style.configure("Project.TLabel", background=self.colors["surface"],
-                        font=("Segoe UI", 10, "bold"), foreground=self.colors["accent"])
-        style.configure("Status.TLabel", background=self.colors["accent_soft"],
-                        font=("Segoe UI", 9), foreground=self.colors["accent"], padding=(10, 7))
+                        font=("Segoe UI", 12, "bold"), foreground=self.colors["wine"])
+        style.configure("Status.TLabel", background=self.colors["teal_soft"],
+                        font=("Segoe UI", 9), foreground=self.colors["teal_dark"],
+                        padding=(10, 7))
         style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"),
-                        padding=(14, 10), background=self.colors["accent"],
+                        padding=(15, 10), background=self.colors["teal"],
                         foreground="#FFFFFF", borderwidth=0, focusthickness=0)
-        style.map("Accent.TButton",
-                  background=[("active", self.colors["accent_hover"]), ("pressed", self.colors["accent_hover"])],
-                  foreground=[("disabled", "#D9CDD2")])
+        style.map("Accent.TButton", background=[("active", self.colors["teal_dark"]),
+                  ("pressed", self.colors["teal_dark"])], foreground=[("disabled", "#D9E5E5")])
+        style.configure("Wine.TButton", font=("Segoe UI", 10, "bold"),
+                        padding=(15, 10), background=self.colors["wine"],
+                        foreground="#FFFFFF", borderwidth=0, focusthickness=0)
+        style.map("Wine.TButton", background=[("active", self.colors["wine_dark"]),
+                  ("pressed", self.colors["wine_dark"])])
         style.configure("Secondary.TButton", font=("Segoe UI", 9, "bold"),
-                        padding=(11, 8), background="#F3EFF2",
-                        foreground=self.colors["text"], borderwidth=1,
+                        padding=(11, 8), background="#EEF2F3",
+                        foreground=self.colors["ink"], borderwidth=1,
                         relief="flat", bordercolor=self.colors["line"])
-        style.map("Secondary.TButton", background=[("active", "#EAE2E7")])
-        style.configure("Nav.TButton", font=("Segoe UI", 10), padding=(12, 10),
-                        anchor="w", background=self.colors["sidebar"],
-                        foreground="#F6EFF3", borderwidth=0, focusthickness=0)
-        style.map("Nav.TButton", background=[("active", self.colors["sidebar_hover"])],
-                  foreground=[("active", "#FFFFFF")])
-        style.configure("Treeview", rowheight=34, font=("Segoe UI", 9),
+        style.map("Secondary.TButton", background=[("active", "#E2EAEC")])
+        style.configure("Notebook", background=self.colors["canvas"], borderwidth=0, tabmargins=(0, 8, 0, 0))
+        style.configure("TNotebook.Tab", font=("Segoe UI", 10, "bold"),
+                        padding=(18, 11), background="#E9EFF0", foreground=self.colors["muted"])
+        style.map("TNotebook.Tab", background=[("selected", self.colors["wine"])],
+                  foreground=[("selected", "#FFFFFF")])
+        style.configure("Treeview", rowheight=36, font=("Segoe UI", 9),
                         background=self.colors["surface"], fieldbackground=self.colors["surface"],
-                        foreground=self.colors["text"], borderwidth=0, relief="flat")
+                        foreground=self.colors["ink"], borderwidth=0, relief="flat")
         style.configure("Treeview.Heading", font=("Segoe UI", 9, "bold"),
-                        background="#F6F3F5", foreground=self.colors["muted"],
-                        padding=(9, 10), relief="flat")
-        style.map("Treeview", background=[("selected", "#EEDFE6")],
-                  foreground=[("selected", self.colors["text"])])
-        style.configure("Vertical.TScrollbar", background="#E5DFE4",
-                        troughcolor="#F7F5F7", bordercolor="#F7F5F7", arrowsize=12)
+                        background="#EDF2F3", foreground=self.colors["muted"],
+                        padding=(10, 11), relief="flat")
+        style.map("Treeview", background=[("selected", "#F1DDE5")],
+                  foreground=[("selected", self.colors["ink"])])
+        style.configure("Vertical.TScrollbar", background="#DCE3E6",
+                        troughcolor="#F5F7F7", bordercolor="#F5F7F7", arrowsize=12)
 
     def _build(self):
+        """Build a complete, card-based workflow workspace rather than a plain file manager."""
         self.root.title("Biologie Examenverwerker")
-        self.root.geometry("1280x820")
-        self.root.minsize(1040, 680)
+        self.root.geometry("1380x900")
+        self.root.minsize(1120, 760)
 
         shell = ttk.Frame(self.root, style="App.TFrame")
         shell.pack(fill="both", expand=True)
 
-        # Brand header
-        header = tk.Frame(shell, bg="#FFFFFF", height=82,
+        # Brand bar
+        header = tk.Frame(shell, bg="#FFFFFF", height=76,
                           highlightthickness=1, highlightbackground=self.colors["line"])
         header.pack(fill="x")
         header.pack_propagate(False)
         brand = tk.Frame(header, bg="#FFFFFF")
-        brand.pack(side="left", fill="y", padx=26)
-        mark = tk.Label(brand, text="B", bg=self.colors["accent"], fg="#FFFFFF",
-                        font=("Segoe UI", 17, "bold"), width=2, height=1)
-        mark.pack(side="left", pady=17)
+        brand.pack(side="left", padx=28, fill="y")
+        mark = tk.Label(brand, text="B", bg=self.colors["wine"], fg="#FFFFFF",
+                        font=("Segoe UI", 18, "bold"), width=2, height=1)
+        mark.pack(side="left", pady=15)
         brand_text = tk.Frame(brand, bg="#FFFFFF")
-        brand_text.pack(side="left", padx=12, pady=13)
+        brand_text.pack(side="left", padx=12, pady=12)
         tk.Label(brand_text, text="BIOLOGIE EXAMENVERWERKER", bg="#FFFFFF",
-                 fg=self.colors["text"], font=("Segoe UI", 13, "bold")).pack(anchor="w")
-        tk.Label(brand_text, text="Van originele pdf naar gecontroleerde examenvragen",
-                 bg="#FFFFFF", fg=self.colors["muted"],
-                 font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
-        tk.Label(header, text="LOKAAL WERKSTATION  ·  GEEN AUTOMATISCHE PUBLICATIE",
+                 fg=self.colors["ink"], font=("Segoe UI", 13, "bold")).pack(anchor="w")
+        tk.Label(brand_text, text="Van originele examen-pdf naar gecontroleerde examenvragen",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
+        tk.Label(header, text="LOKAAL WERKSTATION   ·   OFFLINE STANDAARD   ·   NIET AUTOMATISCH PUBLICEREN",
                  bg="#FFFFFF", fg=self.colors["muted"],
                  font=("Segoe UI", 8, "bold")).pack(side="right", padx=28)
 
-        content = ttk.Frame(shell, style="App.TFrame")
-        content.pack(fill="both", expand=True)
+        # Burgundy welcome banner, echoing the original website's visual identity
+        hero = tk.Frame(shell, bg=self.colors["wine"], height=126)
+        hero.pack(fill="x")
+        hero.pack_propagate(False)
+        hero_inner = tk.Frame(hero, bg=self.colors["wine"])
+        hero_inner.pack(fill="both", expand=True, padx=34, pady=17)
+        tk.Label(hero_inner, text="EXAMENVERWERKING", bg=self.colors["wine"],
+                 fg="#F3C9D5", font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        tk.Label(hero_inner, text="Van bronbestand naar betrouwbare vraagbank",
+                 bg=self.colors["wine"], fg="#FFFFFF",
+                 font=("Segoe UI", 22, "bold")).pack(anchor="w", pady=(3, 2))
+        tk.Label(hero_inner, text="Importeer, controleer en verrijk examens stap voor stap. Jij houdt de inhoudelijke regie.",
+                 bg=self.colors["wine"], fg="#F8EAF0",
+                 font=("Segoe UI", 10)).pack(anchor="w")
 
-        # Dark navigation rail
-        sidebar = ttk.Frame(content, style="Sidebar.TFrame", width=226)
-        sidebar.pack(side="left", fill="y")
-        sidebar.pack_propagate(False)
-        tk.Label(sidebar, text="WERKRUIMTE", bg=self.colors["sidebar"], fg="#BFAEB8",
-                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(24, 10))
-        ttk.Button(sidebar, text="＋  Meerdere examens importeren",
-                   command=self.import_year_set, style="Accent.TButton").pack(fill="x", padx=13, pady=(0, 14))
-        ttk.Separator(sidebar).pack(fill="x", padx=16, pady=5)
-        tk.Label(sidebar, text="PROJECTEN", bg=self.colors["sidebar"], fg="#BFAEB8",
-                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(15, 7))
-        ttk.Button(sidebar, text="▣  Project openen", command=self.open_project,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Button(sidebar, text="＋  Nieuw examenproject", command=self.new_project,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Button(sidebar, text="⇧  Pdf's toevoegen", command=self.add_pdfs,
-                   style="Nav.TButton").pack(fill="x", padx=8, pady=2)
-        ttk.Separator(sidebar).pack(fill="x", padx=16, pady=13)
-        tk.Label(sidebar, text="WERKWIJZE", bg=self.colors["sidebar"], fg="#BFAEB8",
-                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=20, pady=(2, 7))
-        tk.Label(sidebar, text="Doorloop de verwerkroute stap voor stap. Iedere inhoudelijke beslissing blijft bij jou.",
-                 bg=self.colors["sidebar"], fg="#F6EFF3", justify="left",
-                 wraplength=184, font=("Segoe UI", 9)).pack(anchor="w", padx=19, pady=(2, 8))
-        tk.Label(sidebar, text="Offline standaard · bronbestanden blijven intact",
-                 bg=self.colors["sidebar"], fg="#BFAEB8", justify="left",
-                 wraplength=185, font=("Segoe UI", 8)).pack(side="bottom", anchor="w", padx=18, pady=18)
+        body = ttk.Frame(shell, style="App.TFrame", padding=(26, 18, 26, 12))
+        body.pack(fill="both", expand=True)
+        self.notebook = ttk.Notebook(body)
+        self.notebook.pack(fill="both", expand=True)
 
-        # Main work area
-        workspace = ttk.Frame(content, style="App.TFrame", padding=(25, 23))
-        workspace.pack(side="left", fill="both", expand=True)
-        heading = ttk.Frame(workspace, style="App.TFrame")
-        heading.pack(fill="x", pady=(0, 17))
-        heading_left = ttk.Frame(heading, style="App.TFrame")
-        heading_left.pack(side="left", fill="x", expand=True)
-        ttk.Label(heading_left, text="Examenbibliotheek", style="Title.TLabel").pack(anchor="w")
-        ttk.Label(heading_left, text="Beheer bronbestanden en doorloop de inhoudelijke controles.",
-                  style="Subtitle.TLabel").pack(anchor="w", pady=(4, 0))
+        overview = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
+        documents = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
+        workflow = ttk.Frame(self.notebook, style="App.TFrame", padding=4)
+        self.notebook.add(overview, text="  Overzicht  ")
+        self.notebook.add(documents, text="  Documenten  ")
+        self.notebook.add(workflow, text="  Verwerkroute  ")
 
-        project_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(16, 13))
-        project_card.pack(fill="x", pady=(0, 14))
-        ttk.Label(project_card, text="HUIDIG PROJECT", style="CardHint.TLabel").pack(anchor="w")
-        self.project_label = ttk.Label(project_card, text="Geen project geopend",
+        # OVERVIEW: project identity, progress and large primary actions
+        top = ttk.Frame(overview, style="App.TFrame")
+        top.pack(fill="x", pady=(0, 13))
+        title_col = ttk.Frame(top, style="App.TFrame")
+        title_col.pack(side="left", fill="x", expand=True)
+        ttk.Label(title_col, text="Jouw examenwerkplek", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(title_col, text="Een helder overzicht van wat al is verwerkt en wat nog aandacht vraagt.",
+                  style="Muted.TLabel").pack(anchor="w", pady=(3, 0))
+        ttk.Button(top, text="＋  Meerdere examens importeren",
+                   command=self.import_year_set, style="Accent.TButton").pack(side="right", padx=(10, 0), pady=5)
+        ttk.Button(top, text="Open project", command=self.open_project,
+                   style="Secondary.TButton").pack(side="right", pady=5)
+
+        project = tk.Frame(overview, bg="#FFFFFF", highlightthickness=1,
+                           highlightbackground=self.colors["line"])
+        project.pack(fill="x", pady=(0, 13))
+        project_left = tk.Frame(project, bg="#FFFFFF")
+        project_left.pack(side="left", fill="both", expand=True, padx=18, pady=15)
+        tk.Label(project_left, text="ACTIEF EXAMENPROJECT", bg="#FFFFFF",
+                 fg=self.colors["muted"], font=("Segoe UI", 8, "bold")).pack(anchor="w")
+        self.project_label = ttk.Label(project_left, text="Nog geen project geopend",
                                        style="Project.TLabel")
-        self.project_label.pack(anchor="w", pady=(4, 0))
-        self.status = ttk.Label(project_card,
-            text="Importeer meerdere examens of open een bestaand project om te beginnen.",
+        self.project_label.pack(anchor="w", pady=(4, 5))
+        self.status = ttk.Label(project_left,
+            text="Importeer examens of open een bestaand project om te beginnen.",
             style="Status.TLabel", wraplength=900)
-        self.status.pack(anchor="w", fill="x", pady=(10, 0))
+        self.status.pack(anchor="w", fill="x")
+        project_actions = tk.Frame(project, bg="#FFFFFF")
+        project_actions.pack(side="right", padx=18, pady=18)
+        ttk.Button(project_actions, text="＋ Nieuw project", command=self.new_project,
+                   style="Secondary.TButton").pack(fill="x", pady=3)
+        ttk.Button(project_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
+                   style="Secondary.TButton").pack(fill="x", pady=3)
 
-        # Source document table in a distinct card
-        files_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(16, 14))
+        # Metric cards
+        metrics = ttk.Frame(overview, style="App.TFrame")
+        metrics.pack(fill="x", pady=(0, 13))
+        self.metric_documents = self._metric_card(metrics, "BRONBESTANDEN", "0", "PDF's ingelezen", 0)
+        self.metric_questions = self._metric_card(metrics, "VRAAGSTARTS", "0", "kandidaten gevonden", 1)
+        self.metric_todo = self._metric_card(metrics, "NOG TE CONTROLEREN", "0", "documentherkenningen", 2)
+        self.metric_records = self._metric_card(metrics, "VRAAGRECORDS", "0", "inhoudelijke records", 3)
+
+        # Two-column dashboard: workflow cards and guidance
+        lower = ttk.Frame(overview, style="App.TFrame")
+        lower.pack(fill="both", expand=True)
+        route_card = tk.Frame(lower, bg="#FFFFFF", highlightthickness=1,
+                              highlightbackground=self.colors["line"])
+        route_card.pack(side="left", fill="both", expand=True, padx=(0, 8))
+        route_head = tk.Frame(route_card, bg="#FFFFFF")
+        route_head.pack(fill="x", padx=18, pady=(15, 7))
+        tk.Label(route_head, text="DE VERWERKROUTE", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 12, "bold")).pack(anchor="w")
+        tk.Label(route_head, text="Werk van boven naar beneden. Je kunt stappen opnieuw uitvoeren wanneer nodig.",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
+        steps = [
+            ("01", "Bronbestanden importeren", "Selecteer in één keer examens uit meerdere jaren en niveaus.", self.import_year_set, "Importeren"),
+            ("02", "Documenten en metadata", "Controleer opgaven, correctievoorschriften, tijdvak en jaar.", lambda:self.notebook.select(documents), "Documenten bekijken"),
+            ("03", "Vraagstarts en structuur", "Analyseer de opgaven en controleer de vraag- en contextgrenzen.", self.analyze_questions, "Vraagstarts analyseren"),
+            ("04", "Vragen bevestigen", "Beoordeel kandidaten in één doorlopend overzicht.", self.show_candidates, "Vraagcontrole openen"),
+            ("05", "Inhoudelijke eindcontrole", "Controleer tekst, afbeeldingen, context, CV en bijlagen.", self.show_records, "Eindcontrole openen"),
+        ]
+        for number, heading, description, callback, button_text in steps:
+            card = tk.Frame(route_card, bg="#FFFFFF")
+            card.pack(fill="x", padx=16, pady=5)
+            circle = tk.Label(card, text=number, bg=self.colors["wine_soft"],
+                              fg=self.colors["wine"], font=("Segoe UI", 10, "bold"),
+                              width=4, height=2)
+            circle.pack(side="left", padx=(0, 12))
+            text_col = tk.Frame(card, bg="#FFFFFF")
+            text_col.pack(side="left", fill="x", expand=True)
+            tk.Label(text_col, text=heading, bg="#FFFFFF", fg=self.colors["ink"],
+                     font=("Segoe UI", 10, "bold")).pack(anchor="w")
+            tk.Label(text_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
+                     font=("Segoe UI", 8), wraplength=570, justify="left").pack(anchor="w", pady=(2, 0))
+            ttk.Button(card, text=button_text, command=callback,
+                       style="Secondary.TButton").pack(side="right", padx=(8, 0))
+            ttk.Separator(route_card).pack(fill="x", padx=16, pady=3)
+
+        guide = tk.Frame(lower, bg="#FFFFFF", width=280, highlightthickness=1,
+                         highlightbackground=self.colors["line"])
+        guide.pack(side="right", fill="y", padx=(8, 0))
+        guide.pack_propagate(False)
+        tk.Label(guide, text="GOED OM TE WETEN", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=16, pady=(16, 9))
+        for head, body_text, color in [
+            ("Bron blijft leidend", "Originele examen-pdf's worden bewaard. Tekstherkenning is een voorstel, geen bron.", self.colors["teal"]),
+            ("Geen automatische goedkeuring", "Vraagrecords en afbeeldingen worden pas bruikbaar na jouw volledige controle.", self.colors["orange"]),
+            ("Lokaal en veilig", "Bestanden blijven standaard op deze computer. Er wordt niets automatisch gepubliceerd.", self.colors["green"])
+        ]:
+            block = tk.Frame(guide, bg="#F7F9F9")
+            block.pack(fill="x", padx=13, pady=5)
+            tk.Frame(block, bg=color, width=4).pack(side="left", fill="y")
+            inner = tk.Frame(block, bg="#F7F9F9")
+            inner.pack(side="left", fill="both", expand=True, padx=9, pady=9)
+            tk.Label(inner, text=head, bg="#F7F9F9", fg=self.colors["ink"],
+                     font=("Segoe UI", 9, "bold")).pack(anchor="w")
+            tk.Label(inner, text=body_text, bg="#F7F9F9", fg=self.colors["muted"],
+                     font=("Segoe UI", 8), wraplength=205, justify="left").pack(anchor="w", pady=(3, 0))
+        ttk.Button(guide, text="Exportpakket maken", command=self.export_project,
+                   style="Wine.TButton").pack(fill="x", padx=14, pady=(12, 14))
+
+        # DOCUMENTS: dedicated document library with table and clear actions
+        doc_top = ttk.Frame(documents, style="App.TFrame")
+        doc_top.pack(fill="x", pady=(0, 12))
+        ttk.Label(doc_top, text="Documentbibliotheek", style="Title.TLabel").pack(side="left")
+        ttk.Label(doc_top, text="Controleer de herkenning voordat je de inhoud analyseert.",
+                  style="Muted.TLabel").pack(side="left", padx=16, pady=(10, 0))
+        doc_actions = ttk.Frame(documents, style="App.TFrame")
+        doc_actions.pack(fill="x", pady=(0, 10))
+        ttk.Button(doc_actions, text="＋ Pdf's toevoegen", command=self.add_pdfs,
+                   style="Accent.TButton").pack(side="left")
+        ttk.Button(doc_actions, text="Document bekijken", command=self.show_document,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(doc_actions, text="Herkenning aanpassen", command=self.correct_type,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(doc_actions, text="Examengegevens controleren", command=self.edit_exam_metadata,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        files_card = tk.Frame(documents, bg="#FFFFFF", highlightthickness=1,
+                              highlightbackground=self.colors["line"])
         files_card.pack(fill="both", expand=True)
-        files_heading = ttk.Frame(files_card, style="Surface.TFrame")
-        files_heading.pack(fill="x", pady=(0, 10))
-        ttk.Label(files_heading, text="Bronbestanden", style="CardTitle.TLabel").pack(side="left")
-        ttk.Label(files_heading, text="Dubbelklik op een bestand om de bronpagina's te bekijken.",
-                  style="CardHint.TLabel").pack(side="right")
-        table_wrap = ttk.Frame(files_card, style="Surface.TFrame")
+        files_heading = tk.Frame(files_card, bg="#FFFFFF")
+        files_heading.pack(fill="x", padx=16, pady=(13, 5))
+        tk.Label(files_heading, text="INGELEZEN BRONBESTANDEN", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 10, "bold")).pack(side="left")
+        tk.Label(files_heading, text="Dubbelklik op een regel om de PDF te bekijken",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
+        table_wrap = ttk.Frame(files_card, style="Card.TFrame", padding=(12, 7, 12, 12))
         table_wrap.pack(fill="both", expand=True)
         columns = ("name", "type", "pages", "confidence", "state")
         self.table = ttk.Treeview(table_wrap, columns=columns, show="headings")
         for col, title, width in [
-            ("name", "Bestand", 430), ("type", "Herkend documenttype", 190),
-            ("pages", "Pagina's", 85), ("confidence", "Zekerheid", 100), ("state", "Status", 180)
+            ("name", "Bestand", 470), ("type", "Herkend documenttype", 210),
+            ("pages", "Pagina's", 90), ("confidence", "Zekerheid", 110), ("state", "Status", 220)
         ]:
             self.table.heading(col, text=title)
             self.table.column(col, width=width, anchor="w" if col in ("name", "type", "state") else "center")
         scrollbar = ttk.Scrollbar(table_wrap, orient="vertical", command=self.table.yview)
-        horizontal = ttk.Scrollbar(files_card, orient="horizontal", command=self.table.xview)
+        horizontal = ttk.Scrollbar(table_wrap, orient="horizontal", command=self.table.xview)
         self.table.configure(yscrollcommand=scrollbar.set, xscrollcommand=horizontal.set)
         self.table.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
         horizontal.pack(fill="x", pady=(2, 0))
         self.table.tag_configure("odd", background=self.colors["table_alt"])
-        self.table.tag_configure("even", background=self.colors["surface"])
+        self.table.tag_configure("even", background="#FFFFFF")
         self.table.bind("<Double-1>", self.show_document)
 
-        # Quick actions and activity panel
-        actions = ttk.Frame(workspace, style="App.TFrame")
-        actions.pack(fill="x", pady=(13, 0))
-        ttk.Button(actions, text="Document bekijken", command=self.show_document,
-                   style="Secondary.TButton").pack(side="left", padx=(0, 7))
-        ttk.Button(actions, text="Herkenning aanpassen", command=self.correct_type,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        ttk.Button(actions, text="Examengegevens controleren", command=self.edit_exam_metadata,
-                   style="Secondary.TButton").pack(side="left", padx=7)
-        ttk.Button(actions, text="Voortgang opslaan", command=self.save_project,
-                   style="Accent.TButton").pack(side="right")
+        # WORKFLOW: large task cards grouped by the actual processing stages
+        ttk.Label(workflow, text="Verwerkroute", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(workflow, text="Open een stap wanneer je eraan toe bent. De applicatie bewaart je voortgang lokaal.",
+                  style="Muted.TLabel").pack(anchor="w", pady=(3, 14))
+        stages = [
+            ("01", "Vraagstarts analyseren", "Zoek mogelijke vraagstarts in de opgaven-pdf en vergelijk waar mogelijk met het bijbehorende CV.", "Analyse", self.analyze_questions, self.colors["teal"]),
+            ("02", "Examenstructuur vastleggen", "Controleer paginabereiken, vraaggrenzen en de koppeling met contexten, figuren en tabellen.", "Structuur", self.edit_exam_structure, self.colors["wine"]),
+            ("03", "Vraagstarts bevestigen", "Beoordeel de gevonden kandidaten in een doorlopend controlevenster.", "Controleren", self.show_candidates, self.colors["orange"]),
+            ("04", "Vraagrecords samenstellen", "Maak conceptrecords vanuit bevestigde vraagstarts en controleer de bronfragmenten.", "Samenstellen", self.show_candidates, self.colors["teal"]),
+            ("05", "Inhoudelijke eindcontrole", "Controleer alle tekst, opties, afbeeldingen, contexten, CV en bijlagen per vraag.", "Eindcontrole", self.show_records, self.colors["wine"]),
+            ("06", "Veilig exportpakket", "Maak een lokaal exportpakket. Publiceren naar de website gebeurt nooit automatisch.", "Exporteren", self.export_project, self.colors["green"]),
+        ]
+        for number, heading, description, action_text, callback, color in stages:
+            card = tk.Frame(workflow, bg="#FFFFFF", highlightthickness=1,
+                            highlightbackground=self.colors["line"])
+            card.pack(fill="x", pady=5)
+            tk.Label(card, text=number, bg=color, fg="#FFFFFF",
+                     font=("Segoe UI", 13, "bold"), width=4, height=2).pack(side="left", padx=14, pady=12)
+            content_col = tk.Frame(card, bg="#FFFFFF")
+            content_col.pack(side="left", fill="x", expand=True, padx=4, pady=11)
+            tk.Label(content_col, text=heading, bg="#FFFFFF", fg=self.colors["wine"],
+                     font=("Segoe UI", 11, "bold")).pack(anchor="w")
+            tk.Label(content_col, text=description, bg="#FFFFFF", fg=self.colors["muted"],
+                     font=("Segoe UI", 9), wraplength=850, justify="left").pack(anchor="w", pady=(3, 0))
+            ttk.Button(card, text=action_text, command=callback,
+                       style="Accent.TButton" if number in ("01", "03", "05") else "Secondary.TButton").pack(side="right", padx=16, pady=14)
 
-        workflow_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(15, 10))
-        workflow_card.pack(fill="x", pady=(12, 0))
-        workflow_row = ttk.Frame(workflow_card, style="Surface.TFrame")
-        workflow_row.pack(fill="x")
-        ttk.Label(workflow_row, text="VERWERKROUTE", style="CardHint.TLabel").pack(side="left", padx=(0, 15))
-        ttk.Button(workflow_row, text="Vraagstarts", command=self.analyze_questions,
-                   style="Secondary.TButton").pack(side="left", padx=4)
-        ttk.Button(workflow_row, text="Structuur", command=self.edit_exam_structure,
-                   style="Secondary.TButton").pack(side="left", padx=4)
-        ttk.Button(workflow_row, text="Kandidaten", command=self.show_candidates,
-                   style="Secondary.TButton").pack(side="left", padx=4)
-        ttk.Button(workflow_row, text="Beoordelen", command=self.show_records,
-                   style="Secondary.TButton").pack(side="left", padx=4)
-        ttk.Button(workflow_row, text="Exporteren", command=self.export_project,
-                   style="Secondary.TButton").pack(side="left", padx=4)
-
-        log_card = ttk.Frame(workspace, style="Surface.TFrame", padding=(14, 9))
-        log_card.pack(fill="x", pady=(12, 0))
-        log_header = ttk.Frame(log_card, style="Surface.TFrame")
-        log_header.pack(fill="x")
-        ttk.Label(log_header, text="Activiteit en meldingen", style="CardTitle.TLabel").pack(side="left")
-        ttk.Label(log_header, text="Lokale log", style="CardHint.TLabel").pack(side="right")
-        self.log = tk.Text(log_card, height=4, wrap="word", font=("Segoe UI", 9),
-                           background="#FBFAFB", foreground=self.colors["text"],
-                           insertbackground=self.colors["text"], relief="flat",
-                           padx=9, pady=7, highlightthickness=1,
-                           highlightbackground=self.colors["line"])
-        self.log.pack(fill="x", pady=(7, 0))
+        # Persistent activity feed
+        activity = tk.Frame(shell, bg="#FFFFFF", highlightthickness=1,
+                            highlightbackground=self.colors["line"])
+        activity.pack(fill="x", padx=26, pady=(0, 14))
+        activity_head = tk.Frame(activity, bg="#FFFFFF")
+        activity_head.pack(fill="x", padx=13, pady=(8, 2))
+        tk.Label(activity_head, text="ACTIVITEIT EN MELDINGEN", bg="#FFFFFF",
+                 fg=self.colors["wine"], font=("Segoe UI", 8, "bold")).pack(side="left")
+        tk.Label(activity_head, text="Lokale log · bronbestanden blijven intact",
+                 bg="#FFFFFF", fg=self.colors["muted"], font=("Segoe UI", 8)).pack(side="right")
+        self.log = tk.Text(activity, height=3, wrap="word", font=("Segoe UI", 9),
+                           background="#FBFCFC", foreground=self.colors["ink"],
+                           insertbackground=self.colors["ink"], relief="flat",
+                           padx=10, pady=6, highlightthickness=0)
+        self.log.pack(fill="x", padx=10, pady=(2, 8))
         self.log.configure(state="disabled")
+
+    def _metric_card(self, parent, heading, value, caption, column):
+        card = tk.Frame(parent, bg="#FFFFFF", highlightthickness=1,
+                        highlightbackground=self.colors["line"])
+        card.grid(row=0, column=column, sticky="nsew", padx=(0 if column == 0 else 6, 0))
+        parent.columnconfigure(column, weight=1, uniform="metrics")
+        tk.Label(card, text=heading, bg="#FFFFFF", fg=self.colors["muted"],
+                 font=("Segoe UI", 8, "bold")).pack(anchor="w", padx=14, pady=(12, 1))
+        number = ttk.Label(card, text=value, style="Metric.TLabel")
+        number.pack(anchor="w", padx=14)
+        ttk.Label(card, text=caption, style="MetricCaption.TLabel").pack(anchor="w", padx=14, pady=(0, 12))
+        return number
 
     def _welcome(self):
         self._log("Welkom. Open een bestaand examenproject of selecteer in één keer PDF's van meerdere jaren, niveaus en tijdvakken.")
