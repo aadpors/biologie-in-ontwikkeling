@@ -15,7 +15,7 @@ const fs = require("node:fs");
     await page.goto("http://127.0.0.1:8000/", { waitUntil: "networkidle" });
     await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("50"));
     const initialCount = await page.locator("#count").innerText();
-    assert.match(initialCount, /50 bron/);
+    assert.match(initialCount, /50 publicatie/);
 
     const desktopLayout = await page.evaluate(() => ({
       viewport: window.innerWidth,
