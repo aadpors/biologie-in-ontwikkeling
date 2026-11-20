@@ -3849,6 +3849,12 @@ class ExamApp:
                         record["cv_source_document_id"]=doc["id"]
                         record["cv_source_region"]=fragment
                         record["cv_source_region_file"]=name
+                        record["cv_source_region_sha256"]=sha256(self.project_dir/"snippets"/name)
+                        record["cv_snippet_file"]=name
+                        record["cv_snippet_files"]=[name]
+                        record["cv_source_sha256"]=doc.get("sha256")
+                        record["cv_source_document_name"]=doc.get("bestand")
+                        record["cv_match_human_confirmed"]=True
                     elif role=="aanvulling":
                         record.setdefault("cv_amendment_regions",[])
                         record["cv_amendment_regions"]=[x for x in record["cv_amendment_regions"]
@@ -3890,6 +3896,8 @@ class ExamApp:
                    command=self._review_consolidated_cv).pack(side="left",padx=6)
         ttk.Button(region_bar,text="Volledigheid controleren",
                    command=self._review_exam_completeness).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="Visuele eindcontrole openen",
+                   command=lambda:self.review_question_record(record,win)).pack(side="left",padx=6)
         buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
         ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
@@ -4064,6 +4072,10 @@ class ExamApp:
             record["status"]="goedgekeurd"
             record["approved_at"]=now()
             record["approval_method"]="handmatige_eindcontrole"
+            all_records=self.data.get("vraagrecords",[])
+            if all_records and all(x.get("approved_by_human") is True for x in all_records):
+                self.data["final_visual_review"]={"status":"visueel_bevestigd",
+                    "reviewed_at":now(),"record_ids":[x.get("id") for x in all_records]}
             self.save_project()
             self._log(f"Record {record.get('id')} expliciet handmatig goedgekeurd.")
             messagebox.showinfo("Record goedgekeurd","Dit record is nu expliciet door jou goedgekeurd. Het wordt pas meegenomen wanneer het volledige exportpakket alle controles doorstaat.",parent=win)
