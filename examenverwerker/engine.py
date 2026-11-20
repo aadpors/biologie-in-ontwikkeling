@@ -387,7 +387,7 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                         if not text:
                             continue
                         bbox = line.get("bbox") or block.get("bbox") or [0, 0, 0, 0]
-                        normalized = re.sub(r"\\s+", " ", text.lower()).strip()
+                        normalized = re.sub(r"\s+", " ", text.lower()).strip()
                         item = {
                             "text": text,
                             "normalized": normalized,
@@ -434,8 +434,8 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
 
         explicit_footer = re.compile(
             r"(examenblad|college voor toetsen|cito|www\\.|©|"
-            r"pagina\\s*\\d|tijdvak\\s*\\d|lees\\s+verder|"
-            r"\\b\\d{1,3}\\s*/\\s*\\d{1,3}\\b)",
+            r"pagina\s*\d|tijdvak\s*\d|lees\s+verder|"
+            r"\b\d{1,3}\s*/\s*\d{1,3}\b)",
             re.I,
         )
         mapping = []
@@ -449,7 +449,7 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                     if relative_top < 0.76:
                         continue
                     standalone_page_number = bool(
-                        re.fullmatch(r"\\d{1,3}", line["normalized"])
+                        re.fullmatch(r"\d{1,3}", line["normalized"])
                         and relative_top >= 0.90
                     )
                     repeated_footer = (
@@ -501,13 +501,29 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                     max((asset[3] for asset in body_assets), default=0.0),
                 )
 
-                if body_bottom <= 0:
+                footer_conflict = (
+                    footer_top is not None
+                    and body_bottom + float(padding) >= footer_top
+                )
+                if footer_conflict:
+                    # There is not enough whitespace between the final body
+                    # element and the footer. Keep the complete page instead
+                    # of shaving off the descenders or final line of a question.
+                    rejected_footer_lines.extend(footer_lines)
+                    footer_lines = []
+                    footer_top = None
+                    body_lines = list(row["lines"])
+                    body_assets = list(row["assets"])
+                    body_bottom = max(
+                        max((line["bottom"] for line in body_lines), default=0.0),
+                        max((asset[3] for asset in body_assets), default=0.0),
+                    )
+                    cutoff = height
+                elif body_bottom <= 0:
                     # A blank or unextractable page is kept intact for review.
                     cutoff = height
                 else:
                     cutoff = min(height, body_bottom + float(padding))
-                    if footer_top is not None:
-                        cutoff = min(cutoff, footer_top)
 
                 target = preview.new_page(width=width, height=cutoff)
                 clip = fitz.Rect(0, 0, width, cutoff)
@@ -527,7 +543,7 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                     "footer_candidates_rejected": [
                         line["text"] for line in rejected_footer_lines
                     ],
-                    "footer_review_required": bool(rejected_footer_lines),
+                    "footer_review_required": bool(rejected_footer_lines) or footer_conflict,
                     "last_content_bottom": body_bottom,
                 })
 
