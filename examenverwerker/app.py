@@ -3641,13 +3641,31 @@ class ExamApp:
     def _review_exam_completeness(self):
         """Run structural completeness checks and persist the teacher's final confirmation."""
         issues=exam_completeness_issues(self.data or {})
+        for doc in (self.data or {}).get("documenten",[]):
+            source=self.project_dir/"bronnen"/str(doc.get("opslagbestand",""))
+            if not source.is_file() or sha256(source)!=doc.get("sha256"):
+                issues.append({"code":"bronbestand_ontbreekt_of_gewijzigd",
+                               "document_id":doc.get("id")})
+        for record in (self.data or {}).get("vraagrecords",[]):
+            for asset in record.get("context_asset_files",[]):
+                asset_path=self.project_dir/"snippets"/str(asset.get("file",""))
+                expected=asset.get("snippet_sha256") or asset.get("sha256")
+                if not asset_path.is_file() or (expected and sha256(asset_path)!=expected):
+                    issues.append({"code":"contextuitsnede_ontbreekt_of_gewijzigd",
+                                   "record_id":record.get("id"),"question_number":record.get("number")})
+        point_values=[float((r.get("exam") or {}).get("points"))
+                      for r in (self.data or {}).get("vraagrecords",[])
+                      if (r.get("exam") or {}).get("points") not in (None,"")]
+        total_points=sum(point_values)
         win=tk.Toplevel(self.root); win.title("Volledigheidscontrole")
         win.geometry("760x560")
         outer=ttk.Frame(win,padding=14); outer.pack(fill="both",expand=True)
         ttk.Label(outer,text="Automatische structurele controles",
                   font=("Segoe UI",11,"bold")).pack(anchor="w")
-        ttk.Label(outer,text="Deze controle zoekt onder meer dubbele vraagnummering, ontbrekende vraagfragmenten, losse contextfragmenten, verouderde bronkoppelingen en ontbrekende puntenaantallen.",
-                  wraplength=720).pack(anchor="w",pady=(4,10))
+        ttk.Label(outer,text="Deze controle zoekt onder meer dubbele vraagnummering, ontbrekende vraagfragmenten, losse contextfragmenten, verouderde bronkoppelingen, ontbrekende puntenaantallen en ontbrekende of gewijzigde bronbestanden/uitsneden.",
+                  wraplength=720).pack(anchor="w",pady=(4,6))
+        ttk.Label(outer,text=f"Gecontroleerde vragen: {len(self.data.get('vraagrecords',[]))} · ingevulde puntenaantallen: {len(point_values)} · som van ingevulde punten: {total_points:g}",
+                  wraplength=720).pack(anchor="w",pady=(0,8))
         report=tk.Text(outer,wrap="word",height=18)
         report.pack(fill="both",expand=True)
         if issues:
@@ -3666,6 +3684,7 @@ class ExamApp:
                 "status":"visueel_bevestigd","reviewed_at":now(),
                 "question_count":len(self.data.get("vraagrecords",[])),
                 "document_count":len(self.data.get("documenten",[])),
+                "total_points":total_points,
             }
             self.save_project()
             self._log("Structurele volledigheidscontrole bevestigd.")
