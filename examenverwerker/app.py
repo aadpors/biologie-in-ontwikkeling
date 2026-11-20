@@ -3610,6 +3610,7 @@ class ExamApp:
             int(item["original_page"]): item for item in page_layout
         }
         photo = None
+        document_photo = None
         snippet_mode = False
         snippet_layout = []
         snippet_scale = 1.05
@@ -3755,10 +3756,11 @@ class ExamApp:
             canvas.configure(scrollregion=(0, 0, page_image_width, page_image_height))
 
         def show_document(scroll_to_page=None):
-            nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode, overlay_items
+            nonlocal photo, document_photo, page_image_width, page_image_height, displayed_page, snippet_mode, overlay_items
             snippet_mode = False
-            if photo is None:
-                photo = tk.PhotoImage(file=str(stitched_path))
+            if document_photo is None:
+                document_photo = tk.PhotoImage(file=str(stitched_path))
+            photo = document_photo
             page_image_width, page_image_height = photo.width(), photo.height()
             canvas.delete("all")
             canvas.create_image(0, 0, image=photo, anchor="nw")
@@ -3992,6 +3994,14 @@ class ExamApp:
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
         def update_page_span():
+            if snippet_mode:
+                messagebox.showinfo(
+                    "Fragmentvoorbeeld",
+                    "Pas de grenzen rechtstreeks aan met de zwarte lijnen. "
+                    "Gebruik 'Doorlopende PDF' om de selectie op het volledige document te wijzigen.",
+                    parent=win,
+                )
+                return
             frag = selected_fragment()
             if not frag:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waarvan je de grenzen wilt aanpassen.", parent=win)
@@ -4036,6 +4046,7 @@ class ExamApp:
             if not sel: return
             index = int(sel[0])
             if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
+            fragment_tree.selection_remove(fragment_tree.selection())
             fragments.pop(index)
             refresh_fragment_list()
             save_structure()
@@ -4108,7 +4119,7 @@ class ExamApp:
             save_structure(); refresh_fragment_list(); show_document()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
-            nonlocal selection_start, selection_end
+            nonlocal selection_start, selection_end, displayed_page
             fragment_tree.selection_remove(fragment_tree.selection())
             qlist.selection_clear(0, "end")
             type_var.set("Context")
