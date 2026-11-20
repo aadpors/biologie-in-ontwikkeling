@@ -1,3 +1,15 @@
+## 0.15.0
+- De basisapplicatie is vakneutraal gemaakt; bij import kiest de gebruiker het vak.
+- Projectmappen voor andere vakken krijgen een vaknaam, zodat ze niet botsen met biologieprojecten.
+- Er zijn nog maar twee fragmenttypen: context en vraag.
+- Automatische vraagfragmenten eindigen bij de eerste witregel of kadergrens na de vraagstart.
+- Na afronding van de fragmentselectie worden vraagtypen automatisch bepaald vanuit de gekozen vraagfragmenten.
+- Per vraag wordt automatisch een eenvoudig conceptrecord gemaakt met vraagtekst, vraagtype en gekoppelde context.
+- Bestaande projecten met gecontroleerde fragmentgrenzen krijgen de ontbrekende fragmenttekst automatisch aangevuld binnen die grenzen.
+- De uitgebreide vraagrecordknop en de extra tussenstap zijn verwijderd.
+- Een conceptexport bevat de gegevens en bron-PDF's; er vindt geen automatische websitepublicatie plaats.
+- De Windows-app en startbestanden gebruiken voortaan de generieke naam Examenverwerker.
+
 ## 0.13.4
 - Importdialoog gebruikt nu een grid-indeling met een vaste onderste actiebalk. De knoppen **Annuleren** en **Opslaan en doorgaan naar examenverwerking** blijven zichtbaar, ook wanneer het middenpaneel uitrekt.
 - Versienummer verhoogd voor de gecorrigeerde Windows-build.
