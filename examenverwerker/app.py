@@ -1082,20 +1082,11 @@ class ExamApp:
             # round: the persisted geometry is the reviewed source of truth.
             linked[row.get("id")] = fragment
 
-        source_path = self.project_dir / "bronnen" / doc["opslagbestand"]
-        # Read only the page dimensions needed to interpret the saved fragment
-        # coordinates. Do not re-analyse question starts, neighboring content,
-        # or visual regions in the original PDF at this stage.
-        import pymupdf as fitz
-        with fitz.open(source_path) as source_pdf:
-            page_sizes = {
-                index + 1: (float(page.rect.width), float(page.rect.height))
-                for index, page in enumerate(source_pdf)
-            }
         for row in candidates:
             fragment = linked[row.get("id")]
-            segments = page_spans_to_segments(fragment["page_spans"], page_sizes)
-            snippet_text = extract_region_text(source_path, segments)
+            # This text was materialized from the exact selected fragment when
+            # the teacher finished structure editing. Do not return to the PDF.
+            snippet_text = str(fragment.get("text") or "")
             row["vraagtekst_voorstel"] = snippet_text
             if snippet_text.strip():
                 row["vraagtype_controle"] = detect_question_type(snippet_text)
@@ -1144,15 +1135,9 @@ class ExamApp:
             )
             return
         try:
-            source_path = self.project_dir / "bronnen" / source_doc["opslagbestand"]
-            import pymupdf as fitz
-            with fitz.open(source_path) as source_pdf:
-                page_sizes = {
-                    page_no + 1: (float(page.rect.width), float(page.rect.height))
-                    for page_no, page in enumerate(source_pdf)
-                }
-            segments = page_spans_to_segments(question_fragment["page_spans"], page_sizes)
-            snippet_text = extract_region_text(source_path, segments)
+            # Use the cached text of the selected fragment; never rebuild a
+            # question from neighboring regions of the original PDF.
+            snippet_text = str(question_fragment.get("text") or "")
             row["vraagtekst_voorstel"] = snippet_text or row.get("vraagtekst_voorstel", "")
             row["vraagtype_controle"] = (
                 detect_question_type(row["vraagtekst_voorstel"])
@@ -4571,6 +4556,26 @@ class ExamApp:
             if not save_structure():
                 return
             try:
+                # Materialize the exact user-selected question fragments once.
+                # All later analysis reads this saved fragment text, not the PDF.
+                source_path = self.project_dir / "bronnen" / doc["opslagbestand"]
+                import pymupdf as fitz
+                with fitz.open(source_path) as source_pdf:
+                    selected_page_sizes = {
+                        page_no + 1: (float(page.rect.width), float(page.rect.height))
+                        for page_no, page in enumerate(source_pdf)
+                    }
+                for fragment in fragments:
+                    if canonical_fragment_type(fragment.get("type")) != "vraag":
+                        continue
+                    selected_segments = page_spans_to_segments(
+                        fragment.get("page_spans", []), selected_page_sizes
+                    )
+                    fragment["text"] = extract_region_text(source_path, selected_segments)
+                saved_structure = make_exam_structure(doc, fragments, question_numbers)
+                self.data.setdefault("exam_structures", {})[doc["id"]] = saved_structure
+                self.data["exam_structure"] = saved_structure
+                self.save_project()
                 classified = self._classify_question_types_for_document(doc)
             except Exception as exc:
                 self._error("Vraagtypen bepalen na fragmentcontrole", exc)
