@@ -60,13 +60,25 @@ De volgende publicaties zijn opnieuw geformuleerd om schoolsoortspecifieke codes
 - s23: vwo-specifieke koppeling aan B6 gebruikt in plaats van het havo-nummer B5.
 - s33: de te brede koppeling aan afweer verwijderd; de publicatie is primair methodologisch en cellulaire interactie is als inhoudelijke aansluiting beschreven.
 
-## Nog uit te voeren
+## Status 21 november 2026
 
-Dit is een eerste correctieronde, geen afgeronde audit van alle kaarten. De resterende wetenschappelijke publicaties moeten één voor één worden beoordeeld op:
-- exacte aansluiting op de relevante eindterm, niet alleen op een breed thema;
-- juiste CE/SE-status en actuele syllabuscode;
-- afzonderlijke havo- en vwo-koppeling aan SLO v2;
-- directe aansluiting versus analogie/verdieping;
-- of het onderzoekssysteem (mens, modelorganisme, celkweek, ecosysteem) in de kaart correct is weergegeven.
+De wetenschappelijke bibliotheek is opnieuw geïnventariseerd en inhoudelijk heringedeeld. De 40 oorspronkelijke kaarten zijn beoordeeld op thema, niveau, onderzoekssoort, bewijssterkte, curriculumrelatie en interne consistentie. De bibliotheek bevat nu 48 wetenschappelijke kaarten. Acht nieuwe publicaties vullen aantoonbare hiaten aan; enkele bestaande kaarten zijn inhoudelijk of curriculair gecorrigeerd.
 
-Daarna volgt dezelfde inhoudelijke controle voor de pedagogisch-didactische publicaties: publicatietype, onderzoeksopzet, populatie, beperkingen en toepasbaarheid in de Nederlandse biologieles.
+Belangrijke correcties:
+- s9: koppeling aan havo B8 en vwo B9 consequent gemaakt.
+- s12: havo B7 en vwo B8 onderscheiden; havo/vwo CE- en SE-status bij gedrag, seksualiteit en voortplanting verduidelijkt.
+- s23: experimentele bevindingen en evolutionaire modelverklaring uit elkaar gehaald; vwo B6 gebruikt en relevantie teruggebracht van direct naar aansluitend.
+- s35: afzonderlijk thema 'Evolutie van eukaryote cellen'; uitsluitend vwo en aansluitend, niet langer ten onrechte als directe uitwerking van het ontstaan van het eerste leven gepresenteerd.
+- s20: artikelverwijzing gekoppeld aan de officiële Oxford Academic-publicatiepagina.
+- s44: exacte publicatietitel hersteld.
+
+De huidige syllabus 2027 en het conceptprogramma v2 blijven afzonderlijk beschreven. Havo- en vwo-codes worden niet uitwisselbaar gebruikt. Bewijssterkte, bron-/publicatiekwaliteit en curriculumrelevantie zijn afzonderlijke beoordelingen.
+
+## Resterende kwaliteitsbewaking
+
+- De 40 oorspronkelijke kaarten zijn op metadata en inhoudelijke positionering gecontroleerd; een volledige herlezing van elk artikel op detailniveau blijft een doorlopend bronverificatieproces. Nieuwe kaarten zijn aan de hand van de publicatiepagina of PubMed/uitgevermetadata gecontroleerd.
+- De didactische kaarten vragen een afzonderlijke audit op onderzoeksopzet, populatie, beperkingen en toepasbaarheid in de Nederlandse biologieles.
+- De dekking is breder, maar niet volledig: gedrag/voortplanting, genexpressie, DNA-replicatie/celcyclus en enkele specialistische evolutionaire thema's blijven relatief smal vertegenwoordigd. Nieuwe kaarten worden alleen toegevoegd als de bron en onderwijswaarde voldoende sterk zijn.
+
+
+Zie ook [de thematische audit van de wetenschappelijke bibliotheek](science-library-audit.md) voor de dekking, nieuwe kaarten en beoordelingsprincipes.
