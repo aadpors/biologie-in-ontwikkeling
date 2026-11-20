@@ -815,6 +815,15 @@ class ExamApp:
                 else:
                     button="Vraagstarts analyseren"
                     action=self.analyze_questions
+            elif state["stage"] == "ontbrekende_vragen":
+                target_id=state.get("document_id")
+                def add_missing_question():
+                    if target_id:
+                        self._workspace_doc_id=target_id
+                        self._workspace_refresh()
+                    self._workspace_start_manual_mark()
+                button="Vraagstart handmatig toevoegen"
+                action=add_missing_question
         self.workflow_label.configure(text=f"Volgende stap · {label}. {state['action']}")
         self.workflow_button.configure(text=button, command=action)
 
