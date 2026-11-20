@@ -42,10 +42,15 @@ button[data-tip]{cursor:pointer}.pill[data-tip]{cursor:help}.empty{background:wh
 <section class="intro"><h2 id="heading">Biologie: wetenschap in ontwikkeling</h2><p id="description">Concrete biologische inzichten en wetenschappelijke publicaties, inhoudelijk gekoppeld aan onderwerpen en deelconcepten uit de havo- en vwo-examenprogramma’s en syllabi.</p></section>
 <section class="controls"><h3>Zoeken en filteren</h3>
 <div class="filters" id="science-filters">
-<div class="field"><label for="period">Publicatieperiode</label><select id="period"><option value="30">Afgelopen maand</option><option value="90">Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365" selected>Afgelopen jaar</option><option value="1095">Afgelopen 3 jaar</option><option value="all">Alle perioden</option></select></div>
+<div class="field"><label for="period">Publicatieperiode</label><select id="period"><option value="30">Afgelopen maand</option><option value="90">Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365">Afgelopen jaar</option><option value="1095" selected>Afgelopen 3 jaar</option><option value="all">Alle perioden</option></select></div>
 
 <div class="field"><label for="programme">Examenprogramma</label><select id="programme"><option value="all">Huidig en toekomstig</option><option>Huidig</option><option>Toekomstig</option></select></div>
-<div class="field"><label for="concept">Syllabusonderwerp</label><select id="concept"><option value="all">Alle syllabusonderwerpen</option><option>Moleculaire interactie</option><option>Selectie en genetische variatie</option><option>Biodiversiteit en ecosystemen</option><option>Ontstaan en evolutie van meercellig leven</option><option>Afweer van het organisme</option><option>Stofwisseling van het organisme</option><option>Zelforganisatie van het organisme</option><option>Zelfregulatie van het organisme</option><option>DNA-replicatie en celcyclus</option><option>Eiwitsynthese en genexpressie</option><option>Gedrag en voortplanting</option></select></div></div>
+<div class="field"><label for="concept">Syllabusonderwerp</label><select id="concept"><option value="all">Alle syllabusonderwerpen</option><option>Moleculaire interactie</option><option>Selectie en genetische variatie</option><option>Biodiversiteit en ecosystemen</option><option>Ontstaan en evolutie van meercellig leven</option><option>Afweer van het organisme</option><option>Stofwisseling van het organisme</option><option>Zelforganisatie van het organisme</option><option>Zelfregulatie van het organisme</option><option>DNA-replicatie en celcyclus</option><option>Eiwitsynthese en genexpressie</option><option>Gedrag en voortplanting</option><option>Erfelijke eigenschappen en overerving</option></select></div>
+<div class="filters" id="science-assessment-filters" style="margin-top:10px" hidden>
+<div class="field"><label for="level-filter">Doelgroep publicatie</label><select id="level-filter"><option value="all">Alle niveaus</option><option value="Havo">Havo</option><option value="Vwo">Vwo</option><option value="Havo/vwo">Havo én vwo</option></select></div>
+<div class="field"><label for="evidence-filter">Bewijssterkte</label><select id="evidence-filter"><option value="all">Alle bewijsniveaus</option><option>Breed onderbouwd</option><option>Ondersteunend bewijs</option><option>Achtergrondbron</option><option>Voorzichtig interpreteren</option><option>Voorlopig bewijs</option></select></div>
+<div class="field"><label for="relevance-filter">Curriculumrelevantie</label><select id="relevance-filter"><option value="all">Alle relevantieniveaus</option><option>Direct</option><option>Aansluitend</option><option>Verdieping</option></select></div>
+</div>
 <div class="filters" id="education-filters" hidden>
 <div class="field"><label for="ed-period">Publicatieperiode</label><select id="ed-period"><option value="30">Afgelopen maand</option><option value="90">Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365">Afgelopen jaar</option><option value="1095">Afgelopen 3 jaar</option><option value="all" selected>Alle perioden</option></select></div>
 <div class="field"><label for="language">Taal</label><select id="language"><option value="all">Nederlands en Engels</option><option>Nederlands</option><option>Engels</option></select></div>
@@ -69,7 +74,7 @@ let page='science',audience=localStorage.getItem('bioAudience')||'';
 const $=id=>document.getElementById(id),value=id=>$(id).value;
 const voteKey=(publicationId,group)=>publicationId+'::'+group;
 const uiPrefsKey='bioUiPreferencesV1';
-const filterControlIds=['search','rating-filter','period','programme','concept','ed-period','language','source-type','topic'];
+const filterControlIds=['search','rating-filter','period','programme','concept','level-filter','evidence-filter','relevance-filter','ed-period','language','source-type','topic'];
 function saveUiPreferences(){
  try{const controls={};filterControlIds.forEach(id=>{const el=$(id);if(el)controls[id]=el.value;});localStorage.setItem(uiPrefsKey,JSON.stringify({page,controls}));}
  catch(error){console.warn('Filtervoorkeuren konden niet worden bewaard.',error);}
@@ -87,7 +92,7 @@ function restoreUiPreferences(){
  }catch(error){console.warn('Eerder opgeslagen filtervoorkeuren konden niet worden hersteld.',error);}
 }
 restoreUiPreferences();
-function showPage(p){page=p;saveUiPreferences();$('tab-science').setAttribute('aria-selected',p==='science');$('tab-education').setAttribute('aria-selected',p==='education');$('science-filters').hidden=p!=='science';$('education-filters').hidden=p!=='education';$('heading').textContent=p==='science'?'Biologie: wetenschap in ontwikkeling':'Biologieonderwijs: pedagogiek & didactiek';$('description').textContent=p==='science'?'Concrete biologische inzichten en wetenschappelijke publicaties, inhoudelijk gekoppeld aan onderwerpen en deelconcepten uit de havo- en vwo-examenprogramma’s en syllabi.':'Onderzoek, kennisplatforms, vakdidactiek en praktijkervaring uit Nederland en daarbuiten. Breed geselecteerd, met aandacht voor bruikbaarheid in de biologieles.';render()}
+function showPage(p){page=p;saveUiPreferences();$('tab-science').setAttribute('aria-selected',p==='science');$('tab-education').setAttribute('aria-selected',p==='education');$('science-filters').hidden=p!=='science';$('science-assessment-filters').hidden=p!=='science';$('education-filters').hidden=p!=='education';$('heading').textContent=p==='science'?'Biologie: wetenschap in ontwikkeling':'Biologieonderwijs: pedagogiek & didactiek';$('description').textContent=p==='science'?'Concrete biologische inzichten en wetenschappelijke publicaties, inhoudelijk gekoppeld aan onderwerpen en deelconcepten uit de havo- en vwo-examenprogramma’s en syllabi.':'Onderzoek, kennisplatforms, vakdidactiek en praktijkervaring uit Nederland en daarbuiten. Breed geselecteerd, met aandacht voor bruikbaarheid in de biologieles.';render()}
 $('tab-science').onclick=()=>showPage('science');$('tab-education').onclick=()=>showPage('education');
 function openAudienceGate(){ $('audience-gate').hidden=false;$('audience-title').textContent=audience?'Niveauselectie wijzigen':'Voor welk niveau gebruik je deze website?';const chosen=document.querySelector('input[name="audience"][value="'+audience+'"]');if(chosen)chosen.checked=true; }
 function syncAudienceLabel(){ $('current-audience').textContent=audience||'niet gekozen'; }
@@ -96,7 +101,11 @@ $('save-audience').onclick=()=>{const chosen=document.querySelector('input[name=
 syncAudienceLabel();
 if(!audience)openAudienceGate();
 function render(){let list=data.filter(x=>x.page===page),q=value('search').toLowerCase(),rf=value('rating-filter'),period=value(page==='science'?'period':'ed-period');if(period!=='all'){let cutoff=new Date();cutoff.setDate(cutoff.getDate()-Number(period));list=list.filter(x=>new Date(x.date+'T00:00:00')>=cutoff)}
-if(page==='science'){if(audience==='Havo')list=list.filter(x=>x.level==='Havo'||x.level==='Havo/vwo');else if(audience==='Vwo')list=list.filter(x=>x.level==='Vwo'||x.level==='Havo/vwo');if(value('programme')!=='all')list=list.filter(x=>x.programme===value('programme')||x.programme==='Beide');if(value('concept')!=='all')list=list.filter(x=>x.concept===value('concept'))}else{if(value('language')!=='all')list=list.filter(x=>x.language===value('language'));if(value('source-type')!=='all')list=list.filter(x=>x.source===value('source-type'));if(value('topic')!=='all')list=list.filter(x=>x.theme===value('topic'))}
+if(page==='science'){if(audience==='Havo')list=list.filter(x=>x.level==='Havo'||x.level==='Havo/vwo');else if(audience==='Vwo')list=list.filter(x=>x.level==='Vwo'||x.level==='Havo/vwo');if(value('programme')!=='all')list=list.filter(x=>x.programme===value('programme')||x.programme==='Beide');if(value('concept')!=='all')list=list.filter(x=>x.concept===value('concept'));
+if(value('level-filter')!=='all'){const target=value('level-filter');if(target==='Havo')list=list.filter(x=>x.level==='Havo'||x.level==='Havo/vwo');else if(target==='Vwo')list=list.filter(x=>x.level==='Vwo'||x.level==='Havo/vwo');else list=list.filter(x=>x.level==='Havo/vwo');}
+if(value('evidence-filter')!=='all')list=list.filter(x=>x.evidenceLevel===value('evidence-filter'));
+if(value('relevance-filter')!=='all')list=list.filter(x=>x.relevanceLevel===value('relevance-filter'));
+}else{if(value('language')!=='all')list=list.filter(x=>x.language===value('language'));if(value('source-type')!=='all')list=list.filter(x=>x.source===value('source-type'));if(value('topic')!=='all')list=list.filter(x=>x.theme===value('topic'))}
 if(q)list=list.filter(x=>(x.title+' '+x.summary+' '+x.theme+' '+(x.source||'')+' '+x.tags).toLowerCase().includes(q));if(rf==='interesting')list=list.filter(x=>ownVotes[voteKey(x.id,audience)]?.rating==='interesting');if(rf==='not')list=list.filter(x=>ownVotes[voteKey(x.id,audience)]?.rating==='not');if(rf==='unrated')list=list.filter(x=>!ownVotes[voteKey(x.id,audience)]);list.sort((a,b)=>b.date.localeCompare(a.date));$('count').textContent=list.length+' bron(nen)';$('cards').innerHTML='';
 if(!list.length)$('cards').innerHTML=page==='science'
 ?'<div class="empty"><b>Nog geen geverifieerde vakinhoudelijke publicaties opgenomen.</b><br>Deze pagina is bedoeld voor concrete biologische inzichten en publicaties die inhoudelijk aansluiten bij onderwerpen en deelconcepten uit de havo- en vwo-examenprogramma’s en syllabi. Een zoekdatabank is geen inhoudelijke bijdrage en verschijnt daarom niet als kaart. Zodra een publicatie inhoudelijk is gecontroleerd, wordt zij gekoppeld aan het passende niveau, programmaonderdeel en biologische concept.</div>'
@@ -224,7 +233,7 @@ async function initFeedback(){
  }
 }
 
-function resetFilters(){['search','rating-filter'].forEach(id=>$(id).value=id==='rating-filter'?'all':'');(page==='science'?['period','programme','concept']:['ed-period','language','source-type','topic']).forEach(id=>$(id).selectedIndex=0);saveUiPreferences();render()}
+function resetFilters(){['search','rating-filter'].forEach(id=>$(id).value=id==='rating-filter'?'all':'');if(page==='science'){['programme','concept','level-filter','evidence-filter','relevance-filter'].forEach(id=>$(id).selectedIndex=0);$('period').value='1095';}else{['language','source-type','topic'].forEach(id=>$(id).selectedIndex=0);$('ed-period').value='all';}saveUiPreferences();render()}
 $('clear').onclick=resetFilters;
 // Zorg dat uitleg ook als standaard browser-tooltip werkt (naast de vormgegeven ballon).
 function syncTooltips(root=document){root.querySelectorAll('[data-tip]').forEach(el=>{const tip=el.getAttribute('data-tip');if(tip){el.setAttribute('title',tip);if(!el.hasAttribute('tabindex') && !/^(BUTTON|A|INPUT|SELECT)$/.test(el.tagName))el.setAttribute('tabindex','0');}})}
@@ -235,13 +244,13 @@ document.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=
 document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',()=>{saveUiPreferences();render();}));
 showPage(page);
 syncTooltips();
-fetch('./publicaties.json?v=a7028e9133ebae1b8624a47a0971195a424efd6a')
+fetch('./publicaties.json?v=2026-11-21T20:30:00Z')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
   .then(publications=>{if(!Array.isArray(publications))throw new Error('Ongeldig databaseformaat');data=publications;render();})
   .then(()=>initFeedback())
   .catch(error=>{$('cards').innerHTML='<div class="empty"><b>De publicatiedatabase kon niet worden geladen.</b><br>Ververs de pagina later of controleer of publicaties.json in de hoofdmap van de website staat.</div>';console.error(error);});
 
-const currentSiteVersion='2026-11-17T19:25:00.000Z';
+const currentSiteVersion='2026-11-21T20:30:00.000Z';
 async function checkSiteVersion(){
  try{
   const response=await fetch('./site-version.json?check='+Date.now(),{cache:'no-store'});
