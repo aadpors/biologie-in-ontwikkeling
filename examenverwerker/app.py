@@ -3470,6 +3470,84 @@ class ExamApp:
         ttk.Button(buttons,text="Vraag bekijken / aanpassen",command=open_selected).pack(side="left")
         ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
 
+    def _review_consolidated_cv(self):
+        """Show a traceable, question-ordered composite of the original CV and addenda."""
+        records=sorted(self.data.get("vraagrecords",[]),key=lambda r:int(r.get("number",0) or 0))
+        if not records:
+            messagebox.showinfo("Geen vraagrecords","Er zijn nog geen vraagrecords om samen te voegen.",parent=self.root)
+            return
+        win=tk.Toplevel(self.root); win.title("Geconsolideerd correctievoorschrift · visuele controle")
+        win.geometry("1120x860")
+        outer=ttk.Frame(win,padding=10); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text="Samengevoegde weergave · bron-CV en officiële aanvullingen blijven afzonderlijk en ongewijzigd bewaard.",
+                  wraplength=1080).pack(anchor="w",pady=(0,8))
+        frame=ttk.Frame(outer); frame.pack(fill="both",expand=True)
+        canvas=tk.Canvas(frame,background="#edf0f2")
+        sy=ttk.Scrollbar(frame,orient="vertical",command=canvas.yview)
+        canvas.configure(yscrollcommand=sy.set)
+        canvas.pack(side="left",fill="both",expand=True); sy.pack(side="right",fill="y")
+        inner=ttk.Frame(canvas,padding=8)
+        window_id=canvas.create_window((0,0),window=inner,anchor="nw")
+        inner.bind("<Configure>",lambda _e:canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>",lambda e:canvas.itemconfigure(window_id,width=e.width))
+        photos=[]
+        entries=[]
+        missing=[]
+        for record in records:
+            number=record.get("number")
+            block=ttk.LabelFrame(inner,text=f"Vraag {number} · {record.get('cv_amendment_change_type') or 'wijziging niet geclassificeerd'}",padding=8)
+            block.pack(fill="x",pady=6)
+            source_file=record.get("cv_source_region_file") or record.get("cv_snippet_file")
+            source_doc=next((d for d in self.data.get("documenten",[])
+                             if d.get("id")==record.get("cv_source_document_id")),None)
+            if source_file and (self.project_dir/"snippets"/source_file).is_file():
+                ttk.Label(block,text="Oorspronkelijk correctievoorschrift").pack(anchor="w")
+                photo=tk.PhotoImage(file=str(self.project_dir/"snippets"/source_file))
+                factor=max(1,(photo.width()+980-1)//980)
+                if factor>1: photo=photo.subsample(factor,factor)
+                ttk.Label(block,image=photo).pack(anchor="w"); photos.append(photo)
+            else:
+                ttk.Label(block,text="Oorspronkelijk CV-fragment ontbreekt.").pack(anchor="w")
+                missing.append(f"vraag {number}: oorspronkelijk CV-fragment")
+            amendments=record.get("cv_amendment_regions") or []
+            for amendment in amendments:
+                name=amendment.get("snippet_file")
+                path=self.project_dir/"snippets"/str(name or "")
+                ttk.Label(block,text="Officiële aanvulling").pack(anchor="w",pady=(6,0))
+                if name and path.is_file():
+                    photo=tk.PhotoImage(file=str(path))
+                    factor=max(1,(photo.width()+980-1)//980)
+                    if factor>1: photo=photo.subsample(factor,factor)
+                    ttk.Label(block,image=photo).pack(anchor="w"); photos.append(photo)
+                else:
+                    ttk.Label(block,text="Aanvullingsfragment ontbreekt.")
+                    missing.append(f"vraag {number}: aanvullingsfragment")
+            entries.append({
+                "question_number":number,"change_type":record.get("cv_amendment_change_type"),
+                "original_document_id":record.get("cv_source_document_id"),
+                "original_region_file":source_file,
+                "amendment_regions":[dict(x) for x in amendments],
+            })
+        win._consolidated_photos=photos
+        if missing:
+            ttk.Label(outer,text="Niet compleet: "+", ".join(missing),foreground="#9b4d00",
+                      wraplength=1080).pack(anchor="w",pady=5)
+        def confirm():
+            if missing:
+                messagebox.showwarning("Consolidatie onvolledig",
+                    "Los eerst de ontbrekende bronfragmenten op voordat je de samengevoegde CV-weergave bevestigt.",parent=win)
+                return
+            self.data["consolidated_cv"]={
+                "schema":"consolidated-cv-view-v1","status":"visueel_bevestigd",
+                "reviewed_at":now(),"entries":entries,
+                "sources_unchanged":True,
+            }
+            self.save_project()
+            self._log("Geconsolideerde CV-weergave per vraag visueel bevestigd; bronbestanden zijn ongewijzigd.")
+            win.destroy()
+        ttk.Button(outer,text="Geconsolideerde CV-weergave bevestigen",
+                   command=confirm,style="Accent.TButton").pack(anchor="e",pady=(8,0))
+
     def _review_simple_question_draft(self, record, parent):
         """Review question type, points, wording and options from the saved fragment."""
         win=tk.Toplevel(parent)
@@ -3610,6 +3688,8 @@ class ExamApp:
                    command=lambda:open_region("uitwerkbijlage")).pack(side="left",padx=6)
         ttk.Button(region_bar,text="CV-aanvulling afbakenen",
                    command=lambda:open_region("aanvulling")).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="Geconsolideerde CV bekijken",
+                   command=self._review_consolidated_cv).pack(side="left",padx=6)
         buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
         ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
