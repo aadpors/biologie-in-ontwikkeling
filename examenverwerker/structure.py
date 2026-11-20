@@ -25,7 +25,12 @@ def normalize_fragments(fragments: list[dict]) -> list[dict]:
     """Return copied fragments with legacy types migrated; all other data is preserved."""
     normalized = deepcopy(fragments)
     for fragment in normalized:
-        fragment["type"] = canonical_fragment_type(fragment.get("type", ""))
+        original_type = str(fragment.get("type", ""))
+        fragment["type"] = canonical_fragment_type(original_type)
+        if original_type in {"intro", "context_intro"}:
+            fragment.setdefault("context_role", "introductie")
+        elif original_type in {"vraagcontext", "tussen_context", "tussenliggende_context"}:
+            fragment.setdefault("context_role", "vraaggebonden")
     return normalized
 
 
