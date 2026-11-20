@@ -1495,8 +1495,20 @@ def extract_region_text(pdf_path: Path, segments: list[dict]) -> str:
             page_no = int(segment["page"])
             if not 1 <= page_no <= len(source):
                 raise ValueError(f"Ongeldig paginanummer voor tekstextractie: {page_no}")
-            rect = fitz.Rect(segment["bbox"]) & source[page_no - 1].rect
-            text = source[page_no - 1].get_text("text", clip=rect, sort=True).strip()
+            page=source[page_no - 1]
+            rect = fitz.Rect(segment["bbox"]) & page.rect
+            text = page.get_text("text", clip=rect, sort=True).strip()
+            if not text:
+                # OCR is deliberately selective: only a manually selected region
+                # with no usable embedded text triggers a page OCR attempt.
+                for language in ("nld+eng","eng"):
+                    try:
+                        textpage=page.get_textpage_ocr(language=language,dpi=200,full=True)
+                        text=page.get_text("text",clip=rect,textpage=textpage,sort=True).strip()
+                        if text:
+                            break
+                    except Exception:
+                        continue
             if text:
                 parts.append(f"[Pagina {page_no}]\n{text}")
         return "\n\n".join(parts)
