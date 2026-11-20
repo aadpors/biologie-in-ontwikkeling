@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 51 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 52 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 51 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 52 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -22,7 +22,7 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | Selectie en genetische variatie | s2, s21, s23, s37, s42 | 5 |
 | Biodiversiteit en ecosystemen | s3, s6, s13, s16, s19, s20, s40, s41 | 8 |
 | Ontstaan en evolutie van meercellig leven | s4 | 1 |
-| Afweer van het organisme | s5, s28, s29, s44 | 4 |
+| Afweer van het organisme | s5, s28, s29, s44, s52 | 5 |
 | Stofwisseling van het organisme | s7, s26, s27, s39, s45, s47 | 6 |
 | Zelforganisatie van het organisme | s8, s15, s17, s34 | 4 |
 | Zelfregulatie van het organisme | s9, s14, s18, s24, s25, s30, s46 | 7 |
@@ -49,6 +49,7 @@ De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inho
 | s49 | Mitotische controle en chromosomale instabiliteit | Versterkt het onderbelichte thema celcyclus, mitose en correcte chromosoomverdeling; onderscheidt celmodellen van klinische behandeling. |
 | s50 | Neurale circuits voor ouderlijk zorggedrag | Verbreedt gedrag en voortplanting van balts en populatiedynamiek naar ouderlijke zorg, motivatie en contextafhankelijke hersenregulatie. |
 | s51 | Genoverdracht en microbiële associaties tijdens eukaryogenese | Combineert met s35 de experimentele isolatie van moderne verwanten met een fylogenomische reconstructie van genoverdracht tijdens het ontstaan van eukaryote cellen. |
+| s52 | Mobiele vsiRNA's en antivirale afweer bij planten | Voegt plantimmuniteit en RNA-interferentie toe; laat zien hoe naburige cellen vóór virusverspreiding lokaal beschermd kunnen worden. |
 
 ## Bestaande kaarten inhoudelijk aangescherpt
 
@@ -126,7 +127,7 @@ De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een voll
 ### Nieuwe metadata voor bruikbare selectie
 
 Alle 51 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
-- **Primair onderzoek:** 40 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
+- **Primair onderzoek:** 41 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
 - **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
 - **Perspectiefartikel:** 2 kaarten.
 
@@ -164,3 +165,6 @@ Naast de DOI-/titel-/datumcontrole zijn bij onderstaande kaarten de volledige te
 | s51 | Nature full text; fylogenomische datasets, LECA-reconstructie en methodologische onzekerheden | Horizontale genoverdracht als evolutionaire inferentie beschreven; aard van de oude interacties niet als bewezen gepresenteerd. |
 
 Dit is een gerichte verdiepingscontrole, geen claim dat alle 51 volledige artikelen en supplementen integraal zijn nagelezen. De overige kaarten blijven in de auditadministratie staan als bibliografisch en op abstractniveau gecontroleerd, met full-text controle als vervolgstap waar de lesinterpretatie daarvan afhankelijk is.
+
+- **s1:** de open-access methodesectie is geraadpleegd. De kaart onderscheidt nu 467.018 doorzochte metagenomen van de 367.609 metagenomen waarin spacers werden gevonden, en vermeldt de beperkte genomische context van een groot deel van de metagenoom-afgeleide repeats.
+- **s52:** plantafweer via mobiele virus-afgeleide kleine RNA's toegevoegd; de lokale RNAi-beschermingszone is expliciet onderscheiden van adaptief immunologisch geheugen.
