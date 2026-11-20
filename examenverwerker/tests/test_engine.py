@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments, classify_question_with_visuals, render_stitched_preview
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, build_consolidated_cv_pdf, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments, classify_question_with_visuals, render_stitched_preview
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -13,6 +13,35 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(infer_exam_metadata("vw-1018-a-26-2-o.pdf")["year"],"2026")
         self.assertEqual(infer_exam_metadata("ha-1018-a-25-1-u.pdf")["period"],"1")
         self.assertEqual(infer_exam_metadata("ha-1018-a-26-1-c-a1_0.pdf")["year"],"2026")
+    def test_consolidated_cv_pdf_preserves_sources_and_orders_questions(self):
+        import hashlib
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            snippets=root/"snippets"
+            snippets.mkdir()
+            original=snippets/"original.png"
+            replacement=snippets/"replacement.png"
+            Image.new("RGB",(400,600),"white").save(original)
+            Image.new("RGB",(400,500),"white").save(replacement)
+            before={path.name:hashlib.sha256(path.read_bytes()).hexdigest()
+                    for path in (original,replacement)}
+            result=build_consolidated_cv_pdf([
+                {"question_number":2,"change_type":"vervanging",
+                 "original_region_file":"original.png",
+                 "amendment_regions":[{"snippet_file":"replacement.png"}]},
+                {"question_number":1,"change_type":"ongewijzigd",
+                 "original_region_file":"original.png","amendment_regions":[]},
+            ],snippets,root/"afgeleid"/"consolidated.pdf",
+              {"level":"Vwo","year":"2026","period":"1"})
+            self.assertEqual(result["page_count"],3)
+            self.assertEqual(result["question_pages"]["1"],{"start":1,"end":1})
+            self.assertEqual(result["question_pages"]["2"],{"start":2,"end":3})
+            after={path.name:hashlib.sha256(path.read_bytes()).hexdigest()
+                   for path in (original,replacement)}
+            self.assertEqual(before,after)
+            self.assertTrue(Path(result["path"]).is_file())
+
     def test_exam_metadata_can_be_inferred_from_opening_pdf_text(self):
         got=infer_exam_metadata("hernoemde-opgaven.pdf","CENTRAAL EXAMEN HAVO 2025 tijdvak 2")
         self.assertEqual(got["level"],"Havo")
