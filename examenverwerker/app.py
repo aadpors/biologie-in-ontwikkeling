@@ -3457,43 +3457,87 @@ class ExamApp:
         ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
 
     def _review_simple_question_draft(self, record, parent):
-        """Small subject-neutral editor for the generated question text and type."""
+        """Review question type, points, wording and options from the saved fragment."""
         win=tk.Toplevel(parent)
-        win.title(f"Vraag {record.get('number')} · concept")
-        win.geometry("760x620")
+        win.title(f"Vraag {record.get('number')} · vraaganalyse")
+        win.geometry("900x760")
         win.transient(parent)
         outer=ttk.Frame(win,padding=12); outer.pack(fill="both",expand=True)
         ttk.Label(outer,text=f"{record.get('vak','')} · vraag {record.get('number')} · pagina {record.get('source_page')}",
                   font=("Segoe UI",10,"bold")).pack(anchor="w")
-        ttk.Label(outer,text="Vraagtype").pack(anchor="w",pady=(12,3))
+        ttk.Label(outer,text="Controleer uitsluitend de inhoud die uit het reeds bevestigde vraagfragment volgt. De fragmentgrenzen worden hier niet opnieuw beoordeeld.",
+                  wraplength=860).pack(anchor="w",pady=(4,10))
+        top=ttk.Frame(outer); top.pack(fill="x")
+        ttk.Label(top,text="Vraagtype").pack(side="left")
         type_var=tk.StringVar(value=record.get("question_type","onbekend"))
-        ttk.Combobox(outer,textvariable=type_var,values=["meerkeuze","juist_onjuist","wel_niet","open","onbekend"],state="readonly").pack(anchor="w")
+        ttk.Combobox(top,textvariable=type_var,
+            values=["meerkeuze","juist_onjuist","wel_niet","ja_nee","hoger_lager",
+                    "meer_minder","open","onbekend"],state="readonly",width=20).pack(side="left",padx=(6,18))
+        ttk.Label(top,text="Maximaal aantal punten").pack(side="left")
+        exam=record.setdefault("exam",{})
+        points_var=tk.StringVar(value=str(exam.get("points","")))
+        ttk.Entry(top,textvariable=points_var,width=8).pack(side="left",padx=6)
         ttk.Label(outer,text="Vraagtekst uit het gekozen vraagfragment").pack(anchor="w",pady=(12,3))
-        text_box=tk.Text(outer,wrap="word",height=20)
+        text_box=tk.Text(outer,wrap="word",height=12)
         text_box.pack(fill="both",expand=True)
         text_box.insert("1.0",record.get("question_text",""))
+        ttk.Label(outer,text="Antwoordopties (één per regel; bij meerkeuze bijvoorbeeld A. ...).").pack(anchor="w",pady=(8,3))
+        options_box=tk.Text(outer,wrap="word",height=6)
+        options_box.pack(fill="x")
+        options_box.insert("1.0","\n".join(
+            f"{item.get('key','')}. {item.get('text','')}".strip(". ")
+            for item in (record.get("options") or [])
+        ))
+        correct_var=tk.StringVar(value=str(record.get("correct","")))
+        keyrow=ttk.Frame(outer); keyrow.pack(fill="x",pady=(5,0))
+        ttk.Label(keyrow,text="Correcte sleutel (indien van toepassing)").pack(side="left")
+        ttk.Entry(keyrow,textvariable=correct_var,width=16).pack(side="left",padx=8)
         contexts=record.get("context_fragments",[])
         context_text="\n\n".join(
             f"Context {index+1}: {item.get('text') or '[geen uitleesbare tekst; fragment blijft visueel gekoppeld]'}"
             for index,item in enumerate(contexts)
         )
         ttk.Label(outer,text=f"Gekoppelde contextfragmenten: {len(contexts)}",
-                  wraplength=720).pack(anchor="w",pady=(8,2))
+                  wraplength=860).pack(anchor="w",pady=(8,2))
         if context_text:
             context_box=tk.Text(outer,wrap="word",height=5)
             context_box.pack(fill="x")
             context_box.insert("1.0",context_text)
             context_box.configure(state="disabled")
         def save():
+            raw_points=points_var.get().strip().replace(",",".")
+            if raw_points:
+                try:
+                    points=float(raw_points)
+                    if points<0 or points>100:
+                        raise ValueError
+                except ValueError:
+                    messagebox.showerror("Ongeldig puntenaantal","Vul een getal tussen 0 en 100 in.",parent=win)
+                    return
+            else:
+                points=None
+            options=[]
+            for line in options_box.get("1.0","end").splitlines():
+                line=line.strip()
+                if not line:
+                    continue
+                match=re.match(r"^([A-H])\s*[.)-]\s*(.*)$",line,re.I)
+                if match:
+                    options.append({"key":match.group(1).upper(),"text":match.group(2).strip()})
+                else:
+                    options.append({"key":str(len(options)+1),"text":line})
             record["question_text"]=text_box.get("1.0","end").strip()
             record["question_type"]=type_var.get()
             record["question_type_status"]="handmatig_gecontroleerd"
+            record["options"]=options
+            record["correct"]=correct_var.get().strip()
+            record.setdefault("exam",{})["points"]=points
             record["status"]="concept"
             self.save_project()
-            self._log(f"Conceptvraag {record.get('number')} aangepast.")
+            self._log(f"Vraag {record.get('number')}: vraagtype, punten en antwoordopties gecontroleerd.")
             win.destroy()
-        buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(8,0))
-        ttk.Button(buttons,text="Opslaan",command=save).pack(side="right")
+        buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
+        ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
 
     def review_question_record(self,record,parent):
