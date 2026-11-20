@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 from structure import make_exam_structure, make_fragment, make_page_span, make_cv_fragment
 from exam_workflow import (
-    exam_export_fingerprint, exam_review_fingerprint, exam_workflow_state, restore_import_batch,
+    exam_export_fingerprint, exam_review_fingerprint, exam_completeness_issues, exam_workflow_state, restore_import_batch,
 )
 
 
@@ -101,6 +101,15 @@ class ExamWorkflowTests(unittest.TestCase):
         data = with_structure(project())
         data["vraagkandidaten"][0]["vraagtype_status"] = "controle_nodig"
         self.assertEqual(exam_workflow_state(data)["stage"], "vraaganalyse")
+
+    def test_completeness_audit_detects_missing_question_numbers(self):
+        data = with_structure(project())
+        second = dict(data["vraagkandidaten"][0])
+        second.update({"id":"candidate-3","number":3,"page":4})
+        data["vraagkandidaten"].append(second)
+        issues = exam_completeness_issues(data)
+        self.assertTrue(any(issue.get("code")=="vraagnummer_ontbreekt"
+                            and issue.get("numbers")==[2] for issue in issues))
 
     def test_cv_is_required_after_question_analysis(self):
         data = with_structure(project())
