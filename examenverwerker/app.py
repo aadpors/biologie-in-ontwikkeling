@@ -3863,11 +3863,20 @@ class ExamApp:
                             if x.get("document_id")!=doc["id"]]
                         record["cv_amendment_regions"].append({
                             "document_id":doc["id"],"fragment":fragment,"snippet_file":name,
-                            "source_pdf":doc.get("opslagbestand"),"source_sha256":doc.get("sha256")})
+                            "source_pdf":doc.get("opslagbestand"),"source_sha256":doc.get("sha256"),
+                            "snippet_sha256":sha256(self.project_dir/"snippets"/name)})
+                        record.setdefault("cv_amendment_pdfs",[])
+                        if doc.get("opslagbestand") not in record["cv_amendment_pdfs"]:
+                            record["cv_amendment_pdfs"].append(doc.get("opslagbestand"))
+                        record["cv_amendment_snippet_files"]=[
+                            x.get("snippet_file") for x in record["cv_amendment_regions"] if x.get("snippet_file")]
                     else:
                         record.setdefault("uitwerkbijlagen",[])
                         if doc.get("opslagbestand") not in record["uitwerkbijlagen"]:
                             record["uitwerkbijlagen"].append(doc.get("opslagbestand"))
+                        record.setdefault("available_appendix_candidates",[])
+                        if doc.get("opslagbestand") not in record["available_appendix_candidates"]:
+                            record["available_appendix_candidates"].append(doc.get("opslagbestand"))
                         record.setdefault("uitwerkbijlage_region_refs",[])
                         record["uitwerkbijlage_region_refs"]=[x for x in record["uitwerkbijlage_region_refs"]
                             if x.get("document_id")!=doc["id"]]
