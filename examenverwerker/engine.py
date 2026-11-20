@@ -293,28 +293,31 @@ def propose_context_fragments(analysis: dict, candidates: list[dict]) -> list[di
         for index, cluster in enumerate(clusters, 1):
             if cluster["bottom"] - cluster["top"] < 12:
                 continue
-            # A context before a question normally introduces that next
-            # question, not the preceding one. If it lies inside a question,
-            # associate it with the latest preceding anchor instead.
+            # A captioned visual block between two question starts is a
+            # stronger signal for context introducing the next question.
+            # An uncaptioned block after a question is more likely part of that
+            # question's own material, so keep it linked to the preceding anchor.
             cluster_start = (page_no, float(cluster["top"]))
             following = [
                 row for row in anchors
                 if (int(row.get("page", 0)),
                     float((row.get("bbox") or [0, 0])[1])) >= cluster_start
             ]
-            if following:
+            preceding = [
+                row for row in anchors
+                if (int(row.get("page", 0)),
+                    float((row.get("bbox") or [0, 0])[1])) < cluster_start
+            ]
+            if following and (cluster.get("caption") or not preceding):
                 linked = min(following, key=lambda row: (
                     int(row.get("page", 0)), float((row.get("bbox") or [0, 0])[1])
                 ))
-            else:
-                preceding = [
-                    row for row in anchors
-                    if (int(row.get("page", 0)),
-                        float((row.get("bbox") or [0, 0])[1])) < cluster_start
-                ]
+            elif preceding:
                 linked = max(preceding, key=lambda row: (
                     int(row.get("page", 0)), float((row.get("bbox") or [0, 0])[1])
-                )) if preceding else anchors[0]
+                ))
+            else:
+                linked = anchors[0]
             top = max(0.0, min(1.0, cluster["top"] / page_height))
             bottom = max(0.0, min(1.0, cluster["bottom"] / page_height))
             if bottom - top < 0.005:
