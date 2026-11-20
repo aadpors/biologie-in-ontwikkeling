@@ -302,11 +302,15 @@ def exam_workflow_state(data: dict) -> dict:
                            "Detecteer en beoordeel de vraagankers in de uitwerkbijlage; bevestig expliciet wanneer er geen aparte ankers zijn.",
                            document_id=doc.get("id"))
     for doc in appendix_docs:
-        # Question numbering is inherited from the already confirmed opgaven
-        # list; the user visually maps each corresponding appendix answer region
-        # in the same crop editor, avoiding a second, unrelated question list.
-        expected_numbers = sorted({int(row["number"]) for _source, row in all_candidates
-                                   if row.get("number") is not None})
+        detection=doc.get("vraagstarts_detectie") or {}
+        if detection.get("review_note","").startswith("Geen afzonderlijke vraagstarts"):
+            continue
+        reviewed_starts=_confirmed_candidates(data,doc.get("id"))
+        expected_numbers=sorted({int(row["number"]) for row in reviewed_starts
+                                 if row.get("number") is not None})
+        if not expected_numbers:
+            expected_numbers=sorted({int(row["number"]) for _source,row in all_candidates
+                                     if row.get("number") is not None})
         regions = (data.get("uitwerkbijlage_regions") or {}).get(doc.get("id"), {})
         missing = [n for n in expected_numbers if str(n) not in regions
                    or not regions[str(n)].get("page_spans")]
