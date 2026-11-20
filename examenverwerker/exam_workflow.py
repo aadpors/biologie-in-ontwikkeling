@@ -306,20 +306,22 @@ def exam_workflow_state(data: dict) -> dict:
 
     addenda = _documents(data, "aanvulling")
     if addenda:
-        for doc in addenda:
-            for _source_doc, candidate in all_candidates:
-                number = int(candidate["number"])
-                if not _cv_region_ready(cv_regions.get(doc.get("id"), {}).get(str(number)),
-                                        doc, number, "aanvulling"):
-                    return _result("aanvulling", "Aanvulling CV verwerken",
-                                   "Baken de aanvullende beoordelingsinformatie af en classificeer de wijziging per vraag.",
-                                   document_id=doc.get("id"), question_number=number)
         allowed_changes = {"toevoeging", "wijziging", "vervanging", "intrekking", "ongewijzigd"}
         for record in records:
-            if record.get("cv_amendment_change_type") not in allowed_changes:
+            change = record.get("cv_amendment_change_type")
+            if change not in allowed_changes:
                 return _result("aanvulling", "Wijziging per vraag classificeren",
-                               "Classificeer de aanvulling per vraag als toevoeging, wijziging, vervanging, intrekking of ongewijzigd.",
+                               "Classificeer per vraag of de aanvulling een toevoeging, wijziging, vervanging, intrekking of geen wijziging bevat.",
                                record_id=record.get("id"), question_number=record.get("number"))
+            if change == "ongewijzigd":
+                continue
+            number = int(record.get("number"))
+            for doc in addenda:
+                if not _cv_region_ready(cv_regions.get(doc.get("id"), {}).get(str(number)),
+                                        doc, number, "aanvulling"):
+                    return _result("aanvulling", "Aanvulling CV-fragmenten afbakenen",
+                                   "Baken voor deze gewijzigde vraag het volledige fragment uit iedere toepasselijke CV-aanvulling af.",
+                                   document_id=doc.get("id"), question_number=number)
         consolidated = data.get("consolidated_cv") or {}
         if consolidated.get("status") != "visueel_bevestigd":
             return _result("aanvulling", "Geconsolideerd correctievoorschrift controleren",
