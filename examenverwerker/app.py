@@ -1115,7 +1115,7 @@ class ExamApp:
                     "number": int(row.get("number")), "source_page": int(row.get("page", 1)),
                     "candidate_document_id": doc.get("id"), "source_pdf": doc.get("opslagbestand"),
                     "question_fragment_id": fragment.get("id"), "context_fragment_ids": [],
-                    "question_text": "", "question_type": "onbekend",
+                    "context_fragments": [], "question_text": "", "question_type": "onbekend",
                     "question_type_status": "controle_nodig", "status": "concept",
                     "approved_by_human": False,
                 }
@@ -1124,8 +1124,12 @@ class ExamApp:
             record["question_text"] = str(fragment.get("text") or "")
             record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
             record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
-            record["context_fragment_ids"] = [
-                item.get("id") for item in question_links.get("context_fragments", [])
+            linked_contexts = question_links.get("context_fragments", [])
+            record["context_fragment_ids"] = [item.get("id") for item in linked_contexts]
+            record["context_fragments"] = [
+                {"id": item.get("id"), "text": str(item.get("text") or ""),
+                 "page_spans": item.get("page_spans", [])}
+                for item in linked_contexts
             ]
         self.save_project()
         self._log(
@@ -4644,8 +4648,6 @@ class ExamApp:
                         for page_no, page in enumerate(source_pdf)
                     }
                 for fragment in fragments:
-                    if canonical_fragment_type(fragment.get("type")) != "vraag":
-                        continue
                     selected_segments = page_spans_to_segments(
                         fragment.get("page_spans", []), selected_page_sizes
                     )
