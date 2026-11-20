@@ -1504,5 +1504,29 @@
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Reviewartikel in Nature Reviews Neuroscience; het is een synthese van bestaand onderzoek en geen nieuw primair experiment.",
     "studyType": "Review / synthese"
+  },
+  {
+    "id": "s51",
+    "page": "science",
+    "date": "2026-06-10",
+    "title": "Gene ancestries reveal diverse microbial associations during eukaryogenesis",
+    "summary": "Met een uitgebreide fylogenomische analyse reconstrueerden onderzoekers de herkomst van eiwitfamilies in de laatste gemeenschappelijke voorouder van eukaryoten (LECA). Naast de bekende verwantschap met Asgard-archaea en de mitochondriale voorouder vonden zij aanwijzingen voor meerdere golven van genoverdracht vanuit andere bacteriële groepen, waaronder Planctomycetota en Myxococcota. Ook zouden grote DNA-virussen (Nucleocytoviricota) sommige overdrachten hebben kunnen bemiddelen. De resultaten passen bij een geleidelijk proces met meerdere microbiële interacties, maar de aard en precieze volgorde van die oeroude interacties zijn niet rechtstreeks waargenomen.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "Evolutie van eukaryote cellen",
+    "subdomain": "Huidig vwo: P6 Ontstaan van het leven (SE), met evolutionaire verwantschap en endosymbiose als context. Conceptprogramma v2: vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De fylogenomische reconstructie is docentverdieping.",
+    "alignment": "Huidig vwo: P6 Ontstaan van het leven (SE), met endosymbiose en de evolutionaire oorsprong van eukaryote cellen als context. Conceptprogramma v2: vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De studie levert een fylogenomische reconstructie van de herkomst van genen in LECA; de voorgestelde interacties zijn evolutionaire inferenties en geen directe waarnemingen.",
+    "evidence": "Primair fylogenomisch onderzoek (reconstructie van genfamilies en evolutionaire herkomst in LECA)",
+    "article": "https://www.nature.com/articles/s41586-026-10639-9",
+    "doi": "10.1038/s41586-026-10639-9",
+    "why": "Deze studie verdiept de endosymbiosetheorie. De bekende mitochondriale endosymbiose blijft centraal, maar de analyse wijst erop dat de voorouders van eukaryoten mogelijk ook op andere momenten genen uitwisselden met verschillende bacteriële groepen. De auteurs bespreken bovendien een mogelijke rol van grote DNA-virussen als bemiddelaars van horizontale genoverdracht. Dit is een reconstructie op basis van genoomvergelijkingen: genverwantschap kan oude overdracht ondersteunen, maar bewijst niet rechtstreeks of een interactie endosymbiotisch, ectosymbiotisch of anderszins was.<br><br><b>Vwo:</b> gebruik de publicatie om endosymbiose, horizontale genoverdracht en fylogenetische verwantschap met elkaar te verbinden. Laat leerlingen onderscheid maken tussen de mitochondriale endosymbiose als breed gedragen verklaring en aanvullende hypothesen over andere microbiële interacties.<br><b>Veelvoorkomende misconceptie</b><br>De eukaryote cel is in één enkele gebeurtenis ontstaan door de opname van één bacterie; alle andere genen zijn daarna onveranderd doorgegeven.<br><b>Concrete lesvraag of denkprikkel</b><br>Welke aanwijzingen in de genen van huidige eukaryoten kunnen wijzen op meerdere oude genoverdrachten, en waarom vertellen die aanwijzingen niet precies hoe de betrokken micro-organismen met elkaar samenleefden?",
+    "tags": "eukaryogenese eukaryoten archaea endosymbiose mitochondriën horizontale genoverdracht fylogenomica LECA bacteriën Planctomycetota Myxococcota virussen Nucleocytoviricota",
+    "evidenceLevel": "Voorzichtig interpreteren",
+    "evidenceNote": "Uitgebreide fylogenomische analyse van genfamilies en LECA-reconstructie; oude horizontale genoverdracht en de volgorde van gebeurtenissen zijn inferenties die afhangen van fylogenetische modellen en de kwaliteit van beschikbare genomen. De aard van de interacties is niet direct waarneembaar.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Eukaryogenese en endosymbiose sluiten aan bij evolutie en de oorsprong van cellen; de fylogenomische reconstructie en hypothesen over aanvullende microbiële partners zijn vwo-verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Open-access primair onderzoeksartikel in Nature, met uitgebreide fylogenomische datasets en analyses. Peer review en omvangrijke data nemen onzekerheid in reconstructies van zeer oude evolutionaire gebeurtenissen niet weg.",
+    "studyType": "Primair onderzoek"
   }
 ]
