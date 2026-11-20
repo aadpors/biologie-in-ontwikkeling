@@ -18,7 +18,7 @@ from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragmen
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.14.0"
+APP_VERSION = "0.15.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -3249,7 +3249,7 @@ class ExamApp:
                   font=("Segoe UI",10,"bold")).pack(anchor="w")
         ttk.Label(outer,text="Vraagtype").pack(anchor="w",pady=(12,3))
         type_var=tk.StringVar(value=record.get("question_type","onbekend"))
-        ttk.Combobox(outer,textvariable=type_var,values=["mcq","open","onbekend"],state="readonly").pack(anchor="w")
+        ttk.Combobox(outer,textvariable=type_var,values=["meerkeuze","juist_onjuist","wel_niet","open","onbekend"],state="readonly").pack(anchor="w")
         ttk.Label(outer,text="Vraagtekst uit het gekozen vraagfragment").pack(anchor="w",pady=(12,3))
         text_box=tk.Text(outer,wrap="word",height=20)
         text_box.pack(fill="both",expand=True)
