@@ -155,8 +155,10 @@ Naast de DOI-/titel-/datumcontrole zijn bij onderstaande kaarten de volledige te
 | Kaart | Extra gecontroleerd | Gevolg voor de kaart |
 |---|---|---|
 | s5 | Open-access full text; experimentele opzet en biologische replicaten | Kleine aantallen replicaten expliciet als beperking benoemd. |
+| s6 | Nature full text; antibioticabehandeling, synthetische driepartijenmodellen en soortverschillen | De contextafhankelijkheid is expliciet gemaakt: geen significante vermindering van sterfte bij O. tauri met een specialistisch virus; de bijdrage aan natuurlijke algenbloei is niet rechtstreeks in het veld aangetoond. |
 | s7 | Uitgeversabstract en aanvullende veldproefinformatie | Biomassa/groei onderscheiden van korrelopbrengst; geen significante opbrengststijging claimen. |
 | s8 | Nature-artikeltekst; twee-celstadium, lamin B1, LC3 en embryo-experimenten | Modelorganisme en ontwikkelingsstadium expliciet behouden; geen generalisatie naar menselijke embryo's. |
+| s9 | Open-access Nature-artikel en methodebeschrijving; calciumindicatoren, WHOLISTIC en vismodellen | De calciumreadout is expliciet als proxy beschreven; de demonstratie in zebravissen/Danionella wordt niet naar alle gewervelden veralgemeniseerd. |
 | s14 | Onderzoeksopzet en deelnemersaantal | n=10 en modelmatige reconstructie als belangrijke beperking vermeld. |
 | s20 | DOI-resolver, Oxford Academic accepted manuscript en tijdschriftindex | Conflicterende indexmetadata expliciet gemarkeerd; DOI-resolverende record behouden. |
 | s36 | Open-access artikeltekst en onderwijs-/studentenonderzoek | Perspectiefartikel onderscheiden van het beperkte, verkennende surveydeel. |
@@ -168,3 +170,7 @@ Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artike
 
 - **s1:** de open-access methodesectie is geraadpleegd. De kaart onderscheidt nu 467.018 doorzochte metagenomen van de 367.609 metagenomen waarin spacers werden gevonden, en vermeldt de beperkte genomische context van een groot deel van de metagenoom-afgeleide repeats.
 - **s52:** plantafweer via mobiele virus-afgeleide kleine RNA's toegevoegd; de lokale RNAi-beschermingszone is expliciet onderscheiden van adaptief immunologisch geheugen.
+
+- **s6:** de volledige Nature-tekst is geraadpleegd. De kaart vermeldt nu de verschillende steekproefgroottes (n=4 voor G. huxleyi, n=3 voor de overige soorten), de uitzondering bij O. tauri en het onderscheid tussen laboratoriumsynergie en een nog niet rechtstreeks gekwantificeerde bijdrage aan natuurlijke algenbloei.
+
+- **s9:** de WHOLISTIC-methode gebruikt pancellulaire calciumindicatoren. De kaart maakt nu duidelijk dat calciumdynamiek een proxy voor cellulaire activiteit is en geen volledige meting van alle processen in elk orgaan.
