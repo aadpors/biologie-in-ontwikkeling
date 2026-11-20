@@ -226,7 +226,7 @@ class ExamApp:
 
     def _build(self):
         """Integrated examination workbench: source PDF, documents, candidates and review."""
-        self.root.title("Biologie Examenverwerker")
+        self.root.title("Examenverwerker")
         fit_window(self.root, 1440, 920, 980, 640)
         shell = ttk.Frame(self.root, style="App.TFrame", padding=10)
         shell.pack(fill="both", expand=True)
@@ -5009,7 +5009,7 @@ class ExamApp:
         temp = self.project_dir / (PROJECT_FILE + ".tmp")
         temp.write_text(json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8")
         temp.replace(self.project_dir / PROJECT_FILE)
-        self.project_label.configure(text=f"Examen: {self.data.get('naam', self.project_dir.name if self.project_dir else '')}")
+        self.project_label.configure(text=f"{self.data.get('vak', 'Biologie')} · {self.data.get('naam', self.project_dir.name if self.project_dir else '')}")
         self._workflow_refresh()
 
     def refresh(self):
