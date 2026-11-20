@@ -3202,26 +3202,73 @@ class ExamApp:
             messagebox.showinfo("Geen project","Open eerst een examenproject.")
             return
         records=self.data.get("vraagrecords",[])
-        win=tk.Toplevel(self.root); win.title("Vraagrecords · inhoudelijke eindcontrole"); win.geometry("980x600")
-        ttk.Label(win,text=f"{len(records)} concept-vraagrecords. Geen enkel record wordt automatisch goedgekeurd.",padding=10).pack(anchor="w")
-        cols=("id","number","page","type","status","approved")
+        subject=self.data.get("vak","Biologie")
+        win=tk.Toplevel(self.root)
+        win.title(f"Vraagoverzicht · {subject}")
+        win.geometry("980x620")
+        ttk.Label(win,text=f"{len(records)} conceptvragen · vak: {subject}",padding=10).pack(anchor="w")
+        cols=("number","page","type","status","context")
         tree=ttk.Treeview(win,columns=cols,show="headings")
-        for col,label,width in [("id","Record-ID",260),("number","Vraag",70),("page","Pagina",80),("type","Type",100),("status","Status",180),("approved","Menselijk akkoord",140)]:
+        for col,label,width in [
+            ("number","Vraag",70),("page","Pagina",80),("type","Vraagtype",130),
+            ("status","Status",190),("context","Contexten",360)
+        ]:
             tree.heading(col,text=label); tree.column(col,width=width,anchor="w")
         tree.pack(fill="both",expand=True,padx=10,pady=8)
         for i,record in enumerate(records):
-            tree.insert("","end",iid=str(i),values=(record.get("id"),record.get("number"),record.get("source_page"),
-                record.get("exam",{}).get("questionType"),record.get("status"),"Ja" if record.get("approved_by_human") is True else "Nee"))
-        def review_selected():
+            qtype=record.get("question_type") or record.get("exam",{}).get("questionType","onbekend")
+            contexts=record.get("context_fragment_ids",[])
+            tree.insert("","end",iid=str(i),values=(
+                record.get("number"),record.get("source_page"),qtype,
+                record.get("status","concept"),", ".join(contexts)
+            ))
+        def open_selected():
             selection=tree.selection()
             if not selection:
-                messagebox.showinfo("Selecteer record","Selecteer eerst een vraagrecord.",parent=win); return
-            self.review_question_record(records[int(selection[0])],win)
-            tree.set(selection[0],"status",records[int(selection[0])].get("status"))
-            tree.set(selection[0],"approved","Ja" if records[int(selection[0])].get("approved_by_human") is True else "Nee")
+                messagebox.showinfo("Selecteer vraag","Selecteer eerst een vraag.",parent=win)
+                return
+            record=records[int(selection[0])]
+            if record.get("schema")=="exam-question-draft-v1":
+                self._review_simple_question_draft(record,win)
+            else:
+                self.review_question_record(record,win)
+            tree.set(selection[0],"type",record.get("question_type") or record.get("exam",{}).get("questionType","onbekend"))
+            tree.set(selection[0],"status",record.get("status","concept"))
         buttons=ttk.Frame(win); buttons.pack(fill="x",padx=10,pady=(0,10))
-        ttk.Button(buttons,text="Open eindcontrole",command=review_selected).pack(side="left")
+        ttk.Button(buttons,text="Vraag bekijken / aanpassen",command=open_selected).pack(side="left")
         ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
+
+    def _review_simple_question_draft(self, record, parent):
+        """Small subject-neutral editor for the generated question text and type."""
+        win=tk.Toplevel(parent)
+        win.title(f"Vraag {record.get('number')} · concept")
+        win.geometry("760x620")
+        win.transient(parent)
+        outer=ttk.Frame(win,padding=12); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text=f"{record.get('vak','')} · vraag {record.get('number')} · pagina {record.get('source_page')}",
+                  font=("Segoe UI",10,"bold")).pack(anchor="w")
+        ttk.Label(outer,text="Vraagtype").pack(anchor="w",pady=(12,3))
+        type_var=tk.StringVar(value=record.get("question_type","onbekend"))
+        ttk.Combobox(outer,textvariable=type_var,values=["mcq","open","onbekend"],state="readonly").pack(anchor="w")
+        ttk.Label(outer,text="Vraagtekst uit het gekozen vraagfragment").pack(anchor="w",pady=(12,3))
+        text_box=tk.Text(outer,wrap="word",height=20)
+        text_box.pack(fill="both",expand=True)
+        text_box.insert("1.0",record.get("question_text",""))
+        context_ids=record.get("context_fragment_ids",[])
+        ttk.Label(outer,text=("Gekoppelde contextfragmenten: "+", ".join(context_ids))
+                  if context_ids else "Geen contextfragmenten gekoppeld.",
+                  wraplength=720).pack(anchor="w",pady=(8,4))
+        def save():
+            record["question_text"]=text_box.get("1.0","end").strip()
+            record["question_type"]=type_var.get()
+            record["question_type_status"]="handmatig_gecontroleerd"
+            record["status"]="concept"
+            self.save_project()
+            self._log(f"Conceptvraag {record.get('number')} aangepast.")
+            win.destroy()
+        buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(8,0))
+        ttk.Button(buttons,text="Opslaan",command=save).pack(side="right")
+        ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
 
     def review_question_record(self,record,parent):
         win=tk.Toplevel(parent); win.title(f"Eindcontrole · {record.get('id')}"); win.geometry("1040x850")
