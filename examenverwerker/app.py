@@ -1377,6 +1377,15 @@ class ExamApp:
             row["human_decision"] = bool(decision)
             row["status"] = "bevestigd_vraagstart" if decision else "afgewezen_geen_vraag"
             row["decision_reason"] = "Handmatig beoordeeld in de geïntegreerde werkruimte."
+            if row.get("auxiliary_document_role"):
+                auxiliary_doc=next((d for d in self.data.get("documenten",[])
+                                    if d.get("id")==row.get("document_id")),None)
+                auxiliary_rows=[x for x in self.data.get("vraagkandidaten",[])
+                                if x.get("document_id")==row.get("document_id")]
+                if auxiliary_doc and auxiliary_rows and all(
+                    x.get("human_decision") in (True,False) for x in auxiliary_rows):
+                    auxiliary_doc.setdefault("vraagstarts_detectie",{})["status"]="visueel_bevestigd"
+                    auxiliary_doc["vraagstarts_detectie"]["reviewed_at"]=now()
             learn_decision(self.knowledge_dir, {
                 "pattern_key": question_pattern_key(row),
                 "chosen": "question" if decision else "not_question",
@@ -2834,6 +2843,17 @@ class ExamApp:
         ttk.Button(footer, text="Bevestig vraag", command=lambda: decide(True), style="Accent.TButton").pack(side="right", padx=4)
         ttk.Button(footer, text="Onderdrukte dubbelingen",
                    command=lambda: self.show_suppressed_candidates(win)).pack(side="left", padx=4)
+        if not rows and document_id:
+            def confirm_no_anchors():
+                doc=next((d for d in self.data.get("documenten",[]) if d.get("id")==document_id),None)
+                if doc:
+                    doc.setdefault("vraagstarts_detectie",{})["status"]="visueel_bevestigd"
+                    doc["vraagstarts_detectie"]["reviewed_at"]=now()
+                    doc["vraagstarts_detectie"]["review_note"]="Geen afzonderlijke vraagstarts gevonden; vraagkoppeling gebeurt op basis van de opgaven."
+                    self.save_project()
+                    win.destroy()
+            ttk.Button(footer,text="Bevestig: geen afzonderlijke vraagstarts",
+                       command=confirm_no_anchors).pack(side="left",padx=4)
         if rows:
             refresh_rows(next((i for i, row in enumerate(rows) if row.get("human_decision") is None), 0))
         else:
