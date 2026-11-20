@@ -500,7 +500,7 @@ class ExamApp:
         try:
             destination_root = self.user_data_root / "verwijderd"
             destination_root.mkdir(parents=True, exist_ok=True)
-            destination = destination_root / f"{folder.name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            destination = destination_root / f"{folder.name}-{datetime.now().strftime('%Y%m%d-%H%M%S-%f')}"
             shutil.move(str(folder), str(destination))
             self._refresh_library()
             self._log(f"Examen verplaatst naar herstelbare map: {destination}")
