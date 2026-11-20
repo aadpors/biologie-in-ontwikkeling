@@ -43,6 +43,9 @@ class StructureTests(unittest.TestCase):
         self.assertEqual([x["type"] for x in migrated], ["context"] * 5)
         self.assertEqual([x["type"] for x in legacy],
                          ["intro", "context_intro", "vraagcontext", "tussen_context", "tussenliggende_context"])
+        self.assertEqual(migrated[0]["context_role"], "introductie")
+        self.assertEqual(migrated[1]["context_role"], "introductie")
+        self.assertTrue(all(x["context_role"] == "vraaggebonden" for x in migrated[2:]))
 
 
     def test_fragments_are_sorted_in_source_reading_order(self):
