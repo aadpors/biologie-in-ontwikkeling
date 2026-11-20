@@ -65,7 +65,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     pages=[]
     for i,page in enumerate(doc):
         raw=page.get_text("dict", sort=True)
-        text=page.get_text("text",sort=True)
+        page_text=page.get_text("text",sort=True)
         page_area=float(page.rect.width*page.rect.height) or 1.0
         large_image=any(
             block.get("type")==1 and block.get("bbox") and
@@ -76,22 +76,22 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
         # OCR is attempted only for pages whose embedded text is absent or
         # clearly insufficient relative to a large scanned image.
         ocr_used=False
-        if len(text.strip())<40 or (large_image and len(text.strip())<180):
+        if len(page_text.strip())<40 or (large_image and len(text.strip())<180):
             raw_for_text=raw
             for language in ("nld+eng","eng"):
                 try:
                     ocr_page=page.get_textpage_ocr(language=language,dpi=200,full=True)
                     ocr_text=page.get_text("text",textpage=ocr_page,sort=True)
                     if len(ocr_text.strip())>len(text.strip()):
-                        if not text.strip():
+                        if not page_text.strip():
                             raw_for_text=page.get_text("dict",textpage=ocr_page,sort=True)
-                            text=ocr_text
+                            page_text=ocr_text
                         else:
-                            existing_lines={line.strip() for line in text.splitlines() if line.strip()}
+                            existing_lines={line.strip() for line in page_text.splitlines() if line.strip()}
                             extra_lines=[line.strip() for line in ocr_text.splitlines()
                                          if line.strip() and line.strip() not in existing_lines]
                             if extra_lines:
-                                text=text.rstrip()+"\n"+"\n".join(extra_lines)
+                                page_text=page_text.rstrip()+"\n"+"\n".join(extra_lines)
                         ocr_used=bool(ocr_text.strip())
                         break
                 except Exception:
@@ -104,14 +104,14 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
             lines=[]
             for line in block.get("lines",[]):
                 spans=line.get("spans",[])
-                text="".join(s.get("text","") for s in spans).strip()
-                if not text: continue
+                line_text="".join(s.get("text","") for s in spans).strip()
+                if not line_text: continue
                 boxes=[s["bbox"] for s in spans if s.get("text","").strip()]
                 if boxes:
                     bbox=[min(b[0] for b in boxes),min(b[1] for b in boxes),
                           max(b[2] for b in boxes),max(b[3] for b in boxes)]
                 else: bbox=line.get("bbox",block.get("bbox",[0,0,0,0]))
-                lines.append({"bbox":[round(x,2) for x in bbox],"text":text})
+                lines.append({"bbox":[round(x,2) for x in bbox],"text":line_text})
             if lines:
                 blocks.append({"bbox":block.get("bbox",[0,0,0,0]),
                                "text":"\n".join(x["text"] for x in lines),"lines":lines})
@@ -152,7 +152,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
             # Text and raster inventory should still remain usable.
             pass
         pages.append({"page":i+1,"width":page.rect.width,"height":page.rect.height,
-                      "text":text,"ocr_used":ocr_used,"blocks":blocks,
+                      "text":page_text,"ocr_used":ocr_used,"blocks":blocks,
                       "visual_assets": visual_assets})
     meta=doc.metadata or {}
     doc.close()
