@@ -5772,15 +5772,25 @@ class ExamApp:
                             or saved_record.get("cv_pdf") == cv_doc["opslagbestand"])
                         old_region = saved_record.get("cv_source_region")
                         old_hash = saved_record.get("cv_source_region_sha256")
-                    else:
+                        invalidation_key="cv_region_invalidated"
+                    elif role == "aanvulling":
                         old_items = [x for x in saved_record.get("cv_amendment_regions", [])
                                      if x.get("document_id") == cv_doc["id"]]
                         references_region = (cv_doc["opslagbestand"] in saved_record.get("cv_amendment_pdfs", [])
                             or bool(old_items))
                         old_region = old_items[0].get("fragment") if old_items else None
                         old_hash = old_items[0].get("snippet_sha256") if old_items else None
+                        invalidation_key="cv_region_invalidated"
+                    else:
+                        old_items = [x for x in saved_record.get("uitwerkbijlage_region_refs", [])
+                                     if x.get("document_id") == cv_doc["id"]]
+                        references_region = (cv_doc["opslagbestand"] in saved_record.get("uitwerkbijlagen", [])
+                            or bool(old_items))
+                        old_region = old_items[0] if old_items else None
+                        old_hash = old_items[0].get("snippet_sha256") if old_items else None
+                        invalidation_key="appendix_region_invalidated"
                     if references_region and (old_region != fragment or old_hash != rendered_hash):
-                        saved_record["cv_region_invalidated"] = True
+                        saved_record[invalidation_key] = True
                         saved_record["approved_by_human"] = False
                         saved_record["status"] = "cv_fragment_opnieuw_te_controleren"
                         saved_record["approved_at"] = None
