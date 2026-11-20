@@ -3573,27 +3573,21 @@ class ExamApp:
         type_box.bind("<<ComboboxSelected>>", set_default_links)
         set_default_links()
         ttk.Label(left, text="Bestaande fragmenten").pack(anchor="w", pady=(4, 2))
-        fragment_tree = ttk.Treeview(left, columns=("type", "pages", "links", "confidence"), show="tree headings", height=12)
+        fragment_tree = ttk.Treeview(left, columns=("type", "links", "confidence"), show="tree headings", height=12)
         fragment_tree.heading("#0", text="Fragment")
         fragment_tree.column("#0", width=68)
         fragment_tree.heading("type", text="Type"); fragment_tree.column("type", width=82)
-        fragment_tree.heading("pages", text="Pagina's"); fragment_tree.column("pages", width=48)
         fragment_tree.heading("links", text="Vragen"); fragment_tree.column("links", width=55)
         fragment_tree.heading("confidence", text="Zeker"); fragment_tree.column("confidence", width=48, anchor="center")
         fragment_tree.pack(fill="both", expand=True)
         fragment_info = ttk.Label(left, text="Selecteer een fragment voor de herkenningsreden en het bewijs.",
                                   wraplength=230, justify="left")
         fragment_info.pack(fill="x", pady=(5, 2))
-        ttk.Label(left, text="Tip: selecteer een aaneengesloten gebied op de doorlopende PDF. Een fragment mag over meerdere bronpagina's lopen.",
+        ttk.Label(left, text="Tip: selecteer een aaneengesloten gebied op de doorlopende PDF. Een fragment mag meerdere pagina's beslaan.",
                   wraplength=230).pack(anchor="w", pady=8)
         nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
         page_var = tk.IntVar(value=2)
         displayed_page = 2
-        ttk.Button(nav, text="◀", width=3, command=lambda: change_page(-1)).pack(side="left")
-        ttk.Label(nav, text="Bronpagina").pack(side="left", padx=(8, 3))
-        page_spin = tk.Spinbox(nav, from_=2, to=page_count, textvariable=page_var, width=5, command=lambda: jump_question_page())
-        page_spin.pack(side="left")
-        ttk.Label(nav, text=f"van {page_count} (pagina 1 verwijderd)").pack(side="left", padx=(4, 12))
         frame = ttk.Frame(right); frame.pack(fill="both", expand=True)
         canvas = tk.Canvas(frame, background="white", highlightthickness=0)
         sy = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
@@ -3772,13 +3766,6 @@ class ExamApp:
             canvas.create_image(0, 0, image=photo, anchor="nw")
             canvas.image = photo
             overlay_items = []
-            for layout in page_layout:
-                canvas.create_text(
-                    6, float(layout["y0"]) + 3,
-                    text=f"bronpagina {layout['original_page']}",
-                    anchor="nw", fill="#7b8790",
-                    font=("Segoe UI", 7),
-                )
             canvas.configure(scrollregion=(0, 0, page_image_width, page_image_height))
             if scroll_to_page is not None:
                 displayed_page = max(2, min(page_count, int(scroll_to_page)))
@@ -3890,18 +3877,12 @@ class ExamApp:
                 else:
                     drag_handle = None
 
-        def on_drag(event):
+        drag_pointer_y = None
+        auto_scroll_job = None
+
+        def update_drag_selection(pointer_y):
             nonlocal selection_start, selection_end, selection_dirty
-            if not drag_handle:
-                return
-            # Edge auto-scroll lets a user drag a boundary across the full
-            # stitched document without having to release and re-grab it.
-            viewport_height = max(1, canvas.winfo_height())
-            if event.y >= viewport_height - 34:
-                canvas.yview_scroll(2, "units")
-            elif event.y <= 34:
-                canvas.yview_scroll(-2, "units")
-            y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y)))
+            y = max(0.0, min(float(page_image_height), canvas.canvasy(pointer_y)))
             if snippet_mode:
                 layout = drag_handle["layout"]
                 span = layout["span"]
@@ -3922,12 +3903,50 @@ class ExamApp:
                 selection_dirty = True
             redraw_guides()
 
+        def auto_scroll_tick():
+            nonlocal auto_scroll_job
+            auto_scroll_job = None
+            if not drag_handle or drag_pointer_y is None:
+                return
+            viewport_height = max(1, canvas.winfo_height())
+            edge_zone = 48
+            if drag_pointer_y < edge_zone:
+                distance = drag_pointer_y
+                speed = 2 if distance < 14 else 1
+                canvas.yview_scroll(-speed, "units")
+            elif drag_pointer_y > viewport_height - edge_zone:
+                distance = viewport_height - drag_pointer_y
+                speed = 2 if distance < 14 else 1
+                canvas.yview_scroll(speed, "units")
+            else:
+                return
+            update_drag_selection(drag_pointer_y)
+            auto_scroll_job = canvas.after(100, auto_scroll_tick)
+
+        def schedule_auto_scroll():
+            nonlocal auto_scroll_job
+            if not drag_handle or auto_scroll_job is not None:
+                return
+            viewport_height = max(1, canvas.winfo_height())
+            if drag_pointer_y < 48 or drag_pointer_y > viewport_height - 48:
+                auto_scroll_job = canvas.after(100, auto_scroll_tick)
+
+        def on_drag(event):
+            nonlocal drag_pointer_y
+            if not drag_handle:
+                return
+            drag_pointer_y = event.y
+            update_drag_selection(event.y)
+            schedule_auto_scroll()
+
         def on_release(_event):
-            nonlocal drag_handle
+            nonlocal drag_handle, drag_pointer_y, auto_scroll_job
+            if auto_scroll_job is not None:
+                canvas.after_cancel(auto_scroll_job)
+                auto_scroll_job = None
             if drag_handle:
                 if snippet_mode:
                     save_structure()
-                    show_fragment()
                 else:
                     current = selected_fragment()
                     if current:
@@ -3937,8 +3956,9 @@ class ExamApp:
                             save_structure()
                         except Exception as exc:
                             messagebox.showerror("Selectie niet opgeslagen", str(exc), parent=win)
-                    show_document()
+                redraw_guides()
             drag_handle = None
+            drag_pointer_y = None
 
         canvas.bind("<Button-1>", on_press)
         canvas.bind("<B1-Motion>", on_drag)
@@ -3950,12 +3970,11 @@ class ExamApp:
             fragments[:] = sort_fragments_reading_order(fragments)
             for iid in fragment_tree.get_children(): fragment_tree.delete(iid)
             for index, frag in enumerate(fragments):
-                pages = ",".join(str(x["page"]) for x in frag.get("page_spans", []))
                 links = ",".join(str(x) for x in frag.get("question_numbers", []))
                 confidence = frag.get("confidence")
                 confidence_label = f"{float(confidence):.0%}" if isinstance(confidence, (int, float)) else "—"
                 fragment_tree.insert("", "end", iid=str(index), text=fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), f"Fragment {index+1}"),
-                    values=(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), "Onbekend"), pages, links, confidence_label))
+                    values=(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), "Onbekend"), links, confidence_label))
             if selected_id:
                 selected_index = next((i for i, item in enumerate(fragments)
                                        if item.get("id") == selected_id), None)
