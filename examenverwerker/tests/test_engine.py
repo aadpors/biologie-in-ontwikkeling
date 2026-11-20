@@ -22,8 +22,8 @@ class EngineTests(unittest.TestCase):
             snippets.mkdir()
             original=snippets/"original.png"
             replacement=snippets/"replacement.png"
-            Image.new("RGB",(400,600),"white").save(original)
-            Image.new("RGB",(400,500),"white").save(replacement)
+            Image.new("RGB",(400,500),"white").save(original)
+            Image.new("RGB",(400,450),"white").save(replacement)
             before={path.name:hashlib.sha256(path.read_bytes()).hexdigest()
                     for path in (original,replacement)}
             result=build_consolidated_cv_pdf([
