@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 50 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 51 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 50 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 51 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -29,7 +29,7 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | DNA-replicatie en celcyclus | s10, s31, s49 | 3 |
 | Eiwitsynthese en genexpressie | s11, s32 | 2 |
 | Gedrag en voortplanting | s12, s22, s50 | 3 |
-| Evolutie van eukaryote cellen | s35 | 1 |
+| Evolutie van eukaryote cellen | s35, s51 | 2 |
 | Erfelijke eigenschappen en overerving | s36, s38, s43 | 3 |
 
 De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inhoudelijk ook aan andere thema's raken; de tags en curriculumkoppelingen leggen die nevenrelaties vast.
@@ -48,6 +48,7 @@ De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inho
 | s48 | FXR–YAP, celidentiteit en leverhomeostase | Verbindt moleculaire interactie, genregulatie, celdifferentiatie en weefselintegriteit. |
 | s49 | Mitotische controle en chromosomale instabiliteit | Versterkt het onderbelichte thema celcyclus, mitose en correcte chromosoomverdeling; onderscheidt celmodellen van klinische behandeling. |
 | s50 | Neurale circuits voor ouderlijk zorggedrag | Verbreedt gedrag en voortplanting van balts en populatiedynamiek naar ouderlijke zorg, motivatie en contextafhankelijke hersenregulatie. |
+| s51 | Genoverdracht en microbiële associaties tijdens eukaryogenese | Combineert met s35 de experimentele isolatie van moderne verwanten met een fylogenomische reconstructie van genoverdracht tijdens het ontstaan van eukaryote cellen. |
 
 ## Bestaande kaarten inhoudelijk aangescherpt
 
@@ -125,7 +126,7 @@ De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een voll
 ### Nieuwe metadata voor bruikbare selectie
 
 Alle 50 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
-- **Primair onderzoek:** 39 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
+- **Primair onderzoek:** 40 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
 - **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
 - **Perspectiefartikel:** 2 kaarten.
 
@@ -142,3 +143,5 @@ De oude keuzelijst 'Examenprogramma' is uit het filterpaneel verwijderd. In de d
 - **s1 en s2:** de havo- en vwo-codes voor erfelijkheid/selectie zijn nu ook in het korte subdomeinveld expliciet gescheiden (havo B5, vwo B6).
 - **s33:** de niet-onderbouwde verwijzing naar de afweer-subdomeinen B6/B7 is verwijderd; de kaart is beperkt tot de inhoudelijke aansluiting bij cellulaire interacties.
 - **s35:** de v2-koppeling voor cellulaire organisatie is in het korte subdomeinveld gelijkgetrokken met de nadere toelichting: havo B2 en vwo B3.
+
+- **s51:** een fylogenomische reconstructie van genoverdracht en microbiële associaties tijdens eukaryogenese toegevoegd als complement van s35. De voorgestelde interacties zijn als evolutionaire inferenties gemarkeerd, niet als rechtstreeks waargenomen symbiose.
