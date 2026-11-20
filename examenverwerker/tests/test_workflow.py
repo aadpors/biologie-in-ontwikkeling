@@ -54,7 +54,7 @@ def with_cv(data):
 def with_record(data):
     data["vraagrecords"] = [{
         "id": "record-1", "candidate_document_id": "opgaven-1",
-        "number": 1, "source_page": 2,
+        "number": 1, "source_page": 2, "question_type_status": "handmatig_gecontroleerd",
     }]
     return data
 
@@ -123,6 +123,7 @@ class ExamWorkflowTests(unittest.TestCase):
         data["documenten"].append({
             "id": "cv-1", "sha256": "cv-hash", "type_voorstel": "correctievoorschrift",
             "documenttype_handmatig": "correctievoorschrift", "status": "handmatig_bevestigd",
+            "vraagstarts_detectie": {"status": "visueel_bevestigd"},
         })
         self.assertEqual(exam_workflow_state(data)["stage"], "cv_fragmenten")
 
