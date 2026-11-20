@@ -153,11 +153,11 @@ class EngineTests(unittest.TestCase):
 
     def test_context_proposals_use_visual_assets_and_link_to_confirmed_question(self):
         analysis = {"pages": [{
-            "page": 1, "width": 600, "height": 800,
-            "visual_assets": [{"id": "p1-image-1", "kind": "image", "bbox": [100, 180, 450, 300]}],
+            "page": 2, "width": 600, "height": 800,
+            "visual_assets": [{"id": "p2-image-1", "kind": "image", "bbox": [100, 180, 450, 300]}],
             "blocks": [{"lines": [{"bbox": [110, 302, 250, 318], "text": "Figuur 2. De bouw van een blad"}]}],
         }]}
-        candidates = [{"number": 2, "page": 1, "bbox": [40, 100, 90, 120], "human_decision": True}]
+        candidates = [{"number": 2, "page": 2, "bbox": [40, 100, 90, 120], "human_decision": True}]
         proposals = propose_context_fragments(analysis, candidates)
         self.assertEqual(len(proposals), 1)
         proposal = proposals[0]
