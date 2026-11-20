@@ -40,5 +40,12 @@ class ExamWindowSeparationTests(unittest.TestCase):
         self.assertNotIn("＋ Examens importeren", source)
 
 
+    def test_workspace_import_and_completed_actions_return_to_library(self):
+        source = inspect.getsource(ExamApp._workflow_refresh)
+        self.assertIn('"import": ("Examenbibliotheek tonen", self._show_exam_library)', source)
+        self.assertIn('"voltooid": ("Examenbibliotheek tonen", self._show_exam_library)', source)
+        self.assertNotIn('"import": ("Examens importeren", self.import_year_set)', source)
+
+
 if __name__ == "__main__":
     unittest.main()
