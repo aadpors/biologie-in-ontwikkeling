@@ -236,14 +236,27 @@ def validate_review_records(records: list[dict], project_dir: Path) -> list[dict
                     errors.append({"id":rid,"error":f"cv_aanvulling_niet_handmatig_gecontroleerd:{ref}"})
     return errors
 
-def export_approved_records(records: list[dict], project_dir: Path, output_dir: Path):
+def export_approved_records(records: list[dict], project_dir: Path, output_dir: Path,
+                           consolidated_cv: dict | None = None):
     errors=validate_review_records(records,project_dir)
     if errors: return {"ok":False,"errors":errors,"export_dir":None}
+    consolidated_source=None
+    if consolidated_cv and consolidated_cv.get("file"):
+        consolidated_source=Path(project_dir)/str(consolidated_cv["file"])
+        if (consolidated_cv.get("status")!="visueel_bevestigd" or
+                not consolidated_source.is_file() or
+                sha256(consolidated_source)!=consolidated_cv.get("sha256")):
+            return {"ok":False,"errors":[{"error":"geconsolideerde_cv_ontbreekt_of_is_verouderd",
+                "message":"De bevestigde geconsolideerde CV-PDF ontbreekt of is gewijzigd."}],"export_dir":None}
     if output_dir.exists() and any(output_dir.iterdir()):
         return {"ok":False,"errors":[{"error":"exportmap_is_niet_leeg","message":"Kies een nieuwe exportmap; bestaande bestanden worden nooit overschreven."}],"export_dir":None}
     output_dir.mkdir(parents=True,exist_ok=True)
     exam_dir=output_dir/"examens"; snippet_dir=output_dir/"exam-snippets"
     exam_dir.mkdir(); snippet_dir.mkdir()
+    consolidated_cv_output=None
+    if consolidated_source:
+        consolidated_cv_output=output_dir/"correctievoorschrift-geconsolideerd.pdf"
+        shutil.copy2(consolidated_source,consolidated_cv_output)
     mcq=[]; opened=[]; contexts=[]; cv_manifest=[]; manifest=[]
     for r in records:
         meta=r["exam"]; source_name=r["source_pdf"]; cv_name=r["cv_pdf"]
@@ -344,4 +357,11 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
         "created_at":datetime.now().astimezone().isoformat(timespec="seconds"),
         "question_count":len(mcq)+len(opened),"mcq_count":len(mcq),"open_count":len(opened),
         "records":manifest},ensure_ascii=False,indent=2),encoding="utf-8")
-    return {"ok":True,"errors":[],"export_dir":str(output_dir),"mcq":len(mcq),"open":len(opened)}
+    if consolidated_cv_output:
+        (output_dir/"geconsolideerd-cv-manifest.json").write_text(json.dumps({
+            "file":consolidated_cv_output.name,
+            "sha256":sha256(consolidated_cv_output),
+            "sources_unchanged":True,
+            "source_manifest":consolidated_cv.get("entries",[]),
+        },ensure_ascii=False,indent=2),encoding="utf-8")
+        return {"ok":True,"errors":[],"export_dir":str(output_dir),"mcq":len(mcq),"open":len(opened)}
