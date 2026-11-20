@@ -795,28 +795,54 @@ class ExamApp:
         if next_index >= len(self.import_batch_paths):
             return
         next_project = self.import_batch_paths[next_index]
+        owner = getattr(self, "_workspace_owner", None)
+        old_key = getattr(self, "_workspace_key", None)
+        next_key = str(next_project.resolve())
+        if owner is not None:
+            already_open = owner._open_workspaces.get(next_key)
+            if already_open is not None and already_open is not self:
+                try:
+                    already_open.root.deiconify()
+                    already_open.root.lift()
+                    already_open.root.focus_force()
+                except tk.TclError:
+                    pass
+                messagebox.showinfo("Examen al geopend",
+                    "Het volgende examen uit deze importbatch staat al in een eigen verwerkingsvenster. "
+                    "Gebruik dat venster om verder te werken.", parent=self.root)
+                return
         previous = (self.project_dir, self.data, self.import_batch_index,
                     getattr(self, "_workspace_doc_id", None),
-                    getattr(self, "_workspace_selected", None))
+                    getattr(self, "_workspace_selected", None), old_key)
         try:
             next_data = json.loads((next_project / PROJECT_FILE).read_text(encoding="utf-8"))
             if next_data.get("schema") != "biologie-examenproject-v1":
                 raise ValueError("Onbekend examenformaat.")
-            # Switch only after the next project has been read and validated;
-            # roll back the visible workspace too if rendering/loading fails.
+            self.save_project()
+            if owner is not None and old_key:
+                owner._open_workspaces.pop(old_key, None)
             self.project_dir = next_project
             self.data = next_data
             self.import_batch_index = next_index
+            self._workspace_key = next_key
+            if owner is not None:
+                owner._open_workspaces[next_key] = self
             self._workspace_doc_id = None
             self._workspace_selected = None
             self._workspace_load_global_corrections()
             self.refresh()
+            if owner is not None:
+                owner._refresh_library()
             meta = self.data.get("exam_metadata", {})
             self._log(f"Verder met examen {self.import_batch_index + 1}/{len(self.import_batch_paths)}: "
                       f"{meta.get('level', '')} {meta.get('year', '')} tijdvak {meta.get('period', '')}.")
         except Exception as exc:
             self.project_dir, self.data, self.import_batch_index = previous[:3]
-            self._workspace_doc_id, self._workspace_selected = previous[3:]
+            self._workspace_doc_id, self._workspace_selected = previous[3:5]
+            self._workspace_key = previous[5]
+            if owner is not None and old_key:
+                owner._open_workspaces.pop(next_key, None)
+                owner._open_workspaces[old_key] = self
             try:
                 self._workspace_load_global_corrections()
                 self.refresh()
@@ -824,7 +850,8 @@ class ExamApp:
                 self._log(f"Herstel van de vorige werkruimte gaf een fout: {restore_exc}")
             self._error("Volgend examen openen", exc)
             messagebox.showerror("Examen openen mislukt",
-                "Het volgende examen kon niet worden geopend. De vorige werkruimte en batchpositie zijn hersteld.")
+                "Het volgende examen kon niet worden geopend. De vorige werkruimte en batchpositie zijn hersteld.",
+                parent=self.root)
 
     def _workflow_focus_next(self):
         if not self.data:
