@@ -14,7 +14,7 @@ De examenbibliotheek is het hoofdvenster. Elk geopend examen krijgt een eigen ve
 6. **Uitwerkbijlagefragmenten** — baken de relevante delen per vraag af in de originele PDF.
 7. **Vraagstarts correctievoorschrift** — detecteer en beoordeel de vraagankers in het officiële correctievoorschrift.
 8. **CV-fragmenten** — baken per vraag alle beoordelingsregels en punten af. Dezelfde visuele uitsnij- en samenvoegtechniek wordt gebruikt als bij de opgaven.
-9. **Aanvulling CV** — classificeer per vraag toevoeging, wijziging, vervanging, intrekking of ongewijzigd. Bekijk daarna de samengestelde, herleidbare CV-weergave. Bron-CV en aanvulling blijven afzonderlijk en ongewijzigd.
+9. **Aanvulling CV** — classificeer per vraag toevoeging, wijziging, vervanging, intrekking of ongewijzigd. Genereer en controleer daarna de samengestelde, herleidbare CV-PDF. Bron-CV en aanvulling blijven afzonderlijk en ongewijzigd.
 10. **Correcte antwoorden** — controleer de antwoordsleutel, ook voor ja/nee-, waar/onwaar-, hoger/lager- en meer/minder-vraagvormen.
 11. **Volledigheid** — controleer dubbele of ontbrekende vraagnummering, fragmenten, contextkoppelingen, bronintegriteit en puntenaantallen.
 12. **Definitieve uitsneden** — genereer vraag- en contextuitsneden pas nadat de grenzen zijn vastgelegd. Witruimte aan boven- en onderzijde wordt op basis van de feitelijke beeldinhoud verwijderd; de broncoördinaten blijven behouden.
