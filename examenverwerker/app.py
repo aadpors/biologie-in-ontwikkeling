@@ -4380,8 +4380,10 @@ class ExamApp:
                 messagebox.showinfo("Conceptexport klaar",
                     f"Conceptvragen en bron-PDF's zijn geëxporteerd naar:\n{export_dir}\n\nDit is een overdraagbaar conceptpakket, geen publicatiepakket.",parent=self.root)
                 return
+            has_addenda=any(d.get("type_voorstel")=="aanvulling"
+                            for d in self.data.get("documenten",[]))
             result=export_approved_records(records,self.project_dir,export_dir,
-                                          consolidated_cv=self.data.get("consolidated_cv"))
+                                          consolidated_cv=(self.data.get("consolidated_cv") if has_addenda else None))
             if not result.get("ok"):
                 errors=result.get("errors",[])
                 detail="\n".join(f"• {x.get('id','')} · {x.get('error')}" for x in errors[:20])
