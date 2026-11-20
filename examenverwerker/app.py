@@ -224,6 +224,78 @@ class ExamApp:
         style.configure("Vertical.TScrollbar", background="#DCE3E6",
                         troughcolor="#F5F7F7", bordercolor="#F5F7F7", arrowsize=12)
 
+    def _build(self):
+        """Main window: exam library only."""
+        self.root.title("Examenverwerker · Examenbibliotheek")
+        fit_window(self.root, 1180, 780, 860, 560)
+        shell = ttk.Frame(self.root, style="App.TFrame", padding=18)
+        shell.pack(fill="both", expand=True)
+        ttk.Label(shell, text="EXAMENBIBLIOTHEEK", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(shell, text="Beheer examens en open een afzonderlijke verwerkingswerkruimte.",
+                  style="WorkflowText.TLabel").pack(anchor="w", pady=(3, 14))
+        toolbar = ttk.Frame(shell, style="App.TFrame")
+        toolbar.pack(fill="x", pady=(0, 10))
+        ttk.Button(toolbar, text="＋ Examens importeren", command=self.import_year_set,
+                   style="Accent.TButton").pack(side="left")
+        ttk.Button(toolbar, text="Examen openen", command=self.open_project,
+                   style="Wine.TButton").pack(side="left", padx=7)
+        ttk.Button(toolbar, text="Archiveren", command=self._archive_selected_exam,
+                   style="Secondary.TButton").pack(side="left", padx=7)
+        ttk.Button(toolbar, text="Verwijderen", command=self._delete_selected_exam,
+                   style="Secondary.TButton").pack(side="left")
+        filters = ttk.LabelFrame(shell, text="FILTERS", padding=9)
+        filters.pack(fill="x", pady=(0, 9))
+        self._library_filters = {}
+        specs = [
+            ("vak", "Vak", ["Alle vakken"]), ("level", "Niveau", ["Alle niveaus", "Havo", "Vwo"]),
+            ("year", "Jaar", ["Alle jaren"]), ("period", "Tijdvak", ["Alle tijdvakken", "1", "2", "3"]),
+            ("archived", "Archief", ["Actieve examens", "Gearchiveerd", "Alles"]),
+        ]
+        for i, (key, label, values) in enumerate(specs):
+            cell = ttk.Frame(filters)
+            cell.grid(row=0, column=i, sticky="ew", padx=(0, 8))
+            filters.columnconfigure(i, weight=1)
+            ttk.Label(cell, text=label, style="Muted.TLabel").pack(anchor="w")
+            var = tk.StringVar(value=values[0])
+            combo = ttk.Combobox(cell, textvariable=var, values=values, state="readonly", width=16)
+            combo.pack(fill="x", pady=(3, 0))
+            combo.bind("<<ComboboxSelected>>", lambda _e: self._refresh_library())
+            self._library_filters[key] = var
+            setattr(self, f"_library_{key}_combo", combo)
+        panel = ttk.LabelFrame(shell, text="EXAMENS", padding=8)
+        panel.pack(fill="both", expand=True)
+        columns = ("subject", "level", "year", "period", "documents", "questions", "progress", "updated")
+        self.library_table = ttk.Treeview(panel, columns=columns, show="headings", selectmode="browse")
+        for col, label, width in [
+            ("subject", "Vak", 130), ("level", "Niveau", 75), ("year", "Jaar", 65),
+            ("period", "Tijdvak", 70), ("documents", "PDF's", 55), ("questions", "Vraagstarts", 85),
+            ("progress", "Verwerkingsstatus", 230), ("updated", "Laatst opgeslagen", 145),
+        ]:
+            self.library_table.heading(col, text=label)
+            self.library_table.column(col, width=width, minwidth=45,
+                anchor="w" if col in ("subject", "progress") else "center")
+        scroll = ttk.Scrollbar(panel, orient="vertical", command=self.library_table.yview)
+        self.library_table.configure(yscrollcommand=scroll.set)
+        self.library_table.pack(side="left", fill="both", expand=True)
+        scroll.pack(side="right", fill="y")
+        self.library_table.bind("<Double-1>", lambda _e: self.open_project())
+        footer = ttk.Frame(shell, style="App.TFrame")
+        footer.pack(fill="x", pady=(9, 0))
+        self.library_status = ttk.Label(footer, text="", style="Status.TLabel")
+        self.library_status.pack(side="left", fill="x", expand=True)
+        ttk.Button(footer, text="Vernieuwen", command=self._refresh_library,
+                   style="Secondary.TButton").pack(side="right")
+        log_frame = ttk.LabelFrame(shell, text="ACTIVITEIT EN MELDINGEN", padding=(7, 4))
+        log_frame.pack(fill="x", pady=(8, 0))
+        self.log = tk.Text(log_frame, height=2, wrap="word", font=("Segoe UI", 8),
+                           background="#FBFCFC", foreground=self.colors["ink"],
+                           insertbackground=self.colors["ink"], relief="flat", padx=7, pady=4)
+        self.log.pack(fill="x")
+        self.log.configure(state="disabled")
+        self._library_paths = {}
+        self._open_workspaces = {}
+        self._refresh_library()
+
     def _build_workspace(self):
         """Build the complete exam-processing workspace in its own window."""
         self.root.title("Examenverwerker")
