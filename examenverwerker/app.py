@@ -3863,8 +3863,8 @@ class ExamApp:
                 self.data["consolidated_cv"]={
                     "schema":"consolidated-cv-pdf-v1","status":"samengesteld",
                     "file":relative,"sha256":generated["sha256"],
-                    "page_count":generated["page_count"],"entries":entries,
-                    "sources_unchanged":True,"generated_at":now(),
+                    "page_count":generated["page_count"],"question_pages":generated["question_pages"],
+                    "entries":entries,"sources_unchanged":True,"generated_at":now(),
                 }
                 self.save_project()
                 try:
@@ -4195,6 +4195,15 @@ class ExamApp:
         for idx,asset in enumerate(record.get("context_asset_files", []),1):
             preview_specs.append((f"Contextfiguur/-tabel {idx} · pagina {asset.get('page', 'meerdere')} · {asset.get('caption') or asset.get('type') or asset.get('asset_id') or ''}",
                                   self.project_dir/"snippets"/asset["file"],None,None))
+        consolidated=self.data.get("consolidated_cv") or {}
+        consolidated_file=consolidated.get("file")
+        question_range=(consolidated.get("question_pages") or {}).get(str(record.get("number")))
+        consolidated_path=self.project_dir/str(consolidated_file or "")
+        if consolidated.get("status")=="visueel_bevestigd" and consolidated_path.is_file() and question_range:
+            for page_no in range(int(question_range["start"]),int(question_range["end"])+1):
+                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-geconsolideerde-cv-p{page_no}.png"
+                preview_specs.append((f"GECONSOLIDEERDE CV · vraag {record.get('number')} · pagina {page_no}",
+                                      consolidated_path,page_no,target))
         for idx,region in enumerate(record.get("uitwerkbijlage_region_refs",[]),1):
             name=region.get("snippet_file")
             if name:
