@@ -1008,8 +1008,14 @@ def question_fragment_boundary(analysis: dict[str, Any], candidate: dict,
                     frame_ys.append(y0)
         first_frame = min(frame_ys) if frame_ys else None
 
-        previous_bottom = start_y if page_no == start_page else 0.0
-        for line_top, line_bottom in lines:
+        previous_bottom = start_y if page_no == start_page else (
+            lines[0][1] if lines else 0.0
+        )
+        for line_index, (line_top, line_bottom) in enumerate(lines):
+            # Ignore the page's top margin: a new page is not itself a blank line.
+            if page_no > start_page and line_index == 0:
+                previous_bottom = line_bottom
+                continue
             if line_top - previous_bottom >= blank_gap:
                 boundary = (line_top + previous_bottom) / 2.0
                 if first_frame is not None and first_frame < boundary:
