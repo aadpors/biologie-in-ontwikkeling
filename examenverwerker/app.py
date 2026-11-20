@@ -3524,6 +3524,13 @@ class ExamApp:
         trimmed_pages = sum(1 for item in preview_info["page_map"] if item.get("footer_detected"))
         ttk.Label(header, text=f"Voorbewerking: voorblad verwijderd; footer/onderliggende witruimte automatisch afgesneden op {trimmed_pages} van {len(preview_info['page_map'])} pagina's. De originele PDF blijft ongewijzigd.",
                   wraplength=1180).pack(anchor="w", pady=(3, 0))
+        uncertain_pages = [str(item["original_page"]) for item in preview_info["page_map"]
+                           if not item.get("footer_detected")
+                           and float(item["preview_height"]) >= float(item["original_height"]) * 0.95]
+        if uncertain_pages:
+            ttk.Label(header, text="Controle nodig: op pagina('s) " + ", ".join(uncertain_pages) +
+                      " is geen betrouwbare footer gevonden; deze pagina's zijn niet automatisch ingekort.",
+                      foreground="#9b4d00", wraplength=1180).pack(anchor="w", pady=(2, 0))
         ttk.Label(header, text="Selecteer links een fragment om alleen dat fragment als doorlopende snippet te bekijken. Sleep de grenslijnen om het fragment bij te stellen. Met 'Nieuwe selectie' kun je een ontbrekend fragment op een opgeschoonde pagina toevoegen.",
                   wraplength=1180).pack(anchor="w", pady=(3, 0))
         body = ttk.Frame(win, padding=8); body.pack(fill="both", expand=True)
@@ -3875,6 +3882,8 @@ class ExamApp:
                 reason = evidence.get("reason") or "Handmatig afgebakend; controleer de inhoud en koppeling."
                 captions = evidence.get("captions") or []
                 detail = f"{fragment_type_labels.get(canonical_fragment_type(frag.get('type', '')), 'Fragment')}{certainty}\\n{reason}"
+                if any(int(span.get("page", 0)) == 1 for span in frag.get("page_spans", [])):
+                    detail += "\\nLET OP: dit bestaande fragment bevat een selectie op pagina 1. Die pagina is uit de nieuwe preview verwijderd; verwijder deze oude grens of baken het fragment opnieuw af."
                 if captions:
                     detail += "\\nBijschrift: " + " · ".join(captions[:2])
                 fragment_info.configure(text=detail)
