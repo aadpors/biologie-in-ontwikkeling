@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments, classify_question_with_visuals
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments, classify_question_with_visuals, render_stitched_preview
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -394,6 +394,96 @@ class EngineTests(unittest.TestCase):
             with fitz.open(source) as original:
                 self.assertEqual(len(original), 3)
                 self.assertIn("Voorblad", original[0].get_text())
+
+    def test_footer_hypothesis_cannot_remove_question_line_below_it(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            doc = fitz.open()
+            cover = doc.new_page(width=600, height=800)
+            cover.insert_text((60, 120), "Voorblad - instructies")
+            for page_no in (2, 3):
+                page = doc.new_page(width=600, height=800)
+                page.insert_text((60, 120), f"Vraag {page_no - 1}. Beschrijf de situatie.")
+                # This repeated line sits in the footer band but is real exam
+                # content. The final question line must survive beneath it.
+                page.insert_text((60, 765), "Veelvoorkomende tekstregel")
+                page.insert_text((60, 776), (
+                    "De eigenschap dominant overerft."
+                    if page_no == 2 else "Deze inhoud hoort bij de volgende vraag."
+                ))
+                page.insert_text((60, 790), "Biologie | Examen 2026")
+                page.insert_text((540, 797), str(page_no))
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertTrue(result["page_map"][0]["footer_detected"])
+            self.assertTrue(result["page_map"][0]["footer_review_required"])
+            self.assertIn(
+                "Veelvoorkomende tekstregel",
+                result["page_map"][0]["footer_candidates_rejected"],
+            )
+            with fitz.open(preview) as cleaned:
+                page_text = cleaned[0].get_text("text").lower()
+                self.assertIn("dominant overerft", page_text)
+                self.assertNotIn("biologie | examen 2026", page_text)
+                self.assertNotIn("2", page_text.splitlines()[-1:])
+
+    def test_vwo_2026_ii_question_one_and_final_overerft_line_survive_preview(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf
+
+        source = Path(__file__).resolve().parents[2] / "examens" / "vw-1018-a-26-2-o.pdf"
+        self.assertTrue(source.is_file(), "De regressie-PDF vwo 2026 tijdvak 2 ontbreekt.")
+        with tempfile.TemporaryDirectory() as tmp:
+            preview = Path(tmp) / "preview.pdf"
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertEqual(result["page_map"][0]["original_page"], 2)
+            with fitz.open(preview) as cleaned:
+                first_question_page = cleaned[0].get_text("text").lower()
+                self.assertIn("dominant overerft", first_question_page)
+                self.assertIn("geef een combinatie van ouders", first_question_page)
+                self.assertIn("1p 1", first_question_page)
+
+    def test_stitched_preview_is_one_continuous_image_with_original_page_mapping(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf, render_stitched_preview
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            stitched = Path(tmp) / "stitched.png"
+            doc = fitz.open()
+            cover = doc.new_page(width=600, height=800)
+            cover.insert_text((60, 120), "Voorblad")
+            for page_no in (2, 3, 4):
+                page = doc.new_page(width=600, height=800)
+                page.insert_text((60, 120), f"Vraag {page_no - 1}")
+                page.insert_text((60, 780), "Biologie | Examen 2026")
+                page.insert_text((540, 795), str(page_no))
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            stitched_info = render_stitched_preview(
+                preview, stitched, result["page_map"], scale=1.0
+            )
+            self.assertTrue(stitched.is_file())
+            self.assertEqual(
+                [item["original_page"] for item in stitched_info["layout"]],
+                [2, 3, 4],
+            )
+            self.assertGreater(
+                stitched_info["layout"][1]["y0"],
+                stitched_info["layout"][0]["y1"],
+            )
+            pixmap = fitz.Pixmap(str(stitched))
+            self.assertGreater(pixmap.height, 3 * 700)
+            self.assertLessEqual(pixmap.height, 26000)
 
     def test_uncaptioned_visual_after_question_stays_with_that_question(self):
         analysis = {"pages": [{
