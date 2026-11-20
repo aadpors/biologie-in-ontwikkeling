@@ -65,8 +65,32 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     pages=[]
     for i,page in enumerate(doc):
         raw=page.get_text("dict", sort=True)
+        text=page.get_text("text",sort=True)
+        page_area=float(page.rect.width*page.rect.height) or 1.0
+        large_image=any(
+            block.get("type")==1 and block.get("bbox") and
+            (max(0.0,float(block["bbox"][2])-float(block["bbox"][0]))*
+             max(0.0,float(block["bbox"][3])-float(block["bbox"][1])))/page_area>0.18
+            for block in raw.get("blocks",[])
+        )
+        # OCR is attempted only for pages whose embedded text is absent or
+        # clearly insufficient relative to a large scanned image.
+        if len(text.strip())<40 or (large_image and len(text.strip())<180):
+            try:
+                ocr_page=page.get_textpage_ocr(language="nld+eng",dpi=200,full=True)
+                ocr_text=page.get_text("text",textpage=ocr_page,sort=True)
+                if len(ocr_text.strip())>len(text.strip()):
+                    ocr_raw=page.get_text("dict",textpage=ocr_page,sort=True)
+                    raw_for_text=ocr_raw
+                    text=ocr_text
+                else:
+                    raw_for_text=raw
+            except Exception:
+                raw_for_text=raw
+        else:
+            raw_for_text=raw
         blocks=[]
-        for block in raw.get("blocks",[]):
+        for block in raw_for_text.get("blocks",[]):
             if block.get("type") != 0: continue
             lines=[]
             for line in block.get("lines",[]):
@@ -119,7 +143,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
             # Text and raster inventory should still remain usable.
             pass
         pages.append({"page":i+1,"width":page.rect.width,"height":page.rect.height,
-                      "text":page.get_text("text",sort=True),"blocks":blocks,
+                      "text":text,"blocks":blocks,
                       "visual_assets": visual_assets})
     meta=doc.metadata or {}
     doc.close()
