@@ -209,6 +209,9 @@ class ExamApp:
         workspace.pack(fill="both", expand=True)
         left = ttk.Frame(workspace, style="App.TFrame", padding=(0, 0, 6, 0))
         right = ttk.Frame(workspace, style="App.TFrame", padding=(6, 0, 0, 0))
+        self._workspace_container = workspace
+        self._workspace_left = left
+        self._workspace_right = right
         workspace.add(left, weight=3)
         workspace.add(right, weight=8)
 
@@ -3402,11 +3405,12 @@ class ExamApp:
             fragments = normalize_fragments(existing.get("fragments", []))
         else:
             fragments = []
-        # Seed the editor with a transparent, editable proposal derived from the
-        # confirmed question starts. Each question gets a full-width region from
-        # its start to the next confirmed start; the leading area is proposed as
-        # an introduction linked to all questions. Nothing is auto-approved.
-        if not fragments:
+        # Seed the editor with transparent, editable proposals derived from the
+        # confirmed question starts. Page 1 is never treated as context; only
+        # content on page 2 onward before question 1 can become the introduction.
+        # Nothing is auto-approved.
+        generated_proposals = not bool(fragments)
+        if generated_proposals:
             ordered = sorted(
                 [x for x in candidates if x.get("human_decision") is True],
                 key=lambda x: (int(x.get("page", 1)), float((x.get("bbox") or [0, 0])[1]))
@@ -3420,13 +3424,40 @@ class ExamApp:
                 starts.append((page_no, y, int(item["number"])))
             if starts:
                 first_page, first_y, _ = starts[0]
-                if first_page == 1 and first_y > 0.02:
+                # Exclude page 1 unconditionally. Build an intro from meaningful
+                # content on pages 2..first question, including a partial final page.
+                intro_spans = []
+                for intro_page in range(2, first_page + 1):
+                    page_data = next((p for p in analysis.get("pages", [])
+                                      if int(p.get("page", 0)) == intro_page), {})
+                    page_height = page_sizes[intro_page][1]
+                    limit = first_y if intro_page == first_page else 1.0
+                    if limit <= 0.005:
+                        continue
+                    has_content = any(
+                        len(block.get("bbox") or []) == 4
+                        and float(block["bbox"][1]) < limit * page_height
+                        for block in page_data.get("blocks", [])
+                    ) or any(
+                        len(asset.get("bbox") or []) == 4
+                        and float(asset["bbox"][1]) < limit * page_height
+                        for asset in page_data.get("visual_assets", [])
+                    )
+                    if has_content:
+                        intro_spans.append({"page": intro_page, "top": 0.0,
+                                            "bottom": round(limit, 6)})
+                if intro_spans:
                     fragments.append({
                         "id": f"voorstel-intro-{doc['id'][:8]}",
                         "type": "intro",
-                        "page_spans": [{"page": 1, "top": 0.0, "bottom": round(first_y, 6)}],
+                        "page_spans": intro_spans,
                         "question_numbers": question_numbers[:],
                         "status": "automatisch_voorstel_nog_te_controleren",
+                        "confidence": 0.72,
+                        "evidence": {
+                            "reason": "Inleidende examencontext vóór de eerste bevestigde vraag; pagina 1 is uitgesloten.",
+                            "source": "inhoud_voor_vraag_1",
+                        },
                     })
                 for index, (start_page, start_y, number) in enumerate(starts):
                     next_start = starts[index + 1] if index + 1 < len(starts) else (page_count + 1, 0.0, None)
@@ -3452,9 +3483,16 @@ class ExamApp:
                 # Supplement broad question bands with focused, evidence-backed
                 # context proposals around actual PDF figures and their captions.
                 fragments.extend(propose_context_fragments(analysis, candidates))
+        from structure import sort_fragments_reading_order, trim_question_bands_for_contexts
+        if generated_proposals:
+            fragments = trim_question_bands_for_contexts(fragments)
+        fragments = sort_fragments_reading_order(fragments)
         original_structure_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
-        win = tk.Toplevel(self.root); win.title(f"Examenstructuur · {doc['bestand']}"); win.geometry("1280x900")
-        win.transient(self.root)
+        # Reuse the central workbench rather than opening a separate window.
+        self._workspace_container.forget(self._workspace_left)
+        self._workspace_container.forget(self._workspace_right)
+        win = ttk.Frame(self._workspace_container, style="App.TFrame", padding=8)
+        self._workspace_container.add(win, weight=1)
         header = ttk.Frame(win, padding=(12, 8)); header.pack(fill="x")
         ttk.Label(header, text="Eerst de vraagnummering bevestigd; nu context- en vraagfragmenten afbakenen.",
                   font=("Segoe UI", 10, "bold")).pack(anchor="w")
@@ -3587,6 +3625,9 @@ class ExamApp:
             redraw_guides()
         canvas.bind("<Button-1>", on_press); canvas.bind("<B1-Motion>", on_drag)
         def refresh_fragment_list():
+            selected = selected_fragment()
+            selected_id = selected.get("id") if selected else None
+            fragments[:] = sort_fragments_reading_order(fragments)
             for iid in fragment_tree.get_children(): fragment_tree.delete(iid)
             for index, frag in enumerate(fragments):
                 pages = ",".join(str(x["page"]) for x in frag.get("page_spans", []))
@@ -3595,6 +3636,11 @@ class ExamApp:
                 confidence_label = f"{float(confidence):.0%}" if isinstance(confidence, (int, float)) else "—"
                 fragment_tree.insert("", "end", iid=str(index), text=fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), f"Fragment {index+1}"),
                     values=(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), "Onbekend"), pages, links, confidence_label))
+            if selected_id:
+                selected_index = next((i for i, item in enumerate(fragments)
+                                       if item.get("id") == selected_id), None)
+                if selected_index is not None:
+                    fragment_tree.selection_set(str(selected_index))
         def save_structure():
             nonlocal original_structure_signature
             current = selected_fragment()
@@ -3724,8 +3770,14 @@ class ExamApp:
         ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
         def save_and_close():
             if save_structure():
+                self._workspace_container.forget(win)
                 win.destroy()
-        ttk.Button(actions, text="Structuur opslaan en sluiten", command=save_and_close).pack(side="right")
+                self._workspace_container.add(self._workspace_left, weight=3)
+                self._workspace_container.add(self._workspace_right, weight=8)
+                self._workspace_refresh()
+                self._workflow_refresh()
+        ttk.Button(actions, text="Terug naar vraagcontrole", command=save_and_close).pack(side="right", padx=(8, 0))
+        ttk.Button(actions, text="Structuur opslaan", command=save_structure).pack(side="right")
         refresh_fragment_list()
         if fragments: fragment_tree.selection_set("0")
         def jump_question_page(_event=None):
