@@ -3994,6 +3994,7 @@ class ExamApp:
                 try:
                     current["page_spans"] = selection_to_spans()
                 except ValueError as exc:
+                    save_status.set("Niet opgeslagen: controleer de selectie.")
                     messagebox.showerror("Selectie niet opgeslagen", str(exc), parent=win)
                     return False
             new_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
@@ -4001,6 +4002,7 @@ class ExamApp:
             structure = make_exam_structure(doc, fragments, question_numbers)
             errors = validate_exam_structure(structure, doc["id"], doc["sha256"], question_numbers)
             if errors:
+                save_status.set("Niet opgeslagen: controleer de fragmenten.")
                 messagebox.showerror("Structuur niet opgeslagen", "Controleer eerst:\\n" + "\\n".join(errors), parent=win)
                 return False
             selection_dirty = False
@@ -4059,13 +4061,8 @@ class ExamApp:
             try:
                 frag["page_spans"] = selection_to_spans()
                 selection_dirty = True
-                refresh_fragment_list()
-                selected = next(
-                    (i for i, item in enumerate(fragments) if item.get("id") == frag.get("id")),
-                    None,
-                )
-                if selected is not None:
-                    fragment_tree.selection_set(str(selected))
+                # The fragment's label/type/link columns did not change, so
+                # leave the Treeview untouched to avoid a selection event.
                 save_structure()
                 redraw_guides()
             except Exception as exc:
