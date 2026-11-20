@@ -3565,10 +3565,6 @@ class ExamApp:
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
         qlist.pack(fill="x", pady=(2, 8))
         for number in question_numbers: qlist.insert("end", f"Vraag {number}")
-        def set_default_links(*_):
-            qlist.selection_clear(0, "end")
-            # No implicit selection: the user explicitly links each context
-            # to the question(s) it actually introduces.
         # Keep the question links when switching the fragment type.
         # The user may edit both fields independently; changes are saved below.
         ttk.Label(left, text="Bestaande fragmenten").pack(anchor="w", pady=(4, 2))
@@ -4157,7 +4153,7 @@ class ExamApp:
                 captions = evidence.get("captions") or []
                 detail = f"{fragment_type_labels.get(canonical_fragment_type(frag.get('type', '')), 'Fragment')}{certainty}\\n{reason}"
                 if any(int(span.get("page", 0)) == 1 for span in frag.get("page_spans", [])):
-                    detail += "\\nLET OP: dit bestaande fragment bevat een selectie op pagina 1. Die pagina is uit de nieuwe preview verwijderd; verwijder deze oude grens of baken het fragment opnieuw af."
+                    detail += "\\nLET OP: dit bestaande fragment bevat nog een selectie op het verwijderde voorblad. Baken het fragment opnieuw af."
                 if captions:
                     detail += "\\nBijschrift: " + " · ".join(captions[:2])
                 fragment_info.configure(text=detail)
