@@ -16,7 +16,7 @@ from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview
 from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragments, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
-from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
+from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch, exam_completeness_issues
 
 APP_VERSION = "0.17.0"
 PROJECT_FILE = "project.json"
@@ -3470,6 +3470,41 @@ class ExamApp:
         ttk.Button(buttons,text="Vraag bekijken / aanpassen",command=open_selected).pack(side="left")
         ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
 
+    def _review_exam_completeness(self):
+        """Run structural completeness checks and persist the teacher's final confirmation."""
+        issues=exam_completeness_issues(self.data or {})
+        win=tk.Toplevel(self.root); win.title("Volledigheidscontrole")
+        win.geometry("760x560")
+        outer=ttk.Frame(win,padding=14); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text="Automatische structurele controles",
+                  font=("Segoe UI",11,"bold")).pack(anchor="w")
+        ttk.Label(outer,text="Deze controle zoekt onder meer dubbele vraagnummering, ontbrekende vraagfragmenten, losse contextfragmenten, verouderde bronkoppelingen en ontbrekende puntenaantallen.",
+                  wraplength=720).pack(anchor="w",pady=(4,10))
+        report=tk.Text(outer,wrap="word",height=18)
+        report.pack(fill="both",expand=True)
+        if issues:
+            report.insert("1.0","Er zijn nog aandachtspunten:\n\n"+ "\n".join(
+                f"• {item.get('code')} · vraag {item.get('question_number','—')} · document {item.get('document_id','—')} · fragment {item.get('fragment_id','—')}"
+                for item in issues))
+        else:
+            report.insert("1.0","Geen structurele onvolledigheden gevonden. Controleer ook de inhoudelijke volledigheid van de examen-PDF's.")
+        report.configure(state="disabled")
+        def confirm():
+            if issues:
+                messagebox.showwarning("Controle niet compleet",
+                    "Los eerst alle structurele aandachtspunten op. De volledigheidscontrole kan nog niet worden bevestigd.",parent=win)
+                return
+            self.data["completeness_review"]={
+                "status":"visueel_bevestigd","reviewed_at":now(),
+                "question_count":len(self.data.get("vraagrecords",[])),
+                "document_count":len(self.data.get("documenten",[])),
+            }
+            self.save_project()
+            self._log("Structurele volledigheidscontrole bevestigd.")
+            win.destroy()
+        ttk.Button(outer,text="Volledigheid bevestigen",command=confirm,
+                   style="Accent.TButton",state=("disabled" if issues else "normal")).pack(anchor="e",pady=(8,0))
+
     def _review_consolidated_cv(self):
         """Show a traceable, question-ordered composite of the original CV and addenda."""
         records=sorted(self.data.get("vraagrecords",[]),key=lambda r:int(r.get("number",0) or 0))
@@ -3701,6 +3736,8 @@ class ExamApp:
                    command=lambda:open_region("aanvulling")).pack(side="left",padx=6)
         ttk.Button(region_bar,text="Geconsolideerde CV bekijken",
                    command=self._review_consolidated_cv).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="Volledigheid controleren",
+                   command=self._review_exam_completeness).pack(side="left",padx=6)
         buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
         ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
