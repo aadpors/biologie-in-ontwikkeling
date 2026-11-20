@@ -118,3 +118,13 @@ Officiële referenties:
 ### Nog niet afgerond
 
 De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een volledige full-text audit van alle 40 artikelen is nog niet afgerond. Vooral supplementen, statistische onzekerheid, selectiecriteria, modelaannames en eventuele correcties na online-publicatie moeten bij de specialistische kaarten nog worden nagelezen. De inhoudelijke kaarten mogen dus niet worden aangeduid als volledig peer-reviewed door deze website; de bron en de beperkingen blijven leidend.
+
+
+### Nieuwe metadata voor bruikbare selectie
+
+Alle 48 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
+- **Primair onderzoek:** 38 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
+- **Review / synthese:** 8 kaarten, waaronder mini-reviews, reviews en meta-analyses.
+- **Perspectiefartikel:** 2 kaarten.
+
+De oude keuzelijst 'Examenprogramma' is uit het filterpaneel verwijderd. In de data hadden alle wetenschappelijke kaarten de waarde `Beide`, waardoor die keuzelijst geen onderscheid maakte en feitelijk niets filterde. De nieuwe keuzelijst 'Onderzoekstype' maakt wel een inhoudelijk betekenisvol onderscheid. De curriculumrelevantie blijft apart filterbaar.
