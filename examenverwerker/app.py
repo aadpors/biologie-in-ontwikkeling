@@ -296,6 +296,207 @@ class ExamApp:
         self._open_workspaces = {}
         self._refresh_library()
 
+    def _discover_library_projects(self):
+        roots = [self.examens_root, self.user_projects_root, self.app_base / "projecten"]
+        found, seen = [], set()
+        legacy_root = self.app_base / "projecten"
+        for root in roots:
+            if not root.exists():
+                continue
+            try:
+                manifests = sorted(root.rglob(PROJECT_FILE), key=lambda p: p.stat().st_mtime, reverse=True)
+            except OSError:
+                continue
+            for manifest in manifests:
+                folder = manifest.parent
+                try:
+                    resolved = folder.resolve()
+                    if resolved in seen:
+                        continue
+                    if root.resolve() == legacy_root.resolve():
+                        migrated = self.user_projects_root / folder.relative_to(legacy_root)
+                        if migrated.exists() and (migrated / PROJECT_FILE).is_file():
+                            continue
+                    data = json.loads(manifest.read_text(encoding="utf-8"))
+                    if data.get("schema") != "biologie-examenproject-v1":
+                        continue
+                    seen.add(resolved)
+                    meta = data.get("exam_metadata") or {}
+                    updated = data.get("bijgewerkt", "")
+                    try:
+                        updated_label = datetime.fromisoformat(updated).astimezone().strftime("%d-%m-%Y %H:%M") if updated else "—"
+                    except Exception:
+                        updated_label = str(updated)[:16].replace("T", " ") or "—"
+                    found.append({
+                        "folder": folder, "subject": data.get("vak", "Onbekend"),
+                        "level": meta.get("level", ""), "year": str(meta.get("year", "")),
+                        "period": str(meta.get("period", "")), "documents": len(data.get("documenten", [])),
+                        "questions": len(data.get("vraagkandidaten", [])),
+                        "progress": exam_workflow_state(data)["label"], "updated": updated_label,
+                        "archived": bool(data.get("bibliotheek_archief", False)),
+                    })
+                except Exception as exc:
+                    self._log(f"Project overgeslagen in bibliotheek ({folder.name}): {exc}")
+        found.sort(key=lambda row: (row["archived"], row["year"], row["level"],
+                                    row["period"], row["subject"]), reverse=True)
+        return found
+
+    def _refresh_library(self):
+        if not hasattr(self, "library_table"):
+            return
+        rows = self._discover_library_projects()
+        for key, options, label in [
+            ("vak", sorted({r["subject"] for r in rows}, key=str.casefold), "Alle vakken"),
+            ("year", sorted({r["year"] for r in rows if r["year"]}, reverse=True), "Alle jaren"),
+        ]:
+            choices = [label] + options
+            combo = getattr(self, f"_library_{key}_combo", None)
+            if combo:
+                combo.configure(values=choices)
+            if self._library_filters[key].get() not in choices:
+                self._library_filters[key].set(label)
+        for item in self.library_table.get_children():
+            self.library_table.delete(item)
+        self._library_paths = {}
+        filters = {k: v.get() for k, v in self._library_filters.items()}
+        count = 0
+        for row in rows:
+            if filters["vak"] != "Alle vakken" and row["subject"] != filters["vak"]:
+                continue
+            if filters["level"] != "Alle niveaus" and row["level"] != filters["level"]:
+                continue
+            if filters["year"] != "Alle jaren" and row["year"] != filters["year"]:
+                continue
+            if filters["period"] != "Alle tijdvakken" and row["period"] != filters["period"]:
+                continue
+            if filters["archived"] == "Actieve examens" and row["archived"]:
+                continue
+            if filters["archived"] == "Gearchiveerd" and not row["archived"]:
+                continue
+            iid = str(count)
+            self._library_paths[iid] = row["folder"]
+            self.library_table.insert("", "end", iid=iid, values=(
+                row["subject"], row["level"] or "—", row["year"] or "—", row["period"] or "—",
+                row["documents"], row["questions"],
+                ("Archief · " if row["archived"] else "") + row["progress"], row["updated"]))
+            count += 1
+        self.library_status.configure(text=f"{count} examens zichtbaar · {len(rows)} in totaal")
+
+    def _selected_library_folder(self):
+        selection = self.library_table.selection() if hasattr(self, "library_table") else ()
+        return self._library_paths.get(selection[0]) if selection else None
+
+    def _launch_workspace(self, folder, data=None):
+        folder = Path(folder)
+        key = str(folder.resolve())
+        existing = self._open_workspaces.get(key)
+        if existing is not None:
+            try:
+                if existing.root.winfo_exists():
+                    existing.root.deiconify()
+                    existing.root.lift()
+                    existing.root.focus_force()
+                    return existing
+            except tk.TclError:
+                pass
+        try:
+            loaded = data if data is not None else json.loads((folder / PROJECT_FILE).read_text(encoding="utf-8"))
+            if loaded.get("schema") != "biologie-examenproject-v1":
+                raise ValueError("Onbekend examenformaat.")
+            win = tk.Toplevel(self.root)
+            workspace = object.__new__(ExamApp)
+            workspace.__dict__ = self.__dict__.copy()
+            workspace.root = win
+            workspace.project_dir = folder
+            workspace.data = loaded
+            workspace._workspace_owner = self
+            workspace._workspace_key = key
+            workspace._restore_import_batch(folder, loaded)
+            workspace._workspace_load_global_corrections()
+            workspace._build_workspace()
+            workspace.refresh()
+            meta = loaded.get("exam_metadata") or {}
+            title = " · ".join(str(value) for value in [
+                loaded.get("vak", "Examen"), meta.get("level", ""), meta.get("year", ""),
+                f"tijdvak {meta.get('period', '')}".strip()
+            ] if value)
+            win.title(f"Examenverwerking · {title}")
+            def close_workspace():
+                try:
+                    workspace.save_project()
+                except Exception as exc:
+                    workspace._error("Project opslaan bij sluiten", exc)
+                    if not messagebox.askyesno("Opslaan niet gelukt",
+                        "De laatste wijzigingen konden niet worden opgeslagen. Toch sluiten?", parent=win):
+                        return
+                self._open_workspaces.pop(key, None)
+                try:
+                    win.destroy()
+                finally:
+                    self._refresh_library()
+            win.protocol("WM_DELETE_WINDOW", close_workspace)
+            self._open_workspaces[key] = workspace
+            workspace._log("Afzonderlijke verwerkingswerkruimte geopend. De examenbibliotheek blijft beschikbaar.")
+            return workspace
+        except Exception as exc:
+            self._error("Examenverwerking openen", exc)
+            messagebox.showerror("Examen openen mislukt",
+                f"De verwerkingswerkruimte kon niet worden geopend. De projectgegevens zijn niet gewijzigd.\n\n{exc}",
+                parent=self.root)
+            return None
+
+    def _archive_selected_exam(self):
+        folder = self._selected_library_folder()
+        if not folder:
+            messagebox.showinfo("Selecteer een examen", "Selecteer eerst een examen.", parent=self.root)
+            return
+        try:
+            path = folder / PROJECT_FILE
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["bibliotheek_archief"] = not bool(data.get("bibliotheek_archief", False))
+            data["bijgewerkt"] = now()
+            temp = path.with_suffix(".json.tmp")
+            temp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+            temp.replace(path)
+            self._refresh_library()
+        except Exception as exc:
+            self._error("Examen archiveren", exc)
+            messagebox.showerror("Archiveren mislukt", str(exc), parent=self.root)
+
+    def _delete_selected_exam(self):
+        folder = self._selected_library_folder()
+        if not folder:
+            messagebox.showinfo("Selecteer een examen", "Selecteer eerst een examen.", parent=self.root)
+            return
+        if str(folder.resolve()) in self._open_workspaces:
+            messagebox.showwarning("Examen is geopend",
+                "Sluit eerst de bijbehorende verwerkingswerkruimte voordat je dit examen verwijdert.",
+                parent=self.root)
+            return
+        if not messagebox.askyesno("Examen verwijderen",
+            "Het volledige examenproject, inclusief gekopieerde bron-PDF's en controles, wordt naar de herstelbare map 'verwijderd' verplaatst. Doorgaan?",
+            parent=self.root):
+            return
+        try:
+            destination_root = self.user_data_root / "verwijderd"
+            destination_root.mkdir(parents=True, exist_ok=True)
+            destination = destination_root / f"{folder.name}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            shutil.move(str(folder), str(destination))
+            self._refresh_library()
+            self._log(f"Examen verplaatst naar herstelbare map: {destination}")
+        except Exception as exc:
+            self._error("Examen verwijderen", exc)
+            messagebox.showerror("Verwijderen mislukt", str(exc), parent=self.root)
+
+    def open_project(self):
+        """Open the selected exam in its own processing window."""
+        folder = self._selected_library_folder()
+        if folder is None:
+            messagebox.showinfo("Selecteer een examen",
+                "Selecteer eerst een examen in de bibliotheek.", parent=self.root)
+            return
+        self._launch_workspace(folder)
+
     def _build_workspace(self):
         """Build the complete exam-processing workspace in its own window."""
         self.root.title("Examenverwerker")
