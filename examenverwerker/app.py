@@ -3224,7 +3224,7 @@ class ExamApp:
             contexts=record.get("context_fragment_ids",[])
             tree.insert("","end",iid=str(i),values=(
                 record.get("number"),record.get("source_page"),qtype,
-                record.get("status","concept"),", ".join(contexts)
+                record.get("status","concept"),f"{len(contexts)} gekoppeld" if contexts else "geen"
             ))
         def open_selected():
             selection=tree.selection()
@@ -3258,10 +3258,18 @@ class ExamApp:
         text_box=tk.Text(outer,wrap="word",height=20)
         text_box.pack(fill="both",expand=True)
         text_box.insert("1.0",record.get("question_text",""))
-        context_ids=record.get("context_fragment_ids",[])
-        ttk.Label(outer,text=("Gekoppelde contextfragmenten: "+", ".join(context_ids))
-                  if context_ids else "Geen contextfragmenten gekoppeld.",
-                  wraplength=720).pack(anchor="w",pady=(8,4))
+        contexts=record.get("context_fragments",[])
+        context_text="\n\n".join(
+            f"Context {index+1}: {item.get('text') or '[geen uitleesbare tekst; fragment blijft visueel gekoppeld]'}"
+            for index,item in enumerate(contexts)
+        )
+        ttk.Label(outer,text=f"Gekoppelde contextfragmenten: {len(contexts)}",
+                  wraplength=720).pack(anchor="w",pady=(8,2))
+        if context_text:
+            context_box=tk.Text(outer,wrap="word",height=5)
+            context_box.pack(fill="x")
+            context_box.insert("1.0",context_text)
+            context_box.configure(state="disabled")
         def save():
             record["question_text"]=text_box.get("1.0","end").strip()
             record["question_type"]=type_var.get()
