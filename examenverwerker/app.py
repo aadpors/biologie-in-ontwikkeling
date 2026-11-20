@@ -3745,9 +3745,16 @@ class ExamApp:
                 if not asset_path.is_file() or (expected and sha256(asset_path)!=expected):
                     issues.append({"code":"contextuitsnede_ontbreekt_of_gewijzigd",
                                    "record_id":record.get("id"),"question_number":record.get("number")})
-        point_values=[float((r.get("exam") or {}).get("points"))
-                      for r in (self.data or {}).get("vraagrecords",[])
-                      if (r.get("exam") or {}).get("points") not in (None,"")]
+        point_values=[]
+        for record in (self.data or {}).get("vraagrecords",[]):
+            raw_points=(record.get("exam") or {}).get("points")
+            if raw_points in (None,""):
+                continue
+            try:
+                point_values.append(float(raw_points))
+            except (TypeError,ValueError):
+                issues.append({"code":"ongeldig_puntenaantal",
+                               "record_id":record.get("id"),"question_number":record.get("number")})
         total_points=sum(point_values)
         win=tk.Toplevel(self.root); win.title("Volledigheidscontrole")
         win.geometry("760x560")
