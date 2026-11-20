@@ -784,6 +784,7 @@ class ExamApp:
             "documenttype": ("Documenttype bevestigen", self.correct_type),
             "metadata": ("Examengegevens bevestigen", self.edit_exam_metadata),
             "vraagstarts": ("Vraagstarts beoordelen", self.show_candidates),
+            "ontbrekende_vragen": ("Vraagstarts handmatig toevoegen", self._workspace_start_manual_mark),
             "opgaven_fragmenten": ("Context- en vraagfragmenten", self.edit_exam_structure),
             "vraaganalyse": ("Vraagtype en punten controleren", self.show_records),
             "uitwerkbijlage_starts": ("Vraagstarts uitwerkbijlage analyseren", lambda: self.analyze_auxiliary_starts("uitwerkbijlage")),
@@ -2845,6 +2846,16 @@ class ExamApp:
 
         tree.bind("<<TreeviewSelect>>", show_selected)
         ttk.Button(footer, text="Originele pagina", command=inspect_original).pack(side="right", padx=4)
+        if not (rows and rows[0].get("auxiliary_document_role")):
+            def add_missing_question():
+                target_doc=document_id or getattr(self,"_workspace_doc_id",None)
+                if target_doc:
+                    self._workspace_doc_id=target_doc
+                    self._workspace_refresh()
+                win.destroy()
+                self._workspace_start_manual_mark()
+            ttk.Button(footer,text="Vraagstart handmatig toevoegen",
+                       command=add_missing_question).pack(side="left",padx=4)
         ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record,
                    state=("disabled" if rows and rows[0].get("auxiliary_document_role") else "normal")).pack(side="right", padx=4)
         ttk.Button(footer, text="Geen vraag", command=lambda: decide(False)).pack(side="right", padx=4)
