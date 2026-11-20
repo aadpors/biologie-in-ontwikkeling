@@ -2010,7 +2010,12 @@ class ExamApp:
                 manifest = {"schema": "biologie-examenimport-v1", "aangemaakt": now(), "projecten": []}
                 for key, items in sorted(groups.items()):
                     level_key, year_key, period_key = key
-                    project_name = f"{level_key}-tijdvak-{period_key}"
+                    subject_slug = re.sub(r"[^a-z0-9]+", "-", subject.lower()).strip("-") or "vak"
+                    project_name = (
+                        f"{level_key}-tijdvak-{period_key}"
+                        if subject.lower() == "biologie"
+                        else f"{subject_slug}-{level_key}-tijdvak-{period_key}"
+                    )
                     year_dir = target_root / year_key
                     if not year_dir.exists():
                         year_dir.mkdir(parents=True)
