@@ -2,27 +2,33 @@
 
 Een zelfstandige Windows-applicatie om examen-PDF's vakoverstijgend te verwerken. De basisworkflow is bedoeld voor onder meer biologie, aardrijkskunde en andere schoolvakken. Vakinhoudelijke publicatie- of beoordelingsvelden worden niet tijdens de fragmentselectie afgedwongen.
 
-## Werkwijze
+## Verwerkingsworkflow
 
-1. Kies **Examens importeren** en selecteer de PDF's van één vak. Vul bij de vraag naar het vak bijvoorbeeld *Biologie* of *Aardrijkskunde* in.
-2. Controleer de voorgestelde documenttypen en examenmetadata. De applicatie groepeert examens op niveau, jaar en tijdvak. De vaknaam wordt in de projectmap opgenomen, zodat vakken elkaar niet overschrijven.
-3. Laat de vraagstarts analyseren. Bevestig, wijs af of markeer twijfel. Voeg ontbrekende vraagstarts zo nodig handmatig toe.
-4. Open **Structuur bewerken**. Er zijn precies twee fragmenttypen:
-   - **Context**: tekst, afbeelding, tabel of ander materiaal dat bij één of meer vragen hoort.
-   - **Vraag**: de vraag vanaf de vraagstart tot de eerstvolgende witregel of kadergrens (wat het eerst komt). Controleer en corrigeer de voorgestelde grens.
-5. Koppel contextfragmenten aan de juiste vragen. Fragmenten mogen over meerdere pagina's lopen. De oorspronkelijke PDF wordt niet aangepast.
-6. Klik op **Fragmenten klaar**. Daarna bepaalt het programma automatisch de vraagtypen op basis van de gekozen vraagfragmenten en maakt het per vraag een eenvoudig conceptrecord met vraagnummer, vraagtekst, vraagtype en gekoppelde context. Er is geen aparte knop om vraagrecords te maken.
-7. Bekijk zo nodig **Eindcontrole** om de vraagtekst of het vraagtype eenvoudig aan te passen.
-8. Kies **Exportpakket** voor een overdraagbaar conceptexportbestand. Het pakket bevat de conceptvragen, fragmentstructuur en bron-PDF's. Dit is geen automatische publicatie naar een website.
+De examenbibliotheek is het hoofdvenster. Elk geopend examen krijgt een eigen verwerkingsvenster; de bibliotheek blijft open en meerdere examens kunnen naast elkaar worden verwerkt.
+
+1. **Documenteigenschappen** — bepaal op basis van bestandsnaam en eerste PDF-pagina het vak, niveau, jaar, tijdvak en documenttype. Bevestig de documenttypen: opgaven (`-o`), correctievoorschrift (`-c`), aanvulling CV (`-a`) en uitwerkbijlage (`-u`).
+2. **Vraagstarts opgaven** — detecteer vraagstarts automatisch; beoordeel kandidaten, wijs onterechte signalen af en voeg ontbrekende vraagstarts handmatig toe.
+3. **Context- en vraagfragmenten** — gebruik de opgeslagen visuele fragmentgrenzen en contextkoppelingen. Een eerder gecontroleerde structuur wordt niet opnieuw ter bevestiging voorgelegd.
+4. **Vraaganalyse** — maak automatisch conceptrecords vanuit de bevestigde vraagfragmenten. Controleer per vraag de vraagtekst, het vraagtype, het puntenaantal en de antwoordopties.
+5. **Vraagstarts uitwerkbijlage** — detecteer en beoordeel de vraagankers; bevestig expliciet wanneer er geen afzonderlijke ankers zijn.
+6. **Uitwerkbijlagefragmenten** — baken de relevante delen per vraag af in de originele PDF.
+7. **Vraagstarts correctievoorschrift** — detecteer en beoordeel de vraagankers in het officiële correctievoorschrift.
+8. **CV-fragmenten** — baken per vraag alle beoordelingsregels en punten af. Dezelfde visuele uitsnij- en samenvoegtechniek wordt gebruikt als bij de opgaven.
+9. **Aanvulling CV** — classificeer per vraag toevoeging, wijziging, vervanging, intrekking of ongewijzigd. Bekijk daarna de samengestelde, herleidbare CV-weergave. Bron-CV en aanvulling blijven afzonderlijk en ongewijzigd.
+10. **Correcte antwoorden** — controleer de antwoordsleutel, ook voor ja/nee-, waar/onwaar-, hoger/lager- en meer/minder-vraagvormen.
+11. **Volledigheid** — controleer dubbele of ontbrekende vraagnummering, fragmenten, contextkoppelingen, bronintegriteit en puntenaantallen.
+12. **Definitieve uitsneden** — genereer vraag- en contextuitsneden pas nadat de grenzen zijn vastgelegd. Witruimte aan boven- en onderzijde wordt op basis van de feitelijke beeldinhoud verwijderd; de broncoördinaten blijven behouden.
+13. **Visuele eindcontrole** — controleer per vraag de originele opgavenpagina's, contextfragmenten, vraag, opties, uitwerkbijlage, CV en eventuele aanvulling. Herstelacties openen de betreffende editor; de eindcontrole keert terug naar dezelfde vraag.
 
 ## Ontwerpkeuzes
 
-- De vraagtypeanalyse gebruikt de opgeslagen, geselecteerde vraagfragmenten. De oorspronkelijke PDF wordt niet opnieuw gebruikt om vraaggrenzen of vraaginhoud te bepalen.
-- Bij bestaande projecten met eerder gecontroleerde fragmenten vult de applicatie ontbrekende fragmenttekst automatisch aan binnen de al opgeslagen grenzen. De fragmenten hoeven niet opnieuw te worden afgevinkt.
-- Bij een scan zonder uitleesbare tekst wordt het vraagtype als onbekend gemarkeerd; het programma verzint geen tekst of antwoordopties.
-- Het programma maakt geen onnodige biologische metadata aan voor andere vakken.
-- Biologie-specifieke correctietools worden alleen bij een biologieproject getoond.
-- Originele PDF's blijven ongewijzigd. Exportbestanden worden niet over bestaande bestanden heen geschreven.
+- Ingebedde PDF-tekst wordt eerst gebruikt. OCR wordt niet standaard over alle pagina's uitgevoerd; bij beeldvragen zonder bruikbare tekst blijft het vraagtype onbekend totdat het visueel is beoordeeld.
+- Automatische detecties zijn voorstellen. Alleen expliciet bevestigde vraagstarts, fragmenten, antwoorden en eindcontroles tellen als gecontroleerd.
+- Vraagtype en punten worden uitsluitend bepaald vanuit het bevestigde vraagfragment, niet vanuit opnieuw gedetecteerde vraaggrenzen.
+- Bestaande lokaal gecontroleerde fragmentgrenzen blijven behouden. Er worden geen extra vinkrondes voor dezelfde grenzen toegevoegd.
+- Uitsneden worden rechtstreeks uit de originele PDF gerenderd. Opgaven, correctievoorschrift, aanvullingen en uitwerkbijlagen blijven als bronbestanden ongewijzigd.
+- Wijzigingen aan bronfragmenten maken afgeleide controles opnieuw ongeldig. De applicatie gebruikt bronhashes en review-fingerprints om verouderde goedkeuringen te herkennen.
+- De export is een afzonderlijk gecontroleerd pakket; er wordt niets automatisch naar de live website gepubliceerd.
 
 ## Installeren en starten
 
