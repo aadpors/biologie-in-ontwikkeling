@@ -5018,8 +5018,8 @@ class ExamApp:
             messagebox.showerror("CV-bron gewijzigd", "De oorspronkelijke CV-PDF ontbreekt of is gewijzigd. Voeg het juiste bestand opnieuw toe voordat je grenzen vastlegt.")
             return
         role = cv_doc.get("type_voorstel", "correctievoorschrift")
-        if role not in ("correctievoorschrift", "aanvulling"):
-            messagebox.showerror("Verkeerd documenttype", "Kies een correctievoorschrift of officiële aanvulling.")
+        if role not in ("correctievoorschrift", "aanvulling", "uitwerkbijlage"):
+            messagebox.showerror("Verkeerd documenttype", "Kies een correctievoorschrift, officiële aanvulling of uitwerkbijlage.")
             return
         try:
             analysis = analyze_pdf(source)
@@ -5029,12 +5029,15 @@ class ExamApp:
             self._error("CV-pagina's voorbereiden", exc)
             return
         question_number = int(record["number"])
-        all_regions = self.data.setdefault("cv_regions", {})
+        region_store_key = "uitwerkbijlage_regions" if role == "uitwerkbijlage" else "cv_regions"
+        all_regions = self.data.setdefault(region_store_key, {})
         doc_regions = all_regions.setdefault(cv_doc["id"], {})
         existing = doc_regions.get(str(question_number), {})
         spans = [dict(x) for x in existing.get("page_spans", [])]
         win = tk.Toplevel(self.root)
-        win.title(f"{'CV-aanvulling' if role == 'aanvulling' else 'Correctievoorschrift'} · vraag {question_number}")
+        role_title = {"aanvulling": "CV-aanvulling", "uitwerkbijlage": "Uitwerkbijlage",
+                      "correctievoorschrift": "Correctievoorschrift"}[role]
+        win.title(f"{role_title} · vraag {question_number}")
         win.geometry("1120x850")
         win.transient(self.root)
         ttk.Label(win, text=f"Bak de volledige beoordelingsinformatie voor vraag {question_number} af in {cv_doc['bestand']}.",
@@ -5144,7 +5147,7 @@ class ExamApp:
                 if errors:
                     raise ValueError("Controleer de CV-afbakening: " + ", ".join(errors))
                 segments = page_spans_to_segments(spans, page_sizes)
-                prefix = "cv-amend" if role == "aanvulling" else "cv"
+                prefix = "uitwerkbijlage" if role == "uitwerkbijlage" else ("cv-amend" if role == "aanvulling" else "cv")
                 name = f"{prefix}-{cv_doc['id']}-q{question_number}-handmatig.png"
                 target = self.project_dir / "snippets" / name
                 render_composite_crops(source, segments, target, scale=1.35)
