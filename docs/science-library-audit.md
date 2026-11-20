@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 48 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 51 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 48 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 51 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -26,10 +26,10 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | Stofwisseling van het organisme | s7, s26, s27, s39, s45, s47 | 6 |
 | Zelforganisatie van het organisme | s8, s15, s17, s34 | 4 |
 | Zelfregulatie van het organisme | s9, s14, s18, s24, s25, s30, s46 | 7 |
-| DNA-replicatie en celcyclus | s10, s31 | 2 |
+| DNA-replicatie en celcyclus | s10, s31, s49 | 3 |
 | Eiwitsynthese en genexpressie | s11, s32 | 2 |
-| Gedrag en voortplanting | s12, s22 | 2 |
-| Evolutie van eukaryote cellen | s35 | 1 |
+| Gedrag en voortplanting | s12, s22, s50 | 3 |
+| Evolutie van eukaryote cellen | s35, s51 | 2 |
 | Erfelijke eigenschappen en overerving | s36, s38, s43 | 3 |
 
 De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inhoudelijk ook aan andere thema's raken; de tags en curriculumkoppelingen leggen die nevenrelaties vast.
@@ -46,6 +46,9 @@ De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inho
 | s46 | Nierfunctie, ADH en waterterugresorptie | Vult de fysiologie van uitscheiding en waterbalans aan met experimenteel mechanistisch onderzoek in muizen. |
 | s47 | Fotosynthese, droogte en stikstof | Biedt een brede synthese van 84 studies en 1.247 waarnemingen over koolstofopname en -verdeling in planten. |
 | s48 | FXR–YAP, celidentiteit en leverhomeostase | Verbindt moleculaire interactie, genregulatie, celdifferentiatie en weefselintegriteit. |
+| s49 | Mitotische controle en chromosomale instabiliteit | Versterkt het onderbelichte thema celcyclus, mitose en correcte chromosoomverdeling; onderscheidt celmodellen van klinische behandeling. |
+| s50 | Neurale circuits voor ouderlijk zorggedrag | Verbreedt gedrag en voortplanting van balts en populatiedynamiek naar ouderlijke zorg, motivatie en contextafhankelijke hersenregulatie. |
+| s51 | Genoverdracht en microbiële associaties tijdens eukaryogenese | Combineert met s35 de experimentele isolatie van moderne verwanten met een fylogenomische reconstructie van genoverdracht tijdens het ontstaan van eukaryote cellen. |
 
 ## Bestaande kaarten inhoudelijk aangescherpt
 
@@ -69,4 +72,76 @@ Dubbele records van publicaties die al als s9, s10 en s12 aanwezig waren, zijn n
 
 ## Resterende prioriteiten
 
-De verdeling is breder, maar de bibliotheek is nog geen volledige dekking van alle biologie. Relatief smal vertegenwoordigd blijven onder meer gedrag/voortplanting, genexpressie, DNA-replicatie/celcyclus en enkele evolutionaire thema's. Ook menselijke transportfysiologie en planttransport kunnen verder worden versterkt. Nieuwe toevoegingen moeten deze hiaten gericht vullen, zonder de bibliotheek te laten domineren door specialistische moleculaire publicaties.
+De verdeling is breder, maar de bibliotheek is nog geen volledige dekking van alle biologie. Gedrag/voortplanting en DNA-replicatie/celcyclus zijn elk uitgebreid tot drie kaarten, maar blijven kleiner dan de brede ecologie-, stofwisselings- en zelfregulatiethema's. Genexpressie en de evolutionaire overgang naar meercelligheid blijven relatief dun vertegenwoordigd. Ook menselijke transportfysiologie en planttransport kunnen verder worden versterkt. Nieuwe toevoegingen moeten deze hiaten gericht vullen, zonder de bibliotheek te laten domineren door specialistische moleculaire publicaties.
+
+
+## Tweede controle: bronmetadata en curriculumkoppelingen
+
+### Bibliografische broncontrole van de oorspronkelijke kaarten
+
+Voor de oorspronkelijke kaarten s1–s40 zijn DOI, publicatietitel en publicatiedatum opnieuw vergeleken met de uitgeverspagina en/of PubMed. De samenvatting en het beschreven onderzoekstype zijn op abstractniveau gecontroleerd. Een abstractcontrole is nadrukkelijk niet hetzelfde als een volledige kritische herlezing van alle methodes, supplementen en statistische analyses; die blijft nodig waar een lesclaim afhankelijk is van details uit de volledige tekst.
+
+Daarbij zijn onder meer de volgende interpretatiegrenzen expliciet behouden:
+- s2: de circa 70.000 genetisch gebarcodeerde lijnen betreffen *Bacteroides thetaiotaomicron* in muismodellen; niet een longitudinale interventie bij mensen.
+- s4: dit is een reviewartikel over experimentele modellen en evolutionaire overgangen, geen nieuw experiment.
+- s14: de humane hormoonprofielen zijn afkomstig van tien gezonde deelnemers; de simulaties zijn modeluitkomsten en geen stressinterventies bij patiënten.
+- s18: de studie vergelijkt verklaringen voor taksterfte in een specifieke savanne; de uitkomst is niet zonder meer naar alle boomsoorten of ecosystemen te generaliseren.
+- s19: associaties tussen microbiële netwerken, enzymactiviteit en stikstofbeschikbaarheid worden niet als bewezen afzonderlijke causale routes gepresenteerd.
+- s22: de studie is langjarig observationeel; afnemende voorspelbaarheid van de voedselpiek is niet hetzelfde als een aangetoonde verschuiving van het gemiddelde.
+- s23: de experimentele test bij *C. elegans* en de evolutionaire modelverklaring zijn afzonderlijk beschreven.
+- s25: de fysiologische tijdlijn is gereconstrueerd uit cross-sectionele laboratoriumgegevens; de gegevens zijn niet longitudinaal bij dezelfde personen verzameld.
+- s26 en s28: voorspellende proteomische signalen en microbiome-associaties zijn geen bewijs dat de gevonden markers of microbiële patronen op zichzelf ziekte veroorzaken.
+- s29: CAR-T-resultaten zijn preklinisch en vormen geen klinisch bewijs voor werkzaamheid of veiligheid.
+- s33 en s34: de nieuwe methoden brengen interacties in weefsel in kaart; nieuwe interacties zijn niet automatisch functioneel bewezen.
+- s36–s38: perspectief- en reviewartikelen zijn niet als primair effectonderzoek geclassificeerd.
+- s39 en s40: reviewartikelen zijn onderscheiden van nieuw experimenteel bewijs.
+
+### Correcties in de curriculumkoppelingen
+
+De havo- en vwo-versie 2 van de SLO-conceptexamenprogramma's zijn afzonderlijk gebruikt. De nummering is niet uitwisselbaar: havo en vwo hebben verschillende subdomeincodes, ook wanneer de titel van het subdomein gelijk is.
+
+Gecorrigeerd zijn onder meer:
+- s4: de verwijzing naar de oude code F4 is verwijderd; de kaart blijft gekoppeld aan vwo O6 en P6 in de huidige syllabusverwijzing.
+- s10 en s31: DNA-replicatie/celcyclus gekoppeld aan havo B5 en vwo B6 (celcyclus en reproductie van erfelijk materiaal), niet aan B2/B3.
+- s14: hormonale homeostase gekoppeld aan havo B8 en vwo B9 (CE), niet aan de SE-CE-subdomeinen voor afweer.
+- s18: stomatale regulatie niet langer onterecht onder de afweer-subdomeinen B6/B7 geplaatst; de v2-aansluiting is als indirect benoemd.
+- s22: gedrag en voortplanting gesplitst naar havo B7/B4 en vwo B8/B5; ook het verschil in huidige CE/SE-status van O9 is expliciet gemaakt.
+- s24 en s25: voortplanting en hormonale homeostase afzonderlijk gekoppeld aan B4/B5 en B8/B9.
+- s26 en s27: cellulaire stofwisseling (B2/B3) onderscheiden van hormonale regulatie en homeostase (B8/B9).
+- s29 en s30: de vwo-koppelingen voor afweer, gedrag en zenuwstelsel zijn onderscheiden.
+- s32: genexpressie/eiwitsynthese (B2/B3) onderscheiden van de celcyclus (B5/B6).
+- s34: celcyclus/celdifferentiatie en afweerinteracties afzonderlijk gekoppeld.
+- s39 en s45: uitwisseling, transport, vertering en resorptie gekoppeld aan de SE-subdomeinen havo B3 en vwo B4, naast de relevante cellulaire stofwisseling.
+- s46: uitscheiding/transport (havo B3, vwo B4) onderscheiden van hormonale regulatie (havo B8, vwo B9).
+
+Officiële referenties:
+- [SLO conceptexamenprogramma biologie havo, versie 2 (maart 2026)](https://www.slo.nl/publish/pages/22459/conceptexamenprogramma-biologie-havo-versie-2.pdf)
+- [SLO conceptexamenprogramma biologie vwo, versie 2 (maart 2026)](https://www.slo.nl/publish/pages/22463/conceptexamenprogramma-biologie-vwo-versie-2.pdf)
+
+### Nog niet afgerond
+
+De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een volledige full-text audit van alle 40 artikelen is nog niet afgerond. Vooral supplementen, statistische onzekerheid, selectiecriteria, modelaannames en eventuele correcties na online-publicatie moeten bij de specialistische kaarten nog worden nagelezen. De inhoudelijke kaarten mogen dus niet worden aangeduid als volledig peer-reviewed door deze website; de bron en de beperkingen blijven leidend.
+
+
+### Nieuwe metadata voor bruikbare selectie
+
+Alle 50 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
+- **Primair onderzoek:** 40 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
+- **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
+- **Perspectiefartikel:** 2 kaarten.
+
+De oude keuzelijst 'Examenprogramma' is uit het filterpaneel verwijderd. In de data hadden alle wetenschappelijke kaarten de waarde `Beide`, waardoor die keuzelijst geen onderscheid maakte en feitelijk niets filterde. De nieuwe keuzelijst 'Onderzoekstype' maakt wel een inhoudelijk betekenisvol onderscheid. De curriculumrelevantie blijft apart filterbaar.
+
+
+### Aanvullingen na de tweede controle
+
+- **s7:** de samenvatting maakt nu onderscheid tussen toegenomen vegetatieve groei/biomassa en korrelopbrengst. In de veldproef nam de korrelopbrengst per plant niet significant toe.
+- **s20:** de DOI-resolver en Oxford Academic koppelen de DOI aan de kaarttitel. Een andere tijdschriftindexpagina toont dezelfde DOI bij een andere titel. De kaart gebruikt daarom de DOI-resolverende Oxford Academic-pagina en markeert de conflicterende indexvermelding als metadata-anomalie.
+- **s49:** nieuw primair onderzoek naar het SKA-complex, mitotische controle en chromosomale instabiliteit; expliciet als celmodelonderzoek, niet als klinische behandelstudie.
+- **s50:** nieuwe review over neurale circuits voor ouderlijk zorggedrag; mechanistische bevindingen uit knaagdiermodellen worden niet rechtstreeks naar mensen vertaald.
+
+- **s1 en s2:** de havo- en vwo-codes voor erfelijkheid/selectie zijn nu ook in het korte subdomeinveld expliciet gescheiden (havo B5, vwo B6).
+- **s33:** de niet-onderbouwde verwijzing naar de afweer-subdomeinen B6/B7 is verwijderd; de kaart is beperkt tot de inhoudelijke aansluiting bij cellulaire interacties.
+- **s35:** de v2-koppeling voor cellulaire organisatie is in het korte subdomeinveld gelijkgetrokken met de nadere toelichting: havo B2 en vwo B3.
+
+- **s51:** een fylogenomische reconstructie van genoverdracht en microbiële associaties tijdens eukaryogenese toegevoegd als complement van s35. De voorgestelde interacties zijn als evolutionaire inferenties gemarkeerd, niet als rechtstreeks waargenomen symbiose.

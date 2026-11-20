@@ -27,7 +27,45 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  pull-requests: read
 jobs:
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    outputs:
+      exam: ${{ steps.filter.outputs.exam }}
+    steps:
+      - name: Detect whether exam files changed
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filters: |
+            exam:
+              - 'examenoefenen.html'
+              - 'exam-mcq.json'
+              - 'exam-open.json'
+              - 'exam-contexts.json'
+              - 'exam-snippets/**'
+              - 'examens/**'
+              - 'examenverwerker/**'
+              - 'scripts/extract-binary-cv-text.py'
+              - 'scripts/extract-mcq-questions.py'
+              - 'scripts/fix-ha25t1-q34.py'
+              - 'scripts/fix-mcq-options.py'
+              - 'scripts/fix-open-question-crops.py'
+              - 'scripts/render-cv-snippets.py'
+              - 'scripts/render-exam-snippets.py'
+              - 'scripts/restore-exam-rubricering.py'
+              - 'scripts/trim-question-image-edges.py'
+              - 'scripts/validate-exam-snippets.py'
+              - 'scripts/exam-rubricering.json'
+              - 'scripts/exam-snippets.json'
+              - 'scripts/cv-snippets.json'
+              - 'tests/examenoefenen-browser-test.cjs'
+              - 'supabase/functions/inventory-exam-upload/**'
+              - 'supabase/migrations/**'
+
   validate:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
@@ -71,7 +109,8 @@ jobs:
           NODE
 
   reprocess:
-    if: github.event_name == 'pull_request'
+    needs: changes
+    if: github.event_name == 'pull_request' && needs.changes.outputs.exam == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -116,7 +155,8 @@ jobs:
           retention-days: 14
 
   browser-practical:
-    if: github.event_name == 'pull_request'
+    needs: changes
+    if: github.event_name == 'pull_request' && needs.changes.outputs.exam == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -162,3 +202,43 @@ jobs:
           exit 1
       - name: Exercise the old exam route in Chromium
         run: node tests/examenoefenen-browser-test.cjs
+
+
+  homepage-browser:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out commit under review
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve the homepage under review
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/homepage-site.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/homepage-site.log
+          exit 1
+      - name: Test homepage search, filters and responsive layout in Chromium
+        run: node tests/homepage-browser-test.cjs
+      - name: Upload homepage screenshots for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-search-filter-browser-review
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 7

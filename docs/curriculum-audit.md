@@ -62,7 +62,7 @@ De volgende publicaties zijn opnieuw geformuleerd om schoolsoortspecifieke codes
 
 ## Status 21 november 2026
 
-De wetenschappelijke bibliotheek is opnieuw geïnventariseerd en inhoudelijk heringedeeld. De 40 oorspronkelijke kaarten zijn beoordeeld op thema, niveau, onderzoekssoort, bewijssterkte, curriculumrelatie en interne consistentie. De bibliotheek bevat nu 48 wetenschappelijke kaarten. Acht nieuwe publicaties vullen aantoonbare hiaten aan; enkele bestaande kaarten zijn inhoudelijk of curriculair gecorrigeerd.
+De wetenschappelijke bibliotheek is opnieuw geïnventariseerd en inhoudelijk heringedeeld. De 40 oorspronkelijke kaarten zijn beoordeeld op thema, niveau, onderzoekssoort, bewijssterkte, curriculumrelatie en interne consistentie. De bibliotheek bevat nu 51 wetenschappelijke kaarten. Elf nieuwe publicaties vullen aantoonbare hiaten aan; enkele bestaande kaarten zijn inhoudelijk of curriculair gecorrigeerd.
 
 Belangrijke correcties:
 - s9: koppeling aan havo B8 en vwo B9 consequent gemaakt.
@@ -71,6 +71,9 @@ Belangrijke correcties:
 - s35: afzonderlijk thema 'Evolutie van eukaryote cellen'; uitsluitend vwo en aansluitend, niet langer ten onrechte als directe uitwerking van het ontstaan van het eerste leven gepresenteerd.
 - s20: artikelverwijzing gekoppeld aan de officiële Oxford Academic-publicatiepagina.
 - s44: exacte publicatietitel hersteld.
+- s49: mitotische controle en chromosomale instabiliteit toegevoegd als gerichte aanvulling op celcyclus en chromosoomverdeling.
+- s50: neurale circuits voor ouderlijk zorggedrag toegevoegd als aanvulling op gedrag en voortplanting.
+- s51: fylogenomisch onderzoek naar genoverdracht en microbiële associaties tijdens eukaryogenese toegevoegd naast de cultuur- en isolatiestudie s35.
 
 De huidige syllabus 2027 en het conceptprogramma v2 blijven afzonderlijk beschreven. Havo- en vwo-codes worden niet uitwisselbaar gebruikt. Bewijssterkte, bron-/publicatiekwaliteit en curriculumrelevantie zijn afzonderlijke beoordelingen.
 

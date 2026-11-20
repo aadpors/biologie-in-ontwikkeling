@@ -8,7 +8,7 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Moleculaire interactie",
-    "subdomain": "Huidig: M4 Moleculaire interactie (havo SE, vwo CE) en P3 Interactie in ecosystemen (CE). Concept v2: B1 Biodiversiteit en verbondenheid van leven; B5 Erfelijkheid en voortbestaan van leven.",
+    "subdomain": "Huidig havo: M4 Moleculaire interactie (SE) en P3 Interactie in ecosystemen (CE); vwo: M4 Moleculaire en cellulaire interactie (CE) en P3 Interactie in ecosystemen (CE). Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B5 Erfelijkheid en voortbestaan van leven; vwo B1 en B6.",
     "alignment": "Huidig (syllabus 2027): M4 Moleculaire interactie (havo SE; vwo CE) en P3 Interactie in ecosystemen (havo/vwo CE). De casus verbindt CRISPR-Cas, virussen en microbiële gemeenschappen; de nadruk op ecosysteeminteracties maakt P3 passend. Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B5 Erfelijkheid en voortbestaan van leven; vwo B1 en B6. De koppeling aan erfelijkheid betreft de evolutionaire dynamiek van CRISPR-targeting, niet het aanleren van CRISPR als examenstof.",
     "evidence": "Primair onderzoek",
     "article": "https://www.nature.com/articles/s41564-026-02480-7",
@@ -21,7 +21,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Raakt aan moleculaire interactie en biodiversiteit, maar de grootschalige CRISPR-analyses in microbiële gemeenschappen gaan duidelijk verder dan de examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s2",
@@ -32,7 +33,7 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Selectie en genetische variatie",
-    "subdomain": "Huidig: M8 Selectie (DNA, mutatie, recombinatie en variatie; CE havo/vwo). Concept v2: B5 Erfelijkheid en voortbestaan van leven; B1 Biodiversiteit en verbondenheid van leven.",
+    "subdomain": "Huidig havo/vwo: M8 Selectie (CE), met DNA, mutatie, recombinatie en genetische variatie. Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B5 Erfelijkheid en voortbestaan van leven; vwo B1 en B6.",
     "alignment": "Huidig (syllabus 2027): M8 Selectie (havo/vwo CE), met daarnaast P3 Interactie in ecosystemen als ecologische context. Conceptprogramma v2: B1 Biodiversiteit en verbondenheid van leven (havo/vwo), plus havo B5 respectievelijk vwo B6 Erfelijkheid en voortbestaan van leven. De studie gaat over evolutie en overdracht van een darmbacterie tussen gastheren; de microbiële ecologie is context, niet een volledige representatie van menselijke darmfysiologie.",
     "evidence": "Primair onderzoek",
     "article": "https://www.sciencedirect.com/science/article/pii/S1931312826003847",
@@ -44,7 +45,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit rechtstreeks aan bij genetische variatie, mutatie en selectie; de overdracht tussen muizen is een concrete evolutionaire context.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s3",
@@ -67,7 +69,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "De interactiestructuur van ecosystemen sluit direct aan bij voedselrelaties, biodiversiteit en ecosysteemwerking.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s4",
@@ -78,8 +81,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Ontstaan en evolutie van meercellig leven",
-    "subdomain": "Huidig vwo: O6 Zelforganisatie van het organisme (SE) en P6 Ontstaan van het leven (SE). Conceptprogramma v2: B1 Biodiversiteit en verbondenheid van leven en B2 Cellen en meercellige organismen.",
-    "alignment": "Huidig (syllabus 2027): vwo O6 Zelforganisatie van het organisme (SE) en P6 Ontstaan van het leven (SE; dit is de nieuwe syllabusnummering, voorheen F4). De studie bespreekt experimentele modellen voor de overgang naar meercelligheid en is vooral docentverdieping. Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B2 Cellen en meercellige organismen; vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De koppeling is inhoudelijk en niet gelijk aan een-op-een examenstof.",
+    "subdomain": "Huidig vwo: O6 Zelforganisatie van het organisme (SE) en P6 Ontstaan van het leven (SE). Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B2 Cellen en meercellige organismen; vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen.",
+    "alignment": "Huidig (syllabus 2027): vwo O6 Zelforganisatie van het organisme (SE) en P6 Ontstaan van het leven (SE). Het betreft een review van onderzoek naar de evolutionaire overgang naar meercelligheid, vooral geschikt als docentverdieping. Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B2 Cellen en meercellige organismen; vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De koppeling is inhoudelijk en niet gelijk aan een-op-een examenstof.",
     "evidence": "Reviewartikel",
     "article": "https://www.nature.com/articles/s41586-026-11038-w",
     "doi": "10.1038/s41586-026-11038-w",
@@ -90,7 +93,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Geeft verdieping bij het ontstaan van meercelligheid en taakverdeling tussen cellen; de evolutionaire details gaan verder dan de vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "e1",
@@ -180,7 +184,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "Verbindt afweer met microbiële interacties en stress, maar de specifieke koraal-bacteriesymbiose is vooral een contextuele uitbreiding.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s6",
@@ -204,14 +209,15 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Laat voedselrelaties en interacties tussen soorten zien en sluit aan bij de regulatie en dynamiek van ecosystemen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s7",
     "page": "science",
     "date": "2026-10-26",
     "title": "Single-cell multi-omics reveals distinct regulatory architectures coordinating carbon assimilation and cyclic electron flow in maize C4 photosynthesis",
-    "summary": "Met single-nucleus RNA-seq, ATAC-seq en functionele experimenten onderzochten onderzoekers hoe in C4-maïs koolstofassimilatie en cyclische elektronenstroom in bundelschedecellen genetisch worden gereguleerd. Een DOF-transcriptiefactor stimuleerde NDH-gerelateerde genexpressie, cyclische elektronenstroom, het ATP-gehalte en de fotosynthetische prestaties; transgene planten groeiden in veldproeven sterker.",
+    "summary": "Met single-nucleus RNA-seq, ATAC-seq en functionele experimenten onderzochten onderzoekers hoe in C4-maïs koolstofassimilatie en cyclische elektronenstroom in bundelschedecellen genetisch worden gereguleerd. Een DOF-transcriptiefactor stimuleerde NDH-gerelateerde genexpressie, cyclische elektronenstroom, het ATP-gehalte en de fotosynthetische prestaties. In een veldproef hadden transgene planten meer groei en biomassa, maar de korrelopbrengst per plant nam niet significant toe.",
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Stofwisseling van het organisme",
@@ -220,14 +226,15 @@
     "evidence": "Primair onderzoek",
     "article": "https://www.sciencedirect.com/science/article/pii/S1674205226003552",
     "doi": "10.1016/j.molp.2026.10.016",
-    "why": "Geschikt als docentverdieping bij fotosynthese, C4-planten, ATP-vorming en cyclische elektronenstroom. De studie laat zien dat regulatie van fotosynthese niet alleen afhangt van licht en enzymactiviteit, maar ook van celtype-specifieke genexpressie. Gebruik de uitkomsten niet als directe vervanging van het vereenvoudigde schema van cyclische fotofosforylering in de les.<br><br><b>Veelvoorkomende misconceptie</b><br>Alle planten voeren fotosynthese op dezelfde manier uit; verschillen tussen C3- en C4-planten zitten alleen in de hoeveelheid chlorofyl.<br><b>Concrete lesvraag of denkprikkel</b><br>Waarom moeten koolstofassimilatie en cyclische elektronenstroom in C4-maïs op elkaar worden afgestemd, en welke rol speelt ATP daarbij?",
+    "why": "Geschikt als docentverdieping bij fotosynthese, C4-planten, ATP-vorming en cyclische elektronenstroom. De studie laat zien dat regulatie van fotosynthese niet alleen afhangt van licht en enzymactiviteit, maar ook van celtype-specifieke genexpressie. Maak bij de veldresultaten onderscheid tussen meer vegetatieve groei/biomassa en korrelopbrengst: de laatste nam in deze proef niet significant toe. Gebruik de uitkomsten niet als directe vervanging van het vereenvoudigde schema van cyclische fotofosforylering in de les.<br><br><b>Veelvoorkomende misconceptie</b><br>Alle planten voeren fotosynthese op dezelfde manier uit; verschillen tussen C3- en C4-planten zitten alleen in de hoeveelheid chlorofyl.<br><b>Concrete lesvraag of denkprikkel</b><br>Waarom moeten koolstofassimilatie en cyclische elektronenstroom in C4-maïs op elkaar worden afgestemd, en waarom betekent meer biomassa niet automatisch een hogere korrelopbrengst?",
     "tags": "C4-fotosynthese maïs bundelschedecellen cyclische elektronenstroom NDH ATP genregulatie DOF-transcriptiefactor",
     "evidenceLevel": "Ondersteunend bewijs",
-    "evidenceNote": "Primair onderzoek met meerdere omics-technieken, functionele experimenten en veldproeven; de specifieke C4-maïsmechanismen zijn contextgebonden.",
+    "evidenceNote": "Primair onderzoek met meerdere omics-technieken, functionele experimenten en een veldproef met transgene maïs; vegetatieve groei en biomassa namen toe, maar korrelopbrengst per plant niet significant. De specifieke C4-maïsmechanismen zijn contextgebonden.",
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij fotosynthese en stofwisseling van het organisme; C4-specialisatie en de moleculaire regulatie zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e4",
@@ -334,7 +341,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Verheldert embryonale ontwikkeling en zelforganisatie, maar de rol van lamin B1, autofagie en kernmechanica is geen vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s9",
@@ -357,7 +365,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "Geeft een brede illustratie van samenwerking tussen organen en regulatie, maar de gevonden circuits en meetmethode zijn vooral verdieping bij O2.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e8",
@@ -390,8 +399,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "DNA-replicatie en celcyclus",
-    "subdomain": "Huidig havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
-    "alignment": "Huidig examenprogramma havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen. De studie gaat verder dan de vereiste examenstof en is vooral geschikt als docentverdieping over RNA-structuur, helicasen en de samenhang tussen replicatie en chromatidecohesie.",
+    "subdomain": "Huidig havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven, met name de celcyclus, reproductie van erfelijk materiaal en chromosoomverdeling.",
+    "alignment": "Huidig examenprogramma havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven; de celcyclus en reproductie van erfelijk materiaal worden daar expliciet behandeld. De studie gaat verder dan de vereiste examenstof en is vooral geschikt als docentverdieping over RNA-structuur, helicasen en chromatidecohesie.",
     "evidence": "Primair onderzoek",
     "article": "https://www.sciencedirect.com/science/article/pii/S1097276526005514",
     "doi": "10.1016/j.molcel.2026.08.004",
@@ -402,7 +411,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Haakt aan bij DNA-replicatie en de celcyclus, maar de rol van lncRNA, DDX11 en RNA-vouwing gaat ruim voorbij de kern van de examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s11",
@@ -425,7 +435,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit rechtstreeks aan bij transcriptie en regulatie van genexpressie; de clusters van transcriptiefactoren zijn een verdiepende casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s12",
@@ -449,7 +460,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Past direct bij gedrag, interactie, seksualiteit en voortplanting; gebruik de fruitvlieg als vergelijkend biologisch voorbeeld.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s13",
@@ -472,7 +484,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt biodiversiteit met ecosysteemfuncties, energiestromen en diensten en sluit direct aan bij P1, P3 en P5.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s14",
@@ -483,8 +496,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Zelfregulatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met nadruk op homeostase en hormonale regulatie. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE), in het bijzonder hormonale regulatie en homeostase. Conceptprogramma v2: havo B8 en vwo B9 Reageren op veranderingen; beide programma's behandelen de werking van het hormoonstelsel en de bijdrage aan homeostase. De kleine onderzoeksgroep (n=10) en de modelmatige reconstructie vragen om terughoudende interpretatie.",
+    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met hormonale regulatie en homeostase. Conceptprogramma v2: havo B8 en vwo B9 Reageren op veranderingen – CE, met werking van het hormoonstelsel en hormonale regelkringen.",
+    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE), in het bijzonder hormonale regulatie en homeostase. Conceptprogramma v2: havo B8 en vwo B9 Reageren op veranderingen – CE; beide eindtermen behandelen hormonale interacties en de bijdrage aan homeostase. De kleine onderzoeksgroep (n=10) en de modelmatige reconstructie vragen om terughoudende interpretatie.",
     "evidence": "Primair onderzoek en wiskundige modellering (n=10)",
     "article": "https://onlinelibrary.wiley.com/doi/10.1111/jne.70264",
     "doi": "10.1111/jne.70264",
@@ -495,7 +508,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "De HPA-as is een concrete illustratie van hormonale regulatie en negatieve terugkoppeling binnen homeostase; ultradiane ritmes en modellering zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s15",
@@ -519,7 +533,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Sluit aan bij plantontwikkeling en zelforganisatie, maar de precieze auxine-signaalroutes en eiwitcomplexen zijn vooral docentverdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s16",
@@ -542,7 +557,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij energiestromen, biomassa, trofische relaties en de dynamiek van ecosystemen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e9",
@@ -608,7 +624,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt plantenhormonen, omgevingssignalen en plantontwikkeling; de specifieke signaalroutes zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s18",
@@ -619,8 +636,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Zelfregulatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met waterhuishouding en regulatie van huidmondjes als context. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE), met regulatie van waterverlies en gaswisseling via huidmondjes als context. Conceptprogramma v2: er is geen één-op-één-subdomein voor stomatale regulatie bij planten. Een indirecte inhoudelijke aansluiting is havo B2 en vwo B3 Cellen en meercellige organismen; B1 kan als ecosysteemcontext worden gebruikt. De hydraulische hypothesen en savanne-ecologie zijn verdieping. De koppeling aan ‘Reageren op veranderingen’ is daarom niet als directe eindtermkoppeling opgenomen.",
+    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met regulatie van waterverlies en gaswisseling via huidmondjes als context. Conceptprogramma v2: indirecte inhoudelijke aansluiting bij havo B2 en vwo B3 Cellen en meercellige organismen; B1 Biodiversiteit en verbondenheid van leven kan als ecologische context dienen.",
+    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE), met regulatie van waterverlies en gaswisseling via huidmondjes als context. Conceptprogramma v2: er is geen één-op-één-subdomein voor stomatale regulatie bij planten. Een indirecte inhoudelijke aansluiting is havo B2 en vwo B3 Cellen en meercellige organismen; B1 kan als ecosysteemcontext worden gebruikt. De hydraulische hypothesen en savanne-ecologie zijn verdieping.",
     "evidence": "Primair veldonderzoek (mechanistische vergelijking)",
     "article": "https://doi.org/10.1093/jpe/rtag255",
     "doi": "10.1093/jpe/rtag255",
@@ -631,7 +648,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Huidmondjesregulatie, gaswisseling en waterverlies sluiten direct aan bij plantfysiologie en zelfregulatie; de hydraulische hypothesen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s19",
@@ -654,7 +672,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt stikstofbeschikbaarheid, bodemorganismen, kringlopen en primaire productie in een grasland. De specifieke netwerkanalyse is verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s20",
@@ -677,7 +696,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij afbraak, reducenten en de stikstofkringloop; de isotopenmethode is een goede verdieping in onderzoekstechnieken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "De DOI-resolver verwijst naar het geaccepteerde manuscript op Oxford Academic; dit is peer-reviewed maar nog niet de definitief geredigeerde versie. Een tweede pagina in de tijdschriftindex koppelt dezelfde DOI ten onrechte aan een andere titel. De DOI-resolver en de Oxford Academic-record komen overeen met deze kaart; de afwijkende indexvermelding is als metadata-anomalie gemarkeerd en moet bij verschijnen van de definitieve versie opnieuw worden gecontroleerd.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s21",
@@ -689,7 +709,7 @@
     "programme": "Beide",
     "concept": "Selectie en genetische variatie",
     "subdomain": "Huidig vwo: M8 Selectie (CE), met evolutionaire veranderingen in genregulatie als context. Conceptprogramma v2: vwo B1 Biodiversiteit en verbondenheid van leven en B6 Erfelijkheid en voortbestaan van leven.",
-    "alignment": "Huidig (syllabus 2027): vwo M8 Selectie (CE). De studie onderzoekt evolutionaire veranderingen in genregulatie die bijdragen aan verschillen in het menselijk skelet. De eerdere verwijzing naar F4 Ontstaan van het leven is inhoudelijk niet passend en is daarom vervallen. Conceptprogramma v2: B1 Biodiversiteit en verbondenheid van leven (havo/vwo), plus havo B5 respectievelijk vwo B6 Erfelijkheid en voortbestaan van leven. Het gaat om evolutionaire en genetische verdieping, niet om vereiste kennis van de gebruikte genomische technieken.",
+    "alignment": "Huidig (syllabus 2027): vwo M8 Selectie (CE). De studie onderzoekt evolutionaire veranderingen in genregulatie die bijdragen aan verschillen in het menselijk skelet. Conceptprogramma v2: vwo B1 Biodiversiteit en verbondenheid van leven en B6 Erfelijkheid en voortbestaan van leven. Het gaat om evolutionaire en genetische verdieping, niet om vereiste kennis van de gebruikte genomische technieken.",
     "evidence": "Primair vergelijkend en experimenteel genomisch onderzoek",
     "article": "https://www.nature.com/articles/s41586-026-11053-x",
     "doi": "10.1038/s41586-026-11053-x",
@@ -700,7 +720,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt genetische variatie, genregulatie, fenotype en menselijke evolutie; vooral geschikt voor vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s22",
@@ -711,8 +732,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Gedrag en voortplanting",
-    "subdomain": "Huidig havo/vwo: O7 Gedrag en interactie en O9 Voortplanting van het organisme (SE), met voedselbeschikbaarheid, voortplantingssucces en voortplantingstiming als context. Ook P3 Interactie in ecosystemen (CE). Conceptprogramma v2: B6/B7 Reageren op veranderingen en B1 Biodiversiteit en verbondenheid van leven.",
-    "alignment": "Huidig (syllabus 2027): O7 Gedrag en interactie, O9 Voortplanting van het organisme en P3 Interactie in ecosystemen. Conceptprogramma v2: havo B7 en vwo B8 Reageren op veranderingen voor gedrag; havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven voor reproductie. B1 Biodiversiteit en verbondenheid van leven is een aanvullende ecologische context. De casus verbindt voedselbeschikbaarheid, timing van voortplanting en populatiedynamiek.",
+    "subdomain": "Huidig havo: O7 Gedrag en interactie (SE) en O9 Voortplanting van het organisme (SE); vwo: O7 Gedrag en interactie (SE) en O9 Voortplanting van het organisme (CE). Daarnaast P3 Interactie in ecosystemen (CE). Conceptprogramma v2: havo B7 en vwo B8 Reageren op veranderingen – SE voor gedrag; havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven – SE voor reproductie; B1 Biodiversiteit en verbondenheid van leven als ecologische context.",
+    "alignment": "Huidig (syllabus 2027): O7 Gedrag en interactie (havo/vwo SE), O9 Voortplanting van het organisme (havo SE; vwo CE) en P3 Interactie in ecosystemen (CE). Conceptprogramma v2: havo B7 en vwo B8 Reageren op veranderingen – SE voor gedrag; havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven – SE voor reproductie. B1 Biodiversiteit en verbondenheid van leven is een aanvullende ecologische context. De casus verbindt voedselbeschikbaarheid, timing van voortplanting en populatiedynamiek.",
     "evidence": "Primair langjarig observationeel onderzoek (20 jaar)",
     "article": "https://www.nature.com/articles/s41558-026-02795-7",
     "doi": "10.1038/s41558-026-02795-7",
@@ -723,7 +744,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt voortplanting, gedrag, voedselbeschikbaarheid en ecosysteemverandering; ook bruikbaar om correlatie en causaliteit te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s23",
@@ -746,7 +768,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "De studie biedt een verdiepende casus bij natuurlijke selectie, fitness en de relatie tussen voortplanting en overleving. Het specifieke onderzoek naar levensduur bij C. elegans is geen rechtstreekse uitwerking van de kernstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s24",
@@ -757,8 +780,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Zelfregulatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met hormonale regulatie en progesteron als context; O9 Voortplanting van het organisme (SE). Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE) en O9 Voortplanting van het organisme (havo SE; vwo CE). Conceptprogramma v2: havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven voor reproductie en hormonale regulatie van voortplanting; daarnaast havo B8 en vwo B9 Reageren op veranderingen voor hormonale regelkringen en homeostase. De muizen-knock-outstudie is een mechanistische verdieping.",
+    "subdomain": "Huidig vwo: O2 Zelfregulatie van het organisme (CE) en O9 Voortplanting van het organisme (CE). Conceptprogramma v2: vwo B5 Erfelijkheid en voortbestaan van leven – SE voor reproductie; vwo B9 Reageren op veranderingen – CE voor hormonale regelkringen en homeostase.",
+    "alignment": "Huidig (syllabus 2027): vwo O2 Zelfregulatie van het organisme (CE) en O9 Voortplanting van het organisme (CE). Conceptprogramma v2: vwo B5 Erfelijkheid en voortbestaan van leven – SE voor reproductie en hormonale regulatie van voortplanting; daarnaast B9 Reageren op veranderingen – CE voor hormonale regelkringen en homeostase. De muizen-knock-outstudie is een mechanistische verdieping.",
     "evidence": "Primair experimenteel onderzoek (conditionele gen-knock-out bij muizen)",
     "article": "https://doi.org/10.1038/s41467-026-79411-x",
     "doi": "10.1038/s41467-026-79411-x",
@@ -769,7 +792,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij hormonale regulatie en voortplanting; de koppeling tussen celstofwisseling en progesteronproductie is een verdiepende moleculaire casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s25",
@@ -780,8 +804,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Zelfregulatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met hormonale regulatie en homeostase als context; O9 Voortplanting van het organisme (SE). Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE) en O9 Voortplanting van het organisme (havo SE; vwo CE). Conceptprogramma v2: havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven voor reproductie en hormonale veranderingen rond de menopauze; daarnaast havo B8 en vwo B9 Reageren op veranderingen voor hormonale regulatie en homeostase. De studie reconstrueert populatiepatronen uit observationele gegevens en bewijst geen individueel causaal mechanisme.",
+    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE) en O9 Voortplanting van het organisme (havo SE; vwo CE). Conceptprogramma v2: havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven – SE voor reproductie; havo B8 en vwo B9 Reageren op veranderingen – CE voor hormonale regulatie en homeostase.",
+    "alignment": "Huidig (syllabus 2027): O2 Zelfregulatie van het organisme (havo/vwo CE) en O9 Voortplanting van het organisme (havo SE; vwo CE). Conceptprogramma v2: havo B4 en vwo B5 Erfelijkheid en voortbestaan van leven – SE voor reproductie en hormonale veranderingen rond de menopauze; daarnaast havo B8 en vwo B9 Reageren op veranderingen – CE voor hormonale regulatie en homeostase. De studie reconstrueert populatiepatronen uit observationele gegevens en bewijst geen individueel causaal mechanisme.",
     "evidence": "Grootschalige observationele analyse van laboratoriumgegevens (reconstructie uit cross-sectionele cohorten)",
     "article": "https://www.nature.com/articles/s41591-026-04614-0",
     "doi": "10.1038/s41591-026-04614-0",
@@ -792,7 +816,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt hormonale regulatie, voortplanting en de invloed van een fysiologische overgang op meerdere orgaanstelsels; ook geschikt om onderzoeksmethoden kritisch te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s26",
@@ -803,8 +828,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Stofwisseling van het organisme",
-    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE) en O2 Zelfregulatie van het organisme (CE), met insulinewerking, glucosehomeostase en metabole regulatie als context. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen; B6/B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): O1 Stofwisseling van het organisme en O2 Zelfregulatie van het organisme (havo/vwo CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen voor cellulaire stofwisseling; havo B8 en vwo B9 Reageren op veranderingen voor hormonale regulatie en homeostase. De proteomische associaties en externe validatie zijn geen bewijs dat de gevonden eiwitsignaturen op zichzelf ziekte veroorzaken.",
+    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE) en O2 Zelfregulatie van het organisme (CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor cellulaire stofwisseling; havo B8 en vwo B9 Reageren op veranderingen – CE voor hormonale regulatie en homeostase.",
+    "alignment": "Huidig (syllabus 2027): O1 Stofwisseling van het organisme en O2 Zelfregulatie van het organisme (havo/vwo CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor cellulaire stofwisseling; havo B8 en vwo B9 Reageren op veranderingen – CE voor hormonale regulatie en homeostase. De proteomische associaties en externe validatie zijn geen bewijs dat de gevonden eiwitsignaturen op zichzelf ziekte veroorzaken.",
     "evidence": "Primair observationeel proteomics-onderzoek met fysiologische validatie en externe cohorten",
     "article": "https://www.nature.com/articles/s42255-026-01662-1",
     "doi": "10.1038/s42255-026-01662-1",
@@ -815,7 +840,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij insuline, glucosehuishouding, stofwisseling en homeostase; de proteomics en voorspelmodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s27",
@@ -826,8 +852,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Stofwisseling van het organisme",
-    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE) en O2 Zelfregulatie van het organisme (CE), met energieomzetting en temperatuurregulatie als context. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen; B6/B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): O1 Stofwisseling van het organisme en O2 Zelfregulatie van het organisme (havo/vwo CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen voor cellulaire stofwisseling; havo B8 en vwo B9 Reageren op veranderingen voor thermoregulatie en homeostase. De studie biedt een verdiepende context bij energiegebruik en warmteproductie in bruin vetweefsel.",
+    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE) en O2 Zelfregulatie van het organisme (CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor cellulaire stofwisseling; havo B8 en vwo B9 Reageren op veranderingen – CE voor thermoregulatie en homeostase.",
+    "alignment": "Huidig (syllabus 2027): O1 Stofwisseling van het organisme en O2 Zelfregulatie van het organisme (havo/vwo CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor cellulaire stofwisseling; havo B8 en vwo B9 Reageren op veranderingen – CE voor thermoregulatie en homeostase. De studie biedt een verdiepende context bij energiegebruik en warmteproductie in bruin vetweefsel.",
     "evidence": "Primair experimenteel fysiologisch en metabool onderzoek",
     "article": "https://www.nature.com/articles/s42255-026-01652-3",
     "doi": "10.1038/s42255-026-01652-3",
@@ -838,7 +864,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt glucoseverbruik, energieomzetting en temperatuurregulatie; geschikt als context bij stofwisseling en homeostase.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s28",
@@ -861,7 +888,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt micro-organismen, afweer, ontsteking en stofwisseling; geschikt om microbiële functies en de beperkingen van observationeel onderzoek te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s29",
@@ -872,8 +900,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Afweer van het organisme",
-    "subdomain": "Huidig havo/vwo: O3 Afweer van het organisme (CE) en M4 Moleculaire interactie (havo SE, vwo CE), met T-lymfocyten, antigeenherkenning en genetische modificatie als context. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen; B5 Erfelijkheid en voortbestaan van leven.",
-    "alignment": "Huidig (syllabus 2027): vwo O3 Afweer van het organisme en M4 Moleculaire en cellulaire interactie (CE). Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen voor afweer; havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven voor genetische variatie en genetische aanpassing van T-cellen. CAR-T en CRISPR-screening zijn specialistische toepassingen en geen vereiste examenstof.",
+    "subdomain": "Huidig vwo: O3 Afweer van het organisme (CE) en M4 Moleculaire en cellulaire interactie (CE). Conceptprogramma v2: vwo B7 Reageren op veranderingen – SE-CE voor afweer; vwo B3 Cellen en meercellige organismen – CE voor cellulaire interacties; vwo B6 Erfelijkheid en voortbestaan van leven – CE voor genetische verandering en celcyclus.",
+    "alignment": "Huidig (syllabus 2027): vwo O3 Afweer van het organisme en M4 Moleculaire en cellulaire interactie (beide CE). Conceptprogramma v2: vwo B7 Reageren op veranderingen – SE-CE voor afweer; B3 Cellen en meercellige organismen – CE voor cellulaire interacties; B6 Erfelijkheid en voortbestaan van leven – CE voor genetische verandering. CAR-T en CRISPR-screening zijn specialistische toepassingen en geen vereiste examenstof.",
     "evidence": "Primair experimenteel onderzoek (in-vivo CRISPR-screening in CAR-T-cellen)",
     "article": "https://www.nature.com/articles/s41586-026-10956-z",
     "doi": "10.1038/s41586-026-10956-z",
@@ -884,7 +912,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt cellulaire afweer, T-lymfocyten en genregulatie met een actuele medische toepassing; vooral geschikt voor vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s30",
@@ -895,8 +924,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Zelfregulatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE), met verwerking van informatie en geheugen als context; O7 Gedrag en interactie (SE) als aanvullende context. Conceptprogramma v2: havo B6 en vwo B7 Reageren op veranderingen.",
-    "alignment": "Huidig (syllabus 2027): vwo O2 Zelfregulatie van het organisme (CE) en O7 Gedrag en interactie (SE). De studie verbindt neurale activiteit met episodische geheugenvorming. Conceptprogramma v2: havo B8 en vwo B9 Reageren op veranderingen voor de werking van het zenuwstelsel. De single-neuronregistraties bij mensen zijn specialistische onderzoekscontext.",
+    "subdomain": "Huidig vwo: O2 Zelfregulatie van het organisme (CE) en O7 Gedrag en interactie (SE). Conceptprogramma v2: vwo B9 Reageren op veranderingen – CE voor de werking van het zenuwstelsel en vwo B8 Reageren op veranderingen – SE voor gedrag.",
+    "alignment": "Huidig (syllabus 2027): vwo O2 Zelfregulatie van het organisme (CE) en O7 Gedrag en interactie (SE). De studie verbindt neurale activiteit met episodische geheugenvorming. Conceptprogramma v2: vwo B9 Reageren op veranderingen – CE voor de werking van het zenuwstelsel en B8 Reageren op veranderingen – SE voor gedrag. De single-neuronregistraties bij mensen zijn specialistische onderzoekscontext.",
     "evidence": "Primair neurofysiologisch onderzoek bij mensen (single-neuronregistraties)",
     "article": "https://www.nature.com/articles/s41593-026-02493-9",
     "doi": "10.1038/s41593-026-02493-9",
@@ -907,7 +936,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij zenuwstelsel, informatieverwerking en geheugen; bijzonder geschikt als vwo-verdieping in onderzoeksmethoden.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e13",
@@ -1003,8 +1033,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "DNA-replicatie en celcyclus",
-    "subdomain": "Huidig havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
-    "alignment": "Huidig havo/vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel. De studie gaat over de regulatie van de start van DNA-replicatie in de S-fase. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
+    "subdomain": "Huidig vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: vwo B6 Erfelijkheid en voortbestaan van leven – CE, met celcyclus en reproductie van erfelijk materiaal.",
+    "alignment": "Huidig vwo: M5 DNA-replicatie en M6 Levenscyclus van de cel (beide SE). Conceptprogramma v2: vwo B6 Erfelijkheid en voortbestaan van leven – CE; eindterm 14 behandelt de celcyclus en de reproductie van erfelijk materiaal. De studie gaat dieper in op de moleculaire regulatie van replicatieoorsprongen.",
     "evidence": "Primair experimenteel onderzoek (CRISPR-screen, DNA-fibermetingen en biochemie)",
     "article": "https://doi.org/10.1038/s44318-026-00930-w",
     "doi": "10.1038/s44318-026-00930-w",
@@ -1016,7 +1046,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij DNA-replicatie en de regulatie van de celcyclus; vooral geschikt voor verdieping in de moleculaire start van replicatie.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s32",
@@ -1027,8 +1058,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Eiwitsynthese en genexpressie",
-    "subdomain": "Huidig havo: M1 Eiwitsynthese (SE); huidig vwo: M1 Eiwitsynthese (CE) en M5 DNA-replicatie (SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
-    "alignment": "Huidig (syllabus 2027): M1 Eiwitsynthese (havo SE; vwo CE) en M5 DNA-replicatie (havo/vwo SE); voor vwo sluit ook M4 Moleculaire en cellulaire interactie (CE), met genregulatie, direct aan. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen; daarnaast havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven. De specifieke R-loops en replicatie-transcriptieconflicten zijn verdieping.",
+    "subdomain": "Huidig havo: M1 Eiwitsynthese (SE) en M5 DNA-replicatie (SE); vwo: M1 Eiwitsynthese (CE) en M5 DNA-replicatie (SE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor genexpressie en eiwitsynthese; havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven – CE voor de celcyclus.",
+    "alignment": "Huidig (syllabus 2027): M1 Eiwitsynthese (havo SE; vwo CE) en M5 DNA-replicatie (havo/vwo SE); voor vwo sluit ook M4 Moleculaire en cellulaire interactie (CE), met genregulatie, direct aan. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor genexpressie en eiwitsynthese; havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven – CE voor de celcyclus. De specifieke R-loops en replicatie-transcriptieconflicten zijn verdieping.",
     "evidence": "Primair experimenteel onderzoek in gist (live-cell imaging)",
     "article": "https://doi.org/10.1093/nar/gkag1139",
     "doi": "10.1093/nar/gkag1139",
@@ -1039,7 +1070,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt transcriptie, RNA-DNA-hybriden en DNA-replicatie; een goede vwo-verdieping bij genexpressie.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s33",
@@ -1050,7 +1082,7 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Moleculaire interactie",
-    "subdomain": "Huidig havo/vwo: M4 Moleculaire interactie (havo SE, vwo CE), met receptor-eiwitten en signaaltransductie als context. Conceptprogramma v2: B2/B3 Cellen en meercellige organismen; B6/B7 Reageren op veranderingen.",
+    "subdomain": "Huidig havo/vwo: M4 Moleculaire interactie (havo SE, vwo CE), met receptor-eiwitten en signaaltransductie als context. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – inhoudelijke aansluiting bij cellulaire interacties.",
     "alignment": "Huidig (syllabus 2027): M4 Moleculaire interactie (havo SE) en M4 Moleculaire en cellulaire interactie (vwo CE). De studie is vooral methodologisch: zij laat zien hoe eiwit-eiwitinteracties in intact menselijk weefsel kunnen worden onderzocht. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen als inhoudelijke aansluiting; de gebruikte interactomics-techniek is docentverdieping, geen vereiste examenstof.",
     "evidence": "Primair methodologisch en experimenteel onderzoek in menselijk weefsel",
     "article": "https://www.nature.com/articles/s41467-026-79134-z",
@@ -1062,7 +1094,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij moleculaire interactie en signaaltransductie; vooral geschikt voor vwo-verdieping in onderzoeksmethoden.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s34",
@@ -1073,8 +1106,8 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Zelforganisatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O6 Zelforganisatie van het organisme (SE), met differentiatie, weefselorganisatie en samenwerking tussen cellen als context; O3 Afweer van het organisme (CE) als aanvullende context. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
-    "alignment": "Huidig havo/vwo: O6 Zelforganisatie van het organisme en O3 Afweer van het organisme. De studie onderzoekt hoe celtypen in weefsels ruimtelijk georganiseerd zijn en hoe epitheel- en immuuncellen met elkaar interageren. Conceptprogramma v2: B2/B3 Cellen en meercellige organismen.",
+    "subdomain": "Huidig vwo: O6 Zelforganisatie van het organisme (SE) en O3 Afweer van het organisme (CE). Conceptprogramma v2: vwo B6 Erfelijkheid en voortbestaan van leven – CE voor celcyclus, stamcellen en celdifferentiatie; vwo B7 Reageren op veranderingen – SE-CE voor afweer. De specifieke interactomics-methode is docentverdieping.",
+    "alignment": "Huidig vwo: O6 Zelforganisatie van het organisme (SE) en O3 Afweer van het organisme (CE). De studie onderzoekt hoe celtypen in weefsels ruimtelijk georganiseerd zijn en hoe epitheel- en immuuncellen met elkaar interageren. Conceptprogramma v2: vwo B6 Erfelijkheid en voortbestaan van leven – CE voor celcyclus, stamcellen en celdifferentiatie; vwo B7 Reageren op veranderingen – SE-CE voor afweer. De specifieke interactomics-methode is docentverdieping.",
     "evidence": "Primair methodologisch en experimenteel onderzoek (single-cell sequencing en weefselanalyse)",
     "article": "https://www.nature.com/articles/s41592-026-03237-0",
     "doi": "10.1038/s41592-026-03237-0",
@@ -1085,7 +1118,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt celtypen, weefselorganisatie, differentiatie en afweer; geschikt voor vwo-verdieping in meercellige organismen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s35",
@@ -1096,7 +1130,7 @@
     "level": "Vwo",
     "programme": "Beide",
     "concept": "Evolutie van eukaryote cellen",
-    "subdomain": "Huidig vwo: P6 Ontstaan van het leven (SE), met de evolutionaire oorsprong van eukaryote cellen als context. Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en vwo B1/B2; de relatie met celorganisatie is inhoudelijk, niet een één-op-één-eindterm.",
+    "subdomain": "Huidig vwo: P6 Ontstaan van het leven (SE), met de evolutionaire oorsprong van eukaryote cellen als context. Conceptprogramma v2: havo B1 Biodiversiteit en verbondenheid van leven en B2 Cellen en meercellige organismen; vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De relatie met celorganisatie is inhoudelijk, niet een één-op-één-eindterm.",
     "alignment": "Huidig vwo: P6 Ontstaan van het leven (SE). De studie levert een nieuw vergelijkingspunt voor hypothesen over eukaryogenese, maar reconstrueert niet rechtstreeks het ontstaan van de eerste eukaryote cel. Havo: de publicatie is vooral docentverdieping bij evolutie en biodiversiteit; de huidige havo-syllabus heeft geen afzonderlijk P6-subdomein. Conceptprogramma v2: havo/vwo B1 Biodiversiteit en verbondenheid van leven; de relatie met celorganisatie kan aanvullend worden verbonden aan havo B2 en vwo B3 Cellen en meercellige organismen.",
     "evidence": "Primair onderzoek (isolatie en karakterisering van archaeale stammen)",
     "article": "https://www.nature.com/articles/s41586-026-11170-7",
@@ -1108,7 +1142,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "De publicatie verdiept de evolutionaire verwantschap tussen archaea en eukaryoten. Zij onderzoekt niet het ontstaan van het eerste leven en is daarom vooral een aanvullende context bij vwo P6, geen directe uitwerking van de kernstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s36",
@@ -1131,7 +1166,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij de syllabusonderdelen over erfelijke eigenschappen, overervingspatronen, stambomen en kruisschema’s. De bijdrage is vooral conceptueel en vakdidactisch.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in Genetics en open access beschikbaar. Peer review is een kwaliteitscontrole, geen garantie voor foutloos onderzoek of representativiteit."
+    "sourceQualityNote": "Gepubliceerd in Genetics en open access beschikbaar. Peer review is een kwaliteitscontrole, geen garantie voor foutloos onderzoek of representativiteit.",
+    "studyType": "Perspectiefartikel"
   },
   {
     "id": "s37",
@@ -1154,7 +1190,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Verbindt direct met selectie en genetische variatie, maar de genomische methoden en reconstructie van selectiegeschiedenis gaan verder dan de vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Reviewartikel in Nature Reviews Genetics. Een synthese van onderzoek is geen garantie dat alle onderliggende resultaten onafhankelijk zijn gerepliceerd."
+    "sourceQualityNote": "Reviewartikel in Nature Reviews Genetics. Een synthese van onderzoek is geen garantie dat alle onderliggende resultaten onafhankelijk zijn gerepliceerd.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s38",
@@ -1177,7 +1214,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Het onderscheid tussen genotype, fenotype en milieufactoren sluit aan bij de examenstof. De uitgebreide kwantitatieve genetica en genetische architectuur zijn vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in Genetics en opgenomen in PubMed. Peer review is een kwaliteitscontrole, geen garantie dat alle voorgestelde onderzoeksrichtingen al empirisch zijn bevestigd."
+    "sourceQualityNote": "Gepubliceerd in Genetics en opgenomen in PubMed. Peer review is een kwaliteitscontrole, geen garantie dat alle voorgestelde onderzoeksrichtingen al empirisch zijn bevestigd.",
+    "studyType": "Perspectiefartikel"
   },
   {
     "id": "s39",
@@ -1188,8 +1226,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Stofwisseling van het organisme",
-    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE), met O1.3 Ademhaling en O1.6 Transport. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen (CE).",
-    "alignment": "Huidig (syllabus 2027): O1 Stofwisseling van het organisme (havo/vwo CE), in het bijzonder ademhaling en transport. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen (CE), waarin de relatie tussen stofwisseling en functioneren van het organisme centraal staat. De kwantitatieve modellen en pathofysiologische voorbeelden zijn verdieping; voor havo volstaat de hoofdlijn van de samenwerking tussen gaswisseling, bloedtransport en weefselverbruik.",
+    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE), in het bijzonder ademhaling en transport. Conceptprogramma v2: havo B3 en vwo B4 Cellen en meercellige organismen – SE voor uitwisseling en transport van stoffen; havo B2 en vwo B3 – CE voor cellulaire stofwisseling.",
+    "alignment": "Huidig (syllabus 2027): O1 Stofwisseling van het organisme (havo/vwo CE), in het bijzonder ademhaling en transport. Conceptprogramma v2: havo B3 en vwo B4 Cellen en meercellige organismen – SE voor uitwisseling en transport van stoffen; havo B2 en vwo B3 – CE voor cellulaire stofwisseling. De kwantitatieve modellen en pathofysiologische voorbeelden zijn verdieping; voor havo volstaat de hoofdlijn van de samenwerking tussen gaswisseling, bloedtransport en weefselverbruik.",
     "evidence": "Reviewartikel",
     "article": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13090562/",
     "doi": "10.1002/cph4.70149",
@@ -1200,7 +1238,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij ademhaling en transport op orgaan- en organismeniveau. De kwantitatieve diffusie-perfusiemodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Open-access review in Comprehensive Physiology. Peer review en een overzichtsartikel bieden kwaliteitscontrole, maar vervangen geen beoordeling van de onderliggende studies."
+    "sourceQualityNote": "Open-access review in Comprehensive Physiology. Peer review en een overzichtsartikel bieden kwaliteitscontrole, maar vervangen geen beoordeling van de onderliggende studies.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s40",
@@ -1223,7 +1262,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Vult de beperkte aandacht voor kringlopen aan en sluit aan bij de rol van producenten, reducenten en nutriënten in ecosystemen. De moleculaire details zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Reviewartikel in Nature Reviews Microbiology. De status van review en peer review is geen garantie dat elke voorgestelde hypothese al experimenteel bevestigd is."
+    "sourceQualityNote": "Reviewartikel in Nature Reviews Microbiology. De status van review en peer review is geen garantie dat elke voorgestelde hypothese al experimenteel bevestigd is.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s41",
@@ -1246,7 +1286,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Voedselrelaties, energiestromen en biodiversiteit vormen de kern van de studie en sluiten rechtstreeks aan op de ecosysteemonderdelen van havo en vwo.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Onderzoeksartikel in Nature; peer review ondersteunt de redactionele kwaliteitscontrole, maar vervangt geen beoordeling van onderzoeksopzet en causaliteit."
+    "sourceQualityNote": "Onderzoeksartikel in Nature; peer review ondersteunt de redactionele kwaliteitscontrole, maar vervangt geen beoordeling van onderzoeksopzet en causaliteit.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s42",
@@ -1269,7 +1310,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Meiose, crossing-over, recombinatie en erfelijke variatie sluiten rechtstreeks aan op de huidige havo- en vwo-syllabi.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Nature; de omvangrijke dataset is een sterk punt, terwijl de IVF-context expliciet moet meewegen bij interpretatie."
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature; de omvangrijke dataset is een sterk punt, terwijl de IVF-context expliciet moet meewegen bij interpretatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s43",
@@ -1292,7 +1334,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Epigenetica en afwijkende overervingspatronen worden expliciet genoemd bij vwo M7.1 Erfelijke eigenschap; de studie biedt een actuele verdiepende casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Nature Genetics; de methodologische diepgang is sterk, maar de dier- en weefselcontext begrenst de generaliseerbaarheid."
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature Genetics; de methodologische diepgang is sterk, maar de dier- en weefselcontext begrenst de generaliseerbaarheid.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s44",
@@ -1315,7 +1358,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Vaccinatie, aangeboren en verworven afweer en immuungeheugen sluiten rechtstreeks aan bij O3 Afweer van het organisme.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Reviewartikel in Nature; de waarde ligt in de synthese van meerdere onderzoeksrichtingen, niet in één nieuwe effectmeting."
+    "sourceQualityNote": "Reviewartikel in Nature; de waarde ligt in de synthese van meerdere onderzoeksrichtingen, niet in één nieuwe effectmeting.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s45",
@@ -1326,8 +1370,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Stofwisseling van het organisme",
-    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE), in het bijzonder O1.4 Vertering. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
-    "alignment": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE), met vertering en opname van voedingsstoffen als directe koppeling. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen. De microbiële productie en opname van korte-ketenvetzuren is een verdiepende aanvulling op de vertering in het menselijke darmkanaal.",
+    "subdomain": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE), in het bijzonder vertering en opname van voedingsstoffen. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor cellulaire stofwisseling; havo B3 en vwo B4 – SE voor vertering, resorptie en uitwisseling van stoffen.",
+    "alignment": "Huidig havo/vwo: O1 Stofwisseling van het organisme (CE), met vertering en opname van voedingsstoffen als directe koppeling. Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen – CE voor cellulaire stofwisseling; havo B3 en vwo B4 – SE voor vertering, resorptie en uitwisseling van stoffen. De microbiële productie en opname van korte-ketenvetzuren is een verdiepende aanvulling op de vertering in het menselijke darmkanaal.",
     "evidence": "Primair kwantitatief onderzoek (microbiële fermentatie, verteringsfysiologie en metagenomics)",
     "article": "https://doi.org/10.1016/j.cell.2025.07.005",
     "doi": "10.1016/j.cell.2025.07.005",
@@ -1338,7 +1382,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Vertering en opname van voedingsstoffen sluiten direct aan bij O1; de rol van darmmicrobiële fermentatie is een actuele verdiepende context.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Cell; de combinatie van kwantitatieve benaderingen versterkt de analyse, terwijl de uitkomsten mede afhangen van modelaannames en voedingscontext."
+    "sourceQualityNote": "Primair onderzoeksartikel in Cell; de combinatie van kwantitatieve benaderingen versterkt de analyse, terwijl de uitkomsten mede afhangen van modelaannames en voedingscontext.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s46",
@@ -1349,8 +1394,8 @@
     "level": "Havo/vwo",
     "programme": "Beide",
     "concept": "Zelfregulatie van het organisme",
-    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme en O1.5 Uitscheiding (CE). Conceptprogramma v2: havo B8 en vwo B9 Reageren op veranderingen.",
-    "alignment": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE) en O1.5 Uitscheiding (CE). Conceptprogramma v2: havo B8 en vwo B9 Reageren op veranderingen, met hormonale regulatie en homeostase als inhoudelijke koppeling. De specifieke GPR39-route is verdieping; de hoofdleslijn is de invloed van vasopressine op aquaporine-2 en waterterugresorptie.",
+    "subdomain": "Huidig havo/vwo: O2 Zelfregulatie van het organisme en O1.5 Uitscheiding (beide CE). Conceptprogramma v2: havo B3 en vwo B4 Cellen en meercellige organismen – SE voor uitscheiding en uitwisseling van stoffen; havo B8 en vwo B9 Reageren op veranderingen – CE voor hormonale regulatie en homeostase.",
+    "alignment": "Huidig havo/vwo: O2 Zelfregulatie van het organisme (CE) en O1.5 Uitscheiding (CE). Conceptprogramma v2: havo B3 en vwo B4 Cellen en meercellige organismen – SE voor uitscheiding en uitwisseling van stoffen; havo B8 en vwo B9 Reageren op veranderingen – CE voor hormonale regulatie en homeostase. De specifieke GPR39-route is verdieping; de hoofdleslijn is de invloed van vasopressine op aquaporine-2 en waterterugresorptie.",
     "evidence": "Primair experimenteel onderzoek (muizen, nierweefsel en geïsoleerde nierbuisjes)",
     "article": "https://pubmed.ncbi.nlm.nih.gov/40172982/",
     "doi": "10.1681/ASN.0000000687",
@@ -1361,7 +1406,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Waterbalans, hormonale regulatie, nierfunctie en uitscheiding sluiten rechtstreeks aan op O1 en O2; de specifieke receptorroute is verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Journal of the American Society of Nephrology; de experimentele combinatie ondersteunt het mechanisme, maar de bevindingen zijn modelsysteemgebonden."
+    "sourceQualityNote": "Primair onderzoeksartikel in Journal of the American Society of Nephrology; de experimentele combinatie ondersteunt het mechanisme, maar de bevindingen zijn modelsysteemgebonden.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s47",
@@ -1384,7 +1430,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Fotosynthese, koolstofopslag en de invloed van abiotische factoren sluiten rechtstreeks aan op O1; de stikstofkringloop verbindt dit met P1.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Peer-reviewed meta-analyse in Journal of Plant Ecology; de bewijskracht berust op de onderliggende studies en de manier waarop hun verschillen statistisch zijn verwerkt."
+    "sourceQualityNote": "Peer-reviewed meta-analyse in Journal of Plant Ecology; de bewijskracht berust op de onderliggende studies en de manier waarop hun verschillen statistisch zijn verwerkt.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s48",
@@ -1407,6 +1454,79 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "De studie verdiept moleculaire interactie, genregulatie en celdifferentiatie; de specifieke FXR–YAP-route en leverfibrose zijn geen vereiste examenkennis.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Nature Metabolism; genetische modellen, celproeven en humane gegevens leveren convergerende ondersteuning."
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature Metabolism; genetische modellen, celproeven en humane gegevens leveren convergerende ondersteuning.",
+    "studyType": "Primair onderzoek"
+  },
+  {
+    "id": "s49",
+    "page": "science",
+    "date": "2026-11-18",
+    "title": "Chromosomally unstable cancer cells exhibit heightened dependence on the mitotic SKA complex",
+    "summary": "Onderzoekers onderzochten hoe chromosomale instabiliteit de afhankelijkheid van kankercellen van het SKA-complex beïnvloedt. In cellulaire modellen bleek verlies van het spindle- and kinetochore-associated (SKA) complex vooral problematisch wanneer de mitose langer duurt: er ontstonden mitotische fouten en cellen verloren hun levensvatbaarheid. De SKA-complexfunctie en KIF18A beïnvloeden verwante maar mechanistisch verschillende routes van mitotische controle. Dit wijst op een mogelijke kwetsbaarheid van chromosomaal instabiele tumoren, niet op bewezen klinische werkzaamheid van een behandeling.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "DNA-replicatie en celcyclus",
+    "subdomain": "Huidig vwo: M6 Levenscyclus van de cel (SE), met M5 DNA-replicatie (SE) als aanvullende context. Conceptprogramma v2: havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven – CE, met de celcyclus en correcte chromosoomverdeling.",
+    "alignment": "Huidig vwo: M6 Levenscyclus van de cel (SE); M5 DNA-replicatie (SE) is aanvullende context. Conceptprogramma v2: havo B5 en vwo B6 Erfelijkheid en voortbestaan van leven – CE, waarin de celcyclus en chromosoomverdeling aan bod komen. De studie gebruikt kankercelmodellen en is een specialistische verdieping; zij toont geen werkzaamheid van een behandeling bij patiënten.",
+    "evidence": "Primair experimenteel celbiologisch onderzoek (genetische verstoring, mitose-analyse en kankercelmodellen)",
+    "article": "https://www.nature.com/articles/s41467-026-79311-0",
+    "doi": "10.1038/s41467-026-79311-0",
+    "why": "Deze studie laat zien dat een correcte chromosoomverdeling niet alleen afhangt van DNA-replicatie, maar ook van de werking van het spoelfiguur, kinetochoren en mitotische controlepunten. Het SKA-complex blijkt vooral belangrijk wanneer chromosomaal instabiele cellen langer in mitose blijven. Dat maakt de studie bruikbaar om de samenhang tussen mitose, chromosoomverdeling en kankerbiologie te bespreken. De resultaten zijn verkregen in cellulaire modellen; een mogelijke therapeutische kwetsbaarheid is nog geen bewezen behandeling.<br><br><b>Vwo:</b> laat leerlingen verklaren hoe fouten in de mitose tot chromosomale instabiliteit kunnen leiden en waarom sommige kankercellen daardoor extra afhankelijk worden van mitotische eiwitcomplexen.<br><b>Veelvoorkomende misconceptie</b><br>Aneuploïdie ontstaat alleen door fouten bij DNA-replicatie; de mitotische spoelfiguur en controlepunten spelen geen zelfstandige rol.<br><b>Concrete lesvraag of denkprikkel</b><br>Hoe kan verlies van het SKA-complex vooral schadelijk zijn voor chromosomaal instabiele cellen, en waarom bewijst dit nog niet dat een SKA-remmer een effectieve kankerbehandeling is?",
+    "tags": "DNA-replicatie celcyclus mitose chromosoomverdeling aneuploïdie chromosomale instabiliteit kinetochore spoelfiguur SKA-complex kanker checkpoint",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Genetische verstoringen en celbiologische experimenten ondersteunen een mechanistische afhankelijkheid in onderzochte cellijnen; dit is geen klinisch onderzoek en toont geen werkzaamheid bij patiënten.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "De mitose en correcte chromosoomverdeling sluiten aan bij de celcyclus; de specifieke SKA-afhankelijkheid en kankercontext zijn verdiepende toepassingen.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature Communications, met genetische en celbiologische experimenten; de vertaling naar behandeling blijft hypothetisch.",
+    "studyType": "Primair onderzoek"
+  },
+  {
+    "id": "s50",
+    "page": "science",
+    "date": "2026-08-07",
+    "title": "Neural circuits for mammalian parental behaviour",
+    "summary": "Deze review brengt onderzoek samen naar de neurale circuits die ouderlijk zorggedrag bij zoogdieren ondersteunen. De meeste mechanistische inzichten komen uit knaagdiermodellen. De auteurs laten zien hoe interne toestand, hormonale signalen, zintuiglijke informatie, sociale ervaring en levensfase de werking van ouderlijke circuits veranderen. Zorggedrag is daardoor niet simpelweg een vast aangeboren programma: dezelfde neurale netwerken kunnen afhankelijk van context zorg, vermijding of agressie ondersteunen.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "Gedrag en voortplanting",
+    "subdomain": "Huidig vwo: O7 Gedrag en interactie (SE) en O9 Voortplanting van het organisme (CE). Conceptprogramma v2: vwo B8 Reageren op veranderingen – SE voor gedrag en vwo B5 Erfelijkheid en voortbestaan van leven – SE voor voortplanting. Havo: B7 respectievelijk B4.",
+    "alignment": "Huidig vwo: O7 Gedrag en interactie (SE) en O9 Voortplanting van het organisme (CE). Conceptprogramma v2: vwo B8 Reageren op veranderingen – SE voor gedrag en B5 Erfelijkheid en voortbestaan van leven – SE voor voortplanting. De review biedt een inhoudelijke verdieping in de neurobiologie van ouderzorg; de meeste mechanistische bevindingen komen uit knaagdieren en zijn niet zonder meer naar mensen te vertalen.",
+    "evidence": "Review van onderzoek naar neurale circuits en ouderlijk zorggedrag, met nadruk op knaagdiermodellen en vergelijking tussen zoogdieren",
+    "article": "https://www.nature.com/articles/s41583-026-01073-x",
+    "doi": "10.1038/s41583-026-01073-x",
+    "why": "Deze review verbreedt het thema gedrag en voortplanting van balts en partnerkeuze naar ouderlijke zorg. De auteurs beschrijven hoe zintuiglijke prikkels van jongen, hormonen, motivatie, sociale ervaring en levensfase samen de activiteit van ouderlijke circuits beïnvloeden. De meeste causale circuitinzichten komen uit knaagdieren; het is dus geen directe beschrijving van menselijk ouderschap.<br><br><b>Vwo:</b> gebruik de review om aangeboren gedrag, leerervaring, hormonale regulatie en contextafhankelijk gedrag met elkaar te verbinden. Bespreek waarom één gedragsrepertoire niet door één vast 'oudercentrum' in de hersenen wordt bestuurd.<br><b>Veelvoorkomende misconceptie</b><br>Ouderlijke zorg is een volledig vast instinct dat bij alle zoogdieren en in iedere situatie op dezelfde manier wordt uitgevoerd.<br><b>Concrete lesvraag of denkprikkel</b><br>Hoe kunnen interne toestand en sociale ervaring ervoor zorgen dat dezelfde neurale netwerken afhankelijk van de situatie zorggedrag, vermijding of agressie ondersteunen?",
+    "tags": "gedrag voortplanting ouderzorg ouderlijk gedrag zoogdieren hersenen neurale circuits hormonen motivatie sociale ervaring maternale zorg vaderlijke zorg",
+    "evidenceLevel": "Achtergrondbron",
+    "evidenceNote": "Reviewartikel dat bestaand mechanistisch onderzoek synthetiseert; de onderliggende experimentele bewijskracht verschilt per besproken circuit en is grotendeels gebaseerd op knaagdiermodellen.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Ouderlijk zorggedrag sluit aan bij gedrag en voortplanting; de specifieke neurale circuits en knaagdiermodellen zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Reviewartikel in Nature Reviews Neuroscience; het is een synthese van bestaand onderzoek en geen nieuw primair experiment.",
+    "studyType": "Review / synthese"
+  },
+  {
+    "id": "s51",
+    "page": "science",
+    "date": "2026-06-10",
+    "title": "Gene ancestries reveal diverse microbial associations during eukaryogenesis",
+    "summary": "Met een uitgebreide fylogenomische analyse reconstrueerden onderzoekers de herkomst van eiwitfamilies in de laatste gemeenschappelijke voorouder van eukaryoten (LECA). Naast de bekende verwantschap met Asgard-archaea en de mitochondriale voorouder vonden zij aanwijzingen voor meerdere golven van genoverdracht vanuit andere bacteriële groepen, waaronder Planctomycetota en Myxococcota. Ook zouden grote DNA-virussen (Nucleocytoviricota) sommige overdrachten hebben kunnen bemiddelen. De resultaten passen bij een geleidelijk proces met meerdere microbiële interacties, maar de aard en precieze volgorde van die oeroude interacties zijn niet rechtstreeks waargenomen.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "Evolutie van eukaryote cellen",
+    "subdomain": "Huidig vwo: P6 Ontstaan van het leven (SE), met evolutionaire verwantschap en endosymbiose als context. Conceptprogramma v2: vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De fylogenomische reconstructie is docentverdieping.",
+    "alignment": "Huidig vwo: P6 Ontstaan van het leven (SE), met endosymbiose en de evolutionaire oorsprong van eukaryote cellen als context. Conceptprogramma v2: vwo B1/B2 Biodiversiteit en verbondenheid van leven en B3 Cellen en meercellige organismen. De studie levert een fylogenomische reconstructie van de herkomst van genen in LECA; de voorgestelde interacties zijn evolutionaire inferenties en geen directe waarnemingen.",
+    "evidence": "Primair fylogenomisch onderzoek (reconstructie van genfamilies en evolutionaire herkomst in LECA)",
+    "article": "https://www.nature.com/articles/s41586-026-10639-9",
+    "doi": "10.1038/s41586-026-10639-9",
+    "why": "Deze studie verdiept de endosymbiosetheorie. De bekende mitochondriale endosymbiose blijft centraal, maar de analyse wijst erop dat de voorouders van eukaryoten mogelijk ook op andere momenten genen uitwisselden met verschillende bacteriële groepen. De auteurs bespreken bovendien een mogelijke rol van grote DNA-virussen als bemiddelaars van horizontale genoverdracht. Dit is een reconstructie op basis van genoomvergelijkingen: genverwantschap kan oude overdracht ondersteunen, maar bewijst niet rechtstreeks of een interactie endosymbiotisch, ectosymbiotisch of anderszins was.<br><br><b>Vwo:</b> gebruik de publicatie om endosymbiose, horizontale genoverdracht en fylogenetische verwantschap met elkaar te verbinden. Laat leerlingen onderscheid maken tussen de mitochondriale endosymbiose als breed gedragen verklaring en aanvullende hypothesen over andere microbiële interacties.<br><b>Veelvoorkomende misconceptie</b><br>De eukaryote cel is in één enkele gebeurtenis ontstaan door de opname van één bacterie; alle andere genen zijn daarna onveranderd doorgegeven.<br><b>Concrete lesvraag of denkprikkel</b><br>Welke aanwijzingen in de genen van huidige eukaryoten kunnen wijzen op meerdere oude genoverdrachten, en waarom vertellen die aanwijzingen niet precies hoe de betrokken micro-organismen met elkaar samenleefden?",
+    "tags": "eukaryogenese eukaryoten archaea endosymbiose mitochondriën horizontale genoverdracht fylogenomica LECA bacteriën Planctomycetota Myxococcota virussen Nucleocytoviricota",
+    "evidenceLevel": "Voorzichtig interpreteren",
+    "evidenceNote": "Uitgebreide fylogenomische analyse van genfamilies en LECA-reconstructie; oude horizontale genoverdracht en de volgorde van gebeurtenissen zijn inferenties die afhangen van fylogenetische modellen en de kwaliteit van beschikbare genomen. De aard van de interacties is niet direct waarneembaar.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "Eukaryogenese en endosymbiose sluiten aan bij evolutie en de oorsprong van cellen; de fylogenomische reconstructie en hypothesen over aanvullende microbiële partners zijn vwo-verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Open-access primair onderzoeksartikel in Nature, met uitgebreide fylogenomische datasets en analyses. Peer review en omvangrijke data nemen onzekerheid in reconstructies van zeer oude evolutionaire gebeurtenissen niet weg.",
+    "studyType": "Primair onderzoek"
   }
 ]
