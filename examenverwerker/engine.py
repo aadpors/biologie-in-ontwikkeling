@@ -452,6 +452,8 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                     "footer_cutoff": footer_top,
                 })
             output_path.parent.mkdir(parents=True, exist_ok=True)
+            if output_path.exists():
+                output_path.unlink()
             preview.save(output_path, garbage=4, deflate=True)
         finally:
             preview.close()
