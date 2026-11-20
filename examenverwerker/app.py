@@ -3816,6 +3816,7 @@ class ExamApp:
                     options.append({"key":str(len(options)+1),"text":line})
             record["question_text"]=text_box.get("1.0","end").strip()
             record["question_type"]=type_var.get()
+            record.setdefault("exam",{})["questionType"]="mcq" if type_var.get()=="meerkeuze" else "open"
             record["question_type_status"]="handmatig_gecontroleerd"
             record["options"]=options
             record["correct"]=correct_var.get().strip()
@@ -3854,6 +3855,7 @@ class ExamApp:
                         record["cv_snippet_files"]=[name]
                         record["cv_source_sha256"]=doc.get("sha256")
                         record["cv_source_document_name"]=doc.get("bestand")
+                        record["cv_pdf"]=doc.get("opslagbestand")
                         record["cv_match_human_confirmed"]=True
                     elif role=="aanvulling":
                         record.setdefault("cv_amendment_regions",[])
@@ -3914,7 +3916,10 @@ class ExamApp:
         if record.get("cv_region_invalidated") is True:
             ttk.Label(outer,text="LET OP: de handmatige CV-/aanvullingsafbakening is gewijzigd. Sla dit vraagrecord opnieuw op en voer de eindcontrole opnieuw uit.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
         meta=record.get("exam",{})
-        ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {record.get('question_type') or meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        if record.get("correct"):
+            ttk.Label(outer,text=f"Gecontroleerd correct antwoord / antwoordsleutel: {record.get('correct')}",
+                      wraplength=980).pack(anchor="w",pady=(0,5))
         structure_note = record.get("exam_structure_status", "structuur_niet_ingesteld")
         question_pages = ",".join(str(x.get("page")) for x in record.get("question_region_page_spans", [])) or "geen"
         context_count = len(record.get("context_region_fragments", []))
