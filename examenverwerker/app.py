@@ -4041,8 +4041,12 @@ class ExamApp:
         ttk.Button(region_bar,text="Visuele eindcontrole openen",
                    command=lambda:self.review_question_record(record,win)).pack(side="left",padx=6)
         buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
+        def close_editor():
+            win.destroy()
+            if hasattr(self,"_return_to_final_review"):
+                delattr(self,"_return_to_final_review")
         ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
-        ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
+        ttk.Button(buttons,text="Sluiten",command=close_editor).pack(side="right",padx=8)
 
     def review_question_record(self,record,parent):
         win=tk.Toplevel(parent); win.title(f"Eindcontrole · {record.get('id')}"); win.geometry("1040x850")
