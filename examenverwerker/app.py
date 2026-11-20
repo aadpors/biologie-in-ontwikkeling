@@ -430,7 +430,7 @@ class ExamApp:
                     if not messagebox.askyesno("Opslaan niet gelukt",
                         "De laatste wijzigingen konden niet worden opgeslagen. Toch sluiten?", parent=win):
                         return
-                self._open_workspaces.pop(key, None)
+                self._open_workspaces.pop(workspace._workspace_key, None)
                 try:
                     win.destroy()
                 finally:
@@ -465,13 +465,19 @@ class ExamApp:
             messagebox.showinfo("Selecteer een examen", "Selecteer eerst een examen.", parent=self.root)
             return
         try:
-            path = folder / PROJECT_FILE
-            data = json.loads(path.read_text(encoding="utf-8"))
-            data["bibliotheek_archief"] = not bool(data.get("bibliotheek_archief", False))
-            data["bijgewerkt"] = now()
-            temp = path.with_suffix(".json.tmp")
-            temp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-            temp.replace(path)
+            key = str(folder.resolve())
+            workspace = self._open_workspaces.get(key)
+            if workspace is not None:
+                workspace.data["bibliotheek_archief"] = not bool(workspace.data.get("bibliotheek_archief", False))
+                workspace.save_project()
+            else:
+                path = folder / PROJECT_FILE
+                data = json.loads(path.read_text(encoding="utf-8"))
+                data["bibliotheek_archief"] = not bool(data.get("bibliotheek_archief", False))
+                data["bijgewerkt"] = now()
+                temp = path.with_suffix(".json.tmp")
+                temp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+                temp.replace(path)
             self._refresh_library()
         except Exception as exc:
             self._error("Examen archiveren", exc)
