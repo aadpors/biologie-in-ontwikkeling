@@ -3905,6 +3905,10 @@ class ExamApp:
             self.save_project()
             self._log(f"Vraag {record.get('number')}: vraagtype, punten en antwoordopties gecontroleerd.")
             win.destroy()
+            return_to_review=getattr(self,"_return_to_final_review",None)
+            if return_to_review:
+                delattr(self,"_return_to_final_review")
+                self.root.after(100,return_to_review)
         region_bar=ttk.LabelFrame(outer,text="Gekoppelde documentfragmenten",padding=8)
         region_bar.pack(fill="x",pady=(10,0))
         def open_region(role):
@@ -4184,11 +4188,19 @@ class ExamApp:
         def refresh_review():
             win.destroy()
             self.review_question_record(record,parent)
+        def return_to_same_question():
+            try:
+                if win.winfo_exists(): win.destroy()
+            except tk.TclError:
+                pass
+            self.review_question_record(record,parent)
         source_doc=next((d for d in self.data.get("documenten",[])
                          if d.get("id")==record.get("candidate_document_id")),None)
         def edit_question_analysis():
+            self._return_to_final_review=return_to_same_question
             self._review_simple_question_draft(record,win)
         def edit_question_structure():
+            self._return_to_final_review=return_to_same_question
             self._structure_focus_question_number=int(record.get("number",0) or 0)
             self.edit_exam_structure()
         def edit_cv_region(role):
@@ -5467,6 +5479,10 @@ class ExamApp:
             self.status.configure(
                 text=f"Fragmentcontrole afgerond · vraagtypen voor {classified} vragen bepaald · volgende stap: vraagrecords."
             )
+            return_to_review=getattr(self,"_return_to_final_review",None)
+            if return_to_review:
+                delattr(self,"_return_to_final_review")
+                self.root.after(150,return_to_review)
         ttk.Button(actions, text="Fragmenten klaar · verder", command=save_and_close,
                    style="Accent.TButton").pack(side="right", padx=(8, 0))
         ttk.Label(actions, textvariable=save_status, foreground="#47734a").pack(side="right", padx=(8, 12))
