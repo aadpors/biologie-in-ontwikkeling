@@ -1539,7 +1539,10 @@ class ExamApp:
             row["vraagtype_fragment_id"] = fragment.get("id")
         records = self.data.setdefault("vraagrecords", [])
         subject = str(self.data.get("vak") or "Onbekend")
-        exam_meta = doc.get("exam_metadata") or self.data.get("exam_metadata") or {}
+        exam_meta = dict(doc.get("exam_metadata") or self.data.get("exam_metadata") or {})
+        for key in ("theme","concept","end","focus"):
+            exam_meta.setdefault(key,"")
+        exam_meta.setdefault("points",None)
         for row in candidates:
             fragment = linked[row.get("id")]
             question_links = fragments_for_question(structure, int(row["number"]))
@@ -3951,10 +3954,10 @@ class ExamApp:
             if raw_points:
                 try:
                     points=float(raw_points)
-                    if points<0 or points>100:
+                    if points<0 or points>100 or not points.is_integer():
                         raise ValueError
                 except ValueError:
-                    messagebox.showerror("Ongeldig puntenaantal","Vul een getal tussen 0 en 100 in.",parent=win)
+                    messagebox.showerror("Ongeldig puntenaantal","Vul een geheel puntenaantal tussen 0 en 100 in.",parent=win)
                     return
             else:
                 points=None
@@ -3986,7 +3989,7 @@ class ExamApp:
             else:
                 record.pop("answer_review",None)
             record["cv_amendment_change_type"]=amendment_change_var.get()
-            record.setdefault("exam",{})["points"]=points
+            record.setdefault("exam",{})["points"]=int(points) if points is not None else None
             record["status"]="concept"
             self.save_project()
             self._log(f"Vraag {record.get('number')}: vraagtype, punten en antwoordopties gecontroleerd.")
