@@ -18,7 +18,7 @@ from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragmen
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.16.0"
+APP_VERSION = "0.17.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -767,13 +767,20 @@ class ExamApp:
                 self._auto_creating_drafts = False
         actions = {
             "import": ("Examenbibliotheek tonen", self._show_exam_library),
-            "documenttype": ("Documenttype corrigeren", self.correct_type),
-            "analyse": ("Vraagstarts analyseren", self.analyze_questions),
-            "vraagstarts": ("Verder met vraagcontrole", self._workflow_focus_next),
-            "ontbrekende_vragen": ("Ontbrekende vraag markeren", self._workspace_start_manual_mark),
-            "structuur": ("Structuur afbakenen", self.edit_exam_structure),
-            "vraagrecords": ("Volgend vraagrecord maken", self._workflow_make_next_record),
-            "eindcontrole": ("Eindcontrole openen", self.show_records),
+            "documenttype": ("Documenttype bevestigen", self.correct_type),
+            "metadata": ("Examengegevens bevestigen", self.edit_exam_metadata),
+            "vraagstarts": ("Vraagstarts beoordelen", self.show_candidates),
+            "opgaven_fragmenten": ("Context- en vraagfragmenten", self.edit_exam_structure),
+            "vraaganalyse": ("Vraagtype en punten controleren", self.show_candidates),
+            "uitwerkbijlage_starts": ("Uitwerkbijlage controleren", self.show_records),
+            "uitwerkbijlage_fragmenten": ("Uitwerkbijlagefragmenten", self.show_records),
+            "cv_starts": ("Correctievoorschrift controleren", self.show_records),
+            "cv_fragmenten": ("CV-fragmenten controleren", self.show_records),
+            "aanvulling": ("CV-aanvulling verwerken", self.show_records),
+            "antwoorden": ("Correcte antwoorden controleren", self.show_records),
+            "volledigheid": ("Volledigheidscontrole", self.show_records),
+            "snippets": ("Vraaguitsneden controleren", self.show_records),
+            "eindcontrole": ("Visuele eindcontrole", self.show_records),
             "export": ("Exportpakket maken", self.export_project),
             "voltooid": ("Examenbibliotheek tonen", self._show_exam_library),
         }
