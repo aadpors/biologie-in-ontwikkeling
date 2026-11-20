@@ -3508,7 +3508,7 @@ class ExamApp:
         type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
             values=list(fragment_type_ids), width=25)
         type_box.pack(fill="x", pady=(2, 4))
-        ttk.Label(left, text="Intro: geldt voor alle vragen. Tussencontext: koppel aan één of meer vragen. Vraag: precies één vraagblok.",
+        ttk.Label(left, text="Pagina 1 is het voorblad/instructieblad en wordt nooit als context gebruikt. Intro: alle vragen. Tussencontext: één of meer vragen. Vraag: precies één vraagblok.",
                   wraplength=230, justify="left").pack(anchor="w", pady=(0, 8))
         ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
@@ -3674,6 +3674,8 @@ class ExamApp:
         def create_fragment():
             try:
                 kind = fragment_type_ids[type_var.get()]
+                if kind != "vraag" and displayed_page == 1:
+                    raise ValueError("Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag geen contextfragment bevatten.")
                 links = selected_links()
                 if kind == "intro" and not links: links = question_numbers[:]
                 span = make_page_span(displayed_page, top_y, bottom_y)
@@ -3681,7 +3683,9 @@ class ExamApp:
                     f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}")
                 fragments.append(fragment)
                 refresh_fragment_list()
-                fragment_tree.selection_set(str(len(fragments)-1))
+                new_index = next(i for i, item in enumerate(fragments)
+                                 if item.get("id") == fragment.get("id"))
+                fragment_tree.selection_set(str(new_index))
                 save_structure()
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
@@ -3691,6 +3695,8 @@ class ExamApp:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waarvan je de huidige paginagrens wilt aanpassen.", parent=win)
                 return
             try:
+                if canonical_fragment_type(frag.get("type", "")) != "vraag" and displayed_page == 1:
+                    raise ValueError("Pagina 1 van de opgaven-PDF mag niet als context worden afgebakend.")
                 updated = dict(frag)
                 spans = [dict(x) for x in frag.get("page_spans", [])]
                 span = make_page_span(displayed_page, top_y, bottom_y)
@@ -3713,6 +3719,8 @@ class ExamApp:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waaraan je deze pagina wilt toevoegen.", parent=win)
                 return
             try:
+                if canonical_fragment_type(frag.get("type", "")) != "vraag" and displayed_page == 1:
+                    raise ValueError("Pagina 1 van de opgaven-PDF mag niet aan een contextfragment worden toegevoegd.")
                 updated = append_page_span(frag, make_page_span(displayed_page, top_y, bottom_y))
                 fragments[int(fragment_tree.selection()[0])] = updated
                 refresh_fragment_list()
