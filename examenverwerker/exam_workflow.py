@@ -242,18 +242,17 @@ def exam_workflow_state(data: dict) -> dict:
 
     appendix_docs = _documents(data, "uitwerkbijlage")
     for doc in appendix_docs:
-        starts = doc.get("vraagkandidaten") or doc.get("vraagstarts") or []
-        if not starts or any(x.get("human_decision") not in (True, False) for x in starts):
-            return _result("uitwerkbijlage_starts", "Vraagstarts uitwerkbijlage controleren",
-                           "Detecteer en controleer de vraagstarts in de uitwerkbijlage.",
-                           document_id=doc.get("id"))
+        # Question numbering is inherited from the already confirmed opgaven
+        # list; the user visually maps each corresponding appendix answer region
+        # in the same crop editor, avoiding a second, unrelated question list.
+        expected_numbers = sorted({int(row["number"]) for _source, row in all_candidates
+                                   if row.get("number") is not None})
         regions = (data.get("uitwerkbijlage_regions") or {}).get(doc.get("id"), {})
-        missing = [n for n in sorted({int(x["number"]) for x in starts
-                                     if x.get("human_decision") is True})
-                   if str(n) not in regions or not regions[str(n)].get("status") == "bevestigd"]
+        missing = [n for n in expected_numbers if str(n) not in regions
+                   or not regions[str(n)].get("page_spans")]
         if missing:
             return _result("uitwerkbijlage_fragmenten", "Uitwerkbijlagefragmenten controleren",
-                           "Baken de uitwerkbijlagefragmenten af en koppel ze aan de juiste vragen.",
+                           "Baken per vraag de bijbehorende uitwerkbijlage af en controleer de koppeling.",
                            document_id=doc.get("id"), question_numbers=missing)
 
     cv_docs = _documents(data, "correctievoorschrift")
