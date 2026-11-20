@@ -175,7 +175,32 @@ def _completeness_issues(data):
     return issues
 
 
+def exam_completeness_issues(data: dict) -> list[dict]:
+    """Public read-only structural completeness report for the review UI."""
+    issues = list(_completeness_issues(data))
+    records = data.get("vraagrecords") or []
+    for record in records:
+        points = (record.get("exam") or {}).get("points")
+        if points in (None, ""):
+            issues.append({"code": "puntenaantal_ontbreekt",
+                           "record_id": record.get("id"), "question_number": record.get("number")})
+    for doc in _documents(data, "opgaven"):
+        structure = _structure_for(data, doc)
+        if not structure:
+            continue
+        valid_numbers = {int(r["number"]) for r in _confirmed_candidates(data, doc.get("id"))
+                         if r.get("number") is not None}
+        for fragment in structure.get("fragments", []):
+            if fragment.get("type") == "context":
+                links = {int(n) for n in fragment.get("question_numbers", [])}
+                if not links or not links.issubset(valid_numbers):
+                    issues.append({"code": "los_contextfragment",
+                                   "document_id": doc.get("id"), "fragment_id": fragment.get("id")})
+    return issues
+
+
 def exam_workflow_state(data: dict) -> dict:
+
     """Return the next uncompleted processing stage and its evidence requirements."""
     documents = data.get("documenten") or []
     if not documents:
