@@ -209,7 +209,7 @@ for (const id of ['publication-controls', 'science-filter-groups', 'science-cont
 assert.ok(html.includes('class="filter-groups"'), 'De wetenschappelijke filters moeten in één gegroepeerd paneel staan');
 assert.ok(html.includes('.filter-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))'), 'Desktopindeling van de filtergroepen ontbreekt');
 assert.ok(html.includes('@media(max-width:430px)'), 'Mobiele filterindeling ontbreekt');
-assert.ok(html.includes("(x.concept||'')") && html.includes("(x.subdomain||'')") && html.includes("(x.alignment||'')"),
+assert.ok(html.includes("(x.concept||'')") && html.includes("(x.studyType||'')") && html.includes("(x.subdomain||'')") && html.includes("(x.alignment||'')"),
   'Zoeken moet ook hoofdthema, syllabuscode en curriculumkoppeling doorzoeken');
 const conceptFilter = html.match(/<select id="concept">([\s\S]*?)<\/select>/)?.[1] || '';
 const conceptOptions = [...conceptFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
@@ -258,9 +258,10 @@ for (const [index, item] of publications.entries()) {
   if (item.pdf) assert.ok(/^https:\/\//.test(item.pdf), `${where}: PDF-link moet HTTPS gebruiken`);
   if (item.page === 'science') {
     assert.ok(['Havo', 'Vwo', 'Havo/vwo'].includes(item.level), `${where}: onbekend niveau "${item.level}"`);
+    assert.ok(['Primair onderzoek', 'Review / synthese', 'Perspectiefartikel'].includes(item.studyType), `${where}: onbekend onderzoekstype "${item.studyType}"`);
     assert.ok(['Huidig', 'Toekomstig', 'Beide'].includes(item.programme), `${where}: onbekend programma "${item.programme}"`);
     assert.ok(['Direct', 'Aansluitend', 'Verdieping'].includes(item.relevanceLevel), `${where}: onbekende relevantie-indicatie "${item.relevanceLevel}"`);
-    for (const field of ['level', 'programme', 'concept', 'alignment', 'evidence', 'evidenceNote', 'relevanceNote']) {
+    for (const field of ['level', 'programme', 'concept', 'studyType', 'alignment', 'evidence', 'evidenceNote', 'relevanceNote']) {
       assert.equal(typeof item[field], 'string', `${where}: vakinhoudelijk veld "${field}" ontbreekt`);
     }
   } else {
