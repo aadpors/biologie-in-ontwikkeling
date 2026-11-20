@@ -3753,7 +3753,6 @@ class ExamApp:
         def show_document(scroll_to_page=None):
             nonlocal photo, document_photo, page_image_width, page_image_height, displayed_page, snippet_mode, overlay_items
             current_scroll_y = canvas.canvasy(0) if photo is not None else 0.0
-            viewport_height = max(1, canvas.winfo_height())
             snippet_mode = False
             if document_photo is None:
                 document_photo = tk.PhotoImage(file=str(stitched_path))
