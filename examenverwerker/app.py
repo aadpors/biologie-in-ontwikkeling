@@ -224,8 +224,8 @@ class ExamApp:
         style.configure("Vertical.TScrollbar", background="#DCE3E6",
                         troughcolor="#F5F7F7", bordercolor="#F5F7F7", arrowsize=12)
 
-    def _build(self):
-        """Integrated examination workbench: source PDF, documents, candidates and review."""
+    def _build_workspace(self):
+        """Build the complete exam-processing workspace in its own window."""
         self.root.title("Examenverwerker")
         fit_window(self.root, 1440, 920, 980, 640)
         shell = ttk.Frame(self.root, style="App.TFrame", padding=10)
