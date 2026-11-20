@@ -188,6 +188,11 @@ def _completeness_issues(data):
         if duplicates:
             issues.append({"code": "dubbele_vraagnummering", "document_id": doc.get("id"),
                            "numbers": duplicates})
+        if numbers:
+            gaps=sorted(set(range(min(numbers),max(numbers)+1))-set(numbers))
+            if gaps:
+                issues.append({"code":"vraagnummer_ontbreekt","document_id":doc.get("id"),
+                               "numbers":gaps})
         structure = _structure_for(data, doc)
         if structure:
             missing = missing_question_regions(structure, numbers)
