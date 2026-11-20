@@ -3976,7 +3976,9 @@ class ExamApp:
             record["approved_at"]=None
             record["record_review_checklist"]={key:False for key in record.get("record_review_checklist",{})}
             record["question_type"]=type_var.get()
-            record.setdefault("exam",{})["questionType"]="mcq" if type_var.get()=="meerkeuze" else "open"
+            record.setdefault("exam",{})["questionType"]=(
+                "mcq" if type_var.get()=="meerkeuze" else
+                "unknown" if type_var.get()=="onbekend" else "open")
             record["question_type_status"]="handmatig_gecontroleerd"
             record["options"]=options
             record["correct"]=correct_var.get().strip()
