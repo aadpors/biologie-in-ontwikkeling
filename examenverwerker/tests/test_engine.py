@@ -410,7 +410,7 @@ class EngineTests(unittest.TestCase):
                 page.insert_text((60, 120), f"Vraag {page_no - 1}. Beschrijf de situatie.")
                 # This repeated line sits in the footer band but is real exam
                 # content. The final question line must survive beneath it.
-                page.insert_text((60, 750), "Veelvoorkomende tekstregel")
+                page.insert_text((60, 750), "Biologie | Examen 2026")
                 page.insert_text((60, 775), (
                     "De eigenschap dominant overerft."
                     if page_no == 2 else "Deze inhoud hoort bij de volgende vraag."
@@ -424,13 +424,13 @@ class EngineTests(unittest.TestCase):
             self.assertTrue(result["page_map"][0]["footer_detected"])
             self.assertTrue(result["page_map"][0]["footer_review_required"])
             self.assertIn(
-                "Veelvoorkomende tekstregel",
+                "Biologie | Examen 2026",
                 result["page_map"][0]["footer_candidates_rejected"],
             )
             with fitz.open(preview) as cleaned:
                 page_text = cleaned[0].get_text("text").lower()
                 self.assertIn("dominant overerft", page_text)
-                self.assertNotIn("biologie | examen 2026", page_text)
+                self.assertEqual(page_text.count("biologie | examen 2026"), 1)
                 self.assertNotIn("biologie | examen 2026", page_text)
 
     def test_vwo_2026_ii_question_one_and_final_overerft_line_survive_preview(self):
