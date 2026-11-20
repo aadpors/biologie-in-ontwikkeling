@@ -806,6 +806,15 @@ class ExamApp:
             button, action = "Volgend examen", self._workflow_open_next_exam
         else:
             button, action = actions[state["stage"]]
+            if state["stage"] == "vraagstarts":
+                target_id=state.get("document_id")
+                found=any(r.get("document_id")==target_id for r in self.data.get("vraagkandidaten",[]))
+                if found:
+                    button="Vraagstarts beoordelen"
+                    action=lambda:self.show_candidates(target_id)
+                else:
+                    button="Vraagstarts analyseren"
+                    action=self.analyze_questions
         self.workflow_label.configure(text=f"Volgende stap · {label}. {state['action']}")
         self.workflow_button.configure(text=button, command=action)
 
