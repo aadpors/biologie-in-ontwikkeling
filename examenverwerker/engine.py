@@ -75,6 +75,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
         )
         # OCR is attempted only for pages whose embedded text is absent or
         # clearly insufficient relative to a large scanned image.
+        ocr_used=False
         if len(text.strip())<40 or (large_image and len(text.strip())<180):
             raw_for_text=raw
             for language in ("nld+eng","eng"):
@@ -84,6 +85,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
                     if len(ocr_text.strip())>len(text.strip()):
                         raw_for_text=page.get_text("dict",textpage=ocr_page,sort=True)
                         text=ocr_text
+                        ocr_used=True
                         break
                 except Exception:
                     continue
@@ -143,7 +145,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
             # Text and raster inventory should still remain usable.
             pass
         pages.append({"page":i+1,"width":page.rect.width,"height":page.rect.height,
-                      "text":text,"blocks":blocks,
+                      "text":text,"ocr_used":ocr_used,"blocks":blocks,
                       "visual_assets": visual_assets})
     meta=doc.metadata or {}
     doc.close()
