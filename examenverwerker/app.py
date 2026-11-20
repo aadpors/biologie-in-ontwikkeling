@@ -4020,6 +4020,7 @@ class ExamApp:
             except Exception as exc:
                 messagebox.showerror("Selectie niet bijgewerkt", str(exc), parent=win)
         def append_page():
+            nonlocal selection_start, selection_end
             if snippet_mode:
                 show_document(displayed_page)
                 return
@@ -4035,6 +4036,19 @@ class ExamApp:
                 )
                 updated = append_page_span(frag, span)
                 fragments[int(fragment_tree.selection()[0])] = updated
+                ordered_spans = sorted(
+                    updated.get("page_spans", []),
+                    key=lambda item: int(item["page"]),
+                )
+                if ordered_spans:
+                    selection_start = (
+                        int(ordered_spans[0]["page"]),
+                        float(ordered_spans[0]["top"]),
+                    )
+                    selection_end = (
+                        int(ordered_spans[-1]["page"]),
+                        float(ordered_spans[-1]["bottom"]),
+                    )
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(fragments.index(updated)))
                 save_structure()
