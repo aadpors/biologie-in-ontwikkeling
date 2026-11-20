@@ -4143,13 +4143,13 @@ class ExamApp:
                     return False
             new_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
             structure_changed = new_signature != original_structure_signature
-            # Saving the user's edited structure is the review action.
-            # New proposals remain provisional until the user edits/saves them.
-            for fragment in fragments:
-                if fragment.get("status") == "automatisch_voorstel_nog_te_controleren":
-                    fragment["status"] = "handmatig_gecontroleerd"
-                fragment["reviewed_by_human"] = True
-                fragment["reviewed_at"] = now()
+            # An explicit boundary edit reviews only the selected fragment.
+            # Existing, previously hand-adjusted projects are recognized as
+            # reviewed when loaded; untouched fresh proposals stay provisional.
+            if selection_dirty and current:
+                current["status"] = "handmatig_gecontroleerd"
+                current["reviewed_by_human"] = True
+                current["reviewed_at"] = now()
             structure = make_exam_structure(doc, fragments, question_numbers)
             errors = validate_exam_structure(structure, doc["id"], doc["sha256"], question_numbers)
             if errors:
@@ -4186,6 +4186,9 @@ class ExamApp:
                     f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}",
                 )
                 fragment["page_spans"] = spans
+                fragment["status"] = "handmatig_gecontroleerd"
+                fragment["reviewed_by_human"] = True
+                fragment["reviewed_at"] = now()
                 fragments.append(fragment)
                 refresh_fragment_list()
                 new_index = next(i for i, item in enumerate(fragments)
