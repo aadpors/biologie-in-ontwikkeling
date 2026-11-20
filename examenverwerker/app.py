@@ -3528,7 +3528,7 @@ class ExamApp:
         ttk.Label(header, text=f"Voorbewerking: voorblad verwijderd; footer/onderliggende witruimte automatisch afgesneden op {trimmed_pages} van {len(preview_info['page_map'])} pagina's. De originele PDF blijft ongewijzigd.",
                   wraplength=1180).pack(anchor="w", pady=(3, 0))
         uncertain_pages = [
-            str(item["original_page"]) for item in preview_info["page_map"]
+            item for item in preview_info["page_map"]
             if item.get("footer_review_required")
             or (
                 not item.get("footer_detected")
@@ -3538,16 +3538,15 @@ class ExamApp:
         if uncertain_pages:
             ttk.Label(
                 header,
-                text="Visuele controle nodig op pagina('s) " + ", ".join(uncertain_pages) +
-                     ": een footerindicatie overlapt mogelijk met inhoud of kon niet veilig worden vastgesteld. De inhoud is behouden.",
+                text="Enkele pagina's vragen nog een visuele controle: een footerindicatie overlapt mogelijk met inhoud of kon niet veilig worden vastgesteld. De inhoud is behouden.",
                 foreground="#9b4d00", wraplength=1180,
             ).pack(anchor="w", pady=(2, 0))
         ttk.Label(
             header,
             text="De opgeschoonde opgavenpagina's staan hieronder achter elkaar als één doorlopende PDF. "
                  "Selecteer links een fragment en sleep de twee grenslijnen op de lange pagina. "
-                 "Bij een selectie over meerdere pagina's kun je een grenslijn vasthouden en naar de boven- of onderrand bewegen om automatisch mee te scrollen. "
-                 "Met 'Fragmentvoorbeeld' controleer je de samengestelde uitsnede; de koppeling met de oorspronkelijke PDF-pagina's blijft behouden.",
+                 "Bij een selectie over meerdere pagina's kun je een grenslijn vasthouden en rustig naar de boven- of onderrand bewegen om mee te scrollen. "
+                 "Met 'Fragmentvoorbeeld' controleer je de samengestelde uitsnede.",
             wraplength=1180,
         ).pack(anchor="w", pady=(3, 0))
         body = ttk.Frame(win, padding=8); body.pack(fill="both", expand=True)
@@ -3560,7 +3559,7 @@ class ExamApp:
         type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
             values=list(fragment_type_ids), width=25)
         type_box.pack(fill="x", pady=(2, 4))
-        ttk.Label(left, text="Pagina 1 is het voorblad/instructieblad en wordt nooit als context gebruikt. Context: koppel aan één of meer vragen. Vraag: precies één vraagblok.",
+        ttk.Label(left, text="Het voorblad/instructieblad wordt niet als context gebruikt. Context: koppel aan één of meer vragen. Vraag: precies één vraagblok.",
                   wraplength=230, justify="left").pack(anchor="w", pady=(0, 8))
         ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
@@ -3570,8 +3569,8 @@ class ExamApp:
             qlist.selection_clear(0, "end")
             # No implicit selection: the user explicitly links each context
             # to the question(s) it actually introduces.
-        type_box.bind("<<ComboboxSelected>>", set_default_links)
-        set_default_links()
+        # Keep the question links when switching the fragment type.
+        # The user may edit both fields independently; changes are saved below.
         ttk.Label(left, text="Bestaande fragmenten").pack(anchor="w", pady=(4, 2))
         fragment_tree = ttk.Treeview(left, columns=("type", "links", "confidence"), show="tree headings", height=12)
         fragment_tree.heading("#0", text="Fragment")
@@ -3757,6 +3756,7 @@ class ExamApp:
         def show_document(scroll_to_page=None):
             nonlocal photo, document_photo, page_image_width, page_image_height, displayed_page, snippet_mode, overlay_items
             current_scroll_y = canvas.canvasy(0) if photo is not None else 0.0
+            viewport_height = max(1, canvas.winfo_height())
             snippet_mode = False
             if document_photo is None:
                 document_photo = tk.PhotoImage(file=str(stitched_path))
@@ -3781,8 +3781,12 @@ class ExamApp:
                     target_y = 0.0
             else:
                 target_y = current_scroll_y
+            # Tk's yview_moveto fraction is relative to the scrollable range,
+            # not the full image height. Using the image height made every
+            # redraw drift toward the top as the user edited boundaries.
+            scrollable_height = max(1.0, page_image_height - viewport_height)
             canvas.yview_moveto(
-                max(0.0, min(1.0, target_y / max(1.0, page_image_height)))
+                max(0.0, min(1.0, target_y / scrollable_height))
             )
 
         def show_page():
@@ -3909,27 +3913,26 @@ class ExamApp:
             if not drag_handle or drag_pointer_y is None:
                 return
             viewport_height = max(1, canvas.winfo_height())
-            edge_zone = 48
+            # Deliberately slow, fixed-step scrolling. The former 1-2 units
+            # every 100 ms accelerated too much near the edge and could race
+            # the pointer across a very tall stitched page.
+            edge_zone = 24
             if drag_pointer_y < edge_zone:
-                distance = drag_pointer_y
-                speed = 2 if distance < 14 else 1
-                canvas.yview_scroll(-speed, "units")
+                canvas.yview_scroll(-1, "units")
             elif drag_pointer_y > viewport_height - edge_zone:
-                distance = viewport_height - drag_pointer_y
-                speed = 2 if distance < 14 else 1
-                canvas.yview_scroll(speed, "units")
+                canvas.yview_scroll(1, "units")
             else:
                 return
-            update_drag_selection(drag_pointer_y)
-            auto_scroll_job = canvas.after(100, auto_scroll_tick)
+            update_drag_selection(max(0, min(viewport_height, drag_pointer_y)))
+            auto_scroll_job = canvas.after(180, auto_scroll_tick)
 
         def schedule_auto_scroll():
             nonlocal auto_scroll_job
             if not drag_handle or auto_scroll_job is not None:
                 return
             viewport_height = max(1, canvas.winfo_height())
-            if drag_pointer_y < 48 or drag_pointer_y > viewport_height - 48:
-                auto_scroll_job = canvas.after(100, auto_scroll_tick)
+            if drag_pointer_y < 24 or drag_pointer_y > viewport_height - 24:
+                auto_scroll_job = canvas.after(180, auto_scroll_tick)
 
         def on_drag(event):
             nonlocal drag_pointer_y
@@ -4176,7 +4179,7 @@ class ExamApp:
                 return
             frag["type"] = new_type
             frag["question_numbers"] = links
-            save_structure(); refresh_fragment_list(); show_document(displayed_page)
+            save_structure(); refresh_fragment_list(); redraw_guides()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
             nonlocal selection_start, selection_end, displayed_page, selection_dirty
@@ -4237,7 +4240,8 @@ class ExamApp:
                 self._workspace_refresh()
                 self._workflow_refresh()
         ttk.Button(actions, text="Terug naar vraagcontrole", command=save_and_close).pack(side="right", padx=(8, 0))
-        ttk.Button(actions, text="Structuur opslaan", command=save_structure).pack(side="right")
+        save_status = tk.StringVar(value="Wijzigingen worden automatisch opgeslagen.")
+        ttk.Label(actions, textvariable=save_status, foreground="#47734a").pack(side="right", padx=(8, 12))
         refresh_fragment_list()
         if fragments:
             fragment_tree.selection_set("0")
