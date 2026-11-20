@@ -543,28 +543,30 @@ class ExamApp:
             self._workspace_refresh_candidates(index)
 
     def _workflow_make_next_record(self):
+        """Backfill simple drafts for older projects whose fragments were already saved."""
         if not self.data:
             return
-        records = self.data.get("vraagrecords", [])
-        candidate = next((row for row in self.data.get("vraagkandidaten", [])
-            if row.get("human_decision") is True and not any(
-                record.get("candidate_document_id") == row.get("document_id")
-                and int(record.get("number", -1) or -1) == int(row.get("number", -2) or -2)
-                and int(record.get("source_page", -1) or -1) == int(row.get("page", -2) or -2)
-                for record in records)), None)
-        if candidate is None:
-            self._workflow_refresh()
-            return
-        self._workspace_filter.set("Alle kandidaten")
-        if candidate.get("document_id") != self._workspace_doc_id:
-            self._workspace_doc_id = candidate.get("document_id")
-            self._workspace_selected = None
-            self._workspace_refresh()
-        else:
-            index = next((i for i, item in enumerate(self._workspace_rows)
-                          if item.get("id") == candidate.get("id")), 0)
-            self._workspace_refresh_candidates(index)
-        self._workspace_create_record()
+        source_docs=[doc for doc in self.data.get("documenten",[])
+                     if doc.get("type_voorstel")=="opgaven"]
+        created=0
+        try:
+            for doc in source_docs:
+                structure=(self.data.get("exam_structures",{}).get(doc.get("id"))
+                           or self.data.get("exam_structure"))
+                confirmed=[row for row in self.data.get("vraagkandidaten",[])
+                           if row.get("document_id")==doc.get("id")
+                           and row.get("human_decision") is True]
+                if structure and confirmed:
+                    created += self._classify_question_types_for_document(doc)
+            self.refresh()
+            self._log(f"Conceptvragen bijgewerkt vanuit opgeslagen fragmenten: {created}.")
+        except Exception as exc:
+            self._error("Conceptvragen maken",exc)
+            messagebox.showerror(
+                "Conceptvragen niet aangemaakt",
+                "De opgeslagen fragmenten zijn niet aangepast. Controleer de bronbestanden en probeer opnieuw.\n\n"+str(exc),
+                parent=self.root,
+            )
 
     def _workspace_doc(self):
         if not self.data:
@@ -1068,6 +1070,30 @@ class ExamApp:
             raise ValueError("Er zijn geen bevestigde vragen om te classificeren.")
         # Refuse to classify from question starts alone: every question needs
         # its manually checked, persisted question fragment first.
+        # Older projects already contain teacher-reviewed fragment geometry
+        # but predate the cached text field. Extract text only inside those saved
+        # regions once; never rediscover question boundaries from the PDF.
+        saved_fragments = structure.get("fragments", []) if structure else []
+        if any("text" not in fragment for fragment in saved_fragments):
+            source_path = self.project_dir / "bronnen" / doc["opslagbestand"]
+            if not source_path.is_file() or sha256(source_path) != doc.get("sha256"):
+                raise ValueError("De originele PDF ontbreekt of is gewijzigd; de opgeslagen fragmentgrenzen blijven behouden.")
+            import pymupdf as fitz
+            with fitz.open(source_path) as source_pdf:
+                page_sizes = {
+                    index + 1: (float(page.rect.width), float(page.rect.height))
+                    for index, page in enumerate(source_pdf)
+                }
+            for fragment in saved_fragments:
+                if "text" in fragment or not fragment.get("page_spans"):
+                    continue
+                segments = page_spans_to_segments(fragment["page_spans"], page_sizes)
+                fragment["text"] = extract_region_text(source_path, segments)
+            self.data.setdefault("exam_structures", {})[doc["id"]] = structure
+            if self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
+                self.data["exam_structure"] = structure
+            self.save_project()
+
         linked = {}
         for row in candidates:
             result = fragments_for_question(structure, int(row["number"]))
