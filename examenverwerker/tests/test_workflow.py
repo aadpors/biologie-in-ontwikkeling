@@ -55,6 +55,7 @@ def with_record(data):
     data["vraagrecords"] = [{
         "id": "record-1", "candidate_document_id": "opgaven-1",
         "number": 1, "source_page": 2, "question_type_status": "handmatig_gecontroleerd",
+        "exam": {"points": 1},
     }]
     return data
 
