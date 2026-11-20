@@ -211,8 +211,8 @@ assert.ok(html.includes('.filter-groups{display:grid;grid-template-columns:repea
 assert.ok(html.includes('@media(max-width:430px)'), 'Mobiele filterindeling ontbreekt');
 assert.ok(html.includes("(x.concept||'')") && html.includes("(x.subdomain||'')") && html.includes("(x.alignment||'')"),
   'Zoeken moet ook hoofdthema, syllabuscode en curriculumkoppeling doorzoeken');
-const conceptFilter = html.match(/<select id="concept">([\\s\\S]*?)<\\/select>/)?.[1] || '';
-const conceptOptions = [...conceptFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
+const conceptFilter = html.match(/<select id="concept">([\s\S]*?)<\/select>/)?.[1] || '';
+const conceptOptions = [...conceptFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
 const scienceConcepts = [...new Set(publications.filter(item => item.page === 'science').map(item => item.concept))];
 for (const concept of scienceConcepts) assert.ok(conceptOptions.includes(concept), `Hoofdthema ontbreekt in de filterlijst: ${concept}`);
 assert.ok(html.includes("$('science-filter-groups').hidden=p!=='science'") && html.includes("$('education-filter-group').hidden=p!=='education'"),
