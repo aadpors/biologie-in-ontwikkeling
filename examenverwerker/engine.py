@@ -414,11 +414,10 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
             })
 
         explicit_footer = re.compile(
-            r"(examenblad|college voor toetsen|cito|www\.|©|"
-            r"pagina\s*\d|tijdvak\s*\d|lees\s+verder|"
-            r"\b\d{1,3}\s*/\s*\d{1,3}\b|"
-            r"\b(?:biologie|examen)\b.{0,24}\b20\d{2}\b|"
-            r"\b(?:vw|ha)-\d{4}-[a-z]-\d{2}-\d-[\w-]+\b)",
+            r"^(?:examenblad\b|college voor toetsen\b|cito\b|www\.|©|"
+            r"lees\s+verder(?:\s*[►▶>]{1,3})?|"
+            r"(?:biologie\s*[|·-]\s*)?examen\s+20\d{2}|"
+            r"(?:vw|ha)-\d{4}-[a-z]-\d{2}-\d-[\w-]+(?:\s+.*)?)$",
             re.I,
         )
         mapping = []
@@ -435,7 +434,19 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                         re.fullmatch(r"\d{1,3}", line["normalized"])
                         and relative_top >= 0.90
                     )
-                    if explicit_footer.search(line["text"]) or standalone_page_number:
+                    page_counter = bool(
+                        re.fullmatch(
+                            r"(?:pagina\s*)?\d{1,3}\s*(?:/|van)\s*\d{1,3}",
+                            line["text"], re.I,
+                        )
+                        or re.fullmatch(r"pagina\s*\d{1,3}", line["text"], re.I)
+                        or re.fullmatch(r"tijdvak\s*\d{1,2}", line["text"], re.I)
+                    )
+                    footer_marker = (
+                        len(line["text"]) <= 120
+                        and bool(explicit_footer.search(line["text"]))
+                    )
+                    if footer_marker or standalone_page_number or page_counter:
                         candidates.append(line)
 
                 # A footer candidate is safe only if no non-footer text or
