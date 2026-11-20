@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 from structure import make_exam_structure, make_fragment, make_page_span, make_cv_fragment
 from exam_workflow import (
-    exam_export_fingerprint, exam_workflow_state, restore_import_batch,
+    exam_export_fingerprint, exam_review_fingerprint, exam_workflow_state, restore_import_batch,
 )
 
 
@@ -142,11 +142,14 @@ class ExamWorkflowTests(unittest.TestCase):
     def test_snippet_and_final_visual_review_are_distinct_gates(self):
         data = with_cv(with_record(with_structure(project())))
         data["vraagrecords"][0]["answer_review"] = {"status": "visueel_bevestigd"}
-        data["completeness_review"] = {"status": "visueel_bevestigd"}
+        data["completeness_review"] = {"status": "visueel_bevestigd",
+            "fingerprint": exam_review_fingerprint(data, False)}
         self.assertEqual(exam_workflow_state(data)["stage"], "snippets")
         data["vraagrecords"][0]["question_region_snippet_file"] = "q1.png"
         self.assertEqual(exam_workflow_state(data)["stage"], "eindcontrole")
-        data["final_visual_review"] = {"status": "visueel_bevestigd"}
+        data["final_visual_review"] = {"status": "visueel_bevestigd",
+            "fingerprint": exam_review_fingerprint(data, True)}
+        data["vraagrecords"][0]["approved_by_human"] = True
         self.assertEqual(exam_workflow_state(data)["stage"], "export")
 
     def test_export_fingerprint_detects_any_reviewed_data_change(self):
@@ -159,8 +162,11 @@ class ExamWorkflowTests(unittest.TestCase):
         data = with_cv(with_record(with_structure(project())))
         data["vraagrecords"][0]["answer_review"] = {"status": "visueel_bevestigd"}
         data["vraagrecords"][0]["question_region_snippet_file"] = "q1.png"
-        data["completeness_review"] = {"status": "visueel_bevestigd"}
-        data["final_visual_review"] = {"status": "visueel_bevestigd"}
+        data["completeness_review"] = {"status": "visueel_bevestigd",
+            "fingerprint": exam_review_fingerprint(data, False)}
+        data["vraagrecords"][0]["approved_by_human"] = True
+        data["final_visual_review"] = {"status": "visueel_bevestigd",
+            "fingerprint": exam_review_fingerprint(data, True)}
         data["export_status"] = {"fingerprint": exam_export_fingerprint(data)}
         self.assertEqual(exam_workflow_state(data)["stage"], "voltooid")
 
