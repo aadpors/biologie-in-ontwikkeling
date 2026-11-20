@@ -13,9 +13,9 @@ const fs = require("node:fs");
 
   try {
     await page.goto("http://127.0.0.1:8000/", { waitUntil: "networkidle" });
-    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("51"));
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("52"));
     const initialCount = await page.locator("#count").innerText();
-    assert.match(initialCount, /51 publicatie/);
+    assert.match(initialCount, /52 publicatie/);
 
     const desktopLayout = await page.evaluate(() => ({
       viewport: window.innerWidth,
@@ -36,7 +36,7 @@ const fs = require("node:fs");
     await page.locator("#search").fill("M5 DNA-replicatie");
     await page.waitForFunction(() => Number(document.querySelector("#count")?.textContent.match(/\d+/)?.[0] || 0) > 0);
     const curriculumSearchCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
-    assert.ok(curriculumSearchCount < 51, "Zoeken op syllabuscode moet een gerichte selectie opleveren");
+    assert.ok(curriculumSearchCount < 52, "Zoeken op syllabuscode moet een gerichte selectie opleveren");
 
     await page.locator("#search").fill("");
     await page.locator("#study-type").selectOption({ label: "Review / synthese" });
@@ -47,12 +47,12 @@ const fs = require("node:fs");
     await page.locator("#concept").selectOption({ label: "Biodiversiteit en ecosystemen" });
     await page.waitForTimeout(100);
     const themeCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
-    assert.ok(themeCount >= 5 && themeCount < 51, "Hoofdthemafilter moet meerdere, maar niet alle publicaties tonen");
+    assert.ok(themeCount >= 5 && themeCount < 52, "Hoofdthemafilter moet meerdere, maar niet alle publicaties tonen");
 
     await page.locator("#level-filter").selectOption("Vwo");
     await page.locator("#evidence-filter").selectOption("Ondersteunend bewijs");
     await page.locator("#clear").click();
-    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("51"));
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("52"));
     assert.equal(await page.locator("#search").inputValue(), "");
     assert.equal(await page.locator("#concept").inputValue(), "all");
     assert.equal(await page.locator("#study-type").inputValue(), "all");
