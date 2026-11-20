@@ -1454,5 +1454,28 @@
     "relevanceNote": "De publicatie verdiept DNA-replicatie en chromosoomorganisatie, maar de specifieke rol van CONCR en DDX11 is geen vereiste examenkennis.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Molecular Cell; meerdere onafhankelijke structurele en functionele technieken ondersteunen de mechanistische conclusie."
+  },
+  {
+    "id": "s51",
+    "page": "science",
+    "date": "2026-04-28",
+    "title": "FXR–YAP signalling maintains biliary epithelial cell identity and preserves liver homeostasis",
+    "summary": "Galwegcellen (biliaire epitheelcellen) beschermen de lever door de galwegen als barrière intact te houden. Onderzoekers laten zien dat het galzuurreceptor-eiwit FXR de transcriptiefactor YAP activeert, waardoor galwegcellen hun identiteit en onderlinge hechting behouden. Wanneer FXR of YAP ontbreekt, raakt de barrière beschadigd, worden andere signaalroutes geactiveerd en neemt fibrose toe. De studie combineert muismodellen, celmodellen en gegevens van menselijke levermonsters.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "Moleculaire interactie",
+    "subdomain": "Huidig havo: M4 Moleculaire interactie (SE) en M3 Zelforganisatie van cellen (CE); vwo: M4 Moleculaire en cellulaire interactie (CE) en M3 Zelforganisatie van cellen (CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen.",
+    "alignment": "Huidig havo: M4 Moleculaire interactie (SE) en M3 Zelforganisatie van cellen (CE); vwo: M4 Moleculaire en cellulaire interactie en M3 Zelforganisatie van cellen (CE). Conceptprogramma v2: havo B2 en vwo B3 Cellen en meercellige organismen. De studie laat zien hoe receptor-gemedieerde genregulatie de identiteit, hechting en functie van gespecialiseerde cellen ondersteunt. De specifieke FXR–YAP-route is verdieping.",
+    "evidence": "Primair experimenteel onderzoek (muismodellen, celmodellen en menselijke levermonsters)",
+    "article": "https://www.nature.com/articles/s42255-026-01521-z",
+    "doi": "10.1038/s42255-026-01521-z",
+    "why": "Deze publicatie verbindt moleculaire interactie met celdifferentiatie en de functie van een orgaan. Een signaal via FXR houdt YAP actief, waardoor galwegcellen hun gespecialiseerde eigenschappen en onderlinge hechting behouden. Bij verstoring van deze route verliest de galwegbarrière haar integriteit en kan leverfibrose toenemen. De studie is een complexe ziektecontext; de specifieke moleculen zijn geen vereiste examenkennis.<br><br><b>Vwo:</b> bespreek hoe receptoractivatie via genregulatie de identiteit en functie van een cel kan behouden. <b>Docentverdieping:</b> verbind celadhesie, weefselintegriteit en orgaanhomeostase.<br><b>Veelvoorkomende misconceptie</b><br>Een gespecialiseerde cel behoudt zijn functie vanzelf; de identiteit en samenhang van cellen hoeven niet actief gereguleerd te worden.<br><b>Concrete lesvraag of denkprikkel</b><br>Hoe kan een verstoring van één signaalroute in galwegcellen uiteindelijk leiden tot schade op orgaanniveau?",
+    "tags": "moleculaire interactie celcommunicatie genregulatie celdifferentiatie lever galwegcellen FXR YAP celadhesie homeostase fibrose",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Gecombineerde muisgenetica, celmodellen en humane monsters ondersteunen de voorgestelde route; de dier- en ziektemodellen geven mechanistische informatie, maar niet elke stap is rechtstreeks causaal aangetoond bij mensen.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "De studie verdiept moleculaire interactie, genregulatie en celdifferentiatie; de specifieke FXR–YAP-route en leverfibrose zijn geen vereiste examenkennis.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature Metabolism; genetische modellen, celproeven en humane gegevens leveren convergerende ondersteuning."
   }
 ]
