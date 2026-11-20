@@ -3449,7 +3449,8 @@ class ExamApp:
                 if intro_spans:
                     fragments.append({
                         "id": f"voorstel-intro-{doc['id'][:8]}",
-                        "type": "intro",
+                        "type": "context",
+                        "context_role": "introductie",
                         "page_spans": intro_spans,
                         "question_numbers": question_numbers[:],
                         "status": "automatisch_voorstel_nog_te_controleren",
@@ -3502,13 +3503,13 @@ class ExamApp:
         left = ttk.Frame(body, width=245); left.pack(side="left", fill="y", padx=(0, 10))
         right = ttk.Frame(body); right.pack(side="left", fill="both", expand=True)
         ttk.Label(left, text="Fragmenttype").pack(anchor="w")
-        fragment_type_ids = {"Intro": "intro", "Tussencontext": "tussen_context", "Vraag": "vraag"}
+        fragment_type_ids = {"Context": "context", "Vraag": "vraag"}
         fragment_type_labels = {value: key for key, value in fragment_type_ids.items()}
-        type_var = tk.StringVar(value="Intro")
+        type_var = tk.StringVar(value="Context")
         type_box = ttk.Combobox(left, textvariable=type_var, state="readonly",
             values=list(fragment_type_ids), width=25)
         type_box.pack(fill="x", pady=(2, 4))
-        ttk.Label(left, text="Pagina 1 is het voorblad/instructieblad en wordt nooit als context gebruikt. Intro: alle vragen. Tussencontext: één of meer vragen. Vraag: precies één vraagblok.",
+        ttk.Label(left, text="Pagina 1 is het voorblad/instructieblad en wordt nooit als context gebruikt. Context: koppel aan één of meer vragen. Vraag: precies één vraagblok.",
                   wraplength=230, justify="left").pack(anchor="w", pady=(0, 8))
         ttk.Label(left, text="Koppelen aan vraagnummer(s)").pack(anchor="w")
         qlist = tk.Listbox(left, selectmode="extended", exportselection=False, height=12)
@@ -3516,8 +3517,8 @@ class ExamApp:
         for number in question_numbers: qlist.insert("end", f"Vraag {number}")
         def set_default_links(*_):
             qlist.selection_clear(0, "end")
-            if type_var.get() == "Intro":
-                for i in range(qlist.size()): qlist.selection_set(i)
+            # No implicit selection: the user explicitly links each context
+            # to the question(s) it actually introduces.
         type_box.bind("<<ComboboxSelected>>", set_default_links)
         set_default_links()
         ttk.Label(left, text="Bestaande fragmenten").pack(anchor="w", pady=(4, 2))
@@ -3677,7 +3678,8 @@ class ExamApp:
                 if kind != "vraag" and displayed_page == 1:
                     raise ValueError("Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag geen contextfragment bevatten.")
                 links = selected_links()
-                if kind == "intro" and not links: links = question_numbers[:]
+                if kind == "context" and not links:
+                    raise ValueError("Koppel dit contextfragment aan minimaal één vraag.")
                 span = make_page_span(displayed_page, top_y, bottom_y)
                 fragment = make_fragment(kind, span, links, question_numbers,
                     f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}")
@@ -3738,7 +3740,7 @@ class ExamApp:
             load_span_for_page(); redraw_guides()
             frag = selected_fragment()
             if frag:
-                type_var.set(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "tussen_context")), "Tussencontext"))
+                type_var.set(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "context")), "Context"))
                 qlist.selection_clear(0, "end")
                 for i, number in enumerate(question_numbers):
                     if number in frag.get("question_numbers", []): qlist.selection_set(i)
@@ -3758,7 +3760,7 @@ class ExamApp:
             if new_type != "vraag" and any(int(span.get("page", 0)) == 1
                                            for span in frag.get("page_spans", [])):
                 messagebox.showwarning("Pagina 1 is geen context",
-                    "Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag niet als intro- of tussencontext worden opgeslagen.",
+                    "Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag niet als context worden opgeslagen.",
                     parent=win)
                 return
             links = selected_links()
@@ -3766,13 +3768,9 @@ class ExamApp:
                 messagebox.showwarning("Vraagfragment", "Een vraagfragment moet aan precies één vraagnummer gekoppeld zijn.", parent=win)
                 return
             if new_type != "vraag" and not links:
-                if new_type == "intro":
-                    links = question_numbers[:]
-                    messagebox.showinfo("Inleiding", "De contextinleiding is standaard aan alle bevestigde vragen gekoppeld.", parent=win)
-                else:
-                    messagebox.showwarning("Context zonder vraagkoppeling",
-                        "Koppel dit contextfragment aan minimaal één vraag. Anders zou het materiaal bij geen enkele vraag worden getoond.", parent=win)
-                    return
+                messagebox.showwarning("Context zonder vraagkoppeling",
+                    "Koppel dit contextfragment aan minimaal één vraag. Anders zou het materiaal bij geen enkele vraag worden getoond.", parent=win)
+                return
             frag["type"] = new_type
             frag["question_numbers"] = links
             save_structure(); refresh_fragment_list()
