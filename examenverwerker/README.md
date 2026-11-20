@@ -51,7 +51,7 @@ Op een Windows-machine met Python 3.12:
 3. Kopieer de volledige map \`dist\\BiologieExamenverwerker\\\` naar een USB-stick of gewenste locatie.
 4. Start daar \`START.bat\`.
 
-De doelcomputer heeft daarna geen Python-installatie of administratorrechten nodig. De applicatie installeert niets in Windows. De centrale map `kennisbank/` staat naast het programma; bewaar deze map bij updates om de opgebouwde leerervaring te behouden.
+De doelcomputer heeft daarna geen Python-installatie of administratorrechten nodig. De applicatie installeert niets in Windows. Projecten en de leerbank worden vanaf versie 0.14.0 buiten de programmamap opgeslagen: op Windows onder `%LOCALAPPDATA%\\BiologieExamenverwerker\\`. Bij de eerste start kopieert de applicatie bestaande projectmappen uit `projecten/` naar deze vaste gebruikerslocatie en controleert ieder gekopieerd bestand met SHA-256. De oorspronkelijke mappen worden niet verwijderd of aangepast. Daardoor kun je bij een software-update de programmamap vervangen zonder je examens, fragmentgrenzen of leerbank kwijt te raken. Maak desondanks regelmatig een eigen reservekopie van de gebruikersgegevens.
 
 Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
 
