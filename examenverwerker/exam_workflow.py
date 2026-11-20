@@ -88,8 +88,13 @@ def exam_review_fingerprint(data: dict, include_snippets: bool = False) -> str:
                         "question_region_snippet_sha256","cv_snippet_file","cv_snippet_files",
                         "cv_source_region_file","cv_source_region_sha256",
                         "cv_amendment_snippet_file","cv_amendment_snippet_files",
-                        "context_asset_files","context_region_snippet_files"):
+                        "context_region_snippet_files"):
                 record.pop(key,None)
+            if isinstance(record.get("context_asset_files"),list):
+                record["context_asset_files"]=[
+                    asset for asset in record["context_asset_files"]
+                    if not (asset.get("type")=="context" and
+                            asset.get("caption")=="Handmatig afgebakend contextfragment")]
         records.append(record)
     payload={key:data.get(key) for key in keys}
     payload["vraagrecords"]=records
