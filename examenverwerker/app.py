@@ -3550,6 +3550,59 @@ class ExamApp:
             self.save_project()
             self._log(f"Vraag {record.get('number')}: vraagtype, punten en antwoordopties gecontroleerd.")
             win.destroy()
+        region_bar=ttk.LabelFrame(outer,text="Gekoppelde documentfragmenten",padding=8)
+        region_bar.pack(fill="x",pady=(10,0))
+        def open_region(role):
+            docs=[d for d in self.data.get("documenten",[]) if d.get("type_voorstel")==role]
+            if not docs:
+                messagebox.showinfo("Document ontbreekt",
+                    f"Er is nog geen document van het type '{role}' toegevoegd. Voeg eerst de juiste PDF toe.",parent=win)
+                return
+            def launch(doc, chooser=None):
+                if chooser is not None:
+                    chooser.destroy()
+                def saved(name, fragment):
+                    if role=="correctievoorschrift":
+                        record["cv_source_document_id"]=doc["id"]
+                        record["cv_source_region"]=fragment
+                        record["cv_source_region_file"]=name
+                    elif role=="aanvulling":
+                        record.setdefault("cv_amendment_regions",[])
+                        record["cv_amendment_regions"]=[x for x in record["cv_amendment_regions"]
+                            if x.get("document_id")!=doc["id"]]
+                        record["cv_amendment_regions"].append({
+                            "document_id":doc["id"],"fragment":fragment,"snippet_file":name,
+                            "source_pdf":doc.get("opslagbestand"),"source_sha256":doc.get("sha256")})
+                    else:
+                        record.setdefault("uitwerkbijlagen",[])
+                        if doc.get("opslagbestand") not in record["uitwerkbijlagen"]:
+                            record["uitwerkbijlagen"].append(doc.get("opslagbestand"))
+                        record.setdefault("uitwerkbijlage_region_refs",[])
+                        record["uitwerkbijlage_region_refs"]=[x for x in record["uitwerkbijlage_region_refs"]
+                            if x.get("document_id")!=doc["id"]]
+                        record["uitwerkbijlage_region_refs"].append({
+                            "document_id":doc["id"],"question_number":int(record["number"]),
+                            "snippet_file":name,"source_sha256":doc.get("sha256")})
+                    self.save_project()
+                self.open_cv_region_editor(record,doc,saved)
+            if len(docs)==1:
+                launch(docs[0])
+                return
+            chooser=tk.Toplevel(win); chooser.title("Kies brondocument"); chooser.transient(win)
+            ttk.Label(chooser,text="Selecteer het document waarin je dit vraagfragment wilt afbakenen.",padding=8).pack(anchor="w")
+            listing=tk.Listbox(chooser,width=76,height=min(8,len(docs)))
+            listing.pack(fill="both",expand=True,padx=8,pady=6)
+            for doc in docs: listing.insert("end",doc.get("bestand",""))
+            def selected():
+                pick=listing.curselection()
+                if pick: launch(docs[pick[0]],chooser)
+            ttk.Button(chooser,text="Open fragmenteditor",command=selected).pack(pady=(0,8))
+        ttk.Button(region_bar,text="Correctievoorschrift afbakenen",
+                   command=lambda:open_region("correctievoorschrift")).pack(side="left",padx=(0,6))
+        ttk.Button(region_bar,text="Uitwerkbijlage afbakenen",
+                   command=lambda:open_region("uitwerkbijlage")).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="CV-aanvulling afbakenen",
+                   command=lambda:open_region("aanvulling")).pack(side="left",padx=6)
         buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
         ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
         ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
