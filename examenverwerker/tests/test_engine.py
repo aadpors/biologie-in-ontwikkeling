@@ -346,7 +346,9 @@ class EngineTests(unittest.TestCase):
     def test_between_context_before_next_question_links_to_that_question(self):
         analysis = {"pages": [{
             "page": 2, "width": 600, "height": 800,
-            "blocks": [], "visual_assets": [
+            "blocks": [{"lines": [{"bbox": [60, 305, 260, 320],
+                                     "text": "Figuur 2. Inleidende afbeelding"}]}],
+            "visual_assets": [
                 {"id": "figure-between-questions", "kind": "image",
                  "bbox": [60, 150, 300, 300]}
             ]
@@ -358,6 +360,20 @@ class EngineTests(unittest.TestCase):
         proposals = propose_context_fragments(analysis, candidates)
         self.assertEqual(len(proposals), 1)
         self.assertEqual(proposals[0]["question_numbers"], [2])
+
+    def test_uncaptioned_visual_after_question_stays_with_that_question(self):
+        analysis = {"pages": [{
+            "page": 2, "width": 600, "height": 800,
+            "blocks": [], "visual_assets": [
+                {"id": "question-figure", "kind": "image", "bbox": [60, 150, 300, 300]}
+            ]
+        }]}
+        candidates = [
+            {"number": 1, "page": 2, "bbox": [40, 40, 80, 65], "human_decision": True},
+            {"number": 2, "page": 2, "bbox": [40, 420, 80, 445], "human_decision": True},
+        ]
+        proposals = propose_context_fragments(analysis, candidates)
+        self.assertEqual(proposals[0]["question_numbers"], [1])
 
     def test_visual_answer_options_are_flagged_as_possible_multiple_choice(self):
         import pymupdf as fitz
