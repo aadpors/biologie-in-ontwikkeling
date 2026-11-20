@@ -1542,6 +1542,16 @@ class ExamApp:
                 manifests = []
             for manifest_path in manifests:
                 folder = manifest_path.parent
+                # Once a legacy in-folder project has been copied to the stable
+                # user-data location, show only the migrated copy in the library.
+                legacy_root = self.app_base / "projecten"
+                try:
+                    if root.resolve() == legacy_root.resolve():
+                        migrated = self.user_projects_root / folder.relative_to(legacy_root)
+                        if migrated.exists() and (migrated / PROJECT_FILE).is_file():
+                            continue
+                except (OSError, ValueError):
+                    pass
                 if folder in seen:
                     continue
                 seen.add(folder)
