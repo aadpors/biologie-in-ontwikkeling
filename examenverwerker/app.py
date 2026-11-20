@@ -5037,8 +5037,13 @@ class ExamApp:
         records = self.data.get("vraagrecords", []) if self.data else []
         if hasattr(self, "project_label"):
             self.project_label.configure(text=(
-                f"Examen: {self.data.get('naam') or (self.project_dir.name if self.project_dir else '')}"
+                f"{self.data.get('vak', 'Biologie')} · {self.data.get('naam') or (self.project_dir.name if self.project_dir else '')}"
                 if self.data else "Kies een examen uit de bibliotheek"))
+        if hasattr(self, "correction_bar"):
+            if self.data and str(self.data.get("vak", "Biologie")).strip().lower() == "biologie":
+                self.correction_bar.pack(fill="x", pady=(0, 7), before=self._workspace_container)
+            else:
+                self.correction_bar.pack_forget()
         if hasattr(self, "table"):
             for item in self.table.get_children():
                 self.table.delete(item)
