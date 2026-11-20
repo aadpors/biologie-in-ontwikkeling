@@ -3504,14 +3504,14 @@ class ExamApp:
                 render_composite_crops(source,segments,target,scale=1.45)
                 # Trim only blank top/bottom margins; never infer or alter fragment
                 # boundaries. A small white safety margin is retained.
-                with Image.open(target) as image:
-                    image=image.convert("RGB")
+                with Image.open(target) as opened:
+                    image=opened.convert("RGB")
                     gray=image.convert("L")
                     ink=gray.point(lambda value:255 if value<246 else 0)
                     bbox=ink.getbbox()
-                    if bbox:
-                        top=max(0,bbox[1]-4); bottom=min(image.height,bbox[3]+4)
-                        image.crop((0,top,image.width,bottom)).save(target)
+                    trimmed=(image.crop((0,max(0,bbox[1]-4),image.width,
+                                         min(image.height,bbox[3]+4))) if bbox else image.copy())
+                trimmed.save(target)
                 record["question_region_snippet_file"]=name
                 record["snippet_file"]=name
                 record["snippet_files"]=[name]
@@ -3522,13 +3522,13 @@ class ExamApp:
                     context_target=self.project_dir/"snippets"/context_name
                     context_segments=page_spans_to_segments(context["page_spans"],page_sizes)
                     render_composite_crops(source,context_segments,context_target,scale=1.25)
-                    with Image.open(context_target) as image:
-                        image=image.convert("RGB")
+                    with Image.open(context_target) as opened:
+                        image=opened.convert("RGB")
                         gray=image.convert("L")
                         bbox=gray.point(lambda value:255 if value<246 else 0).getbbox()
-                        if bbox:
-                            image.crop((0,max(0,bbox[1]-4),image.width,
-                                        min(image.height,bbox[3]+4))).save(context_target)
+                        trimmed=(image.crop((0,max(0,bbox[1]-4),image.width,
+                                             min(image.height,bbox[3]+4))) if bbox else image.copy())
+                    trimmed.save(context_target)
                     context_names.append({"fragment_id":context.get("id"),"file":context_name,
                                           "sha256":sha256(context_target)})
                 record["context_region_snippet_files"]=context_names
