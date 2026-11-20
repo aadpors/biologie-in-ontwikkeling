@@ -986,6 +986,45 @@ class ExamApp:
             messagebox.showwarning("Vraagstart eerst bevestigen",
                 "Bevestig eerst dat dit een echte vraagstart is. Handmatig toegevoegde vragen zijn al expliciet bevestigd.")
             return
+        # The question type is intentionally determined only after the user
+        # has saved the question snippet boundaries in the exam structure.
+        source_doc = next((d for d in self.data.get("documenten", [])
+                           if d.get("id") == row.get("document_id")), None)
+        structure = (self.data.get("exam_structures", {}).get(row.get("document_id"))
+                     or self.data.get("exam_structure"))
+        linked = fragments_for_question(structure, int(row["number"]))
+        question_fragment = linked.get("question_fragment")
+        if not source_doc or not question_fragment or not question_fragment.get("page_spans"):
+            messagebox.showwarning(
+                "Vraaggrenzen eerst vastleggen",
+                "Baken eerst in 'Structuur bewerken' het volledige vraagfragment af en sla de grenzen op. Daarna wordt de vraagsoort bepaald."
+            )
+            return
+        try:
+            source_path = self.project_dir / "bronnen" / source_doc["opslagbestand"]
+            analysis = analyze_pdf(source_path)
+            page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"]))
+                          for p in analysis.get("pages", [])}
+            segments = page_spans_to_segments(question_fragment["page_spans"], page_sizes)
+            snippet_text = extract_region_text(source_path, segments)
+            ordered = sorted(
+                [x for x in self._workspace_rows
+                 if x.get("document_id") == source_doc["id"] and x.get("human_decision") is True],
+                key=lambda x: (int(x.get("page", 1)), float((x.get("bbox") or [0, 0])[1]))
+            )
+            row_index = ordered.index(row) if row in ordered else -1
+            following = ordered[row_index + 1] if 0 <= row_index < len(ordered) - 1 else None
+            row["vraagtekst_voorstel"] = snippet_text or row.get("vraagtekst_voorstel", "")
+            row["vraagtype_controle"] = classify_question_with_visuals(
+                analysis, row, following, row["vraagtekst_voorstel"]
+            )
+            row["vraagtype_status"] = "controle_nodig"
+            self.save_project()
+        except Exception as exc:
+            self._error("Vraagsoort bepalen na afbakening", exc)
+            messagebox.showerror("Vraagsoort niet bepaald",
+                f"De vraaggrenzen zijn opgeslagen, maar de vraagsoort kon nog niet worden bepaald.\\n\\n{exc}")
+            return
         self.create_question_record(self._workspace_rows, self.candidate_tree, self.root)
 
     def _workspace_store_candidate_correction(self, row):
