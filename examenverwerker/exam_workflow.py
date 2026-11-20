@@ -73,6 +73,31 @@ def exam_export_fingerprint(data: dict) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def exam_review_fingerprint(data: dict, include_snippets: bool = False) -> str:
+    """Fingerprint reviewed content while excluding approval and review metadata."""
+    keys=("documenten","exam_metadata","vraagkandidaten","exam_structures",
+          "exam_structure","cv_regions","uitwerkbijlage_regions","consolidated_cv")
+    records=[]
+    for source in data.get("vraagrecords",[]) or []:
+        record=dict(source)
+        for key in ("approved_by_human","status","approved_at","approval_method",
+                    "record_review_checklist","approval_revoked_reason"):
+            record.pop(key,None)
+        if not include_snippets:
+            for key in ("snippet_file","snippet_files","question_region_snippet_file",
+                        "question_region_snippet_sha256","cv_snippet_file","cv_snippet_files",
+                        "cv_source_region_file","cv_source_region_sha256",
+                        "cv_amendment_snippet_file","cv_amendment_snippet_files",
+                        "context_asset_files","context_region_snippet_files"):
+                record.pop(key,None)
+        records.append(record)
+    payload={key:data.get(key) for key in keys}
+    payload["vraagrecords"]=records
+    encoded=json.dumps(payload,ensure_ascii=False,sort_keys=True,
+                       separators=(",",":"),default=str)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
 def _result(stage, label, action, **details):
     return {"stage": stage, "label": label, "action": action, **details}
 
@@ -345,7 +370,9 @@ def exam_workflow_state(data: dict) -> dict:
         return _result("volledigheid", f"Volledigheidscontrole ({len(issues)} aandachtspunten)",
                        "Los ontbrekende nummers, fragmenten, koppelingen of verouderde bronregio's op.",
                        issues=issues)
-    if (data.get("completeness_review") or {}).get("status") != "visueel_bevestigd":
+    completeness_review=data.get("completeness_review") or {}
+    if (completeness_review.get("status") != "visueel_bevestigd" or
+            completeness_review.get("fingerprint") != exam_review_fingerprint(data,False)):
         return _result("volledigheid", "Volledigheid bevestigen",
                        "Bevestig dat alle vragen, bronnen, punten en fragmentkoppelingen compleet zijn.")
 
@@ -355,7 +382,10 @@ def exam_workflow_state(data: dict) -> dict:
             return _result("snippets", "Vraagfragmenten uitsnijden",
                            "Genereer de definitieve uitsneden vanuit de bevestigde fragmentgrenzen.",
                            record_id=record.get("id"), question_number=record.get("number"))
-    if (data.get("final_visual_review") or {}).get("status") != "visueel_bevestigd":
+    final_review=data.get("final_visual_review") or {}
+    if (final_review.get("status") != "visueel_bevestigd" or
+            final_review.get("fingerprint") != exam_review_fingerprint(data,True) or
+            any(record.get("approved_by_human") is not True for record in records)):
         return _result("eindcontrole", "Visuele eindcontrole per vraag",
                        "Controleer per vraag de context, vraag, opties, bijlage en geconsolideerde CV.")
 
