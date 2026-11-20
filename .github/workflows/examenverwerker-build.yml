@@ -32,17 +32,17 @@ jobs:
       - name: Verify application imports before packaging
         run: python -c "import app; from engine import pdf_page_count, pixel_rect_to_pdf_bbox; print('Application imports and required helpers are available')"
       - name: Build portable folder
-        run: python -m PyInstaller --noconfirm --clean --windowed --name BiologieExamenverwerker --onedir --collect-all pymupdf app.py
+        run: python -m PyInstaller --noconfirm --clean --windowed --name Examenverwerker --onedir --collect-all pymupdf app.py
       - name: Add launch and help files
         shell: pwsh
         run: |
-          Copy-Item START.bat dist/BiologieExamenverwerker/START.bat
-          Copy-Item README.md dist/BiologieExamenverwerker/GEBRUIK.md
-          Copy-Item CHANGELOG.md dist/BiologieExamenverwerker/WIJZIGINGEN.md
-          Copy-Item TESTPLAN.md dist/BiologieExamenverwerker/TESTPLAN.md
+          Copy-Item START.bat dist/Examenverwerker/START.bat
+          Copy-Item README.md dist/Examenverwerker/GEBRUIK.md
+          Copy-Item CHANGELOG.md dist/Examenverwerker/WIJZIGINGEN.md
+          Copy-Item TESTPLAN.md dist/Examenverwerker/TESTPLAN.md
       - uses: actions/upload-artifact@v4
         with:
-          name: BiologieExamenverwerker-portable-Windows
-          path: examenverwerker/dist/BiologieExamenverwerker/
+          name: Examenverwerker-portable-Windows
+          path: examenverwerker/dist/Examenverwerker/
           if-no-files-found: error
           retention-days: 30
