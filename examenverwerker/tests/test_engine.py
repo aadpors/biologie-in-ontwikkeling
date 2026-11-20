@@ -331,6 +331,22 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(extract_candidate_text(analysis,first,second),"1.\nGebruik figuur 2.")
 
 
+    def test_between_context_before_next_question_links_to_that_question(self):
+        analysis = {"pages": [{
+            "page": 2, "width": 600, "height": 800,
+            "blocks": [], "visual_assets": [
+                {"id": "figure-between-questions", "kind": "image",
+                 "bbox": [60, 150, 300, 300]}
+            ]
+        }]}
+        candidates = [
+            {"number": 1, "page": 2, "bbox": [40, 40, 80, 65], "human_decision": True},
+            {"number": 2, "page": 2, "bbox": [40, 420, 80, 445], "human_decision": True},
+        ]
+        proposals = propose_context_fragments(analysis, candidates)
+        self.assertEqual(len(proposals), 1)
+        self.assertEqual(proposals[0]["question_numbers"], [2])
+
     def test_visual_answer_options_are_flagged_as_possible_multiple_choice(self):
         import pymupdf as fitz
         with tempfile.TemporaryDirectory() as d:
