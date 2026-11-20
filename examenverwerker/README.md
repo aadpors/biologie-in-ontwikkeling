@@ -1,91 +1,55 @@
-# Biologie Examenverwerker
+# Examenverwerker
 
-Een zelfstandige Windows-mapapplicatie voor het zorgvuldig verwerken van biologie-examens. De bestaande website en examendata worden niet gewijzigd.
-
-## Wat deze ontwikkelversie al kan
-- Geïntegreerde reviewwerkplek: documentlijst en vraagkandidaten links, grote originele PDF-weergave rechts, beoordelingsvelden en acties direct naast de bron.
-- Kandidaten direct beoordelen als vraag, geen vraag of twijfel; vraagnummer, vraagtekst en notities aanpassen en bewaren.
-- PDF-paginanavigatie en zoom; exacte rode markering van de herkende vraagstart.
-- Filters op nog te beoordelen kandidaten, sterke/zwakke signalen en dubbele nummers.
-- Ontbrekende vraagstarts handmatig aanwijzen op de originele PDF; exacte PDF-punten worden opgeslagen.
-- Correcties uit Biologie-controle v1.0.x importeren en compact exporteren als `biologie-correcties-v1`; handmatige beslissingen en posities blijven bij heranalyse behouden.
-- In één keer examen-PDF’s uit meerdere jaren, havo/vwo en alle tijdvakken importeren; geen vooraf aangemaakte projecten of handmatig gekozen doelmap nodig.
-- Importcontrole in één scherm: PDF-lijst links, geselecteerd voorblad centraal en direct bewerkbare voorgestelde metadata rechts; geen aparte pop-up meer om herkenning per PDF aan te passen.
-- Metadata en documenttypen automatisch voorstellen, alle herkenning vóór import controleren en examens automatisch opslaan onder `examens/<jaar>/<niveau>-tijdvak-<nummer>/`.
-- Een importmanifest bewaren met de projectindeling en waarschuwingen voor ontbrekende of dubbele opgaven/CV-documenten; bestaande examenmappen worden nooit overschreven.
-- Examens beheren via de examenbibliotheek; de technische dossierstructuur wordt automatisch beheerd.
-- Originele PDF's ongewijzigd opnemen en SHA-256-dedupliceren.
-- Documenttypen voorstellen: opgaven, correctievoorschrift, uitwerkbijlage en aanvulling.
-- PDF-tekst, metadata, pagina's en geometrie uitlezen.
-- Rasterafbeeldingen en grotere vectorregio's in originele PDF's inventariseren.
-- Figuur- en tabelverwijzingen koppelen aan mogelijke bijschriften en beeldregio's, zonder automatische goedkeuring.
-- Pagina's zonder bruikbare tekst markeren voor OCR-controle.
-- Mogelijke vraagstarts detecteren, ook bij losse nummerregels en dubbele nummers.
-- Opgaven- en CV-nummering als controlesignaal vergelijken.
-- Originele bronpagina's visueel tonen.
-- Voorlopige vraagfragmenten renderen uit exacte PDF-paginaregio's, ook over paginagrenzen.
-- Concept-vraagrecords samenstellen met bewerkbare vraagtekst, metadata, antwoordopties, exact gekoppelde CV's, uitwerkbijlagen en officiële CV-aanvullingen.
-- Volledige CV-antwoorden over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
-- Een expliciete menselijke eindcontrole uitvoeren met checklist, visuele bronvoorbeelden en herroepbare goedkeuring.
-- Per opgaven-PDF een afzonderlijke visuele structuur vastleggen, met volledige paginabrede vraag- en contextgrenzen.
-- Alle handmatige uitsneden zijn horizontale stroken over de volledige paginabreedte; alleen boven- en ondergrens zijn instelbaar, nooit linker- of rechtergrenzen.
-- Per vraag het originele correctievoorschrift én geselecteerde officiële aanvullingen met dezelfde versleepbare grenzen afbakenen.
-- Vraag-, context-, CV- en aanvullingsuitsneden rechtstreeks uit de oorspronkelijke PDF's renderen; contextafbeeldingen en bijschriften gescheiden houden van de vraagafbeelding.
-- Selecteerbare contexttekst uit handmatig begrensde bronregio's bewaren.
-- Een veilig exportpakket samenstellen; de exportpoort controleert de checklist, bronhashes, vraaggrenzen, CV-regio's en contextbestanden opnieuw.
-- Correctievoorschriftfragmenten over meerdere pagina's samenvoegen tot één controleerbare afbeelding.
-- Menselijke beslissingen opslaan in een lokale leerbank.
-- Optionele externe AI-adapter gebruiken na expliciete toestemming; standaard volledig offline.
-- Een exportpoort gebruiken die niet-goedgekeurde of onvolledige records blokkeert en originele uitwerkbijlagen volledig meeneemt.
-
-## Starten voor ontwikkeling
-1. Installeer Python 3.12.
-2. Open deze map in een terminal.
-3. Voer uit: \`python -m pip install -r requirements.txt\`
-4. Start met \`python app.py\` of dubbelklik op \`START.bat\`.
-
-## Portable Windows-programma bouwen
-Op een Windows-machine met Python 3.12:
-1. Dubbelklik op \`BUILD_PORTABLE.bat\`.
-2. Wacht tot de bouw klaar is.
-3. Kopieer de volledige map \`dist\\BiologieExamenverwerker\\\` naar een USB-stick of gewenste locatie.
-4. Start daar \`START.bat\`.
-
-De doelcomputer heeft daarna geen Python-installatie of administratorrechten nodig. De applicatie installeert niets in Windows. De centrale map `kennisbank/` staat naast het programma; bewaar deze map bij updates om de opgebouwde leerervaring te behouden.
-
-Een GitHub Actions-workflow kan daarnaast een Windows-portable artifact bouwen.
+Een zelfstandige Windows-applicatie om examen-PDF's vakoverstijgend te verwerken. De basisworkflow is bedoeld voor onder meer biologie, aardrijkskunde en andere schoolvakken. Vakinhoudelijke publicatie- of beoordelingsvelden worden niet tijdens de fragmentselectie afgedwongen.
 
 ## Werkwijze
-1. Kies **Examens in bulk importeren** en selecteer alle beschikbare PDF’s, ook als ze uit verschillende jaren, niveaus en tijdvakken komen.
-2. Controleer de voorgestelde documentrollen én de examenidentiteit per PDF (niveau, jaar en tijdvak). De applicatie maakt daarna automatisch de mapstructuur onder `examens/` aan.
-3. Het eerste aangemaakte examen wordt direct geopend in de geïntegreerde werkruimte; de overige examens open je via de examenbibliotheek.
-4. Laat vraagstarts analyseren.
-5. Bekijk kandidaten in de geïntegreerde werkruimte op de originele PDF-pagina. Bevestig, wijs af of markeer twijfel; pas vraagnummer, vraagtekst en notities direct aan. Ontbrekende vraagstarts kun je op de PDF aanwijzen. Alle kandidaten moeten een menselijke beslissing hebben.
-6. Open 'Examenstructuur bewerken' voor iedere opgaven-PDF. Maak voor elke vraag een vraagfragment en leg contextinleidingen, vraagcontexten en tussenliggende contexten vast. Koppel ieder contextfragment aan de juiste vragen.
-7. Maak per vraag een voorlopig snippetvoorstel om mogelijke figuren, tabellen en tekstregio's te inventariseren. Dit zijn alleen kandidaten.
-8. Maak het concept-vraagrecord. Selecteer de juiste CV-PDF en bak het beoordelingsmodel voor die vraag handmatig af. Voeg alle vervolgpagina's toe. Doe hetzelfde voor iedere geselecteerde officiële CV-aanvulling.
-9. Selecteer alleen figuren, tabellen en tekstregio's die aantoonbaar bij de vraag horen. Corrigeer of bevestig per geselecteerde figuur/tabel het bijschrift (ook expliciet als er geen bijschrift is). Controleer uitsneden en contexttekst. De handmatig afgebakende contextfragmenten en hun tekst worden automatisch gekoppeld.
-10. Controleer alle pagina's van uitwerkbijlagen en CV-aanvullingen.
-11. Open 'Vraagrecords beoordelen en goedkeuren', vergelijk alle fragmenten met de volledige originele PDF's, vink alleen werkelijk gecontroleerde onderdelen af en keur ieder record expliciet goed.
-12. Maak pas daarna een exportpakket. Ontbrekende of verouderde vraag- en CV-afbakeningen blokkeren export. Dit wijzigt of publiceert niets op de live website.
 
-## Betrouwbaarheidsregels
-- Originele PDF's worden nooit aangepast.
-- Een nummerpatroon is nooit automatisch een examenvraag.
-- Een voorlopige snippet is nooit automatisch compleet.
-- Gedeelde context, figuren en bijschriften kunnen buiten een vraagfragment vallen; controle is verplicht.
-- Scans zonder tekstlaag worden gemarkeerd; OCR wordt niet stilzwijgend gesimuleerd.
-- AI mag voorstellen doen, maar nooit bronmateriaal verzinnen of iets goedkeuren.
-- Geen automatische publicatie naar de live website.
-- Bestaande uitvoermappen worden nooit overschreven.
+1. Kies **Examens importeren** en selecteer de PDF's van één vak. Vul bij de vraag naar het vak bijvoorbeeld *Biologie* of *Aardrijkskunde* in.
+2. Controleer de voorgestelde documenttypen en examenmetadata. De applicatie groepeert examens op niveau, jaar en tijdvak. De vaknaam wordt in de projectmap opgenomen, zodat vakken elkaar niet overschrijven.
+3. Laat de vraagstarts analyseren. Bevestig, wijs af of markeer twijfel. Voeg ontbrekende vraagstarts zo nodig handmatig toe.
+4. Open **Structuur bewerken**. Er zijn precies twee fragmenttypen:
+   - **Context**: tekst, afbeelding, tabel of ander materiaal dat bij één of meer vragen hoort.
+   - **Vraag**: de vraag vanaf de vraagstart tot de eerstvolgende witregel of kadergrens (wat het eerst komt). Controleer en corrigeer de voorgestelde grens.
+5. Koppel contextfragmenten aan de juiste vragen. Fragmenten mogen over meerdere pagina's lopen. De oorspronkelijke PDF wordt niet aangepast.
+6. Klik op **Fragmenten klaar**. Daarna bepaalt het programma automatisch de vraagtypen op basis van de gekozen vraagfragmenten en maakt het per vraag een eenvoudig conceptrecord met vraagnummer, vraagtekst, vraagtype en gekoppelde context. Er is geen aparte knop om vraagrecords te maken.
+7. Bekijk zo nodig **Eindcontrole** om de vraagtekst of het vraagtype eenvoudig aan te passen.
+8. Kies **Exportpakket** voor een overdraagbaar conceptexportbestand. Het pakket bevat de conceptvragen, fragmentstructuur en bron-PDF's. Dit is geen automatische publicatie naar een website.
 
-## Bekende grenzen van deze ontwikkelfase
-- OCR voor gescande pagina's is nog niet ingebouwd.
-- Vraaggrenzen, contextkoppelingen, CV-fragmenten en beeldselecties vragen menselijke bevestiging.
-- De visuele CV-editor en de volledige exportketen zijn door CI getest; de gebruikersinterface moet nog praktisch op Windows 11 met echte examens worden beproefd.
-- CV-nummering is een signaal en moet inhoudelijk worden gecontroleerd.
-- De eindcontrole is expliciet en handmatig; visuele signalen of AI mogen nooit een vinkje of goedkeuring zetten.
-- Automatische contextkoppelingen zijn uitsluitend kandidaten op basis van PDF-geometrie en bijschriften; inhoudelijke koppeling blijft handwerk.
-- De portable build moet nog op een echte Windows 11-computer worden gestart en met representatieve examenbestanden worden getest.
+## Ontwerpkeuzes
 
-Zie ook \`ONTWERP.md\`, \`SCHEMA.md\`, \`VALIDATIE.md\`, \`LEERBANK.md\`, \`EXPORT.md\` en \`PRIVACY.md\`.
+- De vraagtypeanalyse gebruikt de opgeslagen, geselecteerde vraagfragmenten. De oorspronkelijke PDF wordt niet opnieuw gebruikt om vraaggrenzen of vraaginhoud te bepalen.
+- Bij bestaande projecten met eerder gecontroleerde fragmenten vult de applicatie ontbrekende fragmenttekst automatisch aan binnen de al opgeslagen grenzen. De fragmenten hoeven niet opnieuw te worden afgevinkt.
+- Bij een scan zonder uitleesbare tekst wordt het vraagtype als onbekend gemarkeerd; het programma verzint geen tekst of antwoordopties.
+- Het programma maakt geen onnodige biologische metadata aan voor andere vakken.
+- Biologie-specifieke correctietools worden alleen bij een biologieproject getoond.
+- Originele PDF's blijven ongewijzigd. Exportbestanden worden niet over bestaande bestanden heen geschreven.
+
+## Installeren en starten
+
+1. Download en pak de volledige ZIP-map uit.
+2. Dubbelklik op **START.bat**.
+3. De doelcomputer heeft geen Python-installatie of administratorrechten nodig.
+
+Vervang bij een software-update alleen de programmamap. Projecten en de leerbank staan apart onder `%LOCALAPPDATA%\BiologieExamenverwerker\`; de bestaande projectbestanden worden niet door het vervangen van de programmamap overschreven. Maak desondanks regelmatig een reservekopie van deze gegevens.
+
+## Ontwikkelomgeving
+
+Voor ontwikkelen is Python 3.12 vereist:
+
+```bat
+python -m pip install -r requirements.txt
+python app.py
+```
+
+De regressietests starten met:
+
+```bat
+python -m unittest discover -s tests -v
+```
+
+## Grenzen van deze versie
+
+- De automatische vraaggrens is een voorstel; controleer altijd of de eerstvolgende witregel of kadergrens ook inhoudelijk de juiste grens is.
+- Bij beeldvragen zonder uitleesbare tekst blijft de vraagtypeanalyse onzeker.
+- De conceptexport is een overdraagbaar gegevenspakket, geen websitepublicatie.
+- De portable Windows-build is automatisch getest in CI; test de gebruikersinterface daarnaast op een echte Windows-computer met eigen examens.

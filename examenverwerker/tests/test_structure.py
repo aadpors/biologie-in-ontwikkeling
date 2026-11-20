@@ -1,7 +1,8 @@
 import unittest
 from structure import (
     append_page_span, default_question_links, fragments_for_question, make_cv_fragment, make_exam_structure, make_fragment, missing_question_regions, page_spans_to_segments, validate_cv_fragment,
-    make_page_span, mark_structure_stale, validate_exam_structure,
+    make_page_span, mark_structure_stale, validate_exam_structure, normalize_fragments, FRAGMENT_TYPES,
+    sort_fragments_reading_order, trim_question_bands_for_contexts,
 )
 
 
@@ -18,11 +19,69 @@ class StructureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             make_page_span(0, 0.1, 0.9)
 
-    def test_context_introduction_defaults_to_every_confirmed_question(self):
-        self.assertEqual(default_question_links("context_intro", self.questions), [1, 2, 4])
-        fragment = make_fragment("context_intro", make_page_span(1, 0.1, 0.8), [],
-                                 self.questions, "intro")
-        self.assertEqual(fragment["question_numbers"], self.questions)
+    def test_context_fragments_cannot_use_cover_page(self):
+        with self.assertRaises(ValueError):
+            make_fragment("context", make_page_span(1, 0.1, 0.8), [1],
+                          self.questions, "cover-context")
+        fragment = make_fragment("context", make_page_span(2, 0.1, 0.8), [1],
+                                 self.questions, "context")
+        fragment["page_spans"].append(make_page_span(1, 0.1, 0.2))
+        structure = make_exam_structure(self.doc, [fragment], self.questions)
+        self.assertIn("contextfragment_op_voorblad",
+                      validate_exam_structure(structure, "doc-123", "abc123", self.questions))
+
+
+    def test_context_requires_explicit_question_links(self):
+        self.assertEqual(default_question_links("context", self.questions), [])
+        with self.assertRaises(ValueError):
+            make_fragment("context", make_page_span(2, 0.1, 0.8), [],
+                          self.questions, "unlinked-context")
+        fragment = make_fragment("context", make_page_span(2, 0.1, 0.8), [1, 2],
+                                 self.questions, "shared-context")
+        self.assertEqual(fragment["question_numbers"], [1, 2])
+        self.assertEqual(fragment["type"], "context")
+
+
+    def test_two_fragment_types_and_legacy_projects_migrate(self):
+        self.assertEqual(FRAGMENT_TYPES, {"context", "vraag"})
+        legacy = [
+            {"id": "a", "type": "intro", "question_numbers": [1, 2, 4]},
+            {"id": "b", "type": "context_intro", "question_numbers": [1]},
+            {"id": "c", "type": "vraagcontext", "question_numbers": [1]},
+            {"id": "d", "type": "tussen_context", "question_numbers": [2]},
+            {"id": "e", "type": "tussenliggende_context", "question_numbers": [2]},
+        ]
+        migrated = normalize_fragments(legacy)
+        self.assertEqual([x["type"] for x in migrated], ["context"] * 5)
+        self.assertEqual([x["type"] for x in legacy],
+                         ["intro", "context_intro", "vraagcontext", "tussen_context", "tussenliggende_context"])
+        self.assertEqual(migrated[0]["context_role"], "introductie")
+        self.assertEqual(migrated[1]["context_role"], "introductie")
+        self.assertTrue(all(x["context_role"] == "vraaggebonden" for x in migrated[2:]))
+
+
+    def test_fragments_are_sorted_in_source_reading_order(self):
+        fragments = [
+            make_fragment("vraag", make_page_span(3, 0.1, 0.8), [2], self.questions, "q2"),
+            make_fragment("context", make_page_span(2, 0.2, 0.4), [2], self.questions, "ctx2"),
+            make_fragment("context", make_page_span(2, 0.0, 0.15), self.questions, self.questions, "intro"),
+            make_fragment("vraag", make_page_span(2, 0.15, 0.2), [1], self.questions, "q1"),
+        ]
+        ordered = sort_fragments_reading_order(fragments)
+        self.assertEqual([x["id"] for x in ordered], ["intro", "q1", "ctx2", "q2"])
+
+    def test_between_context_trims_only_immediately_preceding_question_band(self):
+        fragments = [
+            make_fragment("vraag", make_page_span(1, 0.1, 1.0), [1], self.questions, "q1"),
+            make_fragment("vraag", make_page_span(2, 0.0, 1.0), [2], self.questions, "q2"),
+            make_fragment("vraag", make_page_span(3, 0.0, 1.0), [4], self.questions, "q4"),
+            make_fragment("context", make_page_span(2, 0.3, 0.55), [4], self.questions, "ctx4"),
+        ]
+        trimmed = trim_question_bands_for_contexts(fragments)
+        by_id = {x["id"]: x for x in trimmed}
+        self.assertEqual(by_id["q1"]["page_spans"][0]["bottom"], 1.0)
+        self.assertEqual(by_id["q2"]["page_spans"][0]["bottom"], 0.3)
+        self.assertEqual(by_id["q4"]["page_spans"][0]["bottom"], 1.0)
 
     def test_question_fragment_requires_exactly_one_confirmed_question(self):
         with self.assertRaises(ValueError):
@@ -47,8 +106,9 @@ class StructureTests(unittest.TestCase):
             append_page_span(extended, make_page_span(1, 0.1, 0.8))
 
     def test_structure_requires_confirmed_numbering_and_current_source(self):
-        fragment = make_fragment("context_intro", make_page_span(1, 0.1, 0.8),
-                                 [], self.questions, "intro")
+        fragment = make_fragment("context", make_page_span(2, 0.1, 0.8),
+                                 self.questions, self.questions, "intro")
+        fragment["context_role"] = "introductie"
         structure = make_exam_structure(self.doc, [fragment], self.questions)
         self.assertEqual(validate_exam_structure(structure, "doc-123", "abc123", self.questions), [])
         structure["nummering_bevestigd"] = False
@@ -66,7 +126,7 @@ class StructureTests(unittest.TestCase):
         self.assertEqual(structure["status"], "concept_handmatige_controle")
 
     def test_invalid_question_links_and_missing_spans_are_blocked(self):
-        fragment = make_fragment("vraagcontext", make_page_span(1, 0.1, 0.8),
+        fragment = make_fragment("vraagcontext", make_page_span(2, 0.1, 0.8),
                                  [1], self.questions, "context")
         fragment["question_numbers"] = [99]
         fragment["page_spans"] = []
@@ -77,11 +137,12 @@ class StructureTests(unittest.TestCase):
 
 
     def test_question_retrieves_its_question_region_and_shared_context(self):
-        intro = make_fragment("context_intro", make_page_span(1, 0.05, 0.2),
-                              [], self.questions, "intro")
+        intro = make_fragment("context", make_page_span(2, 0.0, 0.05),
+                              self.questions, self.questions, "intro")
+        intro["context_role"] = "introductie"
         question = make_fragment("vraag", make_page_span(2, 0.2, 0.8),
                                  [2], self.questions, "question-2")
-        specific = make_fragment("vraagcontext", make_page_span(2, 0.05, 0.18),
+        specific = make_fragment("context", make_page_span(2, 0.05, 0.18),
                                  [2], self.questions, "context-2")
         structure = make_exam_structure(self.doc, [intro, question, specific], self.questions)
         result = fragments_for_question(structure, 2)
@@ -134,9 +195,9 @@ class StructureTests(unittest.TestCase):
 
     def test_context_fragments_must_link_to_at_least_one_question(self):
         with self.assertRaises(ValueError):
-            make_fragment("vraagcontext", make_page_span(1, 0.1, 0.8), [],
+            make_fragment("vraagcontext", make_page_span(2, 0.1, 0.8), [],
                           self.questions, "unlinked-context")
-        fragment = make_fragment("vraagcontext", make_page_span(1, 0.1, 0.8),
+        fragment = make_fragment("vraagcontext", make_page_span(2, 0.1, 0.8),
                                  [1], self.questions, "context")
         fragment["question_numbers"] = []
         structure = make_exam_structure(self.doc, [fragment], self.questions)

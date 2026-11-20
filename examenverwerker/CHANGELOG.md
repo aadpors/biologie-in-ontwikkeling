@@ -1,4 +1,76 @@
+## 0.16.0
+- Het hoofdvenster is nu uitsluitend de examenbibliotheek: examens filteren op vak, niveau, jaar, tijdvak en archiefstatus.
+- Elk examen opent in een eigen verwerkingsvenster. De bibliotheek blijft beschikbaar en kan meerdere openstaande examens beheren.
+- De volledige bestaande PDF-werkruimte en de bewerkingsfuncties zijn naar het afzonderlijke verwerkingsvenster verplaatst.
+- Een verwerkingsvenster slaat het project op bij sluiten; bij afsluiten van de applicatie worden alle geopende projecten eerst opgeslagen.
+- Examens kunnen vanuit de bibliotheek worden gearchiveerd of naar een herstelbare verwijdermap worden verplaatst.
+- Na import wordt het eerste nieuwe examen in een afzonderlijk verwerkingsvenster geopend.
+- Regressietests toegevoegd voor de scheiding tussen bibliotheek en verwerkingsvenster.
+
+## 0.15.0
+- De basisapplicatie is vakneutraal gemaakt; bij import kiest de gebruiker het vak.
+- Projectmappen voor andere vakken krijgen een vaknaam, zodat ze niet botsen met biologieprojecten.
+- Er zijn nog maar twee fragmenttypen: context en vraag.
+- Automatische vraagfragmenten eindigen bij de eerste witregel of kadergrens na de vraagstart.
+- Na afronding van de fragmentselectie worden vraagtypen automatisch bepaald vanuit de gekozen vraagfragmenten.
+- Per vraag wordt automatisch een eenvoudig conceptrecord gemaakt met vraagtekst, vraagtype en gekoppelde context.
+- Bestaande projecten met gecontroleerde fragmentgrenzen krijgen de ontbrekende fragmenttekst automatisch aangevuld binnen die grenzen.
+- De uitgebreide vraagrecordknop en de extra tussenstap zijn verwijderd.
+- Een conceptexport bevat de gegevens en bron-PDF's; er vindt geen automatische websitepublicatie plaats.
+- De Windows-app en startbestanden gebruiken voortaan de generieke naam Examenverwerker.
+
+## 0.13.4
+- Importdialoog gebruikt nu een grid-indeling met een vaste onderste actiebalk. De knoppen **Annuleren** en **Opslaan en doorgaan naar examenverwerking** blijven zichtbaar, ook wanneer het middenpaneel uitrekt.
+- Versienummer verhoogd voor de gecorrigeerde Windows-build.
+
+## 0.13.3
+- Importcontrole: vaste voettekst met een expliciete knop **Opslaan en doorgaan naar examenverwerking**.
+- De knop voert de volledige batchvalidatie uit, slaat de gecontroleerde metadata en groepering op, maakt de examenprojecten aan en opent het eerste examen. Bij validatiefouten blijft het controlescherm geopend.
+
+## 0.13.10
+- De examenstructuur gebruikt voortaan precies drie fragmenttypen: **Intro**, **Tussencontext** en **Vraag**.
+- Introductiefragmenten worden standaard aan alle bevestigde vragen gekoppeld. Tussencontext kan aan één of meer expliciet geselecteerde vragen worden gekoppeld. Een vraagfragment hoort bij precies één vraag.
+- Automatische contextvoorstellen gebruiken voortaan het type Tussencontext.
+- Bestaande projecten met de oude typen `context_intro`, `vraagcontext` en `tussenliggende_context` worden bij openen naar de drie nieuwe typen vertaald. Fragment-ID's, begrenzingen, vraagkoppelingen, bewijs en overige metadata blijven behouden; de oude projectdata wordt niet ter plekke gemuteerd.
+- De structuur-editor toont alleen de drie begrijpelijke Nederlandse typen en licht hun koppelgedrag toe.
+
+## 0.13.9
+- Vragen worden nu niet uitsluitend op tekst geclassificeerd: de analyse combineert tekstherkenning met de geometrie van rasterafbeeldingen, vectorfiguren en nabijgelegen A-H-labels.
+- Herhaalde, uitgelijnde afbeeldingen binnen één vraaggebied leveren een signaal voor mogelijke afbeeldingsantwoordopties op. Selectieformuleringen in combinatie met visueel materiaal verhogen dit signaal.
+- Beeldmateriaal bij een open vraag wordt niet automatisch als meerkeuze aangemerkt: een enkele illustratie zonder selectieformulering blijft een open vraag met visuele context.
+- De hoofdwerkruimte en vraagcontrole tonen expliciet wanneer visuele antwoordopties gecontroleerd moeten worden; bij een mogelijke visuele meerkeuzevraag wordt in de record-editor alvast mcq voorgesteld.
+- De herkenner leest de tekst ín een afbeelding nog niet uit. Bij zulke vragen blijft visuele controle verplicht; er wordt geen antwoordoptietekst verzonnen.
+- Regressietests toegevoegd voor herhaalde afbeeldingsopties en voor het onderscheiden van een gewone illustratie.
+
+## 0.13.8
+- Meerkeuzeherkenning is robuuster voor PDF-tekstlagen waarin antwoordopties op één regel staan, in kleine letters zijn gezet, tussen haakjes staan of waarbij label en antwoordtekst op aparte regels terechtkomen.
+- Herkenning vereist meerdere verschillende antwoordlabels; één toevallige A-regel leidt niet automatisch tot een meerkeuzeclassificatie.
+- Ontbrekende labels, dubbele labels en onvolledige antwoordreeksen blijven zichtbaar voor controle.
+- Regressietests toegevoegd voor inline opties, kleine letters, gesplitste labels en het voorkomen van fout-positieve meerkeuzeherkenning.
+
+## 0.13.7
+- De doorlopende PDF-weergave berekent vooraf de positie van alle pagina's, maar rendert alleen de zichtbare pagina's en een beperkte buffer.
+- Het aantal gelijktijdig in het geheugen gehouden pagina-afbeeldingen is begrensd op zes. Eerder bekeken pagina's worden vanuit de tijdelijke PNG-cache hersteld; de scrollbare totaalweergave en vraagmarkeringen blijven behouden.
+- Laden gebeurt op basis van scrollpositie en vensterformaat, zodat lange examens niet alle pagina-afbeeldingen tegelijk in Tk-geheugen hoeven te houden.
+
+## 0.13.6
+- Vraagstartleren gebruikt genormaliseerde layout-/taalfeatures in plaats van alleen twee grove patroonklassen; exacte vraagtekst, nummer en PDF-positie worden niet in de leersleutel opgenomen.
+- Een leeradvies vereist nu minimaal drie onafhankelijke examen-PDF's en ten minste 80% overeenstemming. Herhaalde keuzes binnen één PDF tellen niet als onafhankelijke examens; conflicten blijven zichtbaar en niets wordt automatisch toegepast.
+- De structuurvoorstellen bevatten naast vraagbanden ook afzonderlijke, controleerbare contextvoorstellen rond gedetecteerde afbeeldingen, schema's, tabellen en bijschriften.
+- De structuur-editor toont per voorstel de zekerheid en de herkenningsreden, zodat duidelijk is waarop de koppeling is gebaseerd.
+- Regressietests toegevoegd voor generaliseerbare leersleutels, onafhankelijke examensteun, conflicterende feedback en contextvoorstellen uit visuele PDF-elementen.
+
 # Wijzigingen
+
+## 0.13.2
+- Verwerkingsstatus van ieder examen wordt centraal en zonder Tkinter-afhankelijkheden afgeleid; dezelfde regels sturen de hoofdwerkruimte en de examenbibliotheek aan.
+- De bibliotheek toont de concrete eerstvolgende stap per examen en heeft een actie **Volgend openstaand examen**.
+- Een bulkimportbatch wordt vanuit het importmanifest aan ieder aangemaakt examen gekoppeld en na herstart van de applicatie hersteld.
+- Na afronding van een examen kan de gebruiker direct doorgaan met het volgende examen uit dezelfde batch.
+- Na een geslaagde export wordt een inhoudsfingerprint opgeslagen; een gewijzigd examen wordt daardoor niet ten onrechte als afgerond getoond.
+- De batchvolgorde wordt na herstart veilig uit het importmanifest hersteld; ongeldige regels en paden buiten de examenroot worden geweigerd.
+- Als het volgende examen niet kan worden geopend, blijven de huidige werkruimte en batchpositie behouden.
+- Regressietests toegevoegd voor alle verwerkingsstappen, exportvoltooiing, verouderde exports, batchherstel en padbeveiliging.
 
 ## 0.13.1
 - Importcontrole opnieuw ingericht als één werkruimte met PDF-lijst links, voorblad in het midden en bewerkbare metadata rechts.

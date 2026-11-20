@@ -1,6 +1,6 @@
 import tempfile, unittest
 from pathlib import Path
-from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count
+from engine import detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, propose_question_regions, classify_document_role, infer_exam_metadata, build_question_record, question_pattern_key, learn_decision, suggest_from_learning, validate_website_records, analyze_pdf, render_crop, match_correction_documents, match_exam_documents, link_context_assets, render_composite_crops, review_checklist_errors, detect_context_references, extract_region_text, pixel_rect_to_pdf_bbox, pdf_page_count, propose_context_fragments, classify_question_with_visuals, render_stitched_preview
 
 class EngineTests(unittest.TestCase):
     def test_official_exam_filename_roles_and_metadata(self):
@@ -73,7 +73,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(suppressed[0]["suppressed_by"]["page"],1)
 
     def test_question_candidates_keep_repeated_numbers(self):
-        a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\\nBeschrijf de functie van dit orgaan."}]},
+        a={"pages":[{"page":1,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,20,14],"text":"1."},{"bbox":[1,15,100,27],"text":"Beschrijf de functie van dit orgaan."}],"text":"1.\nBeschrijf de functie van dit orgaan."}]},
                     {"page":2,"blocks":[{"bbox":[1,2,3,4],"lines":[{"bbox":[1,2,140,14],"text":"1. Welke stof wordt gevormd?"}],"text":"1. Welke stof wordt gevormd?"}]}]}
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[1,1])
@@ -87,7 +87,7 @@ class EngineTests(unittest.TestCase):
         a={"pages":[{"page":1,"blocks":[{"bbox":[0,0,300,100],"lines":[
             {"bbox":[10,10,20,20],"text":"8."},
             {"bbox":[30,10,250,20],"text":"Welk orgaan produceert dit hormoon?"}
-        ],"text":"8.\\nWelk orgaan produceert dit hormoon?"}]}]}
+        ],"text":"8.\nWelk orgaan produceert dit hormoon?"}]}]}
         got=detect_question_candidates(a)
         self.assertEqual(len(got),1)
         self.assertEqual(got[0]["number"],8)
@@ -101,7 +101,7 @@ class EngineTests(unittest.TestCase):
             {"bbox":[10,100,20,110],"text":"4"},
             {"bbox":[30,100,50,110],"text":"1p"},
             {"bbox":[30,120,200,130],"text":"De vraagtekst volgt hier."}
-        ],"text":"1\\n2\\n3\\nEen doorlopende tekstregel.\\n4\\n1p\\nDe vraagtekst volgt hier."}]}]}
+        ],"text":"1\n2\n3\nEen doorlopende tekstregel.\n4\n1p\nDe vraagtekst volgt hier."}]}]}
         got=detect_question_candidates(a)
         self.assertEqual([x["number"] for x in got],[4])
         self.assertEqual(got[0]["confidence"],0.95)
@@ -116,22 +116,64 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(got[0]["number"],7)
         self.assertEqual(got[0]["page"],1)
         self.assertEqual(got[0]["next_line"],"Beschrijf de oorzaak.")
-    def test_question_pattern_key_distinguishes_layouts(self):
-        self.assertEqual(question_pattern_key({"line":"4. Beschrijf dit.","next_line":""}),"question_start:numbered_line_with_text")
-        self.assertEqual(question_pattern_key({"line":"4.","next_line":"Beschrijf dit."}),"question_start:standalone_number_then_text")
-    def test_learning_requires_repeated_support_and_never_autoplays(self):
+    def test_question_pattern_key_uses_generalizable_features_not_exam_specific_text(self):
+        inline = question_pattern_key({"line":"4. Beschrijf de functie van dit orgaan.","next_line":"2p"})
+        other_text = question_pattern_key({"line":"19. Beschrijf het proces in deze situatie.","next_line":"3 punten"})
+        standalone = question_pattern_key({"line":"4.","next_line":"Beschrijf de oorzaak."})
+        self.assertEqual(inline, other_text)
+        self.assertIn("shape=inline", inline)
+        self.assertIn("points=1", inline)
+        self.assertIn("shape=standalone", standalone)
+        self.assertNotEqual(inline, standalone)
+
+    def test_learning_requires_three_independent_exams_and_never_auto_applies(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)
-            learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True})
-            self.assertIsNone(suggest_from_learning(p,"layout-a")["suggestion"])
-            learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True})
-            s=suggest_from_learning(p,"layout-a")
-            self.assertEqual(s["suggestion"],"question")
-            self.assertFalse(s["auto_apply"])
-            learn_decision(p,{"pattern_key":"layout-a","chosen":"not_question","accepted":True})
-            tie=suggest_from_learning(p,"layout-a")
-            self.assertIsNone(tie["suggestion"])
-            self.assertTrue(tie["conflicting"])
+            # Repeated corrections in one PDF must not masquerade as independent evidence.
+            for _ in range(5):
+                learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True,
+                                  "document_id":"exam-a","candidate_line":"4. Beschrijf dit","page":1})
+            same_exam=suggest_from_learning(p,"layout-a")
+            self.assertIsNone(same_exam["suggestion"])
+            self.assertEqual(same_exam["document_support"],1)
+            for exam in ("exam-b","exam-c"):
+                learn_decision(p,{"pattern_key":"layout-a","chosen":"question","accepted":True,
+                                  "document_id":exam,"candidate_line":"8. Beschrijf dit","page":2})
+            learned=suggest_from_learning(p,"layout-a")
+            self.assertEqual(learned["suggestion"],"question")
+            self.assertEqual(learned["document_support"],3)
+            self.assertEqual(learned["confidence"],1.0)
+            self.assertFalse(learned["auto_apply"])
+            learn_decision(p,{"pattern_key":"layout-a","chosen":"not_question","accepted":True,
+                              "document_id":"exam-d","candidate_line":"9. Bronregel","page":3})
+            conflict=suggest_from_learning(p,"layout-a")
+            self.assertIsNone(conflict["suggestion"])
+            self.assertTrue(conflict["conflicting"])
+            self.assertFalse(conflict["auto_apply"])
+
+    def test_context_proposals_use_visual_assets_and_link_to_confirmed_question(self):
+        analysis = {"pages": [{
+            "page": 2, "width": 600, "height": 800,
+            "visual_assets": [{"id": "p2-image-1", "kind": "image", "bbox": [100, 180, 450, 300]}],
+            "blocks": [{"lines": [{"bbox": [110, 302, 250, 318], "text": "Figuur 2. De bouw van een blad"}]}],
+        }]}
+        candidates = [{"number": 2, "page": 2, "bbox": [40, 100, 90, 120], "human_decision": True}]
+        proposals = propose_context_fragments(analysis, candidates)
+        self.assertEqual(len(proposals), 1)
+        proposal = proposals[0]
+        self.assertEqual(proposal["type"], "context")
+        self.assertEqual(proposal["question_numbers"], [2])
+        self.assertEqual(proposal["status"], "automatisch_voorstel_nog_te_controleren")
+        self.assertEqual(proposal["confidence"], 0.82)
+        self.assertIn("Figuur 2", proposal["evidence"]["captions"][0])
+
+    def test_context_proposals_do_not_invent_regions_without_visual_assets(self):
+        analysis = {"pages": [{"page": 1, "width": 600, "height": 800,
+                               "visual_assets": [], "blocks": []}]}
+        candidates = [{"number": 1, "page": 1, "bbox": [40, 100, 90, 120],
+                       "human_decision": True}]
+        self.assertEqual(propose_context_fragments(analysis, candidates), [])
+
     def test_duplicate_ids_reported(self):
         row={"id":"same","level":"Havo","year":"2025","period":"1","n":1,"page":1,"q":"x","pdf":"a.pdf","cv":"b.pdf"}
         errors=validate_website_records([row],[row],[])
@@ -191,7 +233,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual([x["number"] for x in got],[4])
 
     def test_cv_anchor_detection(self):
-        a={"pages":[{"page":1,"text":"Vraag 1\\nBeoordelingsmodel\\nVraag 3"}]}
+        a={"pages":[{"page":1,"text":"Vraag 1\nBeoordelingsmodel\nVraag 3"}]}
         got=detect_cv_question_numbers(a)
         self.assertEqual([x["number"] for x in got],[1,3])
 
@@ -205,6 +247,28 @@ class EngineTests(unittest.TestCase):
         missing=detect_question_type("Kies het juiste antwoord.\nA. eerste optie\nC. derde optie")
         self.assertFalse(missing["options_complete"])
         self.assertEqual(missing["option_gaps"],["B"])
+        # PDF text extraction can place all options on one line.
+        inline=detect_question_type("Kies het juiste antwoord. A. mitochondriën B. ribosomen C. celkern D. celmembraan")
+        self.assertEqual(inline["type"],"meerkeuze")
+        self.assertEqual(inline["option_labels"],["A","B","C","D"])
+        self.assertTrue(inline["options_complete"])
+        self.assertIn("ribosomen",inline["options"][1]["text"])
+
+        # Parenthesized and lower-case labels are common in exam layouts/OCR.
+        lower=detect_question_type("(a) mitochondriën\n(b) ribosomen\n(c) celkern")
+        self.assertEqual(lower["type"],"meerkeuze")
+        self.assertEqual(lower["option_labels"],["A","B","C"])
+        self.assertTrue(lower["options_complete"])
+
+        # A label on its own line followed by option text must also be retained.
+        split=detect_question_type("Kies één antwoord.\nA\nmitochondriën\nB\nribosomen")
+        self.assertEqual(split["type"],"meerkeuze")
+        self.assertEqual(split["option_labels"],["A","B"])
+
+        # An incidental single letter/label in prose is not sufficient evidence.
+        prose=detect_question_type("A. Beschrijf de functie van mitochondriën.")
+        self.assertEqual(prose["type"],"open")
+
 
     def test_context_assets_link_caption_to_nearby_pdf_image_and_vector(self):
         analysis={"pages":[
@@ -265,6 +329,262 @@ class EngineTests(unittest.TestCase):
         first={"number":1,"page":1,"bbox":[0,10,10,20]}
         second={"number":2,"page":1,"bbox":[0,50,100,60]}
         self.assertEqual(extract_candidate_text(analysis,first,second),"1.\nGebruik figuur 2.")
+
+
+    def test_context_proposals_never_use_page_one(self):
+        analysis = {"pages": [{
+            "page": 1, "width": 600, "height": 800,
+            "blocks": [], "visual_assets": [
+                {"id": "cover-image", "kind": "image", "bbox": [60, 150, 300, 300]}
+            ]
+        }]}
+        candidates = [
+            {"number": 1, "page": 2, "bbox": [40, 40, 80, 65], "human_decision": True}
+        ]
+        self.assertEqual(propose_context_fragments(analysis, candidates), [])
+
+    def test_between_context_before_next_question_links_to_that_question(self):
+        analysis = {"pages": [{
+            "page": 2, "width": 600, "height": 800,
+            "blocks": [{"lines": [{"bbox": [60, 305, 260, 320],
+                                     "text": "Figuur 2. Inleidende afbeelding"}]}],
+            "visual_assets": [
+                {"id": "figure-between-questions", "kind": "image",
+                 "bbox": [60, 150, 300, 300]}
+            ]
+        }]}
+        candidates = [
+            {"number": 1, "page": 2, "bbox": [40, 40, 80, 65], "human_decision": True},
+            {"number": 2, "page": 2, "bbox": [40, 420, 80, 445], "human_decision": True},
+        ]
+        proposals = propose_context_fragments(analysis, candidates)
+        self.assertEqual(len(proposals), 1)
+        self.assertEqual(proposals[0]["question_numbers"], [2])
+
+    def test_preview_pdf_removes_cover_and_repeated_footer_without_changing_source(self):
+        import tempfile
+        import pymupdf as fitz
+        from pathlib import Path
+        from engine import prepare_exam_preview_pdf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            doc = fitz.open()
+            for page_no in range(1, 4):
+                page = doc.new_page(width=600, height=800)
+                if page_no == 1:
+                    page.insert_text((60, 100), "Voorblad - instructies")
+                else:
+                    page.insert_text((60, 120), f"Vraag {page_no - 1}. Beschrijf de afbeelding.")
+                    page.insert_text((60, 760), "Biologie | Examen 2026")
+                    page.insert_text((540, 780), str(page_no))
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertEqual(len(result["page_map"]), 2)
+            self.assertEqual([x["original_page"] for x in result["page_map"]], [2, 3])
+            self.assertTrue(all(x["footer_detected"] for x in result["page_map"]))
+            with fitz.open(preview) as cleaned:
+                self.assertEqual(len(cleaned), 2)
+                self.assertLess(cleaned[0].rect.height, 200)
+                self.assertNotIn("Voorblad", cleaned[0].get_text())
+                self.assertNotIn("Biologie | Examen 2026", cleaned[0].get_text())
+            with fitz.open(source) as original:
+                self.assertEqual(len(original), 3)
+                self.assertIn("Voorblad", original[0].get_text())
+
+    def test_footer_hypothesis_cannot_remove_question_line_below_it(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            doc = fitz.open()
+            cover = doc.new_page(width=600, height=800)
+            cover.insert_text((60, 120), "Voorblad - instructies")
+            for page_no in (2, 3):
+                page = doc.new_page(width=600, height=800)
+                page.insert_text((60, 120), f"Vraag {page_no - 1}. Beschrijf de situatie.")
+                # This repeated line sits in the footer band but is real exam
+                # content. The final question line must survive beneath it.
+                page.insert_text((60, 750), "Biologie | Examen 2026")
+                page.insert_text((60, 770), (
+                    "De eigenschap dominant overerft."
+                    if page_no == 2 else "Deze inhoud hoort bij de volgende vraag."
+                ))
+                page.insert_text((60, 790), "Biologie | Examen 2026")
+                page.insert_text((540, 797), str(page_no))
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertTrue(result["page_map"][0]["footer_detected"])
+            self.assertTrue(result["page_map"][0]["footer_review_required"])
+            self.assertIn(
+                "Biologie | Examen 2026",
+                result["page_map"][0]["footer_candidates_rejected"],
+            )
+            with fitz.open(preview) as cleaned:
+                page_text = cleaned[0].get_text("text").lower()
+                self.assertIn("dominant overerft", page_text)
+                self.assertEqual(page_text.count("biologie | examen 2026"), 1)
+
+    def test_sentence_mentioning_page_number_is_not_mistaken_for_footer(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            doc = fitz.open()
+            cover = doc.new_page(width=600, height=800)
+            cover.insert_text((60, 120), "Voorblad")
+            page = doc.new_page(width=600, height=800)
+            page.insert_text((60, 120), "Vraag 1")
+            page.insert_text(
+                (60, 760),
+                "De pagina 2 laat zien hoe deze eigenschap dominant overerft.",
+            )
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertFalse(result["page_map"][0]["footer_detected"])
+            with fitz.open(preview) as cleaned:
+                page_text = cleaned[0].get_text("text").lower()
+                self.assertIn("pagina 2", page_text)
+                self.assertIn("dominant overerft", page_text)
+
+    def test_vwo_2026_ii_question_one_and_final_overerft_line_survive_preview(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf, render_stitched_preview
+
+        source = Path(__file__).resolve().parents[2] / "examens" / "vw-1018-a-26-2-o.pdf"
+        self.assertTrue(source.is_file(), "De regressie-PDF vwo 2026 tijdvak 2 ontbreekt.")
+        with tempfile.TemporaryDirectory() as tmp:
+            preview = Path(tmp) / "preview.pdf"
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertEqual(result["page_map"][0]["original_page"], 2)
+            self.assertTrue(result["page_map"][0]["footer_detected"], result["page_map"][0])
+            self.assertLess(result["page_map"][0]["preview_height"], result["page_map"][0]["original_height"])
+            self.assertEqual(len(result["page_map"]), 18)
+            with fitz.open(preview) as cleaned:
+                first_question_page = cleaned[0].get_text("text").lower()
+                self.assertRegex(first_question_page, r"dominant\s+overerft")
+                self.assertIn("geef een combinatie van ouders", first_question_page)
+                self.assertRegex(first_question_page, r"1p\s*1")
+
+            stitched = Path(tmp) / "vwo-2026-ii-doorlopend.png"
+            stitched_info = render_stitched_preview(
+                preview, stitched, result["page_map"], scale=1.05
+            )
+            self.assertTrue(stitched.is_file())
+            self.assertEqual(len(stitched_info["layout"]), 18)
+            self.assertEqual(stitched_info["layout"][0]["original_page"], 2)
+            self.assertEqual(stitched_info["layout"][-1]["original_page"], 19)
+            self.assertLessEqual(fitz.Pixmap(str(stitched)).height, 26000)
+
+    def test_stitched_preview_is_one_continuous_image_with_original_page_mapping(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf, render_stitched_preview
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            stitched = Path(tmp) / "stitched.png"
+            doc = fitz.open()
+            cover = doc.new_page(width=600, height=800)
+            cover.insert_text((60, 120), "Voorblad")
+            for page_no in (2, 3, 4):
+                page = doc.new_page(width=600, height=800)
+                page.insert_text((60, 120), f"Vraag {page_no - 1}")
+                page.insert_text((60, 780), "Biologie | Examen 2026")
+                page.insert_text((540, 795), str(page_no))
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            stitched_info = render_stitched_preview(
+                preview, stitched, result["page_map"], scale=1.0
+            )
+            self.assertTrue(stitched.is_file())
+            self.assertEqual(
+                [item["original_page"] for item in stitched_info["layout"]],
+                [2, 3, 4],
+            )
+            self.assertGreater(
+                stitched_info["layout"][1]["y0"],
+                stitched_info["layout"][0]["y1"],
+            )
+            pixmap = fitz.Pixmap(str(stitched))
+            expected_content_height = sum(
+                float(item["height"]) for item in stitched_info["layout"]
+            )
+            self.assertGreater(pixmap.height, expected_content_height * 0.95)
+            self.assertLessEqual(pixmap.height, 26000)
+
+    def test_uncaptioned_visual_after_question_stays_with_that_question(self):
+        analysis = {"pages": [{
+            "page": 2, "width": 600, "height": 800,
+            "blocks": [], "visual_assets": [
+                {"id": "question-figure", "kind": "image", "bbox": [60, 150, 300, 300]}
+            ]
+        }]}
+        candidates = [
+            {"number": 1, "page": 2, "bbox": [40, 40, 80, 65], "human_decision": True},
+            {"number": 2, "page": 2, "bbox": [40, 420, 80, 445], "human_decision": True},
+        ]
+        proposals = propose_context_fragments(analysis, candidates)
+        self.assertEqual(proposals[0]["question_numbers"], [1])
+
+    def test_visual_answer_options_are_flagged_as_possible_multiple_choice(self):
+        import pymupdf as fitz
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"visual-options.pdf"
+            doc=fitz.open()
+            page=doc.new_page(width=600,height=800)
+            page.insert_text((50,60),"Kies het juiste antwoord.",fontsize=11)
+            pix=fitz.Pixmap(fitz.csRGB,fitz.IRect(0,0,40,40),0)
+            pix.clear_with(180)
+            for x in (60,180,300,420):
+                page.insert_image(fitz.Rect(x,120,x+70,190),pixmap=pix)
+            page.insert_text((60,210),"A",fontsize=10)
+            page.insert_text((180,210),"B",fontsize=10)
+            page.insert_text((300,210),"C",fontsize=10)
+            page.insert_text((420,210),"D",fontsize=10)
+            doc.save(path); doc.close()
+            analysis=analyze_pdf(path)
+            candidate={"page":1,"bbox":[40,45,80,65]}
+            check=classify_question_with_visuals(analysis,candidate,None,
+                                                 "Kies het juiste antwoord.")
+            self.assertEqual(check["type"],"mogelijk_visuele_meerkeuze")
+            self.assertEqual(check["visual_detection"]["status"],
+                             "waarschijnlijke_visuele_meerkeuze")
+            self.assertGreaterEqual(check["visual_detection"]["raster_image_count"],4)
+            self.assertTrue(check["visual_detection"]["requires_visual_review"])
+
+    def test_single_illustration_is_not_misclassified_as_visual_multiple_choice(self):
+        import pymupdf as fitz
+        with tempfile.TemporaryDirectory() as d:
+            path=Path(d)/"illustration.pdf"
+            doc=fitz.open()
+            page=doc.new_page(width=600,height=800)
+            page.insert_text((50,60),"Beschrijf wat je ziet.",fontsize=11)
+            pix=fitz.Pixmap(fitz.csRGB,fitz.IRect(0,0,40,40),0)
+            pix.clear_with(180)
+            page.insert_image(fitz.Rect(60,120,260,300),pixmap=pix)
+            doc.save(path); doc.close()
+            analysis=analyze_pdf(path)
+            candidate={"page":1,"bbox":[40,45,80,65]}
+            check=classify_question_with_visuals(analysis,candidate,None,
+                                                 "Beschrijf wat je ziet.")
+            self.assertEqual(check["type"],"open")
+            self.assertEqual(check["visual_detection"]["status"],
+                             "visueel_materiaal_bij_vraag")
+            self.assertTrue(check.get("visual_material_present"))
 
     def test_pdf_analysis_inventories_raster_and_vector_visual_assets(self):
         try:

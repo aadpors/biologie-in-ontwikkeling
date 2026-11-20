@@ -5,7 +5,33 @@ from copy import deepcopy
 from typing import Any
 
 STRUCTURE_SCHEMA = "biologie-examenstructuur-v1"
-FRAGMENT_TYPES = {"context_intro", "vraagcontext", "vraag", "tussenliggende_context"}
+FRAGMENT_TYPES = {"context", "vraag"}
+LEGACY_FRAGMENT_TYPES = {
+    "intro": "context",
+    "context_intro": "context",
+    "tussen_context": "context",
+    "vraagcontext": "context",
+    "tussenliggende_context": "context",
+}
+
+
+def canonical_fragment_type(fragment_type: str) -> str:
+    """Map historical labels to the two current, user-facing fragment types."""
+    value = str(fragment_type or "")
+    return LEGACY_FRAGMENT_TYPES.get(value, value)
+
+
+def normalize_fragments(fragments: list[dict]) -> list[dict]:
+    """Return copied fragments with legacy types migrated; all other data is preserved."""
+    normalized = deepcopy(fragments)
+    for fragment in normalized:
+        original_type = str(fragment.get("type", ""))
+        fragment["type"] = canonical_fragment_type(original_type)
+        if original_type in {"intro", "context_intro"}:
+            fragment.setdefault("context_role", "introductie")
+        elif original_type in {"vraagcontext", "tussen_context", "tussenliggende_context"}:
+            fragment.setdefault("context_role", "vraaggebonden")
+    return normalized
 
 
 def normalize_boundary(value: Any) -> float:
@@ -27,22 +53,25 @@ def make_page_span(page: int, top: Any, bottom: Any) -> dict:
 
 
 def default_question_links(fragment_type: str, confirmed_question_numbers: list[int]) -> list[int]:
+    fragment_type = canonical_fragment_type(fragment_type)
     if fragment_type not in FRAGMENT_TYPES:
         raise ValueError("Onbekend fragmenttype.")
-    numbers = sorted({int(n) for n in confirmed_question_numbers})
-    return numbers if fragment_type == "context_intro" else []
+    # Context scope is explicit; callers decide whether it applies to all
+    # questions or only a selected subset.
+    return []
 
 
 def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[int],
                   confirmed_question_numbers: list[int], fragment_id: str) -> dict:
+    fragment_type = canonical_fragment_type(fragment_type)
     if fragment_type not in FRAGMENT_TYPES:
         raise ValueError("Onbekend fragmenttype.")
     confirmed = sorted({int(n) for n in confirmed_question_numbers})
     links = sorted({int(n) for n in question_numbers})
+    if fragment_type == "context" and int(page_span["page"]) == 1:
+        raise ValueError("Pagina 1 van de opgaven-PDF is het voorblad en mag geen contextfragment bevatten.")
     if any(n not in confirmed for n in links):
         raise ValueError("Een fragment mag alleen aan bevestigde vraagstarts worden gekoppeld.")
-    if fragment_type == "context_intro" and not links:
-        links = default_question_links(fragment_type, confirmed)
     if fragment_type == "vraag" and len(links) != 1:
         raise ValueError("Een vraagfragment moet aan precies één bevestigd vraagnummer gekoppeld zijn.")
     if fragment_type != "vraag" and not links:
@@ -91,16 +120,20 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
         if not fid or fid in seen_ids:
             errors.append("fragment_id_ontbreekt_of_dubbel")
         seen_ids.add(fid)
-        if fragment.get("type") not in FRAGMENT_TYPES:
+        fragment_type = canonical_fragment_type(fragment.get("type", ""))
+        if fragment_type not in FRAGMENT_TYPES:
             errors.append("ongeldig_fragmenttype")
         links = fragment.get("question_numbers", [])
         if any(int(n) not in allowed for n in links):
             errors.append("ongeldige_vraagkoppeling")
-        if fragment.get("type") == "vraag" and len(links) != 1:
+        if fragment_type == "vraag" and len(links) != 1:
             errors.append("vraagfragment_moet_een_vraagnummer_hebben")
-        if fragment.get("type") in FRAGMENT_TYPES - {"vraag"} and not links:
+        if fragment_type in FRAGMENT_TYPES - {"vraag"} and not links:
             errors.append("contextfragment_zonder_vraagkoppeling")
-        if fragment.get("type") == "vraag" and len(links) == 1:
+        if fragment_type == "context" and any(int(span.get("page", 0)) == 1
+                                               for span in fragment.get("page_spans", [])):
+            errors.append("contextfragment_op_voorblad")
+        if fragment_type == "vraag" and len(links) == 1:
             number = int(links[0])
             question_fragment_counts[number] = question_fragment_counts.get(number, 0) + 1
         spans = fragment.get("page_spans", [])
@@ -150,7 +183,7 @@ def fragments_for_question(structure: dict | None, question_number: int) -> dict
     linked = [fragment for fragment in structure.get("fragments", [])
               if number in [int(x) for x in fragment.get("question_numbers", [])]]
     question = next((x for x in linked if x.get("type") == "vraag"), None)
-    contexts = [x for x in linked if x.get("type") in {"context_intro", "vraagcontext", "tussenliggende_context"}]
+    contexts = [x for x in linked if canonical_fragment_type(x.get("type", "")) == "context"]
     return {
         "question_fragment": question,
         "context_fragments": contexts,
@@ -238,3 +271,61 @@ def missing_question_regions(structure: dict | None, question_numbers: list[int]
         and fragment.get("page_spans")
     }
     return sorted({int(x) for x in question_numbers} - covered)
+
+
+def sort_fragments_reading_order(fragments: list[dict]) -> list[dict]:
+    """Return a stable copy of fragments in top-to-bottom PDF reading order."""
+    type_order = {"context": 0, "vraag": 1}
+    def key(fragment):
+        spans = sorted(fragment.get("page_spans", []), key=lambda item: int(item.get("page", 0)))
+        first = spans[0] if spans else {}
+        return (int(first.get("page", 10**9)), float(first.get("top", 0.0)),
+                type_order.get(canonical_fragment_type(fragment.get("type", "")), 9),
+                str(fragment.get("id", "")))
+    return sorted(deepcopy(fragments), key=key)
+
+
+def trim_question_bands_for_contexts(fragments: list[dict]) -> list[dict]:
+    """Stop the immediately preceding question band where next-question context begins."""
+    result = deepcopy(fragments)
+    contexts = [item for item in result
+                if canonical_fragment_type(item.get("type", "")) == "context"
+                and item.get("context_role") != "introductie"]
+    questions = [item for item in result
+                 if canonical_fragment_type(item.get("type", "")) == "vraag"]
+    for context in contexts:
+        links = {int(n) for n in context.get("question_numbers", [])}
+        spans = sorted(context.get("page_spans", []), key=lambda x: int(x.get("page", 0)))
+        if not links or not spans:
+            continue
+        first = spans[0]
+        context_key = (int(first["page"]), float(first["top"]))
+        previous = []
+        for question in questions:
+            qlinks = question.get("question_numbers") or []
+            qspans = sorted(question.get("page_spans", []), key=lambda x: int(x.get("page", 0)))
+            if not qlinks or not qspans or int(qlinks[0]) in links:
+                continue
+            qfirst = qspans[0]
+            qkey = (int(qfirst["page"]), float(qfirst["top"]))
+            if qkey < context_key:
+                previous.append((qkey, question))
+        if not previous:
+            continue
+        _, preceding_question = max(previous, key=lambda item: item[0])
+        kept = []
+        for span in sorted(preceding_question.get("page_spans", []), key=lambda x: int(x.get("page", 0))):
+            page = int(span["page"])
+            if page < context_key[0]:
+                kept.append(span)
+            elif page == context_key[0] and float(span["top"]) < context_key[1]:
+                shortened = dict(span)
+                shortened["bottom"] = min(float(span["bottom"]), context_key[1])
+                if shortened["bottom"] - float(shortened["top"]) >= 0.005:
+                    kept.append(shortened)
+                break
+            else:
+                break
+        if kept:
+            preceding_question["page_spans"] = kept
+    return sort_fragments_reading_order(result)
