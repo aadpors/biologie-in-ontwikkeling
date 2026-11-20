@@ -964,8 +964,10 @@ def build_consolidated_cv_pdf(entries: list[dict], snippets_dir: Path,
         result.save(output_path,garbage=4,deflate=True)
     finally:
         result.close()
+    with fitz.open(output_path) as check:
+        page_count=len(check)
     return {"path":str(output_path),"sha256":digest_file(output_path),
-            "page_count":len(fitz.open(output_path))}
+            "page_count":page_count}
 
 
 def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
