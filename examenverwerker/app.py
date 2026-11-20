@@ -3620,6 +3620,7 @@ class ExamApp:
             2, min(1.0, preview_heights[2] / page_sizes[2][1])
         )
         selection_dirty = False
+        save_status = tk.StringVar(value="Wijzigingen worden automatisch opgeslagen.")
 
         def selected_links():
             return [question_numbers[i] for i in qlist.curselection()]
@@ -3955,7 +3956,9 @@ class ExamApp:
                     if current:
                         try:
                             current["page_spans"] = selection_to_spans()
-                            refresh_fragment_list()
+                            # Do not rebuild/reselect the tree row here: its
+                            # selection event reloads the fragment and jumps
+                            # the stitched canvas back to the fragment start.
                             save_structure()
                         except Exception as exc:
                             messagebox.showerror("Selectie niet opgeslagen", str(exc), parent=win)
@@ -3985,6 +3988,7 @@ class ExamApp:
                     fragment_tree.selection_set(str(selected_index))
         def save_structure():
             nonlocal original_structure_signature, selection_dirty
+            save_status.set("Wijzigingen opslaan…")
             current = selected_fragment()
             if not snippet_mode and current and selection_dirty:
                 try:
@@ -4014,6 +4018,7 @@ class ExamApp:
             # Keep the original single-document key for older project readers.
             self.data["exam_structure"] = structure
             self.save_project()
+            save_status.set("Automatisch opgeslagen")
             self._log(f"Examenstructuur opgeslagen: {len(fragments)} fragment(en), bron {doc['bestand']}.")
             return True
         def create_fragment():
@@ -4062,7 +4067,7 @@ class ExamApp:
                 if selected is not None:
                     fragment_tree.selection_set(str(selected))
                 save_structure()
-                show_document()
+                redraw_guides()
             except Exception as exc:
                 messagebox.showerror("Selectie niet bijgewerkt", str(exc), parent=win)
         def append_page():
@@ -4159,27 +4164,43 @@ class ExamApp:
                 if captions:
                     detail += "\\nBijschrift: " + " · ".join(captions[:2])
                 fragment_info.configure(text=detail)
-        def update_links():
+        def update_fragment_row(frag):
+            try:
+                index = fragments.index(frag)
+                fragment_tree.item(
+                    str(index),
+                    values=(
+                        fragment_type_labels.get(canonical_fragment_type(frag.get("type", "")), "Onbekend"),
+                        ",".join(str(x) for x in frag.get("question_numbers", [])),
+                        f"{float(frag['confidence']):.0%}" if isinstance(frag.get("confidence"), (int, float)) else "—",
+                    ),
+                )
+            except (ValueError, tk.TclError):
+                pass
+
+        def autosave_fragment_links(_event=None):
             frag = selected_fragment()
-            if not frag: return
-            new_type = fragment_type_ids[type_var.get()]
-            if new_type != "vraag" and any(int(span.get("page", 0)) == 1
-                                           for span in frag.get("page_spans", [])):
-                messagebox.showwarning("Pagina 1 is geen context",
-                    "Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag niet als context worden opgeslagen.",
-                    parent=win)
+            if not frag:
                 return
+            new_type = fragment_type_ids[type_var.get()]
             links = selected_links()
             if new_type == "vraag" and len(links) != 1:
-                messagebox.showwarning("Vraagfragment", "Een vraagfragment moet aan precies één vraagnummer gekoppeld zijn.", parent=win)
+                save_status.set("Kies precies één vraag voor een vraagfragment.")
                 return
-            if new_type != "vraag" and not links:
-                messagebox.showwarning("Context zonder vraagkoppeling",
-                    "Koppel dit contextfragment aan minimaal één vraag. Anders zou het materiaal bij geen enkele vraag worden getoond.", parent=win)
+            if new_type == "context" and not links:
+                save_status.set("Koppel een context aan minimaal één vraag.")
+                return
+            if any(int(span.get("page", 0)) == 1 for span in frag.get("page_spans", [])):
+                save_status.set("Dit oude fragment moet eerst opnieuw worden afgebakend.")
                 return
             frag["type"] = new_type
             frag["question_numbers"] = links
-            save_structure(); refresh_fragment_list(); redraw_guides()
+            if save_structure():
+                update_fragment_row(frag)
+                redraw_guides()
+
+        type_box.bind("<<ComboboxSelected>>", autosave_fragment_links)
+        qlist.bind("<<ListboxSelect>>", autosave_fragment_links)
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
             nonlocal selection_start, selection_end, displayed_page, selection_dirty
@@ -4229,7 +4250,7 @@ class ExamApp:
         ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
         ttk.Button(actions, text="Selectie bijwerken", command=update_page_span).pack(side="left", padx=8)
         ttk.Button(actions, text="Volledige pagina toevoegen", command=append_page).pack(side="left", padx=8)
-        ttk.Button(actions, text="Fragmenttype en koppeling opslaan", command=update_links).pack(side="left")
+
         ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
         def save_and_close():
             if save_structure():
@@ -4240,7 +4261,6 @@ class ExamApp:
                 self._workspace_refresh()
                 self._workflow_refresh()
         ttk.Button(actions, text="Terug naar vraagcontrole", command=save_and_close).pack(side="right", padx=(8, 0))
-        save_status = tk.StringVar(value="Wijzigingen worden automatisch opgeslagen.")
         ttk.Label(actions, textvariable=save_status, foreground="#47734a").pack(side="right", padx=(8, 12))
         refresh_fragment_list()
         if fragments:
