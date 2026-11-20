@@ -222,26 +222,23 @@ def exam_workflow_state(data: dict) -> dict:
                            "Baken alle context- en vraagfragmenten af en controleer de koppelingen.",
                            document_id=doc.get("id"), errors=errors)
 
-    # Classification is derived only from confirmed question fragments.
-    for doc in opgaven_docs:
-        for candidate in _confirmed_candidates(data, doc.get("id")):
-            if candidate.get("vraagtype_status") not in ("visueel_bevestigd", "handmatig_bevestigd"):
-                detected = candidate.get("vraagtype_controle") or {}
-                if detected.get("type") in (None, "", "nog_niet_bepaald"):
-                    return _result("vraaganalyse", "Vraagtype en punten bepalen",
-                                   "Analyseer het geselecteerde vraagfragment op vraagtype, punten en antwoordopties.",
-                                   document_id=doc.get("id"), question_number=candidate.get("number"))
-                return _result("vraaganalyse", "Vraagtype en punten controleren",
-                               "Controleer per vraag het voorgestelde vraagtype, puntenaantal en antwoordopties.",
-                               document_id=doc.get("id"), question_number=candidate.get("number"))
-
+    # Create/reuse a lightweight record from each confirmed, manually delimited
+    # question fragment. The record editor is the human review surface for type,
+    # points, wording and options; no second fragment-confirmation round is added.
     records = data.get("vraagrecords") or []
     all_candidates = [(doc, row) for doc in opgaven_docs
                       for row in _confirmed_candidates(data, doc.get("id"))]
-    if any(_record_for(_records_for(data, doc.get("id")), row) is None
-           for doc, row in all_candidates):
-        return _result("vraaganalyse", "Vraaggegevens samenstellen",
-                       "Werk de bestaande vraaggegevens bij vanuit de bevestigde fragmenten.")
+    for doc, candidate in all_candidates:
+        record = _record_for(_records_for(data, doc.get("id")), candidate)
+        if record is None:
+            return _result("vraaganalyse", "Vraaggegevens samenstellen",
+                           "Maak de conceptvraag automatisch vanuit de bevestigde fragmentgrenzen.",
+                           document_id=doc.get("id"), question_number=candidate.get("number"))
+        if record.get("question_type_status") != "handmatig_gecontroleerd":
+            return _result("vraaganalyse", "Vraagtype, punten en opties controleren",
+                           "Controleer in het vraagrecord het vraagtype, puntenaantal, vraagtekst en eventuele antwoordopties.",
+                           document_id=doc.get("id"), question_number=candidate.get("number"),
+                           record_id=record.get("id"))
 
     appendix_docs = _documents(data, "uitwerkbijlage")
     for doc in appendix_docs:
