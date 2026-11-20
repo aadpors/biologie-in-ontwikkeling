@@ -25,7 +25,7 @@ def classify_document_role(filename: str, text: str):
             for kind,terms in DOC_ROLE_TERMS.items()}
     if re.search(r"-(?:o)(?:-|\.pdf$)",lower): scores["opgaven"]+=3
     if re.search(r"-(?:c)(?:-|\.pdf$)",lower): scores["correctievoorschrift"]+=3
-    if re.search(r"-(?:a)(?:-|\.pdf$)",lower): scores["aanvulling"]+=5
+    if re.search(r"-(?:a)(?:\d+(?:_\d+)?)?(?:-spr)?\.pdf$",lower): scores["aanvulling"]+=5
     if re.search(r"-(?:c)-a\d",lower): scores["aanvulling"]+=5
     if re.search(r"-(?:u)(?:-|\.pdf$)",lower): scores["uitwerkbijlage"]+=3
     if "uitwerkbijlage" in lower or "uitwerkbijlage" in hay: scores["uitwerkbijlage"]+=5
@@ -83,9 +83,16 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
                     ocr_page=page.get_textpage_ocr(language=language,dpi=200,full=True)
                     ocr_text=page.get_text("text",textpage=ocr_page,sort=True)
                     if len(ocr_text.strip())>len(text.strip()):
-                        raw_for_text=page.get_text("dict",textpage=ocr_page,sort=True)
-                        text=ocr_text
-                        ocr_used=True
+                        if not text.strip():
+                            raw_for_text=page.get_text("dict",textpage=ocr_page,sort=True)
+                            text=ocr_text
+                        else:
+                            existing_lines={line.strip() for line in text.splitlines() if line.strip()}
+                            extra_lines=[line.strip() for line in ocr_text.splitlines()
+                                         if line.strip() and line.strip() not in existing_lines]
+                            if extra_lines:
+                                text=text.rstrip()+"\n"+"\n".join(extra_lines)
+                        ocr_used=bool(ocr_text.strip())
                         break
                 except Exception:
                     continue
