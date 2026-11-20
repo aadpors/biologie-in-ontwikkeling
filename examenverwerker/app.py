@@ -3546,6 +3546,7 @@ class ExamApp:
             header,
             text="De opgeschoonde opgavenpagina's staan hieronder achter elkaar als één doorlopende PDF. "
                  "Selecteer links een fragment en sleep de twee grenslijnen op de lange pagina. "
+                 "Bij een selectie over meerdere pagina's kun je een grenslijn vasthouden en naar de boven- of onderrand bewegen om automatisch mee te scrollen. "
                  "Met 'Fragmentvoorbeeld' controleer je de samengestelde uitsnede; de koppeling met de oorspronkelijke PDF-pagina's blijft behouden.",
             wraplength=1180,
         ).pack(anchor="w", pady=(3, 0))
@@ -3599,6 +3600,9 @@ class ExamApp:
         sx = ttk.Scrollbar(frame, orient="horizontal", command=canvas.xview)
         canvas.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
         sy.pack(side="right", fill="y"); sx.pack(side="bottom", fill="x"); canvas.pack(side="left", fill="both", expand=True)
+        canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(int(-event.delta / 120), "units"))
+        canvas.bind("<Button-4>", lambda _event: canvas.yview_scroll(-1, "units"))
+        canvas.bind("<Button-5>", lambda _event: canvas.yview_scroll(1, "units"))
         actions = ttk.Frame(right); actions.pack(fill="x", pady=(8, 0))
         stitched_path = self.project_dir / "analyse" / f"opgaven-doorlopend-{doc['id']}-{doc['sha256'][:12]}.png"
         stitched_info = render_stitched_preview(
@@ -3890,6 +3894,13 @@ class ExamApp:
             nonlocal selection_start, selection_end, selection_dirty
             if not drag_handle:
                 return
+            # Edge auto-scroll lets a user drag a boundary across the full
+            # stitched document without having to release and re-grab it.
+            viewport_height = max(1, canvas.winfo_height())
+            if event.y >= viewport_height - 34:
+                canvas.yview_scroll(2, "units")
+            elif event.y <= 34:
+                canvas.yview_scroll(-2, "units")
             y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y)))
             if snippet_mode:
                 layout = drag_handle["layout"]
