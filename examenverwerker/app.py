@@ -271,11 +271,15 @@ class ExamApp:
         self.workflow_button.pack(side="right")
 
         correction_bar = ttk.Frame(shell, style="App.TFrame")
-        correction_bar.pack(fill="x", pady=(0, 7))
-        ttk.Button(correction_bar, text="Correcties uit Biologie-controle importeren",
-                   command=self._workspace_import_corrections).pack(side="left", padx=(0, 5))
-        ttk.Button(correction_bar, text="Beoordelingen exporteren",
-                   command=self._workspace_export_corrections).pack(side="left")
+        self.correction_bar = correction_bar
+        self.correction_import_button = ttk.Button(
+            correction_bar, text="Correcties uit Biologie-controle importeren",
+            command=self._workspace_import_corrections)
+        self.correction_import_button.pack(side="left", padx=(0, 5))
+        self.correction_export_button = ttk.Button(
+            correction_bar, text="Beoordelingen exporteren",
+            command=self._workspace_export_corrections)
+        self.correction_export_button.pack(side="left")
         ttk.Label(correction_bar,
                   text="Bewaart besluiten, notities, vraagnummercorrecties en exacte PDF-posities.",
                   style="Muted.TLabel").pack(side="left", padx=10)
@@ -5020,6 +5024,10 @@ class ExamApp:
         temp.write_text(json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8")
         temp.replace(self.project_dir / PROJECT_FILE)
         self.project_label.configure(text=f"{self.data.get('vak', 'Biologie')} · {self.data.get('naam', self.project_dir.name if self.project_dir else '')}")
+        if str(self.data.get("vak", "Biologie")).strip().lower() == "biologie":
+            self.correction_bar.pack(fill="x", pady=(0, 7), before=self._workspace_container)
+        else:
+            self.correction_bar.pack_forget()
         self._workflow_refresh()
 
     def refresh(self):
