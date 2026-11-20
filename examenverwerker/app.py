@@ -3506,6 +3506,12 @@ class ExamApp:
         keyrow=ttk.Frame(outer); keyrow.pack(fill="x",pady=(5,0))
         ttk.Label(keyrow,text="Correcte sleutel (indien van toepassing)").pack(side="left")
         ttk.Entry(keyrow,textvariable=correct_var,width=16).pack(side="left",padx=8)
+        amendment_row=ttk.Frame(outer); amendment_row.pack(fill="x",pady=(6,0))
+        ttk.Label(amendment_row,text="Wijziging door CV-aanvulling").pack(side="left")
+        amendment_change_var=tk.StringVar(value=record.get("cv_amendment_change_type",""))
+        ttk.Combobox(amendment_row,textvariable=amendment_change_var,
+            values=["niet van toepassing","toevoeging","wijziging","vervanging","intrekking"],
+            state="readonly",width=24).pack(side="left",padx=8)
         contexts=record.get("context_fragments",[])
         context_text="\n\n".join(
             f"Context {index+1}: {item.get('text') or '[geen uitleesbare tekst; fragment blijft visueel gekoppeld]'}"
@@ -3545,6 +3551,7 @@ class ExamApp:
             record["question_type_status"]="handmatig_gecontroleerd"
             record["options"]=options
             record["correct"]=correct_var.get().strip()
+            record["cv_amendment_change_type"]=amendment_change_var.get()
             record.setdefault("exam",{})["points"]=points
             record["status"]="concept"
             self.save_project()
