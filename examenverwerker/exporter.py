@@ -365,4 +365,4 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
             "sources_unchanged":True,
             "source_manifest":consolidated_cv.get("entries",[]),
         },ensure_ascii=False,indent=2),encoding="utf-8")
-        return {"ok":True,"errors":[],"export_dir":str(output_dir),"mcq":len(mcq),"open":len(opened)}
+    return {"ok":True,"errors":[],"export_dir":str(output_dir),"mcq":len(mcq),"open":len(opened)}
