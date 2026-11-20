@@ -5380,8 +5380,15 @@ class ExamApp:
                    style="Accent.TButton").pack(side="right", padx=(8, 0))
         ttk.Label(actions, textvariable=save_status, foreground="#47734a").pack(side="right", padx=(8, 12))
         refresh_fragment_list()
+        focus_number=getattr(self,"_structure_focus_question_number",None)
+        focus_index=next((i for i,frag in enumerate(fragments)
+                          if focus_number is not None
+                          and canonical_fragment_type(frag.get("type",""))=="vraag"
+                          and int(focus_number) in [int(n) for n in frag.get("question_numbers",[])]),0)
+        if hasattr(self,"_structure_focus_question_number"):
+            delattr(self,"_structure_focus_question_number")
         if fragments:
-            fragment_tree.selection_set("0")
+            fragment_tree.selection_set(str(focus_index))
             load_selected_fragment()
         else:
             show_page()
@@ -5395,7 +5402,7 @@ class ExamApp:
             show_document(number)
         page_spin.bind("<Return>", jump_question_page)
         if fragments:
-            fragment_tree.selection_set("0")
+            fragment_tree.selection_set(str(focus_index))
             load_selected_fragment()
         else:
             show_document(2)
