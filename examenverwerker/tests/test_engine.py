@@ -446,7 +446,7 @@ class EngineTests(unittest.TestCase):
                 first_question_page = cleaned[0].get_text("text").lower()
                 self.assertIn("dominant overerft", first_question_page)
                 self.assertIn("geef een combinatie van ouders", first_question_page)
-                self.assertRegex(first_question_page, r"1p\\s*1")
+                self.assertRegex(first_question_page, r"1p\s*1")
 
     def test_stitched_preview_is_one_continuous_image_with_original_page_mapping(self):
         import pymupdf as fitz
