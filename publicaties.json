@@ -696,7 +696,7 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij afbraak, reducenten en de stikstofkringloop; de isotopenmethode is een goede verdieping in onderzoekstechnieken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "sourceQualityNote": "De DOI-resolver verwijst naar het geaccepteerde manuscript op Oxford Academic; dit is peer-reviewed maar nog niet de definitief geredigeerde versie. Een tweede pagina in de tijdschriftindex koppelt dezelfde DOI ten onrechte aan een andere titel. De DOI-resolver en de Oxford Academic-record komen overeen met deze kaart; de afwijkende indexvermelding is als metadata-anomalie gemarkeerd en moet bij verschijnen van de definitieve versie opnieuw worden gecontroleerd.",
     "studyType": "Primair onderzoek"
   },
   {
