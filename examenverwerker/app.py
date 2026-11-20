@@ -4554,7 +4554,7 @@ class ExamApp:
             except Exception as exc:
                 self._error("Vraagtypen bepalen na fragmentcontrole", exc)
                 messagebox.showerror(
-                    "Vervol stap niet uitgevoerd",
+                    "Volgende stap niet uitgevoerd",
                     "De fragmenten zijn opgeslagen, maar de vraagtypen konden nog niet veilig worden bepaald. "
                     "De editor blijft open zodat je de genoemde vraaggrenzen kunt herstellen.\\n\\n"
                     + str(exc), parent=win
