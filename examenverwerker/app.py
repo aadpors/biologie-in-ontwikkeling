@@ -3622,6 +3622,7 @@ class ExamApp:
         selection_end = (
             2, min(1.0, preview_heights[2] / page_sizes[2][1])
         )
+        selection_dirty = False
 
         def selected_links():
             return [question_numbers[i] for i in qlist.curselection()]
@@ -3879,7 +3880,7 @@ class ExamApp:
                     drag_handle = None
 
         def on_drag(event):
-            nonlocal selection_start, selection_end
+            nonlocal selection_start, selection_end, selection_dirty
             if not drag_handle:
                 return
             y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y)))
@@ -3896,9 +3897,11 @@ class ExamApp:
             elif drag_handle["edge"] == "top":
                 y = min(y, position_for(*selection_end) - 5.0)
                 selection_start = point_for_y(y)
+                selection_dirty = True
             else:
                 y = max(y, position_for(*selection_start) + 5.0)
                 selection_end = point_for_y(y)
+                selection_dirty = True
             redraw_guides()
 
         def on_release(_event):
@@ -3941,9 +3944,9 @@ class ExamApp:
                 if selected_index is not None:
                     fragment_tree.selection_set(str(selected_index))
         def save_structure():
-            nonlocal original_structure_signature
+            nonlocal original_structure_signature, selection_dirty
             current = selected_fragment()
-            if not snippet_mode and current:
+            if not snippet_mode and current and selection_dirty:
                 try:
                     current["page_spans"] = selection_to_spans()
                 except ValueError as exc:
@@ -3956,6 +3959,7 @@ class ExamApp:
             if errors:
                 messagebox.showerror("Structuur niet opgeslagen", "Controleer eerst:\\n" + "\\n".join(errors), parent=win)
                 return False
+            selection_dirty = False
             if structure_changed:
                 for record in self.data.get("vraagrecords", []):
                     if record.get("candidate_document_id") == doc["id"]:
@@ -3994,6 +3998,7 @@ class ExamApp:
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
         def update_page_span():
+            nonlocal selection_dirty
             if snippet_mode:
                 messagebox.showinfo(
                     "Fragmentvoorbeeld",
@@ -4008,6 +4013,7 @@ class ExamApp:
                 return
             try:
                 frag["page_spans"] = selection_to_spans()
+                selection_dirty = True
                 refresh_fragment_list()
                 selected = next(
                     (i for i, item in enumerate(fragments) if item.get("id") == frag.get("id")),
@@ -4020,7 +4026,7 @@ class ExamApp:
             except Exception as exc:
                 messagebox.showerror("Selectie niet bijgewerkt", str(exc), parent=win)
         def append_page():
-            nonlocal selection_start, selection_end
+            nonlocal selection_start, selection_end, selection_dirty
             if snippet_mode:
                 show_document(displayed_page)
                 return
@@ -4049,6 +4055,7 @@ class ExamApp:
                         int(ordered_spans[-1]["page"]),
                         float(ordered_spans[-1]["bottom"]),
                     )
+                    selection_dirty = True
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(fragments.index(updated)))
                 save_structure()
@@ -4071,7 +4078,7 @@ class ExamApp:
             else:
                 show_document()
         def load_selected_fragment(_event=None):
-            nonlocal selection_start, selection_end, displayed_page
+            nonlocal selection_start, selection_end, displayed_page, selection_dirty
             frag = selected_fragment()
             if frag:
                 valid_spans = sorted(
@@ -4081,11 +4088,13 @@ class ExamApp:
                 )
                 if valid_spans:
                     first, last = valid_spans[0], valid_spans[-1]
+                    selection_dirty = False
                     selection_start = (int(first["page"]), float(first["top"]))
                     selection_end = (int(last["page"]), float(last["bottom"]))
                     displayed_page = int(first["page"])
                     page_var.set(displayed_page)
                 else:
+                    selection_dirty = False
                     selection_start = (2, 0.0)
                     selection_end = (
                         2, min(1.0, preview_heights[2] / page_sizes[2][1])
@@ -4133,7 +4142,7 @@ class ExamApp:
             save_structure(); refresh_fragment_list(); show_document()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
-            nonlocal selection_start, selection_end, displayed_page
+            nonlocal selection_start, selection_end, displayed_page, selection_dirty
             fragment_tree.selection_remove(fragment_tree.selection())
             qlist.selection_clear(0, "end")
             type_var.set("Context")
@@ -4143,6 +4152,7 @@ class ExamApp:
                 displayed_page,
                 min(1.0, preview_heights[displayed_page] / page_sizes[displayed_page][1]),
             )
+            selection_dirty = True
             show_document(displayed_page)
         def edit_selected_source_page():
             frag = selected_fragment()
