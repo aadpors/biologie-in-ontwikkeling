@@ -3755,6 +3755,12 @@ class ExamApp:
             frag = selected_fragment()
             if not frag: return
             new_type = fragment_type_ids[type_var.get()]
+            if new_type != "vraag" and any(int(span.get("page", 0)) == 1
+                                           for span in frag.get("page_spans", [])):
+                messagebox.showwarning("Pagina 1 is geen context",
+                    "Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag niet als intro- of tussencontext worden opgeslagen.",
+                    parent=win)
+                return
             links = selected_links()
             if new_type == "vraag" and len(links) != 1:
                 messagebox.showwarning("Vraagfragment", "Een vraagfragment moet aan precies één vraagnummer gekoppeld zijn.", parent=win)
