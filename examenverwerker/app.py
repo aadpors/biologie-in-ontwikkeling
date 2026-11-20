@@ -882,7 +882,7 @@ class ExamApp:
             }
             row["document_id"] = doc["id"]
             row["bestand"] = doc["bestand"]
-            row["vraagtype_controle"] = detect_question_type(prompt)
+            row["vraagtype_controle"] = {"type":"nog_niet_bepaald","options":[],"reason":"Vraagsoort wordt pas bepaald nadat de snippetgrenzen zijn vastgesteld."}
             row["context_verwijzingen"] = detect_context_references(prompt)
             self.data.setdefault("vraagkandidaten", []).append(row)
             self._workspace_store_candidate_correction(row)
@@ -912,7 +912,7 @@ class ExamApp:
         row["number"] = number
         row["vraagtekst_voorstel"] = self._workspace_text.get("1.0", "end-1c").strip()
         row["review_note"] = self._workspace_note.get("1.0", "end-1c").strip()
-        row["vraagtype_controle"] = detect_question_type(row["vraagtekst_voorstel"])
+        row["vraagtype_controle"] = {"type":"nog_niet_bepaald","options":[],"reason":"Vraagsoort wordt pas bepaald nadat de snippetgrenzen zijn vastgesteld."}
         row["context_verwijzingen"] = detect_context_references(row["vraagtekst_voorstel"])
         row["vraagtype_status"] = "controle_nodig"
         self._workspace_store_candidate_correction(row)
@@ -2070,7 +2070,7 @@ class ExamApp:
                 for index,item in enumerate(ordered):
                     following=ordered[index+1] if index+1<len(ordered) else None
                     proposal_text=extract_candidate_text(analysis,item,following)
-                    type_check=classify_question_with_visuals(analysis,item,following,proposal_text)
+                    type_check={"type":"nog_niet_bepaald","options":[],"reason":"Vraagsoort wordt pas bepaald nadat de snippetgrenzen zijn vastgesteld."}
                     context_refs=detect_context_references(proposal_text)
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
                         "vraagtekst_voorstel":proposal_text,"vraagtype_controle":type_check,
@@ -2081,7 +2081,7 @@ class ExamApp:
                     following=next((x for x in ordered if (int(x["page"]),float(x.get("bbox",[0,0])[1]))>item_order),None)
                     proposal_text=extract_candidate_text(analysis,item,following)
                     item.update({"document_id":doc["id"],"bestand":doc["bestand"],
-                        "vraagtekst_voorstel":proposal_text,"vraagtype_controle":classify_question_with_visuals(analysis,item,following,proposal_text),
+                        "vraagtekst_voorstel":proposal_text,"vraagtype_controle":{"type":"nog_niet_bepaald","options":[],"reason":"Vraagsoort wordt pas bepaald nadat de snippetgrenzen zijn vastgesteld."},
                         "vraagtype_status":"controle_nodig","context_verwijzingen":detect_context_references(proposal_text)})
                 candidates=self._workspace_merge_review_state(doc, ordered, previous_candidates)
                 self.data.setdefault("vraagkandidaten",[])
@@ -3813,9 +3813,29 @@ class ExamApp:
                     continue
                 page_height = page_sizes[original_page][1]
                 preview_height = preview_heights[original_page]
-                margin = min(32.0, page_height * 0.035)
-                clip_top = max(0.0, float(span["top"]) * page_height - margin)
-                clip_bottom = min(preview_height, float(span["bottom"]) * page_height + margin)
+                # Snijd pas nadat de gebruiker de fragmentgrenzen heeft bepaald:
+                # zoek binnen die grenzen de eerste en laatste rij met niet-witte pixels.
+                clip_top = max(0.0, float(span["top"]) * page_height)
+                clip_bottom = min(preview_height, float(span["bottom"]) * page_height)
+                try:
+                    from PIL import Image
+                    pixel_path = self.project_dir / "analyse" / f"snippet-trim-p{original_page}.png"
+                    render_page(preview_path, int(page_info["preview_page"]), pixel_path, scale=1.0)
+                    with Image.open(pixel_path) as page_image:
+                        gray = page_image.convert("L")
+                        px_per_point = gray.height / max(1.0, float(page_height))
+                        y0 = max(0, min(gray.height - 1, int(clip_top * px_per_point)))
+                        y1 = max(y0 + 1, min(gray.height, int(clip_bottom * px_per_point)))
+                        ink_rows = []
+                        for row_y in range(y0, y1):
+                            row = gray.crop((0, row_y, gray.width, row_y + 1))
+                            if row.getextrema()[0] < 247:
+                                ink_rows.append(row_y)
+                        if ink_rows:
+                            clip_top = max(0.0, (ink_rows[0] / px_per_point) - 1.5)
+                            clip_bottom = min(preview_height, ((ink_rows[-1] + 1) / px_per_point) + 1.5)
+                except Exception as crop_error:
+                    self._log(f"Witruimtedetectie voor fragment op pagina {original_page} overgeslagen: {crop_error}")
                 if clip_bottom - clip_top < 4:
                     continue
                 segments.append({
@@ -3847,8 +3867,9 @@ class ExamApp:
             show_document(page_var.get())
 
         def on_press(event):
-            nonlocal drag_handle
+            nonlocal drag_handle, drag_initial_boundary_y
             y = canvas.canvasy(event.y)
+            drag_initial_boundary_y = y
             if snippet_mode:
                 drag_handle = None
                 for layout in snippet_layout:
@@ -3877,6 +3898,7 @@ class ExamApp:
 
         drag_pointer_y = None
         auto_scroll_job = None
+        drag_initial_boundary_y = None
 
         def update_drag_selection(pointer_y):
             nonlocal selection_start, selection_end, selection_dirty
@@ -3937,7 +3959,7 @@ class ExamApp:
             schedule_auto_scroll()
 
         def on_release(_event):
-            nonlocal drag_handle, drag_pointer_y, auto_scroll_job
+            nonlocal drag_handle, drag_pointer_y, auto_scroll_job, drag_initial_boundary_y
             if auto_scroll_job is not None:
                 canvas.after_cancel(auto_scroll_job)
                 auto_scroll_job = None
@@ -3948,7 +3970,40 @@ class ExamApp:
                     current = selected_fragment()
                     if current:
                         try:
+                            old_boundary_y = drag_initial_boundary_y
+                            new_boundary_y = canvas.canvasy(_event.y) if _event is not None else None
                             current["page_spans"] = selection_to_spans()
+                            # Keep adjacent context/question fragments joined
+                            # when the shared lower/upper boundary is dragged.
+                            if (canonical_fragment_type(current.get("type")) == "context"
+                                    and drag_handle.get("edge") == "bottom"
+                                    and old_boundary_y is not None and new_boundary_y is not None):
+                                old_point = point_for_y(old_boundary_y)
+                                new_point = point_for_y(new_boundary_y)
+                                old_global = position_for(*old_point)
+                                for neighbour in fragments:
+                                    if neighbour is current or canonical_fragment_type(neighbour.get("type")) != "vraag":
+                                        continue
+                                    q_spans = sorted(neighbour.get("page_spans", []), key=lambda x: int(x["page"]))
+                                    if not q_spans:
+                                        continue
+                                    q_first = q_spans[0]
+                                    q_top = (int(q_first["page"]), float(q_first["top"]))
+                                    if abs(position_for(*q_top) - old_global) <= 3.0:
+                                        last = q_spans[-1]
+                                        last_point = (int(last["page"]), float(last["bottom"]))
+                                        if position_for(*new_point) < position_for(*last_point) - 4:
+                                            first_page, first_top = new_point
+                                            last_page, last_bottom = last_point
+                                            rebuilt = []
+                                            for page_no in range(first_page, last_page + 1):
+                                                top = first_top if page_no == first_page else 0.0
+                                                bottom = last_bottom if page_no == last_page else preview_heights[page_no] / page_sizes[page_no][1]
+                                                if bottom - top >= 0.005:
+                                                    rebuilt.append(make_page_span(page_no, top, bottom))
+                                            if rebuilt:
+                                                neighbour["page_spans"] = rebuilt
+                                        break
                             # Do not rebuild/reselect the tree row here: its
                             # selection event reloads the fragment and jumps
                             # the stitched canvas back to the fragment start.
@@ -3958,6 +4013,7 @@ class ExamApp:
                 redraw_guides()
             drag_handle = None
             drag_pointer_y = None
+            drag_initial_boundary_y = None
 
         canvas.bind("<Button-1>", on_press)
         canvas.bind("<B1-Motion>", on_drag)
@@ -4013,7 +4069,7 @@ class ExamApp:
             # Keep the original single-document key for older project readers.
             self.data["exam_structure"] = structure
             self.save_project()
-            save_status.set("Automatisch opgeslagen")
+            save_status.set(f"Automatisch opgeslagen · {datetime.now().astimezone().strftime('%H:%M:%S')}")
             self._log(f"Examenstructuur opgeslagen: {len(fragments)} fragment(en), bron {doc['bestand']}.")
             return True
         def create_fragment():
