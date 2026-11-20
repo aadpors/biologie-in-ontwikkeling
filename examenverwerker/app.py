@@ -1522,8 +1522,9 @@ class ExamApp:
                 records.append(record)
             record["question_fragment_id"] = fragment.get("id")
             record["question_text"] = str(fragment.get("text") or "")
-            record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
-            record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
+            if record.get("question_type_status") != "handmatig_gecontroleerd":
+                record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
+                record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
             linked_contexts = question_links.get("context_fragments", [])
             record["context_fragment_ids"] = [item.get("id") for item in linked_contexts]
             record["context_fragments"] = [
