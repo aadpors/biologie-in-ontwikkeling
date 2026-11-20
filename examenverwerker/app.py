@@ -4810,6 +4810,7 @@ class ExamApp:
     def save_project(self):
         if not self.data or not self.project_dir:
             return
+        self.data["app_versie"] = APP_VERSION
         self.data["bijgewerkt"] = now()
         temp = self.project_dir / (PROJECT_FILE + ".tmp")
         temp.write_text(json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8")
