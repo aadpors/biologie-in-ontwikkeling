@@ -4088,6 +4088,43 @@ class ExamApp:
             self.save_project()
             self._log(f"Goedkeuring van record {record.get('id')} ingetrokken.")
             win.destroy()
+        repair=ttk.LabelFrame(outer,text="Herstelacties voor deze vraag",padding=8)
+        repair.pack(fill="x",pady=(8,0))
+        def refresh_review():
+            win.destroy()
+            self.review_question_record(record,parent)
+        source_doc=next((d for d in self.data.get("documenten",[])
+                         if d.get("id")==record.get("candidate_document_id")),None)
+        def edit_question_analysis():
+            self._review_simple_question_draft(record,win)
+        def edit_question_structure():
+            self._structure_focus_question_number=int(record.get("number",0) or 0)
+            self.edit_exam_structure()
+        def edit_cv_region(role):
+            if role=="correctievoorschrift":
+                doc=next((d for d in self.data.get("documenten",[])
+                          if d.get("id")==record.get("cv_source_document_id")
+                          and d.get("type_voorstel")==role),None)
+            else:
+                doc=next((d for d in self.data.get("documenten",[])
+                          if d.get("type_voorstel")==role),None)
+            if doc:
+                def saved(_name,_fragment):
+                    refresh_review()
+                self.open_cv_region_editor(record,doc,saved)
+            else:
+                messagebox.showinfo("Document ontbreekt",f"Geen document van het type '{role}' gevonden.",parent=win)
+        ttk.Button(repair,text="Vraagtype, punten, tekst en opties",
+                   command=edit_question_analysis).pack(side="left",padx=3)
+        ttk.Button(repair,text="Vraag- en contextgrenzen",
+                   command=edit_question_structure).pack(side="left",padx=3)
+        ttk.Button(repair,text="Correctievoorschrift",
+                   command=lambda:edit_cv_region("correctievoorschrift")).pack(side="left",padx=3)
+        ttk.Button(repair,text="Uitwerkbijlage",
+                   command=lambda:edit_cv_region("uitwerkbijlage")).pack(side="left",padx=3)
+        ttk.Button(repair,text="CV-aanvulling",
+                   command=lambda:edit_cv_region("aanvulling")).pack(side="left",padx=3)
+        ttk.Button(repair,text="Weergave vernieuwen",command=refresh_review).pack(side="right",padx=3)
         actions=ttk.Frame(outer); actions.pack(fill="x",pady=(8,0))
         ttk.Button(actions,text="Goedkeuren",command=approve).pack(side="right")
         if record.get("approved_by_human") is True:
