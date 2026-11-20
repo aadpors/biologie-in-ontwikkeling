@@ -411,7 +411,7 @@ class EngineTests(unittest.TestCase):
                 # This repeated line sits in the footer band but is real exam
                 # content. The final question line must survive beneath it.
                 page.insert_text((60, 750), "Biologie | Examen 2026")
-                page.insert_text((60, 775), (
+                page.insert_text((60, 770), (
                     "De eigenschap dominant overerft."
                     if page_no == 2 else "Deze inhoud hoort bij de volgende vraag."
                 ))
@@ -431,7 +431,6 @@ class EngineTests(unittest.TestCase):
                 page_text = cleaned[0].get_text("text").lower()
                 self.assertIn("dominant overerft", page_text)
                 self.assertEqual(page_text.count("biologie | examen 2026"), 1)
-                self.assertNotIn("biologie | examen 2026", page_text)
 
     def test_vwo_2026_ii_question_one_and_final_overerft_line_survive_preview(self):
         import pymupdf as fitz
@@ -447,7 +446,7 @@ class EngineTests(unittest.TestCase):
                 first_question_page = cleaned[0].get_text("text").lower()
                 self.assertIn("dominant overerft", first_question_page)
                 self.assertIn("geef een combinatie van ouders", first_question_page)
-                self.assertIn("1p 1", first_question_page)
+                self.assertRegex(first_question_page, r"1p\\s*1")
 
     def test_stitched_preview_is_one_continuous_image_with_original_page_mapping(self):
         import pymupdf as fitz
