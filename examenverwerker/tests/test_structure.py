@@ -39,6 +39,29 @@ class StructureTests(unittest.TestCase):
         self.assertEqual([x["type"] for x in legacy],
                          ["context_intro", "vraagcontext", "tussenliggende_context"])
 
+    def test_fragments_are_sorted_in_source_reading_order(self):
+        fragments = [
+            make_fragment("vraag", make_page_span(3, 0.1, 0.8), [2], self.questions, "q2"),
+            make_fragment("vraagcontext", make_page_span(2, 0.2, 0.4), [2], self.questions, "ctx2"),
+            make_fragment("context_intro", make_page_span(2, 0.0, 0.15), self.questions, self.questions, "intro"),
+            make_fragment("vraag", make_page_span(2, 0.15, 0.2), [1], self.questions, "q1"),
+        ]
+        ordered = sort_fragments_reading_order(fragments)
+        self.assertEqual([x["id"] for x in ordered], ["intro", "q1", "ctx2", "q2"])
+
+    def test_between_context_trims_only_immediately_preceding_question_band(self):
+        fragments = [
+            make_fragment("vraag", make_page_span(1, 0.1, 1.0), [1], self.questions, "q1"),
+            make_fragment("vraag", make_page_span(2, 0.0, 1.0), [2], self.questions, "q2"),
+            make_fragment("vraag", make_page_span(3, 0.0, 1.0), [4], self.questions, "q4"),
+            make_fragment("tussen_context", make_page_span(2, 0.3, 0.55), [4], self.questions, "ctx4"),
+        ]
+        trimmed = trim_question_bands_for_contexts(fragments)
+        by_id = {x["id"]: x for x in trimmed}
+        self.assertEqual(by_id["q1"]["page_spans"][0]["bottom"], 1.0)
+        self.assertEqual(by_id["q2"]["page_spans"][0]["bottom"], 0.3)
+        self.assertEqual(by_id["q4"]["page_spans"][0]["bottom"], 1.0)
+
     def test_question_fragment_requires_exactly_one_confirmed_question(self):
         with self.assertRaises(ValueError):
             make_fragment("vraag", make_page_span(1, 0.1, 0.8), [1, 2],
