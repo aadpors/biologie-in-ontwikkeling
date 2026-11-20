@@ -3583,16 +3583,31 @@ class ExamApp:
                 canvas.delete(item)
             overlay_items = []
             if photo is None: return
-            y0, y1 = top_y * page_image_height, bottom_y * page_image_height
-            overlay_items.append(canvas.create_rectangle(0, 0, page_image_width, y0,
-                fill="#c8c8c8", stipple="gray50", outline=""))
-            overlay_items.append(canvas.create_rectangle(0, y1, page_image_width, page_image_height,
-                fill="#c8c8c8", stipple="gray50", outline=""))
-            if top_line: canvas.delete(top_line)
-            if bottom_line: canvas.delete(bottom_line)
-            top_line = canvas.create_line(0, y0, page_image_width, y0, fill="black", width=1)
-            bottom_line = canvas.create_line(0, y1, page_image_width, y1, fill="black", width=1)
-            canvas.tag_raise(top_line); canvas.tag_raise(bottom_line)
+            if snippet_mode:
+                for layout in snippet_layout:
+                    span = layout["span"]
+                    top_px = layout["y0"] + (float(span["top"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
+                    bottom_px = layout["y0"] + (float(span["bottom"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
+                    overlay_items.append(canvas.create_rectangle(0, layout["y0"], page_image_width, top_px,
+                        fill="#c8c8c8", stipple="gray50", outline=""))
+                    overlay_items.append(canvas.create_rectangle(0, bottom_px, page_image_width, layout["y1"],
+                        fill="#c8c8c8", stipple="gray50", outline=""))
+                    overlay_items.append(canvas.create_line(0, top_px, page_image_width, top_px, fill="black", width=2))
+                    overlay_items.append(canvas.create_line(0, bottom_px, page_image_width, bottom_px, fill="black", width=2))
+            else:
+                page_height = page_sizes[displayed_page][1]
+                preview_height = preview_heights[displayed_page]
+                y0 = top_y * page_height / preview_height * page_image_height
+                y1 = bottom_y * page_height / preview_height * page_image_height
+                overlay_items.append(canvas.create_rectangle(0, 0, page_image_width, y0,
+                    fill="#c8c8c8", stipple="gray50", outline=""))
+                overlay_items.append(canvas.create_rectangle(0, y1, page_image_width, page_image_height,
+                    fill="#c8c8c8", stipple="gray50", outline=""))
+                if top_line: canvas.delete(top_line)
+                if bottom_line: canvas.delete(bottom_line)
+                top_line = canvas.create_line(0, y0, page_image_width, y0, fill="black", width=1)
+                bottom_line = canvas.create_line(0, y1, page_image_width, y1, fill="black", width=1)
+                canvas.tag_raise(top_line); canvas.tag_raise(bottom_line)
             canvas.configure(scrollregion=(0, 0, page_image_width, page_image_height))
         def load_span_for_page():
             nonlocal top_y, bottom_y
@@ -3601,17 +3616,18 @@ class ExamApp:
             if span:
                 top_y, bottom_y = float(span["top"]), float(span["bottom"])
             else:
-                top_y, bottom_y = 0.06, 0.94
+                top_y, bottom_y = 0.0, min(1.0, preview_heights[page_var.get()] / page_sizes[page_var.get()][1])
         def show_page():
-            nonlocal photo, page_image_width, page_image_height, displayed_page
+            nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode
             try:
-                number = max(1, min(page_count, int(page_var.get())))
+                number = max(2, min(page_count, int(page_var.get())))
             except (ValueError, tk.TclError):
-                number = 1
+                number = 2
             page_var.set(number)
             displayed_page = number
-            target = self.project_dir / "analyse" / f"structuur-{doc['id']}-p{number}.png"
-            render_page(source, number, target, scale=1.05)
+            snippet_mode = False
+            target = self.project_dir / "analyse" / f"structuur-{doc['id']}-clean-p{number}.png"
+            render_page(preview_path, number - 1, target, scale=1.05)
             photo = tk.PhotoImage(file=str(target))
             page_image_width, page_image_height = photo.width(), photo.height()
             canvas.delete("all")
@@ -3619,6 +3635,50 @@ class ExamApp:
             canvas.image = photo
             load_span_for_page()
             redraw_guides()
+        def show_fragment():
+            nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode, snippet_layout
+            frag = selected_fragment()
+            if not frag or not frag.get("page_spans"):
+                show_page()
+                return
+            snippet_mode = True
+            spans = sorted(frag["page_spans"], key=lambda item: int(item["page"]))
+            displayed_page = int(spans[0]["page"])
+            page_var.set(displayed_page)
+            segments = []
+            snippet_layout = []
+            cursor = 0.0
+            for span in spans:
+                original_page = int(span["page"])
+                page_info = preview_by_original.get(original_page)
+                if not page_info:
+                    continue
+                page_height = page_sizes[original_page][1]
+                preview_height = preview_heights[original_page]
+                margin = min(32.0, page_height * 0.035)
+                clip_top = max(0.0, float(span["top"]) * page_height - margin)
+                clip_bottom = min(preview_height, float(span["bottom"]) * page_height + margin)
+                if clip_bottom - clip_top < 4:
+                    continue
+                segments.append({"page": int(page_info["preview_page"]),
+                                 "bbox": [0.0, clip_top, float(page_info["width"]), clip_bottom]})
+                segment_height = (clip_bottom - clip_top) * snippet_scale
+                snippet_layout.append({"span": span, "page_height": page_height,
+                    "clip_top": clip_top, "clip_bottom": clip_bottom,
+                    "y0": cursor, "y1": cursor + segment_height})
+                cursor += segment_height + 12.0 * snippet_scale
+            if not segments:
+                show_page()
+                return
+            target = self.project_dir / "analyse" / f"snippet-{doc['id']}-{frag['id']}.png"
+            render_composite_crops(preview_path, segments, target, scale=snippet_scale)
+            photo = tk.PhotoImage(file=str(target))
+            page_image_width, page_image_height = photo.width(), photo.height()
+            canvas.delete("all")
+            canvas.create_image(0, 0, image=photo, anchor="nw")
+            canvas.image = photo
+            redraw_guides()
+            canvas.yview_moveto(0)
         def change_page(delta):
             frag = selected_fragment()
             if frag and any(int(x["page"]) == displayed_page for x in frag.get("page_spans", [])):
