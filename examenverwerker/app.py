@@ -3824,6 +3824,9 @@ class ExamApp:
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
         def update_page_span():
+            if snippet_mode:
+                messagebox.showinfo("Fragmentweergave", "Pas de grenzen rechtstreeks aan met de zwarte lijnen in de snippet, of kies eerst 'Bronpagina bewerken'.", parent=win)
+                return
             frag = selected_fragment()
             if not frag:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waarvan je de huidige paginagrens wilt aanpassen.", parent=win)
@@ -3848,6 +3851,9 @@ class ExamApp:
             except Exception as exc:
                 messagebox.showerror("Paginagrens niet bijgewerkt", str(exc), parent=win)
         def append_page():
+            if snippet_mode:
+                messagebox.showinfo("Pagina toevoegen", "Kies eerst 'Bronpagina bewerken' en selecteer daarna de toe te voegen bronpagina.", parent=win)
+                return
             frag = selected_fragment()
             if not frag:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waaraan je deze pagina wilt toevoegen.", parent=win)
@@ -3911,6 +3917,8 @@ class ExamApp:
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
             fragment_tree.selection_remove(fragment_tree.selection())
+            qlist.selection_clear(0, "end")
+            type_var.set("Context")
             page_var.set(max(2, displayed_page))
             show_page()
         def edit_selected_source_page():
@@ -3961,7 +3969,7 @@ class ExamApp:
             show_page()
         def jump_question_page(_event=None):
             current = selected_fragment()
-            if current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
+            if not snippet_mode and current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
                 update_page_span()
             show_page()
         page_spin.bind("<Return>", jump_question_page)
