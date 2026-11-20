@@ -1049,6 +1049,63 @@ class ExamApp:
             self.status.configure(text="Alle vraagstarts in dit examen zijn beoordeeld. De volgende stap is het afbakenen van de examenstructuur.")
             self._workflow_refresh()
 
+    def _classify_question_types_for_document(self, doc):
+        """Classify every confirmed question only after its saved question fragment exists."""
+        if not self.data or not doc:
+            raise ValueError("Er is geen actief examen of opgavenbestand.")
+        structure = (self.data.get("exam_structures", {}).get(doc.get("id"))
+                     or self.data.get("exam_structure"))
+        candidates = sorted(
+            [row for row in self.data.get("vraagkandidaten", [])
+             if row.get("document_id") == doc.get("id") and row.get("human_decision") is True],
+            key=lambda row: (int(row.get("page", 1)),
+                             float((row.get("bbox") or [0, 0])[1]))
+        )
+        if not candidates:
+            raise ValueError("Er zijn geen bevestigde vragen om te classificeren.")
+        # Refuse to classify from question starts alone: every question needs
+        # its manually checked, persisted question fragment first.
+        linked = {}
+        for row in candidates:
+            result = fragments_for_question(structure, int(row["number"]))
+            fragment = result.get("question_fragment")
+            if not fragment or not fragment.get("page_spans"):
+                raise ValueError(
+                    f"Vraag {row.get('number')}: het vraagfragment ontbreekt. "
+                    "Leg eerst alle vraaggrenzen vast."
+                )
+            if not fragment.get("reviewed_by_human") and fragment.get("status") != "handmatig_gecontroleerd":
+                raise ValueError(
+                    f"Vraag {row.get('number')}: het vraagfragment is nog niet als gecontroleerd vastgelegd."
+                )
+            linked[row.get("id")] = fragment
+
+        source_path = self.project_dir / "bronnen" / doc["opslagbestand"]
+        analysis = analyze_pdf(source_path)
+        page_sizes = {int(page["page"]): (float(page["width"]), float(page["height"]))
+                      for page in analysis.get("pages", [])}
+        for index, row in enumerate(candidates):
+            fragment = linked[row.get("id")]
+            segments = page_spans_to_segments(fragment["page_spans"], page_sizes)
+            snippet_text = extract_region_text(source_path, segments)
+            if not snippet_text.strip():
+                raise ValueError(
+                    f"Vraag {row.get('number')}: er kon geen vraagtekst uit het gecontroleerde fragment worden gelezen. "
+                    "Controleer de uitsnede."
+                )
+            following = candidates[index + 1] if index + 1 < len(candidates) else None
+            row["vraagtekst_voorstel"] = snippet_text
+            row["vraagtype_controle"] = classify_question_with_visuals(
+                analysis, row, following, snippet_text
+            )
+            row["vraagtype_status"] = "automatisch_bepaald_controle_nodig"
+            row["vraagtype_bepaald_na_fragmentcontrole"] = True
+        self.save_project()
+        self._log(
+            f"Vraagtypen automatisch bepaald na fragmentcontrole: {len(candidates)} vragen in {doc.get('bestand')}."
+        )
+        return len(candidates)
+
     def _workspace_create_record(self):
         if not self._workspace_rows:
             messagebox.showinfo("Geen kandidaten", "Analyseer eerst de opgaven-PDF en selecteer een vraagstart.")
@@ -4490,14 +4547,30 @@ class ExamApp:
 
         ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
         def save_and_close():
-            if save_structure():
-                self._workspace_container.forget(win)
-                win.destroy()
-                self._workspace_container.add(self._workspace_left, weight=3)
-                self._workspace_container.add(self._workspace_right, weight=8)
-                self._workspace_refresh()
-                self._workflow_refresh()
-        ttk.Button(actions, text="Terug naar vraagcontrole", command=save_and_close).pack(side="right", padx=(8, 0))
+            if not save_structure():
+                return
+            try:
+                classified = self._classify_question_types_for_document(doc)
+            except Exception as exc:
+                self._error("Vraagtypen bepalen na fragmentcontrole", exc)
+                messagebox.showerror(
+                    "Vervol stap niet uitgevoerd",
+                    "De fragmenten zijn opgeslagen, maar de vraagtypen konden nog niet veilig worden bepaald. "
+                    "De editor blijft open zodat je de genoemde vraaggrenzen kunt herstellen.\\n\\n"
+                    + str(exc), parent=win
+                )
+                return
+            self._workspace_container.forget(win)
+            win.destroy()
+            self._workspace_container.add(self._workspace_left, weight=3)
+            self._workspace_container.add(self._workspace_right, weight=8)
+            self._workspace_refresh()
+            self._workflow_refresh()
+            self.status.configure(
+                text=f"Fragmentcontrole afgerond · vraagtypen voor {classified} vragen bepaald · volgende stap: vraagrecords."
+            )
+        ttk.Button(actions, text="Fragmenten klaar · verder", command=save_and_close,
+                   style="Accent.TButton").pack(side="right", padx=(8, 0))
         ttk.Label(actions, textvariable=save_status, foreground="#47734a").pack(side="right", padx=(8, 12))
         refresh_fragment_list()
         if fragments:
