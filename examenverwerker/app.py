@@ -751,8 +751,8 @@ class ExamApp:
             return
         if not self.data:
             self.workflow_label.configure(
-                text="Stap 1 · Importeer examens en controleer de metadata per PDF.")
-            self.workflow_button.configure(text="Examens importeren", command=self.import_year_set)
+                text="Open de examenbibliotheek om examens te importeren of een ander examen te kiezen.")
+            self.workflow_button.configure(text="Examenbibliotheek tonen", command=self._show_exam_library)
             return
 
         state = exam_workflow_state(self.data)
@@ -766,7 +766,7 @@ class ExamApp:
             finally:
                 self._auto_creating_drafts = False
         actions = {
-            "import": ("Examens importeren", self.import_year_set),
+            "import": ("Examenbibliotheek tonen", self._show_exam_library),
             "documenttype": ("Documenttype corrigeren", self.correct_type),
             "analyse": ("Vraagstarts analyseren", self.analyze_questions),
             "vraagstarts": ("Verder met vraagcontrole", self._workflow_focus_next),
@@ -775,7 +775,7 @@ class ExamApp:
             "vraagrecords": ("Volgend vraagrecord maken", self._workflow_make_next_record),
             "eindcontrole": ("Eindcontrole openen", self.show_records),
             "export": ("Exportpakket maken", self.export_project),
-            "voltooid": ("Examenbibliotheek openen", self.open_project),
+            "voltooid": ("Examenbibliotheek tonen", self._show_exam_library),
         }
         label = state["label"]
         if state["stage"] == "voltooid" and self.import_batch_index + 1 < len(self.import_batch_paths):
