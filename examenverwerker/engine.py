@@ -242,7 +242,8 @@ def propose_context_fragments(analysis: dict, candidates: list[dict]) -> list[di
         page_no = int(page.get("page", 0) or 0)
         page_height = float(page.get("height", 0) or 0)
         page_width = float(page.get("width", 0) or 0)
-        if page_no < 1 or page_height <= 0 or page_width <= 0:
+        # Page 1 of the question booklet is never exam context by design.
+        if page_no < 2 or page_height <= 0 or page_width <= 0:
             continue
         assets = []
         for asset in page.get("visual_assets", []):
