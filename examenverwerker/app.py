@@ -517,6 +517,17 @@ class ExamApp:
             return
         self._launch_workspace(folder)
 
+    def _show_exam_library(self):
+        owner = getattr(self, "_workspace_owner", None)
+        if owner is None:
+            return
+        try:
+            owner.root.deiconify()
+            owner.root.lift()
+            owner.root.focus_force()
+        except tk.TclError:
+            pass
+
     def _build_workspace(self):
         """Build the complete exam-processing workspace in its own window."""
         self.root.title("Examenverwerker")
@@ -537,8 +548,7 @@ class ExamApp:
         toolbar = ttk.Frame(shell, style="App.TFrame")
         toolbar.pack(fill="x", pady=(0, 8))
         actions = [
-            ("Examenbibliotheek", self.open_project, "Secondary.TButton"),
-            ("＋ Examens importeren", self.import_year_set, "Accent.TButton"),
+            ("Examenbibliotheek tonen", self._show_exam_library, "Secondary.TButton"),
             ("Vraagstarts analyseren", self.analyze_questions, "Secondary.TButton"),
             ("Structuur bewerken", self.edit_exam_structure, "Secondary.TButton"),
             ("Eindcontrole", self.show_records, "Secondary.TButton"),
