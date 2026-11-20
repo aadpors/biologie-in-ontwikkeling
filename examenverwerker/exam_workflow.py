@@ -279,10 +279,16 @@ def exam_workflow_state(data: dict) -> dict:
                     return _result("aanvulling", "Aanvulling CV verwerken",
                                    "Baken de aanvullende beoordelingsinformatie af en classificeer de wijziging per vraag.",
                                    document_id=doc.get("id"), question_number=number)
+        allowed_changes = {"toevoeging", "wijziging", "vervanging", "intrekking", "ongewijzigd"}
+        for record in records:
+            if record.get("cv_amendment_change_type") not in allowed_changes:
+                return _result("aanvulling", "Wijziging per vraag classificeren",
+                               "Classificeer de aanvulling per vraag als toevoeging, wijziging, vervanging, intrekking of ongewijzigd.",
+                               record_id=record.get("id"), question_number=record.get("number"))
         consolidated = data.get("consolidated_cv") or {}
         if consolidated.get("status") != "visueel_bevestigd":
             return _result("aanvulling", "Geconsolideerd correctievoorschrift controleren",
-                           "Vergelijk de oorspronkelijke CV en aanvulling; bevestig toevoegingen, wijzigingen, vervangingen en intrekkingen.")
+                           "Bekijk de samengevoegde CV-weergave met herleidbare verwijzingen naar beide bron-PDF's en bevestig deze.")
 
     # Correct answers must be reviewed, including non-MCQ binary/comparative forms.
     for record in records:
