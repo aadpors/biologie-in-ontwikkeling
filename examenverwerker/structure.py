@@ -68,6 +68,8 @@ def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[in
         raise ValueError("Onbekend fragmenttype.")
     confirmed = sorted({int(n) for n in confirmed_question_numbers})
     links = sorted({int(n) for n in question_numbers})
+    if fragment_type == "context" and int(page_span["page"]) == 1:
+        raise ValueError("Pagina 1 van de opgaven-PDF is het voorblad en mag geen contextfragment bevatten.")
     if any(n not in confirmed for n in links):
         raise ValueError("Een fragment mag alleen aan bevestigde vraagstarts worden gekoppeld.")
     if fragment_type == "vraag" and len(links) != 1:
@@ -128,6 +130,9 @@ def validate_exam_structure(structure: dict, document_id: str, source_sha256: st
             errors.append("vraagfragment_moet_een_vraagnummer_hebben")
         if fragment_type in FRAGMENT_TYPES - {"vraag"} and not links:
             errors.append("contextfragment_zonder_vraagkoppeling")
+        if fragment_type == "context" and any(int(span.get("page", 0)) == 1
+                                               for span in fragment.get("page_spans", [])):
+            errors.append("contextfragment_op_voorblad")
         if fragment_type == "vraag" and len(links) == 1:
             number = int(links[0])
             question_fragment_counts[number] = question_fragment_counts.get(number, 0) + 1
