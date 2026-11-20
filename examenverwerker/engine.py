@@ -431,10 +431,12 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                     if footer_top is None or asset[1] < footer_top
                 ]
                 body_bottom = max(body_bottom, max((asset[3] for asset in body_assets), default=0.0))
-                if body_bottom < height * 0.45:
-                    # Sparse or image-only pages should not be aggressively cut.
-                    body_bottom = height * 0.90
-                cutoff = min(height, max(height * 0.55, body_bottom + float(padding)))
+                if body_bottom <= 0:
+                    # A genuinely blank or unextractable page needs manual review;
+                    # keep it intact rather than silently deleting its contents.
+                    cutoff = height
+                else:
+                    cutoff = min(height, body_bottom + float(padding))
                 target = preview.new_page(width=width, height=cutoff)
                 clip = fitz.Rect(0, 0, width, cutoff)
                 target.show_pdf_page(target.rect, source, row["original_page"] - 1,
