@@ -3495,6 +3495,22 @@ class ExamApp:
         from structure import sort_fragments_reading_order, trim_question_bands_for_contexts
         if generated_proposals:
             fragments = trim_question_bands_for_contexts(fragments)
+        # Keep fragment coordinates in the untouched source-PDF coordinate
+        # system, but stop their visible range at the cleaned page boundary.
+        for fragment in fragments:
+            cleaned_spans = []
+            for span in fragment.get("page_spans", []):
+                original_page = int(span.get("page", 0))
+                if original_page in preview_heights:
+                    page_height = page_sizes[original_page][1]
+                    span = dict(span)
+                    span["bottom"] = min(float(span["bottom"]),
+                                         preview_heights[original_page] / page_height)
+                    if span["bottom"] - float(span["top"]) >= 0.005:
+                        cleaned_spans.append(span)
+                else:
+                    cleaned_spans.append(dict(span))
+            fragment["page_spans"] = cleaned_spans
         fragments = sort_fragments_reading_order(fragments)
         original_structure_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
         # Reuse the central workbench rather than opening a separate window.
