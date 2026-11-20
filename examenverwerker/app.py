@@ -1101,9 +1101,39 @@ class ExamApp:
                 row["vraagtype_status"] = "visuele_controle_nodig"
             row["vraagtype_bepaald_na_fragmentcontrole"] = True
             row["vraagtype_fragment_id"] = fragment.get("id")
+        records = self.data.setdefault("vraagrecords", [])
+        subject = str(self.data.get("vak") or "Onbekend")
+        exam_meta = doc.get("exam_metadata") or self.data.get("exam_metadata") or {}
+        for row in candidates:
+            fragment = linked[row.get("id")]
+            question_links = fragments_for_question(structure, int(row["number"]))
+            record = next((item for item in records
+                if item.get("candidate_document_id") == doc.get("id")
+                and int(item.get("number", -1) or -1) == int(row.get("number", -2) or -2)
+                and int(item.get("source_page", -1) or -1) == int(row.get("page", -2) or -2)), None)
+            if record is None:
+                record = {
+                    "schema": "exam-question-draft-v1",
+                    "id": f"{subject.lower()}-{doc.get('id','')[:8]}-q{row.get('number')}",
+                    "vak": subject, "exam": dict(exam_meta),
+                    "number": int(row.get("number")), "source_page": int(row.get("page", 1)),
+                    "candidate_document_id": doc.get("id"), "source_pdf": doc.get("opslagbestand"),
+                    "question_fragment_id": fragment.get("id"), "context_fragment_ids": [],
+                    "question_text": "", "question_type": "onbekend",
+                    "question_type_status": "controle_nodig", "status": "concept",
+                    "approved_by_human": False,
+                }
+                records.append(record)
+            record["question_fragment_id"] = fragment.get("id")
+            record["question_text"] = str(fragment.get("text") or "")
+            record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
+            record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
+            record["context_fragment_ids"] = [
+                item.get("id") for item in question_links.get("context_fragments", [])
+            ]
         self.save_project()
         self._log(
-            f"Vraagtypen automatisch bepaald na fragmentcontrole: {len(candidates)} vragen in {doc.get('bestand')}."
+            f"Vraagtypen bepaald en {len(candidates)} eenvoudige conceptrecords aangemaakt voor {doc.get('bestand')}."
         )
         return len(candidates)
 
@@ -1744,6 +1774,13 @@ class ExamApp:
             filetypes=[("PDF-bestanden", "*.pdf")])
         if not files:
             return
+        subject = simpledialog.askstring(
+            "Vak kiezen", "Voor welk vak verwerk je deze examens?",
+            initialvalue="Biologie", parent=self.root,
+        )
+        if subject is None:
+            return
+        subject = subject.strip() or "Onbekend"
 
         documents = []
         seen_hashes = set()
@@ -1997,7 +2034,8 @@ class ExamApp:
                         project_docs.append(clean_doc)
                     project_data = {
                         "schema": "biologie-examenproject-v1", "app_versie": APP_VERSION,
-                        "naam": project_name, "aangemaakt": now(), "bijgewerkt": now(),
+                        "naam": project_name, "vak": subject,
+                        "aangemaakt": now(), "bijgewerkt": now(),
                         "exam_metadata": confirmed_identity, "documenten": project_docs,
                         "beslissingen": [], "publicatiestatus": "niet_vrijgegeven",
                         "vraagkandidaten": [], "vraagrecords": [],
