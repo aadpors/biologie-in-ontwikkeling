@@ -207,6 +207,8 @@ def _completeness_issues(data):
             issues.append({"code": "verouderde_vraagbron", "record_id": record.get("id")})
         if record.get("cv_region_invalidated"):
             issues.append({"code": "verouderde_cv_regio", "record_id": record.get("id")})
+        if record.get("appendix_region_invalidated"):
+            issues.append({"code":"verouderde_uitwerkbijlage_regio","record_id":record.get("id")})
     return issues
 
 
