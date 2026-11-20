@@ -145,3 +145,22 @@ De oude keuzelijst 'Examenprogramma' is uit het filterpaneel verwijderd. In de d
 - **s35:** de v2-koppeling voor cellulaire organisatie is in het korte subdomeinveld gelijkgetrokken met de nadere toelichting: havo B2 en vwo B3.
 
 - **s51:** een fylogenomische reconstructie van genoverdracht en microbiële associaties tijdens eukaryogenese toegevoegd als complement van s35. De voorgestelde interacties zijn als evolutionaire inferenties gemarkeerd, niet als rechtstreeks waargenomen symbiose.
+
+
+### Verdiepende broncontroles in deze ronde
+
+Naast de DOI-/titel-/datumcontrole zijn bij onderstaande kaarten de volledige tekst of uitgebreidere brononderdelen geraadpleegd voor een specifieke claim of methodologische beperking:
+
+| Kaart | Extra gecontroleerd | Gevolg voor de kaart |
+|---|---|---|
+| s5 | Open-access full text; experimentele opzet en biologische replicaten | Kleine aantallen replicaten expliciet als beperking benoemd. |
+| s7 | Uitgeversabstract en aanvullende veldproefinformatie | Biomassa/groei onderscheiden van korrelopbrengst; geen significante opbrengststijging claimen. |
+| s8 | Nature-artikeltekst; twee-celstadium, lamin B1, LC3 en embryo-experimenten | Modelorganisme en ontwikkelingsstadium expliciet behouden; geen generalisatie naar menselijke embryo's. |
+| s14 | Onderzoeksopzet en deelnemersaantal | n=10 en modelmatige reconstructie als belangrijke beperking vermeld. |
+| s20 | DOI-resolver, Oxford Academic accepted manuscript en tijdschriftindex | Conflicterende indexmetadata expliciet gemarkeerd; DOI-resolverende record behouden. |
+| s36 | Open-access artikeltekst en onderwijs-/studentenonderzoek | Perspectiefartikel onderscheiden van het beperkte, verkennende surveydeel. |
+| s49 | Nature Communications full text; genome-wide CRISPR-screen, mitosebeelden en celmodellen | Mechanistische bevindingen en de grens tussen celmodellen en klinische behandeling aangescherpt. |
+| s50 | Nature Reviews Neuroscience reviewtekst en publicatietype | Als review geclassificeerd; knaagdiermodellen en contextafhankelijkheid expliciet gemaakt. |
+| s51 | Nature full text; fylogenomische datasets, LECA-reconstructie en methodologische onzekerheden | Horizontale genoverdracht als evolutionaire inferentie beschreven; aard van de oude interacties niet als bewezen gepresenteerd. |
+
+Dit is een gerichte verdiepingscontrole, geen claim dat alle 51 volledige artikelen en supplementen integraal zijn nagelezen. De overige kaarten blijven in de auditadministratie staan als bibliografisch en op abstractniveau gecontroleerd, met full-text controle als vervolgstap waar de lesinterpretatie daarvan afhankelijk is.
