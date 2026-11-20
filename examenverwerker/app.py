@@ -413,8 +413,8 @@ class ExamApp:
             workspace._workspace_owner = self
             workspace._workspace_key = key
             workspace._restore_import_batch(folder, loaded)
-            workspace._workspace_load_global_corrections()
             workspace._build_workspace()
+            workspace._workspace_load_global_corrections()
             workspace.refresh()
             meta = loaded.get("exam_metadata") or {}
             title = " · ".join(str(value) for value in [
