@@ -138,3 +138,7 @@ De oude keuzelijst 'Examenprogramma' is uit het filterpaneel verwijderd. In de d
 - **s20:** de DOI-resolver en Oxford Academic koppelen de DOI aan de kaarttitel. Een andere tijdschriftindexpagina toont dezelfde DOI bij een andere titel. De kaart gebruikt daarom de DOI-resolverende Oxford Academic-pagina en markeert de conflicterende indexvermelding als metadata-anomalie.
 - **s49:** nieuw primair onderzoek naar het SKA-complex, mitotische controle en chromosomale instabiliteit; expliciet als celmodelonderzoek, niet als klinische behandelstudie.
 - **s50:** nieuwe review over neurale circuits voor ouderlijk zorggedrag; mechanistische bevindingen uit knaagdiermodellen worden niet rechtstreeks naar mensen vertaald.
+
+- **s1 en s2:** de havo- en vwo-codes voor erfelijkheid/selectie zijn nu ook in het korte subdomeinveld expliciet gescheiden (havo B5, vwo B6).
+- **s33:** de niet-onderbouwde verwijzing naar de afweer-subdomeinen B6/B7 is verwijderd; de kaart is beperkt tot de inhoudelijke aansluiting bij cellulaire interacties.
+- **s35:** de v2-koppeling voor cellulaire organisatie is in het korte subdomeinveld gelijkgetrokken met de nadere toelichting: havo B2 en vwo B3.
