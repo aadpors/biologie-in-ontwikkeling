@@ -1539,7 +1539,7 @@ class ExamApp:
             row["vraagtype_fragment_id"] = fragment.get("id")
         records = self.data.setdefault("vraagrecords", [])
         subject = str(self.data.get("vak") or "Onbekend")
-        exam_meta = dict(doc.get("exam_metadata") or self.data.get("exam_metadata") or {})
+        exam_meta = dict(self.data.get("exam_metadata") or doc.get("exam_metadata") or {})
         for key in ("theme","concept","end","focus"):
             exam_meta.setdefault(key,"")
         exam_meta.setdefault("points",None)
