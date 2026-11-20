@@ -126,7 +126,7 @@ De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een voll
 
 ### Nieuwe metadata voor bruikbare selectie
 
-Alle 51 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
+Alle 52 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
 - **Primair onderzoek:** 41 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
 - **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
 - **Perspectiefartikel:** 2 kaarten.
@@ -164,7 +164,7 @@ Naast de DOI-/titel-/datumcontrole zijn bij onderstaande kaarten de volledige te
 | s50 | Nature Reviews Neuroscience reviewtekst en publicatietype | Als review geclassificeerd; knaagdiermodellen en contextafhankelijkheid expliciet gemaakt. |
 | s51 | Nature full text; fylogenomische datasets, LECA-reconstructie en methodologische onzekerheden | Horizontale genoverdracht als evolutionaire inferentie beschreven; aard van de oude interacties niet als bewezen gepresenteerd. |
 
-Dit is een gerichte verdiepingscontrole, geen claim dat alle 51 volledige artikelen en supplementen integraal zijn nagelezen. De overige kaarten blijven in de auditadministratie staan als bibliografisch en op abstractniveau gecontroleerd, met full-text controle als vervolgstap waar de lesinterpretatie daarvan afhankelijk is.
+Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artikelen en supplementen integraal zijn nagelezen. De overige kaarten blijven in de auditadministratie staan als bibliografisch en op abstractniveau gecontroleerd, met full-text controle als vervolgstap waar de lesinterpretatie daarvan afhankelijk is.
 
 - **s1:** de open-access methodesectie is geraadpleegd. De kaart onderscheidt nu 467.018 doorzochte metagenomen van de 367.609 metagenomen waarin spacers werden gevonden, en vermeldt de beperkte genomische context van een groot deel van de metagenoom-afgeleide repeats.
 - **s52:** plantafweer via mobiele virus-afgeleide kleine RNA's toegevoegd; de lokale RNAi-beschermingszone is expliciet onderscheiden van adaptief immunologisch geheugen.
