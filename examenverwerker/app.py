@@ -12,7 +12,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview
 from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragments, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
@@ -3527,15 +3527,28 @@ class ExamApp:
         trimmed_pages = sum(1 for item in preview_info["page_map"] if item.get("footer_detected"))
         ttk.Label(header, text=f"Voorbewerking: voorblad verwijderd; footer/onderliggende witruimte automatisch afgesneden op {trimmed_pages} van {len(preview_info['page_map'])} pagina's. De originele PDF blijft ongewijzigd.",
                   wraplength=1180).pack(anchor="w", pady=(3, 0))
-        uncertain_pages = [str(item["original_page"]) for item in preview_info["page_map"]
-                           if not item.get("footer_detected")
-                           and float(item["preview_height"]) >= float(item["original_height"]) * 0.95]
+        uncertain_pages = [
+            str(item["original_page"]) for item in preview_info["page_map"]
+            if item.get("footer_review_required")
+            or (
+                not item.get("footer_detected")
+                and float(item["preview_height"]) >= float(item["original_height"]) * 0.95
+            )
+        ]
         if uncertain_pages:
-            ttk.Label(header, text="Controle nodig: op pagina('s) " + ", ".join(uncertain_pages) +
-                      " is geen betrouwbare footer gevonden; deze pagina's zijn niet automatisch ingekort.",
-                      foreground="#9b4d00", wraplength=1180).pack(anchor="w", pady=(2, 0))
-        ttk.Label(header, text="Selecteer links een fragment om alleen dat fragment als doorlopende snippet te bekijken. Sleep de grenslijnen om het fragment bij te stellen. Met 'Nieuwe selectie' kun je een ontbrekend fragment op een opgeschoonde pagina toevoegen.",
-                  wraplength=1180).pack(anchor="w", pady=(3, 0))
+            ttk.Label(
+                header,
+                text="Visuele controle nodig op pagina('s) " + ", ".join(uncertain_pages) +
+                     ": een footerindicatie overlapt mogelijk met inhoud of kon niet veilig worden vastgesteld. De inhoud is behouden.",
+                foreground="#9b4d00", wraplength=1180,
+            ).pack(anchor="w", pady=(2, 0))
+        ttk.Label(
+            header,
+            text="De opgeschoonde opgavenpagina's staan hieronder achter elkaar als één doorlopende PDF. "
+                 "Selecteer links een fragment en sleep de twee grenslijnen op de lange pagina. "
+                 "Met 'Fragmentvoorbeeld' controleer je de samengestelde uitsnede; de koppeling met de oorspronkelijke PDF-pagina's blijft behouden.",
+            wraplength=1180,
+        ).pack(anchor="w", pady=(3, 0))
         body = ttk.Frame(win, padding=8); body.pack(fill="both", expand=True)
         left = ttk.Frame(body, width=245); left.pack(side="left", fill="y", padx=(0, 10))
         right = ttk.Frame(body); right.pack(side="left", fill="both", expand=True)
@@ -3570,7 +3583,7 @@ class ExamApp:
         fragment_info = ttk.Label(left, text="Selecteer een fragment voor de herkenningsreden en het bewijs.",
                                   wraplength=230, justify="left")
         fragment_info.pack(fill="x", pady=(5, 2))
-        ttk.Label(left, text="Tip: maak een fragment op de eerste pagina en voeg daarna de volgende pagina's in oplopende volgorde toe.",
+        ttk.Label(left, text="Tip: selecteer een aaneengesloten gebied op de doorlopende PDF. Een fragment mag over meerdere bronpagina's lopen.",
                   wraplength=230).pack(anchor="w", pady=8)
         nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
         page_var = tk.IntVar(value=2)
@@ -3587,7 +3600,15 @@ class ExamApp:
         canvas.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
         sy.pack(side="right", fill="y"); sx.pack(side="bottom", fill="x"); canvas.pack(side="left", fill="both", expand=True)
         actions = ttk.Frame(right); actions.pack(fill="x", pady=(8, 0))
-        top_y, bottom_y = 0.0, min(1.0, preview_heights[displayed_page] / page_sizes[displayed_page][1])
+        stitched_path = self.project_dir / "analyse" / f"opgaven-doorlopend-{doc['id']}-{doc['sha256'][:12]}.png"
+        stitched_info = render_stitched_preview(
+            preview_path, stitched_path, preview_info["page_map"], scale=1.05
+        )
+        stitched_scale = float(stitched_info["scale"])
+        page_layout = stitched_info["layout"]
+        page_layout_by_original = {
+            int(item["original_page"]): item for item in page_layout
+        }
         photo = None
         snippet_mode = False
         snippet_layout = []
@@ -3595,80 +3616,192 @@ class ExamApp:
         drag_handle = None
         page_image_width = 1
         page_image_height = 1
-        drag_target = None
-        top_line = bottom_line = None
         overlay_items = []
+        selection_start = (2, 0.0)
+        selection_end = (
+            2, min(1.0, preview_heights[2] / page_sizes[2][1])
+        )
+
         def selected_links():
             return [question_numbers[i] for i in qlist.curselection()]
+
         def selected_fragment():
             sel = fragment_tree.selection()
             return fragments[int(sel[0])] if sel else None
+
+        def position_for(page_no, normalized_y):
+            layout = page_layout_by_original[int(page_no)]
+            original_height = float(page_sizes[int(page_no)][1])
+            return float(layout["y0"]) + float(normalized_y) * original_height * stitched_scale
+
+        def point_for_y(global_y):
+            y = max(0.0, min(float(page_image_height), float(global_y)))
+            previous = None
+            for layout in page_layout:
+                page_no = int(layout["original_page"])
+                y0, y1 = float(layout["y0"]), float(layout["y1"])
+                if y < y0:
+                    if previous is None:
+                        return page_no, 0.0
+                    previous_end = float(previous["y1"])
+                    if y - previous_end <= y0 - y:
+                        previous_page = int(previous["original_page"])
+                        return previous_page, min(
+                            1.0,
+                            float(preview_heights[previous_page]) /
+                            float(page_sizes[previous_page][1]),
+                        )
+                    return page_no, 0.0
+                if y <= y1:
+                    local_y = max(0.0, min(y1 - y0, y - y0))
+                    normalized = local_y / (
+                        float(page_sizes[page_no][1]) * stitched_scale
+                    )
+                    maximum = float(preview_heights[page_no]) / float(page_sizes[page_no][1])
+                    return page_no, max(0.0, min(maximum, normalized))
+                previous = layout
+            last_page = int(page_layout[-1]["original_page"])
+            return last_page, min(
+                1.0,
+                float(preview_heights[last_page]) /
+                float(page_sizes[last_page][1]),
+            )
+
+        def selection_to_spans():
+            start_point, end_point = selection_start, selection_end
+            start_y = position_for(*start_point)
+            end_y = position_for(*end_point)
+            if start_y > end_y:
+                start_point, end_point = end_point, start_point
+                start_y, end_y = end_y, start_y
+            if end_y - start_y < 4:
+                raise ValueError("De selectie is te klein. Vergroot de afstand tussen de grenslijnen.")
+            first_page, first_top = start_point
+            last_page, last_bottom = end_point
+            spans = []
+            for page_no in range(int(first_page), int(last_page) + 1):
+                if page_no not in page_layout_by_original:
+                    continue
+                top = float(first_top) if page_no == int(first_page) else 0.0
+                bottom = (
+                    float(last_bottom) if page_no == int(last_page)
+                    else float(preview_heights[page_no]) / float(page_sizes[page_no][1])
+                )
+                if bottom - top >= 0.005:
+                    spans.append(make_page_span(page_no, top, bottom))
+            if not spans:
+                raise ValueError("De selectie bevat geen zichtbaar deel van een opgavenpagina.")
+            return spans
+
         def redraw_guides():
-            nonlocal top_line, bottom_line, overlay_items
+            nonlocal overlay_items
             for item in overlay_items:
                 canvas.delete(item)
             overlay_items = []
-            if photo is None: return
+            if photo is None:
+                return
             if snippet_mode:
                 for layout in snippet_layout:
                     span = layout["span"]
-                    top_px = layout["y0"] + (float(span["top"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
-                    bottom_px = layout["y0"] + (float(span["bottom"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
-                    overlay_items.append(canvas.create_rectangle(0, layout["y0"], page_image_width, top_px,
-                        fill="#c8c8c8", stipple="gray50", outline=""))
-                    overlay_items.append(canvas.create_rectangle(0, bottom_px, page_image_width, layout["y1"],
-                        fill="#c8c8c8", stipple="gray50", outline=""))
-                    overlay_items.append(canvas.create_line(0, top_px, page_image_width, top_px, fill="black", width=2))
-                    overlay_items.append(canvas.create_line(0, bottom_px, page_image_width, bottom_px, fill="black", width=2))
+                    top_px = layout["y0"] + (
+                        float(span["top"]) * layout["page_height"] - layout["clip_top"]
+                    ) * snippet_scale
+                    bottom_px = layout["y0"] + (
+                        float(span["bottom"]) * layout["page_height"] - layout["clip_top"]
+                    ) * snippet_scale
+                    overlay_items.append(canvas.create_rectangle(
+                        0, layout["y0"], page_image_width, top_px,
+                        fill="#c8c8c8", stipple="gray50", outline="",
+                    ))
+                    overlay_items.append(canvas.create_rectangle(
+                        0, bottom_px, page_image_width, layout["y1"],
+                        fill="#c8c8c8", stipple="gray50", outline="",
+                    ))
+                    overlay_items.append(canvas.create_line(
+                        0, top_px, page_image_width, top_px, fill="black", width=2,
+                    ))
+                    overlay_items.append(canvas.create_line(
+                        0, bottom_px, page_image_width, bottom_px, fill="black", width=2,
+                    ))
             else:
-                page_height = page_sizes[displayed_page][1]
-                preview_height = preview_heights[displayed_page]
-                y0 = top_y * page_height / preview_height * page_image_height
-                y1 = bottom_y * page_height / preview_height * page_image_height
-                overlay_items.append(canvas.create_rectangle(0, 0, page_image_width, y0,
-                    fill="#c8c8c8", stipple="gray50", outline=""))
-                overlay_items.append(canvas.create_rectangle(0, y1, page_image_width, page_image_height,
-                    fill="#c8c8c8", stipple="gray50", outline=""))
-                if top_line: canvas.delete(top_line)
-                if bottom_line: canvas.delete(bottom_line)
-                top_line = canvas.create_line(0, y0, page_image_width, y0, fill="black", width=1)
-                bottom_line = canvas.create_line(0, y1, page_image_width, y1, fill="black", width=1)
-                canvas.tag_raise(top_line); canvas.tag_raise(bottom_line)
+                start_px = position_for(*selection_start)
+                end_px = position_for(*selection_end)
+                if start_px > end_px:
+                    start_px, end_px = end_px, start_px
+                for layout in page_layout:
+                    page_top, page_bottom = float(layout["y0"]), float(layout["y1"])
+                    selected_top = max(page_top, start_px)
+                    selected_bottom = min(page_bottom, end_px)
+                    if selected_top > page_top:
+                        overlay_items.append(canvas.create_rectangle(
+                            0, page_top, page_image_width, min(selected_top, page_bottom),
+                            fill="#c8c8c8", stipple="gray50", outline="",
+                        ))
+                    if selected_bottom < page_bottom:
+                        overlay_items.append(canvas.create_rectangle(
+                            0, max(selected_bottom, page_top), page_image_width, page_bottom,
+                            fill="#c8c8c8", stipple="gray50", outline="",
+                        ))
+                    if page_top <= start_px <= page_bottom:
+                        overlay_items.append(canvas.create_line(
+                            0, start_px, page_image_width, start_px,
+                            fill="black", width=2,
+                        ))
+                    if page_top <= end_px <= page_bottom:
+                        overlay_items.append(canvas.create_line(
+                            0, end_px, page_image_width, end_px,
+                            fill="black", width=2,
+                        ))
             canvas.configure(scrollregion=(0, 0, page_image_width, page_image_height))
-        def load_span_for_page():
-            nonlocal top_y, bottom_y
-            frag = selected_fragment()
-            span = next((x for x in (frag or {}).get("page_spans", []) if int(x["page"]) == page_var.get()), None)
-            if span:
-                top_y, bottom_y = float(span["top"]), float(span["bottom"])
-            else:
-                top_y, bottom_y = 0.0, min(1.0, preview_heights[page_var.get()] / page_sizes[page_var.get()][1])
-        def show_page():
-            nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode
-            try:
-                number = max(2, min(page_count, int(page_var.get())))
-            except (ValueError, tk.TclError):
-                number = 2
-            page_var.set(number)
-            displayed_page = number
+
+        def show_document(scroll_to_page=None):
+            nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode, overlay_items
             snippet_mode = False
-            target = self.project_dir / "analyse" / f"structuur-{doc['id']}-clean-p{number}.png"
-            render_page(preview_path, number - 1, target, scale=1.05)
-            photo = tk.PhotoImage(file=str(target))
+            if photo is None:
+                photo = tk.PhotoImage(file=str(stitched_path))
             page_image_width, page_image_height = photo.width(), photo.height()
             canvas.delete("all")
             canvas.create_image(0, 0, image=photo, anchor="nw")
             canvas.image = photo
-            load_span_for_page()
+            overlay_items = []
+            for layout in page_layout:
+                canvas.create_text(
+                    6, float(layout["y0"]) + 3,
+                    text=f"bronpagina {layout['original_page']}",
+                    anchor="nw", fill="#7b8790",
+                    font=("Segoe UI", 7),
+                )
+            canvas.configure(scrollregion=(0, 0, page_image_width, page_image_height))
+            if scroll_to_page is not None:
+                displayed_page = max(2, min(page_count, int(scroll_to_page)))
+                page_var.set(displayed_page)
+            else:
+                displayed_page = max(2, min(page_count, int(page_var.get())))
             redraw_guides()
+            layout = page_layout_by_original.get(displayed_page)
+            if layout:
+                canvas.yview_moveto(
+                    max(0.0, min(1.0, float(layout["y0"]) / max(1.0, page_image_height)))
+                )
+
+        def show_page():
+            show_document(page_var.get())
+
         def show_fragment():
             nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode, snippet_layout
             frag = selected_fragment()
             if not frag or not frag.get("page_spans"):
-                show_page()
+                show_document(displayed_page)
                 return
             snippet_mode = True
-            spans = sorted(frag["page_spans"], key=lambda item: int(item["page"]))
+            spans = sorted(
+                [item for item in frag["page_spans"]
+                 if int(item.get("page", 0)) in preview_by_original],
+                key=lambda item: int(item["page"]),
+            )
+            if not spans:
+                show_document(displayed_page)
+                return
             displayed_page = int(spans[0]["page"])
             page_var.set(displayed_page)
             segments = []
@@ -3686,15 +3819,19 @@ class ExamApp:
                 clip_bottom = min(preview_height, float(span["bottom"]) * page_height + margin)
                 if clip_bottom - clip_top < 4:
                     continue
-                segments.append({"page": int(page_info["preview_page"]),
-                                 "bbox": [0.0, clip_top, float(page_info["width"]), clip_bottom]})
+                segments.append({
+                    "page": int(page_info["preview_page"]),
+                    "bbox": [0.0, clip_top, float(page_info["width"]), clip_bottom],
+                })
                 segment_height = (clip_bottom - clip_top) * snippet_scale
-                snippet_layout.append({"span": span, "page_height": page_height,
+                snippet_layout.append({
+                    "span": span, "page_height": page_height,
                     "clip_top": clip_top, "clip_bottom": clip_bottom,
-                    "y0": cursor, "y1": cursor + segment_height})
+                    "y0": cursor, "y1": cursor + segment_height,
+                })
                 cursor += segment_height + 12.0 * snippet_scale
             if not segments:
-                show_page()
+                show_document(displayed_page)
                 return
             target = self.project_dir / "analyse" / f"snippet-{doc['id']}-{frag['id']}.png"
             render_composite_crops(preview_path, segments, target, scale=snippet_scale)
@@ -3705,9 +3842,11 @@ class ExamApp:
             canvas.image = photo
             redraw_guides()
             canvas.yview_moveto(0)
+
         def change_page(delta):
             page_var.set(max(2, min(page_count, int(page_var.get()) + delta)))
-            show_page()
+            show_document(page_var.get())
+
         def on_press(event):
             nonlocal drag_handle
             y = canvas.canvasy(event.y)
@@ -3715,8 +3854,12 @@ class ExamApp:
                 drag_handle = None
                 for layout in snippet_layout:
                     span = layout["span"]
-                    top_px = layout["y0"] + (float(span["top"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
-                    bottom_px = layout["y0"] + (float(span["bottom"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
+                    top_px = layout["y0"] + (
+                        float(span["top"]) * layout["page_height"] - layout["clip_top"]
+                    ) * snippet_scale
+                    bottom_px = layout["y0"] + (
+                        float(span["bottom"]) * layout["page_height"] - layout["clip_top"]
+                    ) * snippet_scale
                     if abs(y - top_px) <= 12:
                         drag_handle = {"layout": layout, "edge": "top"}
                         break
@@ -3724,16 +3867,19 @@ class ExamApp:
                         drag_handle = {"layout": layout, "edge": "bottom"}
                         break
             else:
-                page_height = page_sizes[displayed_page][1]
-                preview_height = preview_heights[displayed_page]
-                top_px = top_y * page_height / preview_height * page_image_height
-                bottom_px = bottom_y * page_height / preview_height * page_image_height
-                if abs(y - top_px) <= 12: drag_handle = {"edge": "top"}
-                elif abs(y - bottom_px) <= 12: drag_handle = {"edge": "bottom"}
-                else: drag_handle = None
+                top_px = position_for(*selection_start)
+                bottom_px = position_for(*selection_end)
+                if abs(y - top_px) <= 12:
+                    drag_handle = {"edge": "top"}
+                elif abs(y - bottom_px) <= 12:
+                    drag_handle = {"edge": "bottom"}
+                else:
+                    drag_handle = None
+
         def on_drag(event):
-            nonlocal top_y, bottom_y
-            if not drag_handle: return
+            nonlocal selection_start, selection_end
+            if not drag_handle:
+                return
             y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y)))
             if snippet_mode:
                 layout = drag_handle["layout"]
@@ -3745,20 +3891,36 @@ class ExamApp:
                     span["top"] = min(normalized, float(span["bottom"]) - 0.005)
                 else:
                     span["bottom"] = max(normalized, float(span["top"]) + 0.005)
+            elif drag_handle["edge"] == "top":
+                y = min(y, position_for(*selection_end) - 5.0)
+                selection_start = point_for_y(y)
             else:
-                normalized = y / page_image_height * preview_heights[displayed_page] / page_sizes[displayed_page][1]
-                if drag_handle["edge"] == "top": top_y = min(normalized, bottom_y - 0.005)
-                else: bottom_y = max(normalized, top_y + 0.005)
+                y = max(y, position_for(*selection_start) + 5.0)
+                selection_end = point_for_y(y)
             redraw_guides()
+
         def on_release(_event):
             nonlocal drag_handle
-            if drag_handle and snippet_mode:
-                save_structure()
-                show_fragment()
+            if drag_handle:
+                if snippet_mode:
+                    save_structure()
+                    show_fragment()
+                else:
+                    current = selected_fragment()
+                    if current:
+                        try:
+                            current["page_spans"] = selection_to_spans()
+                            refresh_fragment_list()
+                            save_structure()
+                        except Exception as exc:
+                            messagebox.showerror("Selectie niet opgeslagen", str(exc), parent=win)
+                    show_document()
             drag_handle = None
+
         canvas.bind("<Button-1>", on_press)
         canvas.bind("<B1-Motion>", on_drag)
         canvas.bind("<ButtonRelease-1>", on_release)
+
         def refresh_fragment_list():
             selected = selected_fragment()
             selected_id = selected.get("id") if selected else None
