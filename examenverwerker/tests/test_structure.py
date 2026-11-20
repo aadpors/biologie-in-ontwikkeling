@@ -2,6 +2,7 @@ import unittest
 from structure import (
     append_page_span, default_question_links, fragments_for_question, make_cv_fragment, make_exam_structure, make_fragment, missing_question_regions, page_spans_to_segments, validate_cv_fragment,
     make_page_span, mark_structure_stale, validate_exam_structure, normalize_fragments, FRAGMENT_TYPES,
+    sort_fragments_reading_order, trim_question_bands_for_contexts,
 )
 
 
