@@ -215,6 +215,11 @@ const conceptFilter = html.match(/<select id="concept">([\s\S]*?)<\/select>/)?.[
 const conceptOptions = [...conceptFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
 const scienceConcepts = [...new Set(publications.filter(item => item.page === 'science').map(item => item.concept))];
 for (const concept of scienceConcepts) assert.ok(conceptOptions.includes(concept), `Hoofdthema ontbreekt in de filterlijst: ${concept}`);
+const studyTypeFilter = html.match(/<select id="study-type">([\\s\\S]*?)<\\/select>/)?.[1] || '';
+const studyTypeOptions = [...studyTypeFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
+const scienceStudyTypes = [...new Set(publications.filter(item => item.page === 'science').map(item => item.studyType))];
+for (const studyType of scienceStudyTypes) assert.ok(studyTypeOptions.includes(studyType), `Onderzoekstype ontbreekt in de filterlijst: ${studyType}`);
+
 assert.ok(html.includes("$('science-filter-groups').hidden=p!=='science'") && html.includes("$('education-filter-group').hidden=p!=='education'"),
   'Paginawisseling moet volledige filtergroepen tonen/verbergen, niet losse filteronderdelen');
 const siteVersion = JSON.parse(fs.readFileSync('site-version.json', 'utf8')).version;
