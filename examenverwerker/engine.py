@@ -365,15 +365,12 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
     remain unchanged in the returned map.
     """
     import fitz
-    from collections import defaultdict
-
     source = fitz.open(source_path)
     try:
         if len(source) < 2:
             raise ValueError("De opgaven-PDF bevat geen pagina's na het voorblad.")
 
         page_rows = []
-        repeated_occurrences = defaultdict(list)
         for page_index in range(1, len(source)):
             page = source[page_index]
             height = float(page.rect.height)
@@ -395,14 +392,6 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                             "bottom": float(bbox[3]),
                         }
                         lines.append(item)
-                        relative_top = item["top"] / max(1.0, height)
-                        # Repeated running footers normally occupy the final
-                        # 12% of the page and are short. Repeated body prose in
-                        # the lower quarter is deliberately not enough.
-                        if relative_top >= 0.88 and len(normalized) <= 100:
-                            repeated_occurrences[normalized].append(
-                                (page_index + 1, relative_top)
-                            )
                 elif block.get("type") == 1 and block.get("bbox"):
                     assets.append([float(x) for x in block["bbox"]])
             try:
@@ -424,18 +413,12 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                 "assets": assets,
             })
 
-        repeated_footer_keys = set()
-        for normalized, occurrences in repeated_occurrences.items():
-            page_numbers = {page_no for page_no, _ in occurrences}
-            positions = [relative_top for _, relative_top in occurrences]
-            if (len(page_numbers) >= 2 and normalized
-                    and max(positions) - min(positions) <= 0.035):
-                repeated_footer_keys.add(normalized)
-
         explicit_footer = re.compile(
             r"(examenblad|college voor toetsen|cito|www\\.|©|"
             r"pagina\s*\d|tijdvak\s*\d|lees\s+verder|"
-            r"\b\d{1,3}\s*/\s*\d{1,3}\b)",
+            r"\b\d{1,3}\s*/\s*\d{1,3}\b|"
+            r"\b(?:biologie|examen)\b.{0,24}\b20\d{2}\b|"
+            r"\b(?:vw|ha)-\d{4}-[a-z]-\d{2}-\d-[\w-]+\b)",
             re.I,
         )
         mapping = []
@@ -452,12 +435,7 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                         re.fullmatch(r"\d{1,3}", line["normalized"])
                         and relative_top >= 0.90
                     )
-                    repeated_footer = (
-                        line["normalized"] in repeated_footer_keys
-                        and relative_top >= 0.88
-                    )
-                    if (explicit_footer.search(line["text"])
-                            or standalone_page_number or repeated_footer):
+                    if explicit_footer.search(line["text"]) or standalone_page_number:
                         candidates.append(line)
 
                 # A footer candidate is safe only if no non-footer text or
