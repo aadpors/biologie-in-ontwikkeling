@@ -1554,10 +1554,31 @@ class ExamApp:
             linked_contexts = question_links.get("context_fragments", [])
             record["context_fragment_ids"] = [item.get("id") for item in linked_contexts]
             record["context_fragments"] = [
-                {"id": item.get("id"), "text": str(item.get("text") or ""),
+                {"id": item.get("id"), "type":item.get("type"),
+                 "text": str(item.get("text") or ""),
                  "page_spans": item.get("page_spans", [])}
                 for item in linked_contexts
             ]
+            record["exam_structure_status"]="gekoppeld"
+            record["exam_structure_document_id"]=doc.get("id")
+            record["exam_structure_source_sha256"]=doc.get("sha256")
+            record["exam_structure_fragment_ids"]=[fragment.get("id")]+[
+                item.get("id") for item in linked_contexts]
+            record["question_region_fragment_id"]=fragment.get("id")
+            record["exam_structure_question_number"]=int(row.get("number"))
+            record["question_region_page_spans"]=list(fragment.get("page_spans",[]))
+            record["context_region_fragments"]=[{
+                "id":item.get("id"),"type":item.get("type"),
+                "page_spans":list(item.get("page_spans",[])),
+                "question_numbers":list(item.get("question_numbers",[])),
+                "text":str(item.get("text") or ""),
+            } for item in linked_contexts]
+            record["source_context"]="\n\n".join(
+                str(item.get("text") or "") for item in linked_contexts if item.get("text"))
+            record["source_analysis_invalidated"]=False
+            record["exam_structure_invalidated"]=False
+            record["cv_region_invalidated"]=False
+            record["approval_revoked_reason"]=None
         self.save_project()
         self._log(
             f"Vraagtypen bepaald en {len(candidates)} eenvoudige conceptrecords aangemaakt voor {doc.get('bestand')}."
