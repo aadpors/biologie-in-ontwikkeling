@@ -3598,6 +3598,8 @@ class ExamApp:
                 record["snippet_files"]=[name]
                 record["question_region_snippet_sha256"]=sha256(target)
                 context_names=[]
+                context_assets=list(record.get("context_asset_files") or [])
+                context_region_records=[]
                 for context in linked.get("context_fragments",[]):
                     context_name=f"context-{doc['id']}-{context['id']}-final.png"
                     context_target=self.project_dir/"snippets"/context_name
@@ -3610,9 +3612,23 @@ class ExamApp:
                         trimmed=(image.crop((0,max(0,bbox[1]-4),image.width,
                                              min(image.height,bbox[3]+4))) if bbox else image.copy())
                     trimmed.save(context_target)
-                    context_names.append({"fragment_id":context.get("id"),"file":context_name,
-                                          "sha256":sha256(context_target)})
+                    asset={"fragment_id":context.get("id"),"file":context_name,
+                           "sha256":sha256(context_target),"snippet_sha256":sha256(context_target),
+                           "source_document_id":doc["id"],"source_sha256":doc.get("sha256"),
+                           "type":"context","caption":"Handmatig afgebakend contextfragment",
+                           "page":context.get("page_spans",[{}])[0].get("page"),
+                           "page_spans":list(context.get("page_spans",[]))}
+                    context_names.append(asset)
+                    context_region_records.append({"id":context.get("id"),"type":"context",
+                        "page_spans":list(context.get("page_spans",[])),
+                        "question_numbers":list(context.get("question_numbers",[])),
+                        "text":str(context.get("text") or "")})
+                    if not any(x.get("fragment_id")==context.get("id") for x in context_assets):
+                        context_assets.append(asset)
                 record["context_region_snippet_files"]=context_names
+                record["context_asset_files"]=context_assets
+                record["context_region_fragments"]=context_region_records
+                record["source_context"]="\n\n".join(x["text"] for x in context_region_records if x["text"])
                 generated+=1
             self.save_project()
             self._log(f"Definitieve vraaguitsneden gegenereerd: {generated} vraagfragmenten; originele PDF's en fragmentgrenzen ongewijzigd.")
@@ -4025,6 +4041,11 @@ class ExamApp:
         for idx,asset in enumerate(record.get("context_asset_files", []),1):
             preview_specs.append((f"Contextfiguur/-tabel {idx} · pagina {asset.get('page', 'meerdere')} · {asset.get('caption') or asset.get('type') or asset.get('asset_id') or ''}",
                                   self.project_dir/"snippets"/asset["file"],None,None))
+        for idx,region in enumerate(record.get("uitwerkbijlage_region_refs",[]),1):
+            name=region.get("snippet_file")
+            if name:
+                preview_specs.append((f"Afgebakend uitwerkbijlagefragment {idx}",
+                                      self.project_dir/"snippets"/name,None,None))
         for idx,name in enumerate(record.get("uitwerkbijlagen",[]),1):
             appendix=self.project_dir/"bronnen"/name
             if appendix.is_file():
