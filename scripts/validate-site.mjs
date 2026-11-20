@@ -198,8 +198,29 @@ for (const question of openExamQuestions) {
 }
 assert.ok(!examPage.includes('window.open(cv,\"_blank\"'), 'CV-knop mag niet terugvallen op een externe PDF in plaats van de lokale snippet');
 
+
 assert.ok(Array.isArray(publications), 'publicaties.json moet een array bevatten');
 assert.ok(publications.length > 0, 'publicatiedatabase mag niet leeg zijn');
+
+// Regression checks for the homepage search/filter redesign.
+for (const id of ['publication-controls', 'science-filter-groups', 'science-content-group', 'science-assessment-group', 'science-filters', 'science-assessment-filters', 'education-filter-group', 'education-filters', 'search', 'rating-filter', 'clear', 'count']) {
+  assert.ok(html.includes(`id="${id}"`), `Homepage mist filteronderdeel #${id}`);
+}
+assert.ok(html.includes('class="filter-groups"'), 'De wetenschappelijke filters moeten in één gegroepeerd paneel staan');
+assert.ok(html.includes('.filter-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))'), 'Desktopindeling van de filtergroepen ontbreekt');
+assert.ok(html.includes('@media(max-width:430px)'), 'Mobiele filterindeling ontbreekt');
+assert.ok(html.includes("(x.concept||'')") && html.includes("(x.subdomain||'')") && html.includes("(x.alignment||'')"),
+  'Zoeken moet ook hoofdthema, syllabuscode en curriculumkoppeling doorzoeken');
+const conceptFilter = html.match(/<select id="concept">([\\s\\S]*?)<\\/select>/)?.[1] || '';
+const conceptOptions = [...conceptFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
+const scienceConcepts = [...new Set(publications.filter(item => item.page === 'science').map(item => item.concept))];
+for (const concept of scienceConcepts) assert.ok(conceptOptions.includes(concept), `Hoofdthema ontbreekt in de filterlijst: ${concept}`);
+assert.ok(html.includes("$('science-filter-groups').hidden=p!=='science'") && html.includes("$('education-filter-group').hidden=p!=='education'"),
+  'Paginawisseling moet volledige filtergroepen tonen/verbergen, niet losse filteronderdelen');
+const siteVersion = JSON.parse(fs.readFileSync('site-version.json', 'utf8')).version;
+assert.ok(html.includes(`const currentSiteVersion='${siteVersion}'`), 'Siteversie in index.html loopt niet gelijk met site-version.json');
+assert.ok(html.includes(`./publicaties.json?v=${siteVersion.replace('.000Z', 'Z')}`), 'Databasecache moet met dezelfde siteversie worden vernieuwd');
+
 
 const ids = new Set();
 for (const [index, item] of publications.entries()) {
