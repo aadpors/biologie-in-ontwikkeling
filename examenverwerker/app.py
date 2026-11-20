@@ -5254,6 +5254,9 @@ class ExamApp:
         else:
             self.correction_bar.pack_forget()
         self._workflow_refresh()
+        owner = getattr(self, "_workspace_owner", None)
+        if owner is not None:
+            owner._refresh_library()
 
     def refresh(self):
         """Refresh document inventory, review queue and project progress."""
