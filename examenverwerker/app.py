@@ -3713,6 +3713,7 @@ class ExamApp:
                 layout = drag_handle["layout"]
                 span = layout["span"]
                 original_y = layout["clip_top"] + (y - layout["y0"]) / snippet_scale
+                original_y = max(layout["clip_top"], min(layout["clip_bottom"], original_y))
                 normalized = max(0.0, min(1.0, original_y / layout["page_height"]))
                 if drag_handle["edge"] == "top":
                     span["top"] = min(normalized, float(span["bottom"]) - 0.005)
@@ -3752,7 +3753,7 @@ class ExamApp:
         def save_structure():
             nonlocal original_structure_signature
             current = selected_fragment()
-            if current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
+            if not snippet_mode and current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
                 span = make_page_span(displayed_page, top_y, bottom_y)
                 current["page_spans"] = [span if int(x["page"]) == span["page"] else dict(x)
                                          for x in current["page_spans"]]
@@ -3796,6 +3797,7 @@ class ExamApp:
                                  if item.get("id") == fragment.get("id"))
                 fragment_tree.selection_set(str(new_index))
                 save_structure()
+                show_fragment()
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
         def update_page_span():
@@ -3880,7 +3882,7 @@ class ExamApp:
                 return
             frag["type"] = new_type
             frag["question_numbers"] = links
-            save_structure(); refresh_fragment_list()
+            save_structure(); refresh_fragment_list(); show_fragment()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
             fragment_tree.selection_remove(fragment_tree.selection())
