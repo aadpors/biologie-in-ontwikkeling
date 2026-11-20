@@ -353,6 +353,117 @@ def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.2
         doc.close()
     return output
 
+
+def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: float = 3.0) -> dict:
+    """Create a derived, footer-trimmed preview PDF without changing the source.
+
+    Original page 1 is omitted. Every remaining page is cropped to the last
+    meaningful body text/visual element above a detected footer, removing the
+    footer and the blank area beneath it. The returned map keeps original page
+    numbers and coordinate heights so fragment metadata remains source-based.
+    """
+    import fitz
+    from collections import Counter
+
+    source = fitz.open(source_path)
+    try:
+        if len(source) < 2:
+            raise ValueError("De opgaven-PDF bevat geen pagina's na het voorblad.")
+        page_rows = []
+        footer_counts = Counter()
+        for page_index in range(1, len(source)):
+            page = source[page_index]
+            height = float(page.rect.height)
+            raw = page.get_text("dict", sort=True)
+            lines = []
+            assets = []
+            for block in raw.get("blocks", []):
+                if block.get("type") == 0:
+                    for line in block.get("lines", []):
+                        text = "".join(span.get("text", "") for span in line.get("spans", [])).strip()
+                        if not text:
+                            continue
+                        bbox = line.get("bbox") or block.get("bbox") or [0, 0, 0, 0]
+                        normalized = re.sub(r"\s+", " ", text.lower()).strip()
+                        row = {"text": text, "normalized": normalized,
+                               "top": float(bbox[1]), "bottom": float(bbox[3])}
+                        lines.append(row)
+                        if row["top"] >= height * 0.76:
+                            footer_counts[normalized] += 1
+                elif block.get("type") == 1 and block.get("bbox"):
+                    assets.append([float(x) for x in block["bbox"]])
+            try:
+                for drawing in page.get_drawings():
+                    rect = drawing.get("rect")
+                    if rect and rect.width > 18 and rect.height > 12:
+                        assets.append([float(rect.x0), float(rect.y0),
+                                       float(rect.x1), float(rect.y1)])
+            except Exception:
+                pass
+            page_rows.append({"original_page": page_index + 1, "width": float(page.rect.width),
+                              "height": height, "lines": lines, "assets": assets})
+
+        footer_terms = re.compile(
+            r"(examenblad|college voor toetsen|cito|www\.|©|pagina\s*\d|tijdvak\s*\d)",
+            re.I,
+        )
+        mapping = []
+        preview = fitz.open()
+        try:
+            for row in page_rows:
+                height, width = row["height"], row["width"]
+                footer_lines = [
+                    line for line in row["lines"]
+                    if line["top"] >= height * 0.76 and (
+                        footer_counts[line["normalized"]] >= 2
+                        or footer_terms.search(line["text"])
+                        or (re.fullmatch(r"\d{1,3}", line["normalized"]) and line["top"] >= height * 0.88)
+                    )
+                ]
+                footer_top = min((line["top"] for line in footer_lines), default=None)
+                body_lines = [
+                    line for line in row["lines"]
+                    if footer_top is None or line["bottom"] <= footer_top + 1.0
+                ]
+                body_bottom = max((line["bottom"] for line in body_lines), default=0.0)
+                body_assets = [
+                    asset for asset in row["assets"]
+                    if footer_top is None or asset[1] < footer_top
+                ]
+                body_bottom = max(body_bottom, max((asset[3] for asset in body_assets), default=0.0))
+                if body_bottom < height * 0.45:
+                    # Sparse or image-only pages should not be aggressively cut.
+                    body_bottom = height * 0.90
+                cutoff = min(height, max(height * 0.55, body_bottom + float(padding)))
+                target = preview.new_page(width=width, height=cutoff)
+                clip = fitz.Rect(0, 0, width, cutoff)
+                target.show_pdf_page(target.rect, source, row["original_page"] - 1,
+                                     clip=clip, keep_proportion=False)
+                mapping.append({
+                    "original_page": row["original_page"],
+                    "preview_page": len(mapping) + 1,
+                    "width": width,
+                    "original_height": height,
+                    "preview_height": cutoff,
+                    "footer_detected": bool(footer_lines),
+                    "footer_text": [line["text"] for line in footer_lines],
+                    "footer_cutoff": footer_top,
+                })
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            preview.save(output_path, garbage=4, deflate=True)
+        finally:
+            preview.close()
+        return {
+            "path": str(output_path),
+            "source_sha256": digest_file(source_path),
+            "page_map": mapping,
+            "removed_first_page": True,
+            "method": "afgeleide preview; originele PDF ongewijzigd",
+        }
+    finally:
+        source.close()
+
+
 def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Path, scale: float=2.0):
     """Render a source PDF rectangle unchanged; coordinates are PDF points."""
     import pymupdf as fitz
