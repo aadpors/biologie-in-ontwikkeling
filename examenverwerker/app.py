@@ -756,22 +756,36 @@ class ExamApp:
             return
 
         state = exam_workflow_state(self.data)
-        # When opening an older project whose fragment boundaries are already
-        # complete, automatically create the new lightweight drafts once.
-        if state["stage"] == "vraagrecords" and not getattr(self, "_auto_creating_drafts", False):
-            self._auto_creating_drafts = True
-            try:
-                self._workflow_make_next_record(refresh_after=False)
-                state = exam_workflow_state(self.data)
-            finally:
-                self._auto_creating_drafts = False
+        # Once the teacher-confirmed fragment geometry is complete, create
+        # lightweight records automatically. This is not another fragment
+        # review step; the records are then used for the separate question analysis.
+        if state["stage"] == "vraaganalyse" and not getattr(self, "_auto_creating_drafts", False):
+            source_docs = [d for d in self.data.get("documenten", [])
+                           if d.get("type_voorstel") == "opgaven"]
+            missing = False
+            for doc in source_docs:
+                confirmed = [r for r in self.data.get("vraagkandidaten", [])
+                             if r.get("document_id") == doc.get("id")
+                             and r.get("human_decision") is True]
+                records = [r for r in self.data.get("vraagrecords", [])
+                           if r.get("candidate_document_id") == doc.get("id")]
+                if len(records) < len(confirmed):
+                    missing = True
+                    break
+            if missing:
+                self._auto_creating_drafts = True
+                try:
+                    self._workflow_make_next_record(refresh_after=False)
+                    state = exam_workflow_state(self.data)
+                finally:
+                    self._auto_creating_drafts = False
         actions = {
             "import": ("Examenbibliotheek tonen", self._show_exam_library),
             "documenttype": ("Documenttype bevestigen", self.correct_type),
             "metadata": ("Examengegevens bevestigen", self.edit_exam_metadata),
             "vraagstarts": ("Vraagstarts beoordelen", self.show_candidates),
             "opgaven_fragmenten": ("Context- en vraagfragmenten", self.edit_exam_structure),
-            "vraaganalyse": ("Vraagtype en punten controleren", self.show_candidates),
+            "vraaganalyse": ("Vraagtype en punten controleren", self.show_records),
             "uitwerkbijlage_starts": ("Uitwerkbijlage controleren", self.show_records),
             "uitwerkbijlage_fragmenten": ("Uitwerkbijlagefragmenten", self.show_records),
             "cv_starts": ("Correctievoorschrift controleren", self.show_records),
