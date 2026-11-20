@@ -3848,6 +3848,7 @@ class ExamApp:
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(fragments.index(updated)))
                 save_structure()
+                show_fragment()
             except Exception as exc:
                 messagebox.showerror("Paginagrens niet bijgewerkt", str(exc), parent=win)
         def append_page():
@@ -3866,6 +3867,7 @@ class ExamApp:
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(fragments.index(updated)))
                 save_structure()
+                show_fragment()
             except Exception as exc:
                 messagebox.showerror("Pagina niet toegevoegd", str(exc), parent=win)
         def delete_fragment():
@@ -3873,7 +3875,15 @@ class ExamApp:
             if not sel: return
             index = int(sel[0])
             if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
-            fragments.pop(index); refresh_fragment_list(); save_structure()
+            fragments.pop(index)
+            refresh_fragment_list()
+            save_structure()
+            if fragments:
+                next_index = min(index, len(fragments) - 1)
+                fragment_tree.selection_set(str(next_index))
+                load_selected_fragment()
+            else:
+                show_page()
         def load_selected_fragment(_event=None):
             frag = selected_fragment()
             if frag:
