@@ -529,17 +529,19 @@ def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, s
                 continue
             normalized.append((page_no-1,rect))
             width=max(width,rect.width)
-            total_height += rect.height + 12.0
+            total_height += rect.height
+        total_height += 12.0 * max(0, len(normalized) - 1)
         if not normalized:
             raise ValueError("De opgegeven fragmenten bevatten geen zichtbaar paginagebied.")
         output_doc=fitz.open()
         try:
-            target_page=output_doc.new_page(width=width,height=max(100.0,total_height))
+            target_page=output_doc.new_page(width=width,height=max(10.0,total_height))
             y=0.0
-            for page_index,clip in normalized:
+            for index, (page_index,clip) in enumerate(normalized):
                 target=fitz.Rect(0,y,clip.width,y+clip.height)
                 target_page.show_pdf_page(target,source,page_index,clip=clip,keep_proportion=False)
-                y += clip.height + 12.0
+                if index < len(normalized) - 1:
+                    y += clip.height + 12.0
             pix=target_page.get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
             output.parent.mkdir(parents=True,exist_ok=True)
             pix.save(output)
