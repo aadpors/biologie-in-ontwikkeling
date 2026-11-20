@@ -84,6 +84,11 @@ class ExamWorkflowTests(unittest.TestCase):
         data["vraagkandidaten"][0]["human_decision"] = None
         self.assertEqual(exam_workflow_state(data)["stage"], "vraagstarts")
 
+    def test_all_rejected_starts_require_manual_addition_before_fragments(self):
+        data = project()
+        data["vraagkandidaten"][0]["human_decision"] = False
+        self.assertEqual(exam_workflow_state(data)["stage"], "ontbrekende_vragen")
+
     def test_confirmed_question_requires_question_and_context_fragments(self):
         self.assertEqual(exam_workflow_state(project())["stage"], "opgaven_fragmenten")
 
