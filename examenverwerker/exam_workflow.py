@@ -16,7 +16,7 @@ from structure import (
 
 
 WORKFLOW_STAGES = (
-    "import", "documenttype", "metadata", "vraagstarts", "opgaven_fragmenten",
+    "import", "documenttype", "metadata", "vraagstarts", "ontbrekende_vragen", "opgaven_fragmenten",
     "vraaganalyse", "uitwerkbijlage_starts", "uitwerkbijlage_fragmenten",
     "cv_starts", "cv_fragmenten", "aanvulling", "antwoorden",
     "volledigheid", "snippets", "eindcontrole", "export", "voltooid",
@@ -237,7 +237,12 @@ def exam_workflow_state(data: dict) -> dict:
                            document_id=doc.get("id"), open_candidates=open_count)
 
     for doc in opgaven_docs:
-        numbers = sorted({int(r["number"]) for r in _confirmed_candidates(data, doc.get("id"))
+        confirmed_rows = _confirmed_candidates(data, doc.get("id"))
+        if not confirmed_rows:
+            return _result("ontbrekende_vragen", "Ontbrekende vraagstarts toevoegen",
+                           "Er zijn geen vraagstarts bevestigd. Markeer de echte vraagstarts handmatig op de originele PDF.",
+                           document_id=doc.get("id"))
+        numbers = sorted({int(r["number"]) for r in confirmed_rows
                           if r.get("number") is not None})
         structure = _structure_for(data, doc)
         errors = (validate_exam_structure(structure, doc.get("id"), doc.get("sha256"), numbers)
