@@ -1,3 +1,12 @@
+## 0.16.0
+- Het hoofdvenster is nu uitsluitend de examenbibliotheek: examens filteren op vak, niveau, jaar, tijdvak en archiefstatus.
+- Elk examen opent in een eigen verwerkingsvenster. De bibliotheek blijft beschikbaar en kan meerdere openstaande examens beheren.
+- De volledige bestaande PDF-werkruimte en de bewerkingsfuncties zijn naar het afzonderlijke verwerkingsvenster verplaatst.
+- Een verwerkingsvenster slaat het project op bij sluiten; bij afsluiten van de applicatie worden alle geopende projecten eerst opgeslagen.
+- Examens kunnen vanuit de bibliotheek worden gearchiveerd of naar een herstelbare verwijdermap worden verplaatst.
+- Na import wordt het eerste nieuwe examen in een afzonderlijk verwerkingsvenster geopend.
+- Regressietests toegevoegd voor de scheiding tussen bibliotheek en verwerkingsvenster.
+
 ## 0.15.0
 - De basisapplicatie is vakneutraal gemaakt; bij import kiest de gebruiker het vak.
 - Projectmappen voor andere vakken krijgen een vaknaam, zodat ze niet botsen met biologieprojecten.
