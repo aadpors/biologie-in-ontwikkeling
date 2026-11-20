@@ -875,6 +875,99 @@ def validate_website_records(mcq: list, opened: list, contexts: list) -> list[di
         keys.add(key)
     return errors
 
+def build_consolidated_cv_pdf(entries: list[dict], snippets_dir: Path,
+                               output_path: Path, metadata: dict | None = None) -> dict:
+    """Create a derived, question-ordered CV PDF without changing source PDFs."""
+    import io
+    import pymupdf as fitz
+    from PIL import Image
+
+    if not entries:
+        raise ValueError("Er zijn geen vraagfragmenten voor het geconsolideerde CV.")
+    output_path=Path(output_path)
+    output_path.parent.mkdir(parents=True,exist_ok=True)
+    result=fitz.open()
+    labels={
+        "ongewijzigd":"Ongewijzigd · oorspronkelijke beoordelingsinformatie",
+        "toevoeging":"Toevoeging uit de officiële CV-aanvulling",
+        "wijziging":"Gewijzigde beoordelingsinformatie uit de officiële aanvulling",
+        "vervanging":"Geldende vervanging uit de officiële CV-aanvulling",
+        "intrekking":"INGETROKKEN · oorspronkelijke beoordelingsinformatie niet meer toepassen",
+    }
+    try:
+        for entry in sorted(entries,key=lambda item:int(item.get("question_number",0) or 0)):
+            number=int(entry.get("question_number",0) or 0)
+            change=entry.get("change_type") or "ongewijzigd"
+            original=Path(snippets_dir)/str(entry.get("original_region_file") or "")
+            if not original.is_file():
+                raise ValueError(f"Vraag {number}: oorspronkelijk CV-fragment ontbreekt.")
+            if change=="vervanging":
+                components=[("Oorspronkelijke tekst · vervangen",original)]
+            elif change=="intrekking":
+                components=[(labels[change],original)]
+            else:
+                components=[(labels.get(change,"Oorspronkelijke beoordelingsinformatie"),original)]
+            amendment_items=entry.get("amendment_regions") or []
+            for amendment in amendment_items:
+                amendment_path=Path(snippets_dir)/str(amendment.get("snippet_file") or "")
+                if not amendment_path.is_file():
+                    raise ValueError(f"Vraag {number}: CV-aanvullingsfragment ontbreekt.")
+                if change=="vervanging":
+                    amendment_label="GELDENDE VERVANGING"
+                elif change=="intrekking":
+                    amendment_label="Officiële intrekking / toelichting"
+                elif change=="toevoeging":
+                    amendment_label="Toegevoegde beoordelingsinformatie"
+                else:
+                    amendment_label="Aanvullende wijzigingsinformatie"
+                components.append((amendment_label,amendment_path))
+            if change=="vervanging" and len(components)==1:
+                raise ValueError(f"Vraag {number}: vervanging is geclassificeerd, maar het vervangende fragment ontbreekt.")
+            if change in ("toevoeging","wijziging") and len(components)==1:
+                raise ValueError(f"Vraag {number}: wijziging is geclassificeerd, maar het aanvullingsfragment ontbreekt.")
+            for component_label,image_path in components:
+                with Image.open(image_path) as opened:
+                    image=opened.convert("RGB")
+                    width,height=image.size
+                    max_slice_height=max(1,int(width*1.38))
+                    slices=max(1,(height+max_slice_height-1)//max_slice_height)
+                    for slice_index in range(slices):
+                        top=slice_index*max_slice_height
+                        bottom=min(height,top+max_slice_height)
+                        crop=image.crop((0,top,width,bottom))
+                        buffer=io.BytesIO()
+                        crop.save(buffer,format="PNG")
+                        image_bytes=buffer.getvalue()
+                        page=result.new_page(width=595,height=842)
+                        page.insert_text((34,30),f"Correctievoorschrift · vraag {number}",
+                                         fontsize=14,fontname="helv")
+                        page.insert_text((34,49),component_label,fontsize=9,fontname="helv")
+                        available=fitz.Rect(34,62,561,805)
+                        scale=min(available.width/crop.width,available.height/crop.height)
+                        image_width=crop.width*scale
+                        image_height=crop.height*scale
+                        rect=fitz.Rect((595-image_width)/2,72,
+                                       (595+image_width)/2,72+image_height)
+                        page.insert_image(rect,stream=image_bytes,keep_proportion=True)
+                        page.insert_text((34,826),
+                            f"Bronfragment: {image_path.name} · deel {slice_index+1}/{slices}",
+                            fontsize=7,fontname="helv")
+                        crop.close()
+                    image.close()
+        meta=metadata or {}
+        result.set_metadata({
+            "title":f"Geconsolideerd correctievoorschrift {meta.get('level','')} {meta.get('year','')}",
+            "author":"Examenverwerker",
+            "subject":f"Tijdvak {meta.get('period','')} · afgeleid document",
+            "keywords":"geconsolideerd correctievoorschrift; bronfragmenten; traceerbaarheid",
+        })
+        result.save(output_path,garbage=4,deflate=True)
+    finally:
+        result.close()
+    return {"path":str(output_path),"sha256":digest_file(output_path),
+            "page_count":len(fitz.open(output_path))}
+
+
 def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
     """Return blockers before a human can explicitly approve a draft question."""
     required=["question_text","question_type","points","cv_alignment","images_and_context","appendices","cv_addenda"]
