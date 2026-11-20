@@ -292,14 +292,28 @@ def propose_context_fragments(analysis: dict, candidates: list[dict]) -> list[di
         for index, cluster in enumerate(clusters, 1):
             if cluster["bottom"] - cluster["top"] < 12:
                 continue
-            same_page = [row for row in anchors if int(row.get("page", 0)) == page_no]
-            preceding = [row for row in same_page
-                         if float((row.get("bbox") or [0, 0])[1]) <= cluster["bottom"]]
-            if preceding:
-                linked = max(preceding, key=lambda row: float((row.get("bbox") or [0, 0])[1]))
+            # A context before a question normally introduces that next
+            # question, not the preceding one. If it lies inside a question,
+            # associate it with the latest preceding anchor instead.
+            cluster_start = (page_no, float(cluster["top"]))
+            following = [
+                row for row in anchors
+                if (int(row.get("page", 0)),
+                    float((row.get("bbox") or [0, 0])[1])) >= cluster_start
+            ]
+            if following:
+                linked = min(following, key=lambda row: (
+                    int(row.get("page", 0)), float((row.get("bbox") or [0, 0])[1])
+                ))
             else:
-                following = [row for row in anchors if int(row.get("page", 0)) > page_no]
-                linked = min(following, key=lambda row: int(row.get("page", 0))) if following else anchors[-1]
+                preceding = [
+                    row for row in anchors
+                    if (int(row.get("page", 0)),
+                        float((row.get("bbox") or [0, 0])[1])) < cluster_start
+                ]
+                linked = max(preceding, key=lambda row: (
+                    int(row.get("page", 0)), float((row.get("bbox") or [0, 0])[1])
+                )) if preceding else anchors[0]
             top = max(0.0, min(1.0, cluster["top"] / page_height))
             bottom = max(0.0, min(1.0, cluster["bottom"] / page_height))
             if bottom - top < 0.005:
