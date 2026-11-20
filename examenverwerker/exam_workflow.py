@@ -267,6 +267,11 @@ def exam_workflow_state(data: dict) -> dict:
 
     appendix_docs = _documents(data, "uitwerkbijlage")
     for doc in appendix_docs:
+        if (doc.get("vraagstarts_detectie") or {}).get("status") != "visueel_bevestigd":
+            return _result("uitwerkbijlage_starts", "Vraagstarts uitwerkbijlage controleren",
+                           "Detecteer en beoordeel de vraagankers in de uitwerkbijlage; bevestig expliciet wanneer er geen aparte ankers zijn.",
+                           document_id=doc.get("id"))
+    for doc in appendix_docs:
         # Question numbering is inherited from the already confirmed opgaven
         # list; the user visually maps each corresponding appendix answer region
         # in the same crop editor, avoiding a second, unrelated question list.
@@ -285,6 +290,11 @@ def exam_workflow_state(data: dict) -> dict:
         return _result("cv_starts", "Correctievoorschrift toevoegen",
                        "Voeg het officiële correctievoorschrift toe en bevestig het documenttype.")
     cv_regions = data.get("cv_regions") or {}
+    for doc in cv_docs:
+        if (doc.get("vraagstarts_detectie") or {}).get("status") != "visueel_bevestigd":
+            return _result("cv_starts", "Vraagstarts correctievoorschrift controleren",
+                           "Detecteer en beoordeel de vraagankers in het correctievoorschrift; bevestig expliciet wanneer er geen aparte ankers zijn.",
+                           document_id=doc.get("id"))
     for doc in cv_docs:
         for _source_doc, candidate in all_candidates:
             number = int(candidate["number"])
