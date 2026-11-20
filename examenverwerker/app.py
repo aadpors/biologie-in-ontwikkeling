@@ -3826,14 +3826,12 @@ class ExamApp:
                         px_per_point = gray.height / max(1.0, float(page_height))
                         y0 = max(0, min(gray.height - 1, int(clip_top * px_per_point)))
                         y1 = max(y0 + 1, min(gray.height, int(clip_bottom * px_per_point)))
-                        ink_rows = []
-                        for row_y in range(y0, y1):
-                            row = gray.crop((0, row_y, gray.width, row_y + 1))
-                            if row.getextrema()[0] < 247:
-                                ink_rows.append(row_y)
-                        if ink_rows:
-                            clip_top = max(0.0, (ink_rows[0] / px_per_point) - 1.5)
-                            clip_bottom = min(preview_height, ((ink_rows[-1] + 1) / px_per_point) + 1.5)
+                        ink_bbox = gray.crop((0, y0, gray.width, y1)).point(
+                            lambda value: 255 if value < 247 else 0
+                        ).getbbox()
+                        if ink_bbox:
+                            clip_top = max(0.0, ((y0 + ink_bbox[1]) / px_per_point) - 1.5)
+                            clip_bottom = min(preview_height, ((y0 + ink_bbox[3]) / px_per_point) + 1.5)
                 except Exception as crop_error:
                     self._log(f"Witruimtedetectie voor fragment op pagina {original_page} overgeslagen: {crop_error}")
                 if clip_bottom - clip_top < 4:
