@@ -7,6 +7,7 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(classify_document_role("ha-1018-a-24-1-o-spr.pdf","")[0],"opgaven")
         self.assertEqual(classify_document_role("ha-1018-a-26-1-c.pdf","")[0],"correctievoorschrift")
         self.assertEqual(classify_document_role("ha-1018-a-26-1-c-a1_0.pdf","")[0],"aanvulling")
+        self.assertEqual(classify_document_role("ha-1018-a-26-1-a.pdf","")[0],"aanvulling")
         self.assertEqual(classify_document_role("ha-1018-a-25-1-u.pdf","")[0],"uitwerkbijlage")
         self.assertEqual(infer_exam_metadata("ha-1018-a-24-1-o-spr.pdf")["level"],"Havo")
         self.assertEqual(infer_exam_metadata("vw-1018-a-26-2-o.pdf")["year"],"2026")
