@@ -4257,6 +4257,8 @@ class ExamApp:
             self._review_simple_question_draft(record,win)
         def edit_question_structure():
             self._return_to_final_review=return_to_same_question
+            self._workspace_doc_id=record.get("candidate_document_id")
+            self._workspace_refresh()
             self._structure_focus_question_number=int(record.get("number",0) or 0)
             self.edit_exam_structure()
         def edit_cv_region(role):
