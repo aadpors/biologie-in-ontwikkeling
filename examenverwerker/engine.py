@@ -958,6 +958,72 @@ def compare_question_numbering(opgaven: list[dict], cv: list[dict]) -> dict:
     }
 
 
+def question_fragment_boundary(analysis: dict[str, Any], candidate: dict,
+                                next_candidate: dict | None = None) -> tuple[int, float, str]:
+    """Find the first blank-line or horizontal frame boundary after a question start.
+
+    The next confirmed question start is a safety cap, not the primary boundary.
+    Coordinates are returned in PDF points.
+    """
+    pages = {int(page["page"]): page for page in analysis.get("pages", [])}
+    start_page = int(candidate.get("page", 1))
+    start_bbox = candidate.get("bbox") or [0, 0, 0, 0]
+    start_y = max(0.0, float(start_bbox[1]) - 2.0)
+    cap_page = int(next_candidate["page"]) if next_candidate else max(pages, default=start_page)
+    cap_y = float((next_candidate.get("bbox") or [0, 0, 0, 0])[1]) if next_candidate else None
+
+    for page_no in range(start_page, cap_page + 1):
+        page = pages.get(page_no)
+        if not page:
+            continue
+        height = float(page.get("height", 0) or 0)
+        width = float(page.get("width", 0) or 0)
+        lines = []
+        for block in page.get("blocks", []):
+            for line in block.get("lines", []):
+                bbox = line.get("bbox") or block.get("bbox") or [0, 0, 0, 0]
+                if len(bbox) != 4 or not str(line.get("text", "")).strip():
+                    continue
+                y0, y1 = float(bbox[1]), float(bbox[3])
+                if page_no == start_page and y1 <= start_y:
+                    continue
+                if page_no == cap_page and cap_y is not None and y0 >= cap_y:
+                    continue
+                lines.append((y0, y1))
+        lines.sort()
+        heights = sorted(max(1.0, bottom - top) for top, bottom in lines)
+        median_height = heights[len(heights) // 2] if heights else 10.0
+        blank_gap = max(9.0, median_height * 1.65)
+
+        # A thin, page-wide vector line is treated as a printed frame divider.
+        frame_ys = []
+        for asset in page.get("visual_assets", []):
+            if asset.get("kind") != "vector_region":
+                continue
+            x0, y0, x1, y1 = map(float, asset.get("bbox", [0, 0, 0, 0]))
+            if width and (x1 - x0) >= width * 0.72 and 0.5 <= (y1 - y0) <= 6.0:
+                if (page_no > start_page or y0 > start_y) and (
+                    page_no < cap_page or cap_y is None or y0 < cap_y
+                ):
+                    frame_ys.append(y0)
+        first_frame = min(frame_ys) if frame_ys else None
+
+        previous_bottom = start_y if page_no == start_page else 0.0
+        for line_top, line_bottom in lines:
+            if line_top - previous_bottom >= blank_gap:
+                boundary = (line_top + previous_bottom) / 2.0
+                if first_frame is not None and first_frame < boundary:
+                    return page_no, first_frame, "kader"
+                return page_no, boundary, "witregel"
+            previous_bottom = max(previous_bottom, line_bottom)
+        if first_frame is not None:
+            return page_no, first_frame, "kader"
+
+    if next_candidate:
+        return cap_page, max(0.0, cap_y or 0.0), "volgende_vraagstart"
+    return max(pages, default=start_page), float(pages.get(max(pages, default=start_page), {}).get("height", 0.0)), "pagina-einde"
+
+
 def propose_question_regions(analysis: dict, candidates: list[dict]) -> list[dict]:
     """Propose per-question page regions, split by page; proposals are never approved."""
     pages = {int(p["page"]): p for p in analysis.get("pages", [])}
