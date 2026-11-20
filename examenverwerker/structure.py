@@ -5,16 +5,18 @@ from copy import deepcopy
 from typing import Any
 
 STRUCTURE_SCHEMA = "biologie-examenstructuur-v1"
-FRAGMENT_TYPES = {"intro", "tussen_context", "vraag"}
+FRAGMENT_TYPES = {"context", "vraag"}
 LEGACY_FRAGMENT_TYPES = {
-    "context_intro": "intro",
-    "vraagcontext": "tussen_context",
-    "tussenliggende_context": "tussen_context",
+    "intro": "context",
+    "context_intro": "context",
+    "tussen_context": "context",
+    "vraagcontext": "context",
+    "tussenliggende_context": "context",
 }
 
 
 def canonical_fragment_type(fragment_type: str) -> str:
-    """Map historical fragment labels to the three current, user-facing types."""
+    """Map historical labels to the two current, user-facing fragment types."""
     value = str(fragment_type or "")
     return LEGACY_FRAGMENT_TYPES.get(value, value)
 
@@ -49,8 +51,9 @@ def default_question_links(fragment_type: str, confirmed_question_numbers: list[
     fragment_type = canonical_fragment_type(fragment_type)
     if fragment_type not in FRAGMENT_TYPES:
         raise ValueError("Onbekend fragmenttype.")
-    numbers = sorted({int(n) for n in confirmed_question_numbers})
-    return numbers if fragment_type == "intro" else []
+    # Context scope is explicit; callers decide whether it applies to all
+    # questions or only a selected subset.
+    return []
 
 
 def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[int],
@@ -62,8 +65,6 @@ def make_fragment(fragment_type: str, page_span: dict, question_numbers: list[in
     links = sorted({int(n) for n in question_numbers})
     if any(n not in confirmed for n in links):
         raise ValueError("Een fragment mag alleen aan bevestigde vraagstarts worden gekoppeld.")
-    if fragment_type == "intro" and not links:
-        links = default_question_links(fragment_type, confirmed)
     if fragment_type == "vraag" and len(links) != 1:
         raise ValueError("Een vraagfragment moet aan precies één bevestigd vraagnummer gekoppeld zijn.")
     if fragment_type != "vraag" and not links:
@@ -172,7 +173,7 @@ def fragments_for_question(structure: dict | None, question_number: int) -> dict
     linked = [fragment for fragment in structure.get("fragments", [])
               if number in [int(x) for x in fragment.get("question_numbers", [])]]
     question = next((x for x in linked if x.get("type") == "vraag"), None)
-    contexts = [x for x in linked if canonical_fragment_type(x.get("type", "")) in {"intro", "tussen_context"}]
+    contexts = [x for x in linked if canonical_fragment_type(x.get("type", "")) == "context"]
     return {
         "question_fragment": question,
         "context_fragments": contexts,
@@ -264,7 +265,7 @@ def missing_question_regions(structure: dict | None, question_numbers: list[int]
 
 def sort_fragments_reading_order(fragments: list[dict]) -> list[dict]:
     """Return a stable copy of fragments in top-to-bottom PDF reading order."""
-    type_order = {"intro": 0, "tussen_context": 1, "vraag": 2}
+    type_order = {"context": 0, "vraag": 1}
     def key(fragment):
         spans = sorted(fragment.get("page_spans", []), key=lambda item: int(item.get("page", 0)))
         first = spans[0] if spans else {}
@@ -278,7 +279,8 @@ def trim_question_bands_for_contexts(fragments: list[dict]) -> list[dict]:
     """Stop the immediately preceding question band where next-question context begins."""
     result = deepcopy(fragments)
     contexts = [item for item in result
-                if canonical_fragment_type(item.get("type", "")) == "tussen_context"]
+                if canonical_fragment_type(item.get("type", "")) == "context"
+                and item.get("context_role") != "introductie"]
     questions = [item for item in result
                  if canonical_fragment_type(item.get("type", "")) == "vraag"]
     for context in contexts:
