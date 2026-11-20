@@ -55,7 +55,22 @@ def extract_pdf(path: Path):
     pages = []
     for index, page in enumerate(doc):
         text = page.get_text("text", sort=True)
-        pages.append({"pagina": index + 1, "tekst": text, "tekens": len(text.strip()), "ocr_nodig": len(text.strip()) < 20})
+        ocr_used=False
+        # The document-property step needs only the first page. Attempt OCR
+        # there only when its embedded text layer is absent or unusable.
+        if index==0 and len(text.strip())<20:
+            for language in ("nld+eng","eng"):
+                try:
+                    textpage=page.get_textpage_ocr(language=language,dpi=200,full=True)
+                    candidate=page.get_text("text",textpage=textpage,sort=True)
+                    if len(candidate.strip())>len(text.strip()):
+                        text=candidate
+                        ocr_used=True
+                        break
+                except Exception:
+                    continue
+        pages.append({"pagina": index + 1, "tekst": text, "tekens": len(text.strip()),
+                      "ocr_nodig": len(text.strip()) < 20, "ocr_gebruikt": ocr_used})
     meta = doc.metadata or {}
     result = {"pagina_aantal": len(doc), "metadata": meta, "pagina_tekst": pages}
     doc.close()
