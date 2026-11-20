@@ -432,6 +432,32 @@ class EngineTests(unittest.TestCase):
                 self.assertIn("dominant overerft", page_text)
                 self.assertEqual(page_text.count("biologie | examen 2026"), 1)
 
+    def test_sentence_mentioning_page_number_is_not_mistaken_for_footer(self):
+        import pymupdf as fitz
+        from engine import prepare_exam_preview_pdf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            doc = fitz.open()
+            cover = doc.new_page(width=600, height=800)
+            cover.insert_text((60, 120), "Voorblad")
+            page = doc.new_page(width=600, height=800)
+            page.insert_text((60, 120), "Vraag 1")
+            page.insert_text(
+                (60, 760),
+                "De pagina 2 laat zien hoe deze eigenschap dominant overerft.",
+            )
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertFalse(result["page_map"][0]["footer_detected"])
+            with fitz.open(preview) as cleaned:
+                page_text = cleaned[0].get_text("text").lower()
+                self.assertIn("pagina 2", page_text)
+                self.assertIn("dominant overerft", page_text)
+
     def test_vwo_2026_ii_question_one_and_final_overerft_line_survive_preview(self):
         import pymupdf as fitz
         from engine import prepare_exam_preview_pdf
