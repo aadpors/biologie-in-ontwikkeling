@@ -1096,14 +1096,18 @@ class ExamApp:
             fragment = linked[row.get("id")]
             segments = page_spans_to_segments(fragment["page_spans"], page_sizes)
             snippet_text = extract_region_text(source_path, segments)
-            if not snippet_text.strip():
-                raise ValueError(
-                    f"Vraag {row.get('number')}: het gekozen vraagfragment bevat geen leesbare tekst. "
-                    "Pas zo nodig de fragmentgrenzen aan."
-                )
             row["vraagtekst_voorstel"] = snippet_text
-            row["vraagtype_controle"] = detect_question_type(snippet_text)
-            row["vraagtype_status"] = "automatisch_bepaald_controle_nodig"
+            if snippet_text.strip():
+                row["vraagtype_controle"] = detect_question_type(snippet_text)
+                row["vraagtype_status"] = "automatisch_bepaald_controle_nodig"
+            else:
+                row["vraagtype_controle"] = {
+                    "type": "onbekend", "subtype": "geen_tekst_in_fragment",
+                    "options": [], "option_labels": [], "options_complete": None,
+                    "option_gaps": [], "duplicate_option_labels": [],
+                    "confidence": 0.0, "status": "alleen_visueel_te_bepalen",
+                }
+                row["vraagtype_status"] = "visuele_controle_nodig"
             row["vraagtype_bepaald_na_fragmentcontrole"] = True
             row["vraagtype_fragment_id"] = fragment.get("id")
         self.save_project()
@@ -1150,7 +1154,15 @@ class ExamApp:
             segments = page_spans_to_segments(question_fragment["page_spans"], page_sizes)
             snippet_text = extract_region_text(source_path, segments)
             row["vraagtekst_voorstel"] = snippet_text or row.get("vraagtekst_voorstel", "")
-            row["vraagtype_controle"] = detect_question_type(row["vraagtekst_voorstel"])
+            row["vraagtype_controle"] = (
+                detect_question_type(row["vraagtekst_voorstel"])
+                if row["vraagtekst_voorstel"].strip() else {
+                    "type": "onbekend", "subtype": "geen_tekst_in_fragment",
+                    "options": [], "option_labels": [], "options_complete": None,
+                    "option_gaps": [], "duplicate_option_labels": [],
+                    "confidence": 0.0, "status": "alleen_visueel_te_bepalen",
+                }
+            )
             row["vraagtype_fragment_id"] = question_fragment.get("id")
             row["vraagtype_status"] = "controle_nodig"
             self.save_project()
