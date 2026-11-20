@@ -25,6 +25,7 @@ def classify_document_role(filename: str, text: str):
             for kind,terms in DOC_ROLE_TERMS.items()}
     if re.search(r"-(?:o)(?:-|\.pdf$)",lower): scores["opgaven"]+=3
     if re.search(r"-(?:c)(?:-|\.pdf$)",lower): scores["correctievoorschrift"]+=3
+    if re.search(r"-(?:a)(?:-|\.pdf$)",lower): scores["aanvulling"]+=5
     if re.search(r"-(?:c)-a\d",lower): scores["aanvulling"]+=5
     if re.search(r"-(?:u)(?:-|\.pdf$)",lower): scores["uitwerkbijlage"]+=3
     if "uitwerkbijlage" in lower or "uitwerkbijlage" in hay: scores["uitwerkbijlage"]+=5
