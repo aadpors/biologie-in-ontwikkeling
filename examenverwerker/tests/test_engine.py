@@ -331,6 +331,18 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(extract_candidate_text(analysis,first,second),"1.\nGebruik figuur 2.")
 
 
+    def test_context_proposals_never_use_page_one(self):
+        analysis = {"pages": [{
+            "page": 1, "width": 600, "height": 800,
+            "blocks": [], "visual_assets": [
+                {"id": "cover-image", "kind": "image", "bbox": [60, 150, 300, 300]}
+            ]
+        }]}
+        candidates = [
+            {"number": 1, "page": 2, "bbox": [40, 40, 80, 65], "human_decision": True}
+        ]
+        self.assertEqual(propose_context_fragments(analysis, candidates), [])
+
     def test_between_context_before_next_question_links_to_that_question(self):
         analysis = {"pages": [{
             "page": 2, "width": 600, "height": 800,
