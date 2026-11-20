@@ -207,7 +207,7 @@ def exam_workflow_state(data: dict) -> dict:
         return _result("import", "Documenten toevoegen", "Importeer de examen-PDF's.")
 
     unconfirmed_types = [d for d in documents if d.get("type_voorstel") in
-                         ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling")
+                         ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling", "onbekend")
                          and not _document_type_confirmed(d)]
     if unconfirmed_types:
         return _result("documenttype",
