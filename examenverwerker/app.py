@@ -94,7 +94,24 @@ class ExamApp:
         self._welcome()
 
     def _migrate_legacy_user_data(self, app_base):
-        """Copy legacy in-folder projects once; never move or delete originals."""
+        """Copy legacy projects and learning data once; never move/delete originals."""
+        legacy_knowledge = Path(app_base) / "kennisbank"
+        if legacy_knowledge.is_dir():
+            for original in legacy_knowledge.rglob("*"):
+                if not original.is_file():
+                    continue
+                duplicate = self.user_knowledge_root / original.relative_to(legacy_knowledge)
+                if duplicate.exists():
+                    continue
+                try:
+                    duplicate.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(original, duplicate)
+                    if sha256(original) != sha256(duplicate):
+                        duplicate.unlink(missing_ok=True)
+                        raise IOError(f"Integriteitscontrole mislukt: {original.name}")
+                    self._migration_log(f"Leerbankbestand veilig gekopieerd: {duplicate.name}")
+                except Exception as exc:
+                    self._migration_log(f"Leerbankmigratie overgeslagen voor {original}: {exc}")
         legacy_roots = [Path(app_base) / "projecten"]
         for legacy_root in legacy_roots:
             if not legacy_root.is_dir():
