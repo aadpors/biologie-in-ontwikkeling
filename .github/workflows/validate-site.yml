@@ -162,3 +162,13 @@ jobs:
           exit 1
       - name: Exercise the old exam route in Chromium
         run: node tests/examenoefenen-browser-test.cjs
+      - name: Test homepage search, filters and responsive layout in Chromium
+        run: node tests/homepage-browser-test.cjs
+      - name: Upload homepage screenshots for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-search-filter-browser-review
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 7
