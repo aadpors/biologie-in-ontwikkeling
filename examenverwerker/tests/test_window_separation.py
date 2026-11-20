@@ -33,6 +33,12 @@ class ExamWindowSeparationTests(unittest.TestCase):
         source = inspect.getsource(ExamApp.import_year_set)
         self.assertIn("self._launch_workspace(created[0])", source)
 
+    def test_workspace_can_return_to_the_library_without_reopening_it(self):
+        source = inspect.getsource(ExamApp._build_workspace)
+        self.assertIn("Examenbibliotheek tonen", source)
+        self.assertIn("self._show_exam_library", source)
+        self.assertNotIn("＋ Examens importeren", source)
+
 
 if __name__ == "__main__":
     unittest.main()
