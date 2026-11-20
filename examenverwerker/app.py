@@ -3935,7 +3935,7 @@ class ExamApp:
         ttk.Label(amendment_row,text="Wijziging door CV-aanvulling").pack(side="left")
         amendment_change_var=tk.StringVar(value=record.get("cv_amendment_change_type",""))
         ttk.Combobox(amendment_row,textvariable=amendment_change_var,
-            values=["niet van toepassing","toevoeging","wijziging","vervanging","intrekking","ongewijzigd"],
+            values=["toevoeging","wijziging","vervanging","intrekking","ongewijzigd"],
             state="readonly",width=24).pack(side="left",padx=8)
         contexts=record.get("context_fragments",[])
         context_text="\n\n".join(
