@@ -34,9 +34,9 @@ class StructureTests(unittest.TestCase):
         self.assertEqual(FRAGMENT_TYPES, {"context", "vraag"})
         legacy = [
             {"id": "a", "type": "intro", "question_numbers": [1, 2, 4]},
-            {"id": "b", "type": "context", "question_numbers": [1]},
-            {"id": "c", "type": "context", "question_numbers": [1]},
-            {"id": "d", "type": "context", "question_numbers": [2]},
+            {"id": "b", "type": "context_intro", "question_numbers": [1]},
+            {"id": "c", "type": "vraagcontext", "question_numbers": [1]},
+            {"id": "d", "type": "tussen_context", "question_numbers": [2]},
             {"id": "e", "type": "tussenliggende_context", "question_numbers": [2]},
         ]
         migrated = normalize_fragments(legacy)
@@ -51,8 +51,8 @@ class StructureTests(unittest.TestCase):
     def test_fragments_are_sorted_in_source_reading_order(self):
         fragments = [
             make_fragment("vraag", make_page_span(3, 0.1, 0.8), [2], self.questions, "q2"),
-            make_fragment("vraagcontext", make_page_span(2, 0.2, 0.4), [2], self.questions, "ctx2"),
-            make_fragment("context_intro", make_page_span(2, 0.0, 0.15), self.questions, self.questions, "intro"),
+            make_fragment("context", make_page_span(2, 0.2, 0.4), [2], self.questions, "ctx2"),
+            make_fragment("context", make_page_span(2, 0.0, 0.15), self.questions, self.questions, "intro"),
             make_fragment("vraag", make_page_span(2, 0.15, 0.2), [1], self.questions, "q1"),
         ]
         ordered = sort_fragments_reading_order(fragments)
@@ -63,7 +63,7 @@ class StructureTests(unittest.TestCase):
             make_fragment("vraag", make_page_span(1, 0.1, 1.0), [1], self.questions, "q1"),
             make_fragment("vraag", make_page_span(2, 0.0, 1.0), [2], self.questions, "q2"),
             make_fragment("vraag", make_page_span(3, 0.0, 1.0), [4], self.questions, "q4"),
-            make_fragment("tussen_context", make_page_span(2, 0.3, 0.55), [4], self.questions, "ctx4"),
+            make_fragment("context", make_page_span(2, 0.3, 0.55), [4], self.questions, "ctx4"),
         ]
         trimmed = trim_question_bands_for_contexts(fragments)
         by_id = {x["id"]: x for x in trimmed}
