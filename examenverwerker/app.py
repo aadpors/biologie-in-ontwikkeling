@@ -3478,11 +3478,43 @@ class ExamApp:
             messagebox.showinfo("Geen project","Open eerst een examenproject."); return
         records=self.data.get("vraagrecords",[])
         if not records:
-            messagebox.showinfo("Geen vraagrecords","Maak eerst concept-vraagrecords vanuit bevestigde vraagstarts."); return
+            messagebox.showinfo("Geen vraagrecords","Rond eerst de fragmentselectie af zodat conceptvragen worden aangemaakt."); return
         destination=filedialog.askdirectory(title="Kies een nieuwe, lege exportmap")
         if not destination: return
         try:
-            result=export_approved_records(records,self.project_dir,Path(destination))
+            export_dir=Path(destination)
+            subject=str(self.data.get("vak","Biologie")).strip()
+            draft_records=[item for item in records if item.get("schema")=="exam-question-draft-v1"]
+            if subject.lower() != "biologie" or draft_records:
+                if any(export_dir.iterdir()):
+                    raise ValueError("Kies een lege exportmap. Bestaande bestanden worden niet overschreven.")
+                source_dir=export_dir/"bronnen"
+                source_dir.mkdir(parents=True,exist_ok=True)
+                for document in self.data.get("documenten",[]):
+                    source=self.project_dir/"bronnen"/document.get("opslagbestand","")
+                    if source.is_file():
+                        shutil.copy2(source,source_dir/source.name)
+                payload={
+                    "schema":"exam-question-drafts-v1",
+                    "vak":subject,
+                    "project":self.data.get("naam",self.project_dir.name),
+                    "exam_metadata":self.data.get("exam_metadata",{}),
+                    "documenten":[
+                        {key:doc.get(key) for key in ("bestand","opslagbestand","type_voorstel","exam_metadata","sha256")}
+                        for doc in self.data.get("documenten",[])
+                    ],
+                    "exam_structures":self.data.get("exam_structures",{}),
+                    "vraagrecords":records,
+                }
+                target=export_dir/"examenverwerker-conceptvragen.json"
+                temp=target.with_suffix(".json.tmp")
+                temp.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding="utf-8")
+                temp.replace(target)
+                self._log(f"Conceptvragen geëxporteerd voor vak {subject}: {target}")
+                messagebox.showinfo("Conceptexport klaar",
+                    f"Conceptvragen en bron-PDF's zijn geëxporteerd naar:\n{export_dir}\n\nDit is een overdraagbaar conceptpakket, geen publicatiepakket.",parent=self.root)
+                return
+            result=export_approved_records(records,self.project_dir,export_dir)
             if not result.get("ok"):
                 errors=result.get("errors",[])
                 detail="\n".join(f"• {x.get('id','')} · {x.get('error')}" for x in errors[:20])
