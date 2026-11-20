@@ -94,8 +94,9 @@ class StructureTests(unittest.TestCase):
             append_page_span(extended, make_page_span(1, 0.1, 0.8))
 
     def test_structure_requires_confirmed_numbering_and_current_source(self):
-        fragment = make_fragment("context_intro", make_page_span(1, 0.1, 0.8),
-                                 [], self.questions, "intro")
+        fragment = make_fragment("context", make_page_span(1, 0.1, 0.8),
+                                 self.questions, self.questions, "intro")
+        fragment["context_role"] = "introductie"
         structure = make_exam_structure(self.doc, [fragment], self.questions)
         self.assertEqual(validate_exam_structure(structure, "doc-123", "abc123", self.questions), [])
         structure["nummering_bevestigd"] = False
@@ -124,11 +125,12 @@ class StructureTests(unittest.TestCase):
 
 
     def test_question_retrieves_its_question_region_and_shared_context(self):
-        intro = make_fragment("context_intro", make_page_span(1, 0.05, 0.2),
-                              [], self.questions, "intro")
+        intro = make_fragment("context", make_page_span(2, 0.0, 0.05),
+                              self.questions, self.questions, "intro")
+        intro["context_role"] = "introductie"
         question = make_fragment("vraag", make_page_span(2, 0.2, 0.8),
                                  [2], self.questions, "question-2")
-        specific = make_fragment("vraagcontext", make_page_span(2, 0.05, 0.18),
+        specific = make_fragment("context", make_page_span(2, 0.05, 0.18),
                                  [2], self.questions, "context-2")
         structure = make_exam_structure(self.doc, [intro, question, specific], self.questions)
         result = fragments_for_question(structure, 2)
