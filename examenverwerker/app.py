@@ -2047,9 +2047,10 @@ class ExamApp:
                     continue
                 seen_hashes.add(digest)
                 extracted = extract_pdf(source)
-                all_text = "\n".join(page["tekst"] for page in extracted["pagina_tekst"])
-                role, role_confidence, role_signals = classify_document_role(source.name, all_text)
-                identity = infer_exam_metadata(source.name, all_text)
+                first_page_text = (extracted["pagina_tekst"][0]["tekst"]
+                                   if extracted.get("pagina_tekst") else "")
+                role, role_confidence, role_signals = classify_document_role(source.name, first_page_text)
+                identity = infer_exam_metadata(source.name, first_page_text)
                 documents.append({
                     "id": digest[:16], "bestand": source.name, "source_path": str(source),
                     "opslagbestand": f"{digest[:12]}-{source.name}", "sha256": digest,
@@ -2377,9 +2378,10 @@ class ExamApp:
                 target = self.project_dir / "bronnen" / f"{digest[:12]}-{source.name}"
                 shutil.copy2(source, target)
                 extracted = extract_pdf(target)
-                all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
-                kind, confidence, scores = classify_document_role(source.name, all_text)
-                exam_meta = infer_exam_metadata(source.name, all_text) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
+                first_page_text = (extracted["pagina_tekst"][0]["tekst"]
+                                   if extracted.get("pagina_tekst") else "")
+                kind, confidence, scores = classify_document_role(source.name, first_page_text)
+                exam_meta = infer_exam_metadata(source.name, first_page_text) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
                        "exam_metadata": exam_meta,
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
