@@ -8,12 +8,13 @@ import shutil
 import sys
 import traceback
 import tempfile
+import webbrowser
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview, build_consolidated_cv_pdf
 from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragments, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch, exam_completeness_issues, exam_review_fingerprint
@@ -3836,6 +3837,8 @@ class ExamApp:
             entries.append({
                 "question_number":number,"change_type":record.get("cv_amendment_change_type"),
                 "original_document_id":record.get("cv_source_document_id"),
+                "original_source_pdf":record.get("cv_pdf"),
+                "original_source_sha256":record.get("cv_source_sha256"),
                 "original_region_file":source_file,
                 "amendment_regions":[dict(x) for x in amendments],
             })
@@ -3848,15 +3851,42 @@ class ExamApp:
                 messagebox.showwarning("Consolidatie onvolledig",
                     "Los eerst de ontbrekende bronfragmenten op voordat je de samengevoegde CV-weergave bevestigt.",parent=win)
                 return
-            self.data["consolidated_cv"]={
-                "schema":"consolidated-cv-view-v1","status":"visueel_bevestigd",
-                "reviewed_at":now(),"entries":entries,
-                "sources_unchanged":True,
-            }
-            self.save_project()
-            self._log("Geconsolideerde CV-weergave per vraag visueel bevestigd; bronbestanden zijn ongewijzigd.")
-            win.destroy()
-        ttk.Button(outer,text="Geconsolideerde CV-weergave bevestigen",
+            try:
+                output=self.project_dir/"afgeleid"/"correctievoorschrift-geconsolideerd.pdf"
+                generated=build_consolidated_cv_pdf(
+                    entries,self.project_dir/"snippets",output,
+                    self.data.get("exam_metadata") or {})
+                relative=str(output.relative_to(self.project_dir))
+                self.data["consolidated_cv"]={
+                    "schema":"consolidated-cv-pdf-v1","status":"samengesteld",
+                    "file":relative,"sha256":generated["sha256"],
+                    "page_count":generated["page_count"],"entries":entries,
+                    "sources_unchanged":True,"generated_at":now(),
+                }
+                self.save_project()
+                try:
+                    if hasattr(os,"startfile"):
+                        os.startfile(str(output))
+                    else:
+                        webbrowser.open(output.resolve().as_uri())
+                except Exception as open_error:
+                    messagebox.showwarning("PDF openen niet gelukt",
+                        f"De geconsolideerde CV is gemaakt, maar kon niet automatisch worden geopend.\n\n{output}\n\n{open_error}",parent=win)
+                confirmed=messagebox.askyesno("Geconsolideerde CV controleren",
+                    f"De samengevoegde CV is aangemaakt en geopend.\n\n{generated['page_count']} pagina's\n{output}\n\nHeb je de volledige PDF visueel gecontroleerd?",parent=win)
+                if confirmed:
+                    self.data["consolidated_cv"]["status"]="visueel_bevestigd"
+                    self.data["consolidated_cv"]["reviewed_at"]=now()
+                    self._log("Geconsolideerde CV-PDF visueel bevestigd; oorspronkelijke CV en aanvulling zijn ongewijzigd.")
+                else:
+                    self._log("Geconsolideerde CV-PDF aangemaakt maar nog niet visueel bevestigd.")
+                self.save_project()
+                if confirmed:
+                    win.destroy()
+            except Exception as exc:
+                self._error("Geconsolideerde CV maken",exc)
+                messagebox.showerror("CV-consolidatie mislukt",str(exc),parent=win)
+        ttk.Button(outer,text="Geconsolideerde CV-PDF genereren en controleren",
                    command=confirm,style="Accent.TButton").pack(anchor="e",pady=(8,0))
 
     def _review_simple_question_draft(self, record, parent):
