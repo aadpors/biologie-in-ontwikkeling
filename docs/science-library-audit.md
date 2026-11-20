@@ -154,6 +154,8 @@ Naast de DOI-/titel-/datumcontrole zijn bij onderstaande kaarten de volledige te
 
 | Kaart | Extra gecontroleerd | Gevolg voor de kaart |
 |---|---|---|
+| s1 | Open-access full text; CRISPR-spacerinventarisatie, metagenoomcontext en aantallen | Onderscheid tussen 467.018 doorzochte metagenomen en 367.609 met spacerreeksen; beperkte contigcontext en mogelijke fout-positieve repeats benoemd. |
+| s2 | Cell Host & Microbe full text; lineage tracking, muismodellen, synthetische gemeenschap en koolstofbronnen | De kaart vermeldt nu circa twee maanden follow-up, de 49-soorten gemeenschap en 29 in-vitro-koolstofbronnen; resultaten niet als menselijk interventieonderzoek gepresenteerd. |
 | s5 | Open-access full text; experimentele opzet en biologische replicaten | Kleine aantallen replicaten expliciet als beperking benoemd. |
 | s6 | Nature full text; antibioticabehandeling, synthetische driepartijenmodellen en soortverschillen | De contextafhankelijkheid is expliciet gemaakt: geen significante vermindering van sterfte bij O. tauri met een specialistisch virus; de bijdrage aan natuurlijke algenbloei is niet rechtstreeks in het veld aangetoond. |
 | s7 | Uitgeversabstract en aanvullende veldproefinformatie | Biomassa/groei onderscheiden van korrelopbrengst; geen significante opbrengststijging claimen. |
@@ -176,3 +178,5 @@ Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artike
 - **s9:** de WHOLISTIC-methode gebruikt pancellulaire calciumindicatoren. De kaart maakt nu duidelijk dat calciumdynamiek een proxy voor cellulaire activiteit is en geen volledige meting van alle processen in elk orgaan.
 
 - **s9:** de volledige Nature-tekst maakt duidelijk dat de lag-regressieanalyse samenhang vaststelt, geen causale richting. Alleen enkele geselecteerde hersen-lichaamroutes zijn met optogenetica causaal getest. Dit onderscheid is nu ook expliciet in de kaart opgenomen.
+
+- **s2:** de volledige Cell Host & Microbe-tekst is geraadpleegd. De kaart onderscheidt overdracht van gebarcodeerde bacterielijnen van parallelle evolutie en vermeldt de 49-soorten synthetische gemeenschap en de 29 koolstofbronnen uit de in-vitro-evolutie.
