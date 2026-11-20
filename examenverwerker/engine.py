@@ -357,8 +357,8 @@ def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.2
 def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: float = 3.0) -> dict:
     """Create a safe, derived preview: omit the cover and trim only proven footers.
 
-    A repeated line is not automatically a footer merely because it occurs in
-    the lower part of multiple pages. Before trimming, every proposed footer
+    Footer-like text is not automatically safe to remove. Before trimming,
+    every proposed footer
     line is checked for meaningful text or visual material below it. If such
     content exists, that footer hypothesis is rejected and the page is kept
     down to its last meaningful element. Source coordinates and page numbers
@@ -414,7 +414,7 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
             })
 
         explicit_footer = re.compile(
-            r"(examenblad|college voor toetsen|cito|www\\.|©|"
+            r"(examenblad|college voor toetsen|cito|www\.|©|"
             r"pagina\s*\d|tijdvak\s*\d|lees\s+verder|"
             r"\b\d{1,3}\s*/\s*\d{1,3}\b|"
             r"\b(?:biologie|examen)\b.{0,24}\b20\d{2}\b|"
