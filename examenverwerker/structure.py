@@ -260,3 +260,60 @@ def missing_question_regions(structure: dict | None, question_numbers: list[int]
         and fragment.get("page_spans")
     }
     return sorted({int(x) for x in question_numbers} - covered)
+
+
+def sort_fragments_reading_order(fragments: list[dict]) -> list[dict]:
+    """Return a stable copy of fragments in top-to-bottom PDF reading order."""
+    type_order = {"intro": 0, "tussen_context": 1, "vraag": 2}
+    def key(fragment):
+        spans = sorted(fragment.get("page_spans", []), key=lambda item: int(item.get("page", 0)))
+        first = spans[0] if spans else {}
+        return (int(first.get("page", 10**9)), float(first.get("top", 0.0)),
+                type_order.get(canonical_fragment_type(fragment.get("type", "")), 9),
+                str(fragment.get("id", "")))
+    return sorted(deepcopy(fragments), key=key)
+
+
+def trim_question_bands_for_contexts(fragments: list[dict]) -> list[dict]:
+    """Stop the immediately preceding question band where next-question context begins."""
+    result = deepcopy(fragments)
+    contexts = [item for item in result
+                if canonical_fragment_type(item.get("type", "")) == "tussen_context"]
+    questions = [item for item in result
+                 if canonical_fragment_type(item.get("type", "")) == "vraag"]
+    for context in contexts:
+        links = {int(n) for n in context.get("question_numbers", [])}
+        spans = sorted(context.get("page_spans", []), key=lambda x: int(x.get("page", 0)))
+        if not links or not spans:
+            continue
+        first = spans[0]
+        context_key = (int(first["page"]), float(first["top"]))
+        previous = []
+        for question in questions:
+            qlinks = question.get("question_numbers") or []
+            qspans = sorted(question.get("page_spans", []), key=lambda x: int(x.get("page", 0)))
+            if not qlinks or not qspans or int(qlinks[0]) in links:
+                continue
+            qfirst = qspans[0]
+            qkey = (int(qfirst["page"]), float(qfirst["top"]))
+            if qkey < context_key:
+                previous.append((qkey, question))
+        if not previous:
+            continue
+        _, preceding_question = max(previous, key=lambda item: item[0])
+        kept = []
+        for span in sorted(preceding_question.get("page_spans", []), key=lambda x: int(x.get("page", 0))):
+            page = int(span["page"])
+            if page < context_key[0]:
+                kept.append(span)
+            elif page == context_key[0] and float(span["top"]) < context_key[1]:
+                shortened = dict(span)
+                shortened["bottom"] = min(float(span["bottom"]), context_key[1])
+                if shortened["bottom"] - float(shortened["top"]) >= 0.005:
+                    kept.append(shortened)
+                break
+            else:
+                break
+        if kept:
+            preceding_question["page_spans"] = kept
+    return sort_fragments_reading_order(result)
