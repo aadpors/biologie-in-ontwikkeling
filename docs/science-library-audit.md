@@ -174,3 +174,5 @@ Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artike
 - **s6:** de volledige Nature-tekst is geraadpleegd. De kaart vermeldt nu de verschillende steekproefgroottes (n=4 voor G. huxleyi, n=3 voor de overige soorten), de uitzondering bij O. tauri en het onderscheid tussen laboratoriumsynergie en een nog niet rechtstreeks gekwantificeerde bijdrage aan natuurlijke algenbloei.
 
 - **s9:** de WHOLISTIC-methode gebruikt pancellulaire calciumindicatoren. De kaart maakt nu duidelijk dat calciumdynamiek een proxy voor cellulaire activiteit is en geen volledige meting van alle processen in elk orgaan.
+
+- **s9:** de volledige Nature-tekst maakt duidelijk dat de lag-regressieanalyse samenhang vaststelt, geen causale richting. Alleen enkele geselecteerde hersen-lichaamroutes zijn met optogenetica causaal getest. Dit onderscheid is nu ook expliciet in de kaart opgenomen.
