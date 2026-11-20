@@ -2596,6 +2596,10 @@ class ExamApp:
         first_doc=None
         try:
             for doc in docs:
+                previous_detection=doc.get("vraagstarts_detectie") or {}
+                if (previous_detection.get("status")=="visueel_bevestigd"
+                        and previous_detection.get("source_sha256")==doc.get("sha256")):
+                    continue
                 source=self.project_dir/"bronnen"/doc["opslagbestand"]
                 if not source.is_file() or sha256(source)!=doc.get("sha256"):
                     raise ValueError(f"De bron-PDF {doc.get('bestand')} ontbreekt of is gewijzigd.")
@@ -2622,10 +2626,12 @@ class ExamApp:
                     if r.get("document_id")!=doc.get("id")
                 ]+reviewed
                 doc["vraagstarts_detectie"]={
-                    "status":"voorstel_gemaakt","count":len(reviewed),
-                    "source_sha256":doc.get("sha256"),"reviewed_at":None,
+                    "status":"visueel_bevestigd" if reviewed and all(
+                        x.get("human_decision") in (True,False) for x in reviewed) else "voorstel_gemaakt",
+                    "count":len(reviewed),"source_sha256":doc.get("sha256"),
+                    "reviewed_at":previous_detection.get("reviewed_at"),
                 }
-                if first_doc is None:
+                if first_doc is None and doc["vraagstarts_detectie"]["status"]!="visueel_bevestigd":
                     first_doc=doc
                 if not reviewed:
                     self._log(f"Geen CV-vraagankers herkend in {doc.get('bestand')}; controleer de PDF handmatig.")
