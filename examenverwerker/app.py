@@ -1540,10 +1540,10 @@ class ExamApp:
                 }
                 records.append(record)
             record["question_fragment_id"] = fragment.get("id")
-            record["question_text"] = str(fragment.get("text") or "")
             if (record.get("question_type_status") != "handmatig_gecontroleerd"
                     or record.get("exam_structure_invalidated") is True
                     or record.get("source_analysis_invalidated") is True):
+                record["question_text"] = str(fragment.get("text") or "")
                 record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
                 record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
                 record["approved_by_human"] = False
