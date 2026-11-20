@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import shutil
 import sys
@@ -17,7 +18,7 @@ from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragmen
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.13.12"
+APP_VERSION = "0.14.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -73,11 +74,69 @@ class ExamApp:
         self.import_batch_manifest_path = None
         app_base=Path(sys.executable).parent if getattr(sys,"frozen",False) else Path(__file__).parent
         self.app_base = app_base
+        # Keep user-owned projects and learning corrections outside the
+        # replaceable program directory. Portable upgrades can now replace
+        # code/_internal without overwriting a teacher's exam work.
+        if os.name == "nt":
+            data_home = Path(os.environ.get("LOCALAPPDATA") or (Path.home() / "AppData" / "Local"))
+        else:
+            data_home = Path(os.environ.get("XDG_DATA_HOME") or (Path.home() / ".local" / "share"))
+        self.user_data_root = data_home / "BiologieExamenverwerker"
+        self.user_projects_root = self.user_data_root / "projecten"
+        self.user_projects_root.mkdir(parents=True, exist_ok=True)
+        self.user_knowledge_root = self.user_data_root / "kennisbank"
+        self.user_knowledge_root.mkdir(parents=True, exist_ok=True)
+        self._migrate_legacy_user_data(app_base)
         self.examens_root = resolve_examens_root(app_base)
-        self.knowledge_dir=app_base/"kennisbank"
+        self.knowledge_dir=self.user_knowledge_root
         self._style()
         self._build()
         self._welcome()
+
+    def _migrate_legacy_user_data(self, app_base):
+        """Copy legacy in-folder projects once; never move or delete originals."""
+        legacy_roots = [Path(app_base) / "projecten"]
+        for legacy_root in legacy_roots:
+            if not legacy_root.is_dir():
+                continue
+            try:
+                manifests = list(legacy_root.rglob(PROJECT_FILE))
+            except OSError:
+                continue
+            for manifest in manifests:
+                source = manifest.parent
+                relative = source.relative_to(legacy_root)
+                target = self.user_projects_root / relative
+                if target.exists():
+                    continue
+                try:
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copytree(source, target)
+                    copied_manifest = target / PROJECT_FILE
+                    copied = json.loads(copied_manifest.read_text(encoding="utf-8"))
+                    if copied.get("schema") != "biologie-examenproject-v1":
+                        raise ValueError("Onbekend projectformaat na kopiëren.")
+                    # Verify every copied project file by size and SHA-256.
+                    for original in source.rglob("*"):
+                        if not original.is_file():
+                            continue
+                        duplicate = target / original.relative_to(source)
+                        if not duplicate.is_file() or original.stat().st_size != duplicate.stat().st_size:
+                            raise IOError(f"Bestand niet volledig gekopieerd: {original.name}")
+                        if sha256(original) != sha256(duplicate):
+                            raise IOError(f"Integriteitscontrole mislukt: {original.name}")
+                    self._migration_log(f"Project veilig gekopieerd naar gebruikersgegevens: {target}")
+                except Exception as exc:
+                    self._migration_log(f"Projectmigratie overgeslagen voor {source}: {exc}")
+
+    def _migration_log(self, message):
+        try:
+            log_dir = self.user_data_root / "logs"
+            log_dir.mkdir(parents=True, exist_ok=True)
+            with (log_dir / "migratie.log").open("a", encoding="utf-8") as handle:
+                handle.write(f"{now()} {message}\\n")
+        except Exception:
+            pass
 
     def _style(self):
         """Warm, card-based interface inspired by the original biology website."""
@@ -1418,7 +1477,7 @@ class ExamApp:
         """Create a project automatically inside the portable app's own project root."""
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         name = f"nieuw-project-{stamp}"
-        root = self.app_base / "projecten"
+        root = self.user_projects_root
         self.project_dir = root / name
         try:
             self.project_dir.mkdir(parents=True, exist_ok=False)
@@ -1471,7 +1530,7 @@ class ExamApp:
         scroll.pack(in_=list_wrap, side="right", fill="y")
 
         paths = {}
-        roots = [self.examens_root, self.app_base / "projecten"]
+        roots = [self.examens_root, self.user_projects_root, self.app_base / "projecten"]
         discovered = []
         seen = set()
         for root in roots:
