@@ -388,7 +388,7 @@ class EngineTests(unittest.TestCase):
             self.assertTrue(all(x["footer_detected"] for x in result["page_map"]))
             with fitz.open(preview) as cleaned:
                 self.assertEqual(len(cleaned), 2)
-                self.assertLess(cleaned[0].rect.height, 800)
+                self.assertLess(cleaned[0].rect.height, 200)
                 self.assertNotIn("Voorblad", cleaned[0].get_text())
                 self.assertNotIn("Biologie | Examen 2026", cleaned[0].get_text())
             with fitz.open(source) as original:
