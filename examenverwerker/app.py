@@ -3450,6 +3450,14 @@ class ExamApp:
             existing = self.data.get("exam_structure")
         if existing and existing.get("document_id") == doc["id"] and existing.get("source_sha256") == doc["sha256"]:
             fragments = normalize_fragments(existing.get("fragments", []))
+            # An existing saved structure is the user's working result, not a
+            # fresh automatic proposal. Preserve it as reviewed on reopening;
+            # do not send the user through a redundant checkbox/approval round.
+            for fragment in fragments:
+                if fragment.get("status") == "automatisch_voorstel_nog_te_controleren":
+                    fragment["status"] = "handmatig_gecontroleerd"
+                    fragment["reviewed_by_human"] = True
+                    fragment["reviewed_at"] = fragment.get("reviewed_at") or now()
         else:
             fragments = []
         # Seed the editor with transparent, editable proposals derived from the
@@ -3620,6 +3628,12 @@ class ExamApp:
         ttk.Label(left, text="Tip: selecteer een aaneengesloten gebied op de doorlopende PDF. Een fragment mag meerdere pagina's beslaan.",
                   wraplength=230).pack(anchor="w", pady=8)
         nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
+        ttk.Label(nav, text="Zoom").pack(side="left", padx=(0, 5))
+        ttk.Button(nav, text="−", width=3, command=lambda: set_preview_zoom(0.85)).pack(side="left")
+        ttk.Button(nav, text="100%", width=6, command=lambda: set_preview_zoom(1.0, absolute=True)).pack(side="left", padx=3)
+        ttk.Button(nav, text="+", width=3, command=lambda: set_preview_zoom(1.18)).pack(side="left")
+        ttk.Button(nav, text="Passend", command=lambda: fit_preview_width()).pack(side="left", padx=(5, 12))
+        ttk.Label(nav, text="Ctrl + muiswiel: in-/uitzoomen", foreground="#63717B").pack(side="left")
         page_var = tk.IntVar(value=2)
         displayed_page = 2
         frame = ttk.Frame(right); frame.pack(fill="both", expand=True)
@@ -3631,8 +3645,10 @@ class ExamApp:
         canvas.bind("<MouseWheel>", lambda event: canvas.yview_scroll(int(-event.delta / 120), "units"))
         canvas.bind("<Button-4>", lambda _event: canvas.yview_scroll(-1, "units"))
         canvas.bind("<Button-5>", lambda _event: canvas.yview_scroll(1, "units"))
+        canvas.bind("<Control-MouseWheel>", lambda event: (set_preview_zoom(1.12 if event.delta > 0 else 0.89), "break")[1])
         actions = ttk.Frame(right); actions.pack(fill="x", pady=(8, 0))
         stitched_path = self.project_dir / "analyse" / f"opgaven-doorlopend-{doc['id']}-{doc['sha256'][:12]}.png"
+        preview_zoom = 1.0
         stitched_info = render_stitched_preview(
             preview_path, stitched_path, preview_info["page_map"], scale=1.05
         )
@@ -3824,6 +3840,48 @@ class ExamApp:
 
         def show_page():
             show_document(page_var.get())
+
+        def set_preview_zoom(value, absolute=False):
+            nonlocal preview_zoom, stitched_scale, page_layout, page_layout_by_original
+            nonlocal photo, document_photo, page_image_width, page_image_height
+            if snippet_mode:
+                show_document(displayed_page)
+            target_zoom = max(0.55, min(2.25, float(value) if absolute else preview_zoom * float(value)))
+            if abs(target_zoom - preview_zoom) < 0.001:
+                return
+            # Keep the selected boundaries in PDF coordinates; only the visual
+            # coordinate system changes. Re-rendering avoids blurry enlargement.
+            old_zoom = preview_zoom
+            preview_zoom = target_zoom
+            new_scale = 1.05 * preview_zoom
+            try:
+                zoom_path = self.project_dir / "analyse" / f"opgaven-doorlopend-{doc['id']}-{doc['sha256'][:12]}-z{preview_zoom:.2f}.png"
+                zoom_info = render_stitched_preview(
+                    preview_path, zoom_path, preview_info["page_map"], scale=new_scale
+                )
+                ratio = float(zoom_info["scale"]) / max(0.0001, stitched_scale)
+                stitched_scale = float(zoom_info["scale"])
+                page_layout = zoom_info["layout"]
+                page_layout_by_original = {int(item["original_page"]): item for item in page_layout}
+                stitched_path = zoom_path
+                document_photo = tk.PhotoImage(file=str(zoom_path))
+                photo = document_photo
+                page_image_width, page_image_height = photo.width(), photo.height()
+                show_document(displayed_page)
+            except Exception as exc:
+                preview_zoom = old_zoom
+                self._log(f"Inzoomen op doorlopende PDF mislukt: {exc}")
+                messagebox.showerror("Zoom niet beschikbaar", str(exc), parent=win)
+
+        def fit_preview_width():
+            try:
+                if document_photo is None:
+                    return
+                available = max(300, canvas.winfo_width() - 24)
+                factor = available / max(1, document_photo.width())
+                set_preview_zoom(preview_zoom * factor, absolute=True)
+            except Exception as exc:
+                self._log(f"Passend zoomen mislukt: {exc}")
 
         def show_fragment():
             nonlocal photo, page_image_width, page_image_height, displayed_page, snippet_mode, snippet_layout
@@ -4085,6 +4143,13 @@ class ExamApp:
                     return False
             new_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
             structure_changed = new_signature != original_structure_signature
+            # Saving the user's edited structure is the review action.
+            # New proposals remain provisional until the user edits/saves them.
+            for fragment in fragments:
+                if fragment.get("status") == "automatisch_voorstel_nog_te_controleren":
+                    fragment["status"] = "handmatig_gecontroleerd"
+                fragment["reviewed_by_human"] = True
+                fragment["reviewed_at"] = now()
             structure = make_exam_structure(doc, fragments, question_numbers)
             errors = validate_exam_structure(structure, doc["id"], doc["sha256"], question_numbers)
             if errors:
