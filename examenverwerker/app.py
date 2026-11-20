@@ -257,7 +257,10 @@ class ExamApp:
         toolbar_secondary = ttk.Frame(shell, style="App.TFrame")
         toolbar_secondary.pack(fill="x", pady=(0, 5))
         for label, callback, style in actions[4:]:
-            ttk.Button(toolbar_secondary, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
+            button = ttk.Button(toolbar_secondary, text=label, command=callback, style=style)
+            button.pack(side="left", padx=(0, 5))
+            if label == "Vraagrecord maken":
+                self.question_record_button = button
 
         # A compact, contextual next-step strip keeps the original workbench
         # layout intact while making the hand-off between processing stages explicit.
@@ -1080,25 +1083,29 @@ class ExamApp:
             linked[row.get("id")] = fragment
 
         source_path = self.project_dir / "bronnen" / doc["opslagbestand"]
-        analysis = analyze_pdf(source_path)
-        page_sizes = {int(page["page"]): (float(page["width"]), float(page["height"]))
-                      for page in analysis.get("pages", [])}
-        for index, row in enumerate(candidates):
+        # Read only the page dimensions needed to interpret the saved fragment
+        # coordinates. Do not re-analyse question starts, neighboring content,
+        # or visual regions in the original PDF at this stage.
+        import pymupdf as fitz
+        with fitz.open(source_path) as source_pdf:
+            page_sizes = {
+                index + 1: (float(page.rect.width), float(page.rect.height))
+                for index, page in enumerate(source_pdf)
+            }
+        for row in candidates:
             fragment = linked[row.get("id")]
             segments = page_spans_to_segments(fragment["page_spans"], page_sizes)
             snippet_text = extract_region_text(source_path, segments)
             if not snippet_text.strip():
                 raise ValueError(
-                    f"Vraag {row.get('number')}: er kon geen vraagtekst uit het gecontroleerde fragment worden gelezen. "
-                    "Controleer de uitsnede."
+                    f"Vraag {row.get('number')}: het gekozen vraagfragment bevat geen leesbare tekst. "
+                    "Pas zo nodig de fragmentgrenzen aan."
                 )
-            following = candidates[index + 1] if index + 1 < len(candidates) else None
             row["vraagtekst_voorstel"] = snippet_text
-            row["vraagtype_controle"] = classify_question_with_visuals(
-                analysis, row, following, snippet_text
-            )
+            row["vraagtype_controle"] = detect_question_type(snippet_text)
             row["vraagtype_status"] = "automatisch_bepaald_controle_nodig"
             row["vraagtype_bepaald_na_fragmentcontrole"] = True
+            row["vraagtype_fragment_id"] = fragment.get("id")
         self.save_project()
         self._log(
             f"Vraagtypen automatisch bepaald na fragmentcontrole: {len(candidates)} vragen in {doc.get('bestand')}."
@@ -1134,22 +1141,17 @@ class ExamApp:
             return
         try:
             source_path = self.project_dir / "bronnen" / source_doc["opslagbestand"]
-            analysis = analyze_pdf(source_path)
-            page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"]))
-                          for p in analysis.get("pages", [])}
+            import pymupdf as fitz
+            with fitz.open(source_path) as source_pdf:
+                page_sizes = {
+                    page_no + 1: (float(page.rect.width), float(page.rect.height))
+                    for page_no, page in enumerate(source_pdf)
+                }
             segments = page_spans_to_segments(question_fragment["page_spans"], page_sizes)
             snippet_text = extract_region_text(source_path, segments)
-            ordered = sorted(
-                [x for x in self._workspace_rows
-                 if x.get("document_id") == source_doc["id"] and x.get("human_decision") is True],
-                key=lambda x: (int(x.get("page", 1)), float((x.get("bbox") or [0, 0])[1]))
-            )
-            row_index = ordered.index(row) if row in ordered else -1
-            following = ordered[row_index + 1] if 0 <= row_index < len(ordered) - 1 else None
             row["vraagtekst_voorstel"] = snippet_text or row.get("vraagtekst_voorstel", "")
-            row["vraagtype_controle"] = classify_question_with_visuals(
-                analysis, row, following, row["vraagtekst_voorstel"]
-            )
+            row["vraagtype_controle"] = detect_question_type(row["vraagtekst_voorstel"])
+            row["vraagtype_fragment_id"] = question_fragment.get("id")
             row["vraagtype_status"] = "controle_nodig"
             self.save_project()
         except Exception as exc:
@@ -3658,13 +3660,18 @@ class ExamApp:
                         },
                     })
                 for index, (start_page, start_y, number) in enumerate(starts):
-                    next_start = starts[index + 1] if index + 1 < len(starts) else (page_count + 1, 0.0, None)
+                    next_candidate = ordered[index + 1] if index + 1 < len(ordered) else None
+                    end_page, end_y, boundary_reason = question_fragment_boundary(
+                        analysis, ordered[index], next_candidate
+                    )
                     spans = []
-                    for page_no in range(start_page, min(page_count, next_start[0]) + 1):
+                    for page_no in range(start_page, min(page_count, end_page) + 1):
+                        page_height = page_sizes[page_no][1]
                         page_top = start_y if page_no == start_page else 0.0
-                        page_bottom = next_start[1] if page_no == next_start[0] else 1.0
+                        page_bottom = (end_y / page_height) if page_no == end_page else 1.0
                         if page_bottom - page_top >= 0.005:
-                            spans.append({"page": page_no, "top": round(page_top, 6), "bottom": round(page_bottom, 6)})
+                            spans.append({"page": page_no, "top": round(page_top, 6),
+                                          "bottom": round(min(1.0, page_bottom), 6)})
                     if spans:
                         fragments.append({
                             "id": f"voorstel-vraag-{doc['id'][:6]}-{number}",
@@ -3674,8 +3681,8 @@ class ExamApp:
                             "status": "automatisch_voorstel_nog_te_controleren",
                             "confidence": float(ordered[index].get("confidence", 0.0) or 0.0),
                             "evidence": {
-                                "reason": "Vraagband afgeleid van de bevestigde vraagstart tot de volgende bevestigde vraagstart",
-                                "source": "vraagstartcontrole",
+                                "reason": f"Vraagstart tot eerste {boundary_reason.replace('_', ' ')}",
+                                "source": "vraagstart_witregel_kader",
                             },
                         })
                 # Supplement broad question bands with focused, evidence-backed
@@ -3705,6 +3712,9 @@ class ExamApp:
                     cleaned_spans.append(dict(span))
             fragment["page_spans"] = cleaned_spans
         fragments = sort_fragments_reading_order(fragments)
+        # The question-record action is not part of fragment selection.
+        if hasattr(self, "question_record_button"):
+            self.question_record_button.pack_forget()
         # Reuse the central workbench rather than opening a separate window.
         self._workspace_container.forget(self._workspace_left)
         self._workspace_container.forget(self._workspace_right)
@@ -4563,6 +4573,8 @@ class ExamApp:
             win.destroy()
             self._workspace_container.add(self._workspace_left, weight=3)
             self._workspace_container.add(self._workspace_right, weight=8)
+            if hasattr(self, "question_record_button"):
+                self.question_record_button.pack(side="left", padx=(0, 5))
             self._workspace_refresh()
             self._workflow_refresh()
             self.status.configure(
