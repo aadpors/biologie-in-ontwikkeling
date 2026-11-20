@@ -3520,7 +3520,7 @@ class ExamApp:
                     if factor>1: photo=photo.subsample(factor,factor)
                     ttk.Label(block,image=photo).pack(anchor="w"); photos.append(photo)
                 else:
-                    ttk.Label(block,text="Aanvullingsfragment ontbreekt.")
+                    ttk.Label(block,text="Aanvullingsfragment ontbreekt.").pack(anchor="w")
                     missing.append(f"vraag {number}: aanvullingsfragment")
             entries.append({
                 "question_number":number,"change_type":record.get("cv_amendment_change_type"),
@@ -3584,6 +3584,9 @@ class ExamApp:
         keyrow=ttk.Frame(outer); keyrow.pack(fill="x",pady=(5,0))
         ttk.Label(keyrow,text="Correcte sleutel (indien van toepassing)").pack(side="left")
         ttk.Entry(keyrow,textvariable=correct_var,width=16).pack(side="left",padx=8)
+        answer_reviewed_var=tk.BooleanVar(value=(record.get("answer_review") or {}).get("status")=="visueel_bevestigd")
+        ttk.Checkbutton(outer,text="Correct antwoord (ook ja/nee, waar/onwaar, hoger/lager enz.) vergeleken met het officiële CV",
+            variable=answer_reviewed_var).pack(anchor="w",pady=(6,0))
         amendment_row=ttk.Frame(outer); amendment_row.pack(fill="x",pady=(6,0))
         ttk.Label(amendment_row,text="Wijziging door CV-aanvulling").pack(side="left")
         amendment_change_var=tk.StringVar(value=record.get("cv_amendment_change_type",""))
@@ -3629,6 +3632,14 @@ class ExamApp:
             record["question_type_status"]="handmatig_gecontroleerd"
             record["options"]=options
             record["correct"]=correct_var.get().strip()
+            if answer_reviewed_var.get():
+                if not correct_var.get().strip():
+                    messagebox.showwarning("Antwoord ontbreekt","Vul eerst het gecontroleerde antwoord of de antwoordsleutel in.",parent=win)
+                    return
+                record["answer_review"]={"status":"visueel_bevestigd","answer":correct_var.get().strip(),
+                                         "reviewed_at":now()}
+            else:
+                record.pop("answer_review",None)
             record["cv_amendment_change_type"]=amendment_change_var.get()
             record.setdefault("exam",{})["points"]=points
             record["status"]="concept"
