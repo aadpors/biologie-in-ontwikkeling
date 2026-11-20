@@ -3680,26 +3680,58 @@ class ExamApp:
             redraw_guides()
             canvas.yview_moveto(0)
         def change_page(delta):
-            frag = selected_fragment()
-            if frag and any(int(x["page"]) == displayed_page for x in frag.get("page_spans", [])):
-                update_page_span()
-            page_var.set(max(1, min(page_count, int(page_var.get()) + delta)))
+            page_var.set(max(2, min(page_count, int(page_var.get()) + delta)))
             show_page()
         def on_press(event):
-            nonlocal drag_target
+            nonlocal drag_handle
             y = canvas.canvasy(event.y)
-            top_px, bottom_px = top_y * page_image_height, bottom_y * page_image_height
-            if abs(y - top_px) <= 12: drag_target = "top"
-            elif abs(y - bottom_px) <= 12: drag_target = "bottom"
-            else: drag_target = None
+            if snippet_mode:
+                drag_handle = None
+                for layout in snippet_layout:
+                    span = layout["span"]
+                    top_px = layout["y0"] + (float(span["top"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
+                    bottom_px = layout["y0"] + (float(span["bottom"]) * layout["page_height"] - layout["clip_top"]) * snippet_scale
+                    if abs(y - top_px) <= 12:
+                        drag_handle = {"layout": layout, "edge": "top"}
+                        break
+                    if abs(y - bottom_px) <= 12:
+                        drag_handle = {"layout": layout, "edge": "bottom"}
+                        break
+            else:
+                page_height = page_sizes[displayed_page][1]
+                preview_height = preview_heights[displayed_page]
+                top_px = top_y * page_height / preview_height * page_image_height
+                bottom_px = bottom_y * page_height / preview_height * page_image_height
+                if abs(y - top_px) <= 12: drag_handle = {"edge": "top"}
+                elif abs(y - bottom_px) <= 12: drag_handle = {"edge": "bottom"}
+                else: drag_handle = None
         def on_drag(event):
             nonlocal top_y, bottom_y
-            if not drag_target: return
-            y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y))) / page_image_height
-            if drag_target == "top": top_y = min(y, bottom_y - 0.01)
-            else: bottom_y = max(y, top_y + 0.01)
+            if not drag_handle: return
+            y = max(0.0, min(float(page_image_height), canvas.canvasy(event.y)))
+            if snippet_mode:
+                layout = drag_handle["layout"]
+                span = layout["span"]
+                original_y = layout["clip_top"] + (y - layout["y0"]) / snippet_scale
+                normalized = max(0.0, min(1.0, original_y / layout["page_height"]))
+                if drag_handle["edge"] == "top":
+                    span["top"] = min(normalized, float(span["bottom"]) - 0.005)
+                else:
+                    span["bottom"] = max(normalized, float(span["top"]) + 0.005)
+            else:
+                normalized = y / page_image_height * preview_heights[displayed_page] / page_sizes[displayed_page][1]
+                if drag_handle["edge"] == "top": top_y = min(normalized, bottom_y - 0.005)
+                else: bottom_y = max(normalized, top_y + 0.005)
             redraw_guides()
-        canvas.bind("<Button-1>", on_press); canvas.bind("<B1-Motion>", on_drag)
+        def on_release(_event):
+            nonlocal drag_handle
+            if drag_handle and snippet_mode:
+                save_structure()
+                show_fragment()
+            drag_handle = None
+        canvas.bind("<Button-1>", on_press)
+        canvas.bind("<B1-Motion>", on_drag)
+        canvas.bind("<ButtonRelease-1>", on_release)
         def refresh_fragment_list():
             selected = selected_fragment()
             selected_id = selected.get("id") if selected else None
@@ -3812,9 +3844,9 @@ class ExamApp:
             if not messagebox.askyesno("Fragment verwijderen", "Weet je zeker dat je dit fragment wilt verwijderen?", parent=win): return
             fragments.pop(index); refresh_fragment_list(); save_structure()
         def load_selected_fragment(_event=None):
-            load_span_for_page(); redraw_guides()
             frag = selected_fragment()
             if frag:
+                show_fragment()
                 type_var.set(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "context")), "Context"))
                 qlist.selection_clear(0, "end")
                 for i, number in enumerate(question_numbers):
@@ -3850,6 +3882,35 @@ class ExamApp:
             frag["question_numbers"] = links
             save_structure(); refresh_fragment_list()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
+        def start_new_fragment():
+            fragment_tree.selection_remove(fragment_tree.selection())
+            page_var.set(max(2, displayed_page))
+            show_page()
+        def edit_selected_source_page():
+            frag = selected_fragment()
+            if not frag:
+                messagebox.showinfo("Selecteer fragment", "Selecteer eerst een fragment.", parent=win)
+                return
+            page_var.set(int(frag.get("page_spans", [{}])[0].get("page", 2)))
+            show_page()
+        def previous_fragment():
+            current = fragment_tree.selection()
+            index = max(0, int(current[0]) - 1) if current else 0
+            if fragment_tree.exists(str(index)):
+                fragment_tree.selection_set(str(index))
+                fragment_tree.focus(str(index))
+                load_selected_fragment()
+        def next_fragment():
+            current = fragment_tree.selection()
+            index = min(len(fragments) - 1, int(current[0]) + 1) if current else 0
+            if fragment_tree.exists(str(index)):
+                fragment_tree.selection_set(str(index))
+                fragment_tree.focus(str(index))
+                load_selected_fragment()
+        ttk.Button(nav, text="◀ Fragment", command=previous_fragment).pack(side="left", padx=(12, 2))
+        ttk.Button(nav, text="Fragment ▶", command=next_fragment).pack(side="left")
+        ttk.Button(nav, text="Nieuwe selectie", command=start_new_fragment).pack(side="left", padx=(12, 2))
+        ttk.Button(nav, text="Bronpagina bewerken", command=edit_selected_source_page).pack(side="left")
         ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
         ttk.Button(actions, text="Huidige paginagrens bijwerken", command=update_page_span).pack(side="left", padx=8)
         ttk.Button(actions, text="Pagina toevoegen aan geselecteerd fragment", command=append_page).pack(side="left", padx=8)
@@ -3866,7 +3927,11 @@ class ExamApp:
         ttk.Button(actions, text="Terug naar vraagcontrole", command=save_and_close).pack(side="right", padx=(8, 0))
         ttk.Button(actions, text="Structuur opslaan", command=save_structure).pack(side="right")
         refresh_fragment_list()
-        if fragments: fragment_tree.selection_set("0")
+        if fragments:
+            fragment_tree.selection_set("0")
+            load_selected_fragment()
+        else:
+            show_page()
         def jump_question_page(_event=None):
             current = selected_fragment()
             if current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
