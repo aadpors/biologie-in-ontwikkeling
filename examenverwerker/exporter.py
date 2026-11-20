@@ -347,7 +347,8 @@ def export_approved_records(records: list[dict], project_dir: Path, output_dir: 
                              "snippet_sha256":x.get("snippet_sha256"),"caption_human_confirmed":x.get("caption_human_confirmed", False),"question_number":x.get("question_number"),"crop_method":x.get("crop_method")} for x in context_assets],
                          "cv_source_region":r.get("cv_source_region"),
                          "cv_source_region_sha256":sha256(project_dir/"snippets"/cv_region_file) if cv_region_file else None,
-                         "cv_amendment_regions":r.get("cv_amendment_regions", [])})
+                         "cv_amendment_regions":r.get("cv_amendment_regions", []),
+                         "cv_amendment_change_type":r.get("cv_amendment_change_type")})
     (output_dir/"exam-mcq.json").write_text(json.dumps(mcq,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-open.json").write_text(json.dumps(opened,ensure_ascii=False,indent=2),encoding="utf-8")
     (output_dir/"exam-contexts.json").write_text(json.dumps(contexts,ensure_ascii=False,indent=2),encoding="utf-8")
