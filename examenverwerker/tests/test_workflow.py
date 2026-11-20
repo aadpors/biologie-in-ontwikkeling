@@ -42,6 +42,7 @@ def with_cv(data):
     cv = {
         "id": "cv-1", "sha256": "cv-hash", "type_voorstel": "correctievoorschrift",
         "documenttype_handmatig": "correctievoorschrift", "status": "handmatig_bevestigd",
+        "vraagstarts_detectie": {"status": "visueel_bevestigd"},
     }
     data["documenten"].append(cv)
     data["cv_regions"] = {
@@ -100,6 +101,22 @@ class ExamWorkflowTests(unittest.TestCase):
         self.assertEqual(exam_workflow_state(data)["stage"], "vraaganalyse")
         with_record(data)
         self.assertEqual(exam_workflow_state(data)["stage"], "cv_starts")
+
+    def test_cv_question_starts_require_visual_review(self):
+        data = with_record(with_structure(project()))
+        data["documenten"].append({
+            "id": "cv-1", "sha256": "cv-hash", "type_voorstel": "correctievoorschrift",
+            "documenttype_handmatig": "correctievoorschrift", "status": "handmatig_bevestigd",
+        })
+        self.assertEqual(exam_workflow_state(data)["stage"], "cv_starts")
+
+    def test_appendix_question_starts_require_visual_review(self):
+        data = with_record(with_structure(project()))
+        data["documenten"].append({
+            "id": "appendix-1", "sha256": "appendix-hash", "type_voorstel": "uitwerkbijlage",
+            "documenttype_handmatig": "uitwerkbijlage", "status": "handmatig_bevestigd",
+        })
+        self.assertEqual(exam_workflow_state(data)["stage"], "uitwerkbijlage_starts")
 
     def test_cv_region_is_required_for_each_question(self):
         data = with_record(with_structure(project()))
