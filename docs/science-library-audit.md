@@ -125,7 +125,7 @@ De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een voll
 
 ### Nieuwe metadata voor bruikbare selectie
 
-Alle 50 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
+Alle 51 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
 - **Primair onderzoek:** 40 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
 - **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
 - **Perspectiefartikel:** 2 kaarten.
