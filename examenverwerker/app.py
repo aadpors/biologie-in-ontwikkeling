@@ -2845,7 +2845,8 @@ class ExamApp:
 
         tree.bind("<<TreeviewSelect>>", show_selected)
         ttk.Button(footer, text="Originele pagina", command=inspect_original).pack(side="right", padx=4)
-        ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record).pack(side="right", padx=4)
+        ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record,
+                   state=("disabled" if rows and rows[0].get("auxiliary_document_role") else "normal")).pack(side="right", padx=4)
         ttk.Button(footer, text="Geen vraag", command=lambda: decide(False)).pack(side="right", padx=4)
         ttk.Button(footer, text="Bevestig vraag", command=lambda: decide(True), style="Accent.TButton").pack(side="right", padx=4)
         ttk.Button(footer, text="Onderdrukte dubbelingen",
