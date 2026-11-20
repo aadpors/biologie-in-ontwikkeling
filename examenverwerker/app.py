@@ -839,6 +839,11 @@ class ExamApp:
                     self._workspace_start_manual_mark()
                 button="Vraagstart handmatig toevoegen"
                 action=add_missing_question
+            elif state["stage"] == "cv_starts" and not any(
+                    d.get("type_voorstel")=="correctievoorschrift"
+                    for d in self.data.get("documenten",[])):
+                button="Correctievoorschrift toevoegen"
+                action=self.add_pdfs
         self.workflow_label.configure(text=f"Volgende stap · {label}. {state['action']}")
         self.workflow_button.configure(text=button, command=action)
 
