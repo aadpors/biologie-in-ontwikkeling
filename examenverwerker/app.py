@@ -8,17 +8,18 @@ import shutil
 import sys
 import traceback
 import tempfile
+import webbrowser
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview, build_consolidated_cv_pdf
 from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragments, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
-from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
+from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch, exam_completeness_issues, exam_review_fingerprint
 
-APP_VERSION = "0.16.0"
+APP_VERSION = "0.17.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -55,7 +56,22 @@ def extract_pdf(path: Path):
     pages = []
     for index, page in enumerate(doc):
         text = page.get_text("text", sort=True)
-        pages.append({"pagina": index + 1, "tekst": text, "tekens": len(text.strip()), "ocr_nodig": len(text.strip()) < 20})
+        ocr_used=False
+        # The document-property step needs only the first page. Attempt OCR
+        # there only when its embedded text layer is absent or unusable.
+        if index==0 and len(text.strip())<20:
+            for language in ("nld+eng","eng"):
+                try:
+                    textpage=page.get_textpage_ocr(language=language,dpi=200,full=True)
+                    candidate=page.get_text("text",textpage=textpage,sort=True)
+                    if len(candidate.strip())>len(text.strip()):
+                        text=candidate
+                        ocr_used=True
+                        break
+                except Exception:
+                    continue
+        pages.append({"pagina": index + 1, "tekst": text, "tekens": len(text.strip()),
+                      "ocr_nodig": len(text.strip()) < 20, "ocr_gebruikt": ocr_used})
     meta = doc.metadata or {}
     result = {"pagina_aantal": len(doc), "metadata": meta, "pagina_tekst": pages}
     doc.close()
@@ -756,24 +772,46 @@ class ExamApp:
             return
 
         state = exam_workflow_state(self.data)
-        # When opening an older project whose fragment boundaries are already
-        # complete, automatically create the new lightweight drafts once.
-        if state["stage"] == "vraagrecords" and not getattr(self, "_auto_creating_drafts", False):
-            self._auto_creating_drafts = True
-            try:
-                self._workflow_make_next_record(refresh_after=False)
-                state = exam_workflow_state(self.data)
-            finally:
-                self._auto_creating_drafts = False
+        # Once the teacher-confirmed fragment geometry is complete, create
+        # lightweight records automatically. This is not another fragment
+        # review step; the records are then used for the separate question analysis.
+        if state["stage"] == "vraaganalyse" and not getattr(self, "_auto_creating_drafts", False):
+            source_docs = [d for d in self.data.get("documenten", [])
+                           if d.get("type_voorstel") == "opgaven"]
+            missing = False
+            for doc in source_docs:
+                confirmed = [r for r in self.data.get("vraagkandidaten", [])
+                             if r.get("document_id") == doc.get("id")
+                             and r.get("human_decision") is True]
+                records = [r for r in self.data.get("vraagrecords", [])
+                           if r.get("candidate_document_id") == doc.get("id")]
+                if len(records) < len(confirmed):
+                    missing = True
+                    break
+            if missing:
+                self._auto_creating_drafts = True
+                try:
+                    self._workflow_make_next_record(refresh_after=False)
+                    state = exam_workflow_state(self.data)
+                finally:
+                    self._auto_creating_drafts = False
         actions = {
             "import": ("Examenbibliotheek tonen", self._show_exam_library),
-            "documenttype": ("Documenttype corrigeren", self.correct_type),
-            "analyse": ("Vraagstarts analyseren", self.analyze_questions),
-            "vraagstarts": ("Verder met vraagcontrole", self._workflow_focus_next),
-            "ontbrekende_vragen": ("Ontbrekende vraag markeren", self._workspace_start_manual_mark),
-            "structuur": ("Structuur afbakenen", self.edit_exam_structure),
-            "vraagrecords": ("Volgend vraagrecord maken", self._workflow_make_next_record),
-            "eindcontrole": ("Eindcontrole openen", self.show_records),
+            "documenttype": ("Documenttype bevestigen", self.correct_type),
+            "metadata": ("Examengegevens bevestigen", self.edit_exam_metadata),
+            "vraagstarts": ("Vraagstarts beoordelen", self.show_candidates),
+            "ontbrekende_vragen": ("Vraagstarts handmatig toevoegen", self._workspace_start_manual_mark),
+            "opgaven_fragmenten": ("Context- en vraagfragmenten", self.edit_exam_structure),
+            "vraaganalyse": ("Vraagtype en punten controleren", self.show_records),
+            "uitwerkbijlage_starts": ("Vraagstarts uitwerkbijlage analyseren", lambda: self.analyze_auxiliary_starts("uitwerkbijlage")),
+            "uitwerkbijlage_fragmenten": ("Uitwerkbijlagefragmenten", self.show_records),
+            "cv_starts": ("Vraagstarts correctievoorschrift analyseren", lambda: self.analyze_auxiliary_starts("correctievoorschrift")),
+            "cv_fragmenten": ("CV-fragmenten controleren", self.show_records),
+            "aanvulling": ("CV-aanvulling verwerken", self.show_records),
+            "antwoorden": ("Correcte antwoorden controleren", self.show_records),
+            "volledigheid": ("Volledigheidscontrole", self.show_records),
+            "snippets": ("Definitieve uitsneden maken", self.generate_final_snippets),
+            "eindcontrole": ("Visuele eindcontrole", self.show_records),
             "export": ("Exportpakket maken", self.export_project),
             "voltooid": ("Examenbibliotheek tonen", self._show_exam_library),
         }
@@ -784,6 +822,29 @@ class ExamApp:
             button, action = "Volgend examen", self._workflow_open_next_exam
         else:
             button, action = actions[state["stage"]]
+            if state["stage"] == "vraagstarts":
+                target_id=state.get("document_id")
+                found=any(r.get("document_id")==target_id for r in self.data.get("vraagkandidaten",[]))
+                if found:
+                    button="Vraagstarts beoordelen"
+                    action=lambda:self.show_candidates(target_id)
+                else:
+                    button="Vraagstarts analyseren"
+                    action=self.analyze_questions
+            elif state["stage"] == "ontbrekende_vragen":
+                target_id=state.get("document_id")
+                def add_missing_question():
+                    if target_id:
+                        self._workspace_doc_id=target_id
+                        self._workspace_refresh()
+                    self._workspace_start_manual_mark()
+                button="Vraagstart handmatig toevoegen"
+                action=add_missing_question
+            elif state["stage"] == "cv_starts" and not any(
+                    d.get("type_voorstel")=="correctievoorschrift"
+                    for d in self.data.get("documenten",[])):
+                button="Correctievoorschrift toevoegen"
+                action=self.add_pdfs
         self.workflow_label.configure(text=f"Volgende stap · {label}. {state['action']}")
         self.workflow_button.configure(text=button, command=action)
 
@@ -1356,6 +1417,15 @@ class ExamApp:
             row["human_decision"] = bool(decision)
             row["status"] = "bevestigd_vraagstart" if decision else "afgewezen_geen_vraag"
             row["decision_reason"] = "Handmatig beoordeeld in de geïntegreerde werkruimte."
+            if row.get("auxiliary_document_role"):
+                auxiliary_doc=next((d for d in self.data.get("documenten",[])
+                                    if d.get("id")==row.get("document_id")),None)
+                auxiliary_rows=[x for x in self.data.get("vraagkandidaten",[])
+                                if x.get("document_id")==row.get("document_id")]
+                if auxiliary_doc and auxiliary_rows and all(
+                    x.get("human_decision") in (True,False) for x in auxiliary_rows):
+                    auxiliary_doc.setdefault("vraagstarts_detectie",{})["status"]="visueel_bevestigd"
+                    auxiliary_doc["vraagstarts_detectie"]["reviewed_at"]=now()
             learn_decision(self.knowledge_dir, {
                 "pattern_key": question_pattern_key(row),
                 "chosen": "question" if decision else "not_question",
@@ -1469,7 +1539,10 @@ class ExamApp:
             row["vraagtype_fragment_id"] = fragment.get("id")
         records = self.data.setdefault("vraagrecords", [])
         subject = str(self.data.get("vak") or "Onbekend")
-        exam_meta = doc.get("exam_metadata") or self.data.get("exam_metadata") or {}
+        exam_meta = dict(self.data.get("exam_metadata") or doc.get("exam_metadata") or {})
+        for key in ("theme","concept","end","focus"):
+            exam_meta.setdefault(key,"")
+        exam_meta.setdefault("points",None)
         for row in candidates:
             fragment = linked[row.get("id")]
             question_links = fragments_for_question(structure, int(row["number"]))
@@ -1491,16 +1564,53 @@ class ExamApp:
                 }
                 records.append(record)
             record["question_fragment_id"] = fragment.get("id")
-            record["question_text"] = str(fragment.get("text") or "")
-            record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
-            record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
+            if (record.get("question_type_status") != "handmatig_gecontroleerd"
+                    or record.get("exam_structure_invalidated") is True
+                    or record.get("source_analysis_invalidated") is True):
+                record["question_text"] = str(fragment.get("text") or "")
+                record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
+                record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
+                record["approved_by_human"] = False
+                record["record_review_checklist"] = {
+                    key: False for key in record.get("record_review_checklist", {})}
+                record["exam_structure_invalidated"] = False
+                record["source_analysis_invalidated"] = False
             linked_contexts = question_links.get("context_fragments", [])
             record["context_fragment_ids"] = [item.get("id") for item in linked_contexts]
             record["context_fragments"] = [
-                {"id": item.get("id"), "text": str(item.get("text") or ""),
+                {"id": item.get("id"), "type":item.get("type"),
+                 "text": str(item.get("text") or ""),
                  "page_spans": item.get("page_spans", [])}
                 for item in linked_contexts
             ]
+            record["exam_structure_status"]="gekoppeld"
+            record["exam_structure_document_id"]=doc.get("id")
+            record["exam_structure_source_sha256"]=doc.get("sha256")
+            record["exam_structure_fragment_ids"]=[fragment.get("id")]+[
+                item.get("id") for item in linked_contexts]
+            record["question_region_fragment_id"]=fragment.get("id")
+            record["exam_structure_question_number"]=int(row.get("number"))
+            record["question_region_page_spans"]=list(fragment.get("page_spans",[]))
+            record["context_region_fragments"]=[{
+                "id":item.get("id"),"type":item.get("type"),
+                "page_spans":list(item.get("page_spans",[])),
+                "question_numbers":list(item.get("question_numbers",[])),
+                "text":str(item.get("text") or ""),
+            } for item in linked_contexts]
+            record["source_context"]="\n\n".join(
+                str(item.get("text") or "") for item in linked_contexts if item.get("text"))
+            record["source_analysis_invalidated"]=False
+            record["exam_structure_invalidated"]=False
+            record["cv_region_invalidated"]=False
+            record["approval_revoked_reason"]=None
+            record["available_appendix_candidates"]=[
+                d.get("opslagbestand") for d in self.data.get("documenten",[])
+                if d.get("type_voorstel")=="uitwerkbijlage"]
+            record["available_cv_amendment_candidates"]=[
+                d.get("opslagbestand") for d in self.data.get("documenten",[])
+                if d.get("type_voorstel")=="aanvulling"]
+            record.setdefault("uitwerkbijlagen",[])
+            record.setdefault("cv_amendment_pdfs",[])
         self.save_project()
         self._log(
             f"Vraagtypen bepaald en {len(candidates)} eenvoudige conceptrecords aangemaakt voor {doc.get('bestand')}."
@@ -1997,9 +2107,10 @@ class ExamApp:
                     continue
                 seen_hashes.add(digest)
                 extracted = extract_pdf(source)
-                all_text = "\n".join(page["tekst"] for page in extracted["pagina_tekst"])
-                role, role_confidence, role_signals = classify_document_role(source.name, all_text)
-                identity = infer_exam_metadata(source.name, all_text)
+                first_page_text = (extracted["pagina_tekst"][0]["tekst"]
+                                   if extracted.get("pagina_tekst") else "")
+                role, role_confidence, role_signals = classify_document_role(source.name, first_page_text)
+                identity = infer_exam_metadata(source.name, first_page_text)
                 documents.append({
                     "id": digest[:16], "bestand": source.name, "source_path": str(source),
                     "opslagbestand": f"{digest[:12]}-{source.name}", "sha256": digest,
@@ -2327,9 +2438,10 @@ class ExamApp:
                 target = self.project_dir / "bronnen" / f"{digest[:12]}-{source.name}"
                 shutil.copy2(source, target)
                 extracted = extract_pdf(target)
-                all_text = "\n".join(p["tekst"] for p in extracted["pagina_tekst"])
-                kind, confidence, scores = classify_document_role(source.name, all_text)
-                exam_meta = infer_exam_metadata(source.name, all_text) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
+                first_page_text = (extracted["pagina_tekst"][0]["tekst"]
+                                   if extracted.get("pagina_tekst") else "")
+                kind, confidence, scores = classify_document_role(source.name, first_page_text)
+                exam_meta = infer_exam_metadata(source.name, first_page_text) if kind in ("opgaven", "correctievoorschrift", "uitwerkbijlage", "aanvulling") else {}
                 doc = {"id": digest[:16], "bestand": source.name, "opslagbestand": target.name,
                        "exam_metadata": exam_meta,
                        "sha256": digest, "type_voorstel": kind, "type_zekerheid": confidence,
@@ -2553,11 +2665,71 @@ class ExamApp:
         self.refresh()
         messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Per examen is alleen het bijbehorende correctievoorschrift vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
 
-    def show_candidates(self):
-        """Review question starts in one continuous workspace, without per-question dialogs."""
+    def analyze_auxiliary_starts(self, role):
+        """Detect and open a human review of question anchors in an appendix or CV PDF."""
+        if role not in ("uitwerkbijlage","correctievoorschrift"):
+            raise ValueError("Alleen uitwerkbijlagen en correctievoorschriften kunnen hier worden geanalyseerd.")
+        docs=[d for d in self.data.get("documenten",[]) if d.get("type_voorstel")==role]
+        if not docs:
+            messagebox.showinfo("Document ontbreekt",
+                f"Voeg eerst een document van het type '{role}' toe.",parent=self.root)
+            return
+        from engine import detect_cv_question_numbers
+        first_doc=None
+        try:
+            for doc in docs:
+                previous_detection=doc.get("vraagstarts_detectie") or {}
+                if (previous_detection.get("status")=="visueel_bevestigd"
+                        and previous_detection.get("source_sha256")==doc.get("sha256")):
+                    continue
+                source=self.project_dir/"bronnen"/doc["opslagbestand"]
+                if not source.is_file() or sha256(source)!=doc.get("sha256"):
+                    raise ValueError(f"De bron-PDF {doc.get('bestand')} ontbreekt of is gewijzigd.")
+                analysis=analyze_pdf(source)
+                found=detect_cv_question_numbers(analysis)
+                old=[r for r in self.data.get("vraagkandidaten",[])
+                     if r.get("document_id")==doc.get("id")]
+                old_by_key={(int(r.get("number",-1)),int(r.get("page",-1))):r for r in old}
+                reviewed=[]
+                for item in found:
+                    key=(int(item["number"]),int(item["page"]))
+                    previous=old_by_key.get(key,{})
+                    row=dict(item)
+                    row.update({
+                        "id":previous.get("id") or f"{role}-{doc['id']}-q{key[0]}-p{key[1]}",
+                        "document_id":doc["id"],"bestand":doc.get("bestand"),
+                        "human_decision":previous.get("human_decision"),
+                        "status":previous.get("status","controle_nodig"),
+                        "auxiliary_document_role":role,
+                    })
+                    reviewed.append(row)
+                self.data["vraagkandidaten"]=[
+                    r for r in self.data.get("vraagkandidaten",[])
+                    if r.get("document_id")!=doc.get("id")
+                ]+reviewed
+                doc["vraagstarts_detectie"]={
+                    "status":"visueel_bevestigd" if reviewed and all(
+                        x.get("human_decision") in (True,False) for x in reviewed) else "voorstel_gemaakt",
+                    "count":len(reviewed),"source_sha256":doc.get("sha256"),
+                    "reviewed_at":previous_detection.get("reviewed_at"),
+                }
+                if first_doc is None and doc["vraagstarts_detectie"]["status"]!="visueel_bevestigd":
+                    first_doc=doc
+                if not reviewed:
+                    self._log(f"Geen CV-vraagankers herkend in {doc.get('bestand')}; controleer de PDF handmatig.")
+            self.save_project()
+            if first_doc:
+                self.show_candidates(first_doc.get("id"))
+        except Exception as exc:
+            self._error("Vraagstarts in bijlage/CV analyseren",exc)
+            messagebox.showerror("Analyse mislukt",str(exc),parent=self.root)
+
+    def show_candidates(self, document_id=None):
+        """Review question starts in one continuous workspace, optionally for one source PDF."""
         if not self.data:
             return
-        rows = self.data.get("vraagkandidaten", [])
+        rows = [r for r in self.data.get("vraagkandidaten", [])
+                if document_id is None or r.get("document_id")==document_id]
         win = tk.Toplevel(self.root)
         win.title("Vraagstarts controleren")
         win.geometry("1280x820")
@@ -2754,11 +2926,33 @@ class ExamApp:
 
         tree.bind("<<TreeviewSelect>>", show_selected)
         ttk.Button(footer, text="Originele pagina", command=inspect_original).pack(side="right", padx=4)
-        ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record).pack(side="right", padx=4)
+        if not (rows and rows[0].get("auxiliary_document_role")):
+            def add_missing_question():
+                target_doc=document_id or getattr(self,"_workspace_doc_id",None)
+                if target_doc:
+                    self._workspace_doc_id=target_doc
+                    self._workspace_refresh()
+                win.destroy()
+                self._workspace_start_manual_mark()
+            ttk.Button(footer,text="Vraagstart handmatig toevoegen",
+                       command=add_missing_question).pack(side="left",padx=4)
+        ttk.Button(footer, text="Concept-vraagrecord maken", command=make_record,
+                   state=("disabled" if rows and rows[0].get("auxiliary_document_role") else "normal")).pack(side="right", padx=4)
         ttk.Button(footer, text="Geen vraag", command=lambda: decide(False)).pack(side="right", padx=4)
         ttk.Button(footer, text="Bevestig vraag", command=lambda: decide(True), style="Accent.TButton").pack(side="right", padx=4)
         ttk.Button(footer, text="Onderdrukte dubbelingen",
                    command=lambda: self.show_suppressed_candidates(win)).pack(side="left", padx=4)
+        if not rows and document_id:
+            def confirm_no_anchors():
+                doc=next((d for d in self.data.get("documenten",[]) if d.get("id")==document_id),None)
+                if doc:
+                    doc.setdefault("vraagstarts_detectie",{})["status"]="visueel_bevestigd"
+                    doc["vraagstarts_detectie"]["reviewed_at"]=now()
+                    doc["vraagstarts_detectie"]["review_note"]="Geen afzonderlijke vraagstarts gevonden; vraagkoppeling gebeurt op basis van de opgaven."
+                    self.save_project()
+                    win.destroy()
+            ttk.Button(footer,text="Bevestig: geen afzonderlijke vraagstarts",
+                       command=confirm_no_anchors).pack(side="left",padx=4)
         if rows:
             refresh_rows(next((i for i, row in enumerate(rows) if row.get("human_decision") is None), 0))
         else:
@@ -3449,45 +3643,456 @@ class ExamApp:
         ttk.Button(buttons,text="Vraag bekijken / aanpassen",command=open_selected).pack(side="left")
         ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
 
+    def generate_final_snippets(self):
+        """Render final question/context snippets only from saved, confirmed page spans."""
+        if not self.data:
+            return
+        records=self.data.get("vraagrecords",[])
+        if not records:
+            messagebox.showinfo("Geen vraagrecords","Er zijn geen bevestigde vraagfragmenten om uit te snijden.",parent=self.root)
+            return
+        generated=0
+        try:
+            from PIL import Image
+            for record in records:
+                doc=next((d for d in self.data.get("documenten",[])
+                          if d.get("id")==record.get("candidate_document_id")),None)
+                if not doc:
+                    raise ValueError(f"Vraag {record.get('number')}: opgavenbron ontbreekt.")
+                source=self.project_dir/"bronnen"/doc["opslagbestand"]
+                if not source.is_file() or sha256(source)!=doc.get("sha256"):
+                    raise ValueError(f"Vraag {record.get('number')}: bron-PDF ontbreekt of is gewijzigd.")
+                structure=(self.data.get("exam_structures",{}).get(doc["id"])
+                           or self.data.get("exam_structure"))
+                linked=fragments_for_question(structure,int(record["number"]))
+                question=linked.get("question_fragment")
+                if not question or not question.get("page_spans"):
+                    raise ValueError(f"Vraag {record.get('number')}: bevestigd vraagfragment ontbreekt.")
+                analysis=analyze_pdf(source)
+                page_sizes={int(p["page"]):(float(p["width"]),float(p["height"]))
+                            for p in analysis["pages"]}
+                segments=page_spans_to_segments(question["page_spans"],page_sizes)
+                name=f"question-{doc['id']}-q{record['number']}-final.png"
+                target=self.project_dir/"snippets"/name
+                render_composite_crops(source,segments,target,scale=1.45)
+                # Trim only blank top/bottom margins; never infer or alter fragment
+                # boundaries. A small white safety margin is retained.
+                with Image.open(target) as opened:
+                    image=opened.convert("RGB")
+                    gray=image.convert("L")
+                    ink=gray.point(lambda value:255 if value<246 else 0)
+                    bbox=ink.getbbox()
+                    trimmed=(image.crop((0,max(0,bbox[1]-4),image.width,
+                                         min(image.height,bbox[3]+4))) if bbox else image.copy())
+                trimmed.save(target)
+                record["question_region_snippet_file"]=name
+                record["snippet_file"]=name
+                record["snippet_files"]=[name]
+                record["question_region_snippet_sha256"]=sha256(target)
+                context_names=[]
+                context_assets=list(record.get("context_asset_files") or [])
+                context_region_records=[]
+                for context in linked.get("context_fragments",[]):
+                    context_name=f"context-{doc['id']}-{context['id']}-final.png"
+                    context_target=self.project_dir/"snippets"/context_name
+                    context_segments=page_spans_to_segments(context["page_spans"],page_sizes)
+                    render_composite_crops(source,context_segments,context_target,scale=1.25)
+                    with Image.open(context_target) as opened:
+                        image=opened.convert("RGB")
+                        gray=image.convert("L")
+                        bbox=gray.point(lambda value:255 if value<246 else 0).getbbox()
+                        trimmed=(image.crop((0,max(0,bbox[1]-4),image.width,
+                                             min(image.height,bbox[3]+4))) if bbox else image.copy())
+                    trimmed.save(context_target)
+                    asset={"fragment_id":context.get("id"),"file":context_name,
+                           "sha256":sha256(context_target),"snippet_sha256":sha256(context_target),
+                           "source_document_id":doc["id"],"source_sha256":doc.get("sha256"),
+                           "type":"context","caption":"Handmatig afgebakend contextfragment",
+                           "page":context.get("page_spans",[{}])[0].get("page"),
+                           "page_spans":list(context.get("page_spans",[]))}
+                    context_names.append(asset)
+                    context_region_records.append({"id":context.get("id"),"type":"context",
+                        "page_spans":list(context.get("page_spans",[])),
+                        "question_numbers":list(context.get("question_numbers",[])),
+                        "text":str(context.get("text") or "")})
+                    if not any(x.get("fragment_id")==context.get("id") for x in context_assets):
+                        context_assets.append(asset)
+                record["context_region_snippet_files"]=context_names
+                record["context_asset_files"]=context_assets
+                record["context_region_fragments"]=context_region_records
+                record["source_context"]="\n\n".join(x["text"] for x in context_region_records if x["text"])
+                generated+=1
+            self.save_project()
+            self._log(f"Definitieve vraaguitsneden gegenereerd: {generated} vraagfragmenten; originele PDF's en fragmentgrenzen ongewijzigd.")
+            messagebox.showinfo("Uitsneden gemaakt",
+                f"De definitieve vraaguitsneden zijn vanuit de opgeslagen grenzen gegenereerd.\n\nAantal vragen: {generated}",parent=self.root)
+        except Exception as exc:
+            self._error("Definitieve vraaguitsneden maken",exc)
+            messagebox.showerror("Uitsneden niet compleet",str(exc),parent=self.root)
+
+    def _review_exam_completeness(self):
+        """Run structural completeness checks and persist the teacher's final confirmation."""
+        issues=exam_completeness_issues(self.data or {})
+        for doc in (self.data or {}).get("documenten",[]):
+            source=self.project_dir/"bronnen"/str(doc.get("opslagbestand",""))
+            if not source.is_file() or sha256(source)!=doc.get("sha256"):
+                issues.append({"code":"bronbestand_ontbreekt_of_gewijzigd",
+                               "document_id":doc.get("id")})
+        for record in (self.data or {}).get("vraagrecords",[]):
+            for asset in record.get("context_asset_files",[]):
+                asset_path=self.project_dir/"snippets"/str(asset.get("file",""))
+                expected=asset.get("snippet_sha256") or asset.get("sha256")
+                if not asset_path.is_file() or (expected and sha256(asset_path)!=expected):
+                    issues.append({"code":"contextuitsnede_ontbreekt_of_gewijzigd",
+                                   "record_id":record.get("id"),"question_number":record.get("number")})
+        point_values=[]
+        for record in (self.data or {}).get("vraagrecords",[]):
+            raw_points=(record.get("exam") or {}).get("points")
+            if raw_points in (None,""):
+                continue
+            try:
+                point_values.append(float(raw_points))
+            except (TypeError,ValueError):
+                issues.append({"code":"ongeldig_puntenaantal",
+                               "record_id":record.get("id"),"question_number":record.get("number")})
+        total_points=sum(point_values)
+        win=tk.Toplevel(self.root); win.title("Volledigheidscontrole")
+        win.geometry("760x560")
+        outer=ttk.Frame(win,padding=14); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text="Automatische structurele controles",
+                  font=("Segoe UI",11,"bold")).pack(anchor="w")
+        ttk.Label(outer,text="Deze controle zoekt onder meer dubbele vraagnummering, ontbrekende vraagfragmenten, losse contextfragmenten, verouderde bronkoppelingen, ontbrekende puntenaantallen en ontbrekende of gewijzigde bronbestanden/uitsneden.",
+                  wraplength=720).pack(anchor="w",pady=(4,6))
+        ttk.Label(outer,text=f"Gecontroleerde vragen: {len(self.data.get('vraagrecords',[]))} · ingevulde puntenaantallen: {len(point_values)} · som van ingevulde punten: {total_points:g}",
+                  wraplength=720).pack(anchor="w",pady=(0,8))
+        report=tk.Text(outer,wrap="word",height=18)
+        report.pack(fill="both",expand=True)
+        if issues:
+            report.insert("1.0","Er zijn nog aandachtspunten:\n\n"+ "\n".join(
+                f"• {item.get('code')} · vraag {item.get('question_number','—')} · document {item.get('document_id','—')} · fragment {item.get('fragment_id','—')}"
+                for item in issues))
+        else:
+            report.insert("1.0","Geen structurele onvolledigheden gevonden. Controleer ook de inhoudelijke volledigheid van de examen-PDF's.")
+        report.configure(state="disabled")
+        def confirm():
+            if issues:
+                messagebox.showwarning("Controle niet compleet",
+                    "Los eerst alle structurele aandachtspunten op. De volledigheidscontrole kan nog niet worden bevestigd.",parent=win)
+                return
+            self.data["completeness_review"]={
+                "status":"visueel_bevestigd","reviewed_at":now(),
+                "question_count":len(self.data.get("vraagrecords",[])),
+                "document_count":len(self.data.get("documenten",[])),
+                "total_points":total_points,
+                "fingerprint":exam_review_fingerprint(self.data,False),
+            }
+            self.save_project()
+            self._log("Structurele volledigheidscontrole bevestigd.")
+            win.destroy()
+        ttk.Button(outer,text="Volledigheid bevestigen",command=confirm,
+                   style="Accent.TButton",state=("disabled" if issues else "normal")).pack(anchor="e",pady=(8,0))
+
+    def _review_consolidated_cv(self):
+        """Show a traceable, question-ordered composite of the original CV and addenda."""
+        records=sorted(self.data.get("vraagrecords",[]),key=lambda r:int(r.get("number",0) or 0))
+        if not records:
+            messagebox.showinfo("Geen vraagrecords","Er zijn nog geen vraagrecords om samen te voegen.",parent=self.root)
+            return
+        win=tk.Toplevel(self.root); win.title("Geconsolideerd correctievoorschrift · visuele controle")
+        win.geometry("1120x860")
+        outer=ttk.Frame(win,padding=10); outer.pack(fill="both",expand=True)
+        ttk.Label(outer,text="Samengevoegde weergave · bron-CV en officiële aanvullingen blijven afzonderlijk en ongewijzigd bewaard.",
+                  wraplength=1080).pack(anchor="w",pady=(0,8))
+        frame=ttk.Frame(outer); frame.pack(fill="both",expand=True)
+        canvas=tk.Canvas(frame,background="#edf0f2")
+        sy=ttk.Scrollbar(frame,orient="vertical",command=canvas.yview)
+        canvas.configure(yscrollcommand=sy.set)
+        canvas.pack(side="left",fill="both",expand=True); sy.pack(side="right",fill="y")
+        inner=ttk.Frame(canvas,padding=8)
+        window_id=canvas.create_window((0,0),window=inner,anchor="nw")
+        inner.bind("<Configure>",lambda _e:canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.bind("<Configure>",lambda e:canvas.itemconfigure(window_id,width=e.width))
+        photos=[]
+        entries=[]
+        missing=[]
+        for record in records:
+            number=record.get("number")
+            block=ttk.LabelFrame(inner,text=f"Vraag {number} · {record.get('cv_amendment_change_type') or 'wijziging niet geclassificeerd'}",padding=8)
+            block.pack(fill="x",pady=6)
+            source_file=record.get("cv_source_region_file") or record.get("cv_snippet_file")
+            source_doc=next((d for d in self.data.get("documenten",[])
+                             if d.get("id")==record.get("cv_source_document_id")),None)
+            if source_file and (self.project_dir/"snippets"/source_file).is_file():
+                ttk.Label(block,text="Oorspronkelijk correctievoorschrift").pack(anchor="w")
+                photo=tk.PhotoImage(file=str(self.project_dir/"snippets"/source_file))
+                factor=max(1,(photo.width()+980-1)//980)
+                if factor>1: photo=photo.subsample(factor,factor)
+                ttk.Label(block,image=photo).pack(anchor="w"); photos.append(photo)
+            else:
+                ttk.Label(block,text="Oorspronkelijk CV-fragment ontbreekt.").pack(anchor="w")
+                missing.append(f"vraag {number}: oorspronkelijk CV-fragment")
+            amendments=record.get("cv_amendment_regions") or []
+            for amendment in amendments:
+                name=amendment.get("snippet_file")
+                path=self.project_dir/"snippets"/str(name or "")
+                ttk.Label(block,text="Officiële aanvulling").pack(anchor="w",pady=(6,0))
+                if name and path.is_file():
+                    photo=tk.PhotoImage(file=str(path))
+                    factor=max(1,(photo.width()+980-1)//980)
+                    if factor>1: photo=photo.subsample(factor,factor)
+                    ttk.Label(block,image=photo).pack(anchor="w"); photos.append(photo)
+                else:
+                    ttk.Label(block,text="Aanvullingsfragment ontbreekt.").pack(anchor="w")
+                    missing.append(f"vraag {number}: aanvullingsfragment")
+            entries.append({
+                "question_number":number,"change_type":record.get("cv_amendment_change_type"),
+                "original_document_id":record.get("cv_source_document_id"),
+                "original_source_pdf":record.get("cv_pdf"),
+                "original_source_sha256":record.get("cv_source_sha256"),
+                "original_region_file":source_file,
+                "amendment_regions":[dict(x) for x in amendments],
+            })
+        win._consolidated_photos=photos
+        if missing:
+            ttk.Label(outer,text="Niet compleet: "+", ".join(missing),foreground="#9b4d00",
+                      wraplength=1080).pack(anchor="w",pady=5)
+        def confirm():
+            if missing:
+                messagebox.showwarning("Consolidatie onvolledig",
+                    "Los eerst de ontbrekende bronfragmenten op voordat je de samengevoegde CV-weergave bevestigt.",parent=win)
+                return
+            try:
+                output=self.project_dir/"afgeleid"/"correctievoorschrift-geconsolideerd.pdf"
+                generated=build_consolidated_cv_pdf(
+                    entries,self.project_dir/"snippets",output,
+                    self.data.get("exam_metadata") or {})
+                relative=str(output.relative_to(self.project_dir))
+                self.data["consolidated_cv"]={
+                    "schema":"consolidated-cv-pdf-v1","status":"samengesteld",
+                    "file":relative,"sha256":generated["sha256"],
+                    "page_count":generated["page_count"],"question_pages":generated["question_pages"],
+                    "entries":entries,"sources_unchanged":True,"generated_at":now(),
+                }
+                self.save_project()
+                try:
+                    if hasattr(os,"startfile"):
+                        os.startfile(str(output))
+                    else:
+                        webbrowser.open(output.resolve().as_uri())
+                except Exception as open_error:
+                    messagebox.showwarning("PDF openen niet gelukt",
+                        f"De geconsolideerde CV is gemaakt, maar kon niet automatisch worden geopend.\n\n{output}\n\n{open_error}",parent=win)
+                confirmed=messagebox.askyesno("Geconsolideerde CV controleren",
+                    f"De samengevoegde CV is aangemaakt en geopend.\n\n{generated['page_count']} pagina's\n{output}\n\nHeb je de volledige PDF visueel gecontroleerd?",parent=win)
+                if confirmed:
+                    self.data["consolidated_cv"]["status"]="visueel_bevestigd"
+                    self.data["consolidated_cv"]["reviewed_at"]=now()
+                    self._log("Geconsolideerde CV-PDF visueel bevestigd; oorspronkelijke CV en aanvulling zijn ongewijzigd.")
+                else:
+                    self._log("Geconsolideerde CV-PDF aangemaakt maar nog niet visueel bevestigd.")
+                self.save_project()
+                if confirmed:
+                    win.destroy()
+            except Exception as exc:
+                self._error("Geconsolideerde CV maken",exc)
+                messagebox.showerror("CV-consolidatie mislukt",str(exc),parent=win)
+        ttk.Button(outer,text="Geconsolideerde CV-PDF genereren en controleren",
+                   command=confirm,style="Accent.TButton").pack(anchor="e",pady=(8,0))
+
     def _review_simple_question_draft(self, record, parent):
-        """Small subject-neutral editor for the generated question text and type."""
+        """Review question type, points, wording and options from the saved fragment."""
         win=tk.Toplevel(parent)
-        win.title(f"Vraag {record.get('number')} · concept")
-        win.geometry("760x620")
+        win.title(f"Vraag {record.get('number')} · vraaganalyse")
+        win.geometry("900x760")
         win.transient(parent)
         outer=ttk.Frame(win,padding=12); outer.pack(fill="both",expand=True)
         ttk.Label(outer,text=f"{record.get('vak','')} · vraag {record.get('number')} · pagina {record.get('source_page')}",
                   font=("Segoe UI",10,"bold")).pack(anchor="w")
-        ttk.Label(outer,text="Vraagtype").pack(anchor="w",pady=(12,3))
+        ttk.Label(outer,text="Controleer uitsluitend de inhoud die uit het reeds bevestigde vraagfragment volgt. De fragmentgrenzen worden hier niet opnieuw beoordeeld.",
+                  wraplength=860).pack(anchor="w",pady=(4,10))
+        top=ttk.Frame(outer); top.pack(fill="x")
+        ttk.Label(top,text="Vraagtype").pack(side="left")
         type_var=tk.StringVar(value=record.get("question_type","onbekend"))
-        ttk.Combobox(outer,textvariable=type_var,values=["meerkeuze","juist_onjuist","wel_niet","open","onbekend"],state="readonly").pack(anchor="w")
+        ttk.Combobox(top,textvariable=type_var,
+            values=["meerkeuze","juist_onjuist","wel_niet","ja_nee","hoger_lager",
+                    "meer_minder","open","onbekend"],state="readonly",width=20).pack(side="left",padx=(6,18))
+        ttk.Label(top,text="Maximaal aantal punten").pack(side="left")
+        exam=record.setdefault("exam",{})
+        points_var=tk.StringVar(value=str(exam.get("points","")))
+        ttk.Entry(top,textvariable=points_var,width=8).pack(side="left",padx=6)
         ttk.Label(outer,text="Vraagtekst uit het gekozen vraagfragment").pack(anchor="w",pady=(12,3))
-        text_box=tk.Text(outer,wrap="word",height=20)
+        text_box=tk.Text(outer,wrap="word",height=12)
         text_box.pack(fill="both",expand=True)
         text_box.insert("1.0",record.get("question_text",""))
+        ttk.Label(outer,text="Antwoordopties (één per regel; bij meerkeuze bijvoorbeeld A. ...).").pack(anchor="w",pady=(8,3))
+        options_box=tk.Text(outer,wrap="word",height=6)
+        options_box.pack(fill="x")
+        options_box.insert("1.0","\n".join(
+            f"{item.get('key','')}. {item.get('text','')}".strip(". ")
+            for item in (record.get("options") or [])
+        ))
+        correct_var=tk.StringVar(value=str(record.get("correct","")))
+        keyrow=ttk.Frame(outer); keyrow.pack(fill="x",pady=(5,0))
+        ttk.Label(keyrow,text="Correcte sleutel (indien van toepassing)").pack(side="left")
+        ttk.Entry(keyrow,textvariable=correct_var,width=16).pack(side="left",padx=8)
+        answer_reviewed_var=tk.BooleanVar(value=(record.get("answer_review") or {}).get("status")=="visueel_bevestigd")
+        ttk.Checkbutton(outer,text="Correct antwoord (ook ja/nee, waar/onwaar, hoger/lager enz.) vergeleken met het officiële CV",
+            variable=answer_reviewed_var).pack(anchor="w",pady=(6,0))
+        amendment_row=ttk.Frame(outer); amendment_row.pack(fill="x",pady=(6,0))
+        ttk.Label(amendment_row,text="Wijziging door CV-aanvulling").pack(side="left")
+        amendment_change_var=tk.StringVar(value=record.get("cv_amendment_change_type",""))
+        ttk.Combobox(amendment_row,textvariable=amendment_change_var,
+            values=["toevoeging","wijziging","vervanging","intrekking","ongewijzigd"],
+            state="readonly",width=24).pack(side="left",padx=8)
         contexts=record.get("context_fragments",[])
         context_text="\n\n".join(
             f"Context {index+1}: {item.get('text') or '[geen uitleesbare tekst; fragment blijft visueel gekoppeld]'}"
             for index,item in enumerate(contexts)
         )
         ttk.Label(outer,text=f"Gekoppelde contextfragmenten: {len(contexts)}",
-                  wraplength=720).pack(anchor="w",pady=(8,2))
+                  wraplength=860).pack(anchor="w",pady=(8,2))
         if context_text:
             context_box=tk.Text(outer,wrap="word",height=5)
             context_box.pack(fill="x")
             context_box.insert("1.0",context_text)
             context_box.configure(state="disabled")
         def save():
+            raw_points=points_var.get().strip().replace(",",".")
+            if raw_points:
+                try:
+                    points=float(raw_points)
+                    if points<0 or points>100 or not points.is_integer():
+                        raise ValueError
+                except ValueError:
+                    messagebox.showerror("Ongeldig puntenaantal","Vul een geheel puntenaantal tussen 0 en 100 in.",parent=win)
+                    return
+            else:
+                points=None
+            options=[]
+            for line in options_box.get("1.0","end").splitlines():
+                line=line.strip()
+                if not line:
+                    continue
+                match=re.match(r"^([A-H])\s*[.)-]\s*(.*)$",line,re.I)
+                if match:
+                    options.append({"key":match.group(1).upper(),"text":match.group(2).strip()})
+                else:
+                    options.append({"key":str(len(options)+1),"text":line})
             record["question_text"]=text_box.get("1.0","end").strip()
+            record["approved_by_human"]=False
+            record["approved_at"]=None
+            record["record_review_checklist"]={key:False for key in record.get("record_review_checklist",{})}
             record["question_type"]=type_var.get()
+            record.setdefault("exam",{})["questionType"]=(
+                "mcq" if type_var.get()=="meerkeuze" else
+                "unknown" if type_var.get()=="onbekend" else "open")
             record["question_type_status"]="handmatig_gecontroleerd"
+            record["options"]=options
+            record["correct"]=correct_var.get().strip()
+            if answer_reviewed_var.get():
+                if not correct_var.get().strip():
+                    messagebox.showwarning("Antwoord ontbreekt","Vul eerst het gecontroleerde antwoord of de antwoordsleutel in.",parent=win)
+                    return
+                record["answer_review"]={"status":"visueel_bevestigd","answer":correct_var.get().strip(),
+                                         "reviewed_at":now()}
+            else:
+                record.pop("answer_review",None)
+            record["cv_amendment_change_type"]=amendment_change_var.get()
+            record.setdefault("exam",{})["points"]=int(points) if points is not None else None
             record["status"]="concept"
             self.save_project()
-            self._log(f"Conceptvraag {record.get('number')} aangepast.")
+            self._log(f"Vraag {record.get('number')}: vraagtype, punten en antwoordopties gecontroleerd.")
             win.destroy()
-        buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(8,0))
-        ttk.Button(buttons,text="Opslaan",command=save).pack(side="right")
-        ttk.Button(buttons,text="Sluiten",command=win.destroy).pack(side="right",padx=8)
+            return_to_review=getattr(self,"_return_to_final_review",None)
+            if return_to_review:
+                delattr(self,"_return_to_final_review")
+                self.root.after(100,return_to_review)
+        region_bar=ttk.LabelFrame(outer,text="Gekoppelde documentfragmenten",padding=8)
+        region_bar.pack(fill="x",pady=(10,0))
+        def open_region(role):
+            docs=[d for d in self.data.get("documenten",[]) if d.get("type_voorstel")==role]
+            if not docs:
+                messagebox.showinfo("Document ontbreekt",
+                    f"Er is nog geen document van het type '{role}' toegevoegd. Voeg eerst de juiste PDF toe.",parent=win)
+                return
+            def launch(doc, chooser=None):
+                if chooser is not None:
+                    chooser.destroy()
+                def saved(name, fragment):
+                    if role=="correctievoorschrift":
+                        record["cv_source_document_id"]=doc["id"]
+                        record["cv_source_region"]=fragment
+                        record["cv_source_region_file"]=name
+                        record["cv_source_region_sha256"]=sha256(self.project_dir/"snippets"/name)
+                        record["cv_snippet_file"]=name
+                        record["cv_snippet_files"]=[name]
+                        record["cv_source_sha256"]=doc.get("sha256")
+                        record["cv_source_document_name"]=doc.get("bestand")
+                        record["cv_pdf"]=doc.get("opslagbestand")
+                        record["cv_match_human_confirmed"]=True
+                        record["cv_region_invalidated"]=False
+                    elif role=="aanvulling":
+                        record.setdefault("cv_amendment_regions",[])
+                        record["cv_amendment_regions"]=[x for x in record["cv_amendment_regions"]
+                            if x.get("document_id")!=doc["id"]]
+                        record["cv_amendment_regions"].append({
+                            "document_id":doc["id"],"fragment":fragment,"snippet_file":name,
+                            "source_pdf":doc.get("opslagbestand"),"source_sha256":doc.get("sha256"),
+                            "snippet_sha256":sha256(self.project_dir/"snippets"/name)})
+                        record.setdefault("cv_amendment_pdfs",[])
+                        if doc.get("opslagbestand") not in record["cv_amendment_pdfs"]:
+                            record["cv_amendment_pdfs"].append(doc.get("opslagbestand"))
+                        record["cv_amendment_snippet_files"]=[
+                            x.get("snippet_file") for x in record["cv_amendment_regions"] if x.get("snippet_file")]
+                        record["cv_region_invalidated"]=False
+                    else:
+                        record.setdefault("uitwerkbijlagen",[])
+                        if doc.get("opslagbestand") not in record["uitwerkbijlagen"]:
+                            record["uitwerkbijlagen"].append(doc.get("opslagbestand"))
+                        record.setdefault("available_appendix_candidates",[])
+                        if doc.get("opslagbestand") not in record["available_appendix_candidates"]:
+                            record["available_appendix_candidates"].append(doc.get("opslagbestand"))
+                        record.setdefault("uitwerkbijlage_region_refs",[])
+                        record["uitwerkbijlage_region_refs"]=[x for x in record["uitwerkbijlage_region_refs"]
+                            if x.get("document_id")!=doc["id"]]
+                        record["uitwerkbijlage_region_refs"].append({
+                            "document_id":doc["id"],"question_number":int(record["number"]),
+                            "snippet_file":name,"source_sha256":doc.get("sha256"),
+                            "snippet_sha256":sha256(self.project_dir/"snippets"/name)})
+                        record["appendix_region_invalidated"]=False
+                    self.save_project()
+                self.open_cv_region_editor(record,doc,saved)
+            if len(docs)==1:
+                launch(docs[0])
+                return
+            chooser=tk.Toplevel(win); chooser.title("Kies brondocument"); chooser.transient(win)
+            ttk.Label(chooser,text="Selecteer het document waarin je dit vraagfragment wilt afbakenen.",padding=8).pack(anchor="w")
+            listing=tk.Listbox(chooser,width=76,height=min(8,len(docs)))
+            listing.pack(fill="both",expand=True,padx=8,pady=6)
+            for doc in docs: listing.insert("end",doc.get("bestand",""))
+            def selected():
+                pick=listing.curselection()
+                if pick: launch(docs[pick[0]],chooser)
+            ttk.Button(chooser,text="Open fragmenteditor",command=selected).pack(pady=(0,8))
+        ttk.Button(region_bar,text="Correctievoorschrift afbakenen",
+                   command=lambda:open_region("correctievoorschrift")).pack(side="left",padx=(0,6))
+        ttk.Button(region_bar,text="Uitwerkbijlage afbakenen",
+                   command=lambda:open_region("uitwerkbijlage")).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="CV-aanvulling afbakenen",
+                   command=lambda:open_region("aanvulling")).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="Geconsolideerde CV bekijken",
+                   command=self._review_consolidated_cv).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="Volledigheid controleren",
+                   command=self._review_exam_completeness).pack(side="left",padx=6)
+        ttk.Button(region_bar,text="Visuele eindcontrole openen",
+                   command=lambda:self.review_question_record(record,win)).pack(side="left",padx=6)
+        buttons=ttk.Frame(outer); buttons.pack(fill="x",pady=(10,0))
+        def close_editor():
+            win.destroy()
+            if hasattr(self,"_return_to_final_review"):
+                delattr(self,"_return_to_final_review")
+        ttk.Button(buttons,text="Analyse bevestigen en opslaan",command=save,style="Accent.TButton").pack(side="right")
+        ttk.Button(buttons,text="Sluiten",command=close_editor).pack(side="right",padx=8)
 
     def review_question_record(self,record,parent):
         win=tk.Toplevel(parent); win.title(f"Eindcontrole · {record.get('id')}"); win.geometry("1040x850")
@@ -3501,7 +4106,10 @@ class ExamApp:
         if record.get("cv_region_invalidated") is True:
             ttk.Label(outer,text="LET OP: de handmatige CV-/aanvullingsafbakening is gewijzigd. Sla dit vraagrecord opnieuw op en voer de eindcontrole opnieuw uit.",foreground="#9b4d00",wraplength=980).pack(anchor="w",pady=4)
         meta=record.get("exam",{})
-        ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        ttk.Label(outer,text=f"{meta.get('level')} {meta.get('year')} tijdvak {meta.get('period')} · vraag {record.get('number')} · {meta.get('points')} punten · {record.get('question_type') or meta.get('questionType')}",padding=(0,6)).pack(anchor="w")
+        if record.get("correct"):
+            ttk.Label(outer,text=f"Gecontroleerd correct antwoord / antwoordsleutel: {record.get('correct')}",
+                      wraplength=980).pack(anchor="w",pady=(0,5))
         structure_note = record.get("exam_structure_status", "structuur_niet_ingesteld")
         question_pages = ",".join(str(x.get("page")) for x in record.get("question_region_page_spans", [])) or "geen"
         context_count = len(record.get("context_region_fragments", []))
@@ -3598,6 +4206,20 @@ class ExamApp:
         for idx,asset in enumerate(record.get("context_asset_files", []),1):
             preview_specs.append((f"Contextfiguur/-tabel {idx} · pagina {asset.get('page', 'meerdere')} · {asset.get('caption') or asset.get('type') or asset.get('asset_id') or ''}",
                                   self.project_dir/"snippets"/asset["file"],None,None))
+        consolidated=self.data.get("consolidated_cv") or {}
+        consolidated_file=consolidated.get("file")
+        question_range=(consolidated.get("question_pages") or {}).get(str(record.get("number")))
+        consolidated_path=self.project_dir/str(consolidated_file or "")
+        if consolidated.get("status")=="visueel_bevestigd" and consolidated_path.is_file() and question_range:
+            for page_no in range(int(question_range["start"]),int(question_range["end"])+1):
+                target=self.project_dir/"analyse"/f"eindcontrole-{record.get('id')}-geconsolideerde-cv-p{page_no}.png"
+                preview_specs.append((f"GECONSOLIDEERDE CV · vraag {record.get('number')} · pagina {page_no}",
+                                      consolidated_path,page_no,target))
+        for idx,region in enumerate(record.get("uitwerkbijlage_region_refs",[]),1):
+            name=region.get("snippet_file")
+            if name:
+                preview_specs.append((f"Afgebakend uitwerkbijlagefragment {idx}",
+                                      self.project_dir/"snippets"/name,None,None))
         for idx,name in enumerate(record.get("uitwerkbijlagen",[]),1):
             appendix=self.project_dir/"bronnen"/name
             if appendix.is_file():
@@ -3659,6 +4281,11 @@ class ExamApp:
             record["status"]="goedgekeurd"
             record["approved_at"]=now()
             record["approval_method"]="handmatige_eindcontrole"
+            all_records=self.data.get("vraagrecords",[])
+            if all_records and all(x.get("approved_by_human") is True for x in all_records):
+                self.data["final_visual_review"]={"status":"visueel_bevestigd",
+                    "reviewed_at":now(),"record_ids":[x.get("id") for x in all_records],
+                    "fingerprint":exam_review_fingerprint(self.data,True)}
             self.save_project()
             self._log(f"Record {record.get('id')} expliciet handmatig goedgekeurd.")
             messagebox.showinfo("Record goedgekeurd","Dit record is nu expliciet door jou goedgekeurd. Het wordt pas meegenomen wanneer het volledige exportpakket alle controles doorstaat.",parent=win)
@@ -3671,6 +4298,53 @@ class ExamApp:
             self.save_project()
             self._log(f"Goedkeuring van record {record.get('id')} ingetrokken.")
             win.destroy()
+        repair=ttk.LabelFrame(outer,text="Herstelacties voor deze vraag",padding=8)
+        repair.pack(fill="x",pady=(8,0))
+        def refresh_review():
+            win.destroy()
+            self.review_question_record(record,parent)
+        def return_to_same_question():
+            try:
+                if win.winfo_exists(): win.destroy()
+            except tk.TclError:
+                pass
+            self.review_question_record(record,parent)
+        source_doc=next((d for d in self.data.get("documenten",[])
+                         if d.get("id")==record.get("candidate_document_id")),None)
+        def edit_question_analysis():
+            self._return_to_final_review=return_to_same_question
+            self._review_simple_question_draft(record,win)
+        def edit_question_structure():
+            self._return_to_final_review=return_to_same_question
+            self._workspace_doc_id=record.get("candidate_document_id")
+            self._workspace_refresh()
+            self._structure_focus_question_number=int(record.get("number",0) or 0)
+            self.edit_exam_structure()
+        def edit_cv_region(role):
+            if role=="correctievoorschrift":
+                doc=next((d for d in self.data.get("documenten",[])
+                          if d.get("id")==record.get("cv_source_document_id")
+                          and d.get("type_voorstel")==role),None)
+            else:
+                doc=next((d for d in self.data.get("documenten",[])
+                          if d.get("type_voorstel")==role),None)
+            if doc:
+                def saved(_name,_fragment):
+                    refresh_review()
+                self.open_cv_region_editor(record,doc,saved)
+            else:
+                messagebox.showinfo("Document ontbreekt",f"Geen document van het type '{role}' gevonden.",parent=win)
+        ttk.Button(repair,text="Vraagtype, punten, tekst en opties",
+                   command=edit_question_analysis).pack(side="left",padx=3)
+        ttk.Button(repair,text="Vraag- en contextgrenzen",
+                   command=edit_question_structure).pack(side="left",padx=3)
+        ttk.Button(repair,text="Correctievoorschrift",
+                   command=lambda:edit_cv_region("correctievoorschrift")).pack(side="left",padx=3)
+        ttk.Button(repair,text="Uitwerkbijlage",
+                   command=lambda:edit_cv_region("uitwerkbijlage")).pack(side="left",padx=3)
+        ttk.Button(repair,text="CV-aanvulling",
+                   command=lambda:edit_cv_region("aanvulling")).pack(side="left",padx=3)
+        ttk.Button(repair,text="Weergave vernieuwen",command=refresh_review).pack(side="right",padx=3)
         actions=ttk.Frame(outer); actions.pack(fill="x",pady=(8,0))
         ttk.Button(actions,text="Goedkeuren",command=approve).pack(side="right")
         if record.get("approved_by_human") is True:
@@ -3717,7 +4391,10 @@ class ExamApp:
                 messagebox.showinfo("Conceptexport klaar",
                     f"Conceptvragen en bron-PDF's zijn geëxporteerd naar:\n{export_dir}\n\nDit is een overdraagbaar conceptpakket, geen publicatiepakket.",parent=self.root)
                 return
-            result=export_approved_records(records,self.project_dir,export_dir)
+            has_addenda=any(d.get("type_voorstel")=="aanvulling"
+                            for d in self.data.get("documenten",[]))
+            result=export_approved_records(records,self.project_dir,export_dir,
+                                          consolidated_cv=(self.data.get("consolidated_cv") if has_addenda else None))
             if not result.get("ok"):
                 errors=result.get("errors",[])
                 detail="\n".join(f"• {x.get('id','')} · {x.get('error')}" for x in errors[:20])
@@ -4922,12 +5599,23 @@ class ExamApp:
             self.status.configure(
                 text=f"Fragmentcontrole afgerond · vraagtypen voor {classified} vragen bepaald · volgende stap: vraagrecords."
             )
+            return_to_review=getattr(self,"_return_to_final_review",None)
+            if return_to_review:
+                delattr(self,"_return_to_final_review")
+                self.root.after(150,return_to_review)
         ttk.Button(actions, text="Fragmenten klaar · verder", command=save_and_close,
                    style="Accent.TButton").pack(side="right", padx=(8, 0))
         ttk.Label(actions, textvariable=save_status, foreground="#47734a").pack(side="right", padx=(8, 12))
         refresh_fragment_list()
+        focus_number=getattr(self,"_structure_focus_question_number",None)
+        focus_index=next((i for i,frag in enumerate(fragments)
+                          if focus_number is not None
+                          and canonical_fragment_type(frag.get("type",""))=="vraag"
+                          and int(focus_number) in [int(n) for n in frag.get("question_numbers",[])]),0)
+        if hasattr(self,"_structure_focus_question_number"):
+            delattr(self,"_structure_focus_question_number")
         if fragments:
-            fragment_tree.selection_set("0")
+            fragment_tree.selection_set(str(focus_index))
             load_selected_fragment()
         else:
             show_page()
@@ -4941,7 +5629,7 @@ class ExamApp:
             show_document(number)
         page_spin.bind("<Return>", jump_question_page)
         if fragments:
-            fragment_tree.selection_set("0")
+            fragment_tree.selection_set(str(focus_index))
             load_selected_fragment()
         else:
             show_document(2)
@@ -4953,8 +5641,8 @@ class ExamApp:
             messagebox.showerror("CV-bron gewijzigd", "De oorspronkelijke CV-PDF ontbreekt of is gewijzigd. Voeg het juiste bestand opnieuw toe voordat je grenzen vastlegt.")
             return
         role = cv_doc.get("type_voorstel", "correctievoorschrift")
-        if role not in ("correctievoorschrift", "aanvulling"):
-            messagebox.showerror("Verkeerd documenttype", "Kies een correctievoorschrift of officiële aanvulling.")
+        if role not in ("correctievoorschrift", "aanvulling", "uitwerkbijlage"):
+            messagebox.showerror("Verkeerd documenttype", "Kies een correctievoorschrift, officiële aanvulling of uitwerkbijlage.")
             return
         try:
             analysis = analyze_pdf(source)
@@ -4964,12 +5652,15 @@ class ExamApp:
             self._error("CV-pagina's voorbereiden", exc)
             return
         question_number = int(record["number"])
-        all_regions = self.data.setdefault("cv_regions", {})
+        region_store_key = "uitwerkbijlage_regions" if role == "uitwerkbijlage" else "cv_regions"
+        all_regions = self.data.setdefault(region_store_key, {})
         doc_regions = all_regions.setdefault(cv_doc["id"], {})
         existing = doc_regions.get(str(question_number), {})
         spans = [dict(x) for x in existing.get("page_spans", [])]
         win = tk.Toplevel(self.root)
-        win.title(f"{'CV-aanvulling' if role == 'aanvulling' else 'Correctievoorschrift'} · vraag {question_number}")
+        role_title = {"aanvulling": "CV-aanvulling", "uitwerkbijlage": "Uitwerkbijlage",
+                      "correctievoorschrift": "Correctievoorschrift"}[role]
+        win.title(f"{role_title} · vraag {question_number}")
         win.geometry("1120x850")
         win.transient(self.root)
         ttk.Label(win, text=f"Bak de volledige beoordelingsinformatie voor vraag {question_number} af in {cv_doc['bestand']}.",
@@ -5079,7 +5770,7 @@ class ExamApp:
                 if errors:
                     raise ValueError("Controleer de CV-afbakening: " + ", ".join(errors))
                 segments = page_spans_to_segments(spans, page_sizes)
-                prefix = "cv-amend" if role == "aanvulling" else "cv"
+                prefix = "uitwerkbijlage" if role == "uitwerkbijlage" else ("cv-amend" if role == "aanvulling" else "cv")
                 name = f"{prefix}-{cv_doc['id']}-q{question_number}-handmatig.png"
                 target = self.project_dir / "snippets" / name
                 render_composite_crops(source, segments, target, scale=1.35)
@@ -5092,15 +5783,25 @@ class ExamApp:
                             or saved_record.get("cv_pdf") == cv_doc["opslagbestand"])
                         old_region = saved_record.get("cv_source_region")
                         old_hash = saved_record.get("cv_source_region_sha256")
-                    else:
+                        invalidation_key="cv_region_invalidated"
+                    elif role == "aanvulling":
                         old_items = [x for x in saved_record.get("cv_amendment_regions", [])
                                      if x.get("document_id") == cv_doc["id"]]
                         references_region = (cv_doc["opslagbestand"] in saved_record.get("cv_amendment_pdfs", [])
                             or bool(old_items))
                         old_region = old_items[0].get("fragment") if old_items else None
                         old_hash = old_items[0].get("snippet_sha256") if old_items else None
+                        invalidation_key="cv_region_invalidated"
+                    else:
+                        old_items = [x for x in saved_record.get("uitwerkbijlage_region_refs", [])
+                                     if x.get("document_id") == cv_doc["id"]]
+                        references_region = (cv_doc["opslagbestand"] in saved_record.get("uitwerkbijlagen", [])
+                            or bool(old_items))
+                        old_region = old_items[0] if old_items else None
+                        old_hash = old_items[0].get("snippet_sha256") if old_items else None
+                        invalidation_key="appendix_region_invalidated"
                     if references_region and (old_region != fragment or old_hash != rendered_hash):
-                        saved_record["cv_region_invalidated"] = True
+                        saved_record[invalidation_key] = True
                         saved_record["approved_by_human"] = False
                         saved_record["status"] = "cv_fragment_opnieuw_te_controleren"
                         saved_record["approved_at"] = None

@@ -1,3 +1,20 @@
+## 0.17.0
+- De verwerkingsworkflow is opnieuw opgebouwd als een expliciete reeks controles: documenteigenschappen, vraagstarts, fragmenten, vraaganalyse, uitwerkbijlage, correctievoorschrift, CV-aanvulling, antwoorden, volledigheid, uitsneden en visuele eindcontrole.
+- Documenttype en examenmetadata worden bij import alleen afgeleid uit de bestandsnaam en de eerste PDF-pagina.
+- De officiële suffixen `-o`, `-c`, `-a` en `-u` worden herkend.
+- Vraagstarts in CV's en uitwerkbijlagen worden automatisch voorgesteld en afzonderlijk visueel beoordeeld.
+- OCR wordt alleen selectief ingezet wanneer de tekstlaag op de eerste pagina, een PDF-pagina of een handmatig geselecteerd fragment ontbreekt of onvoldoende is; zonder beschikbare Tesseract-installatie blijft visuele beoordeling leidend.
+- De bestaande fragmentgrenzen blijven behouden; conceptrecords worden automatisch opgebouwd uit de bevestigde vraagfragmenten.
+- Per vraag zijn aparte controles toegevoegd voor vraagtype, punten, antwoordopties en correcte antwoorden, inclusief binaire en vergelijkende vraagvormen.
+- Dezelfde visuele PDF-regio-editor kan worden gebruikt voor correctievoorschrift, aanvulling en uitwerkbijlage.
+- Per vraag kan een CV-aanvulling worden geclassificeerd als toevoeging, wijziging, vervanging, intrekking of ongewijzigd; de bronbestanden blijven ongewijzigd.
+- Een traceerbare, samengevoegde CV-PDF wordt per vraag opgebouwd, geopend en visueel bevestigd; de bron-CV en aanvulling blijven ongewijzigd en de PDF gaat mee in het exportpakket.
+- De volledigheidscontrole controleert onder meer nummering, fragmentkoppelingen, puntenaantallen en bronintegriteit.
+- Definitieve vraag- en contextuitsneden worden vanuit de opgeslagen grenzen gegenereerd en witruimtebewust bijgesneden.
+- De eindcontrole bevat gerichte herstelacties en keert na bewerking terug naar dezelfde vraag.
+- Reviewbevestigingen zijn gekoppeld aan inhoudsfingerprints; wijzigingen aan inhoud of fragmenten maken verouderde controles ongeldig.
+- Bestaande lokale projectgegevens en bronbestanden worden niet verplaatst of overschreven door software-updates.
+
 ## 0.16.0
 - Het hoofdvenster is nu uitsluitend de examenbibliotheek: examens filteren op vak, niveau, jaar, tijdvak en archiefstatus.
 - Elk examen opent in een eigen verwerkingsvenster. De bibliotheek blijft beschikbaar en kan meerdere openstaande examens beheren.

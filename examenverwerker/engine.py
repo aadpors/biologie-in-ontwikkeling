@@ -25,6 +25,7 @@ def classify_document_role(filename: str, text: str):
             for kind,terms in DOC_ROLE_TERMS.items()}
     if re.search(r"-(?:o)(?:-|\.pdf$)",lower): scores["opgaven"]+=3
     if re.search(r"-(?:c)(?:-|\.pdf$)",lower): scores["correctievoorschrift"]+=3
+    if re.search(r"-(?:a)(?:\d+(?:_\d+)?)?(?:-spr)?\.pdf$",lower): scores["aanvulling"]+=5
     if re.search(r"-(?:c)-a\d",lower): scores["aanvulling"]+=5
     if re.search(r"-(?:u)(?:-|\.pdf$)",lower): scores["uitwerkbijlage"]+=3
     if "uitwerkbijlage" in lower or "uitwerkbijlage" in hay: scores["uitwerkbijlage"]+=5
@@ -64,20 +65,53 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
     pages=[]
     for i,page in enumerate(doc):
         raw=page.get_text("dict", sort=True)
+        page_text=page.get_text("text",sort=True)
+        page_area=float(page.rect.width*page.rect.height) or 1.0
+        large_image=any(
+            block.get("type")==1 and block.get("bbox") and
+            (max(0.0,float(block["bbox"][2])-float(block["bbox"][0]))*
+             max(0.0,float(block["bbox"][3])-float(block["bbox"][1])))/page_area>0.18
+            for block in raw.get("blocks",[])
+        )
+        # OCR is attempted only for pages whose embedded text is absent or
+        # clearly insufficient relative to a large scanned image.
+        ocr_used=False
+        if len(page_text.strip())<40 or (large_image and len(page_text.strip())<180):
+            raw_for_text=raw
+            for language in ("nld+eng","eng"):
+                try:
+                    ocr_page=page.get_textpage_ocr(language=language,dpi=200,full=True)
+                    ocr_text=page.get_text("text",textpage=ocr_page,sort=True)
+                    if len(ocr_text.strip())>len(page_text.strip()):
+                        if not page_text.strip():
+                            raw_for_text=page.get_text("dict",textpage=ocr_page,sort=True)
+                            page_text=ocr_text
+                        else:
+                            existing_lines={line.strip() for line in page_text.splitlines() if line.strip()}
+                            extra_lines=[line.strip() for line in ocr_text.splitlines()
+                                         if line.strip() and line.strip() not in existing_lines]
+                            if extra_lines:
+                                page_text=page_text.rstrip()+"\n"+"\n".join(extra_lines)
+                        ocr_used=bool(ocr_text.strip())
+                        break
+                except Exception:
+                    continue
+        else:
+            raw_for_text=raw
         blocks=[]
-        for block in raw.get("blocks",[]):
+        for block in raw_for_text.get("blocks",[]):
             if block.get("type") != 0: continue
             lines=[]
             for line in block.get("lines",[]):
                 spans=line.get("spans",[])
-                text="".join(s.get("text","") for s in spans).strip()
-                if not text: continue
+                line_text="".join(s.get("text","") for s in spans).strip()
+                if not line_text: continue
                 boxes=[s["bbox"] for s in spans if s.get("text","").strip()]
                 if boxes:
                     bbox=[min(b[0] for b in boxes),min(b[1] for b in boxes),
                           max(b[2] for b in boxes),max(b[3] for b in boxes)]
                 else: bbox=line.get("bbox",block.get("bbox",[0,0,0,0]))
-                lines.append({"bbox":[round(x,2) for x in bbox],"text":text})
+                lines.append({"bbox":[round(x,2) for x in bbox],"text":line_text})
             if lines:
                 blocks.append({"bbox":block.get("bbox",[0,0,0,0]),
                                "text":"\n".join(x["text"] for x in lines),"lines":lines})
@@ -118,7 +152,7 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
             # Text and raster inventory should still remain usable.
             pass
         pages.append({"page":i+1,"width":page.rect.width,"height":page.rect.height,
-                      "text":page.get_text("text",sort=True),"blocks":blocks,
+                      "text":page_text,"ocr_used":ocr_used,"blocks":blocks,
                       "visual_assets": visual_assets})
     meta=doc.metadata or {}
     doc.close()
@@ -848,6 +882,104 @@ def validate_website_records(mcq: list, opened: list, contexts: list) -> list[di
         keys.add(key)
     return errors
 
+def build_consolidated_cv_pdf(entries: list[dict], snippets_dir: Path,
+                               output_path: Path, metadata: dict | None = None) -> dict:
+    """Create a derived, question-ordered CV PDF without changing source PDFs."""
+    import io
+    import pymupdf as fitz
+    from PIL import Image
+
+    if not entries:
+        raise ValueError("Er zijn geen vraagfragmenten voor het geconsolideerde CV.")
+    output_path=Path(output_path)
+    output_path.parent.mkdir(parents=True,exist_ok=True)
+    result=fitz.open()
+    labels={
+        "ongewijzigd":"Ongewijzigd · oorspronkelijke beoordelingsinformatie",
+        "toevoeging":"Toevoeging uit de officiële CV-aanvulling",
+        "wijziging":"Gewijzigde beoordelingsinformatie uit de officiële aanvulling",
+        "vervanging":"Geldende vervanging uit de officiële CV-aanvulling",
+        "intrekking":"INGETROKKEN · oorspronkelijke beoordelingsinformatie niet meer toepassen",
+    }
+    question_pages={}
+    try:
+        for entry in sorted(entries,key=lambda item:int(item.get("question_number",0) or 0)):
+            number=int(entry.get("question_number",0) or 0)
+            first_page=len(result)+1
+            change=entry.get("change_type") or "ongewijzigd"
+            original=Path(snippets_dir)/str(entry.get("original_region_file") or "")
+            if not original.is_file():
+                raise ValueError(f"Vraag {number}: oorspronkelijk CV-fragment ontbreekt.")
+            if change=="vervanging":
+                components=[("Oorspronkelijke tekst · vervangen",original)]
+            elif change=="intrekking":
+                components=[(labels[change],original)]
+            else:
+                components=[(labels.get(change,"Oorspronkelijke beoordelingsinformatie"),original)]
+            amendment_items=entry.get("amendment_regions") or []
+            for amendment in amendment_items:
+                amendment_path=Path(snippets_dir)/str(amendment.get("snippet_file") or "")
+                if not amendment_path.is_file():
+                    raise ValueError(f"Vraag {number}: CV-aanvullingsfragment ontbreekt.")
+                if change=="vervanging":
+                    amendment_label="GELDENDE VERVANGING"
+                elif change=="intrekking":
+                    amendment_label="Officiële intrekking / toelichting"
+                elif change=="toevoeging":
+                    amendment_label="Toegevoegde beoordelingsinformatie"
+                else:
+                    amendment_label="Aanvullende wijzigingsinformatie"
+                components.append((amendment_label,amendment_path))
+            if change=="vervanging" and len(components)==1:
+                raise ValueError(f"Vraag {number}: vervanging is geclassificeerd, maar het vervangende fragment ontbreekt.")
+            if change in ("toevoeging","wijziging") and len(components)==1:
+                raise ValueError(f"Vraag {number}: wijziging is geclassificeerd, maar het aanvullingsfragment ontbreekt.")
+            for component_label,image_path in components:
+                with Image.open(image_path) as opened:
+                    image=opened.convert("RGB")
+                    width,height=image.size
+                    max_slice_height=max(1,int(width*1.38))
+                    slices=max(1,(height+max_slice_height-1)//max_slice_height)
+                    for slice_index in range(slices):
+                        top=slice_index*max_slice_height
+                        bottom=min(height,top+max_slice_height)
+                        crop=image.crop((0,top,width,bottom))
+                        buffer=io.BytesIO()
+                        crop.save(buffer,format="PNG")
+                        image_bytes=buffer.getvalue()
+                        page=result.new_page(width=595,height=842)
+                        page.insert_text((34,30),f"Correctievoorschrift · vraag {number}",
+                                         fontsize=14,fontname="helv")
+                        page.insert_text((34,49),component_label,fontsize=9,fontname="helv")
+                        available=fitz.Rect(34,62,561,805)
+                        scale=min(available.width/crop.width,available.height/crop.height)
+                        image_width=crop.width*scale
+                        image_height=crop.height*scale
+                        rect=fitz.Rect((595-image_width)/2,72,
+                                       (595+image_width)/2,72+image_height)
+                        page.insert_image(rect,stream=image_bytes,keep_proportion=True)
+                        page.insert_text((34,826),
+                            f"Bronfragment: {image_path.name} · deel {slice_index+1}/{slices}",
+                            fontsize=7,fontname="helv")
+                        crop.close()
+                    image.close()
+            question_pages[str(number)]={"start":first_page,"end":len(result)}
+        meta=metadata or {}
+        result.set_metadata({
+            "title":f"Geconsolideerd correctievoorschrift {meta.get('level','')} {meta.get('year','')}",
+            "author":"Examenverwerker",
+            "subject":f"Tijdvak {meta.get('period','')} · afgeleid document",
+            "keywords":"geconsolideerd correctievoorschrift; bronfragmenten; traceerbaarheid",
+        })
+        result.save(output_path,garbage=4,deflate=True)
+    finally:
+        result.close()
+    with fitz.open(output_path) as check:
+        page_count=len(check)
+    return {"path":str(output_path),"sha256":digest_file(output_path),
+            "page_count":page_count,"question_pages":question_pages}
+
+
 def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
     """Return blockers before a human can explicitly approve a draft question."""
     required=["question_text","question_type","points","cv_alignment","images_and_context","appendices","cv_addenda"]
@@ -855,12 +987,16 @@ def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
         required.append("answer_options")
     missing=[key for key in required if checklist.get(key) is not True]
     errors=[f"controle_niet_afgevinkt:{key}" for key in missing]
+    if record.get("question_type")=="onbekend" or (record.get("exam") or {}).get("questionType")=="unknown":
+        errors.append("vraagtype_niet_vastgesteld")
     if record.get("source_analysis_invalidated") is True:
         errors.append("bron_opnieuw_geanalyseerd_record_opnieuw_samenstellen")
     if record.get("exam_structure_invalidated") is True:
         errors.append("vraag_contextstructuur_gewijzigd_record_opnieuw_samenstellen")
     if record.get("cv_region_invalidated") is True:
         errors.append("cv_regio_gewijzigd_record_opnieuw_samenstellen")
+    if record.get("appendix_region_invalidated") is True:
+        errors.append("uitwerkbijlage_regio_gewijzigd_record_opnieuw_samenstellen")
     if not str(record.get("question_text","")).strip():
         errors.append("vraagtekst_ontbreekt")
     if not record.get("source_pdf") or not record.get("cv_pdf"):
@@ -1494,8 +1630,20 @@ def extract_region_text(pdf_path: Path, segments: list[dict]) -> str:
             page_no = int(segment["page"])
             if not 1 <= page_no <= len(source):
                 raise ValueError(f"Ongeldig paginanummer voor tekstextractie: {page_no}")
-            rect = fitz.Rect(segment["bbox"]) & source[page_no - 1].rect
-            text = source[page_no - 1].get_text("text", clip=rect, sort=True).strip()
+            page=source[page_no - 1]
+            rect = fitz.Rect(segment["bbox"]) & page.rect
+            text = page.get_text("text", clip=rect, sort=True).strip()
+            if not text:
+                # OCR is deliberately selective: only a manually selected region
+                # with no usable embedded text triggers a page OCR attempt.
+                for language in ("nld+eng","eng"):
+                    try:
+                        textpage=page.get_textpage_ocr(language=language,dpi=200,full=True)
+                        text=page.get_text("text",clip=rect,textpage=textpage,sort=True).strip()
+                        if text:
+                            break
+                    except Exception:
+                        continue
             if text:
                 parts.append(f"[Pagina {page_no}]\n{text}")
         return "\n\n".join(parts)

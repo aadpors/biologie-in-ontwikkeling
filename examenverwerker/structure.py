@@ -194,8 +194,8 @@ def fragments_for_question(structure: dict | None, question_number: int) -> dict
 def make_cv_fragment(document: dict, question_number: int, page_spans: list[dict],
                      fragment_id: str | None = None, document_role: str = "correctievoorschrift") -> dict:
     """Create a question-linked visual region in a correction PDF or official addendum."""
-    if document_role not in {"correctievoorschrift", "aanvulling"}:
-        raise ValueError("CV-fragmenten horen bij een correctievoorschrift of officiële aanvulling.")
+    if document_role not in {"correctievoorschrift", "aanvulling", "uitwerkbijlage"}:
+        raise ValueError("Fragmenten horen bij een correctievoorschrift, officiële aanvulling of uitwerkbijlage.")
     spans = [make_page_span(x["page"], x["top"], x["bottom"]) for x in page_spans]
     if not spans:
         raise ValueError("Baken minimaal één CV-paginadeel af.")
