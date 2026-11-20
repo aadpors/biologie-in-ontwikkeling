@@ -19,6 +19,18 @@ class StructureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             make_page_span(0, 0.1, 0.9)
 
+    def test_context_fragments_cannot_use_cover_page(self):
+        with self.assertRaises(ValueError):
+            make_fragment("context", make_page_span(1, 0.1, 0.8), [1],
+                          self.questions, "cover-context")
+        fragment = make_fragment("context", make_page_span(2, 0.1, 0.8), [1],
+                                 self.questions, "context")
+        fragment["page_spans"].append(make_page_span(1, 0.1, 0.2))
+        structure = make_exam_structure(self.doc, [fragment], self.questions)
+        self.assertIn("contextfragment_op_voorblad",
+                      validate_exam_structure(structure, "doc-123", "abc123", self.questions))
+
+
     def test_context_requires_explicit_question_links(self):
         self.assertEqual(default_question_links("context", self.questions), [])
         with self.assertRaises(ValueError):
@@ -94,7 +106,7 @@ class StructureTests(unittest.TestCase):
             append_page_span(extended, make_page_span(1, 0.1, 0.8))
 
     def test_structure_requires_confirmed_numbering_and_current_source(self):
-        fragment = make_fragment("context", make_page_span(1, 0.1, 0.8),
+        fragment = make_fragment("context", make_page_span(2, 0.1, 0.8),
                                  self.questions, self.questions, "intro")
         fragment["context_role"] = "introductie"
         structure = make_exam_structure(self.doc, [fragment], self.questions)
@@ -114,7 +126,7 @@ class StructureTests(unittest.TestCase):
         self.assertEqual(structure["status"], "concept_handmatige_controle")
 
     def test_invalid_question_links_and_missing_spans_are_blocked(self):
-        fragment = make_fragment("vraagcontext", make_page_span(1, 0.1, 0.8),
+        fragment = make_fragment("vraagcontext", make_page_span(2, 0.1, 0.8),
                                  [1], self.questions, "context")
         fragment["question_numbers"] = [99]
         fragment["page_spans"] = []
