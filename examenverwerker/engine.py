@@ -988,6 +988,8 @@ def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
         errors.append("vraag_contextstructuur_gewijzigd_record_opnieuw_samenstellen")
     if record.get("cv_region_invalidated") is True:
         errors.append("cv_regio_gewijzigd_record_opnieuw_samenstellen")
+    if record.get("appendix_region_invalidated") is True:
+        errors.append("uitwerkbijlage_regio_gewijzigd_record_opnieuw_samenstellen")
     if not str(record.get("question_text","")).strip():
         errors.append("vraagtekst_ontbreekt")
     if not record.get("source_pdf") or not record.get("cv_pdf"):
