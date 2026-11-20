@@ -445,7 +445,7 @@ class EngineTests(unittest.TestCase):
             self.assertLess(result["page_map"][0]["preview_height"], result["page_map"][0]["original_height"])
             with fitz.open(preview) as cleaned:
                 first_question_page = cleaned[0].get_text("text").lower()
-                self.assertRegex(first_question_page, r"dominant\\s+overerft")
+                self.assertRegex(first_question_page, r"dominant\s+overerft")
                 self.assertIn("geef een combinatie van ouders", first_question_page)
                 self.assertRegex(first_question_page, r"1p\s*1")
 
