@@ -76,13 +76,13 @@ def analyze_pdf(path: Path) -> dict[str, Any]:
         # OCR is attempted only for pages whose embedded text is absent or
         # clearly insufficient relative to a large scanned image.
         ocr_used=False
-        if len(page_text.strip())<40 or (large_image and len(text.strip())<180):
+        if len(page_text.strip())<40 or (large_image and len(page_text.strip())<180):
             raw_for_text=raw
             for language in ("nld+eng","eng"):
                 try:
                     ocr_page=page.get_textpage_ocr(language=language,dpi=200,full=True)
                     ocr_text=page.get_text("text",textpage=ocr_page,sort=True)
-                    if len(ocr_text.strip())>len(text.strip()):
+                    if len(ocr_text.strip())>len(page_text.strip()):
                         if not page_text.strip():
                             raw_for_text=page.get_text("dict",textpage=ocr_page,sort=True)
                             page_text=ocr_text
