@@ -16,7 +16,7 @@ from exporter import export_approved_records
 from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf, render_stitched_preview
 from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragments, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
-from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch, exam_completeness_issues
+from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch, exam_completeness_issues, exam_review_fingerprint
 
 APP_VERSION = "0.17.0"
 PROJECT_FILE = "project.json"
@@ -3715,6 +3715,7 @@ class ExamApp:
                 "question_count":len(self.data.get("vraagrecords",[])),
                 "document_count":len(self.data.get("documenten",[])),
                 "total_points":total_points,
+                "fingerprint":exam_review_fingerprint(self.data,False),
             }
             self.save_project()
             self._log("Structurele volledigheidscontrole bevestigd.")
@@ -3880,6 +3881,9 @@ class ExamApp:
                 else:
                     options.append({"key":str(len(options)+1),"text":line})
             record["question_text"]=text_box.get("1.0","end").strip()
+            record["approved_by_human"]=False
+            record["approved_at"]=None
+            record["record_review_checklist"]={key:False for key in record.get("record_review_checklist",{})}
             record["question_type"]=type_var.get()
             record.setdefault("exam",{})["questionType"]="mcq" if type_var.get()=="meerkeuze" else "open"
             record["question_type_status"]="handmatig_gecontroleerd"
@@ -4159,7 +4163,8 @@ class ExamApp:
             all_records=self.data.get("vraagrecords",[])
             if all_records and all(x.get("approved_by_human") is True for x in all_records):
                 self.data["final_visual_review"]={"status":"visueel_bevestigd",
-                    "reviewed_at":now(),"record_ids":[x.get("id") for x in all_records]}
+                    "reviewed_at":now(),"record_ids":[x.get("id") for x in all_records],
+                    "fingerprint":exam_review_fingerprint(self.data,True)}
             self.save_project()
             self._log(f"Record {record.get('id')} expliciet handmatig goedgekeurd.")
             messagebox.showinfo("Record goedgekeurd","Dit record is nu expliciet door jou goedgekeurd. Het wordt pas meegenomen wanneer het volledige exportpakket alle controles doorstaat.",parent=win)
