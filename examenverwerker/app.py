@@ -3778,12 +3778,10 @@ class ExamApp:
                     target_y = 0.0
             else:
                 target_y = current_scroll_y
-            # Tk's yview_moveto fraction is relative to the scrollable range,
-            # not the full image height. Using the image height made every
-            # redraw drift toward the top as the user edited boundaries.
-            scrollable_height = max(1.0, page_image_height - viewport_height)
+            # Tk's yview_moveto fraction is measured against the full
+            # scrollregion. Keep the same document coordinate after a redraw.
             canvas.yview_moveto(
-                max(0.0, min(1.0, target_y / scrollable_height))
+                max(0.0, min(1.0, target_y / max(1.0, page_image_height)))
             )
 
         def show_page():
