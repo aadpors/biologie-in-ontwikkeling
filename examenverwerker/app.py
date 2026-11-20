@@ -65,7 +65,7 @@ def extract_pdf(path: Path):
 class ExamApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Biologie Examenverwerker")
+        self.root.title("Examenverwerker")
         fit_window(self.root, 1380, 900, 900, 620)
         self.project_dir = None
         self.data = None
@@ -235,7 +235,7 @@ class ExamApp:
         header.pack(fill="x", pady=(0, 8))
         brand = ttk.Frame(header, style="App.TFrame")
         brand.pack(side="left", fill="x", expand=True)
-        ttk.Label(brand, text="BIOLOGIE EXAMENVERWERKER", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(brand, text="EXAMENVERWERKER", style="Title.TLabel").pack(anchor="w")
         ttk.Label(brand, text="Werkruimte voor volledige, visueel gecontroleerde examenverwerking",
                   style="Muted.TLabel").pack(anchor="w", pady=(1, 0))
         self.project_label = ttk.Label(header, text="Kies een examen uit de bibliotheek", style="Project.TLabel")
@@ -248,7 +248,6 @@ class ExamApp:
             ("＋ Examens importeren", self.import_year_set, "Accent.TButton"),
             ("Vraagstarts analyseren", self.analyze_questions, "Secondary.TButton"),
             ("Structuur bewerken", self.edit_exam_structure, "Secondary.TButton"),
-            ("Vraagrecord maken", self._workspace_create_record, "Secondary.TButton"),
             ("Eindcontrole", self.show_records, "Secondary.TButton"),
             ("Exportpakket", self.export_project, "Wine.TButton"),
         ]
@@ -257,10 +256,7 @@ class ExamApp:
         toolbar_secondary = ttk.Frame(shell, style="App.TFrame")
         toolbar_secondary.pack(fill="x", pady=(0, 5))
         for label, callback, style in actions[4:]:
-            button = ttk.Button(toolbar_secondary, text=label, command=callback, style=style)
-            button.pack(side="left", padx=(0, 5))
-            if label == "Vraagrecord maken":
-                self.question_record_button = button
+            ttk.Button(toolbar_secondary, text=label, command=callback, style=style).pack(side="left", padx=(0, 5))
 
         # A compact, contextual next-step strip keeps the original workbench
         # layout intact while making the hand-off between processing stages explicit.
@@ -3747,9 +3743,6 @@ class ExamApp:
                     cleaned_spans.append(dict(span))
             fragment["page_spans"] = cleaned_spans
         fragments = sort_fragments_reading_order(fragments)
-        # The question-record action is not part of fragment selection.
-        if hasattr(self, "question_record_button"):
-            self.question_record_button.pack_forget()
         # Reuse the central workbench rather than opening a separate window.
         self._workspace_container.forget(self._workspace_left)
         self._workspace_container.forget(self._workspace_right)
@@ -4628,8 +4621,6 @@ class ExamApp:
             win.destroy()
             self._workspace_container.add(self._workspace_left, weight=3)
             self._workspace_container.add(self._workspace_right, weight=8)
-            if hasattr(self, "question_record_button"):
-                self.question_record_button.pack(side="left", padx=(0, 5))
             self._workspace_refresh()
             self._workflow_refresh()
             self.status.configure(
