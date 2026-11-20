@@ -21,7 +21,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Raakt aan moleculaire interactie en biodiversiteit, maar de grootschalige CRISPR-analyses in microbiële gemeenschappen gaan duidelijk verder dan de examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s2",
@@ -44,7 +45,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit rechtstreeks aan bij genetische variatie, mutatie en selectie; de overdracht tussen muizen is een concrete evolutionaire context.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s3",
@@ -67,7 +69,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "De interactiestructuur van ecosystemen sluit direct aan bij voedselrelaties, biodiversiteit en ecosysteemwerking.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s4",
@@ -90,7 +93,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Geeft verdieping bij het ontstaan van meercelligheid en taakverdeling tussen cellen; de evolutionaire details gaan verder dan de vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "e1",
@@ -180,7 +184,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "Verbindt afweer met microbiële interacties en stress, maar de specifieke koraal-bacteriesymbiose is vooral een contextuele uitbreiding.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s6",
@@ -204,7 +209,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Laat voedselrelaties en interacties tussen soorten zien en sluit aan bij de regulatie en dynamiek van ecosystemen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s7",
@@ -227,7 +233,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij fotosynthese en stofwisseling van het organisme; C4-specialisatie en de moleculaire regulatie zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e4",
@@ -334,7 +341,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Verheldert embryonale ontwikkeling en zelforganisatie, maar de rol van lamin B1, autofagie en kernmechanica is geen vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s9",
@@ -357,7 +365,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "Geeft een brede illustratie van samenwerking tussen organen en regulatie, maar de gevonden circuits en meetmethode zijn vooral verdieping bij O2.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e8",
@@ -402,7 +411,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Haakt aan bij DNA-replicatie en de celcyclus, maar de rol van lncRNA, DDX11 en RNA-vouwing gaat ruim voorbij de kern van de examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s11",
@@ -425,7 +435,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit rechtstreeks aan bij transcriptie en regulatie van genexpressie; de clusters van transcriptiefactoren zijn een verdiepende casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s12",
@@ -449,7 +460,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Past direct bij gedrag, interactie, seksualiteit en voortplanting; gebruik de fruitvlieg als vergelijkend biologisch voorbeeld.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s13",
@@ -472,7 +484,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt biodiversiteit met ecosysteemfuncties, energiestromen en diensten en sluit direct aan bij P1, P3 en P5.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s14",
@@ -495,7 +508,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "De HPA-as is een concrete illustratie van hormonale regulatie en negatieve terugkoppeling binnen homeostase; ultradiane ritmes en modellering zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s15",
@@ -519,7 +533,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Sluit aan bij plantontwikkeling en zelforganisatie, maar de precieze auxine-signaalroutes en eiwitcomplexen zijn vooral docentverdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s16",
@@ -542,7 +557,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij energiestromen, biomassa, trofische relaties en de dynamiek van ecosystemen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e9",
@@ -608,7 +624,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt plantenhormonen, omgevingssignalen en plantontwikkeling; de specifieke signaalroutes zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s18",
@@ -631,7 +648,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Huidmondjesregulatie, gaswisseling en waterverlies sluiten direct aan bij plantfysiologie en zelfregulatie; de hydraulische hypothesen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s19",
@@ -654,7 +672,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt stikstofbeschikbaarheid, bodemorganismen, kringlopen en primaire productie in een grasland. De specifieke netwerkanalyse is verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s20",
@@ -677,7 +696,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij afbraak, reducenten en de stikstofkringloop; de isotopenmethode is een goede verdieping in onderzoekstechnieken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s21",
@@ -700,7 +720,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt genetische variatie, genregulatie, fenotype en menselijke evolutie; vooral geschikt voor vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s22",
@@ -723,7 +744,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt voortplanting, gedrag, voedselbeschikbaarheid en ecosysteemverandering; ook bruikbaar om correlatie en causaliteit te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s23",
@@ -746,7 +768,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "De studie biedt een verdiepende casus bij natuurlijke selectie, fitness en de relatie tussen voortplanting en overleving. Het specifieke onderzoek naar levensduur bij C. elegans is geen rechtstreekse uitwerking van de kernstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s24",
@@ -769,7 +792,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij hormonale regulatie en voortplanting; de koppeling tussen celstofwisseling en progesteronproductie is een verdiepende moleculaire casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s25",
@@ -792,7 +816,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt hormonale regulatie, voortplanting en de invloed van een fysiologische overgang op meerdere orgaanstelsels; ook geschikt om onderzoeksmethoden kritisch te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s26",
@@ -815,7 +840,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij insuline, glucosehuishouding, stofwisseling en homeostase; de proteomics en voorspelmodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s27",
@@ -838,7 +864,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt glucoseverbruik, energieomzetting en temperatuurregulatie; geschikt als context bij stofwisseling en homeostase.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s28",
@@ -861,7 +888,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt micro-organismen, afweer, ontsteking en stofwisseling; geschikt om microbiële functies en de beperkingen van observationeel onderzoek te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s29",
@@ -884,7 +912,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt cellulaire afweer, T-lymfocyten en genregulatie met een actuele medische toepassing; vooral geschikt voor vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s30",
@@ -907,7 +936,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit aan bij zenuwstelsel, informatieverwerking en geheugen; bijzonder geschikt als vwo-verdieping in onderzoeksmethoden.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "e13",
@@ -1016,7 +1046,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij DNA-replicatie en de regulatie van de celcyclus; vooral geschikt voor verdieping in de moleculaire start van replicatie.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s32",
@@ -1039,7 +1070,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt transcriptie, RNA-DNA-hybriden en DNA-replicatie; een goede vwo-verdieping bij genexpressie.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s33",
@@ -1062,7 +1094,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij moleculaire interactie en signaaltransductie; vooral geschikt voor vwo-verdieping in onderzoeksmethoden.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s34",
@@ -1085,7 +1118,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Verbindt celtypen, weefselorganisatie, differentiatie en afweer; geschikt voor vwo-verdieping in meercellige organismen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s35",
@@ -1108,7 +1142,8 @@
     "relevanceLevel": "Aansluitend",
     "relevanceNote": "De publicatie verdiept de evolutionaire verwantschap tussen archaea en eukaryoten. Zij onderzoekt niet het ontstaan van het eerste leven en is daarom vooral een aanvullende context bij vwo P6, geen directe uitwerking van de kernstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie."
+    "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s36",
@@ -1131,7 +1166,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij de syllabusonderdelen over erfelijke eigenschappen, overervingspatronen, stambomen en kruisschema’s. De bijdrage is vooral conceptueel en vakdidactisch.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in Genetics en open access beschikbaar. Peer review is een kwaliteitscontrole, geen garantie voor foutloos onderzoek of representativiteit."
+    "sourceQualityNote": "Gepubliceerd in Genetics en open access beschikbaar. Peer review is een kwaliteitscontrole, geen garantie voor foutloos onderzoek of representativiteit.",
+    "studyType": "Perspectiefartikel"
   },
   {
     "id": "s37",
@@ -1154,7 +1190,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Verbindt direct met selectie en genetische variatie, maar de genomische methoden en reconstructie van selectiegeschiedenis gaan verder dan de vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Reviewartikel in Nature Reviews Genetics. Een synthese van onderzoek is geen garantie dat alle onderliggende resultaten onafhankelijk zijn gerepliceerd."
+    "sourceQualityNote": "Reviewartikel in Nature Reviews Genetics. Een synthese van onderzoek is geen garantie dat alle onderliggende resultaten onafhankelijk zijn gerepliceerd.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s38",
@@ -1177,7 +1214,8 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "Het onderscheid tussen genotype, fenotype en milieufactoren sluit aan bij de examenstof. De uitgebreide kwantitatieve genetica en genetische architectuur zijn vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Gepubliceerd in Genetics en opgenomen in PubMed. Peer review is een kwaliteitscontrole, geen garantie dat alle voorgestelde onderzoeksrichtingen al empirisch zijn bevestigd."
+    "sourceQualityNote": "Gepubliceerd in Genetics en opgenomen in PubMed. Peer review is een kwaliteitscontrole, geen garantie dat alle voorgestelde onderzoeksrichtingen al empirisch zijn bevestigd.",
+    "studyType": "Perspectiefartikel"
   },
   {
     "id": "s39",
@@ -1200,7 +1238,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Sluit direct aan bij ademhaling en transport op orgaan- en organismeniveau. De kwantitatieve diffusie-perfusiemodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Open-access review in Comprehensive Physiology. Peer review en een overzichtsartikel bieden kwaliteitscontrole, maar vervangen geen beoordeling van de onderliggende studies."
+    "sourceQualityNote": "Open-access review in Comprehensive Physiology. Peer review en een overzichtsartikel bieden kwaliteitscontrole, maar vervangen geen beoordeling van de onderliggende studies.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s40",
@@ -1223,7 +1262,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Vult de beperkte aandacht voor kringlopen aan en sluit aan bij de rol van producenten, reducenten en nutriënten in ecosystemen. De moleculaire details zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Reviewartikel in Nature Reviews Microbiology. De status van review en peer review is geen garantie dat elke voorgestelde hypothese al experimenteel bevestigd is."
+    "sourceQualityNote": "Reviewartikel in Nature Reviews Microbiology. De status van review en peer review is geen garantie dat elke voorgestelde hypothese al experimenteel bevestigd is.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s41",
@@ -1246,7 +1286,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Voedselrelaties, energiestromen en biodiversiteit vormen de kern van de studie en sluiten rechtstreeks aan op de ecosysteemonderdelen van havo en vwo.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Onderzoeksartikel in Nature; peer review ondersteunt de redactionele kwaliteitscontrole, maar vervangt geen beoordeling van onderzoeksopzet en causaliteit."
+    "sourceQualityNote": "Onderzoeksartikel in Nature; peer review ondersteunt de redactionele kwaliteitscontrole, maar vervangt geen beoordeling van onderzoeksopzet en causaliteit.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s42",
@@ -1269,7 +1310,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Meiose, crossing-over, recombinatie en erfelijke variatie sluiten rechtstreeks aan op de huidige havo- en vwo-syllabi.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Nature; de omvangrijke dataset is een sterk punt, terwijl de IVF-context expliciet moet meewegen bij interpretatie."
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature; de omvangrijke dataset is een sterk punt, terwijl de IVF-context expliciet moet meewegen bij interpretatie.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s43",
@@ -1292,7 +1334,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Epigenetica en afwijkende overervingspatronen worden expliciet genoemd bij vwo M7.1 Erfelijke eigenschap; de studie biedt een actuele verdiepende casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Nature Genetics; de methodologische diepgang is sterk, maar de dier- en weefselcontext begrenst de generaliseerbaarheid."
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature Genetics; de methodologische diepgang is sterk, maar de dier- en weefselcontext begrenst de generaliseerbaarheid.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s44",
@@ -1315,7 +1358,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Vaccinatie, aangeboren en verworven afweer en immuungeheugen sluiten rechtstreeks aan bij O3 Afweer van het organisme.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Reviewartikel in Nature; de waarde ligt in de synthese van meerdere onderzoeksrichtingen, niet in één nieuwe effectmeting."
+    "sourceQualityNote": "Reviewartikel in Nature; de waarde ligt in de synthese van meerdere onderzoeksrichtingen, niet in één nieuwe effectmeting.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s45",
@@ -1338,7 +1382,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Vertering en opname van voedingsstoffen sluiten direct aan bij O1; de rol van darmmicrobiële fermentatie is een actuele verdiepende context.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Cell; de combinatie van kwantitatieve benaderingen versterkt de analyse, terwijl de uitkomsten mede afhangen van modelaannames en voedingscontext."
+    "sourceQualityNote": "Primair onderzoeksartikel in Cell; de combinatie van kwantitatieve benaderingen versterkt de analyse, terwijl de uitkomsten mede afhangen van modelaannames en voedingscontext.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s46",
@@ -1361,7 +1406,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Waterbalans, hormonale regulatie, nierfunctie en uitscheiding sluiten rechtstreeks aan op O1 en O2; de specifieke receptorroute is verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Journal of the American Society of Nephrology; de experimentele combinatie ondersteunt het mechanisme, maar de bevindingen zijn modelsysteemgebonden."
+    "sourceQualityNote": "Primair onderzoeksartikel in Journal of the American Society of Nephrology; de experimentele combinatie ondersteunt het mechanisme, maar de bevindingen zijn modelsysteemgebonden.",
+    "studyType": "Primair onderzoek"
   },
   {
     "id": "s47",
@@ -1384,7 +1430,8 @@
     "relevanceLevel": "Direct",
     "relevanceNote": "Fotosynthese, koolstofopslag en de invloed van abiotische factoren sluiten rechtstreeks aan op O1; de stikstofkringloop verbindt dit met P1.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Peer-reviewed meta-analyse in Journal of Plant Ecology; de bewijskracht berust op de onderliggende studies en de manier waarop hun verschillen statistisch zijn verwerkt."
+    "sourceQualityNote": "Peer-reviewed meta-analyse in Journal of Plant Ecology; de bewijskracht berust op de onderliggende studies en de manier waarop hun verschillen statistisch zijn verwerkt.",
+    "studyType": "Review / synthese"
   },
   {
     "id": "s48",
@@ -1407,6 +1454,7 @@
     "relevanceLevel": "Verdieping",
     "relevanceNote": "De studie verdiept moleculaire interactie, genregulatie en celdifferentiatie; de specifieke FXR–YAP-route en leverfibrose zijn geen vereiste examenkennis.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
-    "sourceQualityNote": "Primair onderzoeksartikel in Nature Metabolism; genetische modellen, celproeven en humane gegevens leveren convergerende ondersteuning."
+    "sourceQualityNote": "Primair onderzoeksartikel in Nature Metabolism; genetische modellen, celproeven en humane gegevens leveren convergerende ondersteuning.",
+    "studyType": "Primair onderzoek"
   }
 ]
