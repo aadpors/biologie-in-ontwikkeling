@@ -361,6 +361,40 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(len(proposals), 1)
         self.assertEqual(proposals[0]["question_numbers"], [2])
 
+    def test_preview_pdf_removes_cover_and_repeated_footer_without_changing_source(self):
+        import tempfile
+        import pymupdf as fitz
+        from pathlib import Path
+        from engine import prepare_exam_preview_pdf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "source.pdf"
+            preview = Path(tmp) / "preview.pdf"
+            doc = fitz.open()
+            for page_no in range(1, 4):
+                page = doc.new_page(width=600, height=800)
+                if page_no == 1:
+                    page.insert_text((60, 100), "Voorblad - instructies")
+                else:
+                    page.insert_text((60, 120), f"Vraag {page_no - 1}. Beschrijf de afbeelding.")
+                    page.insert_text((60, 760), "Biologie | Examen 2026")
+                    page.insert_text((540, 780), str(page_no))
+            doc.save(source)
+            doc.close()
+
+            result = prepare_exam_preview_pdf(source, preview)
+            self.assertEqual(len(result["page_map"]), 2)
+            self.assertEqual([x["original_page"] for x in result["page_map"]], [2, 3])
+            self.assertTrue(all(x["footer_detected"] for x in result["page_map"]))
+            with fitz.open(preview) as cleaned:
+                self.assertEqual(len(cleaned), 2)
+                self.assertLess(cleaned[0].rect.height, 800)
+                self.assertNotIn("Voorblad", cleaned[0].get_text())
+                self.assertNotIn("Biologie | Examen 2026", cleaned[0].get_text())
+            with fitz.open(source) as original:
+                self.assertEqual(len(original), 3)
+                self.assertIn("Voorblad", original[0].get_text())
+
     def test_uncaptioned_visual_after_question_stays_with_that_question(self):
         analysis = {"pages": [{
             "page": 2, "width": 600, "height": 800,
