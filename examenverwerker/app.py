@@ -4023,6 +4023,7 @@ class ExamApp:
                         record["cv_source_document_name"]=doc.get("bestand")
                         record["cv_pdf"]=doc.get("opslagbestand")
                         record["cv_match_human_confirmed"]=True
+                        record["cv_region_invalidated"]=False
                     elif role=="aanvulling":
                         record.setdefault("cv_amendment_regions",[])
                         record["cv_amendment_regions"]=[x for x in record["cv_amendment_regions"]
@@ -4036,6 +4037,7 @@ class ExamApp:
                             record["cv_amendment_pdfs"].append(doc.get("opslagbestand"))
                         record["cv_amendment_snippet_files"]=[
                             x.get("snippet_file") for x in record["cv_amendment_regions"] if x.get("snippet_file")]
+                        record["cv_region_invalidated"]=False
                     else:
                         record.setdefault("uitwerkbijlagen",[])
                         if doc.get("opslagbestand") not in record["uitwerkbijlagen"]:
@@ -4048,7 +4050,9 @@ class ExamApp:
                             if x.get("document_id")!=doc["id"]]
                         record["uitwerkbijlage_region_refs"].append({
                             "document_id":doc["id"],"question_number":int(record["number"]),
-                            "snippet_file":name,"source_sha256":doc.get("sha256")})
+                            "snippet_file":name,"source_sha256":doc.get("sha256"),
+                            "snippet_sha256":sha256(self.project_dir/"snippets"/name)})
+                        record["appendix_region_invalidated"]=False
                     self.save_project()
                 self.open_cv_region_editor(record,doc,saved)
             if len(docs)==1:
