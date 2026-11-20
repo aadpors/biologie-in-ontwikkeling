@@ -1074,10 +1074,9 @@ class ExamApp:
                     f"Vraag {row.get('number')}: het vraagfragment ontbreekt. "
                     "Leg eerst alle vraaggrenzen vast."
                 )
-            if not fragment.get("reviewed_by_human") and fragment.get("status") != "handmatig_gecontroleerd":
-                raise ValueError(
-                    f"Vraag {row.get('number')}: het vraagfragment is nog niet als gecontroleerd vastgelegd."
-                )
+            # The teacher has already visually checked and edited the saved
+            # fragment set. Do not introduce a second confirmation/checkbox
+            # round: the persisted geometry is the reviewed source of truth.
             linked[row.get("id")] = fragment
 
         source_path = self.project_dir / "bronnen" / doc["opslagbestand"]
