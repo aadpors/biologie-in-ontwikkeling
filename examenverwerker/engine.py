@@ -355,22 +355,25 @@ def render_page(pdf_path: Path, page_number: int, output: Path, scale: float=1.2
 
 
 def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: float = 3.0) -> dict:
-    """Create a derived, footer-trimmed preview PDF without changing the source.
+    """Create a safe, derived preview: omit the cover and trim only proven footers.
 
-    Original page 1 is omitted. Every remaining page is cropped to the last
-    meaningful body text/visual element above a detected footer, removing the
-    footer and the blank area beneath it. The returned map keeps original page
-    numbers and coordinate heights so fragment metadata remains source-based.
+    A repeated line is not automatically a footer merely because it occurs in
+    the lower part of multiple pages. Before trimming, every proposed footer
+    line is checked for meaningful text or visual material below it. If such
+    content exists, that footer hypothesis is rejected and the page is kept
+    down to its last meaningful element. Source coordinates and page numbers
+    remain unchanged in the returned map.
     """
     import fitz
-    from collections import Counter
+    from collections import defaultdict
 
     source = fitz.open(source_path)
     try:
         if len(source) < 2:
             raise ValueError("De opgaven-PDF bevat geen pagina's na het voorblad.")
+
         page_rows = []
-        footer_counts = Counter()
+        repeated_occurrences = defaultdict(list)
         for page_index in range(1, len(source)):
             page = source[page_index]
             height = float(page.rect.height)
@@ -384,27 +387,55 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                         if not text:
                             continue
                         bbox = line.get("bbox") or block.get("bbox") or [0, 0, 0, 0]
-                        normalized = re.sub(r"\s+", " ", text.lower()).strip()
-                        row = {"text": text, "normalized": normalized,
-                               "top": float(bbox[1]), "bottom": float(bbox[3])}
-                        lines.append(row)
-                        if row["top"] >= height * 0.76:
-                            footer_counts[normalized] += 1
+                        normalized = re.sub(r"\\s+", " ", text.lower()).strip()
+                        item = {
+                            "text": text,
+                            "normalized": normalized,
+                            "top": float(bbox[1]),
+                            "bottom": float(bbox[3]),
+                        }
+                        lines.append(item)
+                        relative_top = item["top"] / max(1.0, height)
+                        # Repeated running footers normally occupy the final
+                        # 12% of the page and are short. Repeated body prose in
+                        # the lower quarter is deliberately not enough.
+                        if relative_top >= 0.88 and len(normalized) <= 100:
+                            repeated_occurrences[normalized].append(
+                                (page_index + 1, relative_top)
+                            )
                 elif block.get("type") == 1 and block.get("bbox"):
                     assets.append([float(x) for x in block["bbox"]])
             try:
                 for drawing in page.get_drawings():
                     rect = drawing.get("rect")
                     if rect and rect.width > 18 and rect.height > 12:
-                        assets.append([float(rect.x0), float(rect.y0),
-                                       float(rect.x1), float(rect.y1)])
+                        assets.append([
+                            float(rect.x0), float(rect.y0),
+                            float(rect.x1), float(rect.y1),
+                        ])
             except Exception:
+                # Malformed vector data must not prevent text-based review.
                 pass
-            page_rows.append({"original_page": page_index + 1, "width": float(page.rect.width),
-                              "height": height, "lines": lines, "assets": assets})
+            page_rows.append({
+                "original_page": page_index + 1,
+                "width": float(page.rect.width),
+                "height": height,
+                "lines": lines,
+                "assets": assets,
+            })
 
-        footer_terms = re.compile(
-            r"(examenblad|college voor toetsen|cito|www\.|©|pagina\s*\d|tijdvak\s*\d)",
+        repeated_footer_keys = set()
+        for normalized, occurrences in repeated_occurrences.items():
+            page_numbers = {page_no for page_no, _ in occurrences}
+            positions = [relative_top for _, relative_top in occurrences]
+            if (len(page_numbers) >= 2 and normalized
+                    and max(positions) - min(positions) <= 0.035):
+                repeated_footer_keys.add(normalized)
+
+        explicit_footer = re.compile(
+            r"(examenblad|college voor toetsen|cito|www\\.|©|"
+            r"pagina\\s*\\d|tijdvak\\s*\\d|lees\\s+verder|"
+            r"\\b\\d{1,3}\\s*/\\s*\\d{1,3}\\b)",
             re.I,
         )
         mapping = []
@@ -412,35 +443,78 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
         try:
             for row in page_rows:
                 height, width = row["height"], row["width"]
-                footer_lines = [
-                    line for line in row["lines"]
-                    if line["top"] >= height * 0.76 and (
-                        footer_counts[line["normalized"]] >= 2
-                        or footer_terms.search(line["text"])
-                        or (re.fullmatch(r"\d{1,3}", line["normalized"]) and line["top"] >= height * 0.88)
+                candidates = []
+                for line in row["lines"]:
+                    relative_top = line["top"] / max(1.0, height)
+                    if relative_top < 0.76:
+                        continue
+                    standalone_page_number = bool(
+                        re.fullmatch(r"\\d{1,3}", line["normalized"])
+                        and relative_top >= 0.90
                     )
-                ]
-                footer_top = min((line["top"] for line in footer_lines), default=None)
+                    repeated_footer = (
+                        line["normalized"] in repeated_footer_keys
+                        and relative_top >= 0.88
+                    )
+                    if (explicit_footer.search(line["text"])
+                            or standalone_page_number or repeated_footer):
+                        candidates.append(line)
+
+                # A footer candidate is safe only if no non-footer text or
+                # visual object follows it. This protects the final content
+                # line of a question (including the Vwo 2026-II 'overerft'
+                # regression) even when a repeated body line looks footer-like.
+                candidate_ids = {id(line) for line in candidates}
+                footer_lines = []
+                rejected_footer_lines = []
+                for candidate in candidates:
+                    content_after = any(
+                        id(line) not in candidate_ids
+                        and line["top"] > candidate["bottom"] + 1.0
+                        for line in row["lines"]
+                    )
+                    visual_after = any(
+                        asset[1] > candidate["bottom"] + 1.0
+                        for asset in row["assets"]
+                    )
+                    if content_after or visual_after:
+                        rejected_footer_lines.append(candidate)
+                    else:
+                        footer_lines.append(candidate)
+
+                footer_top = min(
+                    (line["top"] for line in footer_lines), default=None
+                )
+                footer_ids = {id(line) for line in footer_lines}
                 body_lines = [
-                    line for line in row["lines"]
-                    if footer_top is None or line["bottom"] <= footer_top + 1.0
+                    line for line in row["lines"] if id(line) not in footer_ids
                 ]
-                body_bottom = max((line["bottom"] for line in body_lines), default=0.0)
                 body_assets = [
                     asset for asset in row["assets"]
                     if footer_top is None or asset[1] < footer_top
                 ]
-                body_bottom = max(body_bottom, max((asset[3] for asset in body_assets), default=0.0))
+                body_bottom = max(
+                    (line["bottom"] for line in body_lines), default=0.0
+                )
+                body_bottom = max(
+                    body_bottom,
+                    max((asset[3] for asset in body_assets), default=0.0),
+                )
+
                 if body_bottom <= 0:
-                    # A genuinely blank or unextractable page needs manual review;
-                    # keep it intact rather than silently deleting its contents.
+                    # A blank or unextractable page is kept intact for review.
                     cutoff = height
                 else:
                     cutoff = min(height, body_bottom + float(padding))
+                    if footer_top is not None:
+                        cutoff = min(cutoff, footer_top)
+
                 target = preview.new_page(width=width, height=cutoff)
                 clip = fitz.Rect(0, 0, width, cutoff)
-                target.show_pdf_page(target.rect, source, row["original_page"] - 1,
-                                     clip=clip, keep_proportion=False)
+                target.show_pdf_page(
+                    target.rect, source, row["original_page"] - 1,
+                    clip=clip, keep_proportion=False,
+                )
                 mapping.append({
                     "original_page": row["original_page"],
                     "preview_page": len(mapping) + 1,
@@ -450,13 +524,20 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
                     "footer_detected": bool(footer_lines),
                     "footer_text": [line["text"] for line in footer_lines],
                     "footer_cutoff": footer_top,
+                    "footer_candidates_rejected": [
+                        line["text"] for line in rejected_footer_lines
+                    ],
+                    "footer_review_required": bool(rejected_footer_lines),
+                    "last_content_bottom": body_bottom,
                 })
+
             output_path.parent.mkdir(parents=True, exist_ok=True)
             if output_path.exists():
                 output_path.unlink()
             preview.save(output_path, garbage=4, deflate=True)
         finally:
             preview.close()
+
         return {
             "path": str(output_path),
             "source_sha256": digest_file(source_path),
@@ -466,7 +547,6 @@ def prepare_exam_preview_pdf(source_path: Path, output_path: Path, padding: floa
         }
     finally:
         source.close()
-
 
 def render_crop(pdf_path: Path, page_number: int, bbox: list[float], output: Path, scale: float=2.0):
     """Render a source PDF rectangle unchanged; coordinates are PDF points."""
@@ -509,41 +589,53 @@ def pixel_rect_to_pdf_bbox(pixel_bbox: list[float], image_size: tuple[int, int],
     return bbox
 
 
-def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, scale: float = 1.5):
-    """Render multiple page regions into one tall PNG, preserving CV answers across pages."""
+def render_composite_crops(
+    pdf_path: Path,
+    segments: list[dict],
+    output: Path,
+    scale: float = 1.5,
+    gap: float = 12.0,
+):
+    """Render ordered PDF regions into one tall image without changing content."""
     import pymupdf as fitz
     if not segments:
         raise ValueError("Geen fragmentregio's opgegeven.")
     source = fitz.open(pdf_path)
     try:
-        normalized=[]
-        width=0.0
-        total_height=0.0
+        normalized = []
+        width = 0.0
+        total_height = 0.0
         for segment in segments:
-            page_no=int(segment["page"])
+            page_no = int(segment["page"])
             if not 1 <= page_no <= len(source):
                 raise ValueError(f"Ongeldig PDF-paginanummer: {page_no}")
-            rect=fitz.Rect(segment["bbox"])
-            rect &= source[page_no-1].rect
+            rect = fitz.Rect(segment["bbox"])
+            rect &= source[page_no - 1].rect
             if rect.is_empty or rect.width <= 0 or rect.height <= 0:
                 continue
-            normalized.append((page_no-1,rect))
-            width=max(width,rect.width)
+            normalized.append((page_no - 1, rect))
+            width = max(width, rect.width)
             total_height += rect.height
-        total_height += 12.0 * max(0, len(normalized) - 1)
+        total_height += float(gap) * max(0, len(normalized) - 1)
         if not normalized:
             raise ValueError("De opgegeven fragmenten bevatten geen zichtbaar paginagebied.")
-        output_doc=fitz.open()
+        output_doc = fitz.open()
         try:
-            target_page=output_doc.new_page(width=width,height=max(10.0,total_height))
-            y=0.0
-            for index, (page_index,clip) in enumerate(normalized):
-                target=fitz.Rect(0,y,clip.width,y+clip.height)
-                target_page.show_pdf_page(target,source,page_index,clip=clip,keep_proportion=False)
+            target_page = output_doc.new_page(
+                width=width, height=max(10.0, total_height)
+            )
+            y = 0.0
+            for index, (page_index, clip) in enumerate(normalized):
+                target = fitz.Rect(0, y, clip.width, y + clip.height)
+                target_page.show_pdf_page(
+                    target, source, page_index, clip=clip, keep_proportion=False
+                )
                 if index < len(normalized) - 1:
-                    y += clip.height + 12.0
-            pix=target_page.get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
-            output.parent.mkdir(parents=True,exist_ok=True)
+                    y += clip.height + float(gap)
+            pix = target_page.get_pixmap(
+                matrix=fitz.Matrix(scale, scale), alpha=False
+            )
+            output.parent.mkdir(parents=True, exist_ok=True)
             pix.save(output)
         finally:
             output_doc.close()
@@ -551,6 +643,76 @@ def render_composite_crops(pdf_path: Path, segments: list[dict], output: Path, s
         source.close()
     return output
 
+
+def render_stitched_preview(
+    preview_pdf_path: Path,
+    output_path: Path,
+    page_map: list[dict],
+    scale: float = 1.05,
+    gap: float = 12.0,
+    max_height_px: int = 26000,
+) -> dict:
+    """Render all cleaned preview pages as one vertically stitched image.
+
+    The layout maps every pixel band back to its original PDF page. If a very
+    long exam would exceed a safe Tk image height, the scale is reduced while
+    retaining the same page-relative coordinate mapping.
+    """
+    import pymupdf as fitz
+
+    source = fitz.open(preview_pdf_path)
+    try:
+        segments = []
+        layout = []
+        total_points = 0.0
+        for item in page_map:
+            preview_page = int(item["preview_page"])
+            if not 1 <= preview_page <= len(source):
+                raise ValueError("De preview bevat een ongeldige paginakoppeling.")
+            page = source[preview_page - 1]
+            rect = page.rect
+            segments.append({
+                "page": preview_page,
+                "bbox": [0.0, 0.0, float(rect.width), float(rect.height)],
+            })
+            total_points += float(rect.height)
+        total_points += float(gap) * max(0, len(segments) - 1)
+        if not segments:
+            raise ValueError("Er zijn geen opgeschoonde examenpagina's om samen te voegen.")
+        actual_scale = min(float(scale), float(max_height_px) / max(1.0, total_points))
+        if actual_scale < 0.55:
+            raise ValueError(
+                "Dit examen bevat te veel pagina's voor één doorlopende afbeelding. "
+                "Gebruik de paginaweergave of splits het document."
+            )
+        cursor = 0.0
+        for item, segment in zip(page_map, segments):
+            page = source[int(item["preview_page"]) - 1]
+            page_height = float(page.rect.height)
+            layout.append({
+                "original_page": int(item["original_page"]),
+                "preview_page": int(item["preview_page"]),
+                "width": float(page.rect.width),
+                "height": page_height,
+                "y0": cursor * actual_scale,
+                "y1": (cursor + page_height) * actual_scale,
+                "scale": actual_scale,
+            })
+            cursor += page_height + float(gap)
+    finally:
+        source.close()
+
+    render_composite_crops(
+        preview_pdf_path, segments, output_path,
+        scale=actual_scale, gap=gap,
+    )
+    return {
+        "path": str(output_path),
+        "layout": layout,
+        "scale": actual_scale,
+        "width_points": max(item["width"] for item in layout),
+        "height_points": total_points,
+    }
 
 def question_pattern_key(candidate: dict) -> str:
     """Build a privacy-safe, normalized feature signature for reusable learning.
