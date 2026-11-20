@@ -3758,6 +3758,7 @@ class ExamApp:
 
         def show_document(scroll_to_page=None):
             nonlocal photo, document_photo, page_image_width, page_image_height, displayed_page, snippet_mode, overlay_items
+            current_scroll_y = canvas.canvasy(0) if photo is not None else 0.0
             snippet_mode = False
             if document_photo is None:
                 document_photo = tk.PhotoImage(file=str(stitched_path))
@@ -3781,11 +3782,17 @@ class ExamApp:
             else:
                 displayed_page = max(2, min(page_count, int(page_var.get())))
             redraw_guides()
-            layout = page_layout_by_original.get(displayed_page)
-            if layout:
-                canvas.yview_moveto(
-                    max(0.0, min(1.0, float(layout["y0"]) / max(1.0, page_image_height)))
-                )
+            if scroll_to_page is not None:
+                layout = page_layout_by_original.get(displayed_page)
+                if layout:
+                    target_y = float(layout["y0"])
+                else:
+                    target_y = 0.0
+            else:
+                target_y = current_scroll_y
+            canvas.yview_moveto(
+                max(0.0, min(1.0, target_y / max(1.0, page_image_height)))
+            )
 
         def show_page():
             show_document(page_var.get())
@@ -4139,7 +4146,7 @@ class ExamApp:
                 return
             frag["type"] = new_type
             frag["question_numbers"] = links
-            save_structure(); refresh_fragment_list(); show_document()
+            save_structure(); refresh_fragment_list(); show_document(displayed_page)
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
             nonlocal selection_start, selection_end, displayed_page, selection_dirty
