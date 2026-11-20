@@ -1579,6 +1579,14 @@ class ExamApp:
             record["exam_structure_invalidated"]=False
             record["cv_region_invalidated"]=False
             record["approval_revoked_reason"]=None
+            record["available_appendix_candidates"]=[
+                d.get("opslagbestand") for d in self.data.get("documenten",[])
+                if d.get("type_voorstel")=="uitwerkbijlage"]
+            record["available_cv_amendment_candidates"]=[
+                d.get("opslagbestand") for d in self.data.get("documenten",[])
+                if d.get("type_voorstel")=="aanvulling"]
+            record.setdefault("uitwerkbijlagen",[])
+            record.setdefault("cv_amendment_pdfs",[])
         self.save_project()
         self._log(
             f"Vraagtypen bepaald en {len(candidates)} eenvoudige conceptrecords aangemaakt voor {doc.get('bestand')}."
