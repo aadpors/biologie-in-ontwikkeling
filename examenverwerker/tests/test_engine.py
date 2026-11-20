@@ -468,6 +468,7 @@ class EngineTests(unittest.TestCase):
             preview = Path(tmp) / "preview.pdf"
             result = prepare_exam_preview_pdf(source, preview)
             self.assertEqual(result["page_map"][0]["original_page"], 2)
+            self.assertTrue(result["page_map"][0]["footer_detected"], result["page_map"][0])
             self.assertLess(result["page_map"][0]["preview_height"], result["page_map"][0]["original_height"])
             self.assertEqual(len(result["page_map"]), 18)
             with fitz.open(preview) as cleaned:
