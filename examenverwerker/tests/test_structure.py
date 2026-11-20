@@ -19,26 +19,31 @@ class StructureTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             make_page_span(0, 0.1, 0.9)
 
-    def test_context_introduction_defaults_to_every_confirmed_question(self):
-        self.assertEqual(default_question_links("context_intro", self.questions), [1, 2, 4])
-        fragment = make_fragment("context_intro", make_page_span(1, 0.1, 0.8), [],
-                                 self.questions, "intro")
-        self.assertEqual(fragment["question_numbers"], self.questions)
-        self.assertEqual(fragment["type"], "intro")
+    def test_context_requires_explicit_question_links(self):
+        self.assertEqual(default_question_links("context", self.questions), [])
+        with self.assertRaises(ValueError):
+            make_fragment("context", make_page_span(2, 0.1, 0.8), [],
+                          self.questions, "unlinked-context")
+        fragment = make_fragment("context", make_page_span(2, 0.1, 0.8), [1, 2],
+                                 self.questions, "shared-context")
+        self.assertEqual(fragment["question_numbers"], [1, 2])
+        self.assertEqual(fragment["type"], "context")
 
 
-    def test_only_three_fragment_types_are_exposed_and_legacy_projects_migrate(self):
-        self.assertEqual(FRAGMENT_TYPES, {"intro", "tussen_context", "vraag"})
+    def test_two_fragment_types_and_legacy_projects_migrate(self):
+        self.assertEqual(FRAGMENT_TYPES, {"context", "vraag"})
         legacy = [
-            {"id": "a", "type": "context_intro", "question_numbers": [1]},
-            {"id": "b", "type": "vraagcontext", "question_numbers": [1]},
-            {"id": "c", "type": "tussenliggende_context", "question_numbers": [2]},
+            {"id": "a", "type": "intro", "question_numbers": [1, 2, 4]},
+            {"id": "b", "type": "context", "question_numbers": [1]},
+            {"id": "c", "type": "context", "question_numbers": [1]},
+            {"id": "d", "type": "context", "question_numbers": [2]},
+            {"id": "e", "type": "tussenliggende_context", "question_numbers": [2]},
         ]
         migrated = normalize_fragments(legacy)
-        self.assertEqual([x["type"] for x in migrated],
-                         ["intro", "tussen_context", "tussen_context"])
+        self.assertEqual([x["type"] for x in migrated], ["context"] * 5)
         self.assertEqual([x["type"] for x in legacy],
-                         ["context_intro", "vraagcontext", "tussenliggende_context"])
+                         ["intro", "context_intro", "vraagcontext", "tussen_context", "tussenliggende_context"])
+
 
     def test_fragments_are_sorted_in_source_reading_order(self):
         fragments = [
