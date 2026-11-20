@@ -19,12 +19,12 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | Biologisch hoofdthema | Kaarten | Aantal |
 |---|---|---:|
 | Moleculaire interactie | s1, s33, s48 | 3 |
-| Selectie en genetische variatie | s21, s23, s37, s42, s? | 5 |
-| Biodiversiteit en ecosystemen | s3, s5, s6, s13, s16, s19, s20, s41 | 8 |
+| Selectie en genetische variatie | s2, s21, s23, s37, s42 | 5 |
+| Biodiversiteit en ecosystemen | s3, s6, s13, s16, s19, s20, s40, s41 | 8 |
 | Ontstaan en evolutie van meercellig leven | s4 | 1 |
 | Afweer van het organisme | s5, s28, s29, s44 | 4 |
-| Stofwisseling van het organisme | s7, s26, s27, s45, s47, s? | 6 |
-| Zelforganisatie van het organisme | s8, s11, s15, s17 | 4 |
+| Stofwisseling van het organisme | s7, s26, s27, s39, s45, s47 | 6 |
+| Zelforganisatie van het organisme | s8, s15, s17, s34 | 4 |
 | Zelfregulatie van het organisme | s9, s14, s18, s24, s25, s30, s46 | 7 |
 | DNA-replicatie en celcyclus | s10, s31 | 2 |
 | Eiwitsynthese en genexpressie | s11, s32 | 2 |
@@ -32,7 +32,7 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | Evolutie van eukaryote cellen | s35 | 1 |
 | Erfelijke eigenschappen en overerving | s36, s38, s43 | 3 |
 
-*De tabel is een navigatie-indeling; kaarten kunnen inhoudelijk ook aan andere thema's raken. Een vraagteken duidt op een kaart waarvan de primaire hoofdindeling nogmaals in de brondata moet worden gecontroleerd voordat deze tabel als definitieve taxonomie wordt gebruikt.*
+De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inhoudelijk ook aan andere thema's raken; de tags en curriculumkoppelingen leggen die nevenrelaties vast.
 
 ## Nieuwe wetenschappelijke kaarten
 
@@ -52,7 +52,7 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 - **s9:** de bestaande WHOLISTIC-kaart uitgebreid met een havo/vwo-lesinsteek, begrenzing van het vismodel en een expliciete lesvraag.
 - **s10:** de bestaande CONCR-kaart uitgebreid met de relatie tussen niet-coderend RNA, DDX11, DNA-replicatie en zusterchromatiden.
 - **s12:** de bestaande Drosophila-kaart uitgebreid met de multisensorische terugkoppeling en correcte havo/vwo-koppeling.
-- **s23:** samenvatting herzien zodat de experimentele test van de resource-allocationtheorie niet wordt verward met de evolutionaire modelverklaring; relevantie is 'aansluitend'.
+- **s23:** samenvatting herzien zodat de experimentele test van de resource-allocationtheorie niet wordt verward met de evolutionaire modelverklaring; de curriculumrelatie is 'aansluitend'.
 - **s35:** verplaatst naar een eigen hoofdthema voor eukaryogenese, beperkt tot vwo en als 'aansluitend' geclassificeerd.
 
 Dubbele records van publicaties die al als s9, s10 en s12 aanwezig waren, zijn niet behouden. Zo groeit de database niet kunstmatig door dezelfde publicatie meermaals op te nemen.
@@ -69,4 +69,4 @@ Dubbele records van publicaties die al als s9, s10 en s12 aanwezig waren, zijn n
 
 ## Resterende prioriteiten
 
-De verdeling is evenwichtiger, maar de bibliotheek is nog geen volledige dekking van alle biologie. Relatief smal vertegenwoordigd blijven onder meer gedrag/voortplanting, genexpressie, DNA-replicatie/celcyclus en de evolutionaire overgang naar complexere cellen. Ook menselijke transportfysiologie en planttransport kunnen verder worden versterkt. Nieuwe toevoegingen moeten deze hiaten gericht vullen, zonder de bibliotheek te laten domineren door specialistische moleculaire publicaties.
+De verdeling is breder, maar de bibliotheek is nog geen volledige dekking van alle biologie. Relatief smal vertegenwoordigd blijven onder meer gedrag/voortplanting, genexpressie, DNA-replicatie/celcyclus en enkele evolutionaire thema's. Ook menselijke transportfysiologie en planttransport kunnen verder worden versterkt. Nieuwe toevoegingen moeten deze hiaten gericht vullen, zonder de bibliotheek te laten domineren door specialistische moleculaire publicaties.
