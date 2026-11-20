@@ -793,7 +793,7 @@ class ExamApp:
             "aanvulling": ("CV-aanvulling verwerken", self.show_records),
             "antwoorden": ("Correcte antwoorden controleren", self.show_records),
             "volledigheid": ("Volledigheidscontrole", self.show_records),
-            "snippets": ("Vraaguitsneden controleren", self.show_records),
+            "snippets": ("Definitieve uitsneden maken", self.generate_final_snippets),
             "eindcontrole": ("Visuele eindcontrole", self.show_records),
             "export": ("Exportpakket maken", self.export_project),
             "voltooid": ("Examenbibliotheek tonen", self._show_exam_library),
@@ -3469,6 +3469,77 @@ class ExamApp:
         buttons=ttk.Frame(win); buttons.pack(fill="x",padx=10,pady=(0,10))
         ttk.Button(buttons,text="Vraag bekijken / aanpassen",command=open_selected).pack(side="left")
         ttk.Button(buttons,text="Vernieuw",command=lambda:(win.destroy(),self.show_records())).pack(side="left",padx=8)
+
+    def generate_final_snippets(self):
+        """Render final question/context snippets only from saved, confirmed page spans."""
+        if not self.data:
+            return
+        records=self.data.get("vraagrecords",[])
+        if not records:
+            messagebox.showinfo("Geen vraagrecords","Er zijn geen bevestigde vraagfragmenten om uit te snijden.",parent=self.root)
+            return
+        generated=0
+        try:
+            from PIL import Image
+            for record in records:
+                doc=next((d for d in self.data.get("documenten",[])
+                          if d.get("id")==record.get("candidate_document_id")),None)
+                if not doc:
+                    raise ValueError(f"Vraag {record.get('number')}: opgavenbron ontbreekt.")
+                source=self.project_dir/"bronnen"/doc["opslagbestand"]
+                if not source.is_file() or sha256(source)!=doc.get("sha256"):
+                    raise ValueError(f"Vraag {record.get('number')}: bron-PDF ontbreekt of is gewijzigd.")
+                structure=(self.data.get("exam_structures",{}).get(doc["id"])
+                           or self.data.get("exam_structure"))
+                linked=fragments_for_question(structure,int(record["number"]))
+                question=linked.get("question_fragment")
+                if not question or not question.get("page_spans"):
+                    raise ValueError(f"Vraag {record.get('number')}: bevestigd vraagfragment ontbreekt.")
+                analysis=analyze_pdf(source)
+                page_sizes={int(p["page"]):(float(p["width"]),float(p["height"]))
+                            for p in analysis["pages"]}
+                segments=page_spans_to_segments(question["page_spans"],page_sizes)
+                name=f"question-{doc['id']}-q{record['number']}-final.png"
+                target=self.project_dir/"snippets"/name
+                render_composite_crops(source,segments,target,scale=1.45)
+                # Trim only blank top/bottom margins; never infer or alter fragment
+                # boundaries. A small white safety margin is retained.
+                with Image.open(target) as image:
+                    image=image.convert("RGB")
+                    gray=image.convert("L")
+                    ink=gray.point(lambda value:255 if value<246 else 0)
+                    bbox=ink.getbbox()
+                    if bbox:
+                        top=max(0,bbox[1]-4); bottom=min(image.height,bbox[3]+4)
+                        image.crop((0,top,image.width,bottom)).save(target)
+                record["question_region_snippet_file"]=name
+                record["snippet_file"]=name
+                record["snippet_files"]=[name]
+                record["question_region_snippet_sha256"]=sha256(target)
+                context_names=[]
+                for context in linked.get("context_fragments",[]):
+                    context_name=f"context-{doc['id']}-{context['id']}-final.png"
+                    context_target=self.project_dir/"snippets"/context_name
+                    context_segments=page_spans_to_segments(context["page_spans"],page_sizes)
+                    render_composite_crops(source,context_segments,context_target,scale=1.25)
+                    with Image.open(context_target) as image:
+                        image=image.convert("RGB")
+                        gray=image.convert("L")
+                        bbox=gray.point(lambda value:255 if value<246 else 0).getbbox()
+                        if bbox:
+                            image.crop((0,max(0,bbox[1]-4),image.width,
+                                        min(image.height,bbox[3]+4))).save(context_target)
+                    context_names.append({"fragment_id":context.get("id"),"file":context_name,
+                                          "sha256":sha256(context_target)})
+                record["context_region_snippet_files"]=context_names
+                generated+=1
+            self.save_project()
+            self._log(f"Definitieve vraaguitsneden gegenereerd: {generated} vraagfragmenten; originele PDF's en fragmentgrenzen ongewijzigd.")
+            messagebox.showinfo("Uitsneden gemaakt",
+                f"De definitieve vraaguitsneden zijn vanuit de opgeslagen grenzen gegenereerd.\n\nAantal vragen: {generated}",parent=self.root)
+        except Exception as exc:
+            self._error("Definitieve vraaguitsneden maken",exc)
+            messagebox.showerror("Uitsneden niet compleet",str(exc),parent=self.root)
 
     def _review_exam_completeness(self):
         """Run structural completeness checks and persist the teacher's final confirmation."""
