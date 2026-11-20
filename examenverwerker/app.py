@@ -1541,9 +1541,16 @@ class ExamApp:
                 records.append(record)
             record["question_fragment_id"] = fragment.get("id")
             record["question_text"] = str(fragment.get("text") or "")
-            if record.get("question_type_status") != "handmatig_gecontroleerd":
+            if (record.get("question_type_status") != "handmatig_gecontroleerd"
+                    or record.get("exam_structure_invalidated") is True
+                    or record.get("source_analysis_invalidated") is True):
                 record["question_type"] = (row.get("vraagtype_controle") or {}).get("type", "onbekend")
                 record["question_type_status"] = row.get("vraagtype_status", "controle_nodig")
+                record["approved_by_human"] = False
+                record["record_review_checklist"] = {
+                    key: False for key in record.get("record_review_checklist", {})}
+                record["exam_structure_invalidated"] = False
+                record["source_analysis_invalidated"] = False
             linked_contexts = question_links.get("context_fragments", [])
             record["context_fragment_ids"] = [item.get("id") for item in linked_contexts]
             record["context_fragments"] = [
