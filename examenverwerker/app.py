@@ -2244,20 +2244,17 @@ class ExamApp:
             self.import_batch_paths = list(created)
             self.import_batch_index = 0
             self.import_batch_manifest_path = manifest_path
-            self.project_dir = created[0]
-            self.data = json.loads((self.project_dir / PROJECT_FILE).read_text(encoding="utf-8"))
-            self._workspace_load_global_corrections()
             self._log(f"Examens geïmporteerd onder: {target_root}")
             for project in created:
                 self._log(f"  Examen toegevoegd aan bibliotheek: {project.name}")
-            self._log(f"Eerste examen wordt geopend in een afzonderlijk verwerkingsvenster: {self.project_dir.name}")
+            self._log(f"Eerste examen wordt geopend in een afzonderlijk verwerkingsvenster: {created[0].name}")
             messagebox.showinfo("Examens geïmporteerd",
                 f"{len(created)} examens zijn toegevoegd aan de examenbibliotheek.\n\n"
-                f"Het eerste examen ({self.project_dir.name}) wordt in een afzonderlijk verwerkingsvenster geopend. "
+                f"Het eerste examen ({created[0].name}) wordt in een afzonderlijk verwerkingsvenster geopend. "
                 "De overige examens blijven beschikbaar in de bibliotheek. De oorspronkelijke PDF's zijn ongewijzigd gekopieerd.",
                 parent=self.root)
             self._refresh_library()
-            self._launch_workspace(self.project_dir, data=self.data)
+            self._launch_workspace(created[0])
 
         ttk.Button(footer, text="Annuleren", command=win.destroy).grid(row=0, column=2, sticky="e", padx=(8, 0))
         ttk.Button(footer, text="Opslaan en doorgaan naar examenverwerking  →",
