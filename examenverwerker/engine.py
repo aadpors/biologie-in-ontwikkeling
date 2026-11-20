@@ -894,9 +894,11 @@ def build_consolidated_cv_pdf(entries: list[dict], snippets_dir: Path,
         "vervanging":"Geldende vervanging uit de officiële CV-aanvulling",
         "intrekking":"INGETROKKEN · oorspronkelijke beoordelingsinformatie niet meer toepassen",
     }
+    question_pages={}
     try:
         for entry in sorted(entries,key=lambda item:int(item.get("question_number",0) or 0)):
             number=int(entry.get("question_number",0) or 0)
+            first_page=len(result)+1
             change=entry.get("change_type") or "ongewijzigd"
             original=Path(snippets_dir)/str(entry.get("original_region_file") or "")
             if not original.is_file():
@@ -954,6 +956,7 @@ def build_consolidated_cv_pdf(entries: list[dict], snippets_dir: Path,
                             fontsize=7,fontname="helv")
                         crop.close()
                     image.close()
+            question_pages[str(number)]={"start":first_page,"end":len(result)}
         meta=metadata or {}
         result.set_metadata({
             "title":f"Geconsolideerd correctievoorschrift {meta.get('level','')} {meta.get('year','')}",
@@ -967,7 +970,7 @@ def build_consolidated_cv_pdf(entries: list[dict], snippets_dir: Path,
     with fitz.open(output_path) as check:
         page_count=len(check)
     return {"path":str(output_path),"sha256":digest_file(output_path),
-            "page_count":page_count}
+            "page_count":page_count,"question_pages":question_pages}
 
 
 def review_checklist_errors(record: dict, checklist: dict) -> list[str]:
