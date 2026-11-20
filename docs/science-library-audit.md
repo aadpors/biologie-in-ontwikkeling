@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 48 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 50 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 48 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 50 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -26,9 +26,9 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | Stofwisseling van het organisme | s7, s26, s27, s39, s45, s47 | 6 |
 | Zelforganisatie van het organisme | s8, s15, s17, s34 | 4 |
 | Zelfregulatie van het organisme | s9, s14, s18, s24, s25, s30, s46 | 7 |
-| DNA-replicatie en celcyclus | s10, s31 | 2 |
+| DNA-replicatie en celcyclus | s10, s31, s49 | 3 |
 | Eiwitsynthese en genexpressie | s11, s32 | 2 |
-| Gedrag en voortplanting | s12, s22 | 2 |
+| Gedrag en voortplanting | s12, s22, s50 | 3 |
 | Evolutie van eukaryote cellen | s35 | 1 |
 | Erfelijke eigenschappen en overerving | s36, s38, s43 | 3 |
 
@@ -46,6 +46,8 @@ De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inho
 | s46 | Nierfunctie, ADH en waterterugresorptie | Vult de fysiologie van uitscheiding en waterbalans aan met experimenteel mechanistisch onderzoek in muizen. |
 | s47 | Fotosynthese, droogte en stikstof | Biedt een brede synthese van 84 studies en 1.247 waarnemingen over koolstofopname en -verdeling in planten. |
 | s48 | FXR–YAP, celidentiteit en leverhomeostase | Verbindt moleculaire interactie, genregulatie, celdifferentiatie en weefselintegriteit. |
+| s49 | Mitotische controle en chromosomale instabiliteit | Versterkt het onderbelichte thema celcyclus, mitose en correcte chromosoomverdeling; onderscheidt celmodellen van klinische behandeling. |
+| s50 | Neurale circuits voor ouderlijk zorggedrag | Verbreedt gedrag en voortplanting van balts en populatiedynamiek naar ouderlijke zorg, motivatie en contextafhankelijke hersenregulatie. |
 
 ## Bestaande kaarten inhoudelijk aangescherpt
 
@@ -69,7 +71,7 @@ Dubbele records van publicaties die al als s9, s10 en s12 aanwezig waren, zijn n
 
 ## Resterende prioriteiten
 
-De verdeling is breder, maar de bibliotheek is nog geen volledige dekking van alle biologie. Relatief smal vertegenwoordigd blijven onder meer gedrag/voortplanting, genexpressie, DNA-replicatie/celcyclus en enkele evolutionaire thema's. Ook menselijke transportfysiologie en planttransport kunnen verder worden versterkt. Nieuwe toevoegingen moeten deze hiaten gericht vullen, zonder de bibliotheek te laten domineren door specialistische moleculaire publicaties.
+De verdeling is breder, maar de bibliotheek is nog geen volledige dekking van alle biologie. Gedrag/voortplanting en DNA-replicatie/celcyclus zijn elk uitgebreid tot drie kaarten, maar blijven kleiner dan de brede ecologie-, stofwisselings- en zelfregulatiethema's. Genexpressie en de evolutionaire overgang naar meercelligheid blijven relatief dun vertegenwoordigd. Ook menselijke transportfysiologie en planttransport kunnen verder worden versterkt. Nieuwe toevoegingen moeten deze hiaten gericht vullen, zonder de bibliotheek te laten domineren door specialistische moleculaire publicaties.
 
 
 ## Tweede controle: bronmetadata en curriculumkoppelingen
@@ -122,9 +124,17 @@ De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een voll
 
 ### Nieuwe metadata voor bruikbare selectie
 
-Alle 48 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
-- **Primair onderzoek:** 38 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
-- **Review / synthese:** 8 kaarten, waaronder mini-reviews, reviews en meta-analyses.
+Alle 50 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
+- **Primair onderzoek:** 39 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
+- **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
 - **Perspectiefartikel:** 2 kaarten.
 
 De oude keuzelijst 'Examenprogramma' is uit het filterpaneel verwijderd. In de data hadden alle wetenschappelijke kaarten de waarde `Beide`, waardoor die keuzelijst geen onderscheid maakte en feitelijk niets filterde. De nieuwe keuzelijst 'Onderzoekstype' maakt wel een inhoudelijk betekenisvol onderscheid. De curriculumrelevantie blijft apart filterbaar.
+
+
+### Aanvullingen na de tweede controle
+
+- **s7:** de samenvatting maakt nu onderscheid tussen toegenomen vegetatieve groei/biomassa en korrelopbrengst. In de veldproef nam de korrelopbrengst per plant niet significant toe.
+- **s20:** de DOI-resolver en Oxford Academic koppelen de DOI aan de kaarttitel. Een andere tijdschriftindexpagina toont dezelfde DOI bij een andere titel. De kaart gebruikt daarom de DOI-resolverende Oxford Academic-pagina en markeert de conflicterende indexvermelding als metadata-anomalie.
+- **s49:** nieuw primair onderzoek naar het SKA-complex, mitotische controle en chromosomale instabiliteit; expliciet als celmodelonderzoek, niet als klinische behandelstudie.
+- **s50:** nieuwe review over neurale circuits voor ouderlijk zorggedrag; mechanistische bevindingen uit knaagdiermodellen worden niet rechtstreeks naar mensen vertaald.
