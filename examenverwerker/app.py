@@ -12,7 +12,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from exporter import export_approved_records
-from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments
+from engine import analyze_pdf, detect_question_candidates, detect_cv_question_numbers, compare_question_numbering, learn_decision, render_page, render_crop, propose_question_regions, classify_document_role, infer_exam_metadata, question_pattern_key, suggest_from_learning, extract_candidate_text, detect_question_type, classify_question_with_visuals, detect_context_references, match_correction_documents, match_exam_documents, build_question_record, render_composite_crops, review_checklist_errors, extract_region_text, pdf_page_count, pixel_rect_to_pdf_bbox, propose_context_fragments, prepare_exam_preview_pdf
 from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragments, make_page_span, make_fragment, append_page_span, make_exam_structure, validate_exam_structure, mark_structure_stale, fragments_for_question, make_cv_fragment, validate_cv_fragment, page_spans_to_segments, missing_question_regions
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
@@ -3397,6 +3397,14 @@ class ExamApp:
         analysis = analyze_pdf(source)
         page_count = int(analysis["page_count"])
         page_sizes = {int(p["page"]): (float(p["width"]), float(p["height"])) for p in analysis["pages"]}
+        if page_count < 2:
+            messagebox.showwarning("Geen opgavenpagina's", "Pagina 1 is het voorblad en wordt niet in de fragmenteditor opgenomen. Er zijn geen volgende pagina's.")
+            return
+        preview_path = self.project_dir / "analyse" / f"opgaven-preview-{doc['id']}-{doc['sha256'][:12]}.pdf"
+        preview_info = prepare_exam_preview_pdf(source, preview_path)
+        preview_by_original = {int(item["original_page"]): item for item in preview_info["page_map"]}
+        preview_heights = {int(item["original_page"]): float(item["preview_height"])
+                           for item in preview_info["page_map"]}
         structures = self.data.setdefault("exam_structures", {})
         existing = structures.get(doc["id"])
         if existing is None and self.data.get("exam_structure", {}).get("document_id") == doc["id"]:
@@ -3497,7 +3505,10 @@ class ExamApp:
         header = ttk.Frame(win, padding=(12, 8)); header.pack(fill="x")
         ttk.Label(header, text="Eerst de vraagnummering bevestigd; nu context- en vraagfragmenten afbakenen.",
                   font=("Segoe UI", 10, "bold")).pack(anchor="w")
-        ttk.Label(header, text="Sleep de dunne zwarte lijnen. Binnen de lijnen blijft de PDF wit; erbuiten ligt een doorschijnende lichtgrijze markering. De bron-PDF wordt nooit aangepast.",
+        trimmed_pages = sum(1 for item in preview_info["page_map"] if item.get("footer_detected"))
+        ttk.Label(header, text=f"Voorbewerking: voorblad verwijderd; footer/onderliggende witruimte automatisch afgesneden op {trimmed_pages} van {len(preview_info['page_map'])} pagina's. De originele PDF blijft ongewijzigd.",
+                  wraplength=1180).pack(anchor="w", pady=(3, 0))
+        ttk.Label(header, text="Selecteer links een fragment om alleen dat fragment als doorlopende snippet te bekijken. Sleep de grenslijnen om het fragment bij te stellen. Met 'Nieuwe selectie' kun je een ontbrekend fragment op een opgeschoonde pagina toevoegen.",
                   wraplength=1180).pack(anchor="w", pady=(3, 0))
         body = ttk.Frame(win, padding=8); body.pack(fill="both", expand=True)
         left = ttk.Frame(body, width=245); left.pack(side="left", fill="y", padx=(0, 10))
@@ -3536,13 +3547,13 @@ class ExamApp:
         ttk.Label(left, text="Tip: maak een fragment op de eerste pagina en voeg daarna de volgende pagina's in oplopende volgorde toe.",
                   wraplength=230).pack(anchor="w", pady=8)
         nav = ttk.Frame(right); nav.pack(fill="x", pady=(0, 6))
-        page_var = tk.IntVar(value=1)
-        displayed_page = 1
+        page_var = tk.IntVar(value=2)
+        displayed_page = 2
         ttk.Button(nav, text="◀", width=3, command=lambda: change_page(-1)).pack(side="left")
-        ttk.Label(nav, text="Pagina").pack(side="left", padx=(8, 3))
-        page_spin = tk.Spinbox(nav, from_=1, to=page_count, textvariable=page_var, width=5, command=lambda: jump_question_page())
+        ttk.Label(nav, text="Bronpagina").pack(side="left", padx=(8, 3))
+        page_spin = tk.Spinbox(nav, from_=2, to=page_count, textvariable=page_var, width=5, command=lambda: jump_question_page())
         page_spin.pack(side="left")
-        ttk.Label(nav, text=f"van {page_count}").pack(side="left", padx=(4, 12))
+        ttk.Label(nav, text=f"van {page_count} (pagina 1 verwijderd)").pack(side="left", padx=(4, 12))
         frame = ttk.Frame(right); frame.pack(fill="both", expand=True)
         canvas = tk.Canvas(frame, background="white", highlightthickness=0)
         sy = ttk.Scrollbar(frame, orient="vertical", command=canvas.yview)
@@ -3550,8 +3561,12 @@ class ExamApp:
         canvas.configure(yscrollcommand=sy.set, xscrollcommand=sx.set)
         sy.pack(side="right", fill="y"); sx.pack(side="bottom", fill="x"); canvas.pack(side="left", fill="both", expand=True)
         actions = ttk.Frame(right); actions.pack(fill="x", pady=(8, 0))
-        top_y, bottom_y = 0.06, 0.94
+        top_y, bottom_y = 0.0, min(1.0, preview_heights[displayed_page] / page_sizes[displayed_page][1])
         photo = None
+        snippet_mode = False
+        snippet_layout = []
+        snippet_scale = 1.05
+        drag_handle = None
         page_image_width = 1
         page_image_height = 1
         drag_target = None
