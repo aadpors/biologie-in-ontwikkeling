@@ -453,6 +453,15 @@ class ExamApp:
             return
 
         state = exam_workflow_state(self.data)
+        # When opening an older project whose fragment boundaries are already
+        # complete, automatically create the new lightweight drafts once.
+        if state["stage"] == "vraagrecords" and not getattr(self, "_auto_creating_drafts", False):
+            self._auto_creating_drafts = True
+            try:
+                self._workflow_make_next_record(refresh_after=False)
+                state = exam_workflow_state(self.data)
+            finally:
+                self._auto_creating_drafts = False
         actions = {
             "import": ("Examens importeren", self.import_year_set),
             "documenttype": ("Documenttype corrigeren", self.correct_type),
@@ -542,7 +551,7 @@ class ExamApp:
                           if item.get("id") == row.get("id")), 0)
             self._workspace_refresh_candidates(index)
 
-    def _workflow_make_next_record(self):
+    def _workflow_make_next_record(self, refresh_after=True):
         """Backfill simple drafts for older projects whose fragments were already saved."""
         if not self.data:
             return
@@ -558,7 +567,8 @@ class ExamApp:
                            and row.get("human_decision") is True]
                 if structure and confirmed:
                     created += self._classify_question_types_for_document(doc)
-            self.refresh()
+            if refresh_after:
+                self.refresh()
             self._log(f"Conceptvragen bijgewerkt vanuit opgeslagen fragmenten: {created}.")
         except Exception as exc:
             self._error("Conceptvragen maken",exc)
