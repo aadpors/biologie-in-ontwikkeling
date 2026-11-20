@@ -22,7 +22,7 @@ De examenbibliotheek is het hoofdvenster. Elk geopend examen krijgt een eigen ve
 
 ## Ontwerpkeuzes
 
-- Ingebedde PDF-tekst wordt eerst gebruikt. OCR wordt niet standaard over alle pagina's uitgevoerd; bij beeldvragen zonder bruikbare tekst blijft het vraagtype onbekend totdat het visueel is beoordeeld.
+- Ingebedde PDF-tekst wordt eerst gebruikt. OCR wordt alleen geprobeerd op de eerste pagina of op pagina's/geselecteerde fragmenten waar de tekstlaag ontbreekt of aantoonbaar onvoldoende is. OCR vereist een beschikbare Tesseract-installatie; zonder die blijft beeldinhoud visueel te beoordelen en wordt geen vraagtype geraden.
 - Automatische detecties zijn voorstellen. Alleen expliciet bevestigde vraagstarts, fragmenten, antwoorden en eindcontroles tellen als gecontroleerd.
 - Vraagtype en punten worden uitsluitend bepaald vanuit het bevestigde vraagfragment, niet vanuit opnieuw gedetecteerde vraaggrenzen.
 - Bestaande lokaal gecontroleerde fragmentgrenzen blijven behouden. Er worden geen extra vinkrondes voor dezelfde grenzen toegevoegd.
