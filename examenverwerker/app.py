@@ -18,7 +18,7 @@ from structure import FRAGMENT_TYPES, canonical_fragment_type, normalize_fragmen
 from batch_import import group_exam_documents, batch_document_warnings, validate_batch_documents, resolve_examens_root
 from exam_workflow import exam_workflow_state, exam_export_fingerprint, restore_import_batch
 
-APP_VERSION = "0.15.0"
+APP_VERSION = "0.16.0"
 PROJECT_FILE = "project.json"
 
 def now():
@@ -295,6 +295,7 @@ class ExamApp:
         self._library_paths = {}
         self._open_workspaces = {}
         self._refresh_library()
+        self.root.protocol("WM_DELETE_WINDOW", self._close_application)
 
     def _discover_library_projects(self):
         roots = [self.examens_root, self.user_projects_root, self.app_base / "projecten"]
@@ -337,7 +338,7 @@ class ExamApp:
                     })
                 except Exception as exc:
                     self._log(f"Project overgeslagen in bibliotheek ({folder.name}): {exc}")
-        found.sort(key=lambda row: (row["archived"], row["year"], row["level"],
+        found.sort(key=lambda row: (not row["archived"], row["year"], row["level"],
                                     row["period"], row["subject"]), reverse=True)
         return found
 
@@ -444,6 +445,19 @@ class ExamApp:
                 f"De verwerkingswerkruimte kon niet worden geopend. De projectgegevens zijn niet gewijzigd.\n\n{exc}",
                 parent=self.root)
             return None
+
+    def _close_application(self):
+        """Save every open workspace before the library's Tk root is closed."""
+        for key, workspace in list(self._open_workspaces.items()):
+            try:
+                workspace.save_project()
+            except Exception as exc:
+                workspace._error("Project opslaan bij afsluiten", exc)
+                if not messagebox.askyesno("Opslaan niet gelukt",
+                    "Een examen kon niet worden opgeslagen. Wil je de applicatie toch afsluiten?",
+                    parent=self.root):
+                    return
+        self.root.destroy()
 
     def _archive_selected_exam(self):
         folder = self._selected_library_folder()
