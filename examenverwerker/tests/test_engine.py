@@ -460,7 +460,7 @@ class EngineTests(unittest.TestCase):
 
     def test_vwo_2026_ii_question_one_and_final_overerft_line_survive_preview(self):
         import pymupdf as fitz
-        from engine import prepare_exam_preview_pdf
+        from engine import prepare_exam_preview_pdf, render_stitched_preview
 
         source = Path(__file__).resolve().parents[2] / "examens" / "vw-1018-a-26-2-o.pdf"
         self.assertTrue(source.is_file(), "De regressie-PDF vwo 2026 tijdvak 2 ontbreekt.")
@@ -469,11 +469,22 @@ class EngineTests(unittest.TestCase):
             result = prepare_exam_preview_pdf(source, preview)
             self.assertEqual(result["page_map"][0]["original_page"], 2)
             self.assertLess(result["page_map"][0]["preview_height"], result["page_map"][0]["original_height"])
+            self.assertEqual(len(result["page_map"]), 18)
             with fitz.open(preview) as cleaned:
                 first_question_page = cleaned[0].get_text("text").lower()
                 self.assertRegex(first_question_page, r"dominant\s+overerft")
                 self.assertIn("geef een combinatie van ouders", first_question_page)
                 self.assertRegex(first_question_page, r"1p\s*1")
+
+            stitched = Path(tmp) / "vwo-2026-ii-doorlopend.png"
+            stitched_info = render_stitched_preview(
+                preview, stitched, result["page_map"], scale=1.05
+            )
+            self.assertTrue(stitched.is_file())
+            self.assertEqual(len(stitched_info["layout"]), 18)
+            self.assertEqual(stitched_info["layout"][0]["original_page"], 2)
+            self.assertEqual(stitched_info["layout"][-1]["original_page"], 19)
+            self.assertLessEqual(fitz.Pixmap(str(stitched)).height, 26000)
 
     def test_stitched_preview_is_one_continuous_image_with_original_page_mapping(self):
         import pymupdf as fitz
