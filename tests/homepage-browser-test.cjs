@@ -41,7 +41,7 @@ const fs = require("node:fs");
     await page.locator("#search").fill("");
     await page.locator("#study-type").selectOption({ label: "Review / synthese" });
     await page.waitForTimeout(100);
-    const reviewCount = Number((await page.locator("#count").innerText()).match(/\\d+/)[0]);
+    const reviewCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
     assert.equal(reviewCount, 8, "Het onderzoekstypefilter moet de acht review- en syntheseartikelen tonen");
     await page.locator("#study-type").selectOption("all");
     await page.locator("#concept").selectOption({ label: "Biodiversiteit en ecosystemen" });
