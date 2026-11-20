@@ -4366,7 +4366,8 @@ class ExamApp:
                 messagebox.showinfo("Conceptexport klaar",
                     f"Conceptvragen en bron-PDF's zijn geëxporteerd naar:\n{export_dir}\n\nDit is een overdraagbaar conceptpakket, geen publicatiepakket.",parent=self.root)
                 return
-            result=export_approved_records(records,self.project_dir,export_dir)
+            result=export_approved_records(records,self.project_dir,export_dir,
+                                          consolidated_cv=self.data.get("consolidated_cv"))
             if not result.get("ok"):
                 errors=result.get("errors",[])
                 detail="\n".join(f"• {x.get('id','')} · {x.get('error')}" for x in errors[:20])
