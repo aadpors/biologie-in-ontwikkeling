@@ -2574,11 +2574,65 @@ class ExamApp:
         self.refresh()
         messagebox.showinfo("Analyse voltooid", f"{total} mogelijke vraagstarts gevonden. Per examen is alleen het bijbehorende correctievoorschrift vergeleken. Dit zijn signalen, geen automatisch goedgekeurde vragen.")
 
-    def show_candidates(self):
-        """Review question starts in one continuous workspace, without per-question dialogs."""
+    def analyze_auxiliary_starts(self, role):
+        """Detect and open a human review of question anchors in an appendix or CV PDF."""
+        if role not in ("uitwerkbijlage","correctievoorschrift"):
+            raise ValueError("Alleen uitwerkbijlagen en correctievoorschriften kunnen hier worden geanalyseerd.")
+        docs=[d for d in self.data.get("documenten",[]) if d.get("type_voorstel")==role]
+        if not docs:
+            messagebox.showinfo("Document ontbreekt",
+                f"Voeg eerst een document van het type '{role}' toe.",parent=self.root)
+            return
+        from engine import detect_cv_question_numbers
+        first_doc=None
+        try:
+            for doc in docs:
+                source=self.project_dir/"bronnen"/doc["opslagbestand"]
+                if not source.is_file() or sha256(source)!=doc.get("sha256"):
+                    raise ValueError(f"De bron-PDF {doc.get('bestand')} ontbreekt of is gewijzigd.")
+                analysis=analyze_pdf(source)
+                found=detect_cv_question_numbers(analysis)
+                old=[r for r in self.data.get("vraagkandidaten",[])
+                     if r.get("document_id")==doc.get("id")]
+                old_by_key={(int(r.get("number",-1)),int(r.get("page",-1))):r for r in old}
+                reviewed=[]
+                for item in found:
+                    key=(int(item["number"]),int(item["page"]))
+                    previous=old_by_key.get(key,{})
+                    row=dict(item)
+                    row.update({
+                        "id":previous.get("id") or f"{role}-{doc['id']}-q{key[0]}-p{key[1]}",
+                        "document_id":doc["id"],"bestand":doc.get("bestand"),
+                        "human_decision":previous.get("human_decision"),
+                        "status":previous.get("status","controle_nodig"),
+                        "auxiliary_document_role":role,
+                    })
+                    reviewed.append(row)
+                self.data["vraagkandidaten"]=[
+                    r for r in self.data.get("vraagkandidaten",[])
+                    if r.get("document_id")!=doc.get("id")
+                ]+reviewed
+                doc["vraagstarts_detectie"]={
+                    "status":"voorstel_gemaakt","count":len(reviewed),
+                    "source_sha256":doc.get("sha256"),"reviewed_at":None,
+                }
+                if first_doc is None:
+                    first_doc=doc
+                if not reviewed:
+                    self._log(f"Geen CV-vraagankers herkend in {doc.get('bestand')}; controleer de PDF handmatig.")
+            self.save_project()
+            if first_doc:
+                self.show_candidates(first_doc.get("id"))
+        except Exception as exc:
+            self._error("Vraagstarts in bijlage/CV analyseren",exc)
+            messagebox.showerror("Analyse mislukt",str(exc),parent=self.root)
+
+    def show_candidates(self, document_id=None):
+        """Review question starts in one continuous workspace, optionally for one source PDF."""
         if not self.data:
             return
-        rows = self.data.get("vraagkandidaten", [])
+        rows = [r for r in self.data.get("vraagkandidaten", [])
+                if document_id is None or r.get("document_id")==document_id]
         win = tk.Toplevel(self.root)
         win.title("Vraagstarts controleren")
         win.geometry("1280x820")
