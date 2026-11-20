@@ -3941,10 +3941,12 @@ class ExamApp:
         def save_structure():
             nonlocal original_structure_signature
             current = selected_fragment()
-            if not snippet_mode and current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
-                span = make_page_span(displayed_page, top_y, bottom_y)
-                current["page_spans"] = [span if int(x["page"]) == span["page"] else dict(x)
-                                         for x in current["page_spans"]]
+            if not snippet_mode and current:
+                try:
+                    current["page_spans"] = selection_to_spans()
+                except ValueError as exc:
+                    messagebox.showerror("Selectie niet opgeslagen", str(exc), parent=win)
+                    return False
             new_signature = json.dumps(fragments, ensure_ascii=False, sort_keys=True)
             structure_changed = new_signature != original_structure_signature
             structure = make_exam_structure(doc, fragments, question_numbers)
@@ -3971,68 +3973,62 @@ class ExamApp:
         def create_fragment():
             try:
                 kind = fragment_type_ids[type_var.get()]
-                if kind != "vraag" and displayed_page == 1:
-                    raise ValueError("Pagina 1 van de opgaven-PDF is het voorblad/instructieblad en mag geen contextfragment bevatten.")
                 links = selected_links()
                 if kind == "context" and not links:
                     raise ValueError("Koppel dit contextfragment aan minimaal één vraag.")
-                span = make_page_span(displayed_page, top_y, bottom_y)
-                fragment = make_fragment(kind, span, links, question_numbers,
-                    f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}")
+                spans = selection_to_spans()
+                fragment = make_fragment(
+                    kind, spans[0], links, question_numbers,
+                    f"frag-{doc['id'][:8]}-{datetime.now().strftime('%Y%m%d%H%M%S%f')}",
+                )
+                fragment["page_spans"] = spans
                 fragments.append(fragment)
                 refresh_fragment_list()
                 new_index = next(i for i, item in enumerate(fragments)
                                  if item.get("id") == fragment.get("id"))
                 fragment_tree.selection_set(str(new_index))
                 save_structure()
-                show_fragment()
+                show_document()
             except Exception as exc:
                 messagebox.showerror("Fragment niet opgeslagen", str(exc), parent=win)
         def update_page_span():
-            if snippet_mode:
-                messagebox.showinfo("Fragmentweergave", "Pas de grenzen rechtstreeks aan met de zwarte lijnen in de snippet, of kies eerst 'Bronpagina bewerken'.", parent=win)
-                return
             frag = selected_fragment()
             if not frag:
-                messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waarvan je de huidige paginagrens wilt aanpassen.", parent=win)
+                messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waarvan je de grenzen wilt aanpassen.", parent=win)
                 return
             try:
-                if canonical_fragment_type(frag.get("type", "")) != "vraag" and displayed_page == 1:
-                    raise ValueError("Pagina 1 van de opgaven-PDF mag niet als context worden afgebakend.")
-                updated = dict(frag)
-                spans = [dict(x) for x in frag.get("page_spans", [])]
-                span = make_page_span(displayed_page, top_y, bottom_y)
-                existing_index = next((i for i, item in enumerate(spans) if int(item["page"]) == span["page"]), None)
-                if existing_index is None:
-                    spans.append(span)
-                else:
-                    spans[existing_index] = span
-                spans.sort(key=lambda x: int(x["page"]))
-                updated["page_spans"] = spans
-                fragments[int(fragment_tree.selection()[0])] = updated
+                frag["page_spans"] = selection_to_spans()
                 refresh_fragment_list()
-                fragment_tree.selection_set(str(fragments.index(updated)))
+                selected = next(
+                    (i for i, item in enumerate(fragments) if item.get("id") == frag.get("id")),
+                    None,
+                )
+                if selected is not None:
+                    fragment_tree.selection_set(str(selected))
                 save_structure()
-                show_fragment()
+                show_document()
             except Exception as exc:
-                messagebox.showerror("Paginagrens niet bijgewerkt", str(exc), parent=win)
+                messagebox.showerror("Selectie niet bijgewerkt", str(exc), parent=win)
         def append_page():
             if snippet_mode:
-                messagebox.showinfo("Pagina toevoegen", "Kies eerst 'Bronpagina bewerken' en selecteer daarna de toe te voegen bronpagina.", parent=win)
+                show_document(displayed_page)
                 return
             frag = selected_fragment()
             if not frag:
-                messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waaraan je deze pagina wilt toevoegen.", parent=win)
+                messagebox.showinfo("Selecteer fragment", "Selecteer eerst het fragment waaraan je een volledige pagina wilt toevoegen.", parent=win)
                 return
             try:
-                if canonical_fragment_type(frag.get("type", "")) != "vraag" and displayed_page == 1:
-                    raise ValueError("Pagina 1 van de opgaven-PDF mag niet aan een contextfragment worden toegevoegd.")
-                updated = append_page_span(frag, make_page_span(displayed_page, top_y, bottom_y))
+                page_no = int(displayed_page)
+                span = make_page_span(
+                    page_no, 0.0,
+                    min(1.0, preview_heights[page_no] / page_sizes[page_no][1]),
+                )
+                updated = append_page_span(frag, span)
                 fragments[int(fragment_tree.selection()[0])] = updated
                 refresh_fragment_list()
                 fragment_tree.selection_set(str(fragments.index(updated)))
                 save_structure()
-                show_fragment()
+                show_document(page_no)
             except Exception as exc:
                 messagebox.showerror("Pagina niet toegevoegd", str(exc), parent=win)
         def delete_fragment():
@@ -4048,11 +4044,32 @@ class ExamApp:
                 fragment_tree.selection_set(str(next_index))
                 load_selected_fragment()
             else:
-                show_page()
+                show_document()
         def load_selected_fragment(_event=None):
+            nonlocal selection_start, selection_end, displayed_page
             frag = selected_fragment()
             if frag:
-                show_fragment()
+                valid_spans = sorted(
+                    [item for item in frag.get("page_spans", [])
+                     if int(item.get("page", 0)) in page_layout_by_original],
+                    key=lambda item: int(item["page"]),
+                )
+                if valid_spans:
+                    first, last = valid_spans[0], valid_spans[-1]
+                    selection_start = (int(first["page"]), float(first["top"]))
+                    selection_end = (int(last["page"]), float(last["bottom"]))
+                    displayed_page = int(first["page"])
+                    page_var.set(displayed_page)
+                else:
+                    selection_start = (2, 0.0)
+                    selection_end = (
+                        2, min(1.0, preview_heights[2] / page_sizes[2][1])
+                    )
+                    fragment_info.configure(
+                        text="Dit oude fragment bevat geen geldige selectie op de opgeschoonde pagina's. "
+                             "Baken het fragment opnieuw af op de doorlopende PDF."
+                    )
+                show_document(displayed_page)
                 type_var.set(fragment_type_labels.get(canonical_fragment_type(frag.get("type", "context")), "Context"))
                 qlist.selection_clear(0, "end")
                 for i, number in enumerate(question_numbers):
@@ -4088,21 +4105,33 @@ class ExamApp:
                 return
             frag["type"] = new_type
             frag["question_numbers"] = links
-            save_structure(); refresh_fragment_list(); show_fragment()
+            save_structure(); refresh_fragment_list(); show_document()
         fragment_tree.bind("<<TreeviewSelect>>", load_selected_fragment)
         def start_new_fragment():
+            nonlocal selection_start, selection_end
             fragment_tree.selection_remove(fragment_tree.selection())
             qlist.selection_clear(0, "end")
             type_var.set("Context")
-            page_var.set(max(2, displayed_page))
-            show_page()
+            displayed_page = max(2, min(page_count, int(page_var.get())))
+            selection_start = (displayed_page, 0.0)
+            selection_end = (
+                displayed_page,
+                min(1.0, preview_heights[displayed_page] / page_sizes[displayed_page][1]),
+            )
+            show_document(displayed_page)
         def edit_selected_source_page():
             frag = selected_fragment()
             if not frag:
                 messagebox.showinfo("Selecteer fragment", "Selecteer eerst een fragment.", parent=win)
                 return
-            page_var.set(int(frag.get("page_spans", [{}])[0].get("page", 2)))
-            show_page()
+            spans = sorted(
+                [item for item in frag.get("page_spans", [])
+                 if int(item.get("page", 0)) in page_layout_by_original],
+                key=lambda item: int(item["page"]),
+            )
+            if spans:
+                page_var.set(int(spans[0]["page"]))
+                show_document(int(spans[0]["page"]))
         def previous_fragment():
             current = fragment_tree.selection()
             index = max(0, int(current[0]) - 1) if current else 0
@@ -4120,10 +4149,11 @@ class ExamApp:
         ttk.Button(nav, text="◀ Fragment", command=previous_fragment).pack(side="left", padx=(12, 2))
         ttk.Button(nav, text="Fragment ▶", command=next_fragment).pack(side="left")
         ttk.Button(nav, text="Nieuwe selectie", command=start_new_fragment).pack(side="left", padx=(12, 2))
-        ttk.Button(nav, text="Bronpagina bewerken", command=edit_selected_source_page).pack(side="left")
+        ttk.Button(nav, text="Doorlopende PDF", command=lambda: show_document(page_var.get())).pack(side="left")
+        ttk.Button(nav, text="Fragmentvoorbeeld", command=show_fragment).pack(side="left", padx=(4, 0))
         ttk.Button(actions, text="Nieuw fragment opslaan", command=create_fragment).pack(side="left")
-        ttk.Button(actions, text="Huidige paginagrens bijwerken", command=update_page_span).pack(side="left", padx=8)
-        ttk.Button(actions, text="Pagina toevoegen aan geselecteerd fragment", command=append_page).pack(side="left", padx=8)
+        ttk.Button(actions, text="Selectie bijwerken", command=update_page_span).pack(side="left", padx=8)
+        ttk.Button(actions, text="Volledige pagina toevoegen", command=append_page).pack(side="left", padx=8)
         ttk.Button(actions, text="Fragmenttype en koppeling opslaan", command=update_links).pack(side="left")
         ttk.Button(actions, text="Verwijderen", command=delete_fragment).pack(side="left", padx=8)
         def save_and_close():
@@ -4143,12 +4173,19 @@ class ExamApp:
         else:
             show_page()
         def jump_question_page(_event=None):
-            current = selected_fragment()
-            if not snippet_mode and current and any(int(x["page"]) == displayed_page for x in current.get("page_spans", [])):
-                update_page_span()
-            show_page()
+            nonlocal displayed_page
+            try:
+                number = max(2, min(page_count, int(page_var.get())))
+            except (ValueError, tk.TclError):
+                number = 2
+            displayed_page = number
+            show_document(number)
         page_spin.bind("<Return>", jump_question_page)
-        show_page()
+        if fragments:
+            fragment_tree.selection_set("0")
+            load_selected_fragment()
+        else:
+            show_document(2)
 
     def open_cv_region_editor(self, record, cv_doc, on_saved=None):
         """Manually delimit a question's correction-scheme region on the untouched source PDF."""
