@@ -35,6 +35,17 @@ class PreviewPageTests(unittest.TestCase):
         self.assertIn('q.type==="mcq" ?', self.script)
         self.assertIn("Mijn score", self.script)
 
+    def test_marking_scheme_requires_an_answer(self):
+        # The official answer and rubric must not be exposed before a response exists.
+        self.assertIn("const answered=done(q)", self.script)
+        self.assertIn("if(!done(q))", self.script)
+        self.assertIn("event.preventDefault()", self.script)
+
+    def test_answer_and_self_assessment_are_persisted(self):
+        self.assertIn('writeStore("bioExamV2Answers"', self.script)
+        self.assertIn('writeStore("bioExamV2Scores"', self.script)
+        self.assertIn('localStorage.getItem(key)', self.script)
+
     def test_javascript_syntax(self):
         with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8") as handle:
             handle.write(self.script)
