@@ -345,3 +345,57 @@ De kaarten zijn redactioneel gelabeld op hun bruikbaarheid als lescasus; dit is 
 6. **Ecologie en klimaat:** veldonderzoek naar droogte, bodemprocessen, koolstofopslag en verschuivende interacties in voedselwebben.
 
 De drie kaarten zijn opgenomen met een expliciete lesinsteek, bewijskracht en beperking. De database bevat nu 62 wetenschappelijke kaarten; de uitbreiding betekent niet dat iedere oudere kaart opnieuw integraal op full-textniveau is beoordeeld.
+
+
+## Zesde auditronde: nierfunctie, proprioceptie en maatschappelijke biotechnologie
+
+**Peildatum:** 21 november 2026  
+**Database na deze ronde:** 65 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s63–s65
+
+| ID | Publicatie | Thema | Broncontrole en beperking |
+|---|---|---|---|
+| s63 | Acute kidney injury biomarker responses in young and older female adults following mild hypohydration | Nierfunctie en waterbalans | American Journal of Physiology - Renal Physiology, 1 april 2026, DOI 10.1152/ajprenal.00414.2025. Kleine cross-overstudie bij 26 gezonde vrouwen. Urineconcentratie en enkele biomarkers veranderden na vochtbeperking; de studie toont geen klinische acute nierschade aan en is niet representatief voor alle leeftijden of mannen. |
+| s64 | Variability in cross-modal proprioceptive judgements impairs upper-limb function across the lifespan | Proprioceptie en sensorische integratie | Journal of Applied Physiology, 2026, DOI 10.1152/japplphysiol.00013.2026. Onderzoek bij 184 gezonde volwassenen van 18–95 jaar. Minder precieze complexe proprioceptieve oordelen hingen samen met een tragere alledaagse handeling; de observationele opzet bewijst geen experimentele causaliteit. |
+| s65 | The influence of GMO media strategies on public perceptions of CRISPR crop technologies in Southern Ontario | Biotechnologie en maatschappij | GM Crops & Food, online gepubliceerd 11 februari 2026, DOI 10.1080/21645698.2026.2620131. Mixed-methods-onderzoek naar publieke percepties in Zuid-Ontario en interviews met wetenschapsjournalisten. Dit onderzoek gaat over beeldvorming en communicatie, niet over de biologische veiligheid van CRISPR-gewassen. |
+
+### Wat deze ronde inhoudelijk toevoegt
+
+- **Nierfunctie en homeostase:** s63 brengt humane onderzoeksgegevens over lichte uitdroging, urineconcentratie en niermarkers in. De kleine, uitsluitend vrouwelijke steekproef en korte onderzoeksduur zijn expliciete beperkingen. De kaart mag niet worden gebruikt om zelfexperimenten met vochtbeperking aan te moedigen.
+- **Tast en proprioceptie:** s64 vult de zintuigen aan met positiezin en de integratie van visuele en proprioceptieve informatie. De koppeling aan een alledaagse handeling maakt het onderwerp praktisch bespreekbaar.
+- **Biotechnologie en ethiek:** s65 voegt empirisch onderzoek naar publieke beeldvorming toe. De kaart helpt onderscheid te maken tussen biologische veiligheid, regelgeving, kosten, vertrouwen en communicatie. De regionale uitkomsten zijn niet automatisch toepasbaar op Nederland.
+
+### Bijgewerkte thematische verdeling
+
+| Cluster | Aantal |
+|---|---:|
+| Moleculaire biologie en celprocessen | 8 |
+| Genetica en evolutie | 12 |
+| Ecologie en biodiversiteit | 9 |
+| Afweer en gezondheid | 5 |
+| Stofwisseling en fysiologie | 7 |
+| Ontwikkeling en plantfysiologie | 4 |
+| Menselijke en dierlijke fysiologie | 8 |
+| Gedrag en voortplanting | 3 |
+| Zintuigen en prikkelverwerking | 4 |
+| Biotechnologie en genetische geneeskunde | 3 |
+| Hart en bloedsomloop | 2 |
+
+### Bijgewerkte didactische verdeling
+
+| Didactische rol | Aantal |
+|---|---:|
+| Kernleskaart | 30 |
+| Vwo-verdieping | 32 |
+| Docentachtergrond | 3 |
+
+### Vervolgprioriteiten
+
+1. **Populatiegenetica in natuurlijke populaties:** toegankelijke veldstudies met allelfrequenties, genetische drift, genstroom en lokale adaptatie.
+2. **Menselijke ademhalingsfysiologie:** klinische of experimentele studies over ventilatie, gaswisseling, zuurstoftransport en inspanning die ook voor havo bruikbaar zijn.
+3. **Zenuwstelsel en pijn:** primaire studies die de route van receptor via zenuwbanen naar verwerking in het centrale zenuwstelsel inzichtelijk maken.
+4. **Biotechnologie in de geneeskunde:** diagnostiek, gentherapie, vaccins en celtherapie, met aandacht voor effectiviteit, bijwerkingen en ethiek.
+5. **Ecologie en klimaat:** meer veldonderzoek naar droogte, bodemprocessen, koolstofopslag en veranderingen in voedselwebben.
+
+De uitbreiding brengt het totaal op 65 wetenschappelijke kaarten. De labels zijn redactionele didactische wegwijzers; ze vervangen geen inhoudelijke beoordeling van iedere publicatie en de regionale of experimentele beperkingen blijven bij elke kaart vermeld.
