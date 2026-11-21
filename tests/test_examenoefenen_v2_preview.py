@@ -39,7 +39,12 @@ class PreviewPageTests(unittest.TestCase):
         with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8") as handle:
             handle.write(self.script)
             handle.flush()
-            result = subprocess.run(["node", "--check", handle.name], capture_output=True, text=True)\n            self.assertEqual(result.returncode, 0, result.stderr)
+            result = subprocess.run(
+                ["node", "--check", handle.name],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":
