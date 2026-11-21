@@ -295,6 +295,25 @@ for (const [index, item] of publications.entries()) {
   }
 }
 
+
+const scienceEvidenceLevels = [...new Set(publications.filter(item => item.page === 'science').map(item => item.evidenceLevel))];
+const evidenceFilter = html.match(/<select id="evidence-filter">([\s\S]*?)<\/select>/)?.[1] || '';
+const evidenceOptions = [...evidenceFilter.matchAll(/<option(?:\s+value="([^"]*)")?>([^<]+)<\/option>/g)].map(match => (match[1] || match[2]).trim());
+for (const level of scienceEvidenceLevels) assert.ok(evidenceOptions.includes(level), \`Bewijssterkte ontbreekt in de filterlijst: \${level}\`);
+const relevanceLevels = new Set(['Direct', 'Aansluitend', 'Verdieping']);
+const evidenceLevels = new Set(['Breed onderbouwd', 'Ondersteunend bewijs', 'Achtergrondbron', 'Voorzichtig interpreteren', 'Voorlopig bewijs', 'Praktijkbron', 'Kennisoverzicht']);
+const doiSet = new Set(), articleSet = new Set();
+for (const item of publications) {
+  assert.ok(evidenceLevels.has(item.evidenceLevel), \`Publicatie \${item.id}: onbekende bewijssterkte \${item.evidenceLevel}\`);
+  assert.ok(relevanceLevels.has(item.relevanceLevel), \`Publicatie \${item.id}: onbekende relevantie \${item.relevanceLevel}\`);
+  if (item.doi) { const doi = item.doi.trim().toLowerCase(); assert.ok(!doiSet.has(doi), \`Dubbele DOI: \${doi}\`); doiSet.add(doi); }
+  const article = item.article.trim().replace(/\/$/, '').toLowerCase();
+  assert.ok(!articleSet.has(article), \`Dubbele artikel-URL: \${article}\`); articleSet.add(article);
+}
+assert.ok(html.includes('<option value="Kernleskaart" selected>Kernleskaarten</option>'), 'Standaardweergave moet starten met kernleskaarten');
+assert.ok(html.includes('function updateRoleFilterSummary()') && html.includes('Alle kaarten ('), 'Aantallen en zichtbaarheid van de verdiepingslaag moeten dynamisch worden toegelicht');
+assert.ok(html.includes('function normaliseSearchText(') && html.includes('function matchesSearch('), 'Zoeken moet genormaliseerd en op afzonderlijke zoektermen werken');
+
 const inlineScripts = [html, examPage]
   .flatMap(page => [...page.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(match => match[1]))
   .filter(source => source.trim());

@@ -19,6 +19,11 @@ on:
       - 'scripts/fix-open-question-crops.py'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/validate-site.mjs'
+      - 'scripts/audit-library.mjs'
+      - 'docs/library-quality-audit-2026-11.md'
+      - 'docs/quality-indicators.md'
+      - 'docs/science-library-audit.md'
+      - 'docs/curriculum-audit.md'
   pull_request:
     branches: [main]
   workflow_run:
@@ -80,6 +85,8 @@ jobs:
           node-version: 22
       - name: Validate publication data and frontend
         run: node scripts/validate-site.mjs
+      - name: Run focused library relevance and discoverability audit
+        run: node scripts/audit-library.mjs
       - name: Validate hidden exam-management interface JavaScript
         run: |
           node <<'NODE'
