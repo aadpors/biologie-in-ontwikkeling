@@ -203,7 +203,7 @@ assert.ok(Array.isArray(publications), 'publicaties.json moet een array bevatten
 assert.ok(publications.length > 0, 'publicatiedatabase mag niet leeg zijn');
 
 // Regression checks for the homepage search/filter redesign.
-for (const id of ['publication-controls', 'science-filter-groups', 'science-content-group', 'science-assessment-group', 'science-filters', 'science-assessment-filters', 'education-filter-group', 'education-filters', 'search', 'rating-filter', 'clear', 'count']) {
+for (const id of ['publication-controls', 'science-filter-groups', 'science-content-group', 'science-assessment-group', 'science-filters', 'science-assessment-filters', 'education-filter-group', 'education-filters', 'search', 'rating-filter', 'lesson-role-filter', 'cluster-filter', 'clear', 'count']) {
   assert.ok(html.includes(`id="${id}"`), `Homepage mist filteronderdeel #${id}`);
 }
 assert.ok(html.includes('class="filter-groups"'), 'De wetenschappelijke filters moeten in één gegroepeerd paneel staan');
@@ -219,6 +219,23 @@ const studyTypeFilter = html.match(/<select id="study-type">([\s\S]*?)<\/select>
 const studyTypeOptions = [...studyTypeFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
 const scienceStudyTypes = [...new Set(publications.filter(item => item.page === 'science').map(item => item.studyType))];
 for (const studyType of scienceStudyTypes) assert.ok(studyTypeOptions.includes(studyType), `Onderzoekstype ontbreekt in de filterlijst: ${studyType}`);
+const scienceRecords = publications.filter(item => item.page === 'science');
+const lessonRoles = new Set(['Kernleskaart', 'Vwo-verdieping', 'Docentachtergrond']);
+const lessonRoleFilter = html.match(/<select id="lesson-role-filter">([\\s\\S]*?)<\\/select>/)?.[1] || '';
+const lessonRoleOptions = [...lessonRoleFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
+const clusterFilter = html.match(/<select id="cluster-filter">([\\s\\S]*?)<\\/select>/)?.[1] || '';
+const clusterOptions = [...clusterFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
+for (const item of scienceRecords) {
+  assert.ok(lessonRoles.has(item.lessonRole), `Wetenschapskaart ${item.id}: ontbrekende of onbekende didactische lesrol`);
+  assert.ok(typeof item.lessonRoleNote === 'string' && item.lessonRoleNote.trim(), `Wetenschapskaart ${item.id}: toelichting lesrol ontbreekt`);
+  assert.ok(typeof item.themeCluster === 'string' && item.themeCluster.trim(), `Wetenschapskaart ${item.id}: thematische cluster ontbreekt`);
+  assert.ok(lessonRoleOptions.includes(item.lessonRole), `Lesrol ontbreekt in filterlijst: ${item.lessonRole}`);
+  assert.ok(clusterOptions.includes(item.themeCluster), `Thematische cluster ontbreekt in filterlijst: ${item.themeCluster}`);
+}
+assert.ok(html.includes("x.lessonRole===value('lesson-role-filter')") && html.includes("x.themeCluster===value('cluster-filter')"),
+  'De filters voor didactische lesrol en thematische cluster moeten daadwerkelijk filteren');
+assert.ok(html.includes('${x.lessonRole}') && html.includes('${x.themeCluster}'),
+  'Publicatiekaarten moeten lesrol en thematische cluster zichtbaar tonen');
 
 assert.ok(html.includes("$('science-filter-groups').hidden=p!=='science'") && html.includes("$('education-filter-group').hidden=p!=='education'"),
   'Paginawisseling moet volledige filtergroepen tonen/verbergen, niet losse filteronderdelen');
@@ -266,7 +283,7 @@ for (const [index, item] of publications.entries()) {
     assert.ok(['Primair onderzoek', 'Review / synthese', 'Perspectiefartikel'].includes(item.studyType), `${where}: onbekend onderzoekstype "${item.studyType}"`);
     assert.ok(['Huidig', 'Toekomstig', 'Beide'].includes(item.programme), `${where}: onbekend programma "${item.programme}"`);
     assert.ok(['Direct', 'Aansluitend', 'Verdieping'].includes(item.relevanceLevel), `${where}: onbekende relevantie-indicatie "${item.relevanceLevel}"`);
-    for (const field of ['level', 'programme', 'concept', 'studyType', 'alignment', 'evidence', 'evidenceNote', 'relevanceNote']) {
+    for (const field of ['level', 'programme', 'concept', 'studyType', 'alignment', 'evidence', 'evidenceNote', 'relevanceNote', 'themeCluster', 'lessonRole', 'lessonRoleNote']) {
       assert.equal(typeof item[field], 'string', `${where}: vakinhoudelijk veld "${field}" ontbreekt`);
     }
   } else {
