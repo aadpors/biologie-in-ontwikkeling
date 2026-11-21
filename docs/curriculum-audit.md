@@ -62,7 +62,7 @@ De volgende publicaties zijn opnieuw geformuleerd om schoolsoortspecifieke codes
 
 ## Status 21 november 2026
 
-De wetenschappelijke bibliotheek is opnieuw geïnventariseerd en inhoudelijk heringedeeld. De 40 oorspronkelijke kaarten zijn beoordeeld op thema, niveau, onderzoekssoort, bewijssterkte, curriculumrelatie en interne consistentie. De bibliotheek bevat nu 52 wetenschappelijke kaarten. Twaalf nieuwe publicaties vullen aantoonbare hiaten aan; enkele bestaande kaarten zijn inhoudelijk of curriculair gecorrigeerd.
+De wetenschappelijke bibliotheek is opnieuw geïnventariseerd en inhoudelijk heringedeeld. De kaarten zijn beoordeeld op thema, niveau, onderzoekssoort, bewijssterkte, curriculumrelatie en interne consistentie. De bibliotheek bevat per 21 november 2026 77 wetenschappelijke kaarten. Alle 77 records zijn opnieuw op relevantie en didactische positionering beoordeeld; zie `science-library-audit.md` en `library-quality-audit-2026-11.md`.
 
 Belangrijke correcties:
 - s9: koppeling aan havo B8 en vwo B9 consequent gemaakt.

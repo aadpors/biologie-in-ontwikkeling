@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 59 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 77 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -568,3 +568,35 @@ De bibliotheek bevat nu 71 wetenschappelijke kaarten. De nieuwe kaarten versterk
 5. **Ecologie:** waterkwaliteit, voedselwebben en ecosysteemdiensten naast bestuiving en bodemprocessen versterken.
 
 De bibliotheek bevat nu 77 wetenschappelijke kaarten. Deze ronde is bewust gericht op inhoudelijke hiaten en bruikbare lesvragen, niet op maximale aantallen.
+
+
+## Tiende auditronde: relevantie, lesrollen en bibliotheekbalans
+
+De kaartenaudit van 21 november 2026 omvat alle 77 wetenschappelijke records. De actuele verdeling is 53 Direct, 9 Aansluitend en 15 Verdieping. De didactische rolverdeling is 36 Kernleskaart, 37 Vwo-verdieping en 4 Docentachtergrond. Deze assen zijn niet uitwisselbaar: een publicatie kan direct aansluiten op een examenonderwerp en toch door de methodologische of moleculaire complexiteit vooral als vwo-verdieping dienen.
+
+Gerichte metadata-correcties:
+- s18: plantfysiologische huidmondjesregulatie onder ontwikkeling/plantfysiologie geplaatst.
+- s34: moleculaire cel-celinteracties in weefsels onder moleculaire biologie/celprocessen geplaatst.
+- s63: nierfunctie en waterbalans onder menselijke/dierlijke fysiologie geplaatst.
+- s69: vaccin-geïnduceerde B-celrespons gekoppeld aan afweer van het organisme.
+- s65, s72 en s75: bewijssterkte genormaliseerd naar bestaande waarden die passen bij respectievelijk regionaal sociaalwetenschappelijk onderzoek, een kleine humane experimentele studie en een scoping review.
+
+### Bijgewerkte thematische verdeling na correctie
+
+| Cluster | Aantal |
+|---|---:|
+| Moleculaire biologie en celprocessen | 9 |
+| Genetica en evolutie | 13 |
+| Ecologie en biodiversiteit | 11 |
+| Afweer en gezondheid | 6 |
+| Stofwisseling en fysiologie | 6 |
+| Ontwikkeling en plantfysiologie | 5 |
+| Menselijke en dierlijke fysiologie | 10 |
+| Gedrag en voortplanting | 4 |
+| Zintuigen en prikkelverwerking | 6 |
+| Biotechnologie en genetische geneeskunde | 5 |
+| Hart en bloedsomloop | 2 |
+
+Geen kaarten zijn verwijderd omdat zij specialistisch zijn: de verdiepingslaag blijft waardevol voor vwo en docentachtergrond. Wel is de standaardweergave aangepast zodat eerst de kernleskaarten verschijnen en alle andere kaarten via één expliciete keuze beschikbaar blijven.
+
+De volledige analyse en de beslisregels voor toekomstige selectie staan in [de kwaliteits- en relevantieaudit](library-quality-audit-2026-11.md).

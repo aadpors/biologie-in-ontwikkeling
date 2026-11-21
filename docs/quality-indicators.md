@@ -70,3 +70,20 @@ Elk record bevat:
 - `relevanceLevel` en `relevanceNote`
 
 De toegestane bronkwaliteitswaarden worden gecontroleerd door `scripts/validate-site.mjs`. Bij nieuwe records moeten alle zes velden gevuld zijn.
+
+
+## 6. Canonieke waarden voor bewijssterkte
+
+De database bewaart de volgende waarden in `evidenceLevel`; de frontend vertaalt ze naar korte labels:
+
+| Databasewaarde | Weergavelabel | Gebruik |
+|---|---|---|
+| `Breed onderbouwd` | Sterke synthese | Systematische synthese/meta-analyse of brede, transparante basis van meerdere studies. |
+| `Ondersteunend bewijs` | Ondersteunend onderzoek | Empirische ondersteuning; sterkte hangt af van onderzoeksdesign en beperkingen. |
+| `Achtergrondbron` | Achtergrond / review | Review, scoping review, perspectief of conceptuele context zonder gepoolde effectschatting. |
+| `Voorzichtig interpreteren` | Beperkt / voorzichtig | Beperkingen in steekproef, design, causaliteit of generaliseerbaarheid zijn bepalend. |
+| `Voorlopig bewijs` | Voorlopig bewijs | Exploratief, vroeg of zeer kleinschalig onderzoek dat onafhankelijke bevestiging vraagt. |
+| `Kennisoverzicht` | Kennisoverzicht | Redactionele synthese door een kennisinstituut of platform. |
+| `Praktijkbron` | Praktijkbron | Praktijkervaring, ontwerp of materiaal zonder gecontroleerde effectmeting. |
+
+Gebruik geen vrije tekstlabels in `evidenceLevel`. Nuance hoort in `evidenceNote`, niet in een nieuwe enumwaarde. Bronkwaliteit, bewijssterkte en relevantie blijven afzonderlijke dimensies.
