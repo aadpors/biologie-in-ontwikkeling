@@ -280,7 +280,7 @@ for (const [index, item] of publications.entries()) {
   if (item.pdf) assert.ok(/^https:\/\//.test(item.pdf), `${where}: PDF-link moet HTTPS gebruiken`);
   if (item.page === 'science') {
     assert.ok(['Havo', 'Vwo', 'Havo/vwo'].includes(item.level), `${where}: onbekend niveau "${item.level}"`);
-    assert.ok(['Primair onderzoek', 'Review / synthese', 'Perspectiefartikel'].includes(item.studyType), `${where}: onbekend onderzoekstype "${item.studyType}"`);
+    assert.ok(['Primair onderzoek', 'Review / synthese', 'Perspectiefartikel', 'Primair sociaalwetenschappelijk onderzoek'].includes(item.studyType), `${where}: onbekend onderzoekstype "${item.studyType}"`);
     assert.ok(['Huidig', 'Toekomstig', 'Beide'].includes(item.programme), `${where}: onbekend programma "${item.programme}"`);
     assert.ok(['Direct', 'Aansluitend', 'Verdieping'].includes(item.relevanceLevel), `${where}: onbekende relevantie-indicatie "${item.relevanceLevel}"`);
     for (const field of ['level', 'programme', 'concept', 'studyType', 'alignment', 'evidence', 'evidenceNote', 'relevanceNote', 'themeCluster', 'lessonRole', 'lessonRoleNote']) {

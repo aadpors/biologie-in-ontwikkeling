@@ -399,3 +399,57 @@ De drie kaarten zijn opgenomen met een expliciete lesinsteek, bewijskracht en be
 5. **Ecologie en klimaat:** meer veldonderzoek naar droogte, bodemprocessen, koolstofopslag en veranderingen in voedselwebben.
 
 De uitbreiding brengt het totaal op 65 wetenschappelijke kaarten. De labels zijn redactionele didactische wegwijzers; ze vervangen geen inhoudelijke beoordeling van iedere publicatie en de regionale of experimentele beperkingen blijven bij elke kaart vermeld.
+
+
+## Zevende auditronde: populatiegenetica, ademhaling en pijnwaarneming
+
+**Peildatum:** 21 november 2026  
+**Database na deze ronde:** 68 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s66–s68
+
+| ID | Publicatie | Thema | Broncontrole en beperking |
+|---|---|---|---|
+| s66 | Fine-Scale Population Structure, High Gene Flow and Local Adaptation in Australasian Snapper (Chrysophrys auratus) in New Zealand | Populatiegenetica en lokale adaptatie | Evolutionary Applications, 22 oktober 2026, DOI 10.1111/eva.70327. Whole-genome sequencing van 382 vissen uit 13 locaties. De twee genetische clusters verschillen weinig; kandidaatregio's geven tentatief bewijs voor lokale adaptatie, geen definitief causaal bewijs. |
+| s67 | The ventilatory response pattern to exercise across the age-span in healthy adults | Ademhaling en inspanning | Physiological Reports, 2 september 2026, DOI 10.14814/phy2.71065. Retrospectieve, cross-sectionele analyse van 526 gezonde volwassenen van 20–91 jaar. Leeftijd hing samen met een sneller/oppervlakkiger ademhalingspatroon en lagere ventilatoire efficiëntie; kortademigheid is niet rechtstreeks als uitkomst vastgesteld. |
+| s68 | Nociceptive sensitization and pain perception are dissociable in humans | Pijnwaarneming en zenuwstelsel | PNAS, 26 augustus 2026, DOI 10.1073/pnas.2603667123. Preregistreerde humane experimentele studie met thermische grill-stimulatie. Sensibilisatie kon optreden zonder bewuste pijnervaring; de laboratoriumbevinding mag niet worden veralgemeniseerd naar alle pijnsyndromen. |
+
+### Wat deze ronde inhoudelijk toevoegt
+
+- **Populatiegenetica:** s66 brengt een natuurlijke veldpopulatie in beeld waarin genenstroom en lokale selectie naast elkaar bestaan. De casus maakt het mogelijk om genetische differentiatie, migratie en lokale adaptatie te verbinden aan concreet beheer van vispopulaties.
+- **Ademhaling:** s67 vult de menselijke fysiologie aan met een grote cohortanalyse van ademfrequentie, ademvolume en minuutventilatie tijdens inspanning. De leskern is het onderscheid tussen sneller en dieper ademen; entropieanalyse blijft verdieping.
+- **Pijn en zenuwstelsel:** s68 maakt het onderscheid tussen nociceptie en bewuste pijnervaring expliciet. De kaart corrigeert de misvatting dat pijn een directe meter is van weefselschade, zonder pijn te reduceren tot een louter psychologisch verschijnsel.
+
+### Bijgewerkte thematische verdeling
+
+| Cluster | Aantal |
+|---|---:|
+| Moleculaire biologie en celprocessen | 8 |
+| Genetica en evolutie | 13 |
+| Ecologie en biodiversiteit | 9 |
+| Afweer en gezondheid | 5 |
+| Stofwisseling en fysiologie | 7 |
+| Ontwikkeling en plantfysiologie | 4 |
+| Menselijke en dierlijke fysiologie | 9 |
+| Gedrag en voortplanting | 3 |
+| Zintuigen en prikkelverwerking | 5 |
+| Biotechnologie en genetische geneeskunde | 3 |
+| Hart en bloedsomloop | 2 |
+
+### Bijgewerkte didactische verdeling
+
+| Didactische rol | Aantal |
+|---|---:|
+| Kernleskaart | 31 |
+| Vwo-verdieping | 34 |
+| Docentachtergrond | 3 |
+
+### Vervolgprioriteiten
+
+1. **Zenuwstelsel:** primaire studies over synaptische overdracht, reflexen, autonome regulatie en zenuwgeleiding, met een toegankelijke lesinsteek.
+2. **Afweer en infectieziekten:** humane of experimentele studies over aangeboren en verworven afweer, vaccinrespons en immuunontwijking.
+3. **Plantfysiologie:** watertransport, huidmondjes, fotosynthese onder droogte en plant-hormoonregulatie in veld- of kasstudies.
+4. **Ecologie:** bodem, microbiomen, koolstofkringloop en interacties tussen soorten onder klimaatstress.
+5. **Biotechnologie:** diagnostiek, gentherapie en celtherapie met klinische uitkomstmaten en expliciete veiligheidsbeperkingen.
+
+De uitbreiding brengt het totaal op 68 wetenschappelijke kaarten. De nieuwe validator accepteert het expliciete onderzoekstype voor sociaalwetenschappelijk onderzoek; de bijbehorende filteroptie staat ook in de interface. Daarmee blijft de classificatie inhoudelijk correct zonder de maatschappelijke studie ten onrechte als biologisch experimenteel onderzoek te labelen.
