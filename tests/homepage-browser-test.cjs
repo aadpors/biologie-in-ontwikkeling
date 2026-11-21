@@ -35,6 +35,8 @@ const fs = require("node:fs");
     await page.locator(".filter-shell").screenshot({ path: "artifacts/science-filters-desktop.png" });
 
     // Search must include curriculum codes and biological classification, not just titles.
+    await page.locator("#lesson-role-filter").selectOption("all");
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("77"));
     await page.locator("#search").fill("M5 DNA-replicatie");
     await page.waitForFunction(() => Number(document.querySelector("#count")?.textContent.match(/\d+/)?.[0] || 0) > 0);
     const curriculumSearchCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
@@ -55,7 +57,7 @@ const fs = require("node:fs");
     await page.locator("#study-type").selectOption({ label: "Review / synthese" });
     await page.waitForTimeout(100);
     const reviewCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
-    assert.equal(reviewCount, 10, "Het onderzoekstypefilter moet de tien review- en syntheseartikelen tonen");
+    assert.equal(reviewCount, 6, "Het onderzoekstypefilter moet de zes kernleskaarten met review/synthese tonen");
     await page.locator("#study-type").selectOption("all");
     await page.locator("#concept").selectOption({ label: "Biodiversiteit en ecosystemen" });
     await page.waitForTimeout(100);
