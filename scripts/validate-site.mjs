@@ -209,7 +209,7 @@ for (const id of ['publication-controls', 'science-filter-groups', 'science-cont
 assert.ok(html.includes('class="filter-groups"'), 'De wetenschappelijke filters moeten in één gegroepeerd paneel staan');
 assert.ok(html.includes('.filter-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))'), 'Desktopindeling van de filtergroepen ontbreekt');
 assert.ok(html.includes('@media(max-width:430px)'), 'Mobiele filterindeling ontbreekt');
-assert.ok(html.includes("(x.concept||'')") && html.includes("(x.studyType||'')") && html.includes("(x.subdomain||'')") && html.includes("(x.alignment||'')"),
+assert.ok(html.includes('function matchesSearch(') && html.includes('item.concept') && html.includes('item.subdomain') && html.includes('item.alignment'),
   'Zoeken moet ook hoofdthema, syllabuscode en curriculumkoppeling doorzoeken');
 const conceptFilter = html.match(/<select id="concept">([\s\S]*?)<\/select>/)?.[1] || '';
 const conceptOptions = [...conceptFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
