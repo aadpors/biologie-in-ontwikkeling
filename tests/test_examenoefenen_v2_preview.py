@@ -32,14 +32,14 @@ class PreviewPageTests(unittest.TestCase):
     def test_no_open_question_is_automatically_graded(self):
         self.assertIn('q.type==="mcq"', self.script)
         self.assertIn("ad.correct_answer", self.script)
-        self.assertIn('q.type==="open"', self.script)
+        self.assertIn('q.type==="mcq" ?', self.script)
         self.assertIn("Mijn score", self.script)
 
     def test_javascript_syntax(self):
         with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8") as handle:
             handle.write(self.script)
             handle.flush()
-            subprocess.run(["node", "--check", handle.name], check=True, capture_output=True, text=True)
+            result = subprocess.run(["node", "--check", handle.name], capture_output=True, text=True)\n            self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":
