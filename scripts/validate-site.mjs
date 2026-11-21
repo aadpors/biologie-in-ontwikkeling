@@ -222,7 +222,7 @@ for (const studyType of scienceStudyTypes) assert.ok(studyTypeOptions.includes(s
 const scienceRecords = publications.filter(item => item.page === 'science');
 const lessonRoles = new Set(['Kernleskaart', 'Vwo-verdieping', 'Docentachtergrond']);
 const lessonRoleFilter = html.match(/<select id="lesson-role-filter">([\s\S]*?)<\/select>/)?.[1] || '';
-const lessonRoleOptions = [...lessonRoleFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
+const lessonRoleOptions = [...lessonRoleFilter.matchAll(/<option(?:\s+value="([^"]*)")?>([^<]+)<\/option>/g)].map(match => (match[1] || match[2]).trim());
 const clusterFilter = html.match(/<select id="cluster-filter">([\s\S]*?)<\/select>/)?.[1] || '';
 const clusterOptions = [...clusterFilter.matchAll(/<option(?:\s+value="[^"]*")?>([^<]+)<\/option>/g)].map(match => match[1].trim());
 for (const item of scienceRecords) {
