@@ -288,3 +288,60 @@ Deze labels zijn redactionele wegwijzers en geen formele beoordeling van de kwal
 6. **Ecologie en klimaat:** veldonderzoek naar droogte, bodemprocessen, koolstofopslag en verschuivende interacties in voedselwebben.
 
 Alle vier nieuwe publicaties zijn opgenomen met een expliciete beperking van de bewijskracht en een havo/vwo-lesinsteek. De database bevat nu 59 science-kaarten; de inhoudelijke audit blijft een doorlopend proces en niet iedere bestaande kaart is daarmee integraal op full-textniveau herbeoordeeld.
+
+
+## Vijfde auditronde: toegepaste biotechnologie, regeneratie en cardiovasculaire fysiologie
+
+**Peildatum:** 21 november 2026  
+**Database na deze ronde:** 62 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s60–s62
+
+| ID | Publicatie | Thema | Broncontrole en beperking |
+|---|---|---|---|
+| s60 | CRISPR/Cas9-Mediated triple gene editing of Pi21, Bsr-d1, and Xa5 confers broad-spectrum disease resistance in elite early-season rice without yield compromise | Toegepaste biotechnologie en landbouw | Plant Science, online gepubliceerd 15 mei 2026, DOI 10.1016/j.plantsci.2026.113217. Primair onderzoek in twee rijstrassen; de transgeenvrije lijnen vertoonden resistentie tegen twee ziekteverwekkers en vergelijkbare agronomische kenmerken. Meerjarige veldproeven op meerdere locaties zijn nog nodig. |
+| s61 | Transcriptomic profiling of inner ear hair cell spontaneous regeneration reveals the key role of dlx5a | Gehoor/evenwicht en regeneratie | Nature Communications, 18 augustus 2026, DOI 10.1038/s41467-026-76892-8. Primair onderzoek met larvale zebravissen, lijntracering en single-cell-transcriptomics. Het model betreft het vestibulaire binnenoor; resultaten zijn niet rechtstreeks te vertalen naar menselijke haarcelregeneratie. |
+| s62 | Exercise blood pressure relative to fitness and cardiovascular outcomes: the EXERTION study | Hart, bloedsomloop en inspanning | European Heart Journal, online gepubliceerd 13 januari 2026, DOI 10.1093/eurheartj/ehaf1082. Observationeel cohort van 12.743 patiënten uit zes Australische ziekenhuizen, met 1.349 cardiovasculaire gebeurtenissen tijdens een mediane follow-up van 51 maanden. De relatie tussen inspanningsbloeddruk en fitheid is een associatie, geen bewijs van causaliteit of een universele screeningsnorm. |
+
+### Wat deze ronde inhoudelijk toevoegt
+
+- **Toegepaste biotechnologie:** s60 geeft een concreet voorbeeld van CRISPR/Cas9 in voedselgewassen. Het onderscheid tussen genoomediting en het inbouwen van vreemd DNA is expliciet gemaakt; de noodzaak van meerlocatie-veldonderzoek voorkomt dat experimentele resistentie als bewezen landbouwsucces wordt gepresenteerd.
+- **Gehoor en evenwicht:** s61 vult de zintuigkaarten aan met regeneratie van haarcellen uit steuncellen. De kaart maakt onderscheid tussen mitotische en niet-mitotische regeneratie en benoemt nadrukkelijk de beperkingen van het zebravismodel.
+- **Hart en bloedsomloop:** s62 brengt een humane klinische cohortstudie in de bibliotheek. De lesinsteek is bloeddruk tijdens inspanning; de risicomodellen blijven verdieping en worden niet als individuele diagnose gepresenteerd.
+
+### Bijgewerkte thematische verdeling
+
+| Cluster | Aantal kaarten |
+|---|---:|
+| Moleculaire biologie en celprocessen | 8 |
+| Genetica en evolutie | 12 |
+| Ecologie en biodiversiteit | 9 |
+| Afweer en gezondheid | 5 |
+| Stofwisseling en fysiologie | 6 |
+| Ontwikkeling en plantfysiologie | 4 |
+| Menselijke en dierlijke fysiologie | 8 |
+| Gedrag en voortplanting | 3 |
+| Zintuigen en prikkelverwerking | 3 |
+| Biotechnologie en genetische geneeskunde | 2 |
+| Hart en bloedsomloop | 2 |
+
+### Bijgewerkte didactische verdeling
+
+| Didactische rol | Aantal |
+|---|---:|
+| Kernleskaart | 28 |
+| Vwo-verdieping | 32 |
+| Docentachtergrond | 2 |
+
+De kaarten zijn redactioneel gelabeld op hun bruikbaarheid als lescasus; dit is geen formele kwaliteitsrangschikking van de publicaties.
+
+### Resterende inhoudelijke prioriteiten
+
+1. **Nierfunctie en homeostase:** toegankelijke humane of klinische casussen over ADH, uitdroging, zoutbalans en nierziekten, naast de specialistische mechanistische modellen.
+2. **Zintuigen:** tast, proprioceptie en pijnwaarneming; zicht, evenwicht en regeneratie van haarcellen zijn nu vertegenwoordigd.
+3. **Populatiegenetica:** veldstudies met allelfrequenties, genetische drift, genstroom en lokale adaptatie in natuurlijke populaties.
+4. **Biotechnologie en ethiek:** toepassingen in diagnostiek, vaccinontwikkeling en synthetische biologie, met expliciete maatschappelijke afwegingen.
+5. **Menselijke fysiologie:** havo-toegankelijke casussen over ademhaling, nieren en zenuwstelsel, als aanvulling op hart en bloedsomloop.
+6. **Ecologie en klimaat:** veldonderzoek naar droogte, bodemprocessen, koolstofopslag en verschuivende interacties in voedselwebben.
+
+De drie kaarten zijn opgenomen met een expliciete lesinsteek, bewijskracht en beperking. De database bevat nu 62 wetenschappelijke kaarten; de uitbreiding betekent niet dat iedere oudere kaart opnieuw integraal op full-textniveau is beoordeeld.
