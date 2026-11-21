@@ -221,9 +221,9 @@ const scienceStudyTypes = [...new Set(publications.filter(item => item.page === 
 for (const studyType of scienceStudyTypes) assert.ok(studyTypeOptions.includes(studyType), `Onderzoekstype ontbreekt in de filterlijst: ${studyType}`);
 const scienceRecords = publications.filter(item => item.page === 'science');
 const lessonRoles = new Set(['Kernleskaart', 'Vwo-verdieping', 'Docentachtergrond']);
-const lessonRoleFilter = html.match(/<select id="lesson-role-filter">([\\s\\S]*?)<\\/select>/)?.[1] || '';
+const lessonRoleFilter = html.match(/<select id="lesson-role-filter">([\s\S]*?)<\/select>/)?.[1] || '';
 const lessonRoleOptions = [...lessonRoleFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
-const clusterFilter = html.match(/<select id="cluster-filter">([\\s\\S]*?)<\\/select>/)?.[1] || '';
+const clusterFilter = html.match(/<select id="cluster-filter">([\s\S]*?)<\/select>/)?.[1] || '';
 const clusterOptions = [...clusterFilter.matchAll(/<option(?:\\s+value="[^"]*")?>([^<]+)<\\/option>/g)].map(match => match[1].trim());
 for (const item of scienceRecords) {
   assert.ok(lessonRoles.has(item.lessonRole), `Wetenschapskaart ${item.id}: ontbrekende of onbekende didactische lesrol`);
