@@ -453,3 +453,57 @@ De uitbreiding brengt het totaal op 65 wetenschappelijke kaarten. De labels zijn
 5. **Biotechnologie:** diagnostiek, gentherapie en celtherapie met klinische uitkomstmaten en expliciete veiligheidsbeperkingen.
 
 De uitbreiding brengt het totaal op 68 wetenschappelijke kaarten. De nieuwe validator accepteert het expliciete onderzoekstype voor sociaalwetenschappelijk onderzoek; de bijbehorende filteroptie staat ook in de interface. Daarmee blijft de classificatie inhoudelijk correct zonder de maatschappelijke studie ten onrechte als biologisch experimenteel onderzoek te labelen.
+
+
+## Achtste auditronde: vaccinrespons, huidmondjes en bodemmicrobiomen
+
+**Peildatum:** 21 november 2026  
+**Database na deze ronde:** 71 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s69–s71
+
+| ID | Publicatie | Thema | Broncontrole en beperking |
+|---|---|---|---|
+| s69 | mRNA-based influenza vaccine expands the B cell response breadth in humans | Specifieke afweer en immunologisch geheugen | Nature Immunology, 15 juni 2026, DOI 10.1038/s41590-026-02569-5. Observationele vergelijking van gezonde volwassenen over twee griepseizoenen; 75 deelnemers geïncludeerd, met 13 mRNA- en 15 conventionele-vaccindeelnemers in de lymfeklieraspiratie-deelgroep. Antistofbreedte en geheugen-B-cellen zijn gemeten, geen klinische bescherming tegen ziekte. |
+| s70 | Field-Based Dissection of Stomatal Anatomy and Conductance Reveals Stable QTL Under Drought and Heat in Wheat | Huidmondjes en plantfysiologie | Plant, Cell & Environment, 22 oktober 2026, DOI 10.1111/pce.70974. Tweejarige veldproeven in tarwe onder waterbeperking en opwarming. De genetische loci zijn kandidaat-QTL's; associaties tonen niet op zichzelf causale genfuncties aan. |
+| s71 | SIP-enabled multi-omics reveals soil microbiome responses to drought and rehydration | Bodemecologie en koolstofkringloop | Nature Communications, online gepubliceerd 12 november 2026, DOI 10.1038/s41467-026-79474-w. Regenuitsluiting en herbevochtiging op twee Californische veldlocaties, gecombineerd met stabiele-isotooptracering en multi-omics. De specialistische case-study-resultaten zijn niet automatisch representatief voor alle bodems. |
+
+### Wat deze ronde inhoudelijk toevoegt
+
+- **Afweer en vaccinatie:** s69 geeft een humane casus over B-cellen, kiemcentra, antistoffen en immunologisch geheugen. De kaart onderscheidt immunologische uitkomstmaten nadrukkelijk van klinische vaccineffectiviteit.
+- **Plantfysiologie:** s70 verbindt huidmondjes, verdamping en CO₂-opname aan droogte en opwarming. De tweejarige veldproeven maken duidelijk dat anatomische kenmerken en actuele huidmondjesgeleidbaarheid verschillende grootheden zijn.
+- **Ecologie en klimaat:** s71 maakt de microbiële activiteit in de bodem en de koolstofkringloop zichtbaar. De snelle reactie op herbevochtiging wordt geplaatst naast de vertraging na intensieve droogte.
+
+### Bijgewerkte thematische verdeling
+
+| Cluster | Aantal |
+|---|---:|
+| Moleculaire biologie en celprocessen | 8 |
+| Genetica en evolutie | 13 |
+| Ecologie en biodiversiteit | 10 |
+| Afweer en gezondheid | 6 |
+| Stofwisseling en fysiologie | 7 |
+| Ontwikkeling en plantfysiologie | 5 |
+| Menselijke en dierlijke fysiologie | 9 |
+| Gedrag en voortplanting | 3 |
+| Zintuigen en prikkelverwerking | 5 |
+| Biotechnologie en genetische geneeskunde | 3 |
+| Hart en bloedsomloop | 2 |
+
+### Bijgewerkte didactische verdeling
+
+| Didactische rol | Aantal |
+|---|---:|
+| Kernleskaart | 32 |
+| Vwo-verdieping | 36 |
+| Docentachtergrond | 3 |
+
+### Vervolgprioriteiten
+
+1. **Zenuwstelsel:** primaire studies over synaptische overdracht, reflexen, autonome regulatie en zenuwgeleiding, met een toegankelijke lesinsteek.
+2. **Genetica in de praktijk:** klinische genetica, dragerschap, genetische screening en ethische keuzes rond diagnostiek.
+3. **Ecologie:** bestuivers, bodemvoedselwebben, waterkwaliteit en de relatie tussen biodiversiteit en ecosysteemdiensten.
+4. **Menselijke fysiologie:** toegankelijke casussen over hormonale regeling, voortplanting en nierfunctie.
+5. **Planten en klimaat:** fotosynthese onder hittestress, wortelarchitectuur en watertransport in veldproeven.
+
+De bibliotheek bevat nu 71 wetenschappelijke kaarten. De nieuwe kaarten versterken drie ondervertegenwoordigde invalshoeken zonder de experimentele of geografische beperkingen te verbergen.
