@@ -22,7 +22,10 @@
     "relevanceNote": "Raakt aan moleculaire interactie en biodiversiteit, maar de grootschalige CRISPR-analyses in microbiële gemeenschappen gaan duidelijk verder dan de examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s2",
@@ -46,7 +49,10 @@
     "relevanceNote": "Sluit rechtstreeks aan bij genetische variatie, mutatie en selectie; de overdracht tussen muizen is een concrete evolutionaire context.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s3",
@@ -70,7 +76,10 @@
     "relevanceNote": "De interactiestructuur van ecosystemen sluit direct aan bij voedselrelaties, biodiversiteit en ecosysteemwerking.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s4",
@@ -94,7 +103,10 @@
     "relevanceNote": "Geeft verdieping bij het ontstaan van meercelligheid en taakverdeling tussen cellen; de evolutionaire details gaan verder dan de vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "e1",
@@ -185,7 +197,10 @@
     "relevanceNote": "Verbindt afweer met microbiële interacties en stress, maar de specifieke koraal-bacteriesymbiose is vooral een contextuele uitbreiding.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Afweer en gezondheid",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s6",
@@ -210,7 +225,10 @@
     "relevanceNote": "Laat voedselrelaties en interacties tussen soorten zien en sluit aan bij de regulatie en dynamiek van ecosystemen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s7",
@@ -234,7 +252,10 @@
     "relevanceNote": "Sluit aan bij fotosynthese en stofwisseling van het organisme; C4-specialisatie en de moleculaire regulatie zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Stofwisseling en fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "e4",
@@ -342,7 +363,10 @@
     "relevanceNote": "Verheldert embryonale ontwikkeling en zelforganisatie, maar de rol van lamin B1, autofagie en kernmechanica is geen vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ontwikkeling en plantfysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s9",
@@ -366,7 +390,10 @@
     "relevanceNote": "Geeft een brede illustratie van samenwerking tussen organen en regulatie, maar de gevonden circuits en meetmethode zijn vooral verdieping bij O2.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "e8",
@@ -412,7 +439,10 @@
     "relevanceNote": "Haakt aan bij DNA-replicatie en de celcyclus, maar de rol van lncRNA, DDX11 en RNA-vouwing gaat ruim voorbij de kern van de examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s11",
@@ -436,7 +466,10 @@
     "relevanceNote": "Sluit rechtstreeks aan bij transcriptie en regulatie van genexpressie; de clusters van transcriptiefactoren zijn een verdiepende casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s12",
@@ -461,7 +494,10 @@
     "relevanceNote": "Past direct bij gedrag, interactie, seksualiteit en voortplanting; gebruik de fruitvlieg als vergelijkend biologisch voorbeeld.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Gedrag en voortplanting",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s13",
@@ -485,7 +521,10 @@
     "relevanceNote": "Verbindt biodiversiteit met ecosysteemfuncties, energiestromen en diensten en sluit direct aan bij P1, P3 en P5.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s14",
@@ -509,7 +548,10 @@
     "relevanceNote": "De HPA-as is een concrete illustratie van hormonale regulatie en negatieve terugkoppeling binnen homeostase; ultradiane ritmes en modellering zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s15",
@@ -534,7 +576,10 @@
     "relevanceNote": "Sluit aan bij plantontwikkeling en zelforganisatie, maar de precieze auxine-signaalroutes en eiwitcomplexen zijn vooral docentverdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ontwikkeling en plantfysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s16",
@@ -558,7 +603,10 @@
     "relevanceNote": "Sluit direct aan bij energiestromen, biomassa, trofische relaties en de dynamiek van ecosystemen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "e9",
@@ -625,7 +673,10 @@
     "relevanceNote": "Verbindt plantenhormonen, omgevingssignalen en plantontwikkeling; de specifieke signaalroutes zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ontwikkeling en plantfysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s18",
@@ -649,7 +700,10 @@
     "relevanceNote": "Huidmondjesregulatie, gaswisseling en waterverlies sluiten direct aan bij plantfysiologie en zelfregulatie; de hydraulische hypothesen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s19",
@@ -673,7 +727,10 @@
     "relevanceNote": "Verbindt stikstofbeschikbaarheid, bodemorganismen, kringlopen en primaire productie in een grasland. De specifieke netwerkanalyse is verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s20",
@@ -697,7 +754,10 @@
     "relevanceNote": "Sluit aan bij afbraak, reducenten en de stikstofkringloop; de isotopenmethode is een goede verdieping in onderzoekstechnieken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "De DOI-resolver verwijst naar het geaccepteerde manuscript op Oxford Academic; dit is peer-reviewed maar nog niet de definitief geredigeerde versie. Een tweede pagina in de tijdschriftindex koppelt dezelfde DOI ten onrechte aan een andere titel. De DOI-resolver en de Oxford Academic-record komen overeen met deze kaart; de afwijkende indexvermelding is als metadata-anomalie gemarkeerd en moet bij verschijnen van de definitieve versie opnieuw worden gecontroleerd.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s21",
@@ -721,7 +781,10 @@
     "relevanceNote": "Verbindt genetische variatie, genregulatie, fenotype en menselijke evolutie; vooral geschikt voor vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s22",
@@ -745,7 +808,10 @@
     "relevanceNote": "Verbindt voortplanting, gedrag, voedselbeschikbaarheid en ecosysteemverandering; ook bruikbaar om correlatie en causaliteit te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Gedrag en voortplanting",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s23",
@@ -769,7 +835,10 @@
     "relevanceNote": "De studie biedt een verdiepende casus bij natuurlijke selectie, fitness en de relatie tussen voortplanting en overleving. Het specifieke onderzoek naar levensduur bij C. elegans is geen rechtstreekse uitwerking van de kernstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s24",
@@ -793,7 +862,10 @@
     "relevanceNote": "Sluit aan bij hormonale regulatie en voortplanting; de koppeling tussen celstofwisseling en progesteronproductie is een verdiepende moleculaire casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s25",
@@ -817,7 +889,10 @@
     "relevanceNote": "Verbindt hormonale regulatie, voortplanting en de invloed van een fysiologische overgang op meerdere orgaanstelsels; ook geschikt om onderzoeksmethoden kritisch te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s26",
@@ -841,7 +916,10 @@
     "relevanceNote": "Sluit direct aan bij insuline, glucosehuishouding, stofwisseling en homeostase; de proteomics en voorspelmodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Stofwisseling en fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s27",
@@ -865,7 +943,10 @@
     "relevanceNote": "Verbindt glucoseverbruik, energieomzetting en temperatuurregulatie; geschikt als context bij stofwisseling en homeostase.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Stofwisseling en fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s28",
@@ -889,7 +970,10 @@
     "relevanceNote": "Verbindt micro-organismen, afweer, ontsteking en stofwisseling; geschikt om microbiële functies en de beperkingen van observationeel onderzoek te bespreken.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Afweer en gezondheid",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s29",
@@ -913,7 +997,10 @@
     "relevanceNote": "Verbindt cellulaire afweer, T-lymfocyten en genregulatie met een actuele medische toepassing; vooral geschikt voor vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Afweer en gezondheid",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s30",
@@ -937,7 +1024,10 @@
     "relevanceNote": "Sluit aan bij zenuwstelsel, informatieverwerking en geheugen; bijzonder geschikt als vwo-verdieping in onderzoeksmethoden.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "e13",
@@ -1047,7 +1137,10 @@
     "relevanceNote": "Sluit direct aan bij DNA-replicatie en de regulatie van de celcyclus; vooral geschikt voor verdieping in de moleculaire start van replicatie.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s32",
@@ -1071,7 +1164,10 @@
     "relevanceNote": "Verbindt transcriptie, RNA-DNA-hybriden en DNA-replicatie; een goede vwo-verdieping bij genexpressie.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s33",
@@ -1095,7 +1191,10 @@
     "relevanceNote": "Sluit direct aan bij moleculaire interactie en signaaltransductie; vooral geschikt voor vwo-verdieping in onderzoeksmethoden.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Docentachtergrond",
+    "lessonRoleNote": "De kern van deze publicatie is een specialistische onderzoeks- of analysemethode. Gebruik haar vooral om onderzoekspraktijken of nieuwe meetmogelijkheden te bespreken; niet als eerste lescasus voor een biologisch kernconcept."
   },
   {
     "id": "s34",
@@ -1119,7 +1218,10 @@
     "relevanceNote": "Verbindt celtypen, weefselorganisatie, differentiatie en afweer; geschikt voor vwo-verdieping in meercellige organismen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ontwikkeling en plantfysiologie",
+    "lessonRole": "Docentachtergrond",
+    "lessonRoleNote": "De kern van deze publicatie is een specialistische onderzoeks- of analysemethode. Gebruik haar vooral om onderzoekspraktijken of nieuwe meetmogelijkheden te bespreken; niet als eerste lescasus voor een biologisch kernconcept."
   },
   {
     "id": "s35",
@@ -1143,7 +1245,10 @@
     "relevanceNote": "De publicatie verdiept de evolutionaire verwantschap tussen archaea en eukaryoten. Zij onderzoekt niet het ontstaan van het eerste leven en is daarom vooral een aanvullende context bij vwo P6, geen directe uitwerking van de kernstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in een wetenschappelijk tijdschrift met peer review. Dat betekent dat vakgenoten het manuscript vooraf beoordelen; het is geen garantie voor foutloos onderzoek, onafhankelijkheid of replicatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s36",
@@ -1167,7 +1272,10 @@
     "relevanceNote": "Sluit direct aan bij de syllabusonderdelen over erfelijke eigenschappen, overervingspatronen, stambomen en kruisschema’s. De bijdrage is vooral conceptueel en vakdidactisch.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in Genetics en open access beschikbaar. Peer review is een kwaliteitscontrole, geen garantie voor foutloos onderzoek of representativiteit.",
-    "studyType": "Perspectiefartikel"
+    "studyType": "Perspectiefartikel",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s37",
@@ -1191,7 +1299,10 @@
     "relevanceNote": "Verbindt direct met selectie en genetische variatie, maar de genomische methoden en reconstructie van selectiegeschiedenis gaan verder dan de vereiste examenstof.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Reviewartikel in Nature Reviews Genetics. Een synthese van onderzoek is geen garantie dat alle onderliggende resultaten onafhankelijk zijn gerepliceerd.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s38",
@@ -1215,7 +1326,10 @@
     "relevanceNote": "Het onderscheid tussen genotype, fenotype en milieufactoren sluit aan bij de examenstof. De uitgebreide kwantitatieve genetica en genetische architectuur zijn vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Gepubliceerd in Genetics en opgenomen in PubMed. Peer review is een kwaliteitscontrole, geen garantie dat alle voorgestelde onderzoeksrichtingen al empirisch zijn bevestigd.",
-    "studyType": "Perspectiefartikel"
+    "studyType": "Perspectiefartikel",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s39",
@@ -1239,7 +1353,10 @@
     "relevanceNote": "Sluit direct aan bij ademhaling en transport op orgaan- en organismeniveau. De kwantitatieve diffusie-perfusiemodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Open-access review in Comprehensive Physiology. Peer review en een overzichtsartikel bieden kwaliteitscontrole, maar vervangen geen beoordeling van de onderliggende studies.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Stofwisseling en fysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s40",
@@ -1263,7 +1380,10 @@
     "relevanceNote": "Vult de beperkte aandacht voor kringlopen aan en sluit aan bij de rol van producenten, reducenten en nutriënten in ecosystemen. De moleculaire details zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Reviewartikel in Nature Reviews Microbiology. De status van review en peer review is geen garantie dat elke voorgestelde hypothese al experimenteel bevestigd is.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s41",
@@ -1287,7 +1407,10 @@
     "relevanceNote": "Voedselrelaties, energiestromen en biodiversiteit vormen de kern van de studie en sluiten rechtstreeks aan op de ecosysteemonderdelen van havo en vwo.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Onderzoeksartikel in Nature; peer review ondersteunt de redactionele kwaliteitscontrole, maar vervangt geen beoordeling van onderzoeksopzet en causaliteit.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Ecologie en biodiversiteit",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s42",
@@ -1311,7 +1434,10 @@
     "relevanceNote": "Meiose, crossing-over, recombinatie en erfelijke variatie sluiten rechtstreeks aan op de huidige havo- en vwo-syllabi.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Nature; de omvangrijke dataset is een sterk punt, terwijl de IVF-context expliciet moet meewegen bij interpretatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s43",
@@ -1335,7 +1461,10 @@
     "relevanceNote": "Epigenetica en afwijkende overervingspatronen worden expliciet genoemd bij vwo M7.1 Erfelijke eigenschap; de studie biedt een actuele verdiepende casus.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Nature Genetics; de methodologische diepgang is sterk, maar de dier- en weefselcontext begrenst de generaliseerbaarheid.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s44",
@@ -1359,7 +1488,10 @@
     "relevanceNote": "Vaccinatie, aangeboren en verworven afweer en immuungeheugen sluiten rechtstreeks aan bij O3 Afweer van het organisme.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Reviewartikel in Nature; de waarde ligt in de synthese van meerdere onderzoeksrichtingen, niet in één nieuwe effectmeting.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Afweer en gezondheid",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s45",
@@ -1383,7 +1515,10 @@
     "relevanceNote": "Vertering en opname van voedingsstoffen sluiten direct aan bij O1; de rol van darmmicrobiële fermentatie is een actuele verdiepende context.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Cell; de combinatie van kwantitatieve benaderingen versterkt de analyse, terwijl de uitkomsten mede afhangen van modelaannames en voedingscontext.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Stofwisseling en fysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s46",
@@ -1407,7 +1542,10 @@
     "relevanceNote": "Waterbalans, hormonale regulatie, nierfunctie en uitscheiding sluiten rechtstreeks aan op O1 en O2; de specifieke receptorroute is verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Journal of the American Society of Nephrology; de experimentele combinatie ondersteunt het mechanisme, maar de bevindingen zijn modelsysteemgebonden.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Menselijke en dierlijke fysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s47",
@@ -1431,7 +1569,10 @@
     "relevanceNote": "Fotosynthese, koolstofopslag en de invloed van abiotische factoren sluiten rechtstreeks aan op O1; de stikstofkringloop verbindt dit met P1.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Peer-reviewed meta-analyse in Journal of Plant Ecology; de bewijskracht berust op de onderliggende studies en de manier waarop hun verschillen statistisch zijn verwerkt.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Stofwisseling en fysiologie",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
   },
   {
     "id": "s48",
@@ -1455,7 +1596,10 @@
     "relevanceNote": "De studie verdiept moleculaire interactie, genregulatie en celdifferentiatie; de specifieke FXR–YAP-route en leverfibrose zijn geen vereiste examenkennis.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Nature Metabolism; genetische modellen, celproeven en humane gegevens leveren convergerende ondersteuning.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s49",
@@ -1479,7 +1623,10 @@
     "relevanceNote": "De mitose en correcte chromosoomverdeling sluiten aan bij de celcyclus; de specifieke SKA-afhankelijkheid en kankercontext zijn verdiepende toepassingen.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Primair onderzoeksartikel in Nature Communications, met genetische en celbiologische experimenten; de vertaling naar behandeling blijft hypothetisch.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Moleculaire biologie en celprocessen",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s50",
@@ -1503,7 +1650,10 @@
     "relevanceNote": "Ouderlijk zorggedrag sluit aan bij gedrag en voortplanting; de specifieke neurale circuits en knaagdiermodellen zijn verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Reviewartikel in Nature Reviews Neuroscience; het is een synthese van bestaand onderzoek en geen nieuw primair experiment.",
-    "studyType": "Review / synthese"
+    "studyType": "Review / synthese",
+    "themeCluster": "Gedrag en voortplanting",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s51",
@@ -1527,7 +1677,10 @@
     "relevanceNote": "Eukaryogenese en endosymbiose sluiten aan bij evolutie en de oorsprong van cellen; de fylogenomische reconstructie en hypothesen over aanvullende microbiële partners zijn vwo-verdieping.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Open-access primair onderzoeksartikel in Nature, met uitgebreide fylogenomische datasets en analyses. Peer review en omvangrijke data nemen onzekerheid in reconstructies van zeer oude evolutionaire gebeurtenissen niet weg.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Genetica en evolutie",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De publicatie biedt inhoudelijke verdieping, maar vraagt voorkennis of mechanistische details die niet zonder didactische bewerking als kernles voor havo én vwo kunnen dienen."
   },
   {
     "id": "s52",
@@ -1551,6 +1704,93 @@
     "relevanceNote": "Plantafweer sluit direct aan bij afweer van het organisme; de specifieke RNA-interferentieroute en mobiele vsiRNA's zijn een verdiepende moleculaire uitwerking.",
     "sourceQualityLevel": "Peer-reviewed tijdschrift",
     "sourceQualityNote": "Open-access primair onderzoeksartikel in Cell Host & Microbe met cellulaire en genetische experimenten in een modelplant; de beperkte modelsysteemcontext blijft belangrijk voor generalisatie.",
-    "studyType": "Primair onderzoek"
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Afweer en gezondheid",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De biologische hoofdgedachte is te vertalen naar een lescasus voor havo/vwo. De specifieke onderzoeksdetails blijven afhankelijk van de gekozen werkvorm en kunnen worden vereenvoudigd."
+  },
+  {
+    "id": "s53",
+    "page": "science",
+    "date": "2026-08-12",
+    "title": "Photostimulation improves maturation of human photoreceptors",
+    "summary": "Onderzoekers lieten menselijke retina-organoïden, opgebouwd uit stamcellen, ritmisch flikkerend licht ontvangen. Bij een specifieke flikkerfrequentie ontwikkelden de fotoreceptoren meer kenmerken van rijpe cellen, waaronder structuren die nodig zijn voor lichtdetectie. Ook veranderde de genexpressie in de richting van een rijper celtype en reageerden downstream-retinacellen sterker. Het onderzoek laat zien dat licht niet alleen een prikkel is die door fotoreceptoren wordt waargenomen, maar ook de ontwikkeling van deze cellen kan beïnvloeden. De resultaten komen uit gekweekte retina-organoïden en tonen geen behandeling of herstel van zicht bij patiënten aan.",
+    "level": "Havo/vwo",
+    "programme": "Beide",
+    "concept": "Zelfregulatie van het organisme",
+    "subdomain": "Zintuigcellen en prikkelverwerking: fotoreceptoren in het netvlies zetten lichtprikkels om in signalen. De studie biedt een actuele onderzoekscontext bij zintuigen en zenuwstelsel; de organoïdtechniek is verdieping.",
+    "alignment": "Inhoudelijke aansluiting bij zintuigen, zintuigcellen en prikkelverwerking binnen havo/vwo. Gebruik voor havo de functie van fotoreceptoren en de relatie tussen licht en waarneming; gebruik voor vwo eventueel de ontwikkeling en specialisatie van cellen. De studie onderzoekt retina-organoïden en is geen klinische behandeling.",
+    "evidence": "Primair experimenteel onderzoek in menselijke retina-organoïden",
+    "article": "https://pubmed.ncbi.nlm.nih.gov/42586989/",
+    "doi": "10.1038/s41467-026-76112-3",
+    "pdf": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13470456/",
+    "why": "Deze studie vult een duidelijke lacune rond zintuigen en waarneming. Leerlingen kunnen bespreken hoe fotoreceptoren licht waarnemen en hoe de ontwikkeling van gespecialiseerde cellen wordt beïnvloed door omgevingssignalen. <br><br><b>Havo:</b> laat leerlingen uitleggen waarom fotoreceptoren nodig zijn voor zien en wat er mis kan gaan als deze cellen niet goed rijpen. <b>Vwo:</b> bespreek hoe een externe prikkel de differentiatie en genexpressie van cellen kan beïnvloeden. <br><b>Veelvoorkomende misconceptie</b><br>Licht is voor fotoreceptoren uitsluitend een prikkel die zij registreren; het heeft geen invloed op hun ontwikkeling. <br><b>Concrete lesvraag</b><br>Waarom kan ritmische lichtstimulatie tijdens de ontwikkeling van retina-organoïden invloed hebben op de rijping van fotoreceptoren?",
+    "tags": "zintuigen oog netvlies retina fotoreceptoren licht waarneming zintuigcellen stamcellen organoïden",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair experimenteel onderzoek met menselijke stamcel-afgeleide retina-organoïden. De uitkomsten betreffen celrijping en respons in een modelsysteem; er is geen klinische werkzaamheid bij patiënten aangetoond.",
+    "relevanceLevel": "Direct",
+    "relevanceNote": "De hoofdvraag sluit direct aan bij fotoreceptoren, zintuigcellen en waarneming. De organoïdtechniek en moleculaire analyses zijn verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Open-access primair onderzoeksartikel in Nature Communications. De experimentele uitkomsten zijn verkregen in menselijke retina-organoïden; dit is geen klinische studie.",
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Zintuigen en prikkelverwerking",
+    "lessonRole": "Kernleskaart",
+    "lessonRoleNote": "De functie van fotoreceptoren en de invloed van licht op hun ontwikkeling zijn goed te vertalen naar een havo/vwo-les. De organoïdtechniek kan worden weggelaten of als vwo-verdieping worden behandeld."
+  },
+  {
+    "id": "s54",
+    "page": "science",
+    "date": "2026-03-26",
+    "title": "Prime Editing for p47phox-Deficient Chronic Granulomatous Disease",
+    "summary": "In een klinische fase-I/II-studie werd prime editing gebruikt om bij twee mensen met p47phox-deficiënte chronische granulomateuze ziekte een kleine deletie in het NCF1-gen te corrigeren. Eigen bloedvormende stamcellen werden buiten het lichaam bewerkt en daarna teruggegeven. Bij beide deelnemers ontstonden neutrofielen met herstelde NADPH-oxidaseactiviteit. De eerste follow-up liet aanhoudende activiteit zien gedurende respectievelijk zes en vier maanden. Dit is een eerste klinische toepassing bij twee deelnemers, geen bewijs dat de behandeling al breed veilig of effectief is.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "Erfelijke eigenschappen en overerving",
+    "subdomain": "Genmutaties, genexpressie en biotechnologische toepassing van genetische kennis. Inhoudelijke verbinding met erfelijke aandoeningen en afweer; prime editing is specialistische verdieping.",
+    "alignment": "Inhoudelijke aansluiting bij erfelijke eigenschappen en overerving en bij afweer van het organisme. De casus laat zien hoe een ziekteveroorzakende mutatie in eigen stamcellen kan worden gecorrigeerd. Prime editing, pegRNA en de moleculaire techniek zijn geen vereiste kernkennis en horen bij vwo-verdieping.",
+    "evidence": "Klinische fase-I/II-studie (twee deelnemers)",
+    "article": "https://pubmed.ncbi.nlm.nih.gov/41358590/",
+    "doi": "10.1056/NEJMoa2509807",
+    "pdf": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13533071/",
+    "why": "Een concrete toepassing van moderne biotechnologie: een foutje in het DNA van eigen bloedvormende stamcellen wordt buiten het lichaam gericht aangepast, waarna de cellen worden teruggegeven. De studie verbindt mutaties, genotype-fenotype, stamcellen en afweer. <br><br><b>Havo:</b> gebruik de casus om te bespreken hoe een mutatie kan leiden tot een erfelijke afweerstoornis en hoe genetische kennis een behandeling mogelijk maakt. <b>Vwo:</b> bespreek het verschil tussen klassieke CRISPR-Cas-kniptechniek en prime editing en de stappen van ex-vivo celtherapie. <br><b>Veelvoorkomende misconceptie</b><br>Een succesvolle correctie bij twee patiënten bewijst dat de behandeling voor iedereen veilig en effectief is. <br><b>Concrete lesvraag</b><br>Waarom worden de stamcellen buiten het lichaam bewerkt en welke gegevens zijn nodig voordat deze behandeling als bewezen effectief kan worden beschouwd?",
+    "tags": "biotechnologie prime editing CRISPR genbewerking stamcellen NCF1 mutatie erfelijke ziekte chronische granulomateuze ziekte afweer",
+    "evidenceLevel": "Voorzichtig interpreteren",
+    "evidenceNote": "Klinische fase-I/II-rapportage bij slechts twee deelnemers, zonder controlegroep en met korte follow-up. De sponsor financierde het onderzoek en was betrokken bij ontwerp en analyse. De resultaten ondersteunen verdere studie, geen brede conclusies over werkzaamheid of veiligheid.",
+    "relevanceLevel": "Verdieping",
+    "relevanceNote": "Sterke actuele biotechnologische casus bij mutaties, erfelijke aandoeningen en afweer, maar de moleculaire techniek en klinische details vragen vwo-verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Klinische studie gepubliceerd in The New England Journal of Medicine. De zeer kleine deelnemersgroep en korte follow-up beperken de bewijskracht; financiering en rol van de sponsor zijn relevant bij interpretatie.",
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Biotechnologie en genetische geneeskunde",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De maatschappelijke en biologische casus is toegankelijk te introduceren, maar de techniek en de klinische bewijsvoering vragen vwo-verdieping. De kleine studieomvang moet expliciet worden besproken."
+  },
+  {
+    "id": "s55",
+    "page": "science",
+    "date": "2026-01-13",
+    "title": "Blood-borne sphingosine 1-phosphate maintains vascular resistance, blood pressure, and cardiac function in mice",
+    "summary": "Onderzoekers onderzochten bij genetisch aangepaste muizen de rol van sphingosine-1-fosfaat (S1P), een signaallipide in het bloed. Muizen zonder circulerende S1P-pools hadden een lagere bloeddruk en een verminderde systolische functie van de linkerkamer. Toediening van erytrocyten die S1P kunnen produceren herstelde verschillende metingen gedeeltelijk of volledig. De studie laat zien dat bloedbestanddelen en signaalstoffen bijdragen aan vaatweerstand en hartfunctie. De precieze mechanismen zijn onderzocht in muismodellen en mogen niet rechtstreeks als bewezen menselijk mechanisme worden gepresenteerd.",
+    "level": "Vwo",
+    "programme": "Beide",
+    "concept": "Zelfregulatie van het organisme",
+    "subdomain": "Hart- en vaatstelsel, bloeddrukregulatie en homeostase. De specifieke rol van S1P-receptoren is moleculaire verdieping.",
+    "alignment": "Inhoudelijke aansluiting bij zelfregulatie en homeostase, met nadruk op bloeddruk, vaatweerstand en hartfunctie. De studie is uitgevoerd in genetisch aangepaste muizen; de moleculaire signaalroute is verdieping en geen noodzakelijke examenkennis.",
+    "evidence": "Primair experimenteel onderzoek bij muizen",
+    "article": "https://pubmed.ncbi.nlm.nih.gov/41512042/",
+    "doi": "10.1073/pnas.2512853123",
+    "pdf": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12799142/",
+    "why": "Deze publicatie vult het tekort aan actuele casussen over hart- en vaatfysiologie aan. Ze maakt zichtbaar dat bloeddruk niet alleen afhangt van het hart, maar ook van de weerstand in bloedvaten en signalen uit het bloed. <br><br><b>Havo:</b> gebruik de resultaten om de relatie tussen vaatvernauwing, vaatweerstand en bloeddruk te bespreken. <b>Vwo:</b> bespreek hoe een signaalstof via receptoren vaattonus en hartfunctie kan beïnvloeden. <br><b>Veelvoorkomende misconceptie</b><br>De bloeddruk wordt uitsluitend bepaald door de pompkracht van het hart. <br><b>Concrete lesvraag</b><br>Hoe kan een verandering in de weerstand van bloedvaten de bloeddruk beïnvloeden, zelfs wanneer het hartminuutvolume aanvankelijk behouden blijft?",
+    "tags": "hart bloedsomloop bloeddruk vaatweerstand homeostase S1P erytrocyten signaalstof cardiovasculair",
+    "evidenceLevel": "Ondersteunend bewijs",
+    "evidenceNote": "Primair mechanistisch onderzoek met genetisch aangepaste muizen, perfusie-experimenten, bloeddrukmetingen en echocardiografie. De bevindingen onderbouwen een mechanisme in muizen; vertaling naar menselijke fysiologie vraagt aanvullend onderzoek.",
+    "relevanceLevel": "Aansluitend",
+    "relevanceNote": "De hoofdvraag sluit aan bij homeostase, bloeddruk en hart-vaatfunctie; de specifieke signaalstof en receptoren zijn specialistische verdieping.",
+    "sourceQualityLevel": "Peer-reviewed tijdschrift",
+    "sourceQualityNote": "Open-access primair onderzoeksartikel in PNAS. Het betreft mechanistisch onderzoek in muizen; de bevindingen zijn niet rechtstreeks klinisch bewijs voor mensen.",
+    "studyType": "Primair onderzoek",
+    "themeCluster": "Hart en bloedsomloop",
+    "lessonRole": "Vwo-verdieping",
+    "lessonRoleNote": "De fysiologische hoofdgedachte is bruikbaar als vwo-casus over bloeddruk en vaatweerstand. De signaalstof, genetische muismodellen en receptoranalyse zijn verdieping."
   }
 ]
