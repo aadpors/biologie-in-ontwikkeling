@@ -19,6 +19,7 @@ on:
       - 'scripts/fix-open-question-crops.py'
       - 'scripts/validate-exam-snippets.py'
       - 'scripts/validate-site.mjs'
+      - 'tests/homepage-browser-test.cjs'
       - 'scripts/audit-library.mjs'
       - 'docs/library-quality-audit-2026-11.md'
       - 'docs/quality-indicators.md'
@@ -170,7 +171,7 @@ jobs:
       - name: Check out commit under review
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -212,7 +213,7 @@ jobs:
 
 
   homepage-browser:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

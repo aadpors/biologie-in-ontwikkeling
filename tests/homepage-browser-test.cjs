@@ -13,9 +13,11 @@ const fs = require("node:fs");
 
   try {
     await page.goto("http://127.0.0.1:8000/", { waitUntil: "networkidle" });
-    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("52"));
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("36"));
     const initialCount = await page.locator("#count").innerText();
-    assert.match(initialCount, /52 publicatie/);
+    assert.match(initialCount, /36 publicatie/);
+    assert.match(await page.locator("#library-view-note").innerText(), /37 verdiepingen/);
+    assert.match(await page.locator("#library-view-note").innerText(), /4 docentachtergrondkaarten/);
 
     const desktopLayout = await page.evaluate(() => ({
       viewport: window.innerWidth,
@@ -36,28 +38,40 @@ const fs = require("node:fs");
     await page.locator("#search").fill("M5 DNA-replicatie");
     await page.waitForFunction(() => Number(document.querySelector("#count")?.textContent.match(/\d+/)?.[0] || 0) > 0);
     const curriculumSearchCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
-    assert.ok(curriculumSearchCount < 52, "Zoeken op syllabuscode moet een gerichte selectie opleveren");
+    assert.ok(curriculumSearchCount > 0 && curriculumSearchCount < 77, "Zoeken op syllabuscode moet een gerichte selectie opleveren");
+
+    await page.locator("#search").fill("M5 DNA-replicatie");
+    await page.waitForFunction(() => Number(document.querySelector("#count")?.textContent.match(/\\d+/)?.[0] || 0) > 0);
+    const multiWordSearchCount = Number((await page.locator("#count").innerText()).match(/\\d+/)[0]);
+    assert.ok(multiWordSearchCount > 0 && multiWordSearchCount < 77, "Combinatie van losse zoektermen moet een gerichte selectie opleveren");
+    await page.locator("#search").fill("");
+    await page.locator("#lesson-role-filter").selectOption("all");
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("77"));
+    assert.match(await page.locator("#library-view-note").innerText(), /alle 77 kaarten/);
+    await page.locator("#lesson-role-filter").selectOption("Kernleskaart");
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("36"));
 
     await page.locator("#search").fill("");
     await page.locator("#study-type").selectOption({ label: "Review / synthese" });
     await page.waitForTimeout(100);
     const reviewCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
-    assert.equal(reviewCount, 9, "Het onderzoekstypefilter moet de negen review- en syntheseartikelen tonen");
+    assert.equal(reviewCount, 10, "Het onderzoekstypefilter moet de tien review- en syntheseartikelen tonen");
     await page.locator("#study-type").selectOption("all");
     await page.locator("#concept").selectOption({ label: "Biodiversiteit en ecosystemen" });
     await page.waitForTimeout(100);
     const themeCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
-    assert.ok(themeCount >= 5 && themeCount < 52, "Hoofdthemafilter moet meerdere, maar niet alle publicaties tonen");
+    assert.ok(themeCount >= 5 && themeCount < 77, "Hoofdthemafilter moet meerdere, maar niet alle publicaties tonen");
 
     await page.locator("#level-filter").selectOption("Vwo");
     await page.locator("#evidence-filter").selectOption("Ondersteunend bewijs");
     await page.locator("#clear").click();
-    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("52"));
+    await page.waitForFunction(() => document.querySelector("#count")?.textContent.includes("36"));
     assert.equal(await page.locator("#search").inputValue(), "");
     assert.equal(await page.locator("#concept").inputValue(), "all");
     assert.equal(await page.locator("#study-type").inputValue(), "all");
     assert.equal(await page.locator("#level-filter").inputValue(), "all");
     assert.equal(await page.locator("#evidence-filter").inputValue(), "all");
+    assert.equal(await page.locator("#lesson-role-filter").inputValue(), "Kernleskaart");
     assert.equal(await page.locator("#rating-filter").inputValue(), "all");
 
     // Mobile layout must stack the groups and controls without horizontal scrolling.
