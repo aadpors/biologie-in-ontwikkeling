@@ -296,7 +296,7 @@ document.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=
 document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',()=>{saveUiPreferences();render();}));
 showPage(page);
 syncTooltips();
-fetch('./publicaties.json?v=2026-11-21T10:05:00.000Z')
+fetch('./publicaties.json?v=2026-11-21T10:05:00Z')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
   .then(publications=>{if(!Array.isArray(publications))throw new Error('Ongeldig databaseformaat');data=publications;render();})
   .then(()=>initFeedback())
