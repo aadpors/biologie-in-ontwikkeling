@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Examenoefenen v2 · datasetpreview | Biologie in ontwikkeling</title>
+<style>
+:root{--wine:#741d3b;--teal:#168b8b;--ink:#24313b;--muted:#63717b;--line:#dce3e6;--paper:#f4f6f7;--panel:#fff;--soft:#edf4f4}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line)}.top{max-width:1180px;margin:auto;padding:13px 22px;display:flex;justify-content:space-between;gap:12px;align-items:center}.brand{font-weight:800;color:var(--wine);text-decoration:none}.back{color:var(--teal);text-decoration:none;font-size:14px;font-weight:700}
+.hero{background:linear-gradient(120deg,#50172f,var(--wine));color:white;padding:32px 22px}.hero>div{max-width:1136px;margin:auto}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:#f0c6d4;font-weight:800}.hero h1{font-size:clamp(28px,4vw,42px);line-height:1.1;margin:7px 0}.hero p{max-width:760px;margin:0;color:#f8eaf0}
+main{max-width:1180px;margin:22px auto;padding:0 18px 50px}.notice,.filters,.question,.method{background:var(--panel);border:1px solid var(--line);border-radius:13px}.notice{padding:13px 16px;margin-bottom:14px;border-left:5px solid var(--teal);font-size:13px;color:#4d5c64}.notice strong{color:var(--wine)}
+.filters{padding:16px;margin-bottom:15px}.filters h2{font-size:16px;color:var(--wine);margin:0 0 11px}.filtergrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field label{display:block;font-size:11px;font-weight:800;color:var(--muted);margin-bottom:4px}.field select,.field input{width:100%;padding:9px 10px;border:1px solid #cbd5d9;border-radius:8px;background:white;font:inherit;font-size:13px}.filterfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:11px}.btn{border:1px solid var(--line);border-radius:8px;padding:9px 13px;background:#edf1f2;color:var(--ink);font-weight:750;cursor:pointer}.btn.primary{background:var(--teal);color:white;border-color:var(--teal)}.btn:disabled{opacity:.4;cursor:default}.muted{color:var(--muted);font-size:12px}
+.status{margin:10px 0;padding:10px 12px;border-radius:8px;background:#fff4e5;color:#805015;font-size:13px}.status[hidden]{display:none}.status.error{background:#fff0ed;color:#873b2b}.status.ok{background:#eaf6ef;color:#205b39}
+.progress{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:0 2px 10px;color:var(--muted);font-size:12px}.question{padding:clamp(14px,2.5vw,24px)}.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.qhead h2{font-size:19px;line-height:1.3;color:var(--wine);margin:0}.tags{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}.tag{font-size:11px;font-weight:750;padding:3px 8px;border-radius:20px;background:var(--soft);color:#246d70}.tag.gold{background:#fff1df;color:#87500c}.tag.grey{background:#f0eef3;color:#66536d}
+.context{background:#f7f9f9;border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:9px;padding:12px 14px;margin:12px 0}.context h3{font-size:13px;color:var(--wine);margin:0 0 3px}.context p{font-size:13px;margin:0;color:#53616a}
+.snippet{margin:14px 0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#f8fafb}.snippet img{display:block;width:100%;height:auto}.snippet figcaption{padding:7px 10px;background:white;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+.source{font-size:12px;color:var(--muted);margin:8px 0 14px}.source a{color:#087b80;font-weight:700}
+.answerbox{border:1px solid var(--line);border-radius:10px;padding:13px 14px;margin:12px 0}.answerbox h3{font-size:14px;margin:0 0 8px;color:var(--wine)}.answerbox textarea{width:100%;min-height:105px;padding:10px;border:1px solid #cbd5d9;border-radius:8px;font:14px/1.5 inherit;resize:vertical}.options{display:grid;gap:7px}.option{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:8px;background:#f8fafb;cursor:pointer}.option:has(input:checked){border-color:var(--teal);background:#edf7f6}.option input{accent-color:var(--teal)}
+.feedback{margin:9px 0;padding:10px 12px;border-radius:8px;font-size:13px;background:#edf4f4}.feedback.good{background:#eaf6ef;color:#205b39}.feedback.bad{background:#fff0ed;color:#873b2b}
+.rubric{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.rubric summary{cursor:pointer;font-weight:750;color:var(--wine);font-size:13px}.rubricbody{padding:10px 0;font-size:13px}.rubricbody ul{padding-left:20px}.rubricbody li{margin:5px 0}.rubricbody pre{white-space:pre-wrap;font:inherit;background:#f6f8f8;border-radius:7px;padding:10px}.selfscore{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}.selfscore label{font-size:13px;font-weight:700}.selfscore input{width:72px;padding:7px;border:1px solid #cbd5d9;border-radius:7px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0}.method{padding:14px 16px;margin-top:18px;font-size:12px;color:#53616a}.method strong{color:var(--wine)}footer{text-align:center;padding:16px;background:white;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+@media(max-width:760px){.filtergrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:480px){.filtergrid{grid-template-columns:1fr}.top{padding:12px}.hero{padding:25px 16px}main{padding:0 11px 35px}.filterfoot{align-items:flex-start;flex-direction:column}.nav .btn{padding:8px 10px}}
+</style>
+</head>
+<body>
+<header><div class="top"><a class="brand" href="./index.html">Biologie in ontwikkeling</a><a class="back" href="./index.html">← Terug</a></div></header>
+<section class="hero"><div><div class="eyebrow">Afgeschermde ontwikkelversie · niet live</div><h1>Examenoefenen biologie</h1><p>Een nieuwe oefenomgeving op basis van de oorspronkelijke vraagfragmenten en correctievoorschriften. Deze pagina leest rechtstreeks uit één datasetstructuur.</p></div></section>
+<main>
+<section class="notice"><strong>Datasetpreview · havo en vwo 2024–2026</strong><br>Antwoorden en beoordelingsmodellen zijn overgenomen uit de aangeleverde dataset en nog niet onafhankelijk door een docent gevalideerd. Meerkeuzevragen worden alleen automatisch nagekeken als een expliciet correct antwoord beschikbaar is. Open vragen beoordeel je zelf aan de hand van de getoonde scorepunten.</section>
+<section class="filters"><h2>Vragen selecteren</h2><div class="filtergrid">
+<div class="field"><label for="level">Niveau</label><select id="level"><option value="">Alle niveaus</option><option value="havo">Havo</option><option value="vwo">Vwo</option></select></div>
+<div class="field"><label for="year">Jaar</label><select id="year"><option value="">Alle jaren</option><option>2024</option><option>2025</option><option>2026</option></select></div>
+<div class="field"><label for="period">Tijdvak</label><select id="period"><option value="">Alle tijdvakken</option><option value="1">Tijdvak 1</option><option value="2">Tijdvak 2</option></select></div>
+<div class="field"><label for="type">Vraagtype</label><select id="type"><option value="">Alle typen</option><option value="mcq">Meerkeuze</option><option value="open">Open</option></select></div>
+<div class="field"><label for="search">Zoeken in context / vraagnummer</label><input id="search" type="search" placeholder="Bijv. hartklep of 12"></div>
+</div><div class="filterfoot"><button class="btn" id="reset">Wis filters</button><span class="muted" id="count" aria-live="polite">Dataset laden…</span></div></section>
+<div id="status" class="status" role="status">De examendata worden geladen…</div>
+<div class="progress"><span id="position">—</span><span id="completed">Voortgang: 0 gemaakt</span></div>
+<article id="question" class="question" aria-live="polite"><p class="muted">Even geduld…</p></article>
+<nav class="nav"><button class="btn" id="previous">← Vorige</button><span class="muted" id="navlabel">Vraag 0 / 0</span><button class="btn primary" id="next">Volgende →</button></nav>
+<section class="method"><strong>Werkwijze en kwaliteitsstatus</strong><p>De originele vraagafbeelding blijft leidend; tekst, tabellen en figuren worden niet opnieuw opgebouwd uit OCR. De context wordt getoond vanuit de contextmetadata van het examen. Het correctievoorschrift blijft verborgen totdat je je antwoord hebt ingevoerd. De dataset bevat bronverwijzingen naar PDF-bestand en pagina. Een geslaagde technische import betekent niet dat de inhoudelijke correctheid al is vastgesteld.</p><p>Deze ontwikkelpagina staat los van de bestaande oefenpagina. De live versie en bestaande examenbestanden worden niet gewijzigd.</p></section>
+</main><footer>Biologie in ontwikkeling · Examenoefenen v2 · Ontwikkelomgeving</footer>
+<script>
+"use strict";
+// Dezelfde vraagdata voedt straks zowel de examenbibliotheek als de oefenmodus.
+// Tijdens de migratie laden we de twaalf examendatasets uit één versie-map.
+const DATA_ROOT = "exam-data/claude-2024-2026/data/";
+const IMAGE_ROOT = "exam-data/claude-2024-2026/";
+const EXAM_IDS = [
+  "havo-2024-t1","havo-2024-t2","havo-2025-t1","havo-2025-t2",
+  "havo-2026-t1","havo-2026-t2","vwo-2024-t1","vwo-2024-t2",
+  "vwo-2025-t1","vwo-2025-t2","vwo-2026-t1","vwo-2026-t2"
+];
+const $ = id => document.getElementById(id);
+const state = { all: [], filtered: [], index: 0, answers: readStore("bioExamV2Answers"), scores: readStore("bioExamV2Scores") };
+function readStore(key) { try { return JSON.parse(localStorage.getItem(key) || "{}"); } catch { return {}; } }
+function writeStore(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+function esc(value) { return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function setStatus(message, kind="") { const el=$("status");el.textContent=message;el.className="status "+kind;el.hidden=!message; }
+function contextFor(exam, question) { return (question.context_ids || []).map(id => exam.contexts.find(c => c.id === id)).filter(Boolean); }
+function normalize(examId, exam, question) {
+  return { ...question, examId, level:exam.exam.level, year:String(exam.exam.year), period:String(exam.exam.period),
+    contexts:contextFor(exam,question), sourceDocuments:exam.source_documents || [] };
+}
+async function loadDataset() {
+  try {
+    const loaded = await Promise.all(EXAM_IDS.map(async id => {
+      const response = await fetch(DATA_ROOT + id + ".json", {cache:"no-store"});
+      if (!response.ok) throw new Error("Bestand ontbreekt: " + DATA_ROOT + id + ".json (" + response.status + ")");
+      const exam = await response.json();
+      if (!Array.isArray(exam.questions) || !exam.exam) throw new Error("Ongeldige examendataset: " + id);
+      return exam.questions.map(q => normalize(id,exam,q));
+    }));
+    state.all = loaded.flat().sort((a,b) => a.year.localeCompare(b.year) || a.period.localeCompare(b.period) || a.level.localeCompare(b.level) || a.number-b.number);
+    if (state.all.length !== 519) setStatus("Waarschuwing: 519 vragen verwacht, maar " + state.all.length + " geladen. Controleer de datasetbestanden.","error");
+    else setStatus("Alle " + state.all.length + " vragen uit 12 examens zijn geladen. Inhoudelijke docentcontrole blijft noodzakelijk.","ok");
+    applyFilters();
+  } catch(error) {
+    setStatus("De dataset kon niet worden geladen. " + error.message + " Plaats eerst de dataset in " + IMAGE_ROOT + ".","error");
+    $("count").textContent="Geen dataset beschikbaar";
+    $("question").innerHTML="<p>Deze pagina is klaar voor de dataset, maar de JSON- en afbeeldingsbestanden zijn nog niet naar deze branch overgebracht.</p>";
+  }
+}
+function applyFilters() {
+  const level=$("level").value,year=$("year").value,period=$("period").value,type=$("type").value,search=$("search").value.trim().toLocaleLowerCase("nl");
+  state.filtered=state.all.filter(q => (!level||q.level===level)&&(!year||q.year===year)&&(!period||q.period===period)&&(!type||q.type===type)&&(!search||[q.number,...q.contexts.map(c=>c.title),...q.contexts.map(c=>c.description)].join(" ").toLocaleLowerCase("nl").includes(search)));
+  state.index=Math.min(state.index,Math.max(0,state.filtered.length-1));
+  $("count").textContent=state.filtered.length+" van "+state.all.length+" vragen";
+  render();
+}
+function done(q) { const a=state.answers[q.id]; return q.type==="mcq" ? Boolean(a?.choice) : Boolean(a?.response?.trim()); }
+function render() {
+  const q=state.filtered[state.index],total=state.filtered.length;
+  $("position").textContent=total ? "Vraag "+(state.index+1)+" van "+total : "Geen vragen";
+  $("navlabel").textContent=(total?state.index+1:0)+" / "+total;
+  $("previous").disabled=state.index===0;$("next").disabled=!total||state.index===total-1;
+  $("completed").textContent="Voortgang: "+state.all.filter(done).length+" / "+state.all.length gemaakt";
+  if(!q){$("question").innerHTML='<p class="muted">Geen vragen gevonden. Pas de filters aan.</p>';return;}
+  const answer=state.answers[q.id]||{},contexts=q.contexts.map(c=>'<section class="context"><h3>'+esc(c.title)+'</h3><p>'+esc(c.description||"")+'</p></section>').join("");
+  const source=q.source_fragments?.[0]||{},pdf=source.source_pdf;
+  const img=IMAGE_ROOT+q.snippet_file;
+  const tags='<div class="tags"><span class="tag">'+esc(q.level.toUpperCase())+'</span><span class="tag">'+q.year+' · tijdvak '+q.period+'</span><span class="tag gold">'+(q.type==="mcq"?"Meerkeuzevraag":"Open vraag")+'</span><span class="tag grey">'+Number(q.max_points_exam||0)+' punt(en)</span></div>';
+  const answerUI=q.type==="mcq" ? '<section class="answerbox"><h3>Kies je antwoord</h3><div class="options">'+["A","B","C","D","E","F"].map(letter=>'<label class="option"><input type="radio" name="choice" value="'+letter+'" '+(answer.choice===letter?"checked":"")+'> <b>'+letter+'</b></label>').join("")+'</div><div id="feedback" class="feedback" hidden></div></section>' : '<section class="answerbox"><h3>Jouw antwoord</h3><textarea id="response" placeholder="Noteer je antwoord voordat je het correctievoorschrift opent…">'+esc(answer.response||"")+'</textarea></section>';
+  const ad=q.answer_data||{},criteria=Array.isArray(ad.scoring)?ad.scoring.map(x=>'<li>'+esc(x.criterion)+' <b>('+Number(x.points||0)+' punt)</b></li>').join(""):"";
+  const rubric='<details class="rubric" id="rubric"><summary>Toon officieel antwoord en beoordelingsmodel</summary><div class="rubricbody">'+(ad.correct_answer?'<p><b>Correct antwoord:</b> '+esc(ad.correct_answer)+'</p>':"")+(ad.model_answer?'<p><b>Modelantwoord:</b></p><pre>'+esc(ad.model_answer)+'</pre>':"")+(criteria?'<p><b>Scorepunten:</b></p><ul>'+criteria+'</ul>':"")+(ad.remarks?.length?'<p><b>Opmerkingen:</b> '+esc(ad.remarks.join(" · "))+'</p>':"")+(ad.scoring_note?'<p>'+esc(ad.scoring_note)+'</p>':"")+'<p class="muted">Bron: aangeleverde extractie van het officiële correctievoorschrift. Controleer bij twijfel het originele document.</p><div class="selfscore"><label for="score">Mijn score</label><input id="score" type="number" min="0" max="'+Number(q.max_points_exam||0)+'" step="1" value="'+(state.scores[q.id]??"")+'"><span class="muted">van '+Number(q.max_points_exam||0)+' punten</span></div></div></details>';
+  $("question").innerHTML='<div class="qhead"><h2>'+esc(q.level.toUpperCase())+' '+q.year+' · tijdvak '+q.period+' · vraag '+q.number+'</h2></div>'+tags+contexts+'<figure class="snippet"><img src="'+esc(img)+'" alt="Origineel vraagfragment '+esc(q.number)+'" loading="lazy"><figcaption>Origineel vraagfragment · '+esc(q.examId)+' · PDF-pagina '+(source.pdf_page||"onbekend")+'</figcaption></figure><p class="source">Bron: '+(pdf?esc(pdf)+" · ":"")+"pagina "+(source.pdf_page||"onbekend")+' · <span>Maximumscore: '+Number(q.max_points_exam||0)+'</span></p>'+answerUI+rubric;
+  if(q.type==="mcq") {
+    $("question").querySelectorAll('input[name="choice"]').forEach(input=>input.addEventListener("change",()=> {
+      answer.choice=input.value;state.answers[q.id]=answer;writeStore("bioExamV2Answers",state.answers);
+      const feedback=$("feedback"),correct=ad.correct_answer;
+      feedback.hidden=false;
+      if(correct){const ok=input.value.trim().toUpperCase()===String(correct).trim().toUpperCase();feedback.className="feedback "+(ok?"good":"bad");feedback.textContent=ok?"Correct.":"Niet correct. Het juiste antwoord is "+correct+".";}
+      else {feedback.className="feedback";feedback.textContent="Je antwoord is opgeslagen. Er is geen eenduidig correct antwoord beschikbaar voor automatische controle.";}
+      $("completed").textContent="Voortgang: "+state.all.filter(done).length+" / "+state.all.length+" gemaakt";
+    }));
+    if(answer.choice){const selected=$("question").querySelector('input[name="choice"]:checked');if(selected){const correct=ad.correct_answer,fb=$("feedback");fb.hidden=false;if(correct){const ok=answer.choice.toUpperCase()===String(correct).trim().toUpperCase();fb.className="feedback "+(ok?"good":"bad");fb.textContent=ok?"Correct.":"Niet correct. Het juiste antwoord is "+correct+".";}else{fb.textContent="Je antwoord is opgeslagen; geen automatische beoordeling beschikbaar."}}}
+  } else {
+    $("response").addEventListener("input",e=>{answer.response=e.target.value;state.answers[q.id]=answer;writeStore("bioExamV2Answers",state.answers);$("completed").textContent="Voortgang: "+state.all.filter(done).length+" / "+state.all.length+" gemaakt";});
+  }
+  $("score").addEventListener("change",e=>{const value=e.target.value;if(value==="" ){delete state.scores[q.id]}else{const n=Number(value);if(Number.isInteger(n)&&n>=0&&n<=Number(q.max_points_exam||0))state.scores[q.id]=n;else{e.target.value=state.scores[q.id]??"";return;}}writeStore("bioExamV2Scores",state.scores);});
+  // Correctiemodel blijft dicht totdat er daadwerkelijk een antwoord is opgeslagen.
+  $("rubric").open=false;
+  if(!done(q)) $("rubric").querySelector("summary").textContent="Beantwoord eerst de vraag om het correctievoorschrift te openen";
+}
+["level","year","period","type"].forEach(id=>$(id).addEventListener("change",()=>{state.index=0;applyFilters();}));
+$("search").addEventListener("input",()=>{state.index=0;applyFilters();});
+$("reset").addEventListener("click",()=>{["level","year","period","type","search"].forEach(id=>$(id).value="");state.index=0;applyFilters();});
+$("previous").addEventListener("click",()=>{if(state.index>0){state.index--;render();}});
+$("next").addEventListener("click",()=>{if(state.index<state.filtered.length-1){state.index++;render();}});
+loadDataset();
+</script>
+</body></html>
