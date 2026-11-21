@@ -1,4 +1,4 @@
-name: Validate exam dataset importer
+name: Validate exam dataset importer and preview
 
 on:
   push:
@@ -7,11 +7,15 @@ on:
     paths:
       - "scripts/import_claude_exam_dataset.py"
       - "tests/test_import_claude_exam_dataset.py"
+      - "examenoefenen-v2-preview.html"
+      - "tests/test_examenoefenen_v2_preview.py"
       - ".github/workflows/validate-exam-dataset-importer.yml"
   pull_request:
     paths:
       - "scripts/import_claude_exam_dataset.py"
       - "tests/test_import_claude_exam_dataset.py"
+      - "examenoefenen-v2-preview.html"
+      - "tests/test_examenoefenen_v2_preview.py"
       - ".github/workflows/validate-exam-dataset-importer.yml"
   workflow_dispatch:
 
@@ -19,7 +23,7 @@ permissions:
   contents: read
 
 jobs:
-  importer-tests:
+  importer-and-preview-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -29,6 +33,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile importer and tests
-        run: python -m compileall -q scripts/import_claude_exam_dataset.py tests/test_import_claude_exam_dataset.py
-      - name: Run importer safety tests
-        run: python -m unittest discover -s tests -p "test_import_claude_exam_dataset.py" -v
+        run: python -m compileall -q scripts/import_claude_exam_dataset.py tests
+      - name: Run importer and preview regression tests
+        run: python -m unittest discover -s tests -p "test_*exam*.py" -v
