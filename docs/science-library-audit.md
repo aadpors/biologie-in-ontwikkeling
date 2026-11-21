@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 55 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 59 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 55 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 59 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -185,7 +185,7 @@ Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artike
 ## Derde auditronde: didactische vindbaarheid en gerichte lacunes
 
 **Peildatum:** 21 november 2026  
-**Database:** 55 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+**Database:** 59 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
 
 ### Nieuwe kaarten s53–s55
 
@@ -197,13 +197,13 @@ Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artike
 
 ### Nieuwe metadata voor didactische selectie
 
-Alle 55 science-kaarten hebben nu drie extra velden:
+Alle 59 science-kaarten hebben nu drie extra velden:
 
 - `lessonRole`: `Kernleskaart`, `Vwo-verdieping` of `Docentachtergrond`.
 - `lessonRoleNote`: toelichting waarom de kaart die rol krijgt en welke didactische bewerking nodig is.
 - `themeCluster`: een thematische bundeling die verwante publicaties bij elkaar brengt.
 
-De huidige redactionele indeling telt 24 kernleskaarten, 29 vwo-verdiepingskaarten en 2 kaarten voor docentachtergrond/methodiek. Dit is een eerste expliciete selectiehulp, geen formeel keurmerk. De labels moeten bij nieuwe kaarten en na inhoudelijke herbeoordeling opnieuw worden gewogen.
+De huidige redactionele indeling telt 27 kernleskaarten, 30 vwo-verdiepingskaarten en 2 kaarten voor docentachtergrond/methodiek. Dit is een eerste expliciete selectiehulp, geen formeel keurmerk. De labels moeten bij nieuwe kaarten en na inhoudelijke herbeoordeling opnieuw worden gewogen.
 
 ### Thematische clustering
 
@@ -212,14 +212,14 @@ De thematische clusters maken de zoekstructuur scherper dan de brede biologische
 | Cluster | Aantal kaarten |
 |---|---:|
 | Moleculaire biologie en celprocessen | 8 |
-| Genetica en evolutie | 11 |
-| Ecologie en biodiversiteit | 8 |
+| Genetica en evolutie | 12 |
+| Ecologie en biodiversiteit | 9 |
 | Afweer en gezondheid | 5 |
 | Stofwisseling en fysiologie | 6 |
 | Ontwikkeling en plantfysiologie | 4 |
-| Menselijke en dierlijke fysiologie | 7 |
+| Menselijke en dierlijke fysiologie | 8 |
 | Gedrag en voortplanting | 3 |
-| Zintuigen en prikkelverwerking | 1 |
+| Zintuigen en prikkelverwerking | 2 |
 | Biotechnologie en genetische geneeskunde | 1 |
 | Hart en bloedsomloop | 1 |
 
@@ -243,3 +243,48 @@ De drie nieuwe kaarten vullen concrete hiaten rond zintuigen, toegepaste genetis
 6. **Ecologische veranderingen en klimaat:** nieuwe primaire studies over fenologische mismatches, bodemkoolstof, droogte en verschuivende interacties in voedselwebben.
 
 Nieuwe kaarten worden pas toegevoegd na controle van titel, DOI, datum, publicatietype, full-text/abstract, onderzoeksmodel, belangrijkste uitkomst en beperkingen. Zoekrichtingen of onvolledige DOI's zijn geen publicatieverwijzingen en mogen niet als kaart worden opgenomen.
+
+
+## Vierde auditronde: uitbreiding van ondervertegenwoordigde thema's
+
+**Peildatum:** 21 november 2026  
+**Database:** 59 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s56–s59
+
+| ID | Publicatie | Thema | Broncontrole en beperking |
+|---|---|---|---|
+| s56 | An epithelial morphogenetic program for maximal urine concentration | Nierfunctie en osmoregulatie | Nature Communications, 21 maart 2026, DOI 10.1038/s41467-026-70938-7. Open-access primair onderzoek met segment-specifieke genetische manipulatie bij muizen. Claudine-10b en de celarchitectuur van de dunne opstijgende lis van Henle zijn gekoppeld aan urineconcentratie. Geen directe klinische studie bij mensen. |
+| s57 | Sensory-cell population integrity preserves vestibulo-ocular reflexes | Evenwicht en zintuiglijke prikkelverwerking | eNeuro, 9 februari 2026, DOI 10.1523/ENEURO.0303-25.2026. Open-access primair onderzoek bij muizen. De gemeten drempels voor haarcelbehoud zijn geen menselijke klinische grenswaarden. |
+| s58 | Phenological mismatches between larks and grasshoppers degrade a grassland ecosystem | Klimaat, fenologie en voedselweb | Communications Biology, 19 mei 2026, DOI 10.1038/s42003-026-10296-8. Tienjarige veldreeks gecombineerd met een driejarig vogeluitsluitingsexperiment. De veldstudie betreft één reservaat in Binnen-Mongolië; generalisatie naar andere ecosystemen vraagt voorzichtigheid. |
+| s59 | A species interaction kick-starts ecological speciation in allopatry | Populatiegenetica en soortvorming | PNAS, 13 oktober 2025, DOI 10.1073/pnas.2506625122. Open-access primair onderzoek met populatievergelijkingen, genoomdata en 411 paringen in seminatuurlijke vijvers. De voortplantingsisolatie varieerde sterk en was gemiddeld matig; dit is geen bewijs van voltooide soortvorming. |
+
+### Wat deze ronde inhoudelijk toevoegt
+
+- **Nierfunctie:** s56 verbindt de bouw van een specifiek nefronsegment met het osmotische gradiënt en urineconcentratie. Dit vult s46 aan, dat vooral de ADH/GPR39-signaalroute behandelt.
+- **Evenwicht:** s57 voegt het vestibulaire systeem en de vestibulo-oculaire reflex toe naast de bestaande kaart over fotoreceptoren (s53).
+- **Ecologie:** s58 laat zien hoe klimaatgerelateerde verschuivingen in timing via predatie en voedselwebben kunnen doorwerken tot primaire productie.
+- **Soortvorming:** s59 maakt de overgang van lokale adaptatie naar beginnende reproductieve isolatie concreet, als aanvulling op de bredere populatiegenetische review s37.
+
+### Bijgewerkte didactische verdeling
+
+De 59 science-kaarten zijn op dit moment als volgt gelabeld:
+
+| Didactische rol | Aantal |
+|---|---:|
+| Kernleskaart | 27 |
+| Vwo-verdieping | 30 |
+| Docentachtergrond | 2 |
+
+Deze labels zijn redactionele wegwijzers en geen formele beoordeling van de kwaliteit van een publicatie. Bij nieuwe kaarten moeten zowel het onderzoeksniveau als de toegankelijkheid van de biologische hoofdgedachte opnieuw worden beoordeeld.
+
+### Volgende inhoudelijke prioriteiten
+
+1. **Zintuigen:** gehoor, tast, pijnwaarneming en proprioceptie; evenwicht en zicht zijn nu beter vertegenwoordigd.
+2. **Nier en homeostase:** toegankelijke humane of klinische casussen over ADH, uitdroging, zoutbalans en nierziekten, naast de mechanistische muismodellen.
+3. **Populatiegenetica:** veldstudies met allelfrequenties, genetische drift, genstroom en lokale adaptatie in natuurlijke populaties.
+4. **Biotechnologie:** concrete toepassingen in landbouw, diagnostiek, vaccinontwikkeling en synthetische biologie, met expliciete ethische afwegingen.
+5. **Menselijke fysiologie:** havo-toegankelijke casussen over hart, bloedvaten, ademhaling, nieren en zenuwstelsel.
+6. **Ecologie en klimaat:** veldonderzoek naar droogte, bodemprocessen, koolstofopslag en verschuivende interacties in voedselwebben.
+
+Alle vier nieuwe publicaties zijn opgenomen met een expliciete beperking van de bewijskracht en een havo/vwo-lesinsteek. De database bevat nu 59 science-kaarten; de inhoudelijke audit blijft een doorlopend proces en niet iedere bestaande kaart is daarmee integraal op full-textniveau herbeoordeeld.
