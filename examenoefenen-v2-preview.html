@@ -95,7 +95,7 @@ function render() {
   $("position").textContent=total ? "Vraag "+(state.index+1)+" van "+total : "Geen vragen";
   $("navlabel").textContent=(total?state.index+1:0)+" / "+total;
   $("previous").disabled=state.index===0;$("next").disabled=!total||state.index===total-1;
-  $("completed").textContent="Voortgang: "+state.all.filter(done).length+" / "+state.all.length gemaakt";
+  $("completed").textContent="Voortgang: "+state.all.filter(done).length+" / "+state.all.length+" gemaakt";
   if(!q){$("question").innerHTML='<p class="muted">Geen vragen gevonden. Pas de filters aan.</p>';return;}
   const answer=state.answers[q.id]||{},contexts=q.contexts.map(c=>'<section class="context"><h3>'+esc(c.title)+'</h3><p>'+esc(c.description||"")+'</p></section>').join("");
   const source=q.source_fragments?.[0]||{},pdf=source.source_pdf;
