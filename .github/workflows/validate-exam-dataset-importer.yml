@@ -9,6 +9,7 @@ on:
       - "tests/test_import_claude_exam_dataset.py"
       - "examenoefenen-v2-preview.html"
       - "tests/test_examenoefenen_v2_preview.py"
+      - "tests/examenoefenen-v2-browser-test.cjs"
       - ".github/workflows/validate-exam-dataset-importer.yml"
   pull_request:
     paths:
@@ -25,6 +26,7 @@ permissions:
 jobs:
   importer-and-preview-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -36,3 +38,24 @@ jobs:
         run: python -m compileall -q scripts/import_claude_exam_dataset.py tests
       - name: Run importer and preview regression tests
         run: python -m unittest discover -s tests -p "test_*exam*.py" -v
+      - name: Set up Node.js for browser smoke test
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Serve isolated preview page
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/exam-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:8000/examenoefenen-v2-preview.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/exam-preview.log
+          exit 1
+      - name: Exercise v2 preview with deterministic fixture data
+        run: node tests/examenoefenen-v2-browser-test.cjs
