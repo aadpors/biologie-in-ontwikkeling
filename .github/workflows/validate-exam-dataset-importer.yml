@@ -1,0 +1,34 @@
+name: Validate exam dataset importer
+
+on:
+  push:
+    branches:
+      - feature/claude-exam-dataset
+    paths:
+      - "scripts/import_claude_exam_dataset.py"
+      - "tests/test_import_claude_exam_dataset.py"
+      - ".github/workflows/validate-exam-dataset-importer.yml"
+  pull_request:
+    paths:
+      - "scripts/import_claude_exam_dataset.py"
+      - "tests/test_import_claude_exam_dataset.py"
+      - ".github/workflows/validate-exam-dataset-importer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  importer-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile importer and tests
+        run: python -m compileall -q scripts/import_claude_exam_dataset.py tests/test_import_claude_exam_dataset.py
+      - name: Run importer safety tests
+        run: python -m unittest discover -s tests -p "test_import_claude_exam_dataset.py" -v
