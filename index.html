@@ -82,7 +82,8 @@ button[data-tip]{cursor:pointer}.pill[data-tip]{cursor:help}.empty{background:wh
 <div class="filter-group-heading"><span class="filter-step">01</span><div><h4 id="science-content-title">Onderwerp en onderzoek</h4><p>Verfijn op publicatiedatum, onderzoeksopzet en biologisch hoofdthema.</p></div></div>
 <div class="filters science-filter-grid" id="science-filters">
 <div class="field"><label for="period">Publicatieperiode</label><select id="period"><option value="30">Afgelopen maand</option><option value="90">Afgelopen 3 maanden</option><option value="180">Afgelopen 6 maanden</option><option value="365">Afgelopen jaar</option><option value="1095" selected>Afgelopen 3 jaar</option><option value="all">Alle perioden</option></select></div>
-<div class="field"><label for="study-type">Onderzoekstype</label><select id="study-type"><option value="all">Alle typen</option><option>Primair onderzoek</option><option>Review / synthese</option><option>Perspectiefartikel</option></select></div>
+<div class="field"><label for="study-type">Onderzoekstype</label><select id="study-type"><option value="all">Alle typen</option><option>Primair onderzoek</option>
+<option>Primair sociaalwetenschappelijk onderzoek</option><option>Review / synthese</option><option>Perspectiefartikel</option></select></div>
 <div class="field"><label for="concept">Biologisch hoofdthema</label><select id="concept"><option value="all">Alle thema's</option><option>Moleculaire interactie</option><option>Selectie en genetische variatie</option><option>Biodiversiteit en ecosystemen</option><option>Ontstaan en evolutie van meercellig leven</option><option>Evolutie van eukaryote cellen</option><option>Afweer van het organisme</option><option>Stofwisseling van het organisme</option><option>Zelforganisatie van het organisme</option><option>Zelfregulatie van het organisme</option><option>DNA-replicatie en celcyclus</option><option>Eiwitsynthese en genexpressie</option><option>Gedrag en voortplanting</option><option>Erfelijke eigenschappen en overerving</option></select></div>
 </div>
 </section>
@@ -296,13 +297,13 @@ document.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=
 document.querySelectorAll('input[type=search]').forEach(el=>el.addEventListener('input',()=>{saveUiPreferences();render();}));
 showPage(page);
 syncTooltips();
-fetch('./publicaties.json?v=2026-11-21T10:45:00Z')
+fetch('./publicaties.json?v=2026-11-21T11:00:00Z')
   .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
   .then(publications=>{if(!Array.isArray(publications))throw new Error('Ongeldig databaseformaat');data=publications;render();})
   .then(()=>initFeedback())
   .catch(error=>{$('cards').innerHTML='<div class="empty"><b>De publicatiedatabase kon niet worden geladen.</b><br>Ververs de pagina later of controleer of publicaties.json in de hoofdmap van de website staat.</div>';console.error(error);});
 
-const currentSiteVersion='2026-11-21T10:45:00.000Z';
+const currentSiteVersion='2026-11-21T11:00:00.000Z';
 async function checkSiteVersion(){
  try{
   const response=await fetch('./site-version.json?check='+Date.now(),{cache:'no-store'});
