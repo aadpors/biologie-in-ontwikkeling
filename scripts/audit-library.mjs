@@ -32,7 +32,7 @@ function options(id) {
   assert.ok(start >= 0, 'Filter ontbreekt: ' + id);
   const end = html.indexOf('</select>', start);
   const body = html.slice(start, end);
-  return [...body.matchAll(/<option(?:\s+value="([^"]*)")?>([^<]+)<\/option>/g)].map(m => (m[1] || m[2]).trim());
+  return [...body.matchAll(/<option\b([^>]*)>([^<]+)<\/option>/g)].map(m => (m[1].match(/\bvalue="([^"]*)"/)?.[1] || m[2]).trim());
 }
 for (const [id, field] of [['concept','concept'],['cluster-filter','themeCluster'],['lesson-role-filter','lessonRole'],['study-type','studyType'],['evidence-filter','evidenceLevel']]) {
   const available = new Set(options(id));
