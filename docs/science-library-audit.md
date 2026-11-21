@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 59 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 77 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -507,3 +507,64 @@ De uitbreiding brengt het totaal op 68 wetenschappelijke kaarten. De nieuwe vali
 5. **Planten en klimaat:** fotosynthese onder hittestress, wortelarchitectuur en watertransport in veldproeven.
 
 De bibliotheek bevat nu 71 wetenschappelijke kaarten. De nieuwe kaarten versterken drie ondervertegenwoordigde invalshoeken zonder de experimentele of geografische beperkingen te verbergen.
+
+
+## Negende auditronde: zenuwstelsel, klinische genetica, voortplanting en ecosysteemdiensten
+
+**Peildatum:** 21 november 2026  
+**Omvang na deze ronde:** 77 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s72–s77
+
+| ID | Publicatie | Thema | Didactische rol en bewijskracht |
+|---|---|---|---|
+| s72 | Loud acoustic stimulation reveals an online reticulospinal contribution to long-latency reflexes in humans | Reflexen en zenuwstelsel | Kernleskaart. Humane experimentele studie bij 12 deelnemers; de langere reflexcomponent werd versterkt, maar de betrokken baan wordt indirect onderzocht. |
+| s73 | Hierarchical sensory processing in zebrafish thalamocortical-like circuits | Sensorische informatieverwerking | Vwo-verdieping. Primair onderzoek bij zebravissen; functionele principes zijn vergelijkbaar met andere gewervelden, maar de hersenstructuren zijn niet identiek aan die van mensen. |
+| s74 | Integrating preconception carrier screening into public health: lessons learned from a pilot implementation study | Klinische genetica en dragerschap | Kernleskaart. Spaanse pilot met 152 stellen; zes dragerparen gevonden. De resultaten bewijzen uitvoerbaarheid in deze setting, niet dat universele screening overal wenselijk of kosteneffectief is. |
+| s75 | Patient and health care practitioner experiences and perspectives on expanded carrier screening: A scoping review | Genetische screening en ethiek | Docentachtergrond. Scoping review van 45 studies; brengt thema's in kaart, maar is geen meta-analyse en geeft geen gepoolde effectschatting. |
+| s76 | Plasma proteomic signature of the human menstrual cycle | Hormonale regeling en voortplanting | Kernleskaart. Humane analyse van 2.760 vrouwen en 2.917 plasma-eiwitten; cyclusdag verklaarde slechts een beperkt deel van de totale eiwitvariatie. |
+| s77 | Insecticides alter wild and managed pollination dynamics on oil crop yield | Bestuiving en ecosysteemdiensten | Kernleskaart. Tweejarige veldstudie op 35 locaties; wilde bestuivers waren per bezoek gemiddeld effectiever dan honingbijen. Eén gewas en regio begrenzen de generaliseerbaarheid. |
+
+### Inhoudelijke beoordeling
+
+**Zenuwstelsel.** s72 vult een basale lacune rond reflexbogen aan met een humane studie die laat zien dat een langere reflexcomponent door hersenstamroutes kan worden beïnvloed. De kleine steekproef (n=12) en indirecte stimulatie zijn expliciet benoemd. s73 verdiept de verwerking van sensorische informatie: neurale netwerken kunnen signalen ordenen en combineren. Deze publicatie is bewust als vwo-verdieping geclassificeerd.
+
+**Klinische genetica.** s74 maakt autosomaal recessief dragerschap en de kansberekening bij twee dragers concreet. s75 vult dit aan met de maatschappelijke en zorginhoudelijke kant: counseling, vrijwilligheid, onzekerheid, privacy, stigmatisering en gelijke toegang. De scoping review is als docentachtergrond opgenomen, niet als primaire biologische bewijsbron.
+
+**Voortplantingsfysiologie.** s76 verbindt de bekende hormonale regeling van de menstruatiecyclus aan grootschalige humane gegevens. De kaart vermijdt de onjuiste conclusie dat de cyclus alle bloedwaarden sterk beïnvloedt: voor slechts negen eiwitten verklaarde cyclusdag meer dan 5% van de variantie.
+
+**Biodiversiteit en ecosysteemdiensten.** s77 laat zien dat wilde bestuivers en honingbijen niet volledig uitwisselbaar zijn. De opbrengst van één gewas wordt beïnvloed door bestuiversamenstelling en insecticidengebruik. De kaart maakt onderscheid tussen een veldresultaat voor Brassica carinata en algemene uitspraken over alle landbouwgewassen.
+
+### Bijgewerkte thematische verdeling
+
+| Cluster | Aantal |
+|---|---:|
+| Moleculaire biologie en celprocessen | 8 |
+| Genetica en evolutie | 13 |
+| Ecologie en biodiversiteit | 11 |
+| Afweer en gezondheid | 6 |
+| Stofwisseling en fysiologie | 7 |
+| Ontwikkeling en plantfysiologie | 5 |
+| Menselijke en dierlijke fysiologie | 10 |
+| Gedrag en voortplanting | 4 |
+| Zintuigen en prikkelverwerking | 6 |
+| Biotechnologie en genetische geneeskunde | 5 |
+| Hart en bloedsomloop | 2 |
+
+### Bijgewerkte didactische verdeling
+
+| Didactische rol | Aantal |
+|---|---:|
+| Kernleskaart | 36 |
+| Vwo-verdieping | 37 |
+| Docentachtergrond | 4 |
+
+### Nog openstaande inhoudelijke aandachtspunten
+
+1. **Nierfunctie en osmoregulatie:** aanvullen met toegankelijke humane of zoogdierstudies over ADH, nierconcentratie en waterbalans.
+2. **Hormonale regeling:** verbreden met schildklier, stress-as en negatieve terugkoppeling, zonder uitsluitend specialistische endocrinologische studies toe te voegen.
+3. **Zenuwstelsel:** een toegankelijke humane of dierexperimentele casus over synaptische transmissie en zenuwgeleiding toevoegen.
+4. **Klinische genetica:** Nederlandse context rond counseling, screening, varianten van onzekere betekenis en privacy verder documenteren.
+5. **Ecologie:** waterkwaliteit, voedselwebben en ecosysteemdiensten naast bestuiving en bodemprocessen versterken.
+
+De bibliotheek bevat nu 77 wetenschappelijke kaarten. Deze ronde is bewust gericht op inhoudelijke hiaten en bruikbare lesvragen, niet op maximale aantallen.
