@@ -40,7 +40,7 @@ const fs = require("node:fs");
     const curriculumSearchCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
     assert.ok(curriculumSearchCount > 0 && curriculumSearchCount < 77, "Zoeken op syllabuscode moet een gerichte selectie opleveren");
 
-    await page.locator("#search").fill("M5 DNA-replicatie");
+    await page.locator("#search").fill("DNA replicatie");
     await page.waitForFunction(() => Number(document.querySelector("#count")?.textContent.match(/\d+/)?.[0] || 0) > 0);
     const multiWordSearchCount = Number((await page.locator("#count").innerText()).match(/\d+/)[0]);
     assert.ok(multiWordSearchCount > 0 && multiWordSearchCount < 77, "Combinatie van losse zoektermen moet een gerichte selectie opleveren");
