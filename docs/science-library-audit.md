@@ -1,7 +1,7 @@
 # Thematische audit wetenschappelijke bibliotheek
 
 **Peildatum:** 21 november 2026  
-**Omvang:** 52 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
+**Omvang:** 55 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten in de totale bibliotheek.
 
 ## Doel en beoordelingskader
 
@@ -10,7 +10,7 @@ De bibliotheek moet docenten helpen om relevante actuele wetenschap te vinden é
 1. **Wat is onderzocht?** Onderzoeksvraag, systeem, methode en belangrijkste uitkomst.
 2. **Hoe sterk is het bewijs?** Experimenteel, observationeel, modelmatig, review of meta-analyse; plus de belangrijkste beperkingen.
 3. **Wat is de onderwijswaarde?** Havo/vwo-niveau, koppeling aan syllabus 2027 en/of conceptprogramma v2, en directe aansluiting versus verdieping.
-4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 52 wetenschappelijke kaarten bevatten nu beide onderdelen.
+4. **Wat kan een docent ermee?** Een concrete lesvraag of denkprikkel en een expliciete veelvoorkomende misconceptie. Alle 55 wetenschappelijke kaarten bevatten nu beide onderdelen.
 
 Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beoordelingen. Peer review zegt iets over de publicatieprocedure, niet automatisch over causaliteit, generaliseerbaarheid of onderwijsrelevantie.
 
@@ -25,12 +25,12 @@ Bronkwaliteit, bewijssterkte en curriculumrelevantie zijn bewust drie aparte beo
 | Afweer van het organisme | s5, s28, s29, s44, s52 | 5 |
 | Stofwisseling van het organisme | s7, s26, s27, s39, s45, s47 | 6 |
 | Zelforganisatie van het organisme | s8, s15, s17, s34 | 4 |
-| Zelfregulatie van het organisme | s9, s14, s18, s24, s25, s30, s46 | 7 |
+| Zelfregulatie van het organisme | s9, s14, s18, s24, s25, s30, s46, s53, s55 | 9 |
 | DNA-replicatie en celcyclus | s10, s31, s49 | 3 |
 | Eiwitsynthese en genexpressie | s11, s32 | 2 |
 | Gedrag en voortplanting | s12, s22, s50 | 3 |
 | Evolutie van eukaryote cellen | s35, s51 | 2 |
-| Erfelijke eigenschappen en overerving | s36, s38, s43 | 3 |
+| Erfelijke eigenschappen en overerving | s36, s38, s43, s54 | 4 |
 
 De indeling gebruikt één primair hoofdthema per kaart. Een publicatie kan inhoudelijk ook aan andere thema's raken; de tags en curriculumkoppelingen leggen die nevenrelaties vast.
 
@@ -127,7 +127,7 @@ De bibliografische en abstractcontrole van s1–s40 is uitgevoerd, maar een voll
 ### Nieuwe metadata voor bruikbare selectie
 
 Alle 52 wetenschappelijke kaarten hebben nu ook een expliciet veld `studyType`:
-- **Primair onderzoek:** 41 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
+- **Primair onderzoek:** 44 kaarten, waaronder experimenteel, observationeel, veld-, methodologisch en kwantitatief onderzoek.
 - **Review / synthese:** 9 kaarten, waaronder mini-reviews, reviews en meta-analyses.
 - **Perspectiefartikel:** 2 kaarten.
 
@@ -180,3 +180,66 @@ Dit is een gerichte verdiepingscontrole, geen claim dat alle 52 volledige artike
 - **s9:** de volledige Nature-tekst maakt duidelijk dat de lag-regressieanalyse samenhang vaststelt, geen causale richting. Alleen enkele geselecteerde hersen-lichaamroutes zijn met optogenetica causaal getest. Dit onderscheid is nu ook expliciet in de kaart opgenomen.
 
 - **s2:** de volledige Cell Host & Microbe-tekst is geraadpleegd. De kaart onderscheidt overdracht van gebarcodeerde bacterielijnen van parallelle evolutie en vermeldt de 49-soorten synthetische gemeenschap en de 29 koolstofbronnen uit de in-vitro-evolutie.
+
+
+## Derde auditronde: didactische vindbaarheid en gerichte lacunes
+
+**Peildatum:** 21 november 2026  
+**Database:** 55 wetenschappelijke kaarten en 14 onderwijs-/didactische kaarten.
+
+### Nieuwe kaarten s53–s55
+
+| ID | Publicatie | Thema | Broncontrole en beperking |
+|---|---|---|---|
+| s53 | Photostimulation improves maturation of human photoreceptors | Zintuigen en prikkelverwerking | Primair onderzoek in menselijke stamcel-afgeleide retina-organoïden. Open-access full text en DOI gecontroleerd. De bevinding betreft rijping in een modelsysteem, niet herstel van zicht bij patiënten. DOI: 10.1038/s41467-026-76112-3. |
+| s54 | Prime Editing for p47phox-Deficient Chronic Granulomatous Disease | Biotechnologie en genetische geneeskunde | Klinische fase-I/II-studie bij twee deelnemers. Open-access full text en DOI gecontroleerd. De kleine groep, korte follow-up, sponsorbetrokkenheid en beëindiging na twee deelnemers beperken de conclusies. DOI: 10.1056/NEJMoa2509807. |
+| s55 | Blood-borne sphingosine 1-phosphate maintains vascular resistance, blood pressure, and cardiac function in mice | Hart en bloedsomloop | Primair mechanistisch onderzoek in genetisch aangepaste muizen. Open-access full text en DOI gecontroleerd. De resultaten zijn geen direct klinisch bewijs voor mensen. DOI: 10.1073/pnas.2512853123. |
+
+### Nieuwe metadata voor didactische selectie
+
+Alle 55 science-kaarten hebben nu drie extra velden:
+
+- `lessonRole`: `Kernleskaart`, `Vwo-verdieping` of `Docentachtergrond`.
+- `lessonRoleNote`: toelichting waarom de kaart die rol krijgt en welke didactische bewerking nodig is.
+- `themeCluster`: een thematische bundeling die verwante publicaties bij elkaar brengt.
+
+De huidige redactionele indeling telt 24 kernleskaarten, 29 vwo-verdiepingskaarten en 2 kaarten voor docentachtergrond/methodiek. Dit is een eerste expliciete selectiehulp, geen formeel keurmerk. De labels moeten bij nieuwe kaarten en na inhoudelijke herbeoordeling opnieuw worden gewogen.
+
+### Thematische clustering
+
+De thematische clusters maken de zoekstructuur scherper dan de brede biologische hoofdconcepten alleen:
+
+| Cluster | Aantal kaarten |
+|---|---:|
+| Moleculaire biologie en celprocessen | 8 |
+| Genetica en evolutie | 11 |
+| Ecologie en biodiversiteit | 8 |
+| Afweer en gezondheid | 5 |
+| Stofwisseling en fysiologie | 6 |
+| Ontwikkeling en plantfysiologie | 4 |
+| Menselijke en dierlijke fysiologie | 7 |
+| Gedrag en voortplanting | 3 |
+| Zintuigen en prikkelverwerking | 1 |
+| Biotechnologie en genetische geneeskunde | 1 |
+| Hart en bloedsomloop | 1 |
+
+### Website en validatie
+
+- De wetenschappelijke kaarten tonen nu lesrol en thematische cluster als afzonderlijke labels.
+- Het filterpaneel heeft aparte filters voor didactische lesrol en thematische cluster; beide filters werken onafhankelijk van doelgroep, onderzoekstype, bewijssterkte en curriculumrelevantie.
+- De nieuwe velden worden meegenomen in de zoekfunctie en de filterkeuze wordt opgeslagen zoals de bestaande filtervoorkeuren.
+- De siteversie en de cacheparameter voor `publicaties.json` zijn vernieuwd.
+- `scripts/validate-site.mjs` controleert nu of iedere science-kaart een geldige lesrol, toelichting en cluster heeft en of alle gebruikte waarden daadwerkelijk in de filterlijsten staan.
+
+### Resterende hiaten na deze ronde
+
+De drie nieuwe kaarten vullen concrete hiaten rond zintuigen, toegepaste genetische geneeskunde en cardiovasculaire fysiologie. Daarmee zijn deze thema's nog niet volledig afgedekt. Prioriteit voor de volgende uitbreiding:
+
+1. **Nierfunctie en osmoregulatie:** een toegankelijke casus over filtratie, terugresorptie, ADH en water-/zoutbalans op orgaanniveau; s46 blijft een specialistische receptorstudie.
+2. **Populatiegenetica en speciatie:** primair veld- of populatieonderzoek met genstroom, genetische drift, selectie, reproductieve isolatie of lokale adaptatie.
+3. **Zintuigen breder dan het oog:** gehoor/evenwicht, tast, proprioceptie en pijnwaarneming.
+4. **Toegepaste biotechnologie en ethiek:** landbouw, diagnostiek, vaccinontwikkeling en synthetische biologie, met concrete baten, risico's en maatschappelijke afwegingen.
+5. **Menselijke fysiologie op havo-niveau:** lesklare casussen rond hart, bloedvaten, nieren en zenuwstelsel, zonder dat specialistische moleculaire mechanismen de hoofdzaak worden.
+6. **Ecologische veranderingen en klimaat:** nieuwe primaire studies over fenologische mismatches, bodemkoolstof, droogte en verschuivende interacties in voedselwebben.
+
+Nieuwe kaarten worden pas toegevoegd na controle van titel, DOI, datum, publicatietype, full-text/abstract, onderzoeksmodel, belangrijkste uitkomst en beperkingen. Zoekrichtingen of onvolledige DOI's zijn geen publicatieverwijzingen en mogen niet als kaart worden opgenomen.
