@@ -122,9 +122,30 @@ function render() {
     $("response").addEventListener("input",e=>{answer.response=e.target.value;state.answers[q.id]=answer;writeStore("bioExamV2Answers",state.answers);$("completed").textContent="Voortgang: "+state.all.filter(done).length+" / "+state.all.length+" gemaakt";});
   }
   $("score").addEventListener("change",e=>{const value=e.target.value;if(value==="" ){delete state.scores[q.id]}else{const n=Number(value);if(Number.isInteger(n)&&n>=0&&n<=Number(q.max_points_exam||0))state.scores[q.id]=n;else{e.target.value=state.scores[q.id]??"";return;}}writeStore("bioExamV2Scores",state.scores);});
-  // Correctiemodel blijft dicht totdat er daadwerkelijk een antwoord is opgeslagen.
-  $("rubric").open=false;
-  if(!done(q)) $("rubric").querySelector("summary").textContent="Beantwoord eerst de vraag om het correctievoorschrift te openen";
+  // Het correctiemodel blijft dicht totdat er daadwerkelijk een antwoord is opgeslagen.
+  // De click-handler controleert dit op het moment van openen, zodat ook een
+  // antwoord dat later in hetzelfde scherm wordt ingevuld direct wordt herkend.
+  const rubricDetails=$("rubric"),rubricSummary=rubricDetails.querySelector("summary");
+  rubricDetails.open=false;
+  const syncRubricAccess=()=> {
+    const answered=done(q);
+    rubricSummary.textContent=answered
+      ? "Toon officieel antwoord en beoordelingsmodel"
+      : "Beantwoord eerst de vraag om het correctievoorschrift te openen";
+  };
+  syncRubricAccess();
+  rubricSummary.addEventListener("click",event=>{
+    if(!done(q)) {
+      event.preventDefault();
+      setStatus("Vul eerst je antwoord in. Daarna kun je het correctievoorschrift openen.");
+    } else {
+      setStatus("");
+      rubricSummary.textContent="Toon officieel antwoord en beoordelingsmodel";
+    }
+  });
+  const responseField=$("response");
+  if(responseField) responseField.addEventListener("input",syncRubricAccess);
+  $("question").querySelectorAll('input[name="choice"]').forEach(input=>input.addEventListener("change",syncRubricAccess));
 }
 ["level","year","period","type"].forEach(id=>$(id).addEventListener("change",()=>{state.index=0;applyFilters();}));
 $("search").addEventListener("input",()=>{state.index=0;applyFilters();});
