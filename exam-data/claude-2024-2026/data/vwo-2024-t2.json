@@ -1,0 +1,3804 @@
+{
+ "schema_version": "1.0",
+ "exam": {
+  "level": "vwo",
+  "year": 2024,
+  "period": 2
+ },
+ "source_documents": [
+  {
+   "type": "opgavenboekje",
+   "filename": "vw-1018-a-24-2-o-spr.pdf",
+   "page_count": 20
+  },
+  {
+   "type": "correctievoorschrift",
+   "filename": "vw-1018-a-24-2-c.pdf",
+   "page_count": 13
+  }
+ ],
+ "contexts": [
+  {
+   "id": "context-1",
+   "title": "De herintroductie van het przewalskipaard",
+   "description": "Context 'De herintroductie van het przewalskipaard' met vraag 1–8",
+   "source_pages": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "question_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ]
+  },
+  {
+   "id": "context-2",
+   "title": "Bestrijding van ambrosia",
+   "description": "Context 'Bestrijding van ambrosia' met vraag 9–18",
+   "source_pages": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "question_numbers": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ]
+  },
+  {
+   "id": "context-3",
+   "title": "Gentherapie nagemaakt",
+   "description": "Context 'Gentherapie nagemaakt' met vraag 19–28",
+   "source_pages": [
+    10,
+    11,
+    12,
+    13,
+    14
+   ],
+   "question_numbers": [
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+   ]
+  },
+  {
+   "id": "context-4",
+   "title": "Slaap herstelt DNA",
+   "description": "Context 'Slaap herstelt DNA' met vraag 29–36",
+   "source_pages": [
+    15,
+    16,
+    17,
+    18
+   ],
+   "question_numbers": [
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36
+   ]
+  },
+  {
+   "id": "context-5",
+   "title": "Schadelijke peuken",
+   "description": "Context 'Schadelijke peuken' met vraag 37–41",
+   "source_pages": [
+    19,
+    20
+   ],
+   "question_numbers": [
+    37,
+    38,
+    39,
+    40,
+    41
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "vw24t2-1",
+   "number": 1,
+   "main_question_number": 1,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q01.png",
+   "snippet_size_px": [
+    2207,
+    2616
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.7112
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n Equus przewalskii:\nOmdat het aantal chromosomen van het przewalskipaard verschilt van\nhet gewone paard, is het przewalskipaard een andere soort.\n E. przewalskii:\nHet aantal chromosomen is anders.\n Equus ferus przewalskii:\nOmdat kruising van gewone paarden en przewalskipaarden vruchtbare\nnakomelingen oplevert, behoren zij tot dezelfde soort.\n E. ferus przewalskii:\nUit een kruising van gewone paarden en przewalskipaarden ontstaan\nvruchtbare nakomelingen.\nOpmerking\nHet scorepunt toekennen voor een correcte toelichting, passend bij de\ngekozen naamgeving.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n Equus przewalskii:\nOmdat het aantal chromosomen van het przewalskipaard verschilt van\nhet gewone paard, is het przewalskipaard een andere soort.\n E. przewalskii:\nHet aantal chromosomen is anders.\n Equus ferus przewalskii:\nOmdat kruising van gewone paarden en przewalskipaarden vruchtbare\nnakomelingen oplevert, behoren zij tot dezelfde soort.\n E. ferus przewalskii:\nUit een kruising van gewone paarden en przewalskipaarden ontstaan\nvruchtbare nakomelingen.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Het scorepunt toekennen voor een correcte toelichting, passend bij de",
+     "gekozen naamgeving."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-2",
+   "number": 2,
+   "main_question_number": 2,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q02.png",
+   "snippet_size_px": [
+    2207,
+    4449
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 3,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.5845
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 2; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 niet\n2 niet\n3 wel\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 niet\n2 niet\n3 wel\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-3",
+   "number": 3,
+   "main_question_number": 3,
+   "type": "mcq",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q03.png",
+   "snippet_size_px": [
+    2207,
+    3260
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.2458
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-4",
+   "number": 4,
+   "main_question_number": 4,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q04.png",
+   "snippet_size_px": [
+    2207,
+    3315
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.0932
+     },
+     "order": 2,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 3: twaalf dieren in dierentuinen"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2978,
+      "width": 0.8415,
+      "height": 0.1482
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 onjuist\n2 juist\n3 onjuist\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 onjuist\n2 juist\n3 onjuist\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-5",
+   "number": 5,
+   "main_question_number": 5,
+   "type": "mcq",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q05.png",
+   "snippet_size_px": [
+    2207,
+    3897
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4496,
+      "width": 0.8415,
+      "height": 0.4275
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-6",
+   "number": 6,
+   "main_question_number": 6,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q06.png",
+   "snippet_size_px": [
+    2207,
+    4347
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.5556
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• (door sequencing) de nucleotidensequentie/basenvolgorde wordt\nbepaald,  1\n• (zodat) de hengst gekozen kan worden die (genetisch) het meest\nafwijkt van de bestaande populatie. / die het minst verwant is aan de\nbestaande populatie.  1\nOpmerkingen\n Als de kandidaat antwoordt dat de DNA-volgorde wordt bepaald, het\neerste scorepunt toekennen.\n Als de kandidaat antwoordt dat op erfelijke afwijkingen / gunstige\neigenschappen kan worden geselecteerd, het tweede scorepunt\ntoekennen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• (door sequencing) de nucleotidensequentie/basenvolgorde wordt\nbepaald,\n• (zodat) de hengst gekozen kan worden die (genetisch) het meest\nafwijkt van de bestaande populatie. / die het minst verwant is aan de\nbestaande populatie.",
+    "scoring": [
+     {
+      "criterion": "(door sequencing) de nucleotidensequentie/basenvolgorde wordt bepaald,",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(zodat) de hengst gekozen kan worden die (genetisch) het meest afwijkt van de bestaande populatie. / die het minst verwant is aan de bestaande populatie.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     " Als de kandidaat antwoordt dat de DNA-volgorde wordt bepaald, het",
+     "eerste scorepunt toekennen.",
+     " Als de kandidaat antwoordt dat op erfelijke afwijkingen / gunstige",
+     "eigenschappen kan worden geselecteerd, het tweede scorepunt",
+     "toekennen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-7",
+   "number": 7,
+   "main_question_number": 7,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q07.png",
+   "snippet_size_px": [
+    2207,
+    4253
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.4518
+     },
+     "order": 2,
+     "reason": "Verwezen afbeelding 3"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6098,
+      "width": 0.8415,
+      "height": 0.057
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "P diploïd\nQ haploïd\nR diploïd\nindien drie letters correct  2\nindien twee letters correct  1\nindien minder dan twee letters correct  0",
+    "correct_answer": null,
+    "model_answer": "P diploïd\nQ haploïd\nR diploïd\nindien drie letters correct\nindien twee letters correct\nindien minder dan twee letters correct",
+    "scoring": [
+     {
+      "criterion": "indien drie letters correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee letters correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee letters correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-8",
+   "number": 8,
+   "main_question_number": 8,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q08.png",
+   "snippet_size_px": [
+    2207,
+    4378
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6292
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.4518
+     },
+     "order": 2,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 6: klonen via de frozen zoo (afbeelding 3)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.681,
+      "width": 0.8415,
+      "height": 0.0926
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat mitochondriaal-DNA (in het veulen)\nafkomstig is uit de eicel. / afkomstig is van het gedomesticeerde/gewone\npaard.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat mitochondriaal-DNA (in het veulen)\nafkomstig is uit de eicel. / afkomstig is van het gedomesticeerde/gewone\npaard.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-9",
+   "number": 9,
+   "main_question_number": 9,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q09.png",
+   "snippet_size_px": [
+    2207,
+    2130
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5137
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat de plant kiemkrachtige zaden kan\nvormen door klimaatverandering. / door de warmere zomers van de laatste\njaren.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat de plant kiemkrachtige zaden kan\nvormen door klimaatverandering. / door de warmere zomers van de laatste\njaren.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-10",
+   "number": 10,
+   "main_question_number": 10,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q10.png",
+   "snippet_size_px": [
+    2207,
+    1998
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.5774,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "pioniersoort, met een juist kenmerk\nvoorbeelden van een juist kenmerk:\n groeit op verstoorde/kale/ruwe/onbegroeide terreinen\n productie groot aantal zaden\n eenjarig\n zaden hebben lange kiemkracht\nOpmerking\nAan het antwoord ‘grote hoeveelheid stuifmeel’ geen scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "pioniersoort, met een juist kenmerk\nvoorbeelden van een juist kenmerk:\n groeit op verstoorde/kale/ruwe/onbegroeide terreinen\n productie groot aantal zaden\n eenjarig\n zaden hebben lange kiemkracht",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Aan het antwoord ‘grote hoeveelheid stuifmeel’ geen scorepunt toekennen."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-11",
+   "number": 11,
+   "main_question_number": 11,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q11.png",
+   "snippet_size_px": [
+    2207,
+    2998
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6309,
+      "width": 0.8415,
+      "height": 0.2467
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0571
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• (met de positieve controle) duidelijk wordt hoe een allergische reactie /\nhistamine-reactie (op de huid) bij een persoon eruitziet.  1\n• (met de negatieve controle) duidelijk wordt hoe de persoon reageert op\nhet gebruikte oplosmiddel. / op krasjes.  1",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• (met de positieve controle) duidelijk wordt hoe een allergische reactie /\nhistamine-reactie (op de huid) bij een persoon eruitziet.\n• (met de negatieve controle) duidelijk wordt hoe de persoon reageert op\nhet gebruikte oplosmiddel. / op krasjes.",
+    "scoring": [
+     {
+      "criterion": "(met de positieve controle) duidelijk wordt hoe een allergische reactie / histamine-reactie (op de huid) bij een persoon eruitziet.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(met de negatieve controle) duidelijk wordt hoe de persoon reageert op het gebruikte oplosmiddel. / op krasjes.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-12",
+   "number": 12,
+   "main_question_number": 12,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q12.png",
+   "snippet_size_px": [
+    2207,
+    2786
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1112,
+      "width": 0.8415,
+      "height": 0.2636
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 onjuist\n2 onjuist\n3 onjuist\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 onjuist\n2 onjuist\n3 onjuist\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-13",
+   "number": 13,
+   "main_question_number": 13,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q13.png",
+   "snippet_size_px": [
+    2207,
+    2969
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1112,
+      "width": 0.8415,
+      "height": 0.1318
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 12: allergische astma-aanval"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.389,
+      "width": 0.8415,
+      "height": 0.1639
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juiste beschrijving bij A:\n Het diffusie-oppervlak (A) vermindert doordat longblaasjes afgesloten\nraken als gevolg van samentrekking van spieren in de wand van de\nbronchiolen en ophoping van slijm.\n A wordt kleiner doordat sommige longblaasjes afgesloten zijn.\nvoorbeelden van een juiste beschrijving bij ∆c:\n Het verschil in partiële gasdruk (∆c) wordt kleiner, omdat door de\nvernauwde luchtwegen als gevolg van slijmophoping de lucht in de\nlongblaasjes minder goed ververst wordt.\n ∆c neemt af, omdat in de bijna afgesloten longblaasjes minder snel\nverse lucht binnen kan komen.\n•  een juiste beschrijving bij A  1\n•  een juiste beschrijving bij ∆c  1",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juiste beschrijving bij A:\n Het diffusie-oppervlak (A) vermindert doordat longblaasjes afgesloten\nraken als gevolg van samentrekking van spieren in de wand van de\nbronchiolen en ophoping van slijm.\n A wordt kleiner doordat sommige longblaasjes afgesloten zijn.\nvoorbeelden van een juiste beschrijving bij ∆c:\n Het verschil in partiële gasdruk (∆c) wordt kleiner, omdat door de\nvernauwde luchtwegen als gevolg van slijmophoping de lucht in de\nlongblaasjes minder goed ververst wordt.\n ∆c neemt af, omdat in de bijna afgesloten longblaasjes minder snel\nverse lucht binnen kan komen.\n• een juiste beschrijving bij A\n• een juiste beschrijving bij ∆c",
+    "scoring": [
+     {
+      "criterion": "een juiste beschrijving bij A",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "een juiste beschrijving bij ∆c",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-14",
+   "number": 14,
+   "main_question_number": 14,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q14.png",
+   "snippet_size_px": [
+    2207,
+    2844
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1112,
+      "width": 0.8415,
+      "height": 0.1318
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 12: allergische astma-aanval"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.5672,
+      "width": 0.8415,
+      "height": 0.1283
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "C",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-15",
+   "number": 15,
+   "main_question_number": 15,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q15.png",
+   "snippet_size_px": [
+    2207,
+    5364
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1112,
+      "width": 0.8415,
+      "height": 0.1318
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 12: allergische astma-aanval"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 8,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.8463
+     },
+     "order": 4,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 onjuist\n2 onjuist\n3 onjuist\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 onjuist\n2 onjuist\n3 onjuist\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-16",
+   "number": 16,
+   "main_question_number": 16,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q16.png",
+   "snippet_size_px": [
+    2207,
+    2723
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.2458
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat (door het uitzetten van extra\nbladhaantjes) de aantallen van natuurlijke vijanden zullen toenemen.\nOpmerking\nAan een antwoord als ‘De extra bladhaantjes zullen niet alle ambrosia eten\nomdat ze ook andere planten eten’ geen scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat (door het uitzetten van extra\nbladhaantjes) de aantallen van natuurlijke vijanden zullen toenemen.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Aan een antwoord als ‘De extra bladhaantjes zullen niet alle ambrosia eten",
+     "omdat ze ook andere planten eten’ geen scorepunt toekennen."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-17",
+   "number": 17,
+   "main_question_number": 17,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q17.png",
+   "snippet_size_px": [
+    2207,
+    4257
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.1499
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 16: het bladhaantje O. communa"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2893,
+      "width": 0.8415,
+      "height": 0.5129
+     },
+     "order": 4,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 4; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-18",
+   "number": 18,
+   "main_question_number": 18,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q18.png",
+   "snippet_size_px": [
+    2207,
+    3865
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.4172
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.1499
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 16: het bladhaantje O. communa"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2893,
+      "width": 0.8415,
+      "height": 0.3244
+     },
+     "order": 4,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 17: ecologisch model (afbeelding 4)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.8165,
+      "width": 0.8415,
+      "height": 0.057
+     },
+     "order": 5,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van juiste biotische factoren:\n predatie\n ziekteverwekkers\n concurrentie\n aanwezigheid voedsel\nindien twee juiste biotische factoren  1\nindien minder dan twee juiste biotische factoren  0",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van juiste biotische factoren:\n predatie\n ziekteverwekkers\n concurrentie\n aanwezigheid voedsel\nindien twee juiste biotische factoren\nindien minder dan twee juiste biotische factoren",
+    "scoring": [
+     {
+      "criterion": "indien twee juiste biotische factoren",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee juiste biotische factoren",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-19",
+   "number": 19,
+   "main_question_number": 19,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q19.png",
+   "snippet_size_px": [
+    2207,
+    2608
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.6501
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "• (proces P:) emulgeren (van vet waardoor vetdruppeltjes ontstaan)  1\n• (de) lever  1",
+    "correct_answer": null,
+    "model_answer": "• (proces P:) emulgeren (van vet waardoor vetdruppeltjes ontstaan)\n• (de) lever",
+    "scoring": [
+     {
+      "criterion": "(proces P:) emulgeren (van vet waardoor vetdruppeltjes ontstaan)",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(de) lever",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-20",
+   "number": 20,
+   "main_question_number": 20,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q20.png",
+   "snippet_size_px": [
+    2207,
+    2649
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.7138,
+      "width": 0.8415,
+      "height": 0.0926
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Q: golgi-systeem\nR: haarvat/bloedvat/(poort)ader\nS: lymfevat/borstbuis\nindien drie letters correct  2\nindien twee letters correct  1\nindien minder dan twee letters correct  0",
+    "correct_answer": null,
+    "model_answer": "Q: golgi-systeem\nR: haarvat/bloedvat/(poort)ader\nS: lymfevat/borstbuis\nindien drie letters correct\nindien twee letters correct\nindien minder dan twee letters correct",
+    "scoring": [
+     {
+      "criterion": "indien drie letters correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee letters correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee letters correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-21",
+   "number": 21,
+   "main_question_number": 21,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q21.png",
+   "snippet_size_px": [
+    2207,
+    5202
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 11,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.8204
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 2; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 juist\n2 onjuist\n3 juist\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 juist\n2 onjuist\n3 juist\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-22",
+   "number": 22,
+   "main_question_number": 22,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q22.png",
+   "snippet_size_px": [
+    2207,
+    4543
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6325
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "P (bloed)plasma en chylomicronen\nQ witte bloedcellen en rode bloedcellen\n•  de juiste bloedbestanddelen bij de fracties  1\n•  chylomicronen alleen bij dezelfde fractie als bloedplasma  1",
+    "correct_answer": null,
+    "model_answer": "P (bloed)plasma en chylomicronen\nQ witte bloedcellen en rode bloedcellen\n• de juiste bloedbestanddelen bij de fracties\n• chylomicronen alleen bij dezelfde fractie als bloedplasma",
+    "scoring": [
+     {
+      "criterion": "de juiste bloedbestanddelen bij de fracties",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "chylomicronen alleen bij dezelfde fractie als bloedplasma",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-23",
+   "number": 23,
+   "main_question_number": 23,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q23.png",
+   "snippet_size_px": [
+    2207,
+    2774
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6972,
+      "width": 0.8415,
+      "height": 0.1283
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "• 1 lipase  1\n• 2 insuline  1",
+    "correct_answer": null,
+    "model_answer": "• 1 lipase\n• 2 insuline",
+    "scoring": [
+     {
+      "criterion": "1 lipase",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "2 insuline",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-24",
+   "number": 24,
+   "main_question_number": 24,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q24.png",
+   "snippet_size_px": [
+    2207,
+    5176
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 11,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.6184
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 21: LPL in haarvaten (afbeelding 2)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.1745
+     },
+     "order": 4,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• het spierweefsel dan LPL (maakt op basis van het ingebrachte gen en\ndit) afgeeft aan het bloed.  1\n• (het LPL meereist met het bloed, waarna) het zich ook in andere\nweefsels / delen van het lichaam hecht aan het endotheel.  1\nOpmerkingen\n Aan het antwoord dat het spierweefsel dan LPL afgeeft aan het bloed\nen dat dit lokaal zoveel LPL-activiteit heeft, dat voldoende\nafbraakproducten van chylomicronen ter beschikking komen aan alle\nlichaamscellen, 2 scorepunten toekennen.\n Aan het antwoord dat het virus meereist met het bloed en ook andere\ncellen infecteert die vervolgens LPL aanmaken en afgeven aan het\nbloed, in totaal 1 scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• het spierweefsel dan LPL (maakt op basis van het ingebrachte gen en\ndit) afgeeft aan het bloed.\n• (het LPL meereist met het bloed, waarna) het zich ook in andere\nweefsels / delen van het lichaam hecht aan het endotheel.",
+    "scoring": [
+     {
+      "criterion": "het spierweefsel dan LPL (maakt op basis van het ingebrachte gen en dit) afgeeft aan het bloed.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(het LPL meereist met het bloed, waarna) het zich ook in andere weefsels / delen van het lichaam hecht aan het endotheel.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     " Aan het antwoord dat het spierweefsel dan LPL afgeeft aan het bloed",
+     "en dat dit lokaal zoveel LPL-activiteit heeft, dat voldoende",
+     "afbraakproducten van chylomicronen ter beschikking komen aan alle",
+     "lichaamscellen, 2 scorepunten toekennen.",
+     " Aan het antwoord dat het virus meereist met het bloed en ook andere",
+     "cellen infecteert die vervolgens LPL aanmaken en afgeven aan het",
+     "bloed, in totaal 1 scorepunt toekennen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-25",
+   "number": 25,
+   "main_question_number": 25,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q25.png",
+   "snippet_size_px": [
+    2207,
+    2587
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2287,
+      "width": 0.8415,
+      "height": 0.0748
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat een afweerreactie tegen het virus (in\nGlybera) geremd moet worden.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat een afweerreactie tegen het virus (in\nGlybera) geremd moet worden.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-26",
+   "number": 26,
+   "main_question_number": 26,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q26.png",
+   "snippet_size_px": [
+    2207,
+    4370
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3071,
+      "width": 0.8415,
+      "height": 0.5834
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 4; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 wel\n2 niet\n3 wel\n4 niet\nindien vier nummers correct  2\nindien drie nummers correct  1\nindien minder dan drie nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 wel\n2 niet\n3 wel\n4 niet\nindien vier nummers correct\nindien drie nummers correct\nindien minder dan drie nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien vier nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan drie nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-27",
+   "number": 27,
+   "main_question_number": 27,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q27.png",
+   "snippet_size_px": [
+    2207,
+    4705
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3071,
+      "width": 0.8415,
+      "height": 0.4476
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 26: Slybera en minicircles (afbeelding 4)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 14,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0391,
+      "width": 0.8415,
+      "height": 0.2111
+     },
+     "order": 4,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist experiment:\n De ene groep krijgt injecties met een vloeistof met Slybera in de\npootspieren, de andere groep krijgt dezelfde behandeling met alleen de\nvloeistof. Wekelijks wordt bloed afgenomen en hierin wordt de\nhoeveelheid triglyceriden bepaald.\n De groep muizen wordt in twee gedeeld. De ene helft krijgt het LPL-\ngen, de andere helft krijgt geen LPL-gen toegediend. Na verloop van\ntijd wordt de hoeveelheid vet in het bloed van de twee groepen muizen\nvergeleken.\nUit het antwoord moet blijken dat\n• de ene helft (injecties met) het LPL-gen krijgt en de andere helft een\ncontrole-behandeling (en de overige omstandigheden blijven gelijk).  1\n• na enige tijd de hoeveelheid vet/triglyceriden/chylomicronen in het\nbloed wordt bepaald. / na enige tijd de LPL-activiteit wordt bepaald.  1\nOpmerking\nHet al dan niet toedienen van immunosuppressiva niet in de beoordeling\nmeenemen.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist experiment:\n De ene groep krijgt injecties met een vloeistof met Slybera in de\npootspieren, de andere groep krijgt dezelfde behandeling met alleen de\nvloeistof. Wekelijks wordt bloed afgenomen en hierin wordt de\nhoeveelheid triglyceriden bepaald.\n De groep muizen wordt in twee gedeeld. De ene helft krijgt het LPL-\ngen, de andere helft krijgt geen LPL-gen toegediend. Na verloop van\ntijd wordt de hoeveelheid vet in het bloed van de twee groepen muizen\nvergeleken.\nUit het antwoord moet blijken dat\n• de ene helft (injecties met) het LPL-gen krijgt en de andere helft een\ncontrole-behandeling (en de overige omstandigheden blijven gelijk).\n• na enige tijd de hoeveelheid vet/triglyceriden/chylomicronen in het\nbloed wordt bepaald. / na enige tijd de LPL-activiteit wordt bepaald.",
+    "scoring": [
+     {
+      "criterion": "de ene helft (injecties met) het LPL-gen krijgt en de andere helft een controle-behandeling (en de overige omstandigheden blijven gelijk).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "na enige tijd de hoeveelheid vet/triglyceriden/chylomicronen in het bloed wordt bepaald. / na enige tijd de LPL-activiteit wordt bepaald.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Het al dan niet toedienen van immunosuppressiva niet in de beoordeling",
+     "meenemen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-28",
+   "number": 28,
+   "main_question_number": 28,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q28.png",
+   "snippet_size_px": [
+    2207,
+    4289
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5491
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3071,
+      "width": 0.8415,
+      "height": 0.4476
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 26: Slybera en minicircles (afbeelding 4)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 14,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2643,
+      "width": 0.8415,
+      "height": 0.0926
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juiste berekening:\n q = 0,001, q2 = 0,000001\n0,000001 x 18.000.000 inwoners = 18 mensen\n 0,001 x 0,001 x 18.000.000 = 18\n•  het juist berekenen van het aandeel homozygoot recessieve individuen\nin de populatie / van q2  1\n•  het vermenigvuldigen met 18 miljoen en een bijpassend antwoord  1\nOpmerking\nAls de kandidaat de letter p gebruikt voor weergave van het recessieve\nallel met een verder juiste berekening, dit niet aanrekenen.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juiste berekening:\n q = 0,001, q2 = 0,000001\n0,000001 x 18.000.000 inwoners = 18 mensen\n 0,001 x 0,001 x 18.000.000 = 18\n• het juist berekenen van het aandeel homozygoot recessieve individuen\nin de populatie / van q2\n• het vermenigvuldigen met 18 miljoen en een bijpassend antwoord",
+    "scoring": [
+     {
+      "criterion": "het juist berekenen van het aandeel homozygoot recessieve individuen in de populatie / van q2",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "het vermenigvuldigen met 18 miljoen en een bijpassend antwoord",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Als de kandidaat de letter p gebruikt voor weergave van het recessieve",
+     "allel met een verder juiste berekening, dit niet aanrekenen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-29",
+   "number": 29,
+   "main_question_number": 29,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q29.png",
+   "snippet_size_px": [
+    2207,
+    1680
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.3854
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "A",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-30",
+   "number": 30,
+   "main_question_number": 30,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q30.png",
+   "snippet_size_px": [
+    2207,
+    1861
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4492,
+      "width": 0.8415,
+      "height": 0.1817
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 onjuist\n2 juist\n3 onjuist\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 onjuist\n2 juist\n3 onjuist\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-31",
+   "number": 31,
+   "main_question_number": 31,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q31.png",
+   "snippet_size_px": [
+    2207,
+    1899
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6345,
+      "width": 0.8415,
+      "height": 0.1923
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-32",
+   "number": 32,
+   "main_question_number": 32,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q32.png",
+   "snippet_size_px": [
+    2207,
+    1704
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6345,
+      "width": 0.8415,
+      "height": 0.0598
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 31: DNA-schade in neuronen"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.8411,
+      "width": 0.8415,
+      "height": 0.057
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• (in actieve neuronen) impulsgeleiding optreedt. / de rustpotentiaal\nhersteld moet worden.  1\n• ATP verbruikt wordt bij het transport van ionen door de Na-K-pomp. /\nbij het transport van Na+ en K+.  1\nof\n• (in actieve neuronen) impulsoverdracht optreedt.  1\n• ATP verbruikt wordt bij aanmaak/transport/afgifte van\nneurotransmitters.  1",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• (in actieve neuronen) impulsgeleiding optreedt. / de rustpotentiaal\nhersteld moet worden.\n• ATP verbruikt wordt bij het transport van ionen door de Na-K-pomp. /\nbij het transport van Na+ en K+.\nof\n• (in actieve neuronen) impulsoverdracht optreedt.\n• ATP verbruikt wordt bij aanmaak/transport/afgifte van\nneurotransmitters.",
+    "scoring": [
+     {
+      "criterion": "(in actieve neuronen) impulsgeleiding optreedt. / de rustpotentiaal hersteld moet worden.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "ATP verbruikt wordt bij het transport van ionen door de Na-K-pomp. / bij het transport van Na+ en K+.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(in actieve neuronen) impulsoverdracht optreedt.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "ATP verbruikt wordt bij aanmaak/transport/afgifte van neurotransmitters.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-33",
+   "number": 33,
+   "main_question_number": 33,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q33.png",
+   "snippet_size_px": [
+    2207,
+    2024
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 16,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.228
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-34",
+   "number": 34,
+   "main_question_number": 34,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q34.png",
+   "snippet_size_px": [
+    2207,
+    4104
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 16,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2715,
+      "width": 0.8415,
+      "height": 0.5909
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.2102
+     },
+     "order": 4,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat de (reparatie-)enzymen het DNA (in de\nchromatinedraad) beter kunnen bereiken.\nOpmerking\nAls de kandidaat in een juist antwoord een voorbeeld noemt van een\nreparatie-enzym zoals polymerase, het scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat de (reparatie-)enzymen het DNA (in de\nchromatinedraad) beter kunnen bereiken.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Als de kandidaat in een juist antwoord een voorbeeld noemt van een",
+     "reparatie-enzym zoals polymerase, het scorepunt toekennen."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-35",
+   "number": 35,
+   "main_question_number": 35,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q35.png",
+   "snippet_size_px": [
+    2207,
+    5903
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 16,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2715,
+      "width": 0.8415,
+      "height": 0.5909
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 34: onderzoek met zebravisjes (afbeelding 1 en 2)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.1305
+     },
+     "order": 4,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 34: γH2AX als maat voor DNA-herstel"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2631,
+      "width": 0.8415,
+      "height": 0.5724
+     },
+     "order": 5,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "A",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-36",
+   "number": 36,
+   "main_question_number": 36,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q36.png",
+   "snippet_size_px": [
+    2207,
+    5320
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.2356
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 16,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2715,
+      "width": 0.8415,
+      "height": 0.5909
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 34: onderzoek met zebravisjes (afbeelding 1 en 2)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 18,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.5566
+     },
+     "order": 4,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 4; Verwezen afbeelding 5; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "C",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-37",
+   "number": 37,
+   "main_question_number": 37,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q37.png",
+   "snippet_size_px": [
+    2207,
+    2667
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.6668
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n Het kiemingssucces in aanwezigheid van filters met tabak is 57% en\n57\nvan de controle 72%. Het relatieve kiemingssucces is dus  = 79%\n72\n56\n  = 78%\n72\n•  het kiemingssucces (witte klaver op bodem met peuk met tabak)\ntussen 56% en 58%, en kiemingssucces (controle) tussen 71% en 73%  1\n•  een juiste berekening van het relatieve kiemingssucces met de\nbijbehorende uitkomst  1",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n Het kiemingssucces in aanwezigheid van filters met tabak is 57% en\n\nvan de controle 72%. Het relatieve kiemingssucces is dus = 79%\n\n\n = 78%\n\n• het kiemingssucces (witte klaver op bodem met peuk met tabak)\ntussen 56% en 58%, en kiemingssucces (controle) tussen 71% en 73%\n• een juiste berekening van het relatieve kiemingssucces met de\nbijbehorende uitkomst",
+    "scoring": [
+     {
+      "criterion": "het kiemingssucces (witte klaver op bodem met peuk met tabak) tussen 56% en 58%, en kiemingssucces (controle) tussen 71% en 73%",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "een juiste berekening van het relatieve kiemingssucces met de bijbehorende uitkomst",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-38",
+   "number": 38,
+   "main_question_number": 38,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q38.png",
+   "snippet_size_px": [
+    2207,
+    3431
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5703
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.2945
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• (door een kleiner wortelstelsel) er minder\nmineralen/water/voedingsstoffen kunnen worden opgenomen,  1\n• (waardoor) er minder assimilatie/groei plaats kan vinden (waardoor het\nwortelstelsel klein blijft).  1\nOpmerking\nAls de kandidaat uitgaat van een groter wortelstelsel, scorepunten\ntoekennen naar analogie van het correctievoorschrift.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• (door een kleiner wortelstelsel) er minder\nmineralen/water/voedingsstoffen kunnen worden opgenomen,\n• (waardoor) er minder assimilatie/groei plaats kan vinden (waardoor het\nwortelstelsel klein blijft).",
+    "scoring": [
+     {
+      "criterion": "(door een kleiner wortelstelsel) er minder mineralen/water/voedingsstoffen kunnen worden opgenomen,",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(waardoor) er minder assimilatie/groei plaats kan vinden (waardoor het wortelstelsel klein blijft).",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Als de kandidaat uitgaat van een groter wortelstelsel, scorepunten",
+     "toekennen naar analogie van het correctievoorschrift."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-39",
+   "number": 39,
+   "main_question_number": 39,
+   "type": "mcq",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q39.png",
+   "snippet_size_px": [
+    2207,
+    3935
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5703
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0399,
+      "width": 0.8415,
+      "height": 0.218
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 38: tabel met metingen aan de planten"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3427,
+      "width": 0.8415,
+      "height": 0.2001
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "A",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-40",
+   "number": 40,
+   "main_question_number": 40,
+   "type": "mcq",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q40.png",
+   "snippet_size_px": [
+    2207,
+    3230
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5703
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.5428,
+      "width": 0.8415,
+      "height": 0.237
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "C",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "vw24t2-41",
+   "number": 41,
+   "main_question_number": 41,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/vwo-2024-t2/vwo-2024-t2-q41.png",
+   "snippet_size_px": [
+    2207,
+    3104
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0495,
+      "width": 0.8415,
+      "height": 0.5703
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.5428,
+      "width": 0.8415,
+      "height": 0.1066
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 40: symbiose van witte klaver met knolletjesbacteriën"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "vw-1018-a-24-2-o-spr.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.7881,
+      "width": 0.8415,
+      "height": 0.0748
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• (planten met kortere stengels) minder licht opvangen, / minder aan\nfotosynthese doen, / meer last hebben van lichtconcurrentie,  1\n• (waardoor) er voor de knolletjesbacteriën minder voedingstoffen /\nminder organische stoffen beschikbaar komen.  1\n5 Aanleveren scores\nVerwerk de scores van alle kandidaten per examinator in de applicatie Wolf.\nAccordeer deze gegevens voor Cito uiterlijk op 26 juni.\n6 Bronvermeldingen\nafbeelding 1  StockFoto, ID: 1617007591, Przewalski's horse isolated over a white. lat. Equus\nprzewalskii caballus, wild horse. White background door: mariait\nafbeelding 2  Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 3  https://reviverestore.org/projects/przewalskis-horse/about-cloning/\nafbeelding 1  StockFoto, ID: 92526145, Ragweed plant in allergy season isolated on white background,\ncommon allergen door: Elena Elisseeva\nafbeelding 2  https://www.allergievoorlichting.nl/definities/huidtesten-allergie\nafbeelding 3/4  Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 1/2  Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 3  StockIllustratie, ID: 1182690685, tekst toevoegen zoals aangegeven Composition of\nblood. door: Aldona Griskeviciene\nafbeelding 4  https://www.labiotech.eu/partner/minicircle-dna-car-t-therapy/\nafbeelding 1  https://commons.wikimedia.org/wiki/File:Zebrafish95-300.jpg\nafbeelding 2  Zada, D., Bronshtein, I., Lerer-Goldshtein, T. et al. Sleep increases chromosome\ndynamics to enable reduction of accumulating DNA damage in single neurons. Nat\nCommun 10, 895 (2019). https://doi.org/10.1038/s41467-019-08806-w\nafbeelding 3/4/5 Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 1  Stichting Cito Instituut voor Toetsontwikkeling, 2024\n►►► ",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• (planten met kortere stengels) minder licht opvangen, / minder aan\nfotosynthese doen, / meer last hebben van lichtconcurrentie,\n• (waardoor) er voor de knolletjesbacteriën minder voedingstoffen /\nminder organische stoffen beschikbaar komen.\n5 Aanleveren scores\nVerwerk de scores van alle kandidaten per examinator in de applicatie Wolf.\nAccordeer deze gegevens voor Cito uiterlijk op 26 juni.\n6 Bronvermeldingen\nafbeelding 1 StockFoto, ID: 1617007591, Przewalski's horse isolated over a white. lat. Equus\nprzewalskii caballus, wild horse. White background door: mariait\nafbeelding 2 Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 3 https://reviverestore.org/projects/przewalskis-horse/about-cloning/\nafbeelding 1 StockFoto, ID: 92526145, Ragweed plant in allergy season isolated on white background,\ncommon allergen door: Elena Elisseeva\nafbeelding 2 https://www.allergievoorlichting.nl/definities/huidtesten-allergie\nafbeelding 3/4 Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 1/2 Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 3 StockIllustratie, ID: 1182690685, tekst toevoegen zoals aangegeven Composition of\nblood. door: Aldona Griskeviciene\nafbeelding 4 https://www.labiotech.eu/partner/minicircle-dna-car-t-therapy/\nafbeelding 1 https://commons.wikimedia.org/wiki/File:Zebrafish95-300.jpg\nafbeelding 2 Zada, D., Bronshtein, I., Lerer-Goldshtein, T. et al. Sleep increases chromosome\ndynamics to enable reduction of accumulating DNA damage in single neurons. Nat\nCommun 10, 895 (2019). https://doi.org/10.1038/s41467-019-08806-w\nafbeelding 3/4/5 Stichting Cito Instituut voor Toetsontwikkeling, 2024\nafbeelding 1 Stichting Cito Instituut voor Toetsontwikkeling, 2024\n►►► ",
+    "scoring": [
+     {
+      "criterion": "(planten met kortere stengels) minder licht opvangen, / minder aan fotosynthese doen, / meer last hebben van lichtconcurrentie,",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(waardoor) er voor de knolletjesbacteriën minder voedingstoffen / minder organische stoffen beschikbaar komen.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/vwo-2024-t2.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  }
+ ],
+ "review": {
+  "status": "visueel gecontroleerd door Claude",
+  "method": "Alle 41 snippets zijn door mij bekeken (3 snippets naast elkaar, schaal 0,27; kleine letters zijn daardoor niet op volle resolutie beoordeeld, de randcontrole is automatisch). De aangevulde snippets (Q4, 8, 13, 14, 15, 17, 18, 24, 27, 28, 32, 35, 36, 39, 41) zijn in de definitieve versie opnieuw bekeken (schaal 0,17-0,19).",
+  "found_and_fixed": [
+   "vraag 4, 8, 13-15, 17, 18, 24, 27, 28, 32, 35, 36, 39, 41: kaders uit eerdere vragen toegevoegd die nodig zijn om de vraag te beantwoorden"
+  ]
+ }
+}

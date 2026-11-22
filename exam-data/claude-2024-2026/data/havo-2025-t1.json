@@ -1,0 +1,4279 @@
+{
+ "schema_version": "1.0",
+ "exam": {
+  "level": "havo",
+  "year": 2025,
+  "period": 1
+ },
+ "source_documents": [
+  {
+   "type": "opgavenboekje",
+   "filename": "ha-1018-a-25-1-o.pdf",
+   "page_count": 20
+  },
+  {
+   "type": "correctievoorschrift",
+   "filename": "ha-1018-a-25-1-c.pdf",
+   "page_count": 15
+  },
+  {
+   "type": "uitwerkbijlage",
+   "filename": "ha-1018-a-25-1-u.pdf",
+   "page_count": 1
+  }
+ ],
+ "contexts": [
+  {
+   "id": "context-1",
+   "title": "De zeearend moet blijven!",
+   "description": "Context 'De zeearend moet blijven!' met vraag 1–10",
+   "source_pages": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "question_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  {
+   "id": "context-2",
+   "title": "Fanconi-anemie",
+   "description": "Context 'Fanconi-anemie' met vraag 11–17",
+   "source_pages": [
+    6,
+    7,
+    8
+   ],
+   "question_numbers": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ]
+  },
+  {
+   "id": "context-3",
+   "title": "Een nieuwe groente: eendenkroos",
+   "description": "Context 'Een nieuwe groente: eendenkroos' met vraag 18–25",
+   "source_pages": [
+    9,
+    10,
+    11
+   ],
+   "question_numbers": [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+   ]
+  },
+  {
+   "id": "context-4",
+   "title": "De Bajau",
+   "description": "Context 'De Bajau' met vraag 26–34",
+   "source_pages": [
+    12,
+    13,
+    14
+   ],
+   "question_numbers": [
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34
+   ]
+  },
+  {
+   "id": "context-5",
+   "title": "Gevaarlijke sporen",
+   "description": "Context 'Gevaarlijke sporen' met vraag 35–43",
+   "source_pages": [
+    15,
+    16,
+    17,
+    18
+   ],
+   "question_numbers": [
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43
+   ]
+  },
+  {
+   "id": "context-6",
+   "title": "Eieren met spek",
+   "description": "Context 'Eieren met spek' met vraag 44–48",
+   "source_pages": [
+    19,
+    20
+   ],
+   "question_numbers": [
+    44,
+    45,
+    46,
+    47,
+    48
+   ]
+  }
+ ],
+ "questions": [
+  {
+   "id": "ha25t1-1",
+   "number": 1,
+   "main_question_number": 1,
+   "type": "mcq",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q01.png",
+   "snippet_size_px": [
+    2207,
+    2769
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.7551
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; Verwezen afbeelding 2; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-2",
+   "number": 2,
+   "main_question_number": 2,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q02.png",
+   "snippet_size_px": [
+    2207,
+    2639
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.8198,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 2,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n De zeearend is op eigen kracht naar Nederland gekomen.\n De zeearend is zonder hulp van de mens hier gekomen.\n Het is een gevolg van migratie.\n Hij komt hier van nature voor.\n De zeearend was hier eerder al uitgestorven.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n De zeearend is op eigen kracht naar Nederland gekomen.\n De zeearend is zonder hulp van de mens hier gekomen.\n Het is een gevolg van migratie.\n Hij komt hier van nature voor.\n De zeearend was hier eerder al uitgestorven.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-3",
+   "number": 3,
+   "main_question_number": 3,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q03.png",
+   "snippet_size_px": [
+    2207,
+    3014
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 3,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.1461
+     },
+     "order": 2,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• de insecticiden niet worden afgebroken door organismen, / de\ninsecticiden zich ophopen in organismen, / de insecticiden\naccumuleren in organismen,  1\n• (waardoor) de concentratie insecticiden in hogere trofische niveaus\ntoeneemt. / in de voedselketen toeneemt.  1\nof\n• (waardoor) de zeearend, die hoger in de voedselketen staat (dan\ninsectenetende vogels) insecticiden in hogere concentraties in zijn\nlichaam opbouwt.  1\nOpmerking\nAls de kandidaat antwoordt dat insecticiden accumuleren in de\nvoedselketen, het tweede scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• de insecticiden niet worden afgebroken door organismen, / de\ninsecticiden zich ophopen in organismen, / de insecticiden\naccumuleren in organismen,\n• (waardoor) de concentratie insecticiden in hogere trofische niveaus\ntoeneemt. / in de voedselketen toeneemt.\nof\n• (waardoor) de zeearend, die hoger in de voedselketen staat (dan\ninsectenetende vogels) insecticiden in hogere concentraties in zijn\nlichaam opbouwt.",
+    "scoring": [
+     {
+      "criterion": "de insecticiden niet worden afgebroken door organismen, / de insecticiden zich ophopen in organismen, / de insecticiden accumuleren in organismen,",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(waardoor) de concentratie insecticiden in hogere trofische niveaus toeneemt. / in de voedselketen toeneemt.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(waardoor) de zeearend, die hoger in de voedselketen staat (dan insectenetende vogels) insecticiden in hogere concentraties in zijn lichaam opbouwt.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Als de kandidaat antwoordt dat insecticiden accumuleren in de",
+     "voedselketen, het tweede scorepunt toekennen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-4",
+   "number": 4,
+   "main_question_number": 4,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q04.png",
+   "snippet_size_px": [
+    2207,
+    4870
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 3,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2,
+      "width": 0.8415,
+      "height": 0.6753
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 niet\n2 niet\n3 niet\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 niet\n2 niet\n3 niet\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-5",
+   "number": 5,
+   "main_question_number": 5,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q05.png",
+   "snippet_size_px": [
+    2207,
+    3238
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0398,
+      "width": 0.8415,
+      "height": 0.2102
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• hierdoor de genetische variatie (van de nakomelingen) groter wordt, /\nde kans op inteelt kleiner wordt,  1\n• (waardoor) de populatie zeearenden beter bestand is tegen\nverandering van milieufactoren. / (waardoor) de kans op (recessief)\noverervende aandoeningen kleiner is.  1\nOpmerking\nAls de kandidaat antwoord geeft aan de hand van een specifiek voorbeeld,\nscorepunten toekennen naar analogie met het correctievoorschrift.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• hierdoor de genetische variatie (van de nakomelingen) groter wordt, /\nde kans op inteelt kleiner wordt,\n• (waardoor) de populatie zeearenden beter bestand is tegen\nverandering van milieufactoren. / (waardoor) de kans op (recessief)\noverervende aandoeningen kleiner is.",
+    "scoring": [
+     {
+      "criterion": "hierdoor de genetische variatie (van de nakomelingen) groter wordt, / de kans op inteelt kleiner wordt,",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(waardoor) de populatie zeearenden beter bestand is tegen verandering van milieufactoren. / (waardoor) de kans op (recessief) overervende aandoeningen kleiner is.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Als de kandidaat antwoord geeft aan de hand van een specifiek voorbeeld,",
+     "scorepunten toekennen naar analogie met het correctievoorschrift."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-6",
+   "number": 6,
+   "main_question_number": 6,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q06.png",
+   "snippet_size_px": [
+    2207,
+    2889
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2642,
+      "width": 0.8415,
+      "height": 0.1105
+     },
+     "order": 2,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n De eieren vallen door de harde wind uit het nest.\n De jonge zeearenden drogen uit door hitte.\n De kuikens worden te koud door te veel regen.\nOpmerking\nHet antwoord moet een abiotische factor én een toelichting voor een lager\nbroedsucces bevatten.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n De eieren vallen door de harde wind uit het nest.\n De jonge zeearenden drogen uit door hitte.\n De kuikens worden te koud door te veel regen.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Het antwoord moet een abiotische factor én een toelichting voor een lager",
+     "broedsucces bevatten."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-7",
+   "number": 7,
+   "main_question_number": 7,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q07.png",
+   "snippet_size_px": [
+    2207,
+    3364
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3782,
+      "width": 0.8415,
+      "height": 0.2459
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "DNA-analyse / DNA-onderzoek / bepaling van het karyotype/karyogram /\naantonen van de geslachtschromosomen\nOpmerking\nAls een kandidaat het bepalen van de aan- of afwezigheid van het\nY-chromosoom noemt, het scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "DNA-analyse / DNA-onderzoek / bepaling van het karyotype/karyogram /\naantonen van de geslachtschromosomen",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Als een kandidaat het bepalen van de aan- of afwezigheid van het",
+     "Y-chromosoom noemt, het scorepunt toekennen."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-8",
+   "number": 8,
+   "main_question_number": 8,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q08.png",
+   "snippet_size_px": [
+    2207,
+    4572
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 4,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3782,
+      "width": 0.8415,
+      "height": 0.1491
+     },
+     "order": 2,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 7: beschrijving van methode 1 en 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.4214
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 4; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "methode 1, met als verklaring dat er geen overlap is tussen de waardes\nvan de vrouwtjes en de mannetjes",
+    "correct_answer": null,
+    "model_answer": "methode 1, met als verklaring dat er geen overlap is tussen de waardes\nvan de vrouwtjes en de mannetjes",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-9",
+   "number": 9,
+   "main_question_number": 9,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q09.png",
+   "snippet_size_px": [
+    2207,
+    3738
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4756,
+      "width": 0.8415,
+      "height": 0.3525
+     },
+     "order": 2,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 5; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n De zeearend is afhankelijk van de populier, terwijl de bever ook andere\nbomen kan eten.\n Er zijn al heel veel bevers in De Biesbosch.\n Er zijn weinig andere soorten toppredatoren.\n De populatie zeearenden is nog maar klein.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n De zeearend is afhankelijk van de populier, terwijl de bever ook andere\nbomen kan eten.\n Er zijn al heel veel bevers in De Biesbosch.\n Er zijn weinig andere soorten toppredatoren.\n De populatie zeearenden is nog maar klein.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-10",
+   "number": 10,
+   "main_question_number": 10,
+   "type": "open",
+   "context_ids": [
+    "context-1"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q10.png",
+   "snippet_size_px": [
+    2207,
+    3608
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.6586
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen); Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4756,
+      "width": 0.8415,
+      "height": 0.2385
+     },
+     "order": 2,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 9: bevers, zwarte populieren en zeearenden"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 5,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.8424,
+      "width": 0.8415,
+      "height": 0.057
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n De zeearend heeft voordeel; de populier heeft geen voordeel of\nnadeel.\n Het maakt voor de populier niet uit dat de zeearend erin nestelt.\nOpmerking\nUit het antwoord moet voordeel voor de zeearend blijken, evenals het\nontbreken van voordeel én nadeel voor de populier.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n De zeearend heeft voordeel; de populier heeft geen voordeel of\nnadeel.\n Het maakt voor de populier niet uit dat de zeearend erin nestelt.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Uit het antwoord moet voordeel voor de zeearend blijken, evenals het",
+     "ontbreken van voordeel én nadeel voor de populier."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-11",
+   "number": 11,
+   "main_question_number": 11,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q11.png",
+   "snippet_size_px": [
+    2207,
+    2339
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5731
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-12",
+   "number": 12,
+   "main_question_number": 12,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q12.png",
+   "snippet_size_px": [
+    2207,
+    3745
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4599
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6368,
+      "width": 0.8415,
+      "height": 0.2243
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.1105
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    },
+    {
+     "source_document": "uitwerkbijlage",
+     "source_pdf": "ha-1018-a-25-1-u.pdf",
+     "pdf_page": 1,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1924,
+      "width": 0.8415,
+      "height": 0.1191
+     },
+     "order": 5,
+     "reason": "Uitwerkbijlage: tabel waarin het antwoord moet worden ingevuld"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "de juist ingevulde tabel:\nbloedbestanddeel  nummer in afbeelding 2  symptoom bij tekort\nbloedplaatje  2  bloedingen\nrode bloedcel  3  vermoeidheid\nwitte bloedcel  1  infecties\n•  de nummers juist  1\n•  de symptomen juist  1\nOpmerking\nAls de kandidaat meerdere symptomen heeft ingevuld in een vakje, het\ntweede scorepunt niet toekennen.",
+    "correct_answer": null,
+    "model_answer": "de juist ingevulde tabel:\nbloedbestanddeel nummer in afbeelding 2 symptoom bij tekort\nbloedplaatje 2 bloedingen\nrode bloedcel 3 vermoeidheid\nwitte bloedcel 1 infecties\n• de nummers juist\n• de symptomen juist",
+    "scoring": [
+     {
+      "criterion": "de nummers juist",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "de symptomen juist",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Als de kandidaat meerdere symptomen heeft ingevuld in een vakje, het",
+     "tweede scorepunt niet toekennen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-13",
+   "number": 13,
+   "main_question_number": 13,
+   "type": "open",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q13.png",
+   "snippet_size_px": [
+    2207,
+    2587
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4599
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1752,
+      "width": 0.8415,
+      "height": 0.1639
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "B–, 0+ en 0–\nindien alleen de drie juiste bloedgroepen  2\nindien de drie juiste bloedgroepen en één onjuiste bloedgroep  1\nindien alleen twee juiste bloedgroepen  1\nin alle andere gevallen  0\nOpmerking\nAls de kandidaat ook B+ noteert, dit niet aanrekenen.",
+    "correct_answer": null,
+    "model_answer": "B–, 0+ en 0–\nindien alleen de drie juiste bloedgroepen\nindien de drie juiste bloedgroepen en één onjuiste bloedgroep\nindien alleen twee juiste bloedgroepen\nin alle andere gevallen",
+    "scoring": [
+     {
+      "criterion": "indien alleen de drie juiste bloedgroepen",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien de drie juiste bloedgroepen en één onjuiste bloedgroep",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien alleen twee juiste bloedgroepen",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "in alle andere gevallen",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Als de kandidaat ook B+ noteert, dit niet aanrekenen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-14",
+   "number": 14,
+   "main_question_number": 14,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q14.png",
+   "snippet_size_px": [
+    2207,
+    3958
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4599
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3428,
+      "width": 0.8415,
+      "height": 0.5547
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-15",
+   "number": 15,
+   "main_question_number": 15,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q15.png",
+   "snippet_size_px": [
+    2207,
+    3295
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4599
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3428,
+      "width": 0.8415,
+      "height": 0.0963
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 14: stamceltransplantatie"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 8,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.2494
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-16",
+   "number": 16,
+   "main_question_number": 16,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q16.png",
+   "snippet_size_px": [
+    2207,
+    3295
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4599
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3428,
+      "width": 0.8415,
+      "height": 0.0963
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 14: stamceltransplantatie"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 8,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3141,
+      "width": 0.8415,
+      "height": 0.2494
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-17",
+   "number": 17,
+   "main_question_number": 17,
+   "type": "mcq",
+   "context_ids": [
+    "context-2"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q17.png",
+   "snippet_size_px": [
+    2207,
+    2995
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 6,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4599
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 7,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3428,
+      "width": 0.8415,
+      "height": 0.0963
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 14: stamceltransplantatie"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 8,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.5778,
+      "width": 0.8415,
+      "height": 0.1639
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "A",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-18",
+   "number": 18,
+   "main_question_number": 18,
+   "type": "mcq",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q18.png",
+   "snippet_size_px": [
+    2207,
+    2561
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.6363
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; Verwezen afbeelding 2; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-19",
+   "number": 19,
+   "main_question_number": 19,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q19.png",
+   "snippet_size_px": [
+    2207,
+    2688
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6985,
+      "width": 0.8415,
+      "height": 0.1817
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 geslachtelijk(e voortplanting)\n2 ongeslachtelijk(e voortplanting)\n3 geslachtelijk(e voortplanting)\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 geslachtelijk(e voortplanting)\n2 ongeslachtelijk(e voortplanting)\n3 geslachtelijk(e voortplanting)\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-20",
+   "number": 20,
+   "main_question_number": 20,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q20.png",
+   "snippet_size_px": [
+    2207,
+    2876
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.2352
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "2–3–4–1",
+    "correct_answer": null,
+    "model_answer": "2–3–4–1",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-21",
+   "number": 21,
+   "main_question_number": 21,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q21.png",
+   "snippet_size_px": [
+    2207,
+    3677
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2892,
+      "width": 0.8415,
+      "height": 0.4637
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 geen\n2 wel\n3 wel\n4 wel\nindien vier nummers correct  2\nindien drie nummers correct  1\nindien minder dan drie nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 geen\n2 wel\n3 wel\n4 wel\nindien vier nummers correct\nindien drie nummers correct\nindien minder dan drie nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien vier nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan drie nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-22",
+   "number": 22,
+   "main_question_number": 22,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q22.png",
+   "snippet_size_px": [
+    2207,
+    2441
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 10,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.7665,
+      "width": 0.8415,
+      "height": 0.111
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n temperatuur (van de lucht / van het water)\n (hoeveelheid) licht\n pH van het water\n grootte van de kweekbak\nOpmerking\nAan het antwoord (hoeveelheid) water, het scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n temperatuur (van de lucht / van het water)\n (hoeveelheid) licht\n pH van het water\n grootte van de kweekbak",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     "Aan het antwoord (hoeveelheid) water, het scorepunt toekennen."
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-23",
+   "number": 23,
+   "main_question_number": 23,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q23.png",
+   "snippet_size_px": [
+    2207,
+    2626
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 11,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.1639
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "dissimilatie/verbranding/warmteverlies",
+    "correct_answer": null,
+    "model_answer": "dissimilatie/verbranding/warmteverlies",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-24",
+   "number": 24,
+   "main_question_number": 24,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q24.png",
+   "snippet_size_px": [
+    2207,
+    2814
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 11,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2286,
+      "width": 0.8415,
+      "height": 0.2173
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• de essentiële aminozuren (die een uur na het eten van eendenkroos in\nhet bloed aanwezig zijn) afkomstig moeten zijn uit verteerde eiwitten\n(van het eendenkroos).  1\n• essentiële aminozuren niet in het lichaam van de mens gevormd\nkunnen worden. / niet-essentiële aminozuren in het lichaam van de\nmens gevormd zouden kunnen zijn.  1",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• de essentiële aminozuren (die een uur na het eten van eendenkroos in\nhet bloed aanwezig zijn) afkomstig moeten zijn uit verteerde eiwitten\n(van het eendenkroos).\n• essentiële aminozuren niet in het lichaam van de mens gevormd\nkunnen worden. / niet-essentiële aminozuren in het lichaam van de\nmens gevormd zouden kunnen zijn.",
+    "scoring": [
+     {
+      "criterion": "de essentiële aminozuren (die een uur na het eten van eendenkroos in het bloed aanwezig zijn) afkomstig moeten zijn uit verteerde eiwitten (van het eendenkroos).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "essentiële aminozuren niet in het lichaam van de mens gevormd kunnen worden. / niet-essentiële aminozuren in het lichaam van de mens gevormd zouden kunnen zijn.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-25",
+   "number": 25,
+   "main_question_number": 25,
+   "type": "open",
+   "context_ids": [
+    "context-3"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q25.png",
+   "snippet_size_px": [
+    2207,
+    3290
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 9,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.4709
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1; Verwezen afbeelding 2"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 11,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4602,
+      "width": 0.8415,
+      "height": 0.3533
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 4; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n Bij verticale landbouw is er geen uitspoeling van meststoffen.\n laag waterverbruik mogelijk\n minder bestrijdingsmiddelen nodig\n minder last van dieren, zoals slakken, die van de planten eten\n minder grote machines nodig die fossiele brandstoffen gebruiken\n minder stikstofbelasting van natuurgebieden\n Er is minder transport nodig omdat de bedrijven dicht bij de\nconsumenten kunnen staan.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n Bij verticale landbouw is er geen uitspoeling van meststoffen.\n laag waterverbruik mogelijk\n minder bestrijdingsmiddelen nodig\n minder last van dieren, zoals slakken, die van de planten eten\n minder grote machines nodig die fossiele brandstoffen gebruiken\n minder stikstofbelasting van natuurgebieden\n Er is minder transport nodig omdat de bedrijven dicht bij de\nconsumenten kunnen staan.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-26",
+   "number": 26,
+   "main_question_number": 26,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q26.png",
+   "snippet_size_px": [
+    2207,
+    2570
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.639
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 onjuist\n2 juist\n3 onjuist\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 onjuist\n2 juist\n3 onjuist\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-27",
+   "number": 27,
+   "main_question_number": 27,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q27.png",
+   "snippet_size_px": [
+    2207,
+    2470
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.6917,
+      "width": 0.8415,
+      "height": 0.2104
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "C",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-28",
+   "number": 28,
+   "main_question_number": 28,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q28.png",
+   "snippet_size_px": [
+    2207,
+    2120
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.1105
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-29",
+   "number": 29,
+   "main_question_number": 29,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q29.png",
+   "snippet_size_px": [
+    2207,
+    1932
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.1752,
+      "width": 0.8415,
+      "height": 0.057
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "hemoglobine",
+    "correct_answer": null,
+    "model_answer": "hemoglobine",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-30",
+   "number": 30,
+   "main_question_number": 30,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q30.png",
+   "snippet_size_px": [
+    2207,
+    2531
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2361,
+      "width": 0.8415,
+      "height": 0.2277
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat het DNA in alle (lichaams)cellen\nhetzelfde is / wangslijmvliescellen hetzelfde DNA hebben als miltcellen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat het DNA in alle (lichaams)cellen\nhetzelfde is / wangslijmvliescellen hetzelfde DNA hebben als miltcellen.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-31",
+   "number": 31,
+   "main_question_number": 31,
+   "type": "mcq",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q31.png",
+   "snippet_size_px": [
+    2207,
+    3184
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.478,
+      "width": 0.8415,
+      "height": 0.4139
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 2; Verwezen afbeelding 3; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-32",
+   "number": 32,
+   "main_question_number": 32,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q32.png",
+   "snippet_size_px": [
+    2207,
+    2965
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2361,
+      "width": 0.8415,
+      "height": 0.1494
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 30: onderzoek naar Bajau en Saluan"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 14,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.1817
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• Bajau-vrouwen worden vergeleken met Saluan-vrouwen.  1\n• de (gemiddelde) miltgrootte van de Bajau-vrouwen groter is (dan die\nvan de Saluan-vrouwen).  1\nof\n•  Bajau-kinderen worden vergeleken met Saluan-kinderen.  1\n•  de (gemiddelde) miltgrootte van de Bajau-kinderen groter is (dan die\nvan de Saluan-kinderen).  1\nof\n•  niet-duikende Bajau(-mannen) worden vergeleken met niet-duikende\nSaluan(-mannen).  1\n•  de (gemiddelde) miltgrootte van de niet-duikende Bajau(-mannen)\ngroter is (dan die van de niet-duikende Saluan-mannen).  1\nof\n•  duikende Bajau(-mannen) worden vergeleken met niet-duikende\nBajau(-mannen).  1\n•  bij deze groepen de milt (gemiddeld ongeveer) dezelfde omvang heeft.  1\nOpmerking\nHet tweede scorepunt kan alleen worden toegekend als het eerste\nscorepunt is behaald.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• Bajau-vrouwen worden vergeleken met Saluan-vrouwen.\n• de (gemiddelde) miltgrootte van de Bajau-vrouwen groter is (dan die\nvan de Saluan-vrouwen).\nof\n• Bajau-kinderen worden vergeleken met Saluan-kinderen.\n• de (gemiddelde) miltgrootte van de Bajau-kinderen groter is (dan die\nvan de Saluan-kinderen).\nof\n• niet-duikende Bajau(-mannen) worden vergeleken met niet-duikende\nSaluan(-mannen).\n• de (gemiddelde) miltgrootte van de niet-duikende Bajau(-mannen)\ngroter is (dan die van de niet-duikende Saluan-mannen).\nof\n• duikende Bajau(-mannen) worden vergeleken met niet-duikende\nBajau(-mannen).\n• bij deze groepen de milt (gemiddeld ongeveer) dezelfde omvang heeft.",
+    "scoring": [
+     {
+      "criterion": "Bajau-vrouwen worden vergeleken met Saluan-vrouwen.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "de (gemiddelde) miltgrootte van de Bajau-vrouwen groter is (dan die van de Saluan-vrouwen).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "Bajau-kinderen worden vergeleken met Saluan-kinderen.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "de (gemiddelde) miltgrootte van de Bajau-kinderen groter is (dan die van de Saluan-kinderen).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "niet-duikende Bajau(-mannen) worden vergeleken met niet-duikende Saluan(-mannen).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "de (gemiddelde) miltgrootte van de niet-duikende Bajau(-mannen) groter is (dan die van de niet-duikende Saluan-mannen).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "duikende Bajau(-mannen) worden vergeleken met niet-duikende Bajau(-mannen).",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "bij deze groepen de milt (gemiddeld ongeveer) dezelfde omvang heeft.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Het tweede scorepunt kan alleen worden toegekend als het eerste",
+     "scorepunt is behaald."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-33",
+   "number": 33,
+   "main_question_number": 33,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q33.png",
+   "snippet_size_px": [
+    2207,
+    3456
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 14,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2361,
+      "width": 0.8415,
+      "height": 0.4914
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 4; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 wel\n2 wel\n3 niet\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 wel\n2 wel\n3 niet\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-34",
+   "number": 34,
+   "main_question_number": 34,
+   "type": "open",
+   "context_ids": [
+    "context-4"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q34.png",
+   "snippet_size_px": [
+    2207,
+    3732
+   ],
+   "max_points_exam": 3,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 12,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3802
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 13,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2361,
+      "width": 0.8415,
+      "height": 0.1494
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 30: onderzoek naar Bajau en Saluan"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 14,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2361,
+      "width": 0.8415,
+      "height": 0.3233
+     },
+     "order": 4,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 33: genetische basis van miltgrootte"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 14,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.7417,
+      "width": 0.8415,
+      "height": 0.057
+     },
+     "order": 5,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• er genetische variatie is in miltgrootte. / er mutaties zijn opgetreden die\nleidden tot een grotere milt.  1\n• mannen met een grotere milt meer voedsel konden verzamelen, /\ndiepere duiken konden overleven,  1\n• (waardoor) deze mannen een hogere fitness hadden. / meer\nvoortplantingssucces hadden.  1\nOpmerking\nAls een kandidaat antwoordt dat mannen die diep kunnen duiken\naantrekkelijker waren voor vrouwen, het tweede scorepunt toekennen.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• er genetische variatie is in miltgrootte. / er mutaties zijn opgetreden die\nleidden tot een grotere milt.\n• mannen met een grotere milt meer voedsel konden verzamelen, /\ndiepere duiken konden overleven,\n• (waardoor) deze mannen een hogere fitness hadden. / meer\nvoortplantingssucces hadden.",
+    "scoring": [
+     {
+      "criterion": "er genetische variatie is in miltgrootte. / er mutaties zijn opgetreden die leidden tot een grotere milt.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "mannen met een grotere milt meer voedsel konden verzamelen, / diepere duiken konden overleven,",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "(waardoor) deze mannen een hogere fitness hadden. / meer voortplantingssucces hadden.",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 3,
+    "remarks": [
+     "Als een kandidaat antwoordt dat mannen die diep kunnen duiken",
+     "aantrekkelijker waren voor vrouwen, het tweede scorepunt toekennen."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-35",
+   "number": 35,
+   "main_question_number": 35,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q35.png",
+   "snippet_size_px": [
+    2207,
+    2537
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.6295
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat\n• de slijmcellen slijm maken waardoor de sporen blijven plakken. /\nwaardoor de sporen weggevangen worden.  1\n• de trilhaarcellen het slijm (met sporen) afvoeren (richting slokdarm).  1\nOpmerking\nHet eerste scorepunt alleen toekennen als zowel de productie als het\neffect van slijm is benoemd.",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat\n• de slijmcellen slijm maken waardoor de sporen blijven plakken. /\nwaardoor de sporen weggevangen worden.\n• de trilhaarcellen het slijm (met sporen) afvoeren (richting slokdarm).",
+    "scoring": [
+     {
+      "criterion": "de slijmcellen slijm maken waardoor de sporen blijven plakken. / waardoor de sporen weggevangen worden.",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "de trilhaarcellen het slijm (met sporen) afvoeren (richting slokdarm).",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Het eerste scorepunt alleen toekennen als zowel de productie als het",
+     "effect van slijm is benoemd."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-36",
+   "number": 36,
+   "main_question_number": 36,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q36.png",
+   "snippet_size_px": [
+    2207,
+    3257
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 16,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0396,
+      "width": 0.8415,
+      "height": 0.2816
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "(alleen) 2/celkern én 3/celwand én 4/vacuole",
+    "correct_answer": null,
+    "model_answer": "(alleen) 2/celkern én 3/celwand én 4/vacuole",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-37",
+   "number": 37,
+   "main_question_number": 37,
+   "type": "mcq",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q37.png",
+   "snippet_size_px": [
+    2207,
+    3894
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 16,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3355,
+      "width": 0.8415,
+      "height": 0.4632
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 2; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "C",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-38",
+   "number": 38,
+   "main_question_number": 38,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q38.png",
+   "snippet_size_px": [
+    2207,
+    3706
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0398,
+      "width": 0.8415,
+      "height": 0.1923
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    },
+    {
+     "source_document": "uitwerkbijlage",
+     "source_pdf": "ha-1018-a-25-1-u.pdf",
+     "pdf_page": 1,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3544,
+      "width": 0.8415,
+      "height": 0.1971
+     },
+     "order": 4,
+     "reason": "Uitwerkbijlage: schema waarin het antwoord moet worden ingevuld"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "het juist ingevulde schema:\n•  azolen, ergosterol en lanosteroldemethylase op de juiste plaats  1\n•  de + en de – op de juiste plaats  1\nOpmerking\nHet tweede scorepunt kan alleen worden toegekend als het eerste\nscorepunt is behaald.",
+    "correct_answer": null,
+    "model_answer": "het juist ingevulde schema:\n• azolen, ergosterol en lanosteroldemethylase op de juiste plaats\n• de + en de – op de juiste plaats",
+    "scoring": [
+     {
+      "criterion": "azolen, ergosterol en lanosteroldemethylase op de juiste plaats",
+      "points": 1,
+      "kind": "criterion"
+     },
+     {
+      "criterion": "de + en de – op de juiste plaats",
+      "points": 1,
+      "kind": "criterion"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": [
+     "Het tweede scorepunt kan alleen worden toegekend als het eerste",
+     "scorepunt is behaald."
+    ]
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-39",
+   "number": 39,
+   "main_question_number": 39,
+   "type": "mcq",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q39.png",
+   "snippet_size_px": [
+    2207,
+    3377
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0398,
+      "width": 0.8415,
+      "height": 0.0964
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 38: azolen en het enzym lanosteroldemethylase"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.2464,
+      "width": 0.8415,
+      "height": 0.1995
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "B",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-40",
+   "number": 40,
+   "main_question_number": 40,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q40.png",
+   "snippet_size_px": [
+    2207,
+    2844
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 17,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4602,
+      "width": 0.8415,
+      "height": 0.1639
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "voorbeelden van een juist antwoord:\n Mutaties zijn toevallig.\n Mutaties ontstaan op willekeurige plaatsen.\n De kans op een mutatie van één base is al klein; de kans op dezelfde\nbaseverandering op dezelfde plek is nog veel kleiner.",
+    "correct_answer": null,
+    "model_answer": "voorbeelden van een juist antwoord:\n Mutaties zijn toevallig.\n Mutaties ontstaan op willekeurige plaatsen.\n De kans op een mutatie van één base is al klein; de kans op dezelfde\nbaseverandering op dezelfde plek is nog veel kleiner.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-41",
+   "number": 41,
+   "main_question_number": 41,
+   "type": "mcq",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q41.png",
+   "snippet_size_px": [
+    2207,
+    3304
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 18,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0406,
+      "width": 0.8415,
+      "height": 0.2949
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-42",
+   "number": 42,
+   "main_question_number": 42,
+   "type": "open",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q42.png",
+   "snippet_size_px": [
+    2207,
+    2997
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 18,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0406,
+      "width": 0.8415,
+      "height": 0.0948
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 41: composthoop en plantaardig afval"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 18,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3498,
+      "width": 0.8415,
+      "height": 0.0926
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "zetmeel/amylose",
+    "correct_answer": null,
+    "model_answer": "zetmeel/amylose",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-43",
+   "number": 43,
+   "main_question_number": 43,
+   "type": "mcq",
+   "context_ids": [
+    "context-5"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q43.png",
+   "snippet_size_px": [
+    2207,
+    2844
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 15,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.5331
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Verwezen afbeelding 1"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 18,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4566,
+      "width": 0.8415,
+      "height": 0.1639
+     },
+     "order": 3,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "C",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-44",
+   "number": 44,
+   "main_question_number": 44,
+   "type": "mcq",
+   "context_ids": [
+    "context-6"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q44.png",
+   "snippet_size_px": [
+    2207,
+    1443
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.3177
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens); Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "D",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-45",
+   "number": 45,
+   "main_question_number": 45,
+   "type": "open",
+   "context_ids": [
+    "context-6"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q45.png",
+   "snippet_size_px": [
+    2207,
+    2552
+   ],
+   "max_points_exam": 2,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.1857
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.3814,
+      "width": 0.8415,
+      "height": 0.4282
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; Verwezen afbeelding 1; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "1 neurotransmitters\n2 exocytose\n3 impulsen\nindien drie nummers correct  2\nindien twee nummers correct  1\nindien minder dan twee nummers correct  0",
+    "correct_answer": null,
+    "model_answer": "1 neurotransmitters\n2 exocytose\n3 impulsen\nindien drie nummers correct\nindien twee nummers correct\nindien minder dan twee nummers correct",
+    "scoring": [
+     {
+      "criterion": "indien drie nummers correct",
+      "points": 2,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien twee nummers correct",
+      "points": 1,
+      "kind": "tier"
+     },
+     {
+      "criterion": "indien minder dan twee nummers correct",
+      "points": 0,
+      "kind": "tier"
+     }
+    ],
+    "maximum_score": 2,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-46",
+   "number": 46,
+   "main_question_number": 46,
+   "type": "mcq",
+   "context_ids": [
+    "context-6"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q46.png",
+   "snippet_size_px": [
+    2207,
+    2410
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.1857
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0401,
+      "width": 0.8415,
+      "height": 0.3878
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "correct_answer": "A",
+    "model_answer": null,
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": []
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-47",
+   "number": 47,
+   "main_question_number": 47,
+   "type": "open",
+   "context_ids": [
+    "context-6"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q47.png",
+   "snippet_size_px": [
+    2207,
+    2752
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.1857
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4279,
+      "width": 0.8415,
+      "height": 0.3459
+     },
+     "order": 3,
+     "reason": "Informatie direct voorafgaand aan de vraag; De vraag zelf (met eventuele antwoordopties/tabel)"
+    },
+    {
+     "source_document": "uitwerkbijlage",
+     "source_pdf": "ha-1018-a-25-1-u.pdf",
+     "pdf_page": 1,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.5944,
+      "width": 0.8415,
+      "height": 0.1191
+     },
+     "order": 4,
+     "reason": "Uitwerkbijlage: tabel waarin het antwoord moet worden aangekruist"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "de juist ingevulde tabel:\nwel smaakwaarneming  geen smaakwaarneming\npudding 1  x\npudding 2  x\npudding 3  x",
+    "correct_answer": null,
+    "model_answer": "de juist ingevulde tabel:\nwel smaakwaarneming geen smaakwaarneming\npudding 1 x\npudding 2 x\npudding 3 x",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  },
+  {
+   "id": "ha25t1-48",
+   "number": 48,
+   "main_question_number": 48,
+   "type": "open",
+   "context_ids": [
+    "context-6"
+   ],
+   "snippet_file": "snippets/havo-2025-t1/havo-2025-t1-q48.png",
+   "snippet_size_px": [
+    2207,
+    2385
+   ],
+   "max_points_exam": 1,
+   "source_fragments": [
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 2,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0505,
+      "width": 0.8415,
+      "height": 0.0392
+     },
+     "order": 1,
+     "reason": "Algemene opmerking bij het examen (geldt voor alle vragen)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 19,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.0494,
+      "width": 0.8415,
+      "height": 0.1857
+     },
+     "order": 2,
+     "reason": "Context-introductie (titel, inleiding en bijbehorende gegevens)"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.4279,
+      "width": 0.8415,
+      "height": 0.2856
+     },
+     "order": 3,
+     "reason": "Handmatige toevoeging na visuele controle: kader bij vraag 47: opzet puddingexperiment"
+    },
+    {
+     "source_document": "opgavenboekje",
+     "source_pdf": "ha-1018-a-25-1-o.pdf",
+     "pdf_page": 20,
+     "coordinates": {
+      "x": 0.0793,
+      "y": 0.7844,
+      "width": 0.8415,
+      "height": 0.0748
+     },
+     "order": 4,
+     "reason": "De vraag zelf (met eventuele antwoordopties/tabel)"
+    }
+   ],
+   "answer_data": {
+    "raw_text": "Uit het antwoord moet blijken dat er een pudding is met ham-smaakstof in\neen concentratie (ruim) boven de drempelwaarde, én een pudding is met\nkaas-smaakstof in een concentratie (ruim) boven de drempelwaarde.\nOpmerkingen\n Als de kandidaat noteert dat de concentraties ham- en kaas-smaakstof\nin de puddingen hoger moeten zijn dan die in pudding 1 en 2, het\nscorepunt toekennen.\n Als de kandidaat ook een derde pudding noteert met ham- en kaas-\nsmaakstof in (dezelfde) concentraties boven de drempelwaarde, dit\nniet aanrekenen.\n5 Aanleveren scores\nVerwerk de scores van de eerste vijf kandidaten per examinator in de applicatie Wolf.\nCito gebruikt deze gegevens voor de analyse van de examens.\nOm de gegevens voor dit doel met Cito uit te wisselen dient u ze uiterlijk op 23 mei te\naccorderen.\nOok na 23 mei kunt u nog tot en met 11 juni gegevens voor Cito accorderen. Deze\ngegevens worden niet meer meegenomen in de hierboven genoemde analyses, maar\nworden wel meegenomen bij het genereren van de groepsrapportage.\nNa accordering voor Cito kunt u in Wolf de gegevens nog wijzigen om ze vervolgens vrij\nte geven voor het overleg met de externe corrector. Deze optie is relevant als u Wolf\nook gebruikt voor uitwisseling van de gegevens met de externe corrector.\ntweede tijdvak\nOok in het tweede tijdvak wordt de normering mede gebaseerd op door kandidaten\nbehaalde scores. Wissel te zijner tijd ook voor al uw tweede-tijdvak-kandidaten de\nscores uit met Cito via Wolf. Dit geldt niet voor de aangewezen vakken.\n6 Bronvermeldingen\nafbeelding 1  StockFoto, ID: 1115962481 White tailed eagle (Haliaeetus albicilla), the biggest eagle in\nthe Danube Delta. Calin Stan\nafbeelding 2  StockIllustratie, ID: 133707275 Eagle Silhouette on white background. Raster version with\nclipping paths. Aleksandr Sulga\nafbeelding 3,4  Stichting Cito Instituut voor Toetsontwikkeling, 2025\nafbeelding 5  StockFoto, ID: 359994722 a beaver is cutting a tree to build a dam. Procy\nafbeelding 1  Stichting Cito Instituut voor Toetsontwikkeling, 2025\nafbeelding 2  Stichting Cito Instituut voor Toetsontwikkeling, 2025\nafbeelding 3  StockIllustratie, ID: 172528949 Centrale veneuze katheter. Alila Medical Media\nafbeelding 1  StockFoto, ID: 1512937709. Common Duckweed, Duckweed, Lesser Duckweed, Natural\nGreen Duckweed (Lemna perpusilla Torrey) on The water for background or texture. close\nup Green leaf aquatic plant on a water background. ONGUSHI\nafbeelding 2  Stichting Cito Instituut voor Toetsontwikkeling, 2025\nafbeelding 3  Teelt van Lemna voor onderzoek naar verteerbaarheid. Ingrid van der Meer, Wageningen\nUniversity & Research\nafbeelding 4  StockFoto, ID: 1899686857. Vegetables are growing in indoor farm(vertical farm). Plants\non vertical farms grow with led lights. Vertical farming is sustainable agriculture for future\nfood and used for plant vaccine. YEINISM\nafbeelding 1  StockFoto, ID: 688900762. Semporna, Malaysia - 18 April, 2015: Young Bajau laut\nchildren paddling a boat near stilted houses off the coast of Borneo in The Celebes Sea in\nthe vicinity of Sipidan and Tun Sakaran Marine Park. Nokuro\nafbeelding 2  StockFoto, ID: 1883165185. Focus on woman sonographer's hands in sterile gloves\nholding ultrasound transducer. Female doctor using modern ultrasound scanner. Concept\nof ultrasonography, medical equipment, ultrasound diagnostics. anatoliy_gleb\nafbeelding 3  Stichting Cito Instituut voor Toetsontwikkeling, 2025\nafbeelding 4  Stichting Cito Instituut voor Toetsontwikkeling, 2025\nafbeelding 1  StockVector, ID: 1564540270 Aspergillosis is invasive fungal infection cause Aspergillus\nfumigatus. Airborne conidia that Inhalation by person results in fungi that grow in the lung.\nInfectious life cycle of pathogenic flora. Designua\nafbeelding 2  Stock Vector ID: 2417930995 Horizontal cross sections through cerebrum. cross section\nof human brain. Rauf pessel\nafbeelding 1  Stichting Cito Instituut voor Toetsontwikkeling, 2025\n►►► ",
+    "correct_answer": null,
+    "model_answer": "Uit het antwoord moet blijken dat er een pudding is met ham-smaakstof in\neen concentratie (ruim) boven de drempelwaarde, én een pudding is met\nkaas-smaakstof in een concentratie (ruim) boven de drempelwaarde.",
+    "scoring": [],
+    "maximum_score": 1,
+    "remarks": [
+     " Als de kandidaat noteert dat de concentraties ham- en kaas-smaakstof",
+     "in de puddingen hoger moeten zijn dan die in pudding 1 en 2, het",
+     "scorepunt toekennen.",
+     " Als de kandidaat ook een derde pudding noteert met ham- en kaas-",
+     "smaakstof in (dezelfde) concentraties boven de drempelwaarde, dit",
+     "niet aanrekenen.",
+     "5 Aanleveren scores",
+     "Verwerk de scores van de eerste vijf kandidaten per examinator in de applicatie Wolf.",
+     "Cito gebruikt deze gegevens voor de analyse van de examens.",
+     "Om de gegevens voor dit doel met Cito uit te wisselen dient u ze uiterlijk op 23 mei te",
+     "accorderen.",
+     "Ook na 23 mei kunt u nog tot en met 11 juni gegevens voor Cito accorderen. Deze",
+     "gegevens worden niet meer meegenomen in de hierboven genoemde analyses, maar",
+     "worden wel meegenomen bij het genereren van de groepsrapportage.",
+     "Na accordering voor Cito kunt u in Wolf de gegevens nog wijzigen om ze vervolgens vrij",
+     "te geven voor het overleg met de externe corrector. Deze optie is relevant als u Wolf",
+     "ook gebruikt voor uitwisseling van de gegevens met de externe corrector.",
+     "tweede tijdvak",
+     "Ook in het tweede tijdvak wordt de normering mede gebaseerd op door kandidaten",
+     "behaalde scores. Wissel te zijner tijd ook voor al uw tweede-tijdvak-kandidaten de",
+     "scores uit met Cito via Wolf. Dit geldt niet voor de aangewezen vakken.",
+     "6 Bronvermeldingen",
+     "afbeelding 1 StockFoto, ID: 1115962481 White tailed eagle (Haliaeetus albicilla), the biggest eagle in",
+     "the Danube Delta. Calin Stan",
+     "afbeelding 2 StockIllustratie, ID: 133707275 Eagle Silhouette on white background. Raster version with",
+     "clipping paths. Aleksandr Sulga",
+     "afbeelding 3,4 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "afbeelding 5 StockFoto, ID: 359994722 a beaver is cutting a tree to build a dam. Procy",
+     "afbeelding 1 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "afbeelding 2 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "afbeelding 3 StockIllustratie, ID: 172528949 Centrale veneuze katheter. Alila Medical Media",
+     "afbeelding 1 StockFoto, ID: 1512937709. Common Duckweed, Duckweed, Lesser Duckweed, Natural",
+     "Green Duckweed (Lemna perpusilla Torrey) on The water for background or texture. close",
+     "up Green leaf aquatic plant on a water background. ONGUSHI",
+     "afbeelding 2 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "afbeelding 3 Teelt van Lemna voor onderzoek naar verteerbaarheid. Ingrid van der Meer, Wageningen",
+     "University & Research",
+     "afbeelding 4 StockFoto, ID: 1899686857. Vegetables are growing in indoor farm(vertical farm). Plants",
+     "on vertical farms grow with led lights. Vertical farming is sustainable agriculture for future",
+     "food and used for plant vaccine. YEINISM",
+     "afbeelding 1 StockFoto, ID: 688900762. Semporna, Malaysia - 18 April, 2015: Young Bajau laut",
+     "children paddling a boat near stilted houses off the coast of Borneo in The Celebes Sea in",
+     "the vicinity of Sipidan and Tun Sakaran Marine Park. Nokuro",
+     "afbeelding 2 StockFoto, ID: 1883165185. Focus on woman sonographer's hands in sterile gloves",
+     "holding ultrasound transducer. Female doctor using modern ultrasound scanner. Concept",
+     "of ultrasonography, medical equipment, ultrasound diagnostics. anatoliy_gleb",
+     "afbeelding 3 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "afbeelding 4 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "afbeelding 1 StockVector, ID: 1564540270 Aspergillosis is invasive fungal infection cause Aspergillus",
+     "fumigatus. Airborne conidia that Inhalation by person results in fungi that grow in the lung.",
+     "Infectious life cycle of pathogenic flora. Designua",
+     "afbeelding 2 Stock Vector ID: 2417930995 Horizontal cross sections through cerebrum. cross section",
+     "of human brain. Rauf pessel",
+     "afbeelding 1 Stichting Cito Instituut voor Toetsontwikkeling, 2025",
+     "►►► "
+    ],
+    "scoring_note": "Geen deelscores in het correctievoorschrift voor deze vraag (enkelvoudig antwoord); zie model_answer."
+   },
+   "quality_check": {
+    "complete_question": true,
+    "all_context_included": true,
+    "all_figures_and_tables_included": true,
+    "visual_check_passed": true,
+    "independent_answerability": true,
+    "automatic_checks": {
+     "question_block_included": true,
+     "no_content_cut_at_crop_edges": true,
+     "references_resolved": true,
+     "type_consistent": true
+    },
+    "uncertainties": [],
+    "review_note": "Visueel beoordeeld door Claude (zie audit/havo-2025-t1.md voor methode en beperkingen); geen beoordeling door een docent."
+   }
+  }
+ ],
+ "review": {
+  "status": "visueel gecontroleerd door Claude",
+  "method": "Alle 48 snippets zijn door mij bekeken (3 snippets naast elkaar, schaal 0,27; kleine letters zijn daardoor niet op volle resolutie beoordeeld, de randcontrole is automatisch). De aangevulde snippets (Q8, 10, 15, 16, 17, 32, 34, 39, 42, 48) zijn in de definitieve versie opnieuw bekeken (schaal 0,2). De uitwerkbijlage-fragmenten bij Q12, Q38 en Q47 zijn bekeken.",
+  "found_and_fixed": [
+   "vraag 8: kader bij vraag 7 (methode 1 en 2) toegevoegd",
+   "vraag 10: kader bij vraag 9 (bevers/zwarte populieren) toegevoegd",
+   "vraag 15, 16 en 17: kader bij vraag 14 (stamceltransplantatie) toegevoegd",
+   "vraag 32 en 34: kader bij vraag 30 (onderzoek Bajau/Saluan) toegevoegd, vraag 34 ook kader bij vraag 33 (DNA-analyse)",
+   "vraag 39: kader bij vraag 38 (azolen en enzym) toegevoegd",
+   "vraag 42: kader bij vraag 41 (composthoop) toegevoegd",
+   "vraag 48: kader bij vraag 47 (puddingexperiment) toegevoegd",
+   "vraag 12, 38 en 47: relevant deel van de uitwerkbijlage (tabel/schema) toegevoegd"
+  ]
+ }
+}
