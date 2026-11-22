@@ -10,6 +10,8 @@ on:
       - "examenoefenen-v2-preview.html"
       - "tests/test_examenoefenen_v2_preview.py"
       - "tests/examenoefenen-v2-browser-test.cjs"
+      - "tests/examenoefenen-v2-real-data-test.cjs"
+      - "exam-data/claude-2024-2026/**"
       - ".github/workflows/validate-exam-dataset-importer.yml"
   pull_request:
     paths:
@@ -17,6 +19,8 @@ on:
       - "tests/test_import_claude_exam_dataset.py"
       - "examenoefenen-v2-preview.html"
       - "tests/test_examenoefenen_v2_preview.py"
+      - "tests/examenoefenen-v2-real-data-test.cjs"
+      - "exam-data/claude-2024-2026/**"
       - ".github/workflows/validate-exam-dataset-importer.yml"
   workflow_dispatch:
 
@@ -59,3 +63,5 @@ jobs:
           exit 1
       - name: Exercise v2 preview with deterministic fixture data
         run: node tests/examenoefenen-v2-browser-test.cjs
+      - name: Exercise v2 preview with the real 519-question dataset
+        run: node tests/examenoefenen-v2-real-data-test.cjs
