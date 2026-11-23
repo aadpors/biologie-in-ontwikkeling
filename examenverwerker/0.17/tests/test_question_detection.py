@@ -529,7 +529,12 @@ class QuestionDetectionTests(unittest.TestCase):
         image.save(image_path)
         image.close()
 
-        self.assertEqual(main._white_row_ranges(image_path), [[0, 0], [2, 3]])
+        ranges = main._white_row_ranges(image_path)
+        self.assertEqual(ranges, [[0, 0], [2, 3]])
+        self.assertTrue(main._is_white_boundary(0, ranges))
+        # Een decimale coördinaat mag niet door afronden alsnog op rij 0
+        # worden goedgekeurd; de opgeslagen grens moet exact een pixelrij zijn.
+        self.assertFalse(main._is_white_boundary(0.4, ranges))
 
     def test_stitched_normalisation_does_not_cut_a_question_at_an_early_blank_row(self):
         # De detector kan een interne witregel in een vraag ten onrechte als
