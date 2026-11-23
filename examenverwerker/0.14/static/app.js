@@ -372,7 +372,8 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         <p class="eyebrow">${stageLabel}</p>
         <h2>${escapeHtml(stageTitle)}</h2>
         <p class="lead">Controleer de markeringen op de oorspronkelijke pagina's. Je kunt starts toevoegen door op de juiste plek op een pagina te klikken, ze verwijderen of naar een andere pagina verplaatsen. De PDF blijft de bron.</p>
-        <div class="notice"><strong>${result.candidates.filter(item => !item.removed).length} kandidaten</strong> in ${result.page_count} pagina's van ${escapeHtml(result.document.filename)}. Controleer ook pagina's waarop geen kandidaat is gevonden.</div>
+        <div class="notice"><strong>Betekenis van het vinkje:</strong> aangevinkt = dit nummer gebruiken als hoofdvraagstart. Uitgevinkt = de nummerherkenning is niet opgenomen in de hoofdvraagreeks en wordt niet gebruikt voor de automatische vraagfragmenten. Een oranje regel is mogelijk een stellingnummer, subvraag of ander genummerd onderdeel.</div>
+        <div class="notice"><strong>${result.candidates.filter(item => !item.removed).length} herkenningen</strong> in ${result.page_count} pagina's van ${escapeHtml(result.document.filename)}. Controleer ook pagina's waarop geen kandidaat is gevonden.</div>
         <div class="review-actions"><button class="quiet" id="acceptAllStarts" type="button">Alle voorstellen accepteren</button><button class="quiet" id="rejectAllStarts" type="button">Alle voorstellen afwijzen</button></div>
         ${result.pages.map(renderPage).join('')}
         <label class="review-warning"><input type="checkbox" id="allPagesReviewed"> Ik heb alle pagina's van dit document visueel gecontroleerd, ook de pagina's zonder voorstellen.</label>
