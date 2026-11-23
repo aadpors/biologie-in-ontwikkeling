@@ -291,6 +291,17 @@ class QuestionDetectionTests(unittest.TestCase):
         )
         self.assertEqual(completed_fragments.status_code, 200, completed_fragments.text)
 
+        # Een vertraagde pagehide/visibilitychange-autosave met exact dezelfde
+        # selectie mag de zojuist afgeronde fragmentcontrole niet terugzetten.
+        late_autosave = self.client.post(
+            f"/api/exams/{exam_id}/stitched-opgaven/review",
+            json={"selections":reviewed_selections, "reviewed":False},
+        )
+        self.assertEqual(late_autosave.status_code, 200, late_autosave.text)
+        self.assertTrue(late_autosave.json()["complete"])
+        current_exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(current_exam["steps"]["opgaven_fragments"]["status"], "complete")
+
         analysis = self.client.get(f"/api/exams/{exam_id}/question-analysis")
         self.assertEqual(analysis.status_code, 200, analysis.text)
         questions_result = analysis.json()["questions"]
