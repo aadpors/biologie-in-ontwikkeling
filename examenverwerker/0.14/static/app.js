@@ -29,7 +29,7 @@ function bindStageAutoSave(panel, save, statusSelector) {
 
   const saveNow = () => {
     clearTimeout(timer);
-    saveChain = saveChain.catch(() => {}).then(() => save()).then(result => {
+    saveChain = saveChain.catch(() => {}).then(() => save({draft:true})).then(result => {
       const status = panel.querySelector(statusSelector);
       if (status) status.textContent = 'Wijziging automatisch opgeslagen.';
       return result;
@@ -373,7 +373,7 @@ async function renderSnippetsStage() {
     [...contextChecks(),...questionChecks(),...workbookChecks(),...cvChecks()].forEach(x=>x.addEventListener('change',refresh));
     $('#confirmNoContexts')?.addEventListener('change',refresh); refresh();
     const collect=()=>({contexts:result.contexts.map(c=>({id:c.id,from_question:Number(document.querySelector(`[data-context-from="${c.id}"]`).value),to_question:Number(document.querySelector(`[data-context-to="${c.id}"]`).value),reviewed:document.querySelector(`[data-context-reviewed="${c.id}"]`).checked})),reviewed_question_numbers:questionChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetReviewed)),reviewed_uitwerk_numbers:workbookChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetUitwerk)),reviewed_cv_numbers:cvChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetCv)),confirmed_no_contexts:noContextConfirmed()});
-    const save=()=>api(`/api/exams/${state.examId}/snippets/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collect())});
+    const save=(options={})=>api(`/api/exams/${state.examId}/snippets/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...collect(),...options})});
     bindStageAutoSave(panel, save, '#snippetsMessage');
     $('#saveSnippets').addEventListener('click',async()=>{try{const r=await save();$('#snippetsMessage').textContent=`${r.reviewed_count} vragen en ${r.reviewed_all_contexts?result.context_count:contextChecks().filter(x=>x.checked).length} contexten gecontroleerd.`;}catch(error){$('#snippetsMessage').textContent=error.message;}});
     $('#completeSnippets').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle contexten en vraagfragmenten.');await api(`/api/exams/${state.examId}/steps/snippets/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_all_contexts:true})});await openWorkspace(state.examId);}catch(error){$('#snippetsMessage').textContent=error.message;}});
@@ -397,7 +397,7 @@ async function renderFinalReviewStage() {
     checks().forEach(x=>x.addEventListener('change',refresh));
     document.querySelectorAll('[data-final-note]').forEach(x=>x.addEventListener('input',refresh)); refresh();
     const collect=()=>cards.map(card=>{const n=Number(card.dataset.finalCard);return {question_number:n,reviewed:card.querySelector(`[data-final-reviewed="${n}"]`).checked,resolution_note:card.querySelector(`[data-final-note="${n}"]`).value};});
-    const save=()=>api(`/api/exams/${state.examId}/final-review/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
+    const save=(options={})=>api(`/api/exams/${state.examId}/final-review/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect(),...options})});
     bindStageAutoSave(panel, save, '#finalReviewMessage');
     $('#saveFinalReview').addEventListener('click',async()=>{try{const r=await save();$('#finalReviewMessage').textContent=`${r.reviewed_count} van ${result.question_count} vragen gecontroleerd.`;}catch(error){$('#finalReviewMessage').textContent=error.message;}});
     $('#completeFinalReview').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle vragen.');await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}});

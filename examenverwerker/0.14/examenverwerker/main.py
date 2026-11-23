@@ -1158,8 +1158,11 @@ def save_final_review(exam_id: str, payload: dict):
         seen.add(number)
         source = next(question for question in result["questions"] if question["question_number"] == number)
         note = str(item.get("resolution_note", ""))[:2000]
-        # Een lege toelichting is toegestaan in een concept. De afrondactie
-        # controleert dat ieder scoreverschil daadwerkelijk is toegelicht.
+        # Een lege toelichting is alleen toegestaan bij een automatische
+        # conceptopslag. Een handmatige opslag of afronding moet de afwijking
+        # inhoudelijk toelichten.
+        if source["points_match"] is False and not note.strip() and not payload.get("draft"):
+            raise HTTPException(422, f"Leg het verschil tussen de opgave- en CV-score bij vraag {number} vast.")
         cleaned.append({"question_number": number, "reviewed": bool(item.get("reviewed")),
                         "resolution_note": note})
     if seen != expected:
