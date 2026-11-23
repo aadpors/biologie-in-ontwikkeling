@@ -28,10 +28,14 @@ from .question_analysis import analyse_questions, validate_question_analysis
 from .answer_detection import analyse_answers, detect_cv_max_points, validate_answer_review
 from .cv_supplement import analyse_supplement, validate_supplement_review
 from .context_detection import generate_context_candidates, validate_context_review
-from .storage import Store
+from .storage import Store, resolve_shared_data_root
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA = Path(__import__("os").environ.get("EXAMENVERWERKER_DATA", ROOT / "data")).resolve()
+# De opslag staat buiten de versie-map. Bij de eerste start van 0.14 wordt
+# een bestaande 0.13-opslag automatisch gekopieerd als er nog geen gedeelde
+# gegevensmap bestaat. Daardoor blijven eerder geïmporteerde examens behouden.
+_data_override = __import__("os").environ.get("EXAMENVERWERKER_DATA")
+DATA = Path(_data_override).resolve() if _data_override else resolve_shared_data_root(ROOT)
 STORE = Store(DATA)
 app = FastAPI(title="Examenverwerker", version="0.13.0")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")

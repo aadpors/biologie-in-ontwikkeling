@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from examenverwerker.storage import Store
+from examenverwerker.storage import Store, resolve_shared_data_root
 
 
 class StorageTests(unittest.TestCase):
@@ -26,6 +26,40 @@ class StorageTests(unittest.TestCase):
             finally:
                 connection.close()
             self.assertIn("published_at", columns)
+
+    def test_new_version_migrates_existing_013_data_once(self):
+        """Een nieuwe versie neemt de bestaande examens en bronnen mee."""
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "examenverwerker"
+            legacy = base / "0.13" / "data"
+            current_version = base / "0.14"
+            legacy.mkdir(parents=True)
+            (legacy / "examenverwerker.sqlite3").write_bytes(b"sqlite-database")
+            (legacy / "exams").mkdir()
+            (legacy / "exams" / "source.pdf").write_bytes(b"original-pdf")
+
+            shared = resolve_shared_data_root(current_version)
+
+            self.assertEqual(shared, base / "data")
+            self.assertEqual((shared / "examenverwerker.sqlite3").read_bytes(), b"sqlite-database")
+            self.assertEqual((shared / "exams" / "source.pdf").read_bytes(), b"original-pdf")
+            # De oude versie blijft intact als terugvalkopie.
+            self.assertTrue((legacy / "examenverwerker.sqlite3").is_file())
+
+    def test_existing_shared_data_is_never_overwritten_by_legacy_copy(self):
+        """Latere starts mogen nieuwere gedeelde data niet terugzetten."""
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp) / "examenverwerker"
+            legacy = base / "0.13" / "data"
+            shared = base / "data"
+            legacy.mkdir(parents=True)
+            shared.mkdir(parents=True)
+            (legacy / "marker.txt").write_text("oud", encoding="utf-8")
+            (shared / "marker.txt").write_text("nieuw", encoding="utf-8")
+
+            resolved = resolve_shared_data_root(base / "0.14")
+
+            self.assertEqual((resolved / "marker.txt").read_text(encoding="utf-8"), "nieuw")
 
     def test_publish_exam_persists_status_and_timestamp(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -24,7 +24,8 @@ aan, installeert de benodigde pakketten en start de server. Open daarna
 
 ### 1. Bibliotheek, import en metadata
 
-- Examenbibliotheek met persistente SQLite-opslag.
+- Examenbibliotheek met persistente SQLite-opslag in een gedeelde map buiten de versiemappen.
+- Bij de eerste start van 0.14 wordt bestaande lokale opslag uit `0.13/data` eenmalig gekopieerd als de gedeelde opslag nog niet bestaat; de oude map blijft als terugvalkopie behouden.
 - Import van meerdere PDF's als één examenproject.
 - Validatie van PDF-bestanden, ongewijzigde opslag van de bronbestanden,
   SHA-256-hash en paginatelling.

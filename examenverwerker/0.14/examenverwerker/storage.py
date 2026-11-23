@@ -11,9 +11,30 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
+
+
+def resolve_shared_data_root(version_root: Path) -> Path:
+    """Gebruik één gegevensmap voor alle versie-mappen van de applicatie.
+
+    Iedere versie blijft afzonderlijk uitvoerbaar, maar examens horen niet
+    opnieuw geïmporteerd te hoeven worden wanneer de gebruiker een nieuwe
+    versie start. Daarom staat de gedeelde opslag één niveau boven de
+    versiemap. Als daar nog geen opslag bestaat, wordt de bestaande 0.13-data
+    één keer volledig gekopieerd. De oude map blijft onaangeroerd als
+    terugvalkopie; bron-PDF's en SQLite-bestand gaan dus niet verloren.
+    """
+    shared_root = version_root.parent / "data"
+    legacy_root = version_root.parent / "0.13" / "data"
+
+    if not shared_root.exists() and legacy_root.is_dir():
+        shared_root.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(legacy_root, shared_root)
+
+    return shared_root.resolve()
 
 
 class Store:
