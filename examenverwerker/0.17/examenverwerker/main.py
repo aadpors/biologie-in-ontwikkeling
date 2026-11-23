@@ -473,8 +473,19 @@ def _nearest_white_row(y: float, ranges: list[list[int]]) -> int:
 
 
 def _is_white_boundary(y: float, ranges: list[list[int]]) -> bool:
-    """Controleer of een opgeslagen grens exact op een volledig witte rij ligt."""
-    row = int(round(float(y)))
+    """Controleer of een opgeslagen integergrens op een volledig witte rij ligt.
+
+    Afronden is hier niet toegestaan: een coördinaat van bijvoorbeeld 12,4 px
+    is niet dezelfde grens als de witte pixelrij 12. De browser stuurt
+    integerpixelrijen; de server dwingt diezelfde afspraak af.
+    """
+    try:
+        value = float(y)
+    except (TypeError, ValueError):
+        return False
+    if not value.is_integer():
+        return False
+    row = int(value)
     return any(start <= row <= end for start, end in ranges)
 
 
@@ -772,8 +783,11 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
         kind = item.get("type")
         top, bottom = item.get("top"), item.get("bottom")
         numbers = item.get("question_numbers")
-        if kind not in {"context", "vraag"} or not isinstance(top, (int, float)) or not isinstance(bottom, (int, float)) or top < 0 or bottom <= top or bottom >= stitched_height:
-            raise HTTPException(422, "Een fragmenttype of fragmentgrens is ongeldig of valt buiten de lange afbeelding.")
+        if (kind not in {"context", "vraag"}
+                or not isinstance(top, (int, float)) or not isinstance(bottom, (int, float))
+                or not float(top).is_integer() or not float(bottom).is_integer()
+                or top < 0 or bottom <= top or bottom >= stitched_height):
+            raise HTTPException(422, "Een fragmenttype of fragmentgrens is ongeldig. Gebruik gehele pixelrijen binnen de lange afbeelding.")
         if not _is_white_boundary(top, white_rows) or not _is_white_boundary(bottom, white_rows):
             raise HTTPException(422, "Plaats beide fragmentgrenzen op een volledig witte horizontale regel van links tot rechts.")
         if not isinstance(numbers, list) or not numbers or any(not isinstance(n, int) or not 1 <= n <= 60 for n in numbers):
