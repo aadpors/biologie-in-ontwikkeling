@@ -12,10 +12,10 @@
 ## Aanvullende correcties voor stap 3
 
 - De knop **Nieuw fragment selecteren** staat buiten het interne scrollgebied van de examenafbeelding. Alleen de lange afbeelding en de fragmentenlijst hebben hun eigen scrollpositie.
-- Selecteren en scrollen synchroniseren uitsluitend het afbeeldingspaneel en de fragmentenlijst. Navigatie gebruikt de eigen scrollcontainers en verplaatst de volledige pagina niet.
+- Selecteren en scrollen synchroniseren uitsluitend het afbeeldingspaneel en de fragmentenlijst. Bij het selecteren van een fragment scrollt alleen het andere paneel; een programmatische sprong wordt niet teruggesynchroniseerd. Navigatie gebruikt de eigen scrollcontainers en verplaatst de volledige pagina niet.
 - De bovengrens wordt op de onderste volledig witte pixelrij van de scheidingsstrook geplaatst; de ondergrens op de bovenste volledig witte pixelrij.
 - Oude automatisch aangemaakte contextfragmenten tussen twee vragen worden bij het heropenen hersteld naar de daaropvolgende vraaggroep, tot aan het volgende contextblok. Handmatig samengestelde koppelingen blijven behouden.
-- Een vertraagde, identieke autosave kan de goedkeuring van de vraagstartcontrole niet meer terugzetten. De statuscontrole en conceptopslag vinden nu in één SQLite-schrijftransactie plaats; echte wijzigingen maken de goedkeuring wel ongeldig.
+- Een vertraagde, identieke autosave kan de goedkeuring van de vraagstartcontrole of fragmentcontrole niet meer terugzetten. De statuscontrole en conceptopslag vinden nu in één SQLite-schrijftransactie plaats; echte wijzigingen maken de goedkeuring wel ongeldig.
 - Regressietests toegevoegd voor de vertraagde autosave, herstel van oude contextkoppelingen en de exacte boven-/onderrand van fragmenten.
 
 ## Stap 4 — foutdiagnose en integratie
