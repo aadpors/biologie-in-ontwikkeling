@@ -6,6 +6,7 @@ on:
       - feature/claude-exam-dataset
     paths:
       - "scripts/import_claude_exam_dataset.py"
+      - "scripts/audit_claude_exam_dataset.py"
       - "tests/test_import_claude_exam_dataset.py"
       - "examenoefenen-v2-preview.html"
       - "tests/test_examenoefenen_v2_preview.py"
@@ -38,10 +39,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Compile importer and tests
-        run: python -m compileall -q scripts/import_claude_exam_dataset.py tests
+      - name: Compile importer, audit and tests
+        run: python -m compileall -q scripts tests
       - name: Run importer and preview regression tests
         run: python -m unittest discover -s tests -p "test_*exam*.py" -v
+      - name: Audit dataset content extraction
+        run: python scripts/audit_claude_exam_dataset.py --data-dir exam-data/claude-2024-2026/data
       - name: Set up Node.js for browser smoke test
         uses: actions/setup-node@v4
         with:
