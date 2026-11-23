@@ -442,5 +442,47 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual(regenerated["questions"][0]["segments"][0]["pdf_clip"][3], 300)
 
 
+    def test_fragment_boundaries_require_pure_white_rgb_rows(self):
+        # Een bijna-witte pixel is nog steeds inhoud. Alleen de rijen die
+        # volledig uit RGB(255, 255, 255) bestaan, mogen als grens dienen.
+        image_path = self.root / "white-rows.png"
+        image = Image.new("RGB", (4, 4), (255, 255, 255))
+        image.putpixel((2, 1), (254, 255, 255))
+        image.save(image_path)
+        image.close()
+
+        self.assertEqual(main._white_row_ranges(image_path), [[0, 0], [2, 3]])
+
+    def test_selected_stitched_text_is_read_from_the_matching_source_page(self):
+        # Pagina 1 is de omslag en wordt niet in het stitchwerkvlak opgenomen.
+        # De tekstextractie moet de geselecteerde pixelstrook terugrekenen naar
+        # de juiste bronpagina, zonder tekst van een andere pagina toe te voegen.
+        document = fitz.open()
+        cover = document.new_page()
+        cover.insert_text((60, 100), "OMSLAGTEKST")
+        content = document.new_page()
+        content.insert_text((60, 100), "Vraag 1 unieke geselecteerde tekst")
+        content.insert_text((60, 300), "Vraag 2 staat lager op dezelfde pagina")
+        later = document.new_page()
+        later.insert_text((60, 100), "Tekst van een latere pagina")
+        pdf_path = self.root / "selected-text.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        metadata = build_stitched_exam(pdf_path, self.root / "selected-text.png")
+        first_content_page = metadata["pages"][0]
+        extracted = main._extract_stitched_selection_text(
+            pdf_path,
+            metadata["pages"],
+            first_content_page["top"],
+            first_content_page["bottom"],
+        )
+
+        self.assertIn("Vraag 1 unieke geselecteerde tekst", extracted)
+        self.assertIn("Vraag 2 staat lager op dezelfde pagina", extracted)
+        self.assertNotIn("OMSLAGTEKST", extracted)
+        self.assertNotIn("Tekst van een latere pagina", extracted)
+
+
 if __name__ == "__main__":
     unittest.main()
