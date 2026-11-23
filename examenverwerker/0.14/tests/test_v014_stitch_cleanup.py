@@ -75,13 +75,12 @@ class ContextProposalTests(unittest.TestCase):
             pdf.new_page(width=600, height=800)
             page = pdf.new_page(width=600, height=800)
             context_lines = [
-                "In een ecosysteem leven verschillende organismen met elkaar samen.",
-                "De omstandigheden in het gebied veranderen gedurende het jaar.",
-                "Onderzoekers volgen de populaties en meten verschillende factoren.",
+                "In een ecosysteem leven organismen samen en beïnvloeden zij elkaar.",
+                "Onderzoekers meten veranderingen in populaties gedurende het jaar.",
             ]
             for index, line in enumerate(context_lines):
                 page.insert_text((50, 80 + index * 22), line, fontsize=11)
-            page.insert_text((50, 190), "1", fontsize=12)
+            page.insert_text((50, 170), "1", fontsize=12)
             pdf.save(source)
             pdf.close()
 

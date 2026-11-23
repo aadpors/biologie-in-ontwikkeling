@@ -54,10 +54,10 @@ def generate_context_candidates(
             extracted = page.get_text("text", clip=clip).strip()
             words = [word for word in extracted.split() if word.strip()]
             # Een paar losse kopregels of een paginanummer zijn geen context.
-            # Twintig woorden is een voorzichtige ondergrens die korte
-            # betekenisvolle contexten niet automatisch goedkeurt, maar wel
-            # voorkomt dat elke lege bovenmarge als context wordt aangeboden.
-            if len(words) < 20:
+            # Een context kan uit een korte introductie bestaan. Acht woorden
+            # is daarom voldoende voor een voorstel, maar niet voor automatische
+            # goedkeuring. De docent controleert de uitsnede altijd visueel.
+            if len(words) < 8:
                 continue
             pixmap = page.get_pixmap(matrix=fitz.Matrix(render_scale, render_scale),
                                      clip=clip, alpha=False, annots=True)
