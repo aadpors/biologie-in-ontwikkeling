@@ -595,7 +595,7 @@ class QuestionDetectionTests(unittest.TestCase):
 
         white_rows = main._white_row_ranges(image_path)
         selections = [
-            {"id":"q1", "type":"vraag", "top":28, "bottom":50,
+            {"id":"q1", "type":"vraag", "top":28, "bottom":70,
              "question_numbers":[1], "label":"Vraag 1"},
             {"id":"q2", "type":"vraag", "top":112, "bottom":150,
              "question_numbers":[2], "label":"Vraag 2"},
@@ -606,7 +606,7 @@ class QuestionDetectionTests(unittest.TestCase):
         questions = [item for item in normalised if item["type"] == "vraag"]
 
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0]["bottom"], 50)
+        self.assertEqual(questions[0]["bottom"], 70)
         self.assertLess(questions[0]["bottom"], questions[1]["top"])
         contexts = [item for item in normalised if item["type"] == "context"]
         self.assertEqual(len(contexts), 1)
