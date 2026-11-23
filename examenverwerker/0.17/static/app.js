@@ -891,8 +891,31 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const stitchedView = imageScroll;
     const inspector = panel.querySelector('.stitched-inspector');
     let syncingScroll = false;
+    let suppressScrollSync = false;
+    let scrollSyncReleaseTimer = null;
+
+    // Bij een klik op een fragment moet alleen het andere paneel naar de
+    // bijbehorende regel springen. De automatische tweerichtingssynchronisatie
+    // mag die programmatische sprong niet terugkaatsen naar het paneel waarop
+    // de gebruiker zojuist heeft geklikt.
+    const pauseScrollSync = () => {
+      suppressScrollSync = true;
+      clearTimeout(scrollSyncReleaseTimer);
+      // scrollend wordt in moderne browsers gebruikt; de timer is de
+      // terugval voor browsers die dat event niet ondersteunen.
+      scrollSyncReleaseTimer = setTimeout(() => {
+        suppressScrollSync = false;
+      }, 1200);
+    };
+    const resumeScrollSync = () => {
+      clearTimeout(scrollSyncReleaseTimer);
+      suppressScrollSync = false;
+    };
+    imageScroll.addEventListener('scrollend', resumeScrollSync, {passive:true});
+    inspector.addEventListener('scrollend', resumeScrollSync, {passive:true});
+
     const syncScroll = (source, target) => {
-      if (syncingScroll) return;
+      if (syncingScroll || suppressScrollSync) return;
       syncingScroll = true;
       const sourceRange = Math.max(1, source.scrollHeight - source.clientHeight);
       const targetRange = Math.max(0, target.scrollHeight - target.clientHeight);
@@ -1031,6 +1054,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const imageRect = img.getBoundingClientRect();
       const imageY = (item.top + (item.bottom - item.top) / 2) / result.height * imageRect.height;
       const target = view.scrollTop + imageRect.top - viewRect.top + imageY;
+      pauseScrollSync();
       view.scrollTo({top: Math.max(0, target - view.clientHeight / 2), behavior:'smooth'});
     };
 
@@ -1043,6 +1067,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const inspectorRect = inspector.getBoundingClientRect();
       const buttonRect = button.getBoundingClientRect();
       const target = inspector.scrollTop + buttonRect.top - inspectorRect.top;
+      pauseScrollSync();
       inspector.scrollTo({top:Math.max(0, target - 18), behavior:'smooth'});
     };
 
