@@ -1,4 +1,4 @@
-# Examenverwerker — geïntegreerde applicatie 0.17.0
+# Examenverwerker — geïntegreerde applicatie 0.18.0
 
 Dit project is een nieuwe, samenhangende webapplicatie op basis van de
 functionele blauwdruk `Implementatie Nog Niet Afgerond.txt`. De bibliotheek,
@@ -52,6 +52,16 @@ aan, installeert de benodigde pakketten en start de server. Open daarna
 - Servervalidatie van paginagrenzen en bronhash.
 
 ### 3. Vraagfragmenten
+
+**Wijzigingen in 0.18.0**
+- Automatische vraagfragmenten worden conservatiever begrensd: een vraag loopt vanaf de goedgekeurde vraagstart tot vlak vóór de volgende goedgekeurde hoofdvraag.
+- Interne witruimtes, alinea-afstanden en kaders binnen een vraag worden niet langer als automatische ondergrens gebruikt. Dit voorkomt dat meerregelige vragen, figuren en tabellen voortijdig worden afgebroken.
+- Alleen materiaal vóór de eerste vraag wordt automatisch als context voorgesteld. Tussenliggende inhoud wordt niet op basis van een gok als context geclassificeerd; die kan in de editor handmatig worden geselecteerd.
+- Het selecteren van een fragment in het rechterpaneel brengt het middendeel nauwkeuriger naar het verticale midden van dat fragment.
+- Scrollen tussen het middelste beeldpaneel en de rechter inspector wordt wederzijds gesynchroniseerd.
+- Een grens kan niet langer terugvallen op een willekeurige pixelrij wanneer geen volledig witte horizontale regel is gevonden.
+- Regressietests toegevoegd voor interne witregels in meerregelige vragen en voor grenzen op witte beeldrijen.
+
 
 - Voor het opgavenboekje wordt vanaf pagina 2 één lange verticale werkafbeelding opgebouwd.
 - Herhaalde kop-/voetteksten en grote buitenmarges worden waar mogelijk verwijderd; de originele PDF blijft ongewijzigd.
