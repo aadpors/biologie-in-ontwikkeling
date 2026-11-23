@@ -6,7 +6,11 @@ acceptatietest met echte examen-PDF's.
 """
 import unittest
 
-from examenverwerker.question_fragments import propose_stitched_question_selections\nfrom examenverwerker.question_detection import detect_question_starts\nimport fitz\nfrom pathlib import Path\nimport tempfile
+from examenverwerker.question_fragments import propose_stitched_question_selections
+from examenverwerker.question_detection import detect_question_starts
+import fitz
+from pathlib import Path
+import tempfile
 
 
 class StitchedProposalTests(unittest.TestCase):

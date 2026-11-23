@@ -22,7 +22,8 @@ from PIL import Image
 from .domain import WORKFLOW, STEP_BY_KEY, unmet_requirements, invalidate_dependents
 from .metadata import suggest_metadata
 from .question_detection import detect_question_starts, validate_review
-from .question_fragments import (generate_question_fragments, build_stitched_exam,\n                                  propose_stitched_question_selections)
+from .question_fragments import (generate_question_fragments, build_stitched_exam,
+                                  propose_stitched_question_selections)
 from .question_analysis import analyse_questions, validate_question_analysis
 from .answer_detection import analyse_answers, detect_cv_max_points, validate_answer_review
 from .cv_supplement import analyse_supplement, validate_supplement_review
@@ -770,8 +771,11 @@ def get_answers(exam_id: str):
                 question["confidence"] = "laag"
                 question["reason"] = "De aanvulling is als vervanging gemarkeerd; controleer de volledige vervangende tekst."
             elif action in {"toevoegen", "handmatig"}:
-                question["answer_text"] = (question["answer_text"] + "\n\nAanvulling (pagina " +
-                                            str(page_number) + "): \n" + page_text).strip()
+                question["answer_text"] = (question["answer_text"] + "
+
+Aanvulling (pagina " +
+                                            str(page_number) + "): 
+" + page_text).strip()
                 if action == "handmatig":
                     question["answer_kind"] = "handmatig"
                     question["confidence"] = "laag"
