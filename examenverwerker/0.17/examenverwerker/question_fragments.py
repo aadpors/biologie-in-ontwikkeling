@@ -404,20 +404,20 @@ def propose_stitched_question_selections(
         # De bovengrens hoort op dezelfde pagina te liggen als de vraagstart.
         # De ondergrens mag op een volgende pagina liggen: zo blijft een vraag
         # die over een paginaovergang doorloopt één doorlopend vraagfragment.
-        local_before = [value for value in separators
-                        if page_top <= value < start_y]
-        global_after = [value for value in separators if value > start_y]
-        # Als er vóór de vraagstart geen expliciete witregel/kader is,
-        # gebruik dan de vraagstart zelf als scheiding. Zo blijft tekst die
-        # aantoonbaar vóór de eerste vraag staat als context beschikbaar.
-        # De vraag begint bij het goedgekeurde vraagstartanker, niet bij de
-        # dichtstbijzijnde eerdere witregel. Die witregel kan midden in de
-        # context of in de vorige vraag liggen. Door het anker te gebruiken
-        # blijft alle inhoud tussen het vorige fragment en dit vraagnummer
-        # beschikbaar als contextkandidaat.
+        # De vraagstart is het vaste beginanker. Voor de ondergrens zoeken
+        # we juist de laatste duidelijke visuele scheiding vóór de volgende
+        # hoofdvraag. Een eerste witregel kan een interne alinea-afstand zijn;
+        # de laatste scheiding houdt de volledige vraag bijeen en laat tekst
+        # ná de vraag als afzonderlijke context over.
+        next_start_y = mapped[index + 1][0] if index + 1 < len(mapped) else float(image_height)
+        separators_before_next = [
+            value for value in separators
+            if start_y < value < next_start_y
+        ]
         top_boundary = start_y - 8.0
         top = max(page_top, top_boundary)
-        bottom = min(float(image_height), global_after[0] if global_after else float(image_height))
+        bottom_boundary = separators_before_next[-1] if separators_before_next else next_start_y
+        bottom = min(float(image_height), bottom_boundary)
 
         # De boven- en ondergrens vallen net buiten de witregel/kaderlijn.
         # De marge voorkomt dat antialiasing of de lijn zelf wordt afgesneden.
@@ -589,15 +589,15 @@ def normalise_stitched_selections(
         for index, question in enumerate(questions):
             next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
 
-            # Gebruik voor iedere vraag behalve de laatste de laatste zuiver
-            # witte rij vóór de volgende goedgekeurde vraagstart. De eerdere
-            # detector kan een witregel midden in een vraag hebben aangezien
-            # voor een fragmentgrens. Die voorspelling wordt daarom niet als
-            # ondergrens vertrouwd: alle inhoud tot de volgende vraagstart
-            # blijft behouden. Eventuele context in dit tussenstuk kan de
-            # docent daarna expliciet afsplitsen in de fragmenteditor.
+            # Behoud de voorgestelde visuele ondergrens als die vóór de
+            # volgende vraagstart ligt. De voorstelgenerator kiest de laatste
+            # duidelijke witregel/kadergrens vóór die volgende vraag, zodat
+            # een interne witregel eerder in de vraag niet tot afkappen leidt.
+            # Het resterende zichtbare gebied wordt hieronder als context
+            # opgebouwd en niet stilzwijgend aan de volgende vraag gekoppeld.
             if next_top is not None:
-                question["bottom"] = next_top
+                proposed_bottom = int(question["bottom"])
+                question["bottom"] = min(next_top, proposed_bottom) if proposed_bottom > question["top"] else next_top
             else:
                 # De laatste vraag loopt door tot de laatste volledig witte
                 # rij in de lange afbeelding. Een interne witregel in de
