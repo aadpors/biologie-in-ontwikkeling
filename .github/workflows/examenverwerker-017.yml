@@ -4,6 +4,7 @@ on:
     paths:
       - "examenverwerker/0.17/**"
       - ".github/workflows/examenverwerker-017.yml"
+      - "examens/vw-1018-a-26-2-o.pdf"
   workflow_dispatch:
 jobs:
   test:
@@ -26,3 +27,13 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Controleer JavaScript
         run: node --check static/app.js
+      - name: Analyseer echt vwo-examen voor fragmentdiagnose
+        run: python tools/diagnose_real_exam.py
+        env:
+          EXAM_DIAGNOSTIC_OUTPUT: ${{ runner.temp }}/exam-diagnostic
+      - name: Bewaar diagnosebeeld en detectierapport
+        uses: actions/upload-artifact@v4
+        with:
+          name: exam-fragment-diagnostics
+          path: ${{ runner.temp }}/exam-diagnostic/
+          retention-days: 7
