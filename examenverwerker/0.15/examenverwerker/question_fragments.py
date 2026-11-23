@@ -428,11 +428,35 @@ def propose_stitched_question_selections(
             "source": "automatic_visual_boundaries",
         })
 
-    # De niet-geselecteerde ruimte tussen twee vraagfragmenten is per definitie
-    # een contextfragment. Koppel deze aan de daaropvolgende vraag, zodat de
-    # context vóór de vraag in de uiteindelijke leesvolgorde staat.
+    # Context vóór de eerste vraag en de niet-geselecteerde ruimte tussen
+    # opeenvolgende vraagfragmenten vormen contextfragmenten. Koppel ieder
+    # contextfragment aan de eerstvolgende vraag, zodat de leesvolgorde
+    # context → vraag → context → vraag ontstaat.
     context_selections: list[dict[str, Any]] = []
     ordered_questions = sorted(question_selections, key=lambda item: item["top"])
+
+    if ordered_questions:
+        first_question = ordered_questions[0]
+        first_number = int(first_question["question_numbers"][0])
+        first_page_number = next(
+            (int(start["page_index"]) + 1 for _, start in mapped
+             if int(start["question_number"]) == first_number),
+            None,
+        )
+        if first_page_number in page_limits:
+            leading_top = page_limits[first_page_number][0]
+            leading_bottom = float(first_question["top"])
+            if leading_bottom - leading_top >= 24:
+                context_selections.append({
+                    "id": f"auto-context-before-{first_number}",
+                    "type": "context",
+                    "top": round(leading_top, 2),
+                    "bottom": round(leading_bottom, 2),
+                    "question_numbers": [first_number],
+                    "label": "Automatisch contextvoorstel — inhoud vóór de eerste vraag",
+                    "source": "automatic_leading_context",
+                })
+
     for index, question in enumerate(ordered_questions[:-1]):
         following = ordered_questions[index + 1]
         gap_top = float(question["bottom"])

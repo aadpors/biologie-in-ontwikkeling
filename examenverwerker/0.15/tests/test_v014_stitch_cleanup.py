@@ -130,11 +130,15 @@ class QuestionAndContextSegmentationTests(unittest.TestCase):
             questions = [item for item in selections if item["type"] == "vraag"]
             contexts = [item for item in selections if item["type"] == "context"]
             self.assertEqual(len(questions), 2)
-            self.assertEqual(len(contexts), 1)
-            self.assertEqual(contexts[0]["question_numbers"], [2])
+            self.assertEqual(len(contexts), 2)
+            # De eerste context staat vóór vraag 1; de tweede ligt tussen
+            # vraag 1 en vraag 2 en wordt aan vraag 2 gekoppeld.
+            self.assertEqual(contexts[0]["question_numbers"], [1])
+            self.assertEqual(contexts[1]["question_numbers"], [2])
             self.assertGreater(contexts[0]["bottom"], contexts[0]["top"])
-            self.assertLessEqual(questions[0]["bottom"], contexts[0]["top"])
-            self.assertLessEqual(contexts[0]["bottom"], questions[1]["top"])
+            self.assertLessEqual(contexts[0]["bottom"], questions[0]["top"])
+            self.assertLessEqual(questions[0]["bottom"], contexts[1]["top"])
+            self.assertLessEqual(contexts[1]["bottom"], questions[1]["top"])
 
 
 if __name__ == "__main__":
