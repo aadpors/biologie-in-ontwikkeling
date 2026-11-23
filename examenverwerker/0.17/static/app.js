@@ -851,15 +851,30 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const y = Math.max(minimum, Math.min(maximum, Number(value) || 0));
       let nearest = null;
       let distance = Infinity;
+
       for (const [rangeStart, rangeEnd] of whiteRowRanges) {
+        // Houd de kandidaat binnen de geldige ruimte tussen de andere grens
+        // en de rand van de afbeelding. Zo kunnen twee grenzen nooit kruisen.
         const start = Math.max(rangeStart, minimum);
         const end = Math.min(rangeEnd, maximum);
         if (start > end) continue;
-        const candidate = Math.max(start, Math.min(end, Math.round(y)));
+
+        // De bovenrand van een fragment hoort op de onderste rij van de
+        // witte strook te liggen; de onderrand op de bovenste rij. 'nearest'
+        // blijft beschikbaar voor het eerste klikpunt, dat nog geen rol heeft.
+        const candidate = edge === 'top'
+          ? end
+          : edge === 'bottom'
+            ? start
+            : Math.max(start, Math.min(end, Math.round(y)));
         const delta = Math.abs(candidate - y);
-        if (delta < distance) { nearest = candidate; distance = delta; }
+        if (delta < distance) {
+          nearest = candidate;
+          distance = delta;
+        }
       }
-      // Wanneer tussen de minimale en maximale grens geen witte rij ligt,
+
+      // Wanneer binnen de toegestane ruimte geen volledig witte rij ligt,
       // blijft de bestaande grens staan. null is nooit een geldige pixelrij.
       return nearest;
     };
