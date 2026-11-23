@@ -8,7 +8,14 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
+
+# Scriptbestanden worden door Python met hun eigen map als sys.path[0]
+# gestart. Voeg daarom expliciet de versiehoofdmap toe om dezelfde package
+# te importeren als de normale applicatiestart.
+VERSION_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(VERSION_ROOT))
 
 from examenverwerker.question_detection import detect_question_starts
 from examenverwerker.question_fragments import build_stitched_exam, propose_stitched_question_selections
