@@ -172,8 +172,16 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         line_bbox = line.get("bbox")
                         if not line_bbox:
                             continue
-                        if (re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", line_text)
-                                and float(line_bbox[1]) >= page.rect.height * 0.93):
+                        lower_text = line_text.casefold()
+                        # Veel examen-PDF's combineren de documentcode,
+                        # paginering ("2 / 19") en "lees verder" in één regel.
+                        # Dat is geen geïsoleerd getal, maar wel een footer.
+                        is_page_counter = bool(re.search(r"\b\d{1,3}\s*/\s*\d{1,3}\b", line_text))
+                        is_read_on_footer = "lees verder" in lower_text or "►" in line_text
+                        is_isolated_number = bool(re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", line_text))
+                        if (float(line_bbox[1]) >= page.rect.height * 0.90
+                                and (is_page_counter or is_read_on_footer or
+                                     (is_isolated_number and float(line_bbox[1]) >= page.rect.height * 0.93))):
                             footer_numbers.append(line_bbox)
                 if footer_numbers:
                     with Image.open(page_path) as rendered:

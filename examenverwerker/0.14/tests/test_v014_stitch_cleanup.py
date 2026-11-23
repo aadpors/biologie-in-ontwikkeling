@@ -24,7 +24,7 @@ class StitchedPageCleanupTests(unittest.TestCase):
             page = pdf.new_page(width=600, height=800)
             page.insert_text((55, 110), "Een inhoudelijke context begint hier.", fontsize=12)
             page.insert_text((55, 150), "De tweede regel bevat voldoende zichtbare inhoud.", fontsize=12)
-            page.insert_text((300, 780), "2", fontsize=10)  # Los paginanummer in footer.
+            page.insert_text((45, 780), "VW-1018-a-26-2-o     2 / 19     lees verder ►►►", fontsize=9)  # Samengestelde examenfooter.
             pdf.save(source)
             pdf.close()
 
