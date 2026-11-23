@@ -249,14 +249,19 @@ def propose_stitched_question_selections(
         # De crop-bovenrand is uitgedrukt in de oorspronkelijke renderpixels.
         # Na het croppen kan een pagina bovendien proportioneel zijn verkleind
         # of vergroot om alle pagina's op dezelfde stitchbreedte te krijgen.
-        crop_top = float(page.get("crop_pixels", [0, 0, 0, 0])[1])
+        crop = page.get("crop_pixels", [0, 0, 0, 0])
+        crop_top = float(crop[1])
+        crop_height = max(1.0, float(crop[3]) - crop_top)
+        source_height = max(1.0, float(page.get("source_height", crop_height / render_scale)))
         cropped_width = max(1.0, float(page.get("render_width", 1)))
         stitched_width = max(1.0, float(page.get("stitched_width", cropped_width)))
         resize_factor = stitched_width / cropped_width
 
-        # Van PDF-punten naar renderpixels, aftrekken van de crop en daarna
-        # dezelfde normalisatiefactor toepassen als bij het stitchen.
-        local_y = (float(bbox[1]) * render_scale - crop_top) * resize_factor
+        # Bereken de werkelijke verticale renderfactor uit de bronpaginahoogte
+        # en de gerenderde crop. Dat voorkomt afrondingsfouten van PyMuPDF
+        # wanneer pixmap-afmetingen niet exact render_scale * PDF-punten zijn.
+        actual_render_scale_y = crop_height / source_height
+        local_y = (float(bbox[1]) * actual_render_scale_y - crop_top) * resize_factor
         absolute_y = float(page["top"]) + local_y
         absolute_y = max(float(page["top"]), min(float(page["bottom"]) - 1, absolute_y))
         mapped.append((absolute_y, start))

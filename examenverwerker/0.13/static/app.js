@@ -621,7 +621,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       if (!selections[index]) return;
       activeIndex = index;
       boundaryDrag = { index, edge: handle.dataset.boundary };
-      render();
+      // Houd de aangeklikte greep in de DOM; anders raakt pointer capture
+      // verloren zodra de overlay tijdens pointerdown opnieuw wordt getekend.
+      handle.setPointerCapture?.(event.pointerId);
+      overlay.querySelectorAll('[data-overlay-select]').forEach((element, elementIndex) => {
+        element.classList.toggle('active', elementIndex === index);
+      });
+      list.querySelectorAll('[data-select-fragment]').forEach((button, buttonIndex) => {
+        button.classList.toggle('active', buttonIndex === index);
+      });
     });
     overlay.addEventListener('pointermove', event => {
       if (!boundaryDrag) return;
