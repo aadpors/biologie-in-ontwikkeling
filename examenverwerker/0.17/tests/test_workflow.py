@@ -91,31 +91,41 @@ class WorkflowApplicationTests(unittest.TestCase):
         """Heropenen van oude examens herstelt alleen de oude automatische koppeling."""
         selections = [
             {
+                "id":"q38", "type":"vraag", "top":150, "bottom":190,
+                "question_numbers":[38], "label":"Vraag 38",
+            },
+            {
+                "id":"q39", "type":"vraag", "top":200, "bottom":240,
+                "question_numbers":[39], "label":"Vraag 39",
+            },
+            {
                 "id":"auto-context-between-37-38",
                 "type":"context",
                 "top":100,
                 "bottom":150,
-                "question_numbers":[38],
-                "label":"Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
+                "question_numbers":[37],
+                "label":"Automatisch contextvoorstel — inhoud na de voorafgaande vraag",
             },
             {
                 "id":"manual-context-1",
                 "type":"context",
-                "top":200,
-                "bottom":250,
+                "top":250,
+                "bottom":300,
                 "question_numbers":[38, 39],
                 "label":"Door docent gekoppelde context",
             },
         ]
 
         repaired = main._repair_automatic_context_links(selections)
+        repaired_auto = next(item for item in repaired if item["id"] == "auto-context-between-37-38")
+        repaired_manual = next(item for item in repaired if item["id"] == "manual-context-1")
 
-        self.assertEqual(repaired[0]["question_numbers"], [37])
-        self.assertIn("voorafgaande vraag", repaired[0]["label"])
+        self.assertEqual(repaired_auto["question_numbers"], [38, 39])
+        self.assertIn("bijbehorende vragen", repaired_auto["label"])
         # Handmatig gekozen koppelingen met meerdere vraagnummers blijven
         # ongewijzigd; de migratie mag geen inhoudelijke docentkeuze overschrijven.
-        self.assertEqual(repaired[1]["question_numbers"], [38, 39])
-        self.assertEqual(repaired[1]["label"], "Door docent gekoppelde context")
+        self.assertEqual(repaired_manual["question_numbers"], [38, 39])
+        self.assertEqual(repaired_manual["label"], "Door docent gekoppelde context")
 
     def test_import_detects_document_suffix_and_persists_originals(self):
         result = self.import_sample()
