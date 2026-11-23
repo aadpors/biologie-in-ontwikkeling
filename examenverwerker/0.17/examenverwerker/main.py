@@ -495,7 +495,11 @@ def _load_document_fragments(exam_id: str, document_type: str):
                              "sha256": document["sha256"]}
     proposals["document_type"] = document_type
     proposals["step_key"] = fragments_step_key
-    reviewed_numbers = set(previous.get("reviewed_question_numbers", []))
+    raw_reviewed_numbers = previous.get("reviewed_question_numbers", [])
+    # Oudere 0.17-builds konden hier per ongeluk een integer (het aantal
+    # gecontroleerde vragen) opslaan. Dat getal is geen lijst met vraag-ID's;
+    # behandel zulke records veilig als nog niet individueel gecontroleerd.
+    reviewed_numbers = set(raw_reviewed_numbers) if isinstance(raw_reviewed_numbers, list) else set()
     for question in proposals["questions"]:
         question["reviewed"] = question["question_number"] in reviewed_numbers
     return proposals
@@ -515,6 +519,8 @@ def _save_document_fragment_review(exam_id: str, document_type: str, payload: di
     reviewed = payload.get("reviewed_question_numbers")
     if not isinstance(reviewed, list) or any(not isinstance(number, int) for number in reviewed):
         raise HTTPException(422, "De lijst met gecontroleerde vraagnummers is ongeldig.")
+    if not isinstance(reviewed, list):
+        raise HTTPException(422, "De lijst met gecontroleerde vraagnummers moet een lijst zijn.")
     reviewed_set = set(reviewed)
     if not reviewed_set.issubset(expected):
         raise HTTPException(422, "Er is een vraagnummer aangeleverd dat niet bij de goedgekeurde starts hoort.")

@@ -820,7 +820,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
           <div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div>
         </section>
-        <aside class="stitched-inspector"><h3>Fragmenten</h3><div id="stitchedSelectionList"></div><div id="stitchedEditor"><p class="muted">Selecteer een fragment of maak een nieuw fragment aan.</p></div></aside>
+        <aside class="stitched-inspector"><h3>Fragmenten</h3><div id="stitchedSelectionList"></div></aside>
       </div>
       <div class="review-actions"><button class="primary" id="saveStitched">Nu opslaan</button><button class="primary" id="completeStitched">Fragmentcontrole goedkeuren en doorgaan</button></div><p id="stitchedMessage" class="form-error" role="status"></p>`;
 
@@ -835,12 +835,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // Een grens mag uitsluitend op een rij liggen waarvan ieder pixel wit is.
     // De API levert compacte intervallen met zulke rijen; deze functie kiest
     // steeds de dichtstbijzijnde geldige rij, ook bij slepen en handmatige invoer.
-    const snapBoundary = value => {
-      const y = Math.max(0, Math.min(result.height - 1, Number(value) || 0));
+    const snapBoundary = (value, minimum = 0, maximum = result.height - 1) => {
+      const y = Math.max(minimum, Math.min(maximum, Number(value) || 0));
       if (!whiteRowRanges.length) return Math.round(y);
       let nearest = null;
       let distance = Infinity;
-      for (const [start, end] of whiteRowRanges) {
+      for (const [rangeStart, rangeEnd] of whiteRowRanges) {
+        const start = Math.max(rangeStart, minimum);
+        const end = Math.min(rangeEnd, maximum);
+        if (start > end) continue;
         const candidate = Math.max(start, Math.min(end, Math.round(y)));
         const delta = Math.abs(candidate - y);
         if (delta < distance) { nearest = candidate; distance = delta; }
@@ -942,9 +945,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       if (!item) return;
       const y = snapBoundary(imageY(event));
       if (boundaryDrag.edge === 'top') {
-        item.top = Math.max(0, Math.min(y, item.bottom - 12));
+        item.top = snapBoundary(y, 0, item.bottom - 12);
       } else {
-        item.bottom = Math.min(result.height, Math.max(y, item.top + 12));
+        item.bottom = snapBoundary(y, item.top + 12, result.height - 1);
       }
       const element = overlay.querySelector(`[data-overlay-select="${boundaryDrag.index}"]`);
       if (element) {
@@ -1059,8 +1062,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           scheduleSave();
         });
         const updateBoundary = () => {
-          const top = snapBoundary(Number($('#fragmentTop').value));
-          const bottom = snapBoundary(Number($('#fragmentBottom').value));
+          const top = snapBoundary(Number($('#fragmentTop').value), 0, item.bottom - 12);
+          const bottom = snapBoundary(Number($('#fragmentBottom').value), item.top + 12, result.height - 1);
           if (Number.isFinite(top) && Number.isFinite(bottom) && top >= 0 && bottom <= result.height && bottom > top) {
             item.top = top;
             item.bottom = bottom;
@@ -1144,7 +1147,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         });
         await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`,{
           method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)].length})
+          body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)]})
         });
         await openWorkspace(state.examId);
       } catch(error) { $('#stitchedMessage').textContent=error.message; }

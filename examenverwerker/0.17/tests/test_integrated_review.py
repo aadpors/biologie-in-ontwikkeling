@@ -145,7 +145,7 @@ class IntegratedReviewTests(unittest.TestCase):
         completed = self.client.post(
             f"/api/exams/{exam_id}/steps/opgaven_fragments/complete",
             json={"reviewed": True, "reviewed_all_questions": True,
-                  "reviewed_question_numbers": 1},
+                  "reviewed_question_numbers": [1]},
         )
         self.assertEqual(completed.status_code, 200, completed.text)
 

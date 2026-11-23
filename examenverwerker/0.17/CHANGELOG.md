@@ -17,3 +17,9 @@
 ## Testgrenzen
 
 De witte-rijcontrole wordt op synthetische PDF's getest. Visuele beoordeling van de automatische segmentatie met een echt examen blijft noodzakelijk.
+
+## Correctie na integratietest
+
+- De afrondactie van stap 3 stuurt nu de volledige lijst met gecontroleerde vraagnummers door; het aantal wordt niet langer over hetzelfde opslagveld geschreven.
+- Bestaande dossiers waarin een ouder 0.17-scherm al een integer had opgeslagen, openen stap 4 nu zonder serverfout. De individuele reviewvinkjes worden in dat geval niet automatisch als gecontroleerd beschouwd.
+- Het verslepen en numeriek aanpassen van grenzen blijft binnen de geldige witte-rijintervallen, ook bij de minimale fragmenthoogte.
