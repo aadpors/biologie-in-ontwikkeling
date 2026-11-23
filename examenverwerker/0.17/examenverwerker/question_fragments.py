@@ -653,14 +653,20 @@ def normalise_stitched_selections(
             gap_bottom = int(following["top"])
             if gap_bottom - gap_top < 12 or not has_visible_content(gap_top, gap_bottom):
                 continue
+            # Een context die direct onder een vraag staat, hoort bij de
+            # vraag die eraan voorafgaat. Koppelen aan de volgende vraag
+            # maakte bijvoorbeeld de context tussen 37 en 38 onderdeel van
+            # vraag 38, terwijl de leesvolgorde context-na-vraag juist bij 37
+            # hoort. De docent kan de koppeling later uitbreiden of wijzigen.
+            previous_number = int(previous["question_numbers"][0])
             following_number = int(following["question_numbers"][0])
             contexts.append({
-                "id": f"auto-context-between-{previous['question_numbers'][0]}-{following_number}",
+                "id": f"auto-context-between-{previous_number}-{following_number}",
                 "type": "context",
                 "top": gap_top,
                 "bottom": gap_bottom,
-                "question_numbers": [following_number],
-                "label": "Automatisch contextvoorstel — zichtbare inhoud tussen vraagfragmenten",
+                "question_numbers": [previous_number],
+                "label": "Automatisch contextvoorstel — inhoud na de voorafgaande vraag",
                 "source": "automatic_inter_question_gap",
             })
 
