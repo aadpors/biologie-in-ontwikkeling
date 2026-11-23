@@ -771,11 +771,8 @@ def get_answers(exam_id: str):
                 question["confidence"] = "laag"
                 question["reason"] = "De aanvulling is als vervanging gemarkeerd; controleer de volledige vervangende tekst."
             elif action in {"toevoegen", "handmatig"}:
-                question["answer_text"] = (question["answer_text"] + "
-
-Aanvulling (pagina " +
-                                            str(page_number) + "): 
-" + page_text).strip()
+                question["answer_text"] = (question["answer_text"] + "\n\nAanvulling (pagina " +
+                                            str(page_number) + "): \n" + page_text).strip()
                 if action == "handmatig":
                     question["answer_kind"] = "handmatig"
                     question["confidence"] = "laag"
