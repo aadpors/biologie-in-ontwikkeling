@@ -915,8 +915,20 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
     evidence.update({"stitched_selections": clean,
                      "stitched_reviewed": bool(payload.get("reviewed")),
                      "document_sha256": starts.get("evidence", {}).get("document_sha256")})
-    STORE.save_step_draft(exam_id, "opgaven_fragments", evidence)
-    return {"ok": True, "selection_count": len(clean), "reviewed": evidence["stitched_reviewed"]}
+
+    # Ook voor de fragmentreview kan een autosave vanaf pagehide of
+    # visibilitychange pas na de afrondactie aankomen. Een identieke
+    # momentopname mag de complete stap niet terugzetten naar pending; een
+    # daadwerkelijk gewijzigde selectie moet de goedkeuring juist intrekken.
+    saved_as_draft = STORE.save_step_draft_preserving_identical_complete(
+        exam_id,
+        "opgaven_fragments",
+        evidence,
+        identity_fields=("stitched_selections", "document_sha256"),
+    )
+    return {"ok": True, "selection_count": len(clean),
+            "reviewed": evidence["stitched_reviewed"],
+            "complete": not saved_as_draft}
 
 
 @app.get("/api/exams/{exam_id}/document-question-fragments/{document_type}")
