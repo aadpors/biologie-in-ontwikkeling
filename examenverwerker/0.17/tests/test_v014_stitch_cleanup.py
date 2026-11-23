@@ -134,7 +134,10 @@ class StitchedSelectionNormalisationTests(unittest.TestCase):
             self.assertLessEqual(questions[0]["bottom"], questions[1]["top"])
             # De strook tussen de vragen is volledig wit en mag geen context worden.
             self.assertFalse(any(item["top"] == 83 and item["bottom"] == 95 for item in contexts))
-            self.assertEqual(contexts[0]["question_numbers"], [1])
+            # Een inleidende context wordt gekoppeld aan de daaropvolgende
+            # vragen tot aan het volgende contextblok. In dit voorbeeld is er
+            # geen tweede contextblok, dus vallen vraag 1 en 2 in dezelfde groep.
+            self.assertEqual(contexts[0]["question_numbers"], [1, 2])
 
 
 class QuestionAndContextSegmentationTests(unittest.TestCase):
