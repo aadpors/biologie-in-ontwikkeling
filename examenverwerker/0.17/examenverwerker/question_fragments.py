@@ -516,12 +516,12 @@ def normalise_stitched_selections(
     alleen witruimte. Deze normalisatie gebruikt de goedgekeurde vraagstarts
     als vaste volgorde en de volledige witte beeldrijen als enige grenslijnen.
 
-    De ondergrens van een vraag wordt nooit voorbij de bovengrens van de
-    volgende vraag geplaatst. Als de eerste heuristische ondergrens vóór die
-    grens valt (bijvoorbeeld midden in een meerregelige vraag), loopt het
-    vraagfragment door tot de eerstvolgende vraaggrens. Tussen twee vragen
-    wordt alleen een context voorgesteld wanneer daar daadwerkelijk tekst,
-    een afbeelding of een ander niet-wit element zichtbaar is.
+    De vraagstarts bepalen de veilige scheiding: een vraag loopt door tot
+    de laatste zuiver witte rij vóór de volgende goedgekeurde vraagstart. Een
+    eerdere witregel kan midden in een meerregelige vraag staan en wordt dus
+    niet als automatische afkapgrens vertrouwd. Zichtbare inhoud tussen twee
+    vraagstarts blijft behouden bij de voorafgaande vraag en kan in de editor
+    handmatig als afzonderlijke context worden afgesplitst.
     """
     if not selections:
         return []
