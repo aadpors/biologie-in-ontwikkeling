@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 import fitz
+from PIL import Image
 from fastapi.testclient import TestClient
 
 from examenverwerker import main
