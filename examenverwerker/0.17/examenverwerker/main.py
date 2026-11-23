@@ -400,6 +400,65 @@ def _white_row_ranges(image_path: str | Path) -> list[list[int]]:
     return ranges
 
 
+def _extract_stitched_selection_text(
+    pdf_path: str | Path,
+    page_metadata: list[dict[str, Any]],
+    top: float,
+    bottom: float,
+    *,
+    render_scale: float = 1.25,
+) -> str:
+    """Haal de tekst op uit exact het geselecteerde gebied van de stitchafbeelding.
+
+    De vraagafbeelding is leidend voor de grenzen. Voor de automatische
+    type-/puntenvoorstellen halen we daarnaast de selecteerbare PDF-tekst op
+    uit precies hetzelfde verticale bereik. De coördinaten worden teruggezet
+    via de crop-, render- en stitchmetadata; zo wordt niet per ongeluk de tekst
+    van de volledige pagina of van de volgende vraag meegenomen.
+    """
+    if bottom <= top:
+        return ""
+
+    text_parts: list[str] = []
+    with fitz.open(pdf_path) as pdf:
+        for page_info in page_metadata:
+            page_number = int(page_info["page_number"])
+            if page_number < 1 or page_number > pdf.page_count:
+                continue
+
+            # Alleen het overlappende deel van deze bronpagina wordt uitgelezen.
+            page_top = float(page_info["top"])
+            page_bottom = float(page_info["bottom"])
+            overlap_top = max(float(top), page_top)
+            overlap_bottom = min(float(bottom), page_bottom)
+            if overlap_bottom <= overlap_top:
+                continue
+
+            # De lange afbeelding is per pagina eerst gecropt en daarna
+            # eventueel proportioneel geschaald naar de gemeenschappelijke
+            # stitchbreedte. Draai beide stappen in omgekeerde volgorde terug.
+            crop_pixels = page_info.get("crop_pixels", [0, 0, 0, 0])
+            crop_top = float(crop_pixels[1])
+            rendered_width = max(1.0, float(page_info.get("render_width", 1)))
+            stitched_width = max(1.0, float(page_info.get("stitched_width", rendered_width)))
+            resize_factor = stitched_width / rendered_width
+
+            render_y0 = (overlap_top - page_top) / resize_factor + crop_top
+            render_y1 = (overlap_bottom - page_top) / resize_factor + crop_top
+            pdf_y0 = max(0.0, render_y0 / render_scale)
+            pdf_y1 = min(float(page_info["source_height"]), render_y1 / render_scale)
+            if pdf_y1 <= pdf_y0:
+                continue
+
+            page = pdf[page_number - 1]
+            clip = fitz.Rect(0, pdf_y0, page.rect.width, pdf_y1)
+            extracted = page.get_text("text", clip=clip, sort=True).strip()
+            if extracted:
+                text_parts.append(extracted)
+
+    return "\n".join(text_parts)
+
+
 def _nearest_white_row(y: float, ranges: list[list[int]]) -> int:
     """Rond een voorgestelde grens af op de dichtstbijzijnde volledig witte rij."""
     if not ranges:
@@ -461,8 +520,10 @@ def _load_document_fragments(exam_id: str, document_type: str):
     if document_type == "opgaven" and previous.get("stitched_selections"):
         stitched_dir = DATA / "exams" / exam_id / "derived" / "opgaven_stitched"
         stitched_path = stitched_dir / "exam-long.png"
-        if not stitched_path.is_file():
-            build_stitched_exam(source_path, stitched_path)
+        # Bouw de metadata opnieuw op naast de afbeelding. Die metadata is
+        # nodig om de geselecteerde pixelstrook terug te rekenen naar de
+        # exacte bronpagina's en PDF-tekstcoördinaten.
+        stitched_metadata = build_stitched_exam(source_path, stitched_path)
         stitched_questions = [item for item in previous["stitched_selections"] if item.get("type") == "vraag"]
         stitched_contexts = [item for item in previous["stitched_selections"] if item.get("type") == "context"]
         question_map = {int(item["question_number"]): item for item in accepted}
@@ -485,7 +546,13 @@ def _load_document_fragments(exam_id: str, document_type: str):
                         "first_page": start["page_index"] + 1, "last_page": start["page_index"] + 1,
                         "segments": [{"page_number": start["page_index"] + 1, "filename": filename, "url": url}],
                         "source_segments": None, "stitched": True,
-                        "extracted_text": selection.get("label", ""), "reviewed": True,
+                        # Analyseer uitsluitend de tekst binnen de goedgekeurde
+                        # visuele selectie. Het label is alleen een omschrijving
+                        # en mag nooit als vervanging voor vraagtekst dienen.
+                        "extracted_text": _extract_stitched_selection_text(
+                            source_path, stitched_metadata["pages"], top, bottom
+                        ),
+                        "reviewed": True,
                         "selection_id": selection.get("id"),
                     })
         if rebuilt_questions:
