@@ -691,6 +691,43 @@ def save_question_fragment_review(exam_id: str, payload: dict):
     return _save_document_fragment_review(exam_id, "opgaven", payload)
 
 
+def _repair_automatic_context_links(selections: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Herstel oude automatische contextkoppelingen bij het laden van stap 3.
+
+    Een eerdere versie koppelde context tussen twee vragen aan de volgende
+    vraag. De huidige leesvolgorde koppelt zo'n context aan de voorafgaande
+    vraag. Bestaande opgeslagen examens kunnen nog de oude automatische
+    koppeling bevatten; herstel daarom alleen herkenbare automatische
+    context-ID's met precies de oude enkelvoudige koppeling. Handmatig
+    samengestelde koppelingen met meerdere vraagnummers blijven ongemoeid.
+    """
+    repaired: list[dict[str, Any]] = []
+    pattern = re.compile(r"^auto-context-between-(\d+)-(\d+)$")
+
+    for selection in selections:
+        item = dict(selection)
+        match = pattern.fullmatch(str(item.get("id", "")))
+        numbers = item.get("question_numbers", [])
+        is_automatic_context = (
+            item.get("type") == "context"
+            and match is not None
+            and str(item.get("label", "")).startswith("Automatisch contextvoorstel")
+        )
+
+        if is_automatic_context and numbers == [int(match.group(2))]:
+            # De context staat fysiek ná de eerste vraag en vóór de volgende.
+            # De oude versie wees hem aan de tweede vraag toe; corrigeer die
+            # ene herkenbare situatie naar de vraag die eraan voorafgaat.
+            item["question_numbers"] = [int(match.group(1))]
+            item["label"] = (
+                "Automatisch contextvoorstel — inhoud na de voorafgaande vraag"
+            )
+
+        repaired.append(item)
+
+    return repaired
+
+
 @app.get("/api/exams/{exam_id}/stitched-opgaven")
 def get_stitched_opgaven(exam_id: str):
     """Lever het lange selectiewerkvlak voor stap 3 van de opgaven."""
@@ -712,7 +749,12 @@ def get_stitched_opgaven(exam_id: str):
     # Bestaande docentselecties blijven altijd leidend. Alleen bij een nieuw
     # examen worden automatische voorstellen gemaakt op basis van de al
     # goedgekeurde hoofdvraagstarts; opgeslagen werk wordt nooit overschreven.
-    saved_selections = previous.get("stitched_selections", [])
+    # Herstel bij het laden ook reeds opgeslagen automatische contexten uit
+    # oudere versies. Zo blijft een context tussen vraag 37 en 38 gekoppeld
+    # aan vraag 37, ook wanneer de gebruiker het examen eerder al had bewaard.
+    saved_selections = _repair_automatic_context_links(
+        previous.get("stitched_selections", [])
+    )
     starts_evidence = exam["steps"].get("opgaven_starts", {}).get("evidence", {})
     accepted_starts = [
         item for item in starts_evidence.get("candidates", [])
