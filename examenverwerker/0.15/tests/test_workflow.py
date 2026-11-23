@@ -124,12 +124,22 @@ class WorkflowApplicationTests(unittest.TestCase):
 
     def test_duplicate_exam_requires_confirmation_and_replaces_old_processing(self):
         """Een identieke PDF-verzameling mag alleen na bevestiging worden vervangen."""
-        original = self.import_sample()
-        files = [
-            ("files", ("biologie-vwo-2026-tv2-o.pdf", self.pdf_bytes(), "application/pdf")),
-            ("files", ("biologie-vwo-2026-tv2-c.pdf", self.pdf_bytes("Correctievoorschrift biologie vwo 2026"), "application/pdf")),
+        opgaven_pdf = self.pdf_bytes()
+        cv_pdf = self.pdf_bytes("Correctievoorschrift biologie vwo 2026")
+        original_files = [
+            ("files", ("biologie-vwo-2026-tv2-o.pdf", opgaven_pdf, "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", cv_pdf, "application/pdf")),
         ]
-        duplicate = self.client.post("/api/exams/import", files=files)
+        original_response = self.client.post("/api/exams/import", files=original_files)
+        self.assertEqual(original_response.status_code, 200, original_response.text)
+        original = original_response.json()
+
+        # Zelfde bronbestanden, maar in omgekeerde uploadvolgorde.
+        duplicate_files = [
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", cv_pdf, "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-o.pdf", opgaven_pdf, "application/pdf")),
+        ]
+        duplicate = self.client.post("/api/exams/import", files=duplicate_files)
         self.assertEqual(duplicate.status_code, 409)
         detail = duplicate.json()["detail"]
         self.assertEqual(detail["code"], "duplicate_exam")
@@ -137,14 +147,14 @@ class WorkflowApplicationTests(unittest.TestCase):
 
         # De bevestigde vervanging maakt een nieuw examen en verwijdert de
         # oude databasegegevens inclusief alle bijbehorende workflowstappen.
-        files = [
-            ("files", ("biologie-vwo-2026-tv2-c.pdf", self.pdf_bytes("Correctievoorschrift biologie vwo 2026"), "application/pdf")),
-            ("files", ("biologie-vwo-2026-tv2-o.pdf", self.pdf_bytes(), "application/pdf")),
+        replacement_files = [
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", cv_pdf, "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-o.pdf", opgaven_pdf, "application/pdf")),
         ]
         replacement = self.client.post(
             "/api/exams/import",
             data={"replace_exam_id": original["exam_id"]},
-            files=files,
+            files=replacement_files,
         )
         self.assertEqual(replacement.status_code, 200, replacement.text)
         self.assertNotEqual(replacement.json()["exam_id"], original["exam_id"])
