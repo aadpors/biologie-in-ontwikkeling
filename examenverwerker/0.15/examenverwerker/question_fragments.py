@@ -406,7 +406,11 @@ def propose_stitched_question_selections(
         local_before = [value for value in separators
                         if page_top <= value < start_y]
         global_after = [value for value in separators if value > start_y]
-        top = max(page_top, local_before[-1] if local_before else page_top)
+        # Als er vóór de vraagstart geen expliciete witregel/kader is,
+        # gebruik dan de vraagstart zelf als scheiding. Zo blijft tekst die
+        # aantoonbaar vóór de eerste vraag staat als context beschikbaar.
+        top_boundary = local_before[-1] if local_before else start_y - 8.0
+        top = max(page_top, top_boundary)
         bottom = min(float(image_height), global_after[0] if global_after else float(image_height))
 
         # De boven- en ondergrens vallen net buiten de witregel/kaderlijn.
