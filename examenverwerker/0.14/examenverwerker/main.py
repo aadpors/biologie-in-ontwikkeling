@@ -1171,7 +1171,13 @@ def save_final_review(exam_id: str, payload: dict):
     evidence = {"questions": cleaned, "reviewed_count": reviewed,
                 "reviewed_all_questions": reviewed == len(cleaned)}
     STORE.save_step_draft(exam_id, "eindcontrole", evidence)
-    return {"ok": True, **evidence, "complete": evidence["reviewed_all_questions"]}
+    unresolved = any(
+        question["points_match"] is False and
+        not next(item for item in cleaned if item["question_number"] == question["question_number"])["resolution_note"].strip()
+        for question in result["questions"]
+    )
+    return {"ok": True, **evidence,
+            "complete": evidence["reviewed_all_questions"] and not unresolved}
 
 
 @app.get("/api/context-images/{exam_id}/{filename}")

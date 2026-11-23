@@ -115,6 +115,11 @@ class IntegratedReviewTests(unittest.TestCase):
                    "reviewed_cv_numbers":[q["question_number"] for q in snippets.json()["correctievoorschrift"]["questions"]]}
         blocked = self.client.post(f"/api/exams/{exam_id}/snippets/review", json=payload)
         self.assertEqual(blocked.status_code, 422)
+        # Automatisch opslaan mag een onvolledige review bewaren; afronden
+        # blijft geblokkeerd totdat de docent expliciet geen context bevestigt.
+        draft = self.client.post(f"/api/exams/{exam_id}/snippets/review", json={**payload, "draft":True})
+        self.assertEqual(draft.status_code, 200, draft.text)
+        self.assertFalse(draft.json()["complete"])
         payload["confirmed_no_contexts"] = True
         accepted = self.client.post(f"/api/exams/{exam_id}/snippets/review", json=payload)
         self.assertEqual(accepted.status_code, 200, accepted.text)
@@ -143,6 +148,11 @@ class IntegratedReviewTests(unittest.TestCase):
             {"question_number":1,"reviewed":True,"resolution_note":""}
         ]})
         self.assertEqual(blocked.status_code, 422)
+        draft = self.client.post(f"/api/exams/{exam_id}/final-review/review", json={
+            "draft":True,"questions":[{"question_number":1,"reviewed":True,"resolution_note":""}]
+        })
+        self.assertEqual(draft.status_code, 200, draft.text)
+        self.assertFalse(draft.json()["complete"])
         accepted = self.client.post(f"/api/exams/{exam_id}/final-review/review", json={"questions":[
             {"question_number":1,"reviewed":True,"resolution_note":"De CV-score is leidend; verschil handmatig gecontroleerd."}
         ]})
