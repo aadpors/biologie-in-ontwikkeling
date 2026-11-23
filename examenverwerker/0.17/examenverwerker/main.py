@@ -341,21 +341,18 @@ def _save_document_question_start_review(exam_id: str, document_type: str, paylo
     step_key = {"opgaven":"opgaven_starts", "uitwerkbijlage":"uitwerk_starts",
                 "correctievoorschrift":"cv_starts"}[document_type]
 
-    # De browser kan bij het verlaten van stap 1 nog een laatste autosave
-    # versturen. Die request kan ná de expliciete afrondactie aankomen. Als
-    # de inhoudelijke vraagstartbeslissingen identiek zijn aan de reeds
-    # goedgekeurde versie, mag zo'n late, identieke autosave de status
-    # 'complete' niet terugzetten naar 'pending'. Een echte wijziging wordt
-    # wel als nieuw concept opgeslagen en vereist opnieuw goedkeuren.
-    current_step = exam["steps"].get(step_key, {})
-    current_evidence = current_step.get("evidence", {})
-    same_approved_candidates = (
-        current_step.get("status") == "complete"
-        and current_evidence.get("candidates") == review.get("candidates")
-        and current_evidence.get("document_sha256") == review.get("document_sha256")
+    # Een autosave kan pas aankomen nadat de gebruiker de stap al heeft
+    # goedgekeurd. De opslaglaag vergelijkt de inhoud daarom binnen één
+    # SQLite-schrijftransactie. Zo kan een identieke late autosave de status
+    # 'complete' niet terugzetten naar 'pending'; echte wijzigingen doen dat
+    # nadrukkelijk wel en vragen opnieuw om visuele goedkeuring.
+    saved_as_draft = STORE.save_step_draft_preserving_identical_complete(
+        exam_id,
+        step_key,
+        review,
+        identity_fields=("candidates", "document_sha256"),
     )
-    if not same_approved_candidates:
-        STORE.save_step_draft(exam_id, step_key, review)
+    same_approved_candidates = not saved_as_draft
 
     return {"ok": True, "review": review,
             "complete": bool(same_approved_candidates),
