@@ -823,7 +823,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
-          <div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div>
+          <div class="stitched-image-scroll" id="stitchedImageScroll"><div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div></div>
         </section>
         <aside class="stitched-inspector"><h3>Fragmenten</h3><div id="stitchedSelectionList"></div></aside>
       </div>
@@ -831,6 +831,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
 
     const img = $('#stitchedImage');
     const wrap = $('#stitchedImageWrap');
+    const imageScroll = $('#stitchedImageScroll');
     const overlay = $('#stitchedOverlay');
     const hint = $('#selectionHint');
     const list = $('#stitchedSelectionList');
@@ -846,7 +847,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // Een grens mag uitsluitend op een rij liggen waarvan iedere RGB-pixel
     // exact wit is. De server levert alleen zulke rijen aan; de browser kiest
     // daaruit steeds de dichtstbijzijnde positie.
-    const snapBoundary = (value, minimum = 0, maximum = result.height - 1) => {
+    const snapBoundary = (value, minimum = 0, maximum = result.height - 1, edge = 'nearest') => {
       const y = Math.max(minimum, Math.min(maximum, Number(value) || 0));
       let nearest = null;
       let distance = Infinity;
@@ -872,7 +873,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // Synchroniseer de twee onafhankelijke scrollvakken op basis van hun
     // relatieve voortgang. Zo blijft de rechter fragmentlijst meelopen met de
     // lange examenstrook, en andersom. De guard voorkomt een scroll-lus.
-    const stitchedView = panel.querySelector('.stitched-view');
+    const stitchedView = imageScroll;
     const inspector = panel.querySelector('.stitched-inspector');
     let syncingScroll = false;
     const syncScroll = (source, target) => {
@@ -883,7 +884,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       target.scrollTop = source.scrollTop / sourceRange * targetRange;
       requestAnimationFrame(() => { syncingScroll = false; });
     };
-    stitchedView.addEventListener('scroll', () => syncScroll(stitchedView, inspector), {passive:true});
+    imageScroll.addEventListener('scroll', () => syncScroll(imageScroll, inspector), {passive:true});
     inspector.addEventListener('scroll', () => syncScroll(inspector, stitchedView), {passive:true});
 
     // Sla een momentopname van de selectie op. Een seriële promiseketen
@@ -958,11 +959,11 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const y = imageY(event);
       if (y === null) return;
       if (boundaryDrag.edge === 'top') {
-        const snappedTop = snapBoundary(y, 0, item.bottom - 12);
+        const snappedTop = snapBoundary(y, 0, item.bottom - 12, 'top');
         if (snappedTop === null) return;
         item.top = snappedTop;
       } else {
-        const snappedBottom = snapBoundary(y, item.top + 12, result.height - 1);
+        const snappedBottom = snapBoundary(y, item.top + 12, result.height - 1, 'bottom');
         if (snappedBottom === null) return;
         item.bottom = snappedBottom;
       }
@@ -988,10 +989,18 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     overlay.addEventListener('pointerup', stopBoundaryDrag);
     overlay.addEventListener('pointercancel', stopBoundaryDrag);
 
+    // Toon geen technische fragmentnummers. De inhoudelijke naam volgt
+    // uit het fragmenttype en de gekoppelde vraag-/vraagnummers.
     const questionLabel = item => {
-      const numbers = item.question_numbers || [];
+      const numbers = [...(item.question_numbers || [])].sort((a, b) => a - b);
       if (!numbers.length) return 'Nog niet gekoppeld';
-      return numbers.length === 1 ? `Vraag ${numbers[0]}` : `Vragen ${numbers.join(', ')}`;
+      if (item.type === 'vraag') return numbers.length === 1 ? `Vraag ${numbers[0]}` : `Vragen ${numbers.join(', ')}`;
+      const joined = numbers.length === 1
+        ? String(numbers[0])
+        : numbers.length === 2
+          ? `${numbers[0]} en ${numbers[1]}`
+          : `${numbers.slice(0, -1).join(', ')} en ${numbers[numbers.length - 1]}`;
+      return `Context bij vraag ${joined}`;
     };
 
     // Verplaats het middendeel naar het verticale midden van een fragment.
@@ -999,7 +1008,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const scrollImageToFragment = index => {
       const item = selections[index];
       if (!item) return;
-      const view = panel.querySelector('.stitched-view');
+      const view = imageScroll;
       // Bereken de doelpositie ten opzichte van het scrollvak zelf. offsetTop
       // hangt af van de offsetParent en gaf bij deze geneste layout soms een
       // positie ten opzichte van de hele pagina in plaats van het werkpaneel.
@@ -1023,8 +1032,14 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     };
 
     const render = () => {
-      // De fragmentnummers zijn doorlopend en onafhankelijk van het type.
-      // De koppeling staat op een tweede regel en gebruikt enkelvoud/meervoud.
+      // Houd de actieve selectie vast op basis van haar stabiele ID terwijl
+      // de volledige lijst op de fysieke documentpositie wordt gesorteerd.
+      const activeId = selections[activeIndex]?.id;
+      selections.sort((a, b) => Number(a.top) - Number(b.top) || Number(a.bottom) - Number(b.bottom));
+      activeIndex = activeId ? selections.findIndex(item => item.id === activeId) : -1;
+
+      // De inhoudelijke naam is voldoende; een los fragmentnummer voegt
+      // voor de docent niets toe en verandert bovendien bij hersorteren.
       list.innerHTML = selections.map((item, index) => {
         const selectedEditor = index === activeIndex ? `
           <div class="stitched-editor" id="stitchedEditor">
@@ -1050,8 +1065,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         return `
           <div class="stitched-list-entry">
             <button type="button" class="stitched-list-item ${index===activeIndex?'active':''}" data-select-fragment="${index}">
-              <strong>Fragment ${index+1} ${item.type==='context'?'context':'vraag'}</strong>
-              <small>${escapeHtml(questionLabel(item))} · ${Math.round(item.bottom-item.top)} px</small>
+              <strong>${escapeHtml(questionLabel(item))}</strong>
+              <small>${Math.round(item.bottom-item.top)} px</small>
             </button>
             ${selectedEditor}
           </div>`;
@@ -1060,7 +1075,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       overlay.innerHTML = selections.map((item,index) =>
         `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?20:1}" data-overlay-select="${index}">
           <button type="button" class="stitched-boundary stitched-boundary-top" data-boundary="top" data-boundary-index="${index}" aria-label="Bovengrens verslepen"></button>
-          <span>Fragment ${index+1} · ${item.type==='context'?'context':'vraag'}</span>
+          <span>${escapeHtml(questionLabel(item))}</span>
           <button type="button" class="stitched-boundary stitched-boundary-bottom" data-boundary="bottom" data-boundary-index="${index}" aria-label="Ondergrens verslepen"></button>
         </div>`
       ).join('') + (pendingTop!==null?`<div class="stitched-pending" style="top:${pendingTop/result.height*100}%"></div>`:'');
@@ -1090,8 +1105,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           scheduleSave();
         });
         const updateBoundary = () => {
-          const top = snapBoundary(Number($('#fragmentTop').value), 0, item.bottom - 12);
-          const bottom = snapBoundary(Number($('#fragmentBottom').value), item.top + 12, result.height - 1);
+          const top = snapBoundary(Number($('#fragmentTop').value), 0, item.bottom - 12, 'top');
+          const bottom = snapBoundary(Number($('#fragmentBottom').value), item.top + 12, result.height - 1, 'bottom');
           if (Number.isFinite(top) && Number.isFinite(bottom) && top >= 0 && bottom <= result.height && bottom > top) {
             item.top = top;
             item.bottom = bottom;
@@ -1143,8 +1158,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         hint.textContent='Het fragment is te klein. Kies opnieuw.';
         pendingTop=null;render();return;
       }
-      const snappedTop=snapBoundary(top);
-      const snappedBottom=snapBoundary(bottom);
+      const snappedTop=snapBoundary(top, 0, result.height - 1, 'top');
+      const snappedBottom=snapBoundary(bottom, 0, result.height - 1, 'bottom');
       if(snappedTop===null || snappedBottom===null || snappedBottom-snappedTop<12){
         hint.textContent='Tussen deze punten ligt geen bruikbare volledig witte grens. Kies opnieuw.';
         pendingTop=null;render();return;
