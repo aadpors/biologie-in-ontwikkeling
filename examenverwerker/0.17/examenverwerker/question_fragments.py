@@ -628,23 +628,22 @@ def normalise_stitched_selections(
         for index, question in enumerate(questions):
             next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
 
-            # Een voorgestelde scheiding wordt alleen als contextgrens
-            # gebruikt wanneer er tussen die grens en de volgende vraagstart
-            # daadwerkelijk inhoud staat. De context zelf blijft een apart
-            # fragment; de koppeling wordt hieronder aan de daaropvolgende
-            # vragen toegekend.
+            # Gebruik de voorgestelde ondergrens zodra deze na de
+            # bovengrens en vóór de volgende vraag ligt. Ook wanneer er geen
+            # contextinhoud achter staat, blijft de lijn op de eerste witte
+            # rij na de vraag staan; een lege witte strook wordt niet in het
+            # vraagfragment opgenomen.
             if next_top is not None:
                 proposed_bottom = int(question["bottom"])
-                has_following_content = has_visible_content(proposed_bottom, next_top)
-                question["bottom"] = (
-                    min(next_top, proposed_bottom)
-                    if proposed_bottom > question["top"] and has_following_content
-                    else next_top
-                )
+                if question["top"] < proposed_bottom < next_top:
+                    question["bottom"] = proposed_bottom
+                else:
+                    # Een overlappende of onbruikbare voorstelgrens mag nooit
+                    # over de volgende vraag heen lopen.
+                    question["bottom"] = next_top
             else:
-                # De laatste vraag loopt door tot de laatste volledig witte
-                # rij in de lange afbeelding. Een interne witregel in de
-                # laatste vraag mag dus evenmin als eindgrens worden gebruikt.
+                # De laatste vraag eindigt op de bovenste rij van de laatste
+                # volledig witte strook na de laatste inhoudsregel.
                 question["bottom"] = snap_after(height - 1)
 
             if question["bottom"] <= question["top"]:
