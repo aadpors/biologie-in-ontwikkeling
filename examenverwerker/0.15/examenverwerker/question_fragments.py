@@ -292,17 +292,15 @@ def propose_stitched_question_selections(
         # of vergroot om alle pagina's op dezelfde stitchbreedte te krijgen.
         crop = page.get("crop_pixels", [0, 0, 0, 0])
         crop_top = float(crop[1])
-        crop_height = max(1.0, float(crop[3]) - crop_top)
-        source_height = max(1.0, float(page.get("source_height", crop_height / render_scale)))
         cropped_width = max(1.0, float(page.get("render_width", 1)))
         stitched_width = max(1.0, float(page.get("stitched_width", cropped_width)))
         resize_factor = stitched_width / cropped_width
 
-        # Bereken de werkelijke verticale renderfactor uit de bronpaginahoogte
-        # en de gerenderde crop. Dat voorkomt afrondingsfouten van PyMuPDF
-        # wanneer pixmap-afmetingen niet exact render_scale * PDF-punten zijn.
-        actual_render_scale_y = crop_height / source_height
-        local_y = (float(bbox[1]) * actual_render_scale_y - crop_top) * resize_factor
+        # crop_pixels bevat alleen de inhoudsbounding-box en dus niet de
+        # volledige paginahoogte. De renderfactor moet daarom de schaal zijn
+        # waarmee de PDF-pagina werkelijk is gerenderd, niet crop_height /
+        # source_height (dat laatste verkleint de coördinaten onterecht).
+        local_y = (float(bbox[1]) * render_scale - crop_top) * resize_factor
         absolute_y = float(page["top"]) + local_y
         absolute_y = max(float(page["top"]), min(float(page["bottom"]) - 1, absolute_y))
         mapped.append((absolute_y, start))
@@ -346,15 +344,15 @@ def propose_stitched_question_selections(
                 page = pdf[page_number - 1]
                 crop = page_info.get("crop_pixels", [0, 0, 0, 0])
                 crop_top = float(crop[1])
-                crop_height = max(1.0, float(crop[3]) - crop_top)
-                source_height = max(1.0, float(page_info.get("source_height", crop_height)))
-                render_factor_y = crop_height / source_height
                 resize_factor = float(page_info.get("stitched_width", page_info["render_width"])) / max(
                     1.0, float(page_info["render_width"])
                 )
 
                 def to_stitch_y(pdf_y: float) -> float:
-                    return float(page_info["top"]) + (pdf_y * render_factor_y - crop_top) * resize_factor
+                    # De PDF is vóór het croppen op render_scale gerenderd.
+                    # Gebruik dezelfde schaal bij het terugrekenen van alle
+                    # witregel- en kadergrenzen naar de lange afbeelding.
+                    return float(page_info["top"]) + (pdf_y * render_scale - crop_top) * resize_factor
 
                 page_top = float(page_info["top"])
                 page_bottom = float(page_info["bottom"])
