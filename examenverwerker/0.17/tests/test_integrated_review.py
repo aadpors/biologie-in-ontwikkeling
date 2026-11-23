@@ -155,9 +155,13 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertTrue(step_four.json()["questions"][0]["segments"])
 
         # Niet-witte pixels mogen ook via de API niet als grens worden opgeslagen.
+        # Kies bewust een rij direct na een volledig witte band. Die rij
+        # bevat de eerste zichtbare PDF-pixels en mag dus geen grens worden.
+        invalid_row = metadata["white_row_ranges"][0][1] + 1
+        self.assertFalse(any(start <= invalid_row <= end for start, end in metadata["white_row_ranges"]))
         invalid = self.client.post(
             f"/api/exams/{exam_id}/stitched-opgaven/review",
-            json={"selections": [{"id":"bad","type":"vraag","top":valid_row + 1,
+            json={"selections": [{"id":"bad","type":"vraag","top":invalid_row,
                                   "bottom":next_valid_row,"question_numbers":[1]}],
                   "reviewed": False},
         )
