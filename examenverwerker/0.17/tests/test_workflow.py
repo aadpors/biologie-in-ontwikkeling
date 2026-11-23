@@ -45,6 +45,48 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         return response.json()
 
+    def test_late_identical_question_start_autosave_cannot_reopen_approved_step(self):
+        """Een vertraagde identieke autosave mag een afgeronde stap niet terugzetten."""
+        result = self.import_sample()
+        exam_id = result["exam_id"]
+        approved = {
+            "candidates": [{"id":"candidate-1", "question_number":1, "accepted":True}],
+            "document_sha256": "a" * 64,
+            "reviewed_all_pages": True,
+        }
+        main.STORE.complete_step(exam_id, "opgaven_starts", approved)
+
+        # Simuleer een autosave die vóór de afrondklik is gestart, maar pas
+        # daarna bij de opslaglaag aankomt. De inhoudelijke review is identiek.
+        saved_as_draft = main.STORE.save_step_draft_preserving_identical_complete(
+            exam_id,
+            "opgaven_starts",
+            approved,
+            identity_fields=("candidates", "document_sha256"),
+        )
+        self.assertFalse(saved_as_draft)
+        self.assertEqual(
+            main.STORE.get_exam(exam_id)["steps"]["opgaven_starts"]["status"],
+            "complete",
+        )
+
+        # Een echte wijziging moet de goedkeuring juist wel intrekken.
+        changed = {
+            **approved,
+            "candidates": [{"id":"candidate-1", "question_number":2, "accepted":True}],
+        }
+        saved_as_draft = main.STORE.save_step_draft_preserving_identical_complete(
+            exam_id,
+            "opgaven_starts",
+            changed,
+            identity_fields=("candidates", "document_sha256"),
+        )
+        self.assertTrue(saved_as_draft)
+        self.assertEqual(
+            main.STORE.get_exam(exam_id)["steps"]["opgaven_starts"]["status"],
+            "pending",
+        )
+
     def test_import_detects_document_suffix_and_persists_originals(self):
         result = self.import_sample()
         self.assertEqual(len(result["documents"]), 2)
