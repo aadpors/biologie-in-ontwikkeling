@@ -393,108 +393,61 @@ def propose_stitched_question_selections(
         for value in separators
     })
 
-    # Ieder vraagfragment is het gebied tussen de dichtstbijzijnde visuele
-    # scheiding boven en onder de vraagstart. Daardoor wordt niet automatisch
-    # alles tot de volgende vraagstart in één groot vraagfragment opgenomen.
+    # Gebruik de goedgekeurde vraagstarts als harde ankers. De vorige
+    # algoritmeversie koos de eerste tekstwitruimte of kaderlijn ná iedere
+    # vraagstart als ondergrens. In examens staan binnen één vraag echter vaak
+    # alinea-afstanden, figuren, tabellen en kaders. Daardoor werden vragen
+    # midden in hun inhoud afgebroken.
+    #
+    # De veilige automatische keuze is daarom conservatief: één vraag loopt
+    # vanaf haar goedgekeurde start tot vlak vóór de volgende goedgekeurde
+    # hoofdvraag. Zo blijft alle tussenliggende vraaginhoud behouden, ook bij
+    # meerregelige vragen en vragen die over pagina's doorlopen. De docent kan
+    # de grens daarna in de reviewomgeving verfijnen. Alle grenzen worden daar
+    # uitsluitend naar volledig witte beeldrijen afgerond.
     question_selections: list[dict[str, Any]] = []
     for index, (start_y, start) in enumerate(mapped):
         number = int(start["question_number"])
-        page_number = int(start["page_index"]) + 1
-        page_top, page_bottom = page_limits.get(page_number, (0.0, float(image_height)))
-        # De bovengrens hoort op dezelfde pagina te liggen als de vraagstart.
-        # De ondergrens mag op een volgende pagina liggen: zo blijft een vraag
-        # die over een paginaovergang doorloopt één doorlopend vraagfragment.
-        local_before = [value for value in separators
-                        if page_top <= value < start_y]
-        global_after = [value for value in separators if value > start_y]
-        # Als er vóór de vraagstart geen expliciete witregel/kader is,
-        # gebruik dan de vraagstart zelf als scheiding. Zo blijft tekst die
-        # aantoonbaar vóór de eerste vraag staat als context beschikbaar.
-        # De vraag begint bij het goedgekeurde vraagstartanker, niet bij de
-        # dichtstbijzijnde eerdere witregel. Die witregel kan midden in de
-        # context of in de vorige vraag liggen. Door het anker te gebruiken
-        # blijft alle inhoud tussen het vorige fragment en dit vraagnummer
-        # beschikbaar als contextkandidaat.
-        top_boundary = start_y - 8.0
-        top = max(page_top, top_boundary)
-        bottom = min(float(image_height), global_after[0] if global_after else float(image_height))
+        next_y = mapped[index + 1][0] if index + 1 < len(mapped) else float(image_height)
 
-        # De boven- en ondergrens vallen net buiten de witregel/kaderlijn.
-        # De marge voorkomt dat antialiasing of de lijn zelf wordt afgesneden.
-        top = max(page_top, top - 2.0)
-        bottom = min(page_bottom, bottom + 2.0)
-        if bottom - top < 12:
-            # Bij een ongebruikelijke PDF-layout liever het vraagstartanker
-            # behouden dan een onbruikbaar fragment met vrijwel nul hoogte.
-            top = max(page_top, start_y - 8.0)
-            bottom = min(float(image_height), start_y + 80.0)
+        # Een kleine veiligheidsmarge houdt het vraagnummer en de eerste
+        # tekstregel binnen de uitsnede. De volgende vraagstart vormt de enige
+        # automatische ondergrens; een interne witregel is nadrukkelijk geen
+        # bewijs dat een vraag afgelopen is.
+        top = max(0.0, start_y - 8.0)
+        bottom = min(float(image_height), max(top + 12.0, next_y - 8.0))
         question_selections.append({
             "id": f"auto-vraag-{number}-{index + 1}",
             "type": "vraag",
             "top": round(top, 2),
             "bottom": round(bottom, 2),
             "question_numbers": [number],
-            "label": "Automatisch voorstel — begrensd door witregel/kader",
-            "source": "automatic_visual_boundaries",
+            "label": "Automatisch voorstel — volledige ruimte tot de volgende hoofdvraag",
+            "source": "automatic_question_start_anchors",
         })
 
-    # Context vóór de eerste vraag en de niet-geselecteerde ruimte tussen
-    # opeenvolgende vraagfragmenten vormen contextfragmenten. Koppel ieder
-    # contextfragment aan de eerstvolgende vraag, zodat de leesvolgorde
-    # context → vraag → context → vraag ontstaat.
+    # Alleen materiaal vóór de eerste goedgekeurde vraagstart wordt zonder
+    # verdere aannames als automatische context aangeboden. Tussenliggende
+    # inhoud wordt bewust niet automatisch als context geclassificeerd: die
+    # kan bij de voorgaande vraag horen. De docent kan zulke contexten
+    # afzonderlijk selecteren en aan de juiste vraag koppelen.
     context_selections: list[dict[str, Any]] = []
-    ordered_questions = sorted(question_selections, key=lambda item: item["top"])
-
-    if ordered_questions:
-        first_question = ordered_questions[0]
+    if question_selections:
+        first_question = question_selections[0]
         first_number = int(first_question["question_numbers"][0])
-        first_page_number = next(
-            (int(start["page_index"]) + 1 for _, start in mapped
-             if int(start["question_number"]) == first_number),
-            None,
-        )
-        if first_page_number in page_limits:
-            leading_top = page_limits[first_page_number][0]
-            first_start_y = next(
-                (position for position, start in mapped
-                 if int(start["question_number"]) == first_number),
-                float(first_question["top"]),
-            )
-            # Een kaderlijn kan samenvallen met de bovenrand van de crop.
-            # Gebruik dan de herkende vraagstart als scheiding tussen de
-            # voorafgaande context en het eerste vraagfragment.
-            leading_bottom = max(
-                float(first_question["top"]),
-                first_start_y - 8.0,
-            )
-            if leading_bottom - leading_top >= 24:
-                first_question["top"] = round(leading_bottom, 2)
-                context_selections.append({
-                    "id": f"auto-context-before-{first_number}",
-                    "type": "context",
-                    "top": round(leading_top, 2),
-                    "bottom": round(leading_bottom, 2),
-                    "question_numbers": [first_number],
-                    "label": "Automatisch contextvoorstel — inhoud vóór de eerste vraag",
-                    "source": "automatic_leading_context",
-                })
-
-    for index, question in enumerate(ordered_questions[:-1]):
-        following = ordered_questions[index + 1]
-        gap_top = float(question["bottom"])
-        gap_bottom = float(following["top"])
-        if gap_bottom - gap_top < 24:
-            continue
-        following_number = int(following["question_numbers"][0])
-        context_selections.append({
-            "id": f"auto-context-between-{question['question_numbers'][0]}-{following_number}",
-            "type": "context",
-            "top": round(gap_top, 2),
-            "bottom": round(gap_bottom, 2),
-            "question_numbers": [following_number],
-            "label": "Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
-            "source": "automatic_inter_question_gap",
-        })
+        first_start_y = mapped[0][0]
+        leading_top = min((limits[0] for limits in page_limits.values()), default=0.0)
+        leading_bottom = max(float(first_question["top"]), first_start_y - 8.0)
+        if leading_bottom - leading_top >= 24:
+            context_selections.append({
+                "id": f"auto-context-before-{first_number}",
+                "type": "context",
+                "top": round(leading_top, 2),
+                "bottom": round(leading_bottom, 2),
+                "question_numbers": [first_number],
+                "label": "Automatisch contextvoorstel — inhoud vóór de eerste vraag",
+                "source": "automatic_leading_context",
+            })
 
     return sorted(
         [*question_selections, *context_selections],
