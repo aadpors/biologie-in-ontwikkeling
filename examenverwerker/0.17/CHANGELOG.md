@@ -14,7 +14,7 @@
 - De knop **Nieuw fragment selecteren** staat buiten het interne scrollgebied van de examenafbeelding. Alleen de lange afbeelding en de fragmentenlijst hebben hun eigen scrollpositie.
 - Selecteren en scrollen synchroniseren uitsluitend het afbeeldingspaneel en de fragmentenlijst. Navigatie gebruikt de eigen scrollcontainers en verplaatst de volledige pagina niet.
 - De bovengrens wordt op de onderste volledig witte pixelrij van de scheidingsstrook geplaatst; de ondergrens op de bovenste volledig witte pixelrij.
-- Oude automatisch aangemaakte contextfragmenten tussen twee vragen worden bij het heropenen hersteld naar de voorafgaande vraag. Handmatig samengestelde koppelingen blijven behouden.
+- Oude automatisch aangemaakte contextfragmenten tussen twee vragen worden bij het heropenen hersteld naar de daaropvolgende vraaggroep, tot aan het volgende contextblok. Handmatig samengestelde koppelingen blijven behouden.
 - Een vertraagde, identieke autosave kan de goedkeuring van de vraagstartcontrole niet meer terugzetten. De statuscontrole en conceptopslag vinden nu in één SQLite-schrijftransactie plaats; echte wijzigingen maken de goedkeuring wel ongeldig.
 - Regressietests toegevoegd voor de vertraagde autosave, herstel van oude contextkoppelingen en de exacte boven-/onderrand van fragmenten.
 
@@ -41,7 +41,7 @@ witruimtes werden soms als context voorgesteld. Daarom:
 
 - Vraagfragmenten worden op leesvolgorde genormaliseerd en eindigen uiterlijk bij de witte grens van de volgende vraag.
 - Als een heuristische ondergrens midden in een vraag valt, loopt het fragment door tot de volgende vraaggrens.
-- Contexten worden opnieuw opgebouwd uit de ruimte tussen de vraagfragmenten, maar alleen wanneer daarin daadwerkelijk niet-witte inhoud staat. Een context tussen vraag 37 en 38 wordt aan vraag 37 gekoppeld, niet aan vraag 38.
+- Contexten worden opnieuw opgebouwd uit de ruimte tussen de vraagfragmenten, maar alleen wanneer daarin daadwerkelijk niet-witte inhoud staat. Een context tussen vraag 37 en 38 blijft een zelfstandig fragment en wordt gekoppeld aan de daaropvolgende vragen waarvoor die context geldt, bijvoorbeeld vraag 38 en 39.
 - Lege contextstroken en vraagfragmenten zonder zichtbare inhoud worden niet als voorstel getoond.
 - De regressietest controleert expliciet dat overlappende vraagfragmenten worden voorkomen en witruimte niet als context wordt aangemerkt.
 
