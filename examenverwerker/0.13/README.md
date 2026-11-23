@@ -173,7 +173,8 @@ aannames, validatie en de reden voor de gekozen aanpak.
 ## Tests uitvoeren
 
 ```powershell
-python -m pip install -r requirements-dev.txt\npython -m unittest discover -s tests -v
+python -m pip install -r requirements-dev.txt
+python -m unittest discover -s tests -v
 node --check static/app.js
 ```
 
