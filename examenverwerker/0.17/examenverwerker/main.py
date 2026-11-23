@@ -694,36 +694,85 @@ def save_question_fragment_review(exam_id: str, payload: dict):
 def _repair_automatic_context_links(selections: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Herstel oude automatische contextkoppelingen bij het laden van stap 3.
 
-    Een eerdere versie koppelde context tussen twee vragen aan de volgende
-    vraag. De huidige leesvolgorde koppelt zo'n context aan de voorafgaande
-    vraag. Bestaande opgeslagen examens kunnen nog de oude automatische
-    koppeling bevatten; herstel daarom alleen herkenbare automatische
-    context-ID's met precies de oude enkelvoudige koppeling. Handmatig
-    samengestelde koppelingen met meerdere vraagnummers blijven ongemoeid.
+    Een eerdere versie koppelde een context tussen twee vragen aan alleen de
+    voorafgaande vraag; een nog oudere versie koppelde hem aan alleen de
+    eerstvolgende vraag. In werkelijkheid hoort de context als zelfstandig
+    fragment bij de daaropvolgende vragen, tot aan het volgende contextblok.
+    Herstel daarom alleen herkenbare oude automatische voorstellen. Bewuste
+    handmatige koppelingen en de nieuwe groepskoppelingen blijven ongemoeid.
     """
-    repaired: list[dict[str, Any]] = []
-    pattern = re.compile(r"^auto-context-between-(\d+)-(\d+)$")
-
-    for selection in selections:
-        item = dict(selection)
-        match = pattern.fullmatch(str(item.get("id", "")))
-        numbers = item.get("question_numbers", [])
-        is_automatic_context = (
-            item.get("type") == "context"
-            and match is not None
+    repaired = [dict(item) for item in selections]
+    question_items = sorted(
+        (item for item in repaired if item.get("type") == "vraag"),
+        key=lambda item: float(item.get("top", 0)),
+    )
+    automatic_contexts = sorted(
+        (
+            item for item in repaired
+            if item.get("type") == "context"
             and str(item.get("label", "")).startswith("Automatisch contextvoorstel")
-        )
+            and (
+                re.fullmatch(r"auto-context-between-\d+-\d+", str(item.get("id", "")))
+                or re.fullmatch(r"auto-context-before-\d+", str(item.get("id", "")))
+            )
+        ),
+        key=lambda item: float(item.get("top", 0)),
+    )
 
-        if is_automatic_context and numbers == [int(match.group(2))]:
-            # De context staat fysiek ná de eerste vraag en vóór de volgende.
-            # De oude versie wees hem aan de tweede vraag toe; corrigeer die
-            # ene herkenbare situatie naar de vraag die eraan voorafgaat.
-            item["question_numbers"] = [int(match.group(1))]
-            item["label"] = (
-                "Automatisch contextvoorstel — inhoud na de voorafgaande vraag"
+    for index, context in enumerate(automatic_contexts):
+        label = str(context.get("label", ""))
+        current_numbers = context.get("question_numbers", [])
+        identifier = str(context.get("id", ""))
+        between = re.fullmatch(r"auto-context-between-(\d+)-(\d+)", identifier)
+        leading = re.fullmatch(r"auto-context-before-(\d+)", identifier)
+
+        # Alleen de bekende oude standaardlabels en enkelvoudige oude
+        # koppelingen worden gemigreerd. Een docent die de vraagkoppeling
+        # handmatig heeft uitgebreid, behoudt die keuze.
+        legacy_link = False
+        if between:
+            previous_number, following_number = map(int, between.groups())
+            legacy_link = (
+                current_numbers in ([previous_number], [following_number])
+                and label in {
+                    "Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
+                    "Automatisch contextvoorstel — inhoud na de voorafgaande vraag",
+                }
+            )
+        elif leading:
+            first_number = int(leading.group(1))
+            legacy_link = (
+                current_numbers == [first_number]
+                and label in {
+                    "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vraag",
+                    "Automatisch contextvoorstel — inhoud vóór de eerste vraag",
+                }
             )
 
-        repaired.append(item)
+        if not legacy_link:
+            continue
+
+        # De volgende automatische context markeert het einde van de huidige
+        # gedeelde contextgroep. Neem alle vraagfragmenten in het tussenliggende
+        # documentgebied op, in plaats van slechts één vraagnummer.
+        next_context_top = (
+            float(automatic_contexts[index + 1].get("top", float("inf")))
+            if index + 1 < len(automatic_contexts)
+            else float("inf")
+        )
+        context_bottom = float(context.get("bottom", context.get("top", 0)))
+        group_numbers = sorted({
+            int(number)
+            for question in question_items
+            if context_bottom <= float(question.get("top", 0)) < next_context_top
+            for number in question.get("question_numbers", [])
+        })
+
+        if group_numbers:
+            context["question_numbers"] = group_numbers
+            context["label"] = (
+                "Automatisch contextvoorstel — inhoud vóór de bijbehorende vragen"
+            )
 
     return repaired
 
