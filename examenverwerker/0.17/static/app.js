@@ -227,6 +227,11 @@ function renderWorkspace() {
 }
 
 function renderMetadataStage() {
+  // Bewaar de verwijzing naar het paneel lokaal. De opruimfunctie voor
+  // autosave-listeners gebruikt dit element wanneer de gebruiker naar een
+  // volgende stap gaat; zonder deze declaratie stopt het renderen hier met
+  // een ReferenceError en wordt de submit-handler nooit gekoppeld.
+  const panel = $('#stagePanel');
   const exam = state.exam;
   const first = exam.documents[0].metadata;
   // Onbevestigde metadata wordt als concept uit SQLite teruggelezen, zodat
