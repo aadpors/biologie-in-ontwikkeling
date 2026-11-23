@@ -1,0 +1,3 @@
+# Alleen nodig wanneer de ontwikkeltests worden uitgevoerd.
+# Starlette gebruikt deze clientdependency voor FastAPI TestClient.
+httpx2
