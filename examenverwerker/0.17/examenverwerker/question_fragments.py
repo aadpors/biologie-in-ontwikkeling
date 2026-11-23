@@ -523,8 +523,16 @@ def normalise_stitched_selections(
     wordt alleen een context voorgesteld wanneer daar daadwerkelijk tekst,
     een afbeelding of een ander niet-wit element zichtbaar is.
     """
-    if not selections or not white_row_ranges:
+    if not selections:
         return []
+    if not white_row_ranges:
+        # Zonder ook maar één volledig witte beeldrij bestaat geen veilige
+        # fragmentgrens. Stop daarom met een duidelijke fout in plaats van
+        # stilzwijgend een tekstregel of willekeurige pixel als grens te kiezen.
+        raise ValueError(
+            "De examenafbeelding bevat geen volledig zuiver witte horizontale rij. "
+            "De fragmentgrenzen kunnen daarom niet veilig automatisch worden bepaald."
+        )
 
     def snap(y: float) -> int:
         target = float(y)
@@ -585,7 +593,15 @@ def normalise_stitched_selections(
                 if later_rows:
                     question["bottom"] = min(later_rows)
                 else:
-                    question["bottom"] = height
+                    # De onderrand van de afbeelding is niet automatisch een
+                    # geldige grens. Ook de laatste vraag moet eindigen op een
+                    # rij die over de volledige breedte exact wit is.
+                    number = question.get("question_numbers", ["?"])[0]
+                    raise ValueError(
+                        f"Voor vraag {number} is na de voorgestelde bovengrens "
+                        "geen volledig witte horizontale grensrij gevonden. "
+                        "Controleer de bron-PDF of voeg de grens handmatig toe."
+                    )
 
             if question["bottom"] <= question["top"]:
                 continue
