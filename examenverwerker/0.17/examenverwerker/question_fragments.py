@@ -598,6 +598,11 @@ def normalise_stitched_selections(
             # docent daarna expliciet afsplitsen in de fragmenteditor.
             if next_top is not None:
                 question["bottom"] = next_top
+            else:
+                # De laatste vraag loopt door tot de laatste volledig witte
+                # rij in de lange afbeelding. Een interne witregel in de
+                # laatste vraag mag dus evenmin als eindgrens worden gebruikt.
+                question["bottom"] = white_row_ranges[-1][1]
 
             if question["bottom"] <= question["top"]:
                 number = question.get("question_numbers", ["?"])[0]
