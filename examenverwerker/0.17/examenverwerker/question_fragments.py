@@ -568,12 +568,13 @@ def normalise_stitched_selections(
             if y1 <= y0:
                 return False
             crop = image.crop((0, y0, width, y1))
-            grayscale = crop.convert("L")
-            visible = grayscale.point(lambda pixel: 255 if pixel != 255 else 0)
-            has_content = visible.getbbox() is not None
+            rgb_crop = crop.convert("RGB")
+            # Ook een bijna-witte gekleurde pixel is beeldinhoud. Gebruik
+            # daarom dezelfde exacte RGB-definitie als bij de grenscontrole
+            # en niet grijswaarden, die subtiele kleurverschillen afronden.
+            has_content = any(value != 255 for value in rgb_crop.tobytes())
             crop.close()
-            grayscale.close()
-            visible.close()
+            rgb_crop.close()
             return has_content
 
         # Vraagfragmenten zijn de ankers. Sorteer ze op hun visuele positie,
