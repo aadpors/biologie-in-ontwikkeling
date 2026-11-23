@@ -44,6 +44,16 @@ Dit is verdacht: een enkelletterig antwoord past niet bij de gebruikelijke verwe
 
 De controle is niet-destructief: zij wijzigt geen examendata. Waarschuwingen blijven zichtbaar, zodat ze handmatig aan de originele PDF's kunnen worden getoetst. Structurele fouten laten de controle falen.
 
+## Aanvullende structurele steekproeven over alle 519 vragen
+
+Een afzonderlijke scan van alle twaalf JSON-bestanden geeft de volgende structurele uitkomsten:
+- Alle 369 open vragen hebben zowel een niet-leeg `raw_text`- als `model_answer`-veld.
+- Alle 150 meerkeuzevragen hebben een expliciete antwoordsleutel.
+- De maximumscore in de vraagmetadata komt bij alle 519 vragen overeen met `answer_data.maximum_score`.
+- De bronfragmenten hebben bij alle 519 vragen een opeenvolgende `order`-volgorde.
+
+Dit bevestigt alleen aanwezigheid en onderlinge consistentie van velden. Het bevestigt niet dat de antwoorden, scorepunten of gekozen fragmenten inhoudelijk juist zijn.
+
 ## Nog uit te voeren vóór publicatie
 
 1. De zeven vervuilde antwoordvelden vergelijken met de officiële correctievoorschriften en de antwoord-/scorevelden corrigeren.
