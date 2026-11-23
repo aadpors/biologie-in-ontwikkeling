@@ -1068,9 +1068,11 @@ def save_snippets_review(exam_id: str, payload: dict):
             len(set(reviewed_cv)) != len(reviewed_cv) or
             not set(reviewed_cv).issubset(expected_cv)):
         raise HTTPException(422, "De gecontroleerde CV-fragmenten zijn ongeldig.")
-    # Ook een onvolledige snippetreview moet tussentijds opgeslagen kunnen
-    # worden. De expliciete bevestiging dat er geen contexten zijn, wordt pas
-    # bij het afronden van de stap verplicht gesteld.
+    # Handmatige opslag zonder contexten vereist expliciete bevestiging.
+    # Alleen de automatische conceptopslag mag deze keuze nog open laten.
+    if (not result["contexts"] and not payload.get("confirmed_no_contexts")
+            and not payload.get("draft")):
+        raise HTTPException(422, "Er zijn geen contextvoorstellen. Bevestig na visuele controle dat er geen afzonderlijke contexten gekoppeld hoeven te worden.")
     try:
         context_review = validate_context_review(
             {"contexts": payload.get("contexts", [])},
