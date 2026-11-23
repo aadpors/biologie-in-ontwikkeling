@@ -763,16 +763,15 @@ def generate_question_fragments(
                 y0 = float(start["pdf_bbox"][1]) - margin_points if page_index == first_page else 0.0
                 y1 = (float(next_start["pdf_bbox"][1]) - margin_points
                       if next_start and page_index == last_page else page_rect.height)
-                # Als de volgende vraag op dezelfde pagina staat, zoeken we
-                # binnen de ruimte tussen beide vraagstarts naar de eerste
-                # duidelijke witregel of de onderrand van een kader. Dat is
-                # een betere beginuitsnede dan standaard alles tot de volgende
-                # vraag meenemen. Bij een vraag die doorloopt naar een volgende
-                # pagina blijft de hele pagina behouden.
-                if page_index == first_page and next_start and first_page == last_page:
-                    visual_break = _first_visual_break(page, float(start["pdf_bbox"][1]), y1)
-                    if visual_break is not None:
-                        y1 = min(y1, visual_break)
+                # Neem de volledige ruimte tussen twee goedgekeurde
+                # hoofdvraagstarts op. Een tweede automatische witregel- of
+                # kaderheuristiek mag de vraag hier niet alsnog afkappen:
+                # zulke witregels kunnen midden in een meerregelige vraag,
+                # antwoordoptie of afbeelding voorkomen. Voor de opgaven is
+                # de visueel gecontroleerde selectie uit stap 3 leidend; voor
+                # andere documenten blijft de volgende goedgekeurde vraagstart
+                # de veilige bovengrens. De docent kan die grens daarna zelf
+                # verfijnen in de documentgerichte fragmentreview.
                 if page_index == first_page and override.get("start_y") is not None:
                     y0 = float(override["start_y"])
                 if page_index == last_page and override.get("end_y") is not None:
