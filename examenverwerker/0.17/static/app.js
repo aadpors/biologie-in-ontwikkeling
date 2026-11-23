@@ -837,7 +837,12 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // steeds de dichtstbijzijnde geldige rij, ook bij slepen en handmatige invoer.
     const snapBoundary = (value, minimum = 0, maximum = result.height - 1) => {
       const y = Math.max(minimum, Math.min(maximum, Number(value) || 0));
-      if (!whiteRowRanges.length) return Math.round(y);
+      // Zonder aantoonbaar volledig witte rijen bestaat er geen geldige grens.
+      // Rond in dat geval niet af op een willekeurige pixelrij: dat zou de
+      // expliciete eis "van links tot rechts volledig wit" stilzwijgend schenden.
+      if (!whiteRowRanges.length) {
+        throw new Error('Er zijn geen volledig witte horizontale regels gevonden. De afbeelding kan daarom niet veilig worden begrensd.');
+      }
       let nearest = null;
       let distance = Infinity;
       for (const [rangeStart, rangeEnd] of whiteRowRanges) {
@@ -863,13 +868,19 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const stitchedView = panel.querySelector('.stitched-view');
     const inspector = panel.querySelector('.stitched-inspector');
     let syncingScroll = false;
+    let syncFrame = 0;
     const syncScroll = (source, target) => {
       if (syncingScroll) return;
       syncingScroll = true;
+
+      // De scrollvakken hebben verschillende hoogtes. Koppel daarom hun
+      // relatieve positie, niet hun absolute scrollTop. Eén animation frame
+      // bundelt snelle wiel-/touchbewegingen en voorkomt wederzijdse events.
       const sourceRange = Math.max(1, source.scrollHeight - source.clientHeight);
       const targetRange = Math.max(0, target.scrollHeight - target.clientHeight);
       target.scrollTop = source.scrollTop / sourceRange * targetRange;
-      requestAnimationFrame(() => { syncingScroll = false; });
+      cancelAnimationFrame(syncFrame);
+      syncFrame = requestAnimationFrame(() => { syncingScroll = false; });
     };
     stitchedView.addEventListener('scroll', () => syncScroll(stitchedView, inspector), {passive:true});
     inspector.addEventListener('scroll', () => syncScroll(inspector, stitchedView), {passive:true});
@@ -983,15 +994,31 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const item = selections[index];
       if (!item) return;
       const view = panel.querySelector('.stitched-view');
-      const imageHeight = img.offsetHeight;
-      const target = (item.top + (item.bottom - item.top) / 2) / result.height * imageHeight;
-      view.scrollTo({top: Math.max(0, target - view.clientHeight / 2), behavior:'smooth'});
+
+      // Bereken de doelpositie ten opzichte van het daadwerkelijke scrollvak.
+      // Alleen de beeldhoogte gebruiken werkte niet wanneer de toolbar of
+      // bovenmarge boven de afbeelding stond: de sprong kwam dan te hoog uit.
+      const imageRect = img.getBoundingClientRect();
+      const viewRect = view.getBoundingClientRect();
+      const imageTopInScrollContent = imageRect.top - viewRect.top + view.scrollTop;
+      const imageY = (item.top + (item.bottom - item.top) / 2) / result.height * img.offsetHeight;
+      const target = imageTopInScrollContent + imageY - view.clientHeight / 2;
+      view.scrollTo({top: Math.max(0, target), behavior:'smooth'});
     };
 
-    // Houd het rechterdeel bij het fragment dat in het middendeel zichtbaar is.
+    // Scroll de lijst zelf, zonder scrollIntoView (dat kan ook het hele
+    // document verschuiven). De editor blijft direct onder de geselecteerde
+    // fragmentregel staan.
     const scrollInspectorToFragment = index => {
       const button = list.querySelector(`[data-select-fragment="${index}"]`);
-      if (button) button.scrollIntoView({block:'nearest', behavior:'smooth'});
+      if (!button) return;
+      const inspectorRect = inspector.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      const target = buttonRect.top - inspectorRect.top + inspector.scrollTop;
+      inspector.scrollTo({
+        top: Math.max(0, target - Math.min(24, inspector.clientHeight * 0.08)),
+        behavior:'smooth'
+      });
     };
 
     const render = () => {
