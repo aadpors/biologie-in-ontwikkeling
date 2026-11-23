@@ -214,6 +214,55 @@ class Store:
                 (exam_id, step_key, "pending", json.dumps(evidence, ensure_ascii=False)),
             )
 
+    def save_step_draft_preserving_identical_complete(
+        self,
+        exam_id: str,
+        step_key: str,
+        evidence: dict[str, Any],
+        *,
+        identity_fields: tuple[str, ...],
+    ) -> bool:
+        """Bewaar een conceptreview zonder een identieke goedkeuring terug te draaien.
+
+        Een browser kan vlak vóór het afronden nog een autosave starten. Die
+        HTTP-aanvraag kan pas ná de expliciete afrondactie in de database
+        aankomen. Een controle buiten de transactie is dan onvoldoende: de
+        autosave kan eerst 'pending' lezen en daarna alsnog de status
+        'complete' overschrijven.
+
+        BEGIN IMMEDIATE vergrendelt de SQLite-schrijfrij vóórdat de bestaande
+        status wordt gelezen. Daardoor geldt een vaste volgorde:
+        - komt de autosave eerst, dan kan de afrondactie daarna 'complete' zetten;
+        - komt de afrondactie eerst, dan ziet de autosave de complete rij en
+          behoudt zij die goedkeuring wanneer de inhoudelijke velden identiek zijn.
+
+        De methode retourneert True wanneer een concept is opgeslagen en False
+        wanneer een identieke, reeds goedgekeurde versie ongewijzigd bleef.
+        """
+        serialised = json.dumps(evidence, ensure_ascii=False)
+        with self.connection() as db:
+            # Neem vóór de SELECT de schrijflock; anders kunnen twee requests
+            # allebei een oude status lezen en elkaar alsnog overschrijven.
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute(
+                "SELECT status, evidence_json FROM steps WHERE exam_id=? AND step_key=?",
+                (exam_id, step_key),
+            ).fetchone()
+
+            if row and row["status"] == "complete":
+                approved = json.loads(row["evidence_json"])
+                if all(approved.get(field) == evidence.get(field) for field in identity_fields):
+                    return False
+
+            db.execute(
+                "INSERT INTO steps(exam_id,step_key,status,evidence_json,updated_at) "
+                "VALUES (?,?,?,?,CURRENT_TIMESTAMP) "
+                "ON CONFLICT(exam_id,step_key) DO UPDATE SET "
+                "status='pending', evidence_json=excluded.evidence_json, updated_at=CURRENT_TIMESTAMP",
+                (exam_id, step_key, "pending", serialised),
+            )
+            return True
+
     def publish_exam(self, exam_id: str):
         """Publicatiestatus en workflowbewijs in één transactie vastleggen.
 
