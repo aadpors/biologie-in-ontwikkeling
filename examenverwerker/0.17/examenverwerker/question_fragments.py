@@ -534,12 +534,26 @@ def normalise_stitched_selections(
             "De fragmentgrenzen kunnen daarom niet veilig automatisch worden bepaald."
         )
 
-    def snap(y: float) -> int:
-        target = float(y)
-        return int(min(
-            (max(start, min(end, round(target))) for start, end in white_row_ranges),
-            key=lambda candidate: abs(candidate - target),
-        ))
+    def snap_before(y: float) -> int:
+        """Kies de laatste zuiver witte rij op of vóór een vraaganker.
+
+        Een vraagstart is een inhoudsanker, geen grens zelf. Door de grens
+        uitsluitend ervoor te leggen blijft het vraagnummer en de eerste
+        tekstregel behouden. Als een wit interval het anker bevat, is het
+        anker zelf ook een geldige grenspositie.
+        """
+        target = max(0, int(round(y)))
+        candidates = [
+            min(target, end)
+            for start, end in white_row_ranges
+            if start <= target
+        ]
+        if not candidates:
+            raise ValueError(
+                "Vóór een herkende vraagstart is geen volledig zuiver witte "
+                "horizontale grensrij gevonden. Controleer de pagina-afsnede."
+            )
+        return int(max(candidates))
 
     # De afbeeldingsbron wordt één keer geopend; alle pixelcontroles gebeuren
     # op uitsneden daarvan en niet op opnieuw gerenderde PDF-pagina's.
@@ -565,7 +579,7 @@ def normalise_stitched_selections(
         # Vraagfragmenten zijn de ankers. Sorteer ze op hun visuele positie,
         # zodat ook meerdere vragen op dezelfde pagina in leesvolgorde staan.
         questions = [
-            {**item, "top": snap(item["top"]), "bottom": snap(item["bottom"])}
+            {**item, "top": snap_before(item["top"]), "bottom": snap_before(item["bottom"])}
             for item in selections if item.get("type") == "vraag"
         ]
         questions.sort(key=lambda item: (item["top"], item["bottom"]))
@@ -574,34 +588,15 @@ def normalise_stitched_selections(
         for index, question in enumerate(questions):
             next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
 
-            # Een vraag mag niet over de volgende vraag heen lopen. Als de
-            # heuristische grens te vroeg lag, laat de vraag doorlopen tot
-            # de witregel vóór de volgende goedgekeurde vraagstart.
+            # Gebruik voor iedere vraag behalve de laatste de laatste zuiver
+            # witte rij vóór de volgende goedgekeurde vraagstart. De eerdere
+            # detector kan een witregel midden in een vraag hebben aangezien
+            # voor een fragmentgrens. Die voorspelling wordt daarom niet als
+            # ondergrens vertrouwd: alle inhoud tot de volgende vraagstart
+            # blijft behouden. Eventuele context in dit tussenstuk kan de
+            # docent daarna expliciet afsplitsen in de fragmenteditor.
             if next_top is not None:
-                question["bottom"] = min(question["bottom"], next_top)
-                if question["bottom"] <= question["top"]:
-                    question["bottom"] = next_top
-            elif question["bottom"] <= question["top"]:
-                # Voor de laatste vraag zoeken we de eerstvolgende geldige
-                # witte rij na het vraaganker. Er wordt nooit een tekstregel
-                # als noodgrens gebruikt.
-                later_rows = [
-                    max(start, question["top"] + 1)
-                    for start, end in white_row_ranges
-                    if end > question["top"] and max(start, question["top"] + 1) <= end
-                ]
-                if later_rows:
-                    question["bottom"] = min(later_rows)
-                else:
-                    # De onderrand van de afbeelding is niet automatisch een
-                    # geldige grens. Ook de laatste vraag moet eindigen op een
-                    # rij die over de volledige breedte exact wit is.
-                    number = question.get("question_numbers", ["?"])[0]
-                    raise ValueError(
-                        f"Voor vraag {number} is na de voorgestelde bovengrens "
-                        "geen volledig witte horizontale grensrij gevonden. "
-                        "Controleer de bron-PDF of voeg de grens handmatig toe."
-                    )
+                question["bottom"] = next_top
 
             if question["bottom"] <= question["top"]:
                 continue
@@ -619,7 +614,7 @@ def normalise_stitched_selections(
         # worden bewust niet hergebruikt: die konden lege witstroken bevatten.
         contexts: list[dict[str, Any]] = []
         first_question = cleaned_questions[0]
-        first_top = snap(leading_top)
+        first_top = snap_before(leading_top)
         first_bottom = first_question["top"]
         if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
             first_number = int(first_question["question_numbers"][0])
