@@ -87,6 +87,36 @@ class WorkflowApplicationTests(unittest.TestCase):
             "pending",
         )
 
+    def test_legacy_automatic_context_link_is_repaired_without_changing_manual_links(self):
+        """Heropenen van oude examens herstelt alleen de oude automatische koppeling."""
+        selections = [
+            {
+                "id":"auto-context-between-37-38",
+                "type":"context",
+                "top":100,
+                "bottom":150,
+                "question_numbers":[38],
+                "label":"Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
+            },
+            {
+                "id":"manual-context-1",
+                "type":"context",
+                "top":200,
+                "bottom":250,
+                "question_numbers":[38, 39],
+                "label":"Door docent gekoppelde context",
+            },
+        ]
+
+        repaired = main._repair_automatic_context_links(selections)
+
+        self.assertEqual(repaired[0]["question_numbers"], [37])
+        self.assertIn("voorafgaande vraag", repaired[0]["label"])
+        # Handmatig gekozen koppelingen met meerdere vraagnummers blijven
+        # ongewijzigd; de migratie mag geen inhoudelijke docentkeuze overschrijven.
+        self.assertEqual(repaired[1]["question_numbers"], [38, 39])
+        self.assertEqual(repaired[1]["label"], "Door docent gekoppelde context")
+
     def test_import_detects_document_suffix_and_persists_originals(self):
         result = self.import_sample()
         self.assertEqual(len(result["documents"]), 2)
