@@ -5,7 +5,8 @@
 - Crop elke pagina vóór het stitchen; maskeer geïsoleerde paginanummers in de onderste paginamarge.
 - Voeg contextvoorstellen toe aan de doorlopende fragmentindeling en knip overlappende vraagfragmenten bij de volgende contextgrens af.
 - Geef sleepgrepen van het geselecteerde fragment voorrang bij samenvallende grenzen.
-- Sla vraagstartbeslissingen en alle wijzigingen in stap 3 automatisch als concept op.
+- Sla metadata en wijzigingen in alle bewerkbare workflowstappen automatisch als concept op, inclusief vraagstarts, fragmentgrenzen, analyse, CV-aanvulling, antwoorden, koppelingen, snippets en eindcontrole.
+- Forceer een laatste conceptopslag bij tabbladwissel of het sluiten van de pagina.
 - Maak de betekenis van de vraagstartvinkjes expliciet.
 
 # Wijzigingen

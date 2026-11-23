@@ -51,9 +51,22 @@ function bindStageAutoSave(panel, save, statusSelector) {
   // change wordt afgevuurd bij checkbox/select-wijzigingen en wanneer een
   // tekstveld focus verliest, dus ook bij wegklikken naar een ander tabblad.
   panel.addEventListener('change', schedule);
+
+  // Forceer een laatste opslag wanneer de gebruiker naar een ander tabblad
+  // gaat of de pagina sluit. Dit voorkomt dat de debounce-timer wordt afgebroken
+  // voordat de laatste wijziging de server bereikt.
+  const flushOnHide = () => saveNow().catch(() => {});
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') flushOnHide();
+  };
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('pagehide', flushOnHide);
+
   panel._stageAutoSaveCleanup = () => {
     clearTimeout(timer);
     panel.removeEventListener('change', schedule);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    window.removeEventListener('pagehide', flushOnHide);
     panel._stageAutoSaveCleanup = null;
   };
 }

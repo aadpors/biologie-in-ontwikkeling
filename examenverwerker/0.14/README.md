@@ -130,7 +130,7 @@ aan, installeert de benodigde pakketten en start de server. Open daarna
 - Geïsoleerde numerieke paginanummers in de onderste 7% van een pagina worden vóór het bijsnijden wit gemaskeerd. De cropdrempel is aangescherpt en de tussenruimte tussen pagina's is verkleind.
 - Contextvoorstellen uit de contextdetector worden naar de coördinaten van de lange afbeelding omgerekend en tussen de vraagvoorstellen geplaatst. Een doorlopende vraag wordt waar nodig vóór de volgende context afgekapt.
 - De grenzen van het geselecteerde fragment krijgen bij overlappende sleepzones voorrang.
-- Vraagstartkeuzes, fragmenttypen, koppelingen, omschrijvingen, toegevoegde/verwijderde fragmenten en grensverplaatsingen worden automatisch als concept opgeslagen. Bij het verlaten van het tabblad wordt nogmaals een opslagrequest verstuurd.
+- Metadata, vraagstartkeuzes, fragmentgrenzen, vraagtypen, punten, antwoordopties, CV-aanvullingskeuzes, antwoorden, documentkoppelingen, contextbereiken, snippetcontroles en de integrale eindcontrole worden na iedere veldwijziging automatisch als concept opgeslagen. Bij het verlaten van het tabblad of sluiten van de pagina wordt een laatste opslagrequest verstuurd.
 - Verdachte nummerherkenningen worden expliciet aangeduid als mogelijke subnummering; het vinkje is nu voorzien van de betekenis ‘als hoofdvraagstart gebruiken’.
 
 ## Wijzigingen in 0.13.0
