@@ -439,9 +439,10 @@ def propose_stitched_question_selections(
         })
 
     # Context vóór de eerste vraag en de niet-geselecteerde ruimte tussen
-    # opeenvolgende vraagfragmenten vormen contextfragmenten. Koppel ieder
-    # contextfragment aan de eerstvolgende vraag, zodat de leesvolgorde
-    # context → vraag → context → vraag ontstaat.
+    # opeenvolgende vraagfragmenten vormen contextfragmenten. Context vóór
+    # vraag 1 hoort bij vraag 1; context ná een vraag hoort bij de vraag die
+    # eraan voorafgaat. Zo wordt tekst tussen vraag 37 en 38 niet automatisch
+    # onderdeel van vraag 38.
     context_selections: list[dict[str, Any]] = []
     ordered_questions = sorted(question_selections, key=lambda item: item["top"])
 
@@ -485,13 +486,13 @@ def propose_stitched_question_selections(
         gap_bottom = float(following["top"])
         if gap_bottom - gap_top < 24:
             continue
-        following_number = int(following["question_numbers"][0])
+        previous_number = int(question["question_numbers"][0])
         context_selections.append({
-            "id": f"auto-context-between-{question['question_numbers'][0]}-{following_number}",
+            "id": f"auto-context-between-{previous_number}-{following['question_numbers'][0]}",
             "type": "context",
             "top": round(gap_top, 2),
             "bottom": round(gap_bottom, 2),
-            "question_numbers": [following_number],
+            "question_numbers": [previous_number],
             "label": "Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
             "source": "automatic_inter_question_gap",
         })
