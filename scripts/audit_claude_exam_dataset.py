@@ -103,6 +103,44 @@ def audit_dataset(data_dir: Path) -> tuple[list[dict], dict]:
                     "detail": f"raw_text bevat documenteinde/administratieve tekst vanaf marker '{marker}'.",
                 })
 
+            # Open answers must contain both the full source text and a usable model answer.
+            if question.get("type") == "open":
+                if not raw_text.strip() or not model_answer.strip():
+                    findings.append({
+                        "severity": "error", "exam": exam_name, "question": qid,
+                        "code": "OPEN_ANSWER_MISSING",
+                        "detail": "Open vraag mist raw_text of model_answer.",
+                    })
+
+            # The question's score and the extracted marking-scheme maximum must agree.
+            question_max = question.get("max_points_exam")
+            answer_max = answer.get("maximum_score")
+            if isinstance(question_max, (int, float)) and isinstance(answer_max, (int, float)):
+                if question_max != answer_max:
+                    findings.append({
+                        "severity": "error", "exam": exam_name, "question": qid,
+                        "code": "MAXIMUM_SCORE_MISMATCH",
+                        "detail": f"Vraagmetadata={question_max}, antwoordgegevens={answer_max}.",
+                    })
+
+            # Fragment order is the intended reading order in the assembled image.
+            fragment_orders = [f.get("order") for f in question.get("source_fragments", [])]
+            if fragment_orders and fragment_orders != list(range(1, len(fragment_orders) + 1)):
+                findings.append({
+                    "severity": "error", "exam": exam_name, "question": qid,
+                    "code": "FRAGMENT_ORDER",
+                    "detail": f"Bronfragmentvolgorde is niet opeenvolgend: {fragment_orders}.",
+                })
+
+            # Every image reference must resolve relative to the dataset root.
+            snippet_path = question.get("snippet_file")
+            if snippet_path and not (data_dir.parent / snippet_path).is_file():
+                findings.append({
+                    "severity": "error", "exam": exam_name, "question": qid,
+                    "code": "MISSING_SNIPPET_FILE",
+                    "detail": f"PNG-bestand niet gevonden: {snippet_path}.",
+                })
+
             # Open questions with a single-letter key need manual verification.
             if question.get("type") == "open" and SINGLE_LETTER.fullmatch(model_answer):
                 findings.append({
