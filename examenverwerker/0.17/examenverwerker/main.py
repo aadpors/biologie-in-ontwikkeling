@@ -369,26 +369,27 @@ def save_document_question_start_review(exam_id: str, document_type: str, payloa
 
 
 def _white_row_ranges(image_path: str | Path) -> list[list[int]]:
-    """Geef intervallen terug van volledig witte horizontale beeldrijen.
+    """Geef intervallen terug van volledig zuiver witte horizontale beeldrijen.
 
-    Een rij is alleen geldig als iedere pixel van links tot rechts exact wit
-    is. De analyse gebeurt op grijswaarden; een pixel die niet 255 is, maakt
-    de volledige rij ongeschikt als fragmentgrens. Intervallen besparen veel
-    API-verkeer vergeleken met het versturen van iedere afzonderlijke rij.
+    Een grensrij is alleen geldig als iedere pixel van links tot rechts exact
+    RGB(255, 255, 255) is. Er wordt bewust niet naar grijswaarden omgerekend:
+    daardoor kan een zeer lichte grijze of gekleurde pixel nooit onbedoeld
+    als witte grens worden geaccepteerd. Intervallen houden de API-respons
+    compact, ook bij lange examenafbeeldingen.
     """
     with Image.open(image_path) as source:
-        grayscale = source.convert("L")
-        width, height = grayscale.size
-        # Markeer niet-witte pixels als 255. Een geldige grensrij bevat daarna
-        # uitsluitend nullen en is dus in één bytes.count-operatie te herkennen.
-        non_white = grayscale.point(lambda pixel: 255 if pixel != 255 else 0)
-        raw = non_white.tobytes()
+        rgb = source.convert("RGB")
+        width, height = rgb.size
+        raw = rgb.tobytes()
+        bytes_per_row = width * 3
 
     ranges: list[list[int]] = []
     range_start: int | None = None
     for y in range(height):
-        row = raw[y * width:(y + 1) * width]
-        is_fully_white = row.count(255) == 0
+        # In RGB zijn drie bytes per pixel nodig. Een zuiver witte rij bevat
+        # uitsluitend de bytewaarde 255, dus precies 3 * breedte bytes.
+        row = raw[y * bytes_per_row:(y + 1) * bytes_per_row]
+        is_fully_white = row.count(255) == bytes_per_row
         if is_fully_white and range_start is None:
             range_start = y
         elif not is_fully_white and range_start is not None:
