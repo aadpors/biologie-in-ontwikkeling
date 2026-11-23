@@ -92,8 +92,7 @@ print(json.dumps({
     "proposals": [
         {"type": item["type"], "questions": item["question_numbers"],
          "top": item["top"], "bottom": item["bottom"],
-         "original_top": item["top_before_snap"],
-         "original_bottom": item["bottom_before_snap"]}
+         "source": item.get("source", "normalised_visual_boundaries")}
         for item in proposals
     ],
     "diagnostic_output": str(OUTPUT),
