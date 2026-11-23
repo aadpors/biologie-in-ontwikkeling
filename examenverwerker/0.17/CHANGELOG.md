@@ -35,3 +35,9 @@ witruimtes werden soms als context voorgesteld. Daarom:
 - Contexten worden opnieuw opgebouwd uit de ruimte tussen de vraagfragmenten, maar alleen wanneer daarin daadwerkelijk niet-witte inhoud staat.
 - Lege contextstroken en vraagfragmenten zonder zichtbare inhoud worden niet als voorstel getoond.
 - De regressietest controleert expliciet dat overlappende vraagfragmenten worden voorkomen en witruimte niet als context wordt aangemerkt.
+
+De CI-diagnose op het echte vwo-examen 2026 tijdvak 2 controleert nu bovendien
+dat alle 39 hoofdvragen precies één vraagfragment hebben, dat geen vraagfragmenten
+overlappen en dat iedere context- en vraaggrens op een volledig witte rij ligt.
+In de uitgevoerde diagnose leverde dit 39 vraagfragmenten en 23 contextfragmenten
+op, zonder overlappende vraagfragmenten.

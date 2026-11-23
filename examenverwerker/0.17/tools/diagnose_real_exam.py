@@ -62,6 +62,36 @@ proposals = normalise_stitched_selections(
     leading_top=min((float(page["top"]) for page in metadata.get("pages", [])), default=0.0),
 )
 
+# Laat de echte examenrun falen wanneer een hoofdvraag ontbreekt,
+# vraagfragmenten elkaar overlappen of een grens niet op een volledig witte
+# horizontale pixelrij ligt. Dit maakt de diagnose ook een echte regressietest.
+question_proposals = sorted(
+    (item for item in proposals if item.get("type") == "vraag"),
+    key=lambda item: item["top"],
+)
+expected_numbers = sorted(item["question_number"] for item in accepted)
+proposed_numbers = sorted(
+    number for item in question_proposals for number in item["question_numbers"]
+)
+if proposed_numbers != expected_numbers:
+    raise SystemExit(
+        f"Niet alle echte examenvragen hebben precies één fragment: "
+        f"verwacht {expected_numbers}, gevonden {proposed_numbers}"
+    )
+for previous, following in zip(question_proposals, question_proposals[1:]):
+    if previous["bottom"] > following["top"]:
+        raise SystemExit(
+            f"Vraagfragmenten overlappen: {previous['question_numbers']} en "
+            f"{following['question_numbers']}"
+        )
+for item in proposals:
+    for edge in ("top", "bottom"):
+        row = int(round(item[edge]))
+        if not any(start <= row <= end for start, end in white_rows):
+            raise SystemExit(
+                f"Fragmentgrens {edge}={row} van {item['id']} ligt niet op een volledig witte rij"
+            )
+
 report = {
     "source_pdf": SOURCE.name,
     "page_count": len(metadata["pages"]),
