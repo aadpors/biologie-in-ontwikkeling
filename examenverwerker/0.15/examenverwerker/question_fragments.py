@@ -315,9 +315,11 @@ def propose_stitched_question_selections(
     if pdf_path is None:
         legacy: list[dict[str, Any]] = []
         for index, (start_y, start) in enumerate(mapped):
-            next_y = mapped[index + 1][0] if index + 1 < len(mapped) else float(image_height)
+            has_next = index + 1 < len(mapped)
+            next_y = mapped[index + 1][0] if has_next else float(image_height)
             top = max(0.0, start_y - 8.0)
-            bottom = min(float(image_height), max(top + 12.0, next_y - 4.0))
+            proposed_bottom = next_y - 4.0 if has_next else float(image_height)
+            bottom = min(float(image_height), max(top + 12.0, proposed_bottom))
             if bottom > top:
                 number = int(start["question_number"])
                 legacy.append({
