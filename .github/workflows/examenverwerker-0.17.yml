@@ -19,7 +19,9 @@ jobs:
       - name: Haal alleen de map van versie 0.17 op
         uses: actions/checkout@v4
         with:
-          sparse-checkout: examenverwerker/0.17
+          sparse-checkout: |
+            examenverwerker/0.17
+            examens
           sparse-checkout-cone-mode: true
 
       - name: Stel Python in
@@ -40,6 +42,21 @@ jobs:
       - name: Voer alle tests uit
         working-directory: examenverwerker/0.17
         run: python -m unittest discover -s tests -v
+
+      - name: Controleer automatische fragmenten op een echt examen
+        working-directory: examenverwerker/0.17
+        env:
+          EXAM_DIAGNOSTIC_OUTPUT: ${{ runner.temp }}/exam-diagnostic
+        run: python tools/diagnose_real_exam.py
+
+      - name: Bewaar het visuele diagnosepakket
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: examenverwerker-0.17-echt-examen-diagnose
+          path: ${{ runner.temp }}/exam-diagnostic
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Controleer JavaScript-syntaxis
         working-directory: examenverwerker/0.17
