@@ -58,7 +58,7 @@ for item in proposals:
 
 report = {
     "source_pdf": SOURCE.name,
-    "page_count": metadata["page_count"],
+    "page_count": len(metadata["pages"]),
     "stitched_width": metadata["width"],
     "stitched_height": metadata["height"],
     "detected_question_starts": [
