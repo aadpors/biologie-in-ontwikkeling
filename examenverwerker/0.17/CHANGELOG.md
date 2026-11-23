@@ -23,3 +23,15 @@ De witte-rijcontrole wordt op synthetische PDF's getest. Visuele beoordeling van
 - De afrondactie van stap 3 stuurt nu de volledige lijst met gecontroleerde vraagnummers door; het aantal wordt niet langer over hetzelfde opslagveld geschreven.
 - Bestaande dossiers waarin een ouder 0.17-scherm al een integer had opgeslagen, openen stap 4 nu zonder serverfout. De individuele reviewvinkjes worden in dat geval niet automatisch als gecontroleerd beschouwd.
 - Het verslepen en numeriek aanpassen van grenzen blijft binnen de geldige witte-rijintervallen, ook bij de minimale fragmenthoogte.
+
+## Automatische fragmentvoorstellen op basis van echt examen (vwo 2026 tijdvak 2)
+
+De CI-diagnose op het aanwezige echte examen liet twee concrete fouten zien:
+vraagfragmenten konden overlappen bij meerdere vragen op één pagina, en lege
+witruimtes werden soms als context voorgesteld. Daarom:
+
+- Vraagfragmenten worden op leesvolgorde genormaliseerd en eindigen uiterlijk bij de witte grens van de volgende vraag.
+- Als een heuristische ondergrens midden in een vraag valt, loopt het fragment door tot de volgende vraaggrens.
+- Contexten worden opnieuw opgebouwd uit de ruimte tussen de vraagfragmenten, maar alleen wanneer daarin daadwerkelijk niet-witte inhoud staat.
+- Lege contextstroken en vraagfragmenten zonder zichtbare inhoud worden niet als voorstel getoond.
+- De regressietest controleert expliciet dat overlappende vraagfragmenten worden voorkomen en witruimte niet als context wordt aangemerkt.

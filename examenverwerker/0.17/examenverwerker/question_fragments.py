@@ -501,6 +501,144 @@ def propose_stitched_question_selections(
         key=lambda item: (item["top"], 0 if item["type"] == "context" else 1),
     )
 
+def normalise_stitched_selections(
+    selections: list[dict[str, Any]],
+    white_row_ranges: list[list[int]],
+    image_path: str | Path,
+    *,
+    image_height: int,
+    leading_top: float = 0.0,
+) -> list[dict[str, Any]]:
+    """Maak automatische vraag/contextvoorstellen visueel sluitend.
+
+    De oudere voorstelgenerator kon vraagfragmenten laten overlappen wanneer
+    meerdere vragen op één pagina stonden. Ook maakte hij soms een context van
+    alleen witruimte. Deze normalisatie gebruikt de goedgekeurde vraagstarts
+    als vaste volgorde en de volledige witte beeldrijen als enige grenslijnen.
+
+    De ondergrens van een vraag wordt nooit voorbij de bovengrens van de
+    volgende vraag geplaatst. Als de eerste heuristische ondergrens vóór die
+    grens valt (bijvoorbeeld midden in een meerregelige vraag), loopt het
+    vraagfragment door tot de eerstvolgende vraaggrens. Tussen twee vragen
+    wordt alleen een context voorgesteld wanneer daar daadwerkelijk tekst,
+    een afbeelding of een ander niet-wit element zichtbaar is.
+    """
+    if not selections or not white_row_ranges:
+        return []
+
+    def snap(y: float) -> int:
+        target = float(y)
+        return int(min(
+            (max(start, min(end, round(target))) for start, end in white_row_ranges),
+            key=lambda candidate: abs(candidate - target),
+        ))
+
+    # De afbeeldingsbron wordt één keer geopend; alle pixelcontroles gebeuren
+    # op uitsneden daarvan en niet op opnieuw gerenderde PDF-pagina's.
+    with Image.open(image_path) as source:
+        image = source.convert("RGB")
+        width, height = image.size
+
+        def has_visible_content(top: float, bottom: float) -> bool:
+            """True wanneer het gebied ten minste één niet-witte pixel bevat."""
+            y0 = max(0, min(height, int(round(top))))
+            y1 = max(y0, min(height, int(round(bottom))))
+            if y1 <= y0:
+                return False
+            crop = image.crop((0, y0, width, y1))
+            grayscale = crop.convert("L")
+            visible = grayscale.point(lambda pixel: 255 if pixel != 255 else 0)
+            has_content = visible.getbbox() is not None
+            crop.close()
+            grayscale.close()
+            visible.close()
+            return has_content
+
+        # Vraagfragmenten zijn de ankers. Sorteer ze op hun visuele positie,
+        # zodat ook meerdere vragen op dezelfde pagina in leesvolgorde staan.
+        questions = [
+            {**item, "top": snap(item["top"]), "bottom": snap(item["bottom"])}
+            for item in selections if item.get("type") == "vraag"
+        ]
+        questions.sort(key=lambda item: (item["top"], item["bottom"]))
+
+        cleaned_questions: list[dict[str, Any]] = []
+        for index, question in enumerate(questions):
+            next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
+
+            # Een vraag mag niet over de volgende vraag heen lopen. Als de
+            # heuristische grens te vroeg lag, laat de vraag doorlopen tot
+            # de witregel vóór de volgende goedgekeurde vraagstart.
+            if next_top is not None:
+                question["bottom"] = min(question["bottom"], next_top)
+                if question["bottom"] <= question["top"]:
+                    question["bottom"] = next_top
+            elif question["bottom"] <= question["top"]:
+                # Voor de laatste vraag zoeken we de eerstvolgende geldige
+                # witte rij na het vraaganker. Er wordt nooit een tekstregel
+                # als noodgrens gebruikt.
+                later_rows = [
+                    max(start, question["top"] + 1)
+                    for start, end in white_row_ranges
+                    if end > question["top"] and max(start, question["top"] + 1) <= end
+                ]
+                if later_rows:
+                    question["bottom"] = min(later_rows)
+                else:
+                    question["bottom"] = height
+
+            if question["bottom"] <= question["top"]:
+                continue
+            if not has_visible_content(question["top"], question["bottom"]):
+                # Een leeg voorstel is schadelijker dan een ontbrekend voorstel:
+                # de docent kan een ontbrekend fragment handmatig toevoegen.
+                continue
+            cleaned_questions.append(question)
+
+        if not cleaned_questions:
+            return []
+
+        # Contexten worden opnieuw opgebouwd uit de zichtbare ruimte tussen
+        # de nu niet-overlappende vraagfragmenten. De oude contextvoorstellen
+        # worden bewust niet hergebruikt: die konden lege witstroken bevatten.
+        contexts: list[dict[str, Any]] = []
+        first_question = cleaned_questions[0]
+        first_top = snap(leading_top)
+        first_bottom = first_question["top"]
+        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
+            first_number = int(first_question["question_numbers"][0])
+            contexts.append({
+                "id": f"auto-context-before-{first_number}",
+                "type": "context",
+                "top": first_top,
+                "bottom": first_bottom,
+                "question_numbers": [first_number],
+                "label": "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vraag",
+                "source": "automatic_leading_context",
+            })
+
+        for previous, following in zip(cleaned_questions, cleaned_questions[1:]):
+            gap_top = int(previous["bottom"])
+            gap_bottom = int(following["top"])
+            if gap_bottom - gap_top < 12 or not has_visible_content(gap_top, gap_bottom):
+                continue
+            following_number = int(following["question_numbers"][0])
+            contexts.append({
+                "id": f"auto-context-between-{previous['question_numbers'][0]}-{following_number}",
+                "type": "context",
+                "top": gap_top,
+                "bottom": gap_bottom,
+                "question_numbers": [following_number],
+                "label": "Automatisch contextvoorstel — zichtbare inhoud tussen vraagfragmenten",
+                "source": "automatic_inter_question_gap",
+            })
+
+        return sorted(
+            [*cleaned_questions, *contexts],
+            key=lambda item: (item["top"], 0 if item["type"] == "context" else 1),
+        )
+
+
 def _first_visual_break(page: fitz.Page, start_y: float, end_limit: float) -> float | None:
     """Schat de eerste witregel of kadergrens na een vraagstart.
 

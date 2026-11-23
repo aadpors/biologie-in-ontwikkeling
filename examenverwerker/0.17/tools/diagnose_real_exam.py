@@ -18,7 +18,11 @@ VERSION_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(VERSION_ROOT))
 
 from examenverwerker.question_detection import detect_question_starts
-from examenverwerker.question_fragments import build_stitched_exam, propose_stitched_question_selections
+from examenverwerker.question_fragments import (
+    build_stitched_exam,
+    propose_stitched_question_selections,
+    normalise_stitched_selections,
+)
 from examenverwerker.main import _nearest_white_row, _white_row_ranges
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -50,11 +54,13 @@ white_rows = _white_row_ranges(stitched_path)
 
 # Dezelfde witregeluitlijning als de API toepassen en alle broncoördinaten
 # bewaren, zodat een menselijke controle precies kan terugvinden wat is voorgesteld.
-for item in proposals:
-    item["top_before_snap"] = item["top"]
-    item["bottom_before_snap"] = item["bottom"]
-    item["top"] = _nearest_white_row(item["top"], white_rows)
-    item["bottom"] = _nearest_white_row(item["bottom"], white_rows)
+proposals = normalise_stitched_selections(
+    proposals,
+    white_rows,
+    stitched_path,
+    image_height=int(metadata["height"]),
+    leading_top=min((float(page["top"]) for page in metadata.get("pages", [])), default=0.0),
+)
 
 report = {
     "source_pdf": SOURCE.name,

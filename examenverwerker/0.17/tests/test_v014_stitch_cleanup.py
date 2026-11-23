@@ -97,6 +97,46 @@ class ContextProposalTests(unittest.TestCase):
 
 
 
+class StitchedSelectionNormalisationTests(unittest.TestCase):
+    def test_overlapping_questions_are_clamped_and_blank_context_is_removed(self):
+        """Vragen op dezelfde pagina mogen niet overlappen; witruimte is geen context."""
+        from PIL import Image, ImageDraw
+        from examenverwerker.question_fragments import normalise_stitched_selections
+
+        with tempfile.TemporaryDirectory() as folder:
+            image_path = Path(folder) / "stitched.png"
+            image = Image.new("RGB", (100, 180), "white")
+            draw = ImageDraw.Draw(image)
+            draw.rectangle((10, 10, 90, 35), fill="black")   # zichtbare context
+            draw.rectangle((10, 60, 90, 82), fill="black")   # vraag 1
+            draw.rectangle((10, 100, 90, 125), fill="black") # vraag 2
+            image.save(image_path)
+            image.close()
+
+            result = normalise_stitched_selections(
+                [
+                    {"id":"q1","type":"vraag","top":55,"bottom":110,
+                     "question_numbers":[1],"label":"Vraag 1"},
+                    {"id":"q2","type":"vraag","top":95,"bottom":140,
+                     "question_numbers":[2],"label":"Vraag 2"},
+                    {"id":"empty-context","type":"context","top":83,"bottom":95,
+                     "question_numbers":[2]},
+                ],
+                [[0, 4], [40, 44], [55, 59], [83, 87], [95, 99], [126, 130], [150, 154]],
+                image_path,
+                image_height=180,
+                leading_top=0,
+            )
+
+            questions = [item for item in result if item["type"] == "vraag"]
+            contexts = [item for item in result if item["type"] == "context"]
+            self.assertEqual(len(questions), 2)
+            self.assertLessEqual(questions[0]["bottom"], questions[1]["top"])
+            # De strook tussen de vragen is volledig wit en mag geen context worden.
+            self.assertFalse(any(item["top"] == 83 and item["bottom"] == 95 for item in contexts))
+            self.assertEqual(contexts[0]["question_numbers"], [1])
+
+
 class QuestionAndContextSegmentationTests(unittest.TestCase):
     def test_questions_are_bounded_by_visual_gaps_and_context_is_the_space_between(self):
         """Vraagfragmenten worden door witregels begrensd; tussenruimtes worden context."""

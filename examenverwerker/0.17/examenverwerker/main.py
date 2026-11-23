@@ -23,7 +23,7 @@ from .domain import WORKFLOW, STEP_BY_KEY, unmet_requirements, invalidate_depend
 from .metadata import suggest_metadata
 from .question_detection import detect_question_starts, validate_review
 from .question_fragments import (generate_question_fragments, build_stitched_exam,
-                                  propose_stitched_question_selections)
+                                  propose_stitched_question_selections, normalise_stitched_selections)
 from .question_analysis import analyse_questions, validate_question_analysis
 from .answer_detection import analyse_answers, detect_cv_max_points, validate_answer_review
 from .cv_supplement import analyse_supplement, validate_supplement_review
@@ -634,16 +634,16 @@ def get_stitched_opgaven(exam_id: str):
     # gerenderde afbeelding. Automatische voorstellen worden naar de dichtstbijzijnde
     # volledig witte rij verschoven voordat ze aan de browser worden geleverd.
     white_rows = _white_row_ranges(target)
-    for selection in proposed:
-        selection["top"] = _nearest_white_row(selection["top"], white_rows)
-        selection["bottom"] = _nearest_white_row(selection["bottom"], white_rows)
-        if selection["bottom"] <= selection["top"]:
-            # Als twee automatische grenzen op dezelfde witregel landen, laat
-            # dit fragment onbeoordeeld in plaats van een ongeldige crop te maken.
-            selection["bottom"] = next(
-                (start for start, end in white_rows if start > selection["top"]),
-                selection["top"] + 1,
-            )
+    if proposed:
+        # Normaliseer vraagfragmenten vóórdat de browser ze ziet. Daardoor
+        # overlappen twee vragen nooit en worden lege witruimtes geen context.
+        proposed = normalise_stitched_selections(
+            proposed,
+            white_rows,
+            target,
+            image_height=int(metadata["height"]),
+            leading_top=min((float(page["top"]) for page in metadata.get("pages", [])), default=0.0),
+        )
 
     # De voorstelgenerator levert nu zowel vraagfragmenten als contexten.
     # Contexten zijn exact de tussenruimtes tussen opeenvolgende vraagfragmenten;
