@@ -405,10 +405,10 @@ def propose_stitched_question_selections(
         # De ondergrens mag op een volgende pagina liggen: zo blijft een vraag
         # die over een paginaovergang doorloopt één doorlopend vraagfragment.
         # De vraagstart is het vaste beginanker. Voor de ondergrens zoeken
-        # we juist de laatste duidelijke visuele scheiding vóór de volgende
-        # hoofdvraag. Een eerste witregel kan een interne alinea-afstand zijn;
-        # de laatste scheiding houdt de volledige vraag bijeen en laat tekst
-        # ná de vraag als afzonderlijke context over.
+        # we de eerste duidelijke visuele scheiding vóór de volgende
+        # hoofdvraag. De normalisatiestap controleert vervolgens of ná die
+        # scheiding nog zichtbare inhoud staat: zo wordt een lege interne
+        # witregel genegeerd, maar een werkelijk contextblok afgesplitst.
         next_start_y = mapped[index + 1][0] if index + 1 < len(mapped) else float(image_height)
         separators_before_next = [
             value for value in separators
@@ -416,7 +416,7 @@ def propose_stitched_question_selections(
         ]
         top_boundary = start_y - 8.0
         top = max(page_top, top_boundary)
-        bottom_boundary = separators_before_next[-1] if separators_before_next else next_start_y
+        bottom_boundary = separators_before_next[0] if separators_before_next else next_start_y
         bottom = min(float(image_height), bottom_boundary)
 
         # De boven- en ondergrens vallen net buiten de witregel/kaderlijn.
@@ -590,15 +590,19 @@ def normalise_stitched_selections(
         for index, question in enumerate(questions):
             next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
 
-            # Behoud de voorgestelde visuele ondergrens als die vóór de
-            # volgende vraagstart ligt. De voorstelgenerator kiest de laatste
-            # duidelijke witregel/kadergrens vóór die volgende vraag, zodat
-            # een interne witregel eerder in de vraag niet tot afkappen leidt.
-            # Het resterende zichtbare gebied wordt hieronder als context
-            # opgebouwd en niet stilzwijgend aan de volgende vraag gekoppeld.
+            # Een visuele scheiding is pas een echte vraag-/contextgrens als
+            # er ná die witte strook nog zichtbare inhoud staat vóór de
+            # volgende vraagstart. Een lege witregel midden in een vraag
+            # wordt dus genegeerd; een contextblok blijft apart en wordt
+            # hieronder aan de voorafgaande vraag gekoppeld.
             if next_top is not None:
                 proposed_bottom = int(question["bottom"])
-                question["bottom"] = min(next_top, proposed_bottom) if proposed_bottom > question["top"] else next_top
+                has_following_content = has_visible_content(proposed_bottom, next_top)
+                question["bottom"] = (
+                    min(next_top, proposed_bottom)
+                    if proposed_bottom > question["top"] and has_following_content
+                    else next_top
+                )
             else:
                 # De laatste vraag loopt door tot de laatste volledig witte
                 # rij in de lange afbeelding. Een interne witregel in de
