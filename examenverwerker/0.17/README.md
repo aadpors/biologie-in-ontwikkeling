@@ -126,6 +126,13 @@ aan, installeert de benodigde pakketten en start de server. Open daarna
 
 ## Wijzigingen in 0.17.0
 
+- Fragmentgrenzen worden uitsluitend geaccepteerd op een volledige horizontale rij waarvan iedere pixel exact RGB(255, 255, 255) is. Ook de server valideert gehele pixelrijen; een bijna-witte rij of decimale coördinaat wordt niet afgerond tot een geldige grens.
+- De automatische fragmentindeling vertrouwt niet langer op de eerste witregel na een vraagstart. Een vraagfragment loopt conservatief door tot de witte grens vóór de volgende goedgekeurde hoofdvraagstart. Zo wordt een interne witregel in een meerregelige vraag niet als afkapgrens gebruikt. Context die tussen vragen staat kan de docent daarna als afzonderlijk fragment afsplitsen.
+- Vraagtype-, punten- en antwoordoptievoorstellen gebruiken de tekst die hoort bij exact de geselecteerde beeldstrook. De pixelcoördinaten worden via de crop-, render- en stitchmetadata terugvertaald naar de oorspronkelijke PDF-pagina('s); een omschrijving of volledige pagina wordt niet als vervangende vraagtekst gebruikt.
+- De browser plaatst de fragmenteditor direct onder het geselecteerde fragment. Navigatie naar een fragment wordt berekend ten opzichte van het eigen scrollpaneel, zodat de hele pagina niet onbedoeld verspringt.
+- Regressietests toegevoegd voor zuiver witte RGB-grensrijen, integergrensvalidatie, het behouden van vraaginhoud bij een interne witregel en de volledige API-overgang van fragmentreview naar vraaganalyse.
+- De ontwikkeltestdependency is gecorrigeerd naar httpx, de clientbibliotheek die FastAPI/Starlette TestClient gebruikt.
+
 - Vraagfragmenten worden begrensd door de dichtstbijzijnde visuele witregel of brede kadergrens boven en onder de herkende vraagstart. Een vraag die over een paginaovergang doorloopt, blijft één fragment tot de eerstvolgende visuele scheiding.
 - De ruimte tussen opeenvolgende vraagfragmenten wordt als contextfragment voorgesteld en aan de daaropvolgende vraag gekoppeld. De oude beperking waarbij contexten alleen boven de eerste vraagstart op een pagina werden gezocht, is voor deze stap vervallen.
 - Iedere afgeronde stap in de workflow kan opnieuw worden geopend. De eerder opgeslagen invoer blijft als concept beschikbaar; alleen afhankelijke goedkeuringen worden ongeldig gemaakt. Metadata kan op dezelfde manier opnieuw worden bevestigd.
