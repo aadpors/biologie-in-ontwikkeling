@@ -84,6 +84,17 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertTrue(exam["confirmed"])
         self.assertEqual(exam["steps"]["metadata"]["status"], "complete")
 
+        # Na bevestiging moet de workflow de metadatafase overslaan en
+        # direct de eerste inhoudelijke stap aanbieden. Dit controleert de
+        # serverstatus waarop de browser zijn volgende scherm baseert.
+        workflow = self.client.get("/api/workflow").json()
+        completed = {
+            key for key, step in exam["steps"].items()
+            if step["status"] == "complete"
+        }
+        next_step = next(step for step in workflow if step["key"] not in completed)
+        self.assertEqual(next_step["key"], "opgaven_starts")
+
     def test_step_cannot_skip_prerequisites_or_omit_evidence(self):
         result = self.import_sample()
         exam_id = result["exam_id"]
