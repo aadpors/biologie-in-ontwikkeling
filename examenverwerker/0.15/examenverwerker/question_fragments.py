@@ -449,8 +449,20 @@ def propose_stitched_question_selections(
         )
         if first_page_number in page_limits:
             leading_top = page_limits[first_page_number][0]
-            leading_bottom = float(first_question["top"])
+            first_start_y = next(
+                (position for position, start in mapped
+                 if int(start["question_number"]) == first_number),
+                float(first_question["top"]),
+            )
+            # Een kaderlijn kan samenvallen met de bovenrand van de crop.
+            # Gebruik dan de herkende vraagstart als scheiding tussen de
+            # voorafgaande context en het eerste vraagfragment.
+            leading_bottom = max(
+                float(first_question["top"]),
+                first_start_y - 8.0,
+            )
             if leading_bottom - leading_top >= 24:
+                first_question["top"] = round(leading_bottom, 2)
                 context_selections.append({
                     "id": f"auto-context-before-{first_number}",
                     "type": "context",
