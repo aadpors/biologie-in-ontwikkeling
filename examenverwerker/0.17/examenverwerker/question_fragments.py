@@ -659,41 +659,85 @@ def normalise_stitched_selections(
         # Contexten worden opnieuw opgebouwd uit de zichtbare ruimte tussen
         # de nu niet-overlappende vraagfragmenten. De oude contextvoorstellen
         # worden bewust niet hergebruikt: die konden lege witstroken bevatten.
+        #
+        # Een context staat vóór de vragen waarop hij betrekking heeft. Daarom
+        # koppelen we een context aan de daaropvolgende vragen, tot aan het
+        # volgende contextblok. Zo kan één context bijvoorbeeld bij vraag 38
+        # én 39 horen, zonder dat de contextafbeelding onderdeel wordt van
+        # vraag 38 zelf.
         contexts: list[dict[str, Any]] = []
-        first_question = cleaned_questions[0]
-        first_top = snap_before(leading_top)
-        first_bottom = first_question["top"]
-        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
-            first_number = int(first_question["question_numbers"][0])
-            contexts.append({
-                "id": f"auto-context-before-{first_number}",
-                "type": "context",
-                "top": first_top,
-                "bottom": first_bottom,
-                "question_numbers": [first_number],
-                "label": "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vraag",
-                "source": "automatic_leading_context",
-            })
+        context_gaps: list[dict[str, Any]] = []
 
-        for previous, following in zip(cleaned_questions, cleaned_questions[1:]):
+        for question_index, (previous, following) in enumerate(
+            zip(cleaned_questions, cleaned_questions[1:])
+        ):
             gap_top = int(previous["bottom"])
             gap_bottom = int(following["top"])
             if gap_bottom - gap_top < 12 or not has_visible_content(gap_top, gap_bottom):
                 continue
-            # Een context die direct onder een vraag staat, hoort bij de
-            # vraag die eraan voorafgaat. Koppelen aan de volgende vraag
-            # maakte bijvoorbeeld de context tussen 37 en 38 onderdeel van
-            # vraag 38, terwijl de leesvolgorde context-na-vraag juist bij 37
-            # hoort. De docent kan de koppeling later uitbreiden of wijzigen.
-            previous_number = int(previous["question_numbers"][0])
-            following_number = int(following["question_numbers"][0])
-            contexts.append({
-                "id": f"auto-context-between-{previous_number}-{following_number}",
-                "type": "context",
+
+            # Leg eerst alleen de fysieke positie van het contextblok vast.
+            # De vraagkoppeling wordt pas bepaald nadat alle contextblokken
+            # bekend zijn, zodat de volgende contextgrens de gedeelde groep
+            # vragen betrouwbaar kan afbakenen.
+            context_gaps.append({
+                "question_index": question_index,
                 "top": gap_top,
                 "bottom": gap_bottom,
-                "question_numbers": [previous_number],
-                "label": "Automatisch contextvoorstel — inhoud na de voorafgaande vraag",
+                "previous_number": int(previous["question_numbers"][0]),
+                "following_number": int(following["question_numbers"][0]),
+            })
+
+        # Context vóór de eerste vraag hoort bij de eerste reeks vragen tot
+        # aan het eerstvolgende contextblok. Daardoor kan ook een voorblad-
+        # of inleidend contextfragment aan meerdere vragen gekoppeld worden.
+        first_question = cleaned_questions[0]
+        first_top = snap_before(leading_top)
+        first_bottom = first_question["top"]
+        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
+            first_group_end = (
+                context_gaps[0]["question_index"] + 1
+                if context_gaps else len(cleaned_questions)
+            )
+            first_group_numbers = [
+                int(item["question_numbers"][0])
+                for item in cleaned_questions[:first_group_end]
+            ]
+            contexts.append({
+                "id": f"auto-context-before-{first_group_numbers[0]}",
+                "type": "context",
+                "top": first_top,
+                "bottom": first_bottom,
+                "question_numbers": first_group_numbers,
+                "label": "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vragen",
+                "source": "automatic_leading_context",
+            })
+
+        # Een context tussen vraag A en vraag B hoort bij B en de vragen
+        # daarna, zolang er geen nieuw contextblok verschijnt. De volgende
+        # contextgrens bepaalt dus het einde van de gedeelde contextgroep.
+        for gap_index, gap in enumerate(context_gaps):
+            next_context_question_index = (
+                context_gaps[gap_index + 1]["question_index"]
+                if gap_index + 1 < len(context_gaps)
+                else len(cleaned_questions) - 1
+            )
+            group = cleaned_questions[
+                gap["question_index"] + 1 : next_context_question_index + 1
+            ]
+            question_numbers = [
+                int(item["question_numbers"][0]) for item in group
+            ]
+            if not question_numbers:
+                question_numbers = [gap["following_number"]]
+
+            contexts.append({
+                "id": f"auto-context-between-{gap['previous_number']}-{gap['following_number']}",
+                "type": "context",
+                "top": gap["top"],
+                "bottom": gap["bottom"],
+                "question_numbers": question_numbers,
+                "label": "Automatisch contextvoorstel — inhoud vóór de bijbehorende vragen",
                 "source": "automatic_inter_question_gap",
             })
 
