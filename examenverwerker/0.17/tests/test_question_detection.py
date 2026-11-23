@@ -110,6 +110,41 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
         self.assertEqual(exam["steps"]["opgaven_starts"]["evidence"]["accepted_count"], 1)
 
+    def test_late_identical_question_start_autosave_preserves_completed_step(self):
+        """Een late autosave mag een al goedgekeurde vraagstartreview niet heropenen."""
+        response = self.client.post(
+            "/api/exams/import",
+            files=[("files", ("biologie-vwo-2026-tv2-o.pdf", self.make_pdf(), "application/pdf"))],
+        )
+        exam_id = response.json()["exam_id"]
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-o.pdf":"opgaven"}
+        })
+        detected = self.client.get(f"/api/exams/{exam_id}/document-question-starts/opgaven").json()
+        candidates = detected["candidates"]
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/opgaven/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        completed = self.client.post(
+            f"/api/exams/{exam_id}/steps/opgaven_starts/complete",
+            json={"reviewed":True, "reviewed_all_pages":True},
+        )
+        self.assertEqual(completed.status_code, 200, completed.text)
+
+        # Simuleer de vertraagde identieke autosave die bij het verlaten van
+        # het vraagstartscherm nog onderweg kan zijn.
+        late_save = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/opgaven/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(late_save.status_code, 200, late_save.text)
+        self.assertTrue(late_save.json()["complete"])
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "complete")
+
     def test_review_validation_rejects_coordinates_outside_page(self):
         review = {"candidates":[{"id":"manual-1","question_number":1,"page_index":0,
                                   "pdf_bbox":[10,10,2000,20],"accepted":True,"source":"manual"}]}
