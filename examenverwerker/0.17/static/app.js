@@ -831,13 +831,18 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const list = $('#stitchedSelectionList');
     const saveStatus = $('#stitchedSaveStatus');
     const whiteRowRanges = result.white_row_ranges || [];
+    if (!whiteRowRanges.length) {
+      // Geen geldige grensrij betekent dat de selectie niet veilig kan worden
+      // bewerkt. Toon een duidelijke fout in plaats van de grens op een
+      // willekeurige (mogelijk bedrukte) beeldrij te laten vallen.
+      throw new Error('In de examenafbeelding is geen volledig zuiver witte horizontale rij gevonden. Fragmentgrenzen kunnen niet veilig worden geplaatst.');
+    }
 
-    // Een grens mag uitsluitend op een rij liggen waarvan ieder pixel wit is.
-    // De API levert compacte intervallen met zulke rijen; deze functie kiest
-    // steeds de dichtstbijzijnde geldige rij, ook bij slepen en handmatige invoer.
+    // Een grens mag uitsluitend op een rij liggen waarvan iedere RGB-pixel
+    // exact wit is. De server levert alleen zulke rijen aan; de browser kiest
+    // daaruit steeds de dichtstbijzijnde positie.
     const snapBoundary = (value, minimum = 0, maximum = result.height - 1) => {
       const y = Math.max(minimum, Math.min(maximum, Number(value) || 0));
-      if (!whiteRowRanges.length) return Math.round(y);
       let nearest = null;
       let distance = Infinity;
       for (const [rangeStart, rangeEnd] of whiteRowRanges) {
@@ -983,15 +988,26 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const item = selections[index];
       if (!item) return;
       const view = panel.querySelector('.stitched-view');
-      const imageHeight = img.offsetHeight;
-      const target = (item.top + (item.bottom - item.top) / 2) / result.height * imageHeight;
+      // Bereken de doelpositie ten opzichte van het scrollvak zelf. offsetTop
+      // hangt af van de offsetParent en gaf bij deze geneste layout soms een
+      // positie ten opzichte van de hele pagina in plaats van het werkpaneel.
+      const viewRect = view.getBoundingClientRect();
+      const imageRect = img.getBoundingClientRect();
+      const imageY = (item.top + (item.bottom - item.top) / 2) / result.height * imageRect.height;
+      const target = view.scrollTop + imageRect.top - viewRect.top + imageY;
       view.scrollTo({top: Math.max(0, target - view.clientHeight / 2), behavior:'smooth'});
     };
 
-    // Houd het rechterdeel bij het fragment dat in het middendeel zichtbaar is.
+    // Scroll de inspector naar het fragment binnen zijn eigen scrollvak.
+    // scrollIntoView() kan ook de hele pagina laten bewegen; dat is hier
+    // ongewenst omdat alleen de twee werkpanelen synchroon moeten blijven.
     const scrollInspectorToFragment = index => {
       const button = list.querySelector(`[data-select-fragment="${index}"]`);
-      if (button) button.scrollIntoView({block:'nearest', behavior:'smooth'});
+      if (!button) return;
+      const inspectorRect = inspector.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      const target = inspector.scrollTop + buttonRect.top - inspectorRect.top;
+      inspector.scrollTo({top:Math.max(0, target - 18), behavior:'smooth'});
     };
 
     const render = () => {
