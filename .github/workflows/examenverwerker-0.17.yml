@@ -55,7 +55,7 @@ jobs:
         with:
           name: examenverwerker-0.17-echt-examen-diagnose
           path: ${{ runner.temp }}/exam-diagnostic
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 7
 
       - name: Controleer JavaScript-syntaxis
