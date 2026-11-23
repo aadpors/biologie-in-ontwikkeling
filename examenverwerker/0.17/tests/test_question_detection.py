@@ -590,6 +590,11 @@ class QuestionDetectionTests(unittest.TestCase):
         for y in range(112, 141):
             for x in range(3, 17):
                 image.putpixel((x, y), (0, 0, 0))
+        # Vraag 3 volgt op vraag 2 zonder een nieuw contextblok. Het context-
+        # fragment tussen vraag 1 en 2 moet daarom bij beide vervolgvragen horen.
+        for y in range(160, 181):
+            for x in range(3, 17):
+                image.putpixel((x, y), (0, 0, 0))
         image.save(image_path)
         image.close()
 
@@ -599,23 +604,29 @@ class QuestionDetectionTests(unittest.TestCase):
              "question_numbers":[1], "label":"Vraag 1"},
             {"id":"q2", "type":"vraag", "top":112, "bottom":150,
              "question_numbers":[2], "label":"Vraag 2"},
+            {"id":"q3", "type":"vraag", "top":160, "bottom":190,
+             "question_numbers":[3], "label":"Vraag 3"},
         ]
         normalised = normalise_stitched_selections(
             selections, white_rows, image_path, image_height=200
         )
         questions = [item for item in normalised if item["type"] == "vraag"]
 
-        self.assertEqual(len(questions), 2)
+        self.assertEqual(len(questions), 3)
         # De ondergrens van vraag 1 ligt op de bovenste witte rij direct
         # onder de laatste inhoudsregel; de bovengrens van vraag 2 ligt op
         # de onderste witte rij direct boven de eerste inhoudsregel.
         self.assertEqual(questions[0]["bottom"], 66)
         self.assertEqual(questions[1]["top"], 111)
         self.assertEqual(questions[1]["bottom"], 141)
+        self.assertEqual(questions[2]["top"], 159)
+        self.assertEqual(questions[2]["bottom"], 181)
         self.assertLess(questions[0]["bottom"], questions[1]["top"])
         contexts = [item for item in normalised if item["type"] == "context"]
         self.assertEqual(len(contexts), 1)
-        self.assertEqual(contexts[0]["question_numbers"], [1])
+        # De context staat vóór vraag 2 en 3 en wordt aan beide gekoppeld,
+        # maar blijft een afzonderlijk fragment buiten de vraagafbeeldingen.
+        self.assertEqual(contexts[0]["question_numbers"], [2, 3])
         self.assertEqual(contexts[0]["top"], questions[0]["bottom"])
         self.assertEqual(contexts[0]["bottom"], questions[1]["top"])
 
