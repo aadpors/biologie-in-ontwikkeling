@@ -34,9 +34,9 @@ class IntegratedReviewTests(unittest.TestCase):
         doc.close()
         return data
 
-    def create_exam(self):
+    def create_exam(self, opgaven_pages=None):
         uploads = [
-            ("files", ("vw-1018-a-26-2-o.pdf", self.pdf([["1p 1 Kies het juiste antwoord.", "A. optie een", "B. optie twee"]]), "application/pdf")),
+            ("files", ("vw-1018-a-26-2-o.pdf", self.pdf(opgaven_pages or [["1p 1 Kies het juiste antwoord.", "A. optie een", "B. optie twee"]]), "application/pdf")),
             ("files", ("vw-1018-a-26-2-u.pdf", self.pdf([["4", "invulschema"], ["27", "invulschema"]]), "application/pdf")),
             ("files", ("vw-1018-a-26-2-c.pdf", self.pdf([["1 Regels voor beoordeling", "2 Algemene regels"], ["4 Beoordelingsmodel", "1 maximumscore 1", "B 1"]]), "application/pdf")),
         ]
@@ -96,7 +96,10 @@ class IntegratedReviewTests(unittest.TestCase):
 
     def test_stitched_fragment_review_can_open_step_four_question_analysis(self):
         """Test de volledige stap-3-opslag en de daaropvolgende stap-4-API."""
-        exam_id = self.create_exam()
+        exam_id = self.create_exam(opgaven_pages=[
+            ["1p 1 Kies het juiste antwoord.", "A. optie een", "B. optie twee"],
+            ["Aanvullende tekst op de volgende pagina."],
+        ])
         starts = self.client.get(f"/api/exams/{exam_id}/document-question-starts/opgaven")
         self.assertEqual(starts.status_code, 200, starts.text)
         saved_starts = self.client.post(
