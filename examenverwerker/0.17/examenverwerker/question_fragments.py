@@ -536,25 +536,47 @@ def normalise_stitched_selections(
         )
 
     def snap_before(y: float) -> int:
-        """Kies de laatste zuiver witte rij op of vóór een vraaganker.
+        """Kies de onderste rij van de dichtstbijzijnde witte strook vóór inhoud.
 
-        Een vraagstart is een inhoudsanker, geen grens zelf. Door de grens
-        uitsluitend ervoor te leggen blijft het vraagnummer en de eerste
-        tekstregel behouden. Als een wit interval het anker bevat, is het
-        anker zelf ook een geldige grenspositie.
+        De bovengrens van een fragment moet op de onderste volledig witte
+        pixelrij vallen. Ligt het doelpunt midden in een witte strook, dan
+        gebruiken we dus de onderkant van die strook en niet een willekeurige
+        rij in het midden ervan. Ligt het doelpunt tussen stroken, dan nemen
+        we de onderste rij van de dichtstbijzijnde strook erboven.
         """
         target = max(0, int(round(y)))
-        candidates = [
-            min(target, end)
-            for start, end in white_row_ranges
-            if start <= target
+        preceding = [end for start, end in white_row_ranges if start <= target]
+        if preceding:
+            containing = [
+                end for start, end in white_row_ranges
+                if start <= target <= end
+            ]
+            return int(containing[0] if containing else max(preceding))
+        # Aan het begin van de afbeelding kan het doelpunt vóór de eerste
+        # bruikbare strook liggen. Gebruik dan de eerste veilige grensrij.
+        return int(white_row_ranges[0][1])
+
+    def snap_after(y: float) -> int:
+        """Kies de bovenste rij van de dichtstbijzijnde witte strook na inhoud.
+
+        De ondergrens van een fragment moet op de bovenste volledig witte
+        pixelrij vallen. Daarmee blijft de volledige laatste inhoudsregel
+        behouden, zonder de rest van de witte tussenruimte mee te nemen.
+        """
+        target = max(0, int(round(y)))
+        following = [
+            start for start, end in white_row_ranges
+            if end >= target
         ]
-        if not candidates:
-            raise ValueError(
-                "Vóór een herkende vraagstart is geen volledig zuiver witte "
-                "horizontale grensrij gevonden. Controleer de pagina-afsnede."
-            )
-        return int(max(candidates))
+        if following:
+            containing = [
+                start for start, end in white_row_ranges
+                if start <= target <= end
+            ]
+            return int(containing[0] if containing else min(following))
+        # Aan het einde van de afbeelding gebruiken we de bovenrand van de
+        # laatste beschikbare witte strook als veilige terugvalgrens.
+        return int(white_row_ranges[-1][0])
 
     # De afbeeldingsbron wordt één keer geopend; alle pixelcontroles gebeuren
     # op uitsneden daarvan en niet op opnieuw gerenderde PDF-pagina's.
@@ -581,7 +603,7 @@ def normalise_stitched_selections(
         # Vraagfragmenten zijn de ankers. Sorteer ze op hun visuele positie,
         # zodat ook meerdere vragen op dezelfde pagina in leesvolgorde staan.
         questions = [
-            {**item, "top": snap_before(item["top"]), "bottom": snap_before(item["bottom"])}
+            {**item, "top": snap_before(item["top"]), "bottom": snap_after(item["bottom"])}
             for item in selections if item.get("type") == "vraag"
         ]
         questions.sort(key=lambda item: (item["top"], item["bottom"]))
@@ -607,7 +629,7 @@ def normalise_stitched_selections(
                 # De laatste vraag loopt door tot de laatste volledig witte
                 # rij in de lange afbeelding. Een interne witregel in de
                 # laatste vraag mag dus evenmin als eindgrens worden gebruikt.
-                question["bottom"] = white_row_ranges[-1][1]
+                question["bottom"] = snap_after(height - 1)
 
             if question["bottom"] <= question["top"]:
                 number = question.get("question_numbers", ["?"])[0]
