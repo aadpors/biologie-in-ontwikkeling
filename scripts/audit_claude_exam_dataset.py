@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import struct
 from collections import Counter
 from pathlib import Path
 
@@ -51,10 +52,12 @@ def audit_dataset(data_dir: Path) -> tuple[list[dict], dict]:
             })
 
         context_ids = {c.get("id") for c in exam.get("contexts", [])}
-        source_names = {
-            d.get("filename") for d in exam.get("source_documents", [])
+        source_pages = {
+            d.get("filename"): d.get("page_count")
+            for d in exam.get("source_documents", [])
             if d.get("filename")
         }
+        source_names = set(source_pages)
 
         for question in questions:
             qid = question.get("id", f"{exam_name}-?")
@@ -74,11 +77,21 @@ def audit_dataset(data_dir: Path) -> tuple[list[dict], dict]:
 
             # Each source fragment must refer to a declared PDF and a valid page.
             for fragment in question.get("source_fragments", []):
-                if fragment.get("source_pdf") not in source_names:
+                source_pdf = fragment.get("source_pdf")
+                if source_pdf not in source_names:
                     findings.append({
                         "severity": "error", "exam": exam_name, "question": qid,
                         "code": "UNKNOWN_SOURCE_PDF",
-                        "detail": f"Bron-PDF ontbreekt in metadata: {fragment.get('source_pdf')}",
+                        "detail": f"Bron-PDF ontbreekt in metadata: {source_pdf}",
+                    })
+                    break
+                page = fragment.get("pdf_page")
+                page_count = source_pages.get(source_pdf)
+                if isinstance(page, int) and isinstance(page_count, int) and not 1 <= page <= page_count:
+                    findings.append({
+                        "severity": "error", "exam": exam_name, "question": qid,
+                        "code": "SOURCE_PAGE_OUT_OF_RANGE",
+                        "detail": f"PDF-pagina {page} valt buiten {source_pdf} ({page_count} pagina's).",
                     })
                     break
                 coordinates = fragment.get("coordinates") or {}
@@ -134,12 +147,28 @@ def audit_dataset(data_dir: Path) -> tuple[list[dict], dict]:
 
             # Every image reference must resolve relative to the dataset root.
             snippet_path = question.get("snippet_file")
-            if snippet_path and not (data_dir.parent / snippet_path).is_file():
-                findings.append({
-                    "severity": "error", "exam": exam_name, "question": qid,
-                    "code": "MISSING_SNIPPET_FILE",
-                    "detail": f"PNG-bestand niet gevonden: {snippet_path}.",
-                })
+            if snippet_path:
+                image_path = data_dir.parent / snippet_path
+                if not image_path.is_file():
+                    findings.append({
+                        "severity": "error", "exam": exam_name, "question": qid,
+                        "code": "MISSING_SNIPPET_FILE",
+                        "detail": f"PNG-bestand niet gevonden: {snippet_path}.",
+                    })
+                else:
+                    # PNG width/height live in the IHDR chunk. Read only the
+                    # first 24 bytes instead of loading the full image.
+                    with image_path.open("rb") as image_file:
+                        header = image_file.read(24)
+                    if len(header) == 24 and header[:8] == b"\x89PNG\r\n\x1a\n":
+                        actual_size = struct.unpack(">II", header[16:24])
+                        declared_size = question.get("snippet_size_px")
+                        if declared_size and list(actual_size) != declared_size:
+                            findings.append({
+                                "severity": "error", "exam": exam_name, "question": qid,
+                                "code": "SNIPPET_DIMENSION_MISMATCH",
+                                "detail": f"JSON={declared_size}, PNG={list(actual_size)}.",
+                            })
 
             # Open questions with a single-letter key need manual verification.
             if question.get("type") == "open" and SINGLE_LETTER.fullmatch(model_answer):
