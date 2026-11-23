@@ -17,6 +17,47 @@ async function api(url, options = {}) {
   return body;
 }
 
+/* Koppel een bestaande conceptopslagfunctie aan alle bewerkbare velden in
+   een workflowstap. De server ontvangt zo na elke veldwijziging de complete
+   momentopname van die stap; er is geen aparte opslagknop meer nodig om
+   voortgang te behouden. Oude listeners worden verwijderd wanneer een
+   andere stap in hetzelfde paneel wordt geopend. */
+function bindStageAutoSave(panel, save, statusSelector) {
+  if (panel._stageAutoSaveCleanup) panel._stageAutoSaveCleanup();
+  let timer = null;
+  let saveChain = Promise.resolve();
+
+  const saveNow = () => {
+    clearTimeout(timer);
+    saveChain = saveChain.catch(() => {}).then(() => save()).then(result => {
+      const status = panel.querySelector(statusSelector);
+      if (status) status.textContent = 'Wijziging automatisch opgeslagen.';
+      return result;
+    }).catch(error => {
+      const status = panel.querySelector(statusSelector);
+      if (status) status.textContent = 'Automatisch opslaan mislukt: ' + error.message;
+      throw error;
+    });
+    return saveChain;
+  };
+
+  const schedule = event => {
+    if (!event.target.matches('input, textarea, select')) return;
+    if (event.target.type === 'file' || event.target.type === 'button') return;
+    clearTimeout(timer);
+    timer = setTimeout(() => saveNow().catch(() => {}), 300);
+  };
+
+  // change wordt afgevuurd bij checkbox/select-wijzigingen en wanneer een
+  // tekstveld focus verliest, dus ook bij wegklikken naar een ander tabblad.
+  panel.addEventListener('change', schedule);
+  panel._stageAutoSaveCleanup = () => {
+    clearTimeout(timer);
+    panel.removeEventListener('change', schedule);
+    panel._stageAutoSaveCleanup = null;
+  };
+}
+
 function showLibrary() {
   $('#libraryView').hidden = false;
   $('#workspaceView').hidden = true;
@@ -74,6 +115,8 @@ async function openWorkspace(examId) {
 }
 
 function renderWorkspace() {
+  const stagePanel = $('#stagePanel');
+  if (stagePanel?._stageAutoSaveCleanup) stagePanel._stageAutoSaveCleanup();
   const exam = state.exam;
   $('#examTitle').textContent = exam.title;
   const metadata = exam.metadata;
@@ -109,7 +152,10 @@ function renderWorkspace() {
 function renderMetadataStage() {
   const exam = state.exam;
   const first = exam.documents[0].metadata;
-  const common = (key) => exam.documents.map(doc => doc.metadata[key]).find(value => value !== '' && value != null) ?? '';
+  // Onbevestigde metadata wordt als concept uit SQLite teruggelezen, zodat
+  // een herstart niet betekent dat de gebruiker de invoer opnieuw moet doen.
+  const draft = exam.steps.metadata_draft?.evidence || {};
+  const common = (key) => draft[key] ?? exam.documents.map(doc => doc.metadata[key]).find(value => value !== '' && value != null) ?? '';
   const types = {opgaven:'Opgaven',uitwerkbijlage:'Uitwerkbijlage',correctievoorschrift:'Correctievoorschrift',aanvulling_correctievoorschrift:'Aanvulling correctievoorschrift'};
   $('#stagePanel').innerHTML = `
     <p class="eyebrow">FASE 1 · IMPORT EN DOCUMENTHERKENNING</p><h2>Documenteigenschappen bevestigen</h2>
@@ -122,11 +168,36 @@ function renderMetadataStage() {
         <div class="field"><label for="year">Jaar</label><input id="year" type="number" min="2000" max="2099" value="${escapeHtml(common('year'))}" required></div>
         <div class="field"><label for="period">Tijdvak</label><input id="period" type="number" min="1" max="3" value="${escapeHtml(common('period'))}" required></div>
       </div>
-      <h3>Documenttypen</h3><div class="type-list">${exam.documents.map(doc => `<div class="type-row"><span>${escapeHtml(doc.filename)}</span><select data-type-for="${escapeHtml(doc.filename)}">${Object.entries(types).map(([value,label]) => `<option value="${value}" ${doc.metadata.document_type === value ? 'selected' : ''}>${label}</option>`).join('')}</select></div>`).join('')}</div>
+      <h3>Documenttypen</h3><div class="type-list">${exam.documents.map(doc => `<div class="type-row"><span>${escapeHtml(doc.filename)}</span><select data-type-for="${escapeHtml(doc.filename)}">${Object.entries(types).map(([value,label]) => `<option value="${value}" ${(draft.document_types?.[doc.filename] || doc.metadata.document_type) === value ? 'selected' : ''}>${label}</option>`).join('')}</select></div>`).join('')}</div>
       <div class="notice">De originele PDF's blijven ongewijzigd. De eerste pagina wordt alleen gebruikt om de metadata te herkennen en als visueel voorbeeld te tonen.</div>
-      <button class="primary" type="submit">Metadata bevestigen en doorgaan</button><p id="metadataError" class="form-error" role="alert"></p>
+      <button class="primary" type="submit">Metadata bevestigen en doorgaan</button><p id="metadataDraftStatus" class="muted" role="status">Wijzigingen worden automatisch opgeslagen.</p><p id="metadataError" class="form-error" role="alert"></p>
     </form><div id="pagePreview"></div>`;
   document.querySelectorAll('[data-preview]').forEach(button => button.addEventListener('click', () => showPreview(button.dataset.preview)));
+  // Sla metadata als concept op zodra een veld wordt verlaten of een
+  // documenttype wordt gewijzigd. Definitief bevestigen blijft een aparte stap.
+  let metadataDraftTimer = null;
+  $('#metadataForm').addEventListener('change', () => {
+    clearTimeout(metadataDraftTimer);
+    metadataDraftTimer = setTimeout(async () => {
+      try {
+        const payload = {
+          subject: $('#subject').value.trim(),
+          level: $('#level').value.trim(),
+          year: $('#year').value ? Number($('#year').value) : null,
+          period: $('#period').value ? Number($('#period').value) : null,
+          document_types: Object.fromEntries([...document.querySelectorAll('[data-type-for]')]
+            .map(select => [select.dataset.typeFor, select.value]))
+        };
+        await api(`/api/exams/${state.examId}/metadata/draft`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+        $('#metadataDraftStatus').textContent = 'Metadatawijzigingen automatisch opgeslagen.';
+      } catch (error) {
+        $('#metadataDraftStatus').textContent = 'Automatisch opslaan mislukt: ' + error.message;
+      }
+    }, 250);
+  });
   $('#metadataForm').addEventListener('submit', confirmMetadata);
 }
 
@@ -198,6 +269,7 @@ async function renderCvSupplementStage() {
         question_numbers:numbers, reviewed:card.querySelector(`[data-supplement-reviewed="${page}"]`).checked};
     });
     const save = () => api(`/api/exams/${state.examId}/cv-supplement/review`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:collect()})});
+    bindStageAutoSave(panel, save, '#supplementMessage');
     $('#saveSupplement').addEventListener('click', async () => { try { const r=await save(); $('#supplementMessage').textContent=`${r.reviewed_count} van ${r.page_count} pagina's gecontroleerd. Concept opgeslagen.`; } catch(error) { $('#supplementMessage').textContent=error.message; } });
     $('#completeSupplement').addEventListener('click', async () => { try { const r=await save(); if(!r.complete) throw new Error('Controleer eerst alle pagina’s.'); await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_pages:true})}); await openWorkspace(state.examId); } catch(error) { $('#supplementMessage').textContent=error.message; } });
   } catch (error) { panel.innerHTML = `<h2>Aanvulling correctievoorschrift</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
@@ -220,6 +292,7 @@ async function renderAnswersStage() {
     checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
     const collect=()=>cards.map(card=>{const n=Number(card.dataset.answerCard);return {question_number:n,answer_kind:card.querySelector(`[data-answer-kind="${n}"]`).value,answer_text:card.querySelector(`[data-answer-text="${n}"]`).value,reviewed:card.querySelector(`[data-answer-reviewed="${n}"]`).checked};});
     const save=()=>api(`/api/exams/${state.examId}/answers/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
+    bindStageAutoSave(panel, save, '#answersMessage');
     $('#saveAnswers').addEventListener('click',async()=>{try{const r=await save();$('#answersMessage').textContent=`${r.reviewed_count} van ${result.question_count} antwoorden gecontroleerd. Concept opgeslagen.`;}catch(error){$('#answersMessage').textContent=error.message;}});
     $('#completeAnswers').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle antwoorden.');await api(`/api/exams/${state.examId}/steps/antwoorden/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#answersMessage').textContent=error.message;}});
   } catch(error) { panel.innerHTML=`<h2>Antwoorden herkennen</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
@@ -242,6 +315,7 @@ async function renderRelationsStage() {
     checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
     const collect=()=>cards.map(card=>{const n=Number(card.dataset.relationCard);return {question_number:n,reviewed:card.querySelector(`[data-relation-reviewed="${n}"]`).checked,note:card.querySelector(`[data-relation-note="${n}"]`).value};});
     const save=()=>api(`/api/exams/${state.examId}/relations/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
+    bindStageAutoSave(panel, save, '#relationsMessage');
     $('#saveRelations').addEventListener('click',async()=>{try{const r=await save();$('#relationsMessage').textContent=`${r.reviewed_count} van ${result.question_count} koppelingen gecontroleerd.`;}catch(error){$('#relationsMessage').textContent=error.message;}});
     $('#completeRelations').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle koppelingen.');await api(`/api/exams/${state.examId}/steps/relaties/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#relationsMessage').textContent=error.message;}});
   } catch(error) { panel.innerHTML=`<h2>Documentkoppelingen</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
@@ -271,6 +345,7 @@ async function renderSnippetsStage() {
     $('#confirmNoContexts')?.addEventListener('change',refresh); refresh();
     const collect=()=>({contexts:result.contexts.map(c=>({id:c.id,from_question:Number(document.querySelector(`[data-context-from="${c.id}"]`).value),to_question:Number(document.querySelector(`[data-context-to="${c.id}"]`).value),reviewed:document.querySelector(`[data-context-reviewed="${c.id}"]`).checked})),reviewed_question_numbers:questionChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetReviewed)),reviewed_uitwerk_numbers:workbookChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetUitwerk)),reviewed_cv_numbers:cvChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetCv)),confirmed_no_contexts:noContextConfirmed()});
     const save=()=>api(`/api/exams/${state.examId}/snippets/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(collect())});
+    bindStageAutoSave(panel, save, '#snippetsMessage');
     $('#saveSnippets').addEventListener('click',async()=>{try{const r=await save();$('#snippetsMessage').textContent=`${r.reviewed_count} vragen en ${r.reviewed_all_contexts?result.context_count:contextChecks().filter(x=>x.checked).length} contexten gecontroleerd.`;}catch(error){$('#snippetsMessage').textContent=error.message;}});
     $('#completeSnippets').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle contexten en vraagfragmenten.');await api(`/api/exams/${state.examId}/steps/snippets/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_all_contexts:true})});await openWorkspace(state.examId);}catch(error){$('#snippetsMessage').textContent=error.message;}});
   } catch(error) { panel.innerHTML=`<h2>Definitieve snippets</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
@@ -294,6 +369,7 @@ async function renderFinalReviewStage() {
     document.querySelectorAll('[data-final-note]').forEach(x=>x.addEventListener('input',refresh)); refresh();
     const collect=()=>cards.map(card=>{const n=Number(card.dataset.finalCard);return {question_number:n,reviewed:card.querySelector(`[data-final-reviewed="${n}"]`).checked,resolution_note:card.querySelector(`[data-final-note="${n}"]`).value};});
     const save=()=>api(`/api/exams/${state.examId}/final-review/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
+    bindStageAutoSave(panel, save, '#finalReviewMessage');
     $('#saveFinalReview').addEventListener('click',async()=>{try{const r=await save();$('#finalReviewMessage').textContent=`${r.reviewed_count} van ${result.question_count} vragen gecontroleerd.`;}catch(error){$('#finalReviewMessage').textContent=error.message;}});
     $('#completeFinalReview').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle vragen.');await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}});
     document.querySelectorAll('[data-repair]').forEach(button=>button.addEventListener('click',async()=>{try{await api(`/api/exams/${state.examId}/steps/${button.dataset.repair}/reopen`,{method:'POST'});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}}));
@@ -955,6 +1031,8 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
       });
       handle.addEventListener('pointerup', event => {
         if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+        // Na het verslepen direct de nieuwe PDF-grens als concept opslaan.
+        input.dispatchEvent(new Event('change', {bubbles:true}));
       });
       handle.addEventListener('keydown', event => {
         if (!['ArrowUp','ArrowDown'].includes(event.key)) return;
@@ -974,6 +1052,7 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
         }
         handle.style.top = `${Math.max(0,Math.min(100,ratio*100))}%`;
         handle.style.bottom = 'auto';
+        input.dispatchEvent(new Event('change', {bubbles:true}));
       });
     });
 
@@ -1012,6 +1091,7 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
           boundary_overrides:boundaries.map(({question_number,start_y,end_y})=>({question_number,start_y,end_y}))})
       }), changedNumbers};
     };
+    bindStageAutoSave(panel, save, '#fragmentReviewMessage');
     $('#saveFragmentReview').addEventListener('click', async () => {
       try {
         const {saved,changedNumbers} = await save();
@@ -1123,6 +1203,7 @@ async function renderQuestionAnalysisStage() {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({questions:collect()})
     });
+    bindStageAutoSave(panel, save, '#questionAnalysisMessage');
     $('#saveQuestionAnalysis').addEventListener('click', async () => {
       try {
         const saved = await save();

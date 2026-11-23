@@ -57,6 +57,19 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(exam["documents"][0]["page_count"], 1)
         self.assertEqual(len(exam["documents"][0]["sha256"]), 64)
 
+    def test_metadata_draft_is_persisted_without_confirming_exam(self):
+        result = self.import_sample()
+        exam_id = result["exam_id"]
+        response = self.client.post(f"/api/exams/{exam_id}/metadata/draft", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":None,
+            "document_types":{"biologie-vwo-2026-tv2-o.pdf":"opgaven"}
+        })
+        self.assertEqual(response.status_code, 200, response.text)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertFalse(exam["confirmed"])
+        self.assertEqual(exam["steps"]["metadata_draft"]["evidence"]["level"], "vwo")
+        self.assertIsNone(exam["steps"]["metadata_draft"]["evidence"]["period"])
+
     def test_metadata_requires_all_fields_and_document_types(self):
         result = self.import_sample()
         exam_id = result["exam_id"]

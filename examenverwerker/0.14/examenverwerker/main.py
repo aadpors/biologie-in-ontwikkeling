@@ -1068,8 +1068,9 @@ def save_snippets_review(exam_id: str, payload: dict):
             len(set(reviewed_cv)) != len(reviewed_cv) or
             not set(reviewed_cv).issubset(expected_cv)):
         raise HTTPException(422, "De gecontroleerde CV-fragmenten zijn ongeldig.")
-    if not result["contexts"] and not payload.get("confirmed_no_contexts"):
-        raise HTTPException(422, "Er zijn geen contextvoorstellen. Bevestig na visuele controle dat er geen afzonderlijke contexten gekoppeld hoeven te worden.")
+    # Ook een onvolledige snippetreview moet tussentijds opgeslagen kunnen
+    # worden. De expliciete bevestiging dat er geen contexten zijn, wordt pas
+    # bij het afronden van de stap verplicht gesteld.
     try:
         context_review = validate_context_review(
             {"contexts": payload.get("contexts", [])},
@@ -1157,8 +1158,8 @@ def save_final_review(exam_id: str, payload: dict):
         seen.add(number)
         source = next(question for question in result["questions"] if question["question_number"] == number)
         note = str(item.get("resolution_note", ""))[:2000]
-        if source["points_match"] is False and not note.strip():
-            raise HTTPException(422, f"Leg het verschil tussen de opgave- en CV-score bij vraag {number} vast.")
+        # Een lege toelichting is toegestaan in een concept. De afrondactie
+        # controleert dat ieder scoreverschil daadwerkelijk is toegelicht.
         cleaned.append({"question_number": number, "reviewed": bool(item.get("reviewed")),
                         "resolution_note": note})
     if seen != expected:
@@ -1183,6 +1184,22 @@ def context_image(exam_id: str, filename: str):
     return FileResponse(path, media_type="image/png", headers={"Cache-Control":"no-store"})
 
 
+@app.post("/api/exams/{exam_id}/metadata/draft")
+def save_metadata_draft(exam_id: str, payload: dict):
+    """Bewaar onvolledige metadata als concept zonder het examen te bevestigen.
+
+    De docent kan de metadata in meerdere sessies invullen. Een leeg of nog
+    onvolledig veld is daarom toegestaan; definitieve validatie gebeurt pas
+    bij de afzonderlijke bevestigingsactie.
+    """
+    if not STORE.get_exam(exam_id):
+        raise HTTPException(404, "Examen niet gevonden.")
+    if not isinstance(payload, dict):
+        raise HTTPException(422, "De metadata-invoer heeft een ongeldig formaat.")
+    STORE.save_step_draft(exam_id, "metadata_draft", payload)
+    return {"ok": True, "saved": True}
+
+
 @app.post("/api/exams/{exam_id}/metadata/confirm")
 def confirm_metadata(exam_id: str, payload: dict):
     exam = STORE.get_exam(exam_id)
@@ -1200,6 +1217,8 @@ def confirm_metadata(exam_id: str, payload: dict):
             raise HTTPException(422, f"Bevestig het documenttype van {doc['filename']}.")
     metadata = {**{k: payload[k] for k in required}, "document_types": types}
     STORE.confirm_metadata(exam_id, metadata)
+    # Het concept is niet meer nodig zodra de definitieve metadata is bevestigd.
+    STORE.invalidate_steps(exam_id, ["metadata_draft"])
     return {"ok": True, "metadata": metadata}
 
 
@@ -1277,6 +1296,15 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
         questions = previous.get("questions", [])
         if not previous.get("reviewed_all_questions") or not questions or any(not item.get("reviewed") for item in questions):
             raise HTTPException(422, "Controleer alle vragen in de integrale eindcontrole.")
+        # Conceptopslag mag een nog ontbrekende toelichting bewaren; definitief
+        # afronden mag niet zolang een scoreverschil onverklaard blijft.
+        final_data = get_final_review(exam_id)
+        mismatched = {item["question_number"] for item in final_data["questions"]
+                      if item["points_match"] is False}
+        unresolved = [item["question_number"] for item in questions
+                      if item["question_number"] in mismatched and not item.get("resolution_note", "").strip()]
+        if unresolved:
+            raise HTTPException(422, "Leg het scoreverschil nog toe bij vraag/vraagvragen: " + ", ".join(map(str, unresolved)))
     STORE.complete_step(exam_id, step_key, {**previous, **payload})
     return {"ok": True, "step": step_key}
 
