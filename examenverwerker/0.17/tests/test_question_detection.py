@@ -606,7 +606,12 @@ class QuestionDetectionTests(unittest.TestCase):
         questions = [item for item in normalised if item["type"] == "vraag"]
 
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0]["bottom"], 70)
+        # De ondergrens van vraag 1 ligt op de bovenste witte rij direct
+        # onder de laatste inhoudsregel; de bovengrens van vraag 2 ligt op
+        # de onderste witte rij direct boven de eerste inhoudsregel.
+        self.assertEqual(questions[0]["bottom"], 66)
+        self.assertEqual(questions[1]["top"], 111)
+        self.assertEqual(questions[1]["bottom"], 141)
         self.assertLess(questions[0]["bottom"], questions[1]["top"])
         contexts = [item for item in normalised if item["type"] == "context"]
         self.assertEqual(len(contexts), 1)
