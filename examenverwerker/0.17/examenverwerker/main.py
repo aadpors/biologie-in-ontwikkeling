@@ -12,6 +12,7 @@ import re
 import shutil
 import uuid
 from pathlib import Path
+from typing import Any
 
 import fitz
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
