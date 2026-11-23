@@ -189,28 +189,44 @@ function renderMetadataStage() {
   // Sla metadata als concept op zodra een veld wordt verlaten of een
   // documenttype wordt gewijzigd. Definitief bevestigen blijft een aparte stap.
   let metadataDraftTimer = null;
-  $('#metadataForm').addEventListener('change', () => {
+  const saveMetadataDraft = async () => {
     clearTimeout(metadataDraftTimer);
-    metadataDraftTimer = setTimeout(async () => {
-      try {
-        const payload = {
-          subject: $('#subject').value.trim(),
-          level: $('#level').value.trim(),
-          year: $('#year').value ? Number($('#year').value) : null,
-          period: $('#period').value ? Number($('#period').value) : null,
-          document_types: Object.fromEntries([...document.querySelectorAll('[data-type-for]')]
-            .map(select => [select.dataset.typeFor, select.value]))
-        };
-        await api(`/api/exams/${state.examId}/metadata/draft`, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(payload)
-        });
-        $('#metadataDraftStatus').textContent = 'Metadatawijzigingen automatisch opgeslagen.';
-      } catch (error) {
-        $('#metadataDraftStatus').textContent = 'Automatisch opslaan mislukt: ' + error.message;
-      }
-    }, 250);
-  });
+    const payload = {
+      subject: $('#subject').value.trim(),
+      level: $('#level').value.trim(),
+      year: $('#year').value ? Number($('#year').value) : null,
+      period: $('#period').value ? Number($('#period').value) : null,
+      document_types: Object.fromEntries([...document.querySelectorAll('[data-type-for]')]
+        .map(select => [select.dataset.typeFor, select.value]))
+    };
+    try {
+      await api(`/api/exams/${state.examId}/metadata/draft`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      $('#metadataDraftStatus').textContent = 'Metadatawijzigingen automatisch opgeslagen.';
+    } catch (error) {
+      $('#metadataDraftStatus').textContent = 'Automatisch opslaan mislukt: ' + error.message;
+      throw error;
+    }
+  };
+  const scheduleMetadataDraft = () => {
+    clearTimeout(metadataDraftTimer);
+    metadataDraftTimer = setTimeout(() => saveMetadataDraft().catch(() => {}), 250);
+  };
+  const flushMetadataDraft = () => saveMetadataDraft().catch(() => {});
+  const metadataVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') flushMetadataDraft();
+  };
+  $('#metadataForm').addEventListener('change', scheduleMetadataDraft);
+  document.addEventListener('visibilitychange', metadataVisibilityChange);
+  window.addEventListener('pagehide', flushMetadataDraft);
+  panel._stageAutoSaveCleanup = () => {
+    clearTimeout(metadataDraftTimer);
+    document.removeEventListener('visibilitychange', metadataVisibilityChange);
+    window.removeEventListener('pagehide', flushMetadataDraft);
+    panel._stageAutoSaveCleanup = null;
+  };
   $('#metadataForm').addEventListener('submit', confirmMetadata);
 }
 
@@ -514,6 +530,26 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         if (event.target.closest('#acceptAllStarts, #rejectAllStarts')) {
           scheduleStartAutosave();
         }
+      };
+      const flushStartAutosave = () => {
+        clearTimeout(autosaveTimer);
+        saveReview().catch(error => {
+          const status = $('#startReviewMessage');
+          if (status) status.textContent = 'Automatisch opslaan mislukt: ' + error.message;
+        });
+      };
+      const startVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') flushStartAutosave();
+      };
+      document.addEventListener('visibilitychange', startVisibilityChange);
+      window.addEventListener('pagehide', flushStartAutosave);
+      panel._stageAutoSaveCleanup = () => {
+        clearTimeout(autosaveTimer);
+        panel.onchange = null;
+        panel.onclick = null;
+        document.removeEventListener('visibilitychange', startVisibilityChange);
+        window.removeEventListener('pagehide', flushStartAutosave);
+        panel._stageAutoSaveCleanup = null;
       };
 
       $('#acceptAllStarts').addEventListener('click', () => document.querySelectorAll('[data-candidate]').forEach(input => input.checked = true));
