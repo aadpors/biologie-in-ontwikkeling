@@ -185,6 +185,84 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertTrue((self.root / "derived" / result["questions"][0]["segments"][0]["filename"]).is_file())
         self.assertLess(result["questions"][0]["segments"][1]["pdf_clip"][3], 842)
 
+    def test_stitched_fragment_review_can_continue_into_question_analysis(self):
+        # Dit is de volledige API-route die de browser in stap 3 en stap 4
+        # doorloopt. De vraagafbeeldingen, tekstextractie en stapvalidatie
+        # moeten dezelfde goedgekeurde fragmentgrenzen blijven gebruiken.
+        document = fitz.open()
+        cover = document.new_page()
+        cover.insert_text((70, 100), "Biologie examen vwo 2026")
+        questions = document.new_page()
+        questions.insert_text((70, 100), "1. Beschrijf de functie van het celmembraan.", fontsize=11)
+        questions.insert_text((70, 250), "2. Leg uit waarom transport energie kost.", fontsize=11)
+        pdf_bytes = document.tobytes()
+        document.close()
+
+        imported = self.client.post(
+            "/api/exams/import",
+            files=[("files", ("biologie-vwo-2026-tv2-o.pdf", pdf_bytes, "application/pdf"))],
+        )
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-o.pdf":"opgaven"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        starts = self.client.get(f"/api/exams/{exam_id}/question-starts")
+        self.assertEqual(starts.status_code, 200, starts.text)
+        candidates = starts.json()["candidates"]
+        self.assertEqual([item["question_number"] for item in candidates], [1, 2])
+        saved_starts = self.client.post(
+            f"/api/exams/{exam_id}/question-starts/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(saved_starts.status_code, 200, saved_starts.text)
+        completed_starts = self.client.post(
+            f"/api/exams/{exam_id}/steps/opgaven_starts/complete",
+            json={"reviewed":True, "reviewed_all_pages":True},
+        )
+        self.assertEqual(completed_starts.status_code, 200, completed_starts.text)
+
+        stitched = self.client.get(f"/api/exams/{exam_id}/stitched-opgaven")
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        proposed = stitched.json()["proposed_selections"]
+        question_selections = [item for item in proposed if item["type"] == "vraag"]
+        self.assertEqual(len(question_selections), 2)
+        self.assertTrue(stitched.json()["white_row_ranges"])
+
+        reviewed_selections = [
+            {**item, "question_numbers":list(item["question_numbers"])}
+            for item in proposed
+        ]
+        saved_stitched = self.client.post(
+            f"/api/exams/{exam_id}/stitched-opgaven/review",
+            json={"selections":reviewed_selections, "reviewed":True},
+        )
+        self.assertEqual(saved_stitched.status_code, 200, saved_stitched.text)
+
+        saved_fragment_review = self.client.post(
+            f"/api/exams/{exam_id}/document-question-fragments/opgaven/review",
+            json={"reviewed_question_numbers":[1, 2],
+                  "reviewed_all_questions":True, "boundary_overrides":[]},
+        )
+        self.assertEqual(saved_fragment_review.status_code, 200, saved_fragment_review.text)
+        completed_fragments = self.client.post(
+            f"/api/exams/{exam_id}/steps/opgaven_fragments/complete",
+            json={"reviewed":True, "reviewed_all_questions":True,
+                  "reviewed_question_numbers":[1, 2]},
+        )
+        self.assertEqual(completed_fragments.status_code, 200, completed_fragments.text)
+
+        analysis = self.client.get(f"/api/exams/{exam_id}/question-analysis")
+        self.assertEqual(analysis.status_code, 200, analysis.text)
+        questions_result = analysis.json()["questions"]
+        self.assertEqual([item["question_number"] for item in questions_result], [1, 2])
+        self.assertIn("celmembraan", questions_result[0]["extracted_text"].casefold())
+        self.assertIn("energie kost", questions_result[1]["extracted_text"].casefold())
+        self.assertTrue(all(item["segments"] for item in questions_result))
+
     def test_fragment_step_cannot_complete_without_full_review(self):
         response = self.client.post("/api/exams/import", files=[("files", ("biologie-vwo-2026-tv2-o.pdf", self.make_pdf(), "application/pdf"))])
         exam_id = response.json()["exam_id"]
