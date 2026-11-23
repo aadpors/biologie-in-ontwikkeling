@@ -599,11 +599,25 @@ def normalise_stitched_selections(
                 question["bottom"] = next_top
 
             if question["bottom"] <= question["top"]:
-                continue
+                number = question.get("question_numbers", ["?"])[0]
+                following_number = (
+                    questions[index + 1].get("question_numbers", ["?"])[0]
+                    if index + 1 < len(questions) else "het einde van het document"
+                )
+                raise ValueError(
+                    f"Tussen vraag {number} en {following_number} is geen "
+                    "volledig zuiver witte horizontale grensrij gevonden. "
+                    "De fragmenten zijn niet veilig automatisch te scheiden."
+                )
             if not has_visible_content(question["top"], question["bottom"]):
-                # Een leeg voorstel is schadelijker dan een ontbrekend voorstel:
-                # de docent kan een ontbrekend fragment handmatig toevoegen.
-                continue
+                # Een geaccepteerde vraagstart zonder zichtbare inhoud mag
+                # niet ongemerkt uit de resultaten verdwijnen. Dat zou een
+                # onvolledig examen kunnen opleveren zonder waarschuwing.
+                number = question.get("question_numbers", ["?"])[0]
+                raise ValueError(
+                    f"Voor vraag {number} is in het voorgestelde fragment "
+                    "geen zichtbare inhoud gevonden. Controleer de vraagstart."
+                )
             cleaned_questions.append(question)
 
         if not cleaned_questions:
