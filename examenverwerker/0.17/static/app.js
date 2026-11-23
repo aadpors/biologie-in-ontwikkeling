@@ -853,6 +853,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         const delta = Math.abs(candidate - y);
         if (delta < distance) { nearest = candidate; distance = delta; }
       }
+      // Wanneer tussen de minimale en maximale grens geen witte rij ligt,
+      // blijft de bestaande grens staan. null is nooit een geldige pixelrij.
       return nearest;
     };
 
@@ -948,11 +950,16 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       if (!boundaryDrag) return;
       const item = selections[boundaryDrag.index];
       if (!item) return;
-      const y = snapBoundary(imageY(event));
+      const y = imageY(event);
+      if (y === null) return;
       if (boundaryDrag.edge === 'top') {
-        item.top = snapBoundary(y, 0, item.bottom - 12);
+        const snappedTop = snapBoundary(y, 0, item.bottom - 12);
+        if (snappedTop === null) return;
+        item.top = snappedTop;
       } else {
-        item.bottom = snapBoundary(y, item.top + 12, result.height - 1);
+        const snappedBottom = snapBoundary(y, item.top + 12, result.height - 1);
+        if (snappedBottom === null) return;
+        item.bottom = snappedBottom;
       }
       const element = overlay.querySelector(`[data-overlay-select="${boundaryDrag.index}"]`);
       if (element) {
@@ -1122,6 +1129,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     img.addEventListener('click',event=>{
       if(!wrap.classList.contains('selecting')) return;
       const y=imageY(event);
+      if(y===null) return;
       if(pendingTop===null){
         pendingTop=y;hint.textContent='Klik nu bij de onderrand van hetzelfde fragment.';render();return;
       }
@@ -1130,7 +1138,13 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         hint.textContent='Het fragment is te klein. Kies opnieuw.';
         pendingTop=null;render();return;
       }
-      selections.push({id:`fragment-${Date.now()}-${selections.length}`,type:'vraag',top:snapBoundary(top),bottom:snapBoundary(bottom),question_numbers:[],label:''});
+      const snappedTop=snapBoundary(top);
+      const snappedBottom=snapBoundary(bottom);
+      if(snappedTop===null || snappedBottom===null || snappedBottom-snappedTop<12){
+        hint.textContent='Tussen deze punten ligt geen bruikbare volledig witte grens. Kies opnieuw.';
+        pendingTop=null;render();return;
+      }
+      selections.push({id:`fragment-${Date.now()}-${selections.length}`,type:'vraag',top:snappedTop,bottom:snappedBottom,question_numbers:[],label:''});
       activeIndex=selections.length-1;pendingTop=null;wrap.classList.remove('selecting');
       hint.textContent='Fragment toegevoegd. Vul rechts type en vraagnummers in.';
       render();scheduleSave();
