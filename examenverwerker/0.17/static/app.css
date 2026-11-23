@@ -82,7 +82,11 @@
    in dezelfde pixelcoördinaten opgeslagen als de gegenereerde stitchbron. */
 .stitched-workspace{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start;margin:18px 0}
 .stitched-view{min-width:0;background:#f3f5f6;border:1px solid var(--line,#dce2e6);border-radius:12px;padding:12px}
-.stitched-toolbar{position:sticky;top:0;z-index:5;display:flex;gap:12px;align-items:center;background:#f3f5f6;padding:4px 0 10px}
+/* De bedieningsbalk blijft in de normale documentstroom staan.
+   Sticky positionering liet de lange examenafbeelding er bij scrollen
+   visueel achterdoor lopen, waardoor knoppen en fragmentranden over elkaar
+   heen leken te schuiven. De balk reserveert nu gewoon zijn eigen hoogte. */
+.stitched-toolbar{position:relative;top:auto;z-index:1;display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:#f3f5f6;padding:4px 0 10px;min-height:44px}
 .stitched-image-wrap{position:relative;max-width:900px;margin:0 auto;background:#fff;box-shadow:0 2px 12px #172b3a20}
 .stitched-image-wrap.selecting{cursor:crosshair}
 .stitched-image-wrap img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
