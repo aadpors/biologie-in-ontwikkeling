@@ -581,6 +581,12 @@ class QuestionDetectionTests(unittest.TestCase):
         for y in range(30, 66):
             for x in range(3, 17):
                 image.putpixel((x, y), (0, 0, 0))
+        # Dit zichtbare tekstblok ligt ná vraag 1 en vóór vraag 2.
+        # Het is context bij de voorafgaande vraag en mag niet in vraag 2
+        # worden opgenomen.
+        for y in range(76, 94):
+            for x in range(3, 17):
+                image.putpixel((x, y), (30, 30, 30))
         for y in range(112, 141):
             for x in range(3, 17):
                 image.putpixel((x, y), (0, 0, 0))
@@ -600,9 +606,13 @@ class QuestionDetectionTests(unittest.TestCase):
         questions = [item for item in normalised if item["type"] == "vraag"]
 
         self.assertEqual(len(questions), 2)
-        self.assertGreaterEqual(questions[0]["bottom"], 109)
-        self.assertEqual(questions[0]["bottom"], questions[1]["top"])
-        self.assertGreater(questions[0]["bottom"], 50)
+        self.assertEqual(questions[0]["bottom"], 50)
+        self.assertLess(questions[0]["bottom"], questions[1]["top"])
+        contexts = [item for item in normalised if item["type"] == "context"]
+        self.assertEqual(len(contexts), 1)
+        self.assertEqual(contexts[0]["question_numbers"], [1])
+        self.assertEqual(contexts[0]["top"], questions[0]["bottom"])
+        self.assertEqual(contexts[0]["bottom"], questions[1]["top"])
 
     def test_selected_stitched_text_is_read_from_the_matching_source_page(self):
         # Pagina 1 is de omslag en wordt niet in het stitchwerkvlak opgenomen.
