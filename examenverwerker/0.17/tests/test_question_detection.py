@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from examenverwerker import main
 from examenverwerker.storage import Store
 from examenverwerker.question_detection import detect_question_starts, validate_review
-from examenverwerker.question_fragments import generate_question_fragments, build_stitched_exam
+from examenverwerker.question_fragments import generate_question_fragments, build_stitched_exam, normalise_stitched_selections
 from examenverwerker.question_analysis import analyse_questions, detect_options, detect_question_type, detect_max_points, validate_question_analysis
 
 
@@ -452,6 +452,38 @@ class QuestionDetectionTests(unittest.TestCase):
         image.close()
 
         self.assertEqual(main._white_row_ranges(image_path), [[0, 0], [2, 3]])
+
+    def test_stitched_normalisation_does_not_cut_a_question_at_an_early_blank_row(self):
+        # De detector kan een interne witregel in een vraag ten onrechte als
+        # ondergrens voorstellen. De normalisatie moet de vraag dan laten
+        # doorlopen tot de witte rij vóór de volgende goedgekeurde vraagstart.
+        image_path = self.root / "question-boundaries.png"
+        image = Image.new("RGB", (20, 200), (255, 255, 255))
+        for y in range(30, 66):
+            for x in range(3, 17):
+                image.putpixel((x, y), (0, 0, 0))
+        for y in range(112, 141):
+            for x in range(3, 17):
+                image.putpixel((x, y), (0, 0, 0))
+        image.save(image_path)
+        image.close()
+
+        white_rows = main._white_row_ranges(image_path)
+        selections = [
+            {"id":"q1", "type":"vraag", "top":28, "bottom":50,
+             "question_numbers":[1], "label":"Vraag 1"},
+            {"id":"q2", "type":"vraag", "top":112, "bottom":150,
+             "question_numbers":[2], "label":"Vraag 2"},
+        ]
+        normalised = normalise_stitched_selections(
+            selections, white_rows, image_path, image_height=200
+        )
+        questions = [item for item in normalised if item["type"] == "vraag"]
+
+        self.assertEqual(len(questions), 2)
+        self.assertGreaterEqual(questions[0]["bottom"], 109)
+        self.assertEqual(questions[0]["bottom"], questions[1]["top"])
+        self.assertGreater(questions[0]["bottom"], 50)
 
     def test_selected_stitched_text_is_read_from_the_matching_source_page(self):
         # Pagina 1 is de omslag en wordt niet in het stitchwerkvlak opgenomen.
