@@ -1,0 +1,242 @@
+"""Integratietests voor CV-voorbewerking, antwoorden en documentrelaties."""
+import tempfile
+import unittest
+from pathlib import Path
+
+import fitz
+from fastapi.testclient import TestClient
+
+from examenverwerker import main
+from examenverwerker.storage import Store
+
+
+class IntegratedReviewTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        main.DATA = self.root
+        main.STORE = Store(self.root)
+        self.client = TestClient(main.app)
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    @staticmethod
+    def pdf(pages):
+        doc = fitz.open()
+        for lines in pages:
+            page = doc.new_page()
+            y = 80
+            for line in lines:
+                page.insert_text((60, y), line, fontsize=10)
+                y += 28
+        data = doc.tobytes()
+        doc.close()
+        return data
+
+    def create_exam(self):
+        uploads = [
+            ("files", ("vw-1018-a-26-2-o.pdf", self.pdf([["1p 1 Kies het juiste antwoord.", "A. optie een", "B. optie twee"]]), "application/pdf")),
+            ("files", ("vw-1018-a-26-2-u.pdf", self.pdf([["4", "invulschema"], ["27", "invulschema"]]), "application/pdf")),
+            ("files", ("vw-1018-a-26-2-c.pdf", self.pdf([["1 Regels voor beoordeling", "2 Algemene regels"], ["4 Beoordelingsmodel", "1 maximumscore 1", "B 1"]]), "application/pdf")),
+        ]
+        imported = self.client.post("/api/exams/import", files=uploads)
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{
+                "vw-1018-a-26-2-o.pdf":"opgaven",
+                "vw-1018-a-26-2-u.pdf":"uitwerkbijlage",
+                "vw-1018-a-26-2-c.pdf":"correctievoorschrift",
+            }
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+        return exam_id
+
+    def test_cv_detection_ignores_numbered_preamble_before_marking_model(self):
+        exam_id = self.create_exam()
+        result = self.client.get(f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift")
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual([item["question_number"] for item in result.json()["candidates"]], [1])
+        self.assertEqual(result.json()["pages"][0]["candidate_count"], 0)
+
+    def test_answer_endpoint_reads_cv_fragment_and_relations_allow_partial_workbook(self):
+        exam_id = self.create_exam()
+        for doc_type, step in [("opgaven", "opgaven_starts"), ("uitwerkbijlage", "uitwerk_starts"), ("correctievoorschrift", "cv_starts")]:
+            starts = self.client.get(f"/api/exams/{exam_id}/document-question-starts/{doc_type}")
+            self.assertEqual(starts.status_code, 200, starts.text)
+            saved = self.client.post(f"/api/exams/{exam_id}/document-question-starts/{doc_type}/review", json={"candidates":starts.json()["candidates"]})
+            self.assertEqual(saved.status_code, 200, saved.text)
+            main.STORE.complete_step(exam_id, step, {"candidates":starts.json()["candidates"], "reviewed_all_pages":True,
+                                                       "document_sha256":starts.json()["document"]["sha256"]})
+        # CV-fragmentgeneratie en antwoordherkenning gebruiken de opgeslagen,
+        # expliciet goedgekeurde vraagstart als bron.
+        cv_fragments = self.client.get(f"/api/exams/{exam_id}/document-question-fragments/correctievoorschrift")
+        self.assertEqual(cv_fragments.status_code, 200, cv_fragments.text)
+
+        # Stap 4 gebruikt dezelfde goedgekeurde vraagstarts en moet daarom
+        # ook via de volledige API-route een bruikbaar vraagfragment opleveren.
+        # Deze controle voorkomt dat alleen de losse analysemodule slaagt,
+        # terwijl de daadwerkelijke werkruimte bij het openen een serverfout geeft.
+        question_analysis = self.client.get(f"/api/exams/{exam_id}/question-analysis")
+        self.assertEqual(question_analysis.status_code, 200, question_analysis.text)
+        self.assertEqual(question_analysis.json()["question_count"], 1)
+        self.assertTrue(question_analysis.json()["questions"][0]["segments"])
+
+        answers = self.client.get(f"/api/exams/{exam_id}/answers")
+        self.assertEqual(answers.status_code, 200, answers.text)
+        self.assertEqual(answers.json()["questions"][0]["answer_text"], "B")
+        relations = self.client.get(f"/api/exams/{exam_id}/relations")
+        self.assertEqual(relations.status_code, 200, relations.text)
+        # De uitwerkbijlage bevat alleen 4 en 27; afwezigheid van vraag 1 is
+        # een normale situatie en mag geen ontbrekende CV-koppeling opleveren.
+        self.assertEqual(relations.json()["missing_cv"], [])
+        self.assertFalse(relations.json()["questions"][0]["has_uitwerkbijlage"])
+
+    def test_no_supplement_requires_explicit_confirmation(self):
+        exam_id = self.create_exam()
+        result = self.client.get(f"/api/exams/{exam_id}/cv-supplement")
+        self.assertTrue(result.json()["not_required"])
+        # Simuleer de reeds afgeronde verplichte voorganger van de stap.
+        main.STORE.complete_step(exam_id, "cv_fragments", {"reviewed_all_questions":True})
+        blocked = self.client.post(f"/api/exams/{exam_id}/steps/cv_aanvulling/complete", json={"reviewed":True})
+        self.assertEqual(blocked.status_code, 422)
+        accepted = self.client.post(f"/api/exams/{exam_id}/steps/cv_aanvulling/complete", json={"reviewed":True,"not_required":True})
+        self.assertEqual(accepted.status_code, 200, accepted.text)
+
+    def complete_starts(self, exam_id):
+        for doc_type, step in [("opgaven", "opgaven_starts"), ("uitwerkbijlage", "uitwerk_starts"), ("correctievoorschrift", "cv_starts")]:
+            starts = self.client.get(f"/api/exams/{exam_id}/document-question-starts/{doc_type}")
+            self.assertEqual(starts.status_code, 200, starts.text)
+            self.client.post(f"/api/exams/{exam_id}/document-question-starts/{doc_type}/review", json={"candidates":starts.json()["candidates"]})
+            main.STORE.complete_step(exam_id, step, {"candidates":starts.json()["candidates"], "reviewed_all_pages":True,
+                                                       "document_sha256":starts.json()["document"]["sha256"]})
+
+    def test_snippets_requires_explicit_confirmation_when_no_context_was_detected(self):
+        exam_id = self.create_exam()
+        self.complete_starts(exam_id)
+        snippets = self.client.get(f"/api/exams/{exam_id}/snippets")
+        self.assertEqual(snippets.status_code, 200, snippets.text)
+        self.assertEqual(snippets.json()["context_count"], 0)
+        numbers = [q["question_number"] for q in snippets.json()["opgaven"]["questions"]]
+        payload = {"contexts":[], "reviewed_question_numbers":numbers,
+                   "reviewed_uitwerk_numbers":[q["question_number"] for q in snippets.json()["uitwerkbijlage"]["questions"]],
+                   "reviewed_cv_numbers":[q["question_number"] for q in snippets.json()["correctievoorschrift"]["questions"]]}
+        blocked = self.client.post(f"/api/exams/{exam_id}/snippets/review", json=payload)
+        self.assertEqual(blocked.status_code, 422)
+        # Automatisch opslaan mag een onvolledige review bewaren; afronden
+        # blijft geblokkeerd totdat de docent expliciet geen context bevestigt.
+        draft = self.client.post(f"/api/exams/{exam_id}/snippets/review", json={**payload, "draft":True})
+        self.assertEqual(draft.status_code, 200, draft.text)
+        self.assertFalse(draft.json()["complete"])
+        payload["confirmed_no_contexts"] = True
+        accepted = self.client.post(f"/api/exams/{exam_id}/snippets/review", json=payload)
+        self.assertEqual(accepted.status_code, 200, accepted.text)
+        self.assertTrue(accepted.json()["complete"])
+
+    def test_final_review_requires_explanation_for_score_mismatch_and_allows_publication(self):
+        exam_id = self.create_exam()
+        self.complete_starts(exam_id)
+        # De review-API's brongegevens komen normaal uit de eerdere werkstappen.
+        main.STORE.complete_step(exam_id, "opgaven_analyse", {"questions":[
+            {"question_number":1,"question_type":"meerkeuze","max_points":1}
+        ]})
+        main.STORE.complete_step(exam_id, "antwoorden", {"questions":[
+            {"question_number":1,"answer_kind":"meerkeuze","answer_text":"B","cv_max_points":2}
+        ]})
+        main.STORE.complete_step(exam_id, "relaties", {"questions":[
+            {"question_number":1,"reviewed":True,"note":""}
+        ]})
+        main.STORE.complete_step(exam_id, "snippets", {"reviewed_all_questions":True,
+            "reviewed_all_contexts":True,"reviewed_all_uitwerk":True,"reviewed_all_cv":True,
+            "expected_question_numbers":[1],"contexts":[],"confirmed_no_contexts":True})
+        review = self.client.get(f"/api/exams/{exam_id}/final-review")
+        self.assertEqual(review.status_code, 200, review.text)
+        self.assertFalse(review.json()["questions"][0]["points_match"])
+        blocked = self.client.post(f"/api/exams/{exam_id}/final-review/review", json={"questions":[
+            {"question_number":1,"reviewed":True,"resolution_note":""}
+        ]})
+        self.assertEqual(blocked.status_code, 422)
+        draft = self.client.post(f"/api/exams/{exam_id}/final-review/review", json={
+            "draft":True,"questions":[{"question_number":1,"reviewed":True,"resolution_note":""}]
+        })
+        self.assertEqual(draft.status_code, 200, draft.text)
+        self.assertFalse(draft.json()["complete"])
+        accepted = self.client.post(f"/api/exams/{exam_id}/final-review/review", json={"questions":[
+            {"question_number":1,"reviewed":True,"resolution_note":"De CV-score is leidend; verschil handmatig gecontroleerd."}
+        ]})
+        self.assertEqual(accepted.status_code, 200, accepted.text)
+        completed = self.client.post(f"/api/exams/{exam_id}/steps/eindcontrole/complete", json={"reviewed":True})
+        self.assertEqual(completed.status_code, 200, completed.text)
+        published = self.client.post(f"/api/exams/{exam_id}/publish")
+        self.assertEqual(published.status_code, 200, published.text)
+        listed = self.client.get("/api/exams").json()
+        self.assertTrue(next(item for item in listed if item["id"] == exam_id)["published"])
+
+    def test_optional_workbook_can_be_skipped_only_when_absent(self):
+        opgaven = self.pdf([["1p 1 Geef een verklaring."]])
+        cv = self.pdf([["4 Beoordelingsmodel", "1 maximumscore 1", "Het antwoord moet blijken uit..."]])
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("vw-1018-a-26-2-o.pdf", opgaven, "application/pdf")),
+            ("files", ("vw-1018-a-26-2-c.pdf", cv, "application/pdf")),
+        ])
+        exam_id = imported.json()["exam_id"]
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"vw-1018-a-26-2-o.pdf":"opgaven","vw-1018-a-26-2-c.pdf":"correctievoorschrift"}
+        })
+        skipped = self.client.post(f"/api/exams/{exam_id}/skip-optional-workbook")
+        self.assertEqual(skipped.status_code, 200, skipped.text)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["uitwerk_starts"]["evidence"]["not_applicable"], True)
+        self.assertEqual(exam["steps"]["uitwerk_fragments"]["evidence"]["not_applicable"], True)
+
+    def test_reviewed_supplement_replaces_answer_proposal_and_stays_visible(self):
+        opgaven = self.pdf([["1p 1 Geef het juiste antwoord."]])
+        cv = self.pdf([["4 Beoordelingsmodel", "1 maximumscore 1", "A 1"]])
+        workbook = self.pdf([["4", "schema"]])
+        supplement = self.pdf([["Aanvulling op het correctievoorschrift", "Vraag 1: in plaats van het eerdere antwoord geldt: B. maximumscore 2."]])
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("vw-1018-a-26-2-o.pdf", opgaven, "application/pdf")),
+            ("files", ("vw-1018-a-26-2-u.pdf", workbook, "application/pdf")),
+            ("files", ("vw-1018-a-26-2-c.pdf", cv, "application/pdf")),
+            ("files", ("vw-1018-a-26-2-a.pdf", supplement, "application/pdf")),
+        ])
+        exam_id = imported.json()["exam_id"]
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"vw-1018-a-26-2-o.pdf":"opgaven","vw-1018-a-26-2-u.pdf":"uitwerkbijlage",
+                              "vw-1018-a-26-2-c.pdf":"correctievoorschrift","vw-1018-a-26-2-a.pdf":"aanvulling_correctievoorschrift"}
+        })
+        for doc_type, step in [("opgaven", "opgaven_starts"), ("correctievoorschrift", "cv_starts")]:
+            starts = self.client.get(f"/api/exams/{exam_id}/document-question-starts/{doc_type}").json()
+            main.STORE.complete_step(exam_id, step, {"candidates":starts["candidates"],"reviewed_all_pages":True,
+                                                       "document_sha256":starts["document"]["sha256"]})
+        main.STORE.complete_step(exam_id, "cv_aanvulling", {"items":[
+            {"page_number":1,"action":"vervangen","question_numbers":[1],"reviewed":True}
+        ],"reviewed_all_pages":True})
+        answers = self.client.get(f"/api/exams/{exam_id}/answers")
+        self.assertEqual(answers.status_code, 200, answers.text)
+        question = answers.json()["questions"][0]
+        self.assertEqual(question["answer_kind"], "handmatig")
+        self.assertIn("Vraag 1", question["answer_text"])
+        self.assertEqual(question["cv_max_points"], 2)
+        self.assertEqual(question["supplement_pages"][0]["action"], "vervangen")
+
+    def test_cv_detector_excludes_numbered_closed_answer_items(self):
+        opgaven = self.pdf([["1p 1 Geef een verklaring."]])
+        cv = self.pdf([["4 Beoordelingsmodel", "1 maximumscore 1", "2 B 2", "3 maximumscore 2", "1 onjuist", "2 juist", "3 juist"]])
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("vw-1018-a-26-2-o.pdf", opgaven, "application/pdf")),
+            ("files", ("vw-1018-a-26-2-c.pdf", cv, "application/pdf")),
+        ])
+        exam_id = imported.json()["exam_id"]
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"vw-1018-a-26-2-o.pdf":"opgaven","vw-1018-a-26-2-c.pdf":"correctievoorschrift"}
+        })
+        result = self.client.get(f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift")
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual([item["question_number"] for item in result.json()["candidates"]], [1,2,3])
+
