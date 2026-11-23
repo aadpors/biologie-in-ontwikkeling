@@ -438,13 +438,12 @@ def propose_stitched_question_selections(
             "source": "automatic_visual_boundaries",
         })
 
-    # Context vóór de eerste vraag en de niet-geselecteerde ruimte tussen
-    # opeenvolgende vraagfragmenten vormen contextfragmenten. Context vóór
-    # vraag 1 hoort bij vraag 1; context ná een vraag hoort bij de vraag die
-    # eraan voorafgaat. Zo wordt tekst tussen vraag 37 en 38 niet automatisch
-    # onderdeel van vraag 38.
+    # Contextfragmenten staan vóór de vragen waarop ze betrekking hebben.
+    # Verzamel eerst alle zichtbare tussenruimtes; daarna kan ieder contextblok
+    # worden gekoppeld aan de daaropvolgende vraaggroep tot het volgende blok.
     context_selections: list[dict[str, Any]] = []
     ordered_questions = sorted(question_selections, key=lambda item: item["top"])
+    context_gaps: list[dict[str, Any]] = []
 
     if ordered_questions:
         first_question = ordered_questions[0]
@@ -462,7 +461,7 @@ def propose_stitched_question_selections(
                 float(first_question["top"]),
             )
             # Een kaderlijn kan samenvallen met de bovenrand van de crop.
-            # Gebruik dan de herkende vraagstart als scheiding tussen de
+            # Gebruik de herkende vraagstart als scheiding tussen de
             # voorafgaande context en het eerste vraagfragment.
             leading_bottom = max(
                 float(first_question["top"]),
@@ -476,24 +475,41 @@ def propose_stitched_question_selections(
                     "top": round(leading_top, 2),
                     "bottom": round(leading_bottom, 2),
                     "question_numbers": [first_number],
-                    "label": "Automatisch contextvoorstel — inhoud vóór de eerste vraag",
+                    "label": "Automatisch contextvoorstel — inhoud vóór de eerste vragen",
                     "source": "automatic_leading_context",
                 })
 
-    for index, question in enumerate(ordered_questions[:-1]):
-        following = ordered_questions[index + 1]
+    for question_index, question in enumerate(ordered_questions[:-1]):
+        following = ordered_questions[question_index + 1]
         gap_top = float(question["bottom"])
         gap_bottom = float(following["top"])
         if gap_bottom - gap_top < 24:
             continue
-        previous_number = int(question["question_numbers"][0])
-        context_selections.append({
-            "id": f"auto-context-between-{previous_number}-{following['question_numbers'][0]}",
-            "type": "context",
+        context_gaps.append({
+            "question_index": question_index,
             "top": round(gap_top, 2),
             "bottom": round(gap_bottom, 2),
-            "question_numbers": [previous_number],
-            "label": "Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
+            "previous_number": int(question["question_numbers"][0]),
+            "following_number": int(following["question_numbers"][0]),
+        })
+
+    for gap_index, gap in enumerate(context_gaps):
+        next_context_question_index = (
+            context_gaps[gap_index + 1]["question_index"]
+            if gap_index + 1 < len(context_gaps)
+            else len(ordered_questions) - 1
+        )
+        group = ordered_questions[
+            gap["question_index"] + 1 : next_context_question_index + 1
+        ]
+        numbers = [int(item["question_numbers"][0]) for item in group]
+        context_selections.append({
+            "id": f"auto-context-between-{gap['previous_number']}-{gap['following_number']}",
+            "type": "context",
+            "top": gap["top"],
+            "bottom": gap["bottom"],
+            "question_numbers": numbers or [gap["following_number"]],
+            "label": "Automatisch contextvoorstel — inhoud vóór de bijbehorende vragen",
             "source": "automatic_inter_question_gap",
         })
 
@@ -517,12 +533,12 @@ def normalise_stitched_selections(
     alleen witruimte. Deze normalisatie gebruikt de goedgekeurde vraagstarts
     als vaste volgorde en de volledige witte beeldrijen als enige grenslijnen.
 
-    De vraagstarts bepalen de veilige scheiding: een vraag loopt door tot
-    de laatste zuiver witte rij vóór de volgende goedgekeurde vraagstart. Een
-    eerdere witregel kan midden in een meerregelige vraag staan en wordt dus
-    niet als automatische afkapgrens vertrouwd. Zichtbare inhoud tussen twee
-    vraagstarts blijft behouden bij de voorafgaande vraag en kan in de editor
-    handmatig als afzonderlijke context worden afgesplitst.
+    De goedgekeurde vraagstarts bepalen de leesvolgorde; voorgestelde
+    visuele scheidingen worden op volledige witte pixelrijen geplaatst. Een
+    zichtbaar contextblok tussen twee vraagfragmenten blijft een zelfstandig
+    fragment en wordt gekoppeld aan de daaropvolgende vragen tot aan het
+    volgende contextblok. Daardoor komt de context niet in de afbeelding van
+    de eerste vraag terecht en kan hij wel met meerdere vragen worden gedeeld.
     """
     if not selections:
         return []
@@ -612,11 +628,11 @@ def normalise_stitched_selections(
         for index, question in enumerate(questions):
             next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
 
-            # Een visuele scheiding is pas een echte vraag-/contextgrens als
-            # er ná die witte strook nog zichtbare inhoud staat vóór de
-            # volgende vraagstart. Een lege witregel midden in een vraag
-            # wordt dus genegeerd; een contextblok blijft apart en wordt
-            # hieronder aan de voorafgaande vraag gekoppeld.
+            # Een voorgestelde scheiding wordt alleen als contextgrens
+            # gebruikt wanneer er tussen die grens en de volgende vraagstart
+            # daadwerkelijk inhoud staat. De context zelf blijft een apart
+            # fragment; de koppeling wordt hieronder aan de daaropvolgende
+            # vragen toegekend.
             if next_top is not None:
                 proposed_bottom = int(question["bottom"])
                 has_following_content = has_visible_content(proposed_bottom, next_top)
