@@ -27,6 +27,9 @@ from examenverwerker.question_fragments import (
     normalise_stitched_selections,
 )
 from examenverwerker.main import _nearest_white_row, _white_row_ranges
+from examenverwerker import main as exam_main
+from examenverwerker.storage import Store
+from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "examens" / "vw-1018-a-26-2-o.pdf"
@@ -199,6 +202,67 @@ if CV_SOURCE.is_file():
         "cv_candidate_count": len(cv_debug),
         "cv_candidates": cv_debug,
     }, ensure_ascii=False))
+
+# Controleer ook de volledige API-route van stap 7 op het echte CV.
+# De losse detector hierboven is niet voldoende: de applicatie past daarna
+# nog CV-specifieke filters toe om juridische nummering en subonderdelen uit
+# te sluiten. Juist die laatste stap bepaalt wat de gebruiker werkelijk ziet.
+if CV_SOURCE.is_file():
+    cv_workspace = OUTPUT / "cv-api-workspace"
+    cv_workspace.mkdir(parents=True, exist_ok=True)
+    exam_main.DATA = cv_workspace
+    exam_main.STORE = Store(cv_workspace)
+    with TestClient(exam_main.app) as client:
+        imported = client.post(
+            "/api/exams/import",
+            files=[("files", (CV_SOURCE.name, CV_SOURCE.read_bytes(), "application/pdf"))],
+        )
+        if imported.status_code != 200:
+            raise SystemExit(f"CV-import voor eindcontrole mislukt: {imported.text}")
+        exam_id = imported.json()["exam_id"]
+        confirmed = client.post(
+            f"/api/exams/{exam_id}/metadata/confirm",
+            json={
+                "subject": "biologie",
+                "level": "vwo",
+                "year": 2026,
+                "period": 2,
+                "document_types": {CV_SOURCE.name: "correctievoorschrift"},
+            },
+        )
+        if confirmed.status_code != 200:
+            raise SystemExit(f"CV-metadata bevestigen mislukt: {confirmed.text}")
+        starts_response = client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        if starts_response.status_code != 200:
+            raise SystemExit(f"CV-vraagstarts via API mislukt: {starts_response.text}")
+        api_starts = starts_response.json()["candidates"]
+
+    # Iedere hoofdvraag uit het opgavenboekje moet ook in de CV-review
+    # aanwezig zijn. Dit controleert zowel open als meerkeuzevragen en voorkomt
+    # dat een detector die alleen de MC-vragen vindt ten onrechte slaagt.
+    expected_cv_numbers = sorted({int(item["question_number"]) for item in accepted})
+    actual_cv_numbers = sorted({int(item["question_number"]) for item in api_starts
+                                if not item.get("removed", False)})
+    if actual_cv_numbers != expected_cv_numbers:
+        missing = sorted(set(expected_cv_numbers) - set(actual_cv_numbers))
+        unexpected = sorted(set(actual_cv_numbers) - set(expected_cv_numbers))
+        raise SystemExit(
+            "CV-vraagstarts via de volledige stap-7-route zijn onvolledig: "
+            f"ontbrekend={missing}, onverwacht={unexpected}, "
+            f"verwacht={expected_cv_numbers}, gevonden={actual_cv_numbers}"
+        )
+    (OUTPUT / "cv-api-question-starts.json").write_text(
+        json.dumps({
+            "source_pdf": CV_SOURCE.name,
+            "expected_question_numbers": expected_cv_numbers,
+            "detected_question_numbers": actual_cv_numbers,
+            "candidate_count": len(api_starts),
+            "candidates": api_starts,
+        }, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
 print(json.dumps({
     "source": SOURCE.name,
