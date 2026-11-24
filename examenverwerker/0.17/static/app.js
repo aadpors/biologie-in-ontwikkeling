@@ -390,7 +390,13 @@ async function confirmMetadata(event) {
    niet ongemerkt een bestaande beoordelingsregel kan overschrijven. */
 
 function examHasDocumentType(documentType) {
-  return state.exam.documents.some(doc => state.exam.metadata.document_types?.[doc.filename] === documentType);
+  // Gebruik de bevestigde exammetadata als primaire bron. Oudere examens
+  // kunnen het documenttype alleen nog in de metadata van het bronbestand
+  // hebben opgeslagen; die informatie blijft een geldige terugval.
+  return state.exam.documents.some(doc =>
+    state.exam.metadata.document_types?.[doc.filename] === documentType ||
+    doc.metadata?.document_type === documentType
+  );
 }
 
 async function renderSkipWorkbookStage() {
