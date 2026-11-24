@@ -323,7 +323,7 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertEqual(stitched.status_code, 200, stitched.text)
         self.assertGreater(stitched.json()["width"], 0)
         self.assertGreater(stitched.json()["height"], 0)
-        self.assertIn("correctievoorschrift_stitched", stitched.json()["image_url"])
+        self.assertIn("/correctievoorschrift/exam-long.png", stitched.json()["image_url"])
         proposals = stitched.json()["proposed_selections"]
         self.assertTrue(proposals, "Voor de goedgekeurde CV-vraagstart moet een fragmentvoorstel bestaan.")
 
