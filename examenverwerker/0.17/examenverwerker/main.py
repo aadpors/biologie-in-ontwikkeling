@@ -1232,6 +1232,11 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
         **exam["steps"].get(fragments_step_key, {}).get("evidence", {}),
         "stitched_selections": clean,
         "stitched_reviewed": bool(payload.get("reviewed")),
+        # Verwijder eventuele oude PDF-puntgrenzen uit de eerdere stap-8-
+        # interface. De nieuwe review bewaart uitsluitend pixelgrenzen van
+        # de volledige lange afbeelding; oude overrides horen niet meer in
+        # het nieuwe coördinatenstelsel thuis.
+        "boundary_overrides": [],
         "document_sha256": starts.get("evidence", {}).get("document_sha256"),
     }
     saved_as_draft = STORE.save_step_draft_preserving_identical_complete(
