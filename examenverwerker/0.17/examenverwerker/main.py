@@ -1454,6 +1454,65 @@ def question_fragment_image(exam_id: str, document_type: str, filename: str):
     return FileResponse(path, media_type="image/png", headers={"Cache-Control": "no-store"})
 
 
+def _merge_saved_question_analysis(question: dict[str, Any], saved: dict[str, Any]) -> None:
+    """Behoud docentcorrecties zonder nieuwe automatische herkenning te blokkeren.
+
+    Een eerdere versie bewaarde ook onvoltooide automatische voorstellen als
+    concept. Als die oude voorstellen bij het heropenen blind werden teruggezet,
+    kon een later verbeterde OCR-herkenning nooit zichtbaar worden. Definitief
+    beoordeelde vragen blijven volledig leidend; bij open concepten vullen we
+    ontbrekende gegevens aan met de actuele herkenning en behouden we bestaande
+    handmatige antwoordteksten per letter.
+    """
+    if saved.get("reviewed"):
+        # Een expliciet gecontroleerde vraag is een docentbeslissing en mag
+        # nooit door een nieuwe automatische analyse worden overschreven.
+        question.update({
+            key: saved[key]
+            for key in ("question_type", "max_points", "options", "reviewed")
+            if key in saved
+        })
+        return
+
+    saved_type = saved.get("question_type")
+    detected_type = question.get("question_type")
+    if saved_type:
+        # Een oud concept met type 'open' of 'onbekend' mag een nieuwe sterke
+        # meerkeuze-/gesloten herkenning niet blokkeren. Een eerder expliciet
+        # gekozen meerkeuze- of gesloten type blijft wel behouden.
+        if saved_type in {"meerkeuze", "gesloten"} or detected_type not in {"meerkeuze", "gesloten"}:
+            question["question_type"] = saved_type
+
+    # Een handmatig ingevulde score blijft behouden. Een leeg oud veld wordt
+    # aangevuld met de actuele PDF-/OCR-herkenning.
+    if saved.get("max_points") is not None:
+        question["max_points"] = saved["max_points"]
+
+    # Voeg de actuele OCR-opties samen met bestaande docentcorrecties. Een
+    # handmatig aangepaste tekst heeft voorrang; nieuwe letters die eerder
+    # ontbraken worden vanuit de actuele herkenning toegevoegd.
+    current_options = {
+        item.get("letter"): item
+        for item in question.get("options", [])
+        if item.get("letter")
+    }
+    saved_options = {
+        item.get("letter"): item
+        for item in saved.get("options", [])
+        if item.get("letter") and item.get("text", "").strip()
+    }
+    if saved_options or current_options:
+        question["options"] = [
+            saved_options.get(letter) or current_options[letter]
+            for letter in "ABCDE"
+            if letter in saved_options or letter in current_options
+        ]
+
+    # Een concept blijft een concept totdat de docent de vraag expliciet
+    # heeft gecontroleerd; alleen de voorstellen worden hier bijgewerkt.
+    question["reviewed"] = False
+
+
 @app.get("/api/exams/{exam_id}/question-analysis")
 def get_question_analysis(exam_id: str):
     """Maak type-, punten- en antwoordoptievoorstellen per vraag."""
@@ -1482,8 +1541,7 @@ def get_question_analysis(exam_id: str):
     for question in result["questions"]:
         saved = saved_questions.get(question["question_number"])
         if saved:
-            question.update({key: saved[key] for key in
-                             ("question_type", "max_points", "options", "reviewed") if key in saved})
+            _merge_saved_question_analysis(question, saved)
     return result
 
 
