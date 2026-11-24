@@ -410,10 +410,10 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                 # vraagregels zijn gelezen; een gesloten PyMuPDF-document mag
                 # niet worden hergebruikt voor paginatoegang.
                 with fitz.open(path) as cv_end_pdf:
-                    cv_content_end_page = cv_content_end_page(cv_end_pdf)
+                    cv_content_end_page_index = cv_content_end_page(cv_end_pdf)
                 cv_valid_candidates = [
                     candidate for candidate in cv_valid_candidates
-                    if candidate["page_index"] <= cv_content_end_page
+                    if candidate["page_index"] <= cv_content_end_page_index
                 ]
                 # Pas de oplopende nummerreeks pas toe nadat de CV-inleiding
                 # en genummerde antwoordonderdelen zijn uitgesloten.
@@ -447,10 +447,10 @@ def _load_document_question_starts(exam_id: str, document_type: str):
         # handmatige kandidaten toe. Anders kan een oude handmatige start op
         # een administratieve pagina opnieuw een leeg CV-fragment veroorzaken.
         with fitz.open(path) as cv_end_pdf:
-            cv_content_end_page = cv_content_end_page(cv_end_pdf)
+            cv_content_end_page_index = cv_content_end_page(cv_end_pdf)
         result["candidates"] = [
             item for item in result["candidates"]
-            if item["page_index"] <= cv_content_end_page
+            if item["page_index"] <= cv_content_end_page_index
         ]
         valid_candidate_ids = {item["id"] for item in result["candidates"]}
         for page in result["pages"]:
