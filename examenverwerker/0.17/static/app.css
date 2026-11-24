@@ -199,3 +199,33 @@
   resize: vertical;
   white-space: pre-wrap;
 }
+
+
+/* Reviewbevestigingen zijn vervangen door de expliciete afrondactie onderaan
+   iedere stap. De onderliggende velden blijven tijdelijk in de DOM voor
+   compatibiliteit met de opgeslagen reviewgegevens, maar worden niet getoond. */
+.review-warning[hidden] {
+  display: none !important;
+}
+.stage-approval-note {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.9rem;
+}
+.relation-audit-list {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+.relation-audit-row {
+  display: grid;
+  grid-template-columns: 0.6fr 1fr 1.4fr 1.2fr;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border, #ddd);
+  font-size: 0.9rem;
+}
+@media (max-width: 720px) {
+  .relation-audit-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
