@@ -625,8 +625,12 @@ def _load_document_fragments(exam_id: str, document_type: str):
     # examenstrook leidend. Zo gebruikt de analyse exact dezelfde grenzen als
     # de docent in stap 3 heeft vastgesteld; de oude automatische voorstellen
     # blijven alleen als terugval beschikbaar voor oudere examendossiers.
-    if document_type == "opgaven" and previous.get("stitched_selections"):
-        stitched_dir = DATA / "exams" / exam_id / "derived" / "opgaven_stitched"
+    if document_type in {"opgaven", "uitwerkbijlage"} and previous.get("stitched_selections"):
+        # Zowel de opgaven als de uitwerkbijlage gebruiken nu de visueel
+        # goedgekeurde lange afbeelding als bron voor definitieve vraag-PNG's.
+        # De selectiecoördinaten zijn daardoor exact gelijk aan de grenzen die
+        # de docent in de interactieve fragmentreview heeft gecontroleerd.
+        stitched_dir = DATA / "exams" / exam_id / "derived" / f"{document_type}_stitched"
         stitched_path = stitched_dir / "exam-long.png"
         # Bouw de metadata opnieuw op naast de afbeelding. Die metadata is
         # nodig om de geselecteerde pixelstrook terug te rekenen naar de
@@ -668,7 +672,8 @@ def _load_document_fragments(exam_id: str, document_type: str):
         if rebuilt_questions:
             proposals["questions"] = sorted(rebuilt_questions, key=lambda item: item["question_number"])
             proposals["question_count"] = len(proposals["questions"])
-        proposals["selected_contexts"] = stitched_contexts
+        if document_type == "opgaven":
+            proposals["selected_contexts"] = stitched_contexts
     proposals["document"] = {"id": document["id"], "filename": document["filename"],
                              "sha256": document["sha256"]}
     proposals["document_type"] = document_type
