@@ -513,7 +513,6 @@ async function renderRelationsStage() {
     const previous = state.exam.steps.relaties?.evidence?.questions || [];
     const previousNotes = Object.fromEntries(previous.map(item=>[item.question_number,item.note||'']));
     const mismatches = result.score_mismatches || [];
-    const mismatchNumbers = new Set(mismatches.map(item=>item.question_number));
     panel.innerHTML=`
       <p class="eyebrow">FASE 7 · AANVULLENDE CONTROLES</p>
       <h2>Automatische integriteitscontrole</h2>
