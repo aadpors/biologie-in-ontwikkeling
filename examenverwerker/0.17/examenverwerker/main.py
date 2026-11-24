@@ -1461,6 +1461,20 @@ def get_question_analysis(exam_id: str):
     if not exam:
         raise HTTPException(404, "Examen niet gevonden.")
     fragments = get_question_fragments(exam_id)
+
+    # Koppel ieder vraagfragment aan het werkelijk gegenereerde PNG-bestand.
+    # Stap 4 kan daardoor, wanneer de selecteerbare PDF-tekstlaag tekortschiet,
+    # de zichtbare vraag inclusief antwoordopties lokaal met OCR uitlezen.
+    # De bestandspaden blijven intern: analyse_questions neemt ze niet op in
+    # de API-respons en de browser ontvangt alleen de herkende voorstellen.
+    fragment_image_dir = DATA / "exams" / exam_id / "derived" / "opgaven_fragments"
+    for question in fragments.get("questions", []):
+        question["image_paths"] = [
+            str(fragment_image_dir / segment["filename"])
+            for segment in question.get("segments", [])
+            if segment.get("filename") and (fragment_image_dir / segment["filename"]).is_file()
+        ]
+
     result = analyse_questions(fragments)
     result["document"] = fragments["document"]
     previous = exam["steps"].get("opgaven_analyse", {}).get("evidence", {})
