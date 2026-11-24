@@ -84,6 +84,7 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
         # witruimte binnen de al bepaalde fragmentclip wordt verkleind.
         # Horizontaal bijsnijden kan anders kolommen, figuren, bijschriften of
         # uitwerkingen aan de linker- of rechterzijde onzichtbaar maken.
+        _, top, _, bottom = bbox
         top = max(0, top - padding)
         bottom = min(image.height, bottom + padding)
         image.crop((0, top, image.width, bottom)).save(
