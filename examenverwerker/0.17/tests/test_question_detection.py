@@ -81,9 +81,6 @@ class QuestionDetectionTests(unittest.TestCase):
             def __call__(self, _path):
                 return FakeOCRResult()
 
-        with patch("examenverwerker.question_analysis._get_ocr_engine", return_value=FakeEngine()):
-            recognised = main.question_analysis._ocr_image_text([image_path]) if hasattr(main, "question_analysis") else None
-
         # Gebruik de modulefunctie rechtstreeks; de expliciete import houdt
         # de test onafhankelijk van interne attributen van main.py.
         from examenverwerker.question_analysis import _ocr_image_text
