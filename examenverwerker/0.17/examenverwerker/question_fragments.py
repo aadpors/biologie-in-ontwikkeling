@@ -221,7 +221,8 @@ def _stitch_vertical(segment_paths: list[Path], output_path: Path, *, gap: int =
 def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         render_scale: float = 1.25, page_gap: int = 32,
                         start_page: int = 1,
-                        end_page: int | None = None) -> dict[str, Any]:
+                        end_page: int | None = None,
+                        start_y: float = 0.0) -> dict[str, Any]:
     """Maak één lange, opgeschoonde werkafbeelding van het examen.
 
     Pagina 1 wordt standaard overgeslagen omdat dit bij opgaven vaak de
