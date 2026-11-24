@@ -92,6 +92,24 @@ class StitchedPageCleanupTests(unittest.TestCase):
             question = next(item for item in result if item["type"] == "vraag")
             self.assertEqual(question["bottom"], 83)
 
+    def test_standalone_exam_code_in_footer_is_removed(self):
+        """Ook een losse Cito-documentcode in de onderste marge wordt gemaskeerd."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "footer-code.pdf"
+            output = root / "footer-code-long.png"
+
+            pdf = fitz.open()
+            page = pdf.new_page(width=600, height=800)
+            page.insert_text((55, 110), "Inhoudelijke beoordelingsregel staat hier.", fontsize=12)
+            page.insert_text((55, 720), "VW-1018-a-26-2-c", fontsize=9)
+            pdf.save(source)
+            pdf.close()
+
+            metadata = build_stitched_exam(source, output, start_page=0, render_scale=1.0)
+            crop = metadata["pages"][0]["crop_pixels"]
+            self.assertLess(crop[3], 300)
+
     def test_page_crops_are_stitched_with_clear_white_separator(self):
         """De totale hoogte is de som van de crops plus een duidelijk zichtbare witte scheidingsstrook."""
         with tempfile.TemporaryDirectory() as folder:
