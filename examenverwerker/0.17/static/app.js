@@ -529,6 +529,8 @@ async function renderRelationsStage() {
         <span>${result.extra_cv.length ? 'CV-vragen zonder opgave: '+result.extra_cv.join(', ') : 'Geen extra CV-vragen'}</span>
         <span>${result.missing_answers.length ? 'Antwoorden ontbreken: '+result.missing_answers.join(', ') : 'Antwoordrecords volledig gekoppeld'}</span>
         <span>${result.extra_answers.length ? 'Antwoorden zonder opgave: '+result.extra_answers.join(', ') : 'Geen extra antwoordrecords'}</span>
+        <span>${result.uncertain_analysis.length ? 'Onzekere vraaganalyse: '+result.uncertain_analysis.join(', ') : 'Vraagtypen en scores zijn bepaald'}</span>
+        <span>${result.uncertain_answers.length ? 'Handmatige/onzekere antwoorden: '+result.uncertain_answers.join(', ') : 'Antwoorden zijn ingevuld'}</span>
         <span>${mismatches.length ? mismatches.length+' afwijkende maximumscores' : 'Maximumscores komen overeen waar vergelijkbaar'}</span>
         <span>${result.uitwerk_questions.length} vragen in de uitwerkbijlage · gedeeltelijke dekking is toegestaan</span>
       </div>
@@ -554,6 +556,18 @@ async function renderRelationsStage() {
           <h3>Antwoorden zonder opgave</h3>
           <p class="form-error">Er zijn antwoordrecords voor vraag ${result.extra_answers.join(', ')}, maar deze nummers komen niet voor in de opgaven.</p>
           <button class="quiet" type="button" id="repairExtraAnswers">Antwoorden herstellen</button>
+        </section>` : ''}
+      ${result.uncertain_analysis.length ? `
+        <section class="analysis-card">
+          <h3>Onzekere vraaganalyse</h3>
+          <p>Bij vraag ${result.uncertain_analysis.join(', ')} is het vraagtype nog onbekend of ontbreekt een maximumscore. Dit is niet automatisch een fout, maar verdient aandacht in stap 4.</p>
+          <button class="quiet" type="button" id="repairQuestionAnalysis">Vraaganalyse bekijken</button>
+        </section>` : ''}
+      ${result.uncertain_answers.length ? `
+        <section class="analysis-card">
+          <h3>Onzekere of handmatige antwoorden</h3>
+          <p>Bij vraag ${result.uncertain_answers.join(', ')} is de antwoordvorm handmatig bepaald of staat nog geen antwoordtekst. Controleer of dit bewust zo is.</p>
+          <button class="quiet" type="button" id="repairUncertainAnswers">Antwoorden bekijken</button>
         </section>` : ''}
       ${mismatches.length ? `
         <h3>Afwijkende maximumscores</h3>
@@ -631,6 +645,18 @@ async function renderRelationsStage() {
           await openWorkspace(state.examId);
         } catch(error) { $('#relationsMessage').textContent=error.message; }
       });
+    });
+    $('#repairUncertainAnswers')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/antwoorden/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    $('#repairQuestionAnalysis')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/opgaven_analyse/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
     });
   } catch(error) {
     panel.innerHTML=`<h2>Integriteitscontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
