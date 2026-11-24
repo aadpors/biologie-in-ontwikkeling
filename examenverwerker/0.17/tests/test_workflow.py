@@ -546,5 +546,27 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
 
+    def test_stitched_selection_fingerprint_rejects_stale_pixel_coordinates(self):
+        """Pixelgrenzen mogen alleen bij exact dezelfde lange bronafbeelding worden hergebruikt."""
+        image_path = Path(self.temp.name) / "exam-long.png"
+        image_path.write_bytes(b"stitched-image-version-one")
+
+        fingerprint = main._stitched_image_fingerprint(image_path)
+        self.assertTrue(main._stitched_selection_matches_image(
+            {"stitched_image_sha256": fingerprint}, image_path
+        ))
+
+        # Oude projectbestanden hebben geen fingerprint. Hun pixelcoördinaten
+        # kunnen daarom niet betrouwbaar aan de huidige afbeelding worden gekoppeld.
+        self.assertFalse(main._stitched_selection_matches_image({}, image_path))
+
+        # Een wijziging in render-, crop- of stitchresultaat moet oude selecties
+        # ongeldig maken voordat de definitieve snippets worden uitgesneden.
+        image_path.write_bytes(b"stitched-image-version-two")
+        self.assertFalse(main._stitched_selection_matches_image(
+            {"stitched_image_sha256": fingerprint}, image_path
+        ))
+
+
 if __name__ == "__main__":
     unittest.main()
