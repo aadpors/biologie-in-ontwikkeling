@@ -229,7 +229,7 @@ if CV_SOURCE.is_file():
                 debug_item["reason"] = "directe CV-regel"
                 cv_filter_debug.append(debug_item)
                 continue
-            if re.fullmatch(r"\\d{1,2}\\.?", candidate_text):
+            if re.fullmatch(r"\d{1,2}\\.?", candidate_text):
                 positioned_lines = []
                 for block in cv_pdf[page_index].get_text("dict").get("blocks", []):
                     if block.get("type") != 0:
@@ -273,7 +273,7 @@ if CV_SOURCE.is_file():
                     )
                 ]
                 has_maximumscore = any(
-                    re.search(r"\\bmaximumscore\\s+\\d+", item["text"], re.IGNORECASE)
+                    re.search(r"\bmaximumscore\\s+\\d+", item["text"], re.IGNORECASE)
                     for item in nearby
                 )
                 has_inline_mc_answer = any(
