@@ -1583,36 +1583,75 @@ def get_relations(exam_id: str):
                           "max_points": opgaven_score, "cv_max_points": cv_score,
                           "points_match": (cv_score == opgaven_score) if cv_score is not None and opgaven_score is not None else None,
                           "reviewed": saved.get(number, {}).get("reviewed", False)})
+    score_mismatches = [
+        {"question_number": item["question_number"],
+         "opgaven_max_points": item["max_points"],
+         "cv_max_points": item["cv_max_points"]}
+        for item in questions if item["points_match"] is False
+    ]
     return {"question_count": len(questions), "questions": questions,
             "missing_cv": sorted(opgaven - cv), "extra_cv": sorted(cv - opgaven),
+            "score_mismatches": score_mismatches,
             "uitwerk_questions": sorted(uitwerk)}
 
 
 @app.post("/api/exams/{exam_id}/relations/review")
 def save_relations_review(exam_id: str, payload: dict):
-    """Eis een expliciete beoordeling van elke vraagkoppeling."""
+    """Bewaar alleen inhoudelijke uitzonderingen; normale koppelingen zijn automatisch akkoord.
+
+    De vraagnummerkoppeling tussen de documenten is deterministisch. Daarom
+    hoeft de docent niet iedere normale vraag afzonderlijk af te vinken.
+    De lijst met vragen blijft wel als controlebewijs bestaan. Alleen een
+    afwijking kan een toelichting krijgen en blijft zichtbaar in stap 11.
+    """
     result = get_relations(exam_id)
-    questions = payload.get("questions")
-    if not isinstance(questions, list):
-        raise HTTPException(422, "De vraagkoppelingen ontbreken.")
-    expected = {item["question_number"] for item in result["questions"]}
-    seen = set()
-    cleaned = []
-    for item in questions:
+    exam = STORE.get_exam(exam_id)
+    previous = exam["steps"].get("relaties", {}).get("evidence", {})
+    previous_by_number = {
+        item["question_number"]: item for item in previous.get("questions", [])
+    }
+    submitted = payload.get("questions", [])
+    if not isinstance(submitted, list):
+        raise HTTPException(422, "De uitzonderingen bij de vraagkoppelingen hebben een ongeldig formaat.")
+    submitted_by_number = {}
+    for item in submitted:
         number = item.get("question_number") if isinstance(item, dict) else None
-        if not isinstance(number, int) or number not in expected or number in seen:
-            raise HTTPException(422, "Een vraagnummer in de koppeling is ongeldig of dubbel.")
-        seen.add(number)
-        cleaned.append({"question_number": number, "reviewed": bool(item.get("reviewed")),
-                        "note": str(item.get("note", ""))[:1000]})
-    if seen != expected:
-        raise HTTPException(422, "Beoordeel de koppelingen van alle vragen.")
-    reviewed = sum(item["reviewed"] for item in cleaned)
-    evidence = {"questions": cleaned, "reviewed_count": reviewed,
-                "reviewed_all_questions": reviewed == len(cleaned),
-                "missing_cv": result["missing_cv"], "extra_cv": result["extra_cv"]}
+        if not isinstance(number, int) or number not in {q["question_number"] for q in result["questions"]}:
+            raise HTTPException(422, "Een vraagnummer bij de koppelingen is ongeldig.")
+        submitted_by_number[number] = item
+
+    # Alle gewone vraagkoppelingen worden automatisch als gecontroleerd
+    # geregistreerd. Handmatige toelichtingen blijven behouden, ook wanneer
+    # de gebruiker alleen de knop 'opslaan' gebruikt.
+    cleaned = []
+    for question in result["questions"]:
+        number = question["question_number"]
+        item = submitted_by_number.get(number, previous_by_number.get(number, {}))
+        cleaned.append({
+            "question_number": number,
+            "reviewed": True,
+            "note": str(item.get("note", ""))[:1000],
+        })
+
+    evidence = {
+        "questions": cleaned,
+        "reviewed_count": len(cleaned),
+        "reviewed_all_questions": bool(cleaned),
+        "missing_cv": result["missing_cv"],
+        "extra_cv": result["extra_cv"],
+        "score_mismatches": result["score_mismatches"],
+    }
     STORE.save_step_draft(exam_id, "relaties", evidence)
-    return {"ok": True, **evidence, "complete": evidence["reviewed_all_questions"]}
+    unresolved_scores = [
+        item["question_number"] for item in result["score_mismatches"]
+        if not next((row["note"].strip() for row in cleaned
+                     if row["question_number"] == item["question_number"]), "")
+    ]
+    return {
+        "ok": True, **evidence,
+        "unresolved_score_mismatches": unresolved_scores,
+        "complete": not result["missing_cv"] and not unresolved_scores,
+    }
 
 
 
