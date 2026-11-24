@@ -277,7 +277,7 @@ def _looks_like_context_region(
     inhoud bij de vraag en kan de docent haar handmatig als context markeren.
     """
     cues = re.compile(
-        r"\b(?:gebruik de informatie|gebruik onderstaande|gebruik de tekst|"
+        r"\b(?:gebruik de informatie|gebruik de gegevens|gebruik onderstaande|gebruik de tekst|"
         r"lees de tekst|bekijk de afbeelding|onderstaande afbeelding|"
         r"de volgende informatie|de volgende tekst|in de tekst hieronder|"
         r"bij de volgende vragen|voor de volgende vragen|"
