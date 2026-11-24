@@ -1279,9 +1279,9 @@ def get_snippets(exam_id: str):
     selected_contexts = [item for item in selected_contexts if item.get("type") == "context"]
     if selected_contexts:
         stitched_path = DATA / "exams" / exam_id / "derived" / "opgaven_stitched" / "exam-long.png"
-        if not stitched_path.is_file():
-            build_stitched_exam(source, stitched_path)
-        stitched_metadata = build_stitched_exam(source, stitched_path)
+        stitched_metadata = _load_or_build_stitched_exam(
+            source, stitched_path, opgaven_doc["sha256"]
+        )
         selected_output = DATA / "exams" / exam_id / "derived" / "contexts"
         selected_output.mkdir(parents=True, exist_ok=True)
         selected_items = []
