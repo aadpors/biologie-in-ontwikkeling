@@ -361,6 +361,31 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                 result["candidate_count"] = len(result["candidates"])
     except Exception as exc:
         raise HTTPException(422, f"Vraagstarts konden niet worden herkend: {exc}") from exc
+    if document_type == "correctievoorschrift":
+        # Pas de CV-slotgrens ook ná het herstellen van eerder opgeslagen
+        # handmatige kandidaten toe. Anders kan een oude handmatige start op
+        # een administratieve pagina opnieuw een leeg CV-fragment veroorzaken.
+        with fitz.open(path) as cv_end_pdf:
+            cv_content_end_page = len(cv_end_pdf) - 1
+            for page_index, page in enumerate(cv_end_pdf):
+                if re.search(r"(?m)^\\s*5\\s+aanleveren scores\\b",
+                             page.get_text("text").casefold()):
+                    cv_content_end_page = max(0, page_index - 1)
+                    break
+        result["candidates"] = [
+            item for item in result["candidates"]
+            if item["page_index"] <= cv_content_end_page
+        ]
+        valid_candidate_ids = {item["id"] for item in result["candidates"]}
+        for page in result["pages"]:
+            page["candidates"] = [
+                item for item in page["candidates"]
+                if item["id"] in valid_candidate_ids
+            ]
+            page["candidate_count"] = len(page["candidates"])
+        result["candidate_count"] = sum(
+            not item.get("removed", False) for item in result["candidates"]
+        )
     result["document"] = {"id": document["id"], "filename": document["filename"],
                           "sha256": document["sha256"]}
     step_key = {"opgaven":"opgaven_starts", "uitwerkbijlage":"uitwerk_starts",
