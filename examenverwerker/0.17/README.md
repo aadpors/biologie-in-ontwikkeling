@@ -7,7 +7,7 @@ worden beheerd door één FastAPI-app en één SQLite-opslag.
 
 ## Starten
 
-Vereist Python 3.12 (de Windows-startscripts selecteren deze versie expliciet vanwege de lokale OCR-engine en ONNX Runtime).
+Vereist Python 3.12 (de Windows-startscripts selecteren deze versie expliciet vanwege de lokale OCR-engine en ONNX Runtime). Op Windows proberen `start.bat` en `start.ps1` Python 3.12 automatisch te installeren met `py install 3.12` als de runtime nog ontbreekt.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -17,8 +17,9 @@ python -m uvicorn examenverwerker.main:app --reload
 ```
 
 Op Windows kan dit ook met `start.bat` of `start.ps1`; beide scripts selecteren
-Python 3.12 expliciet. Als `.venv` eerder met een incompatibele Python-versie
-is aangemaakt, wordt alleen die virtuele omgeving opnieuw opgebouwd. De
+Python 3.12 expliciet en proberen de runtime zo nodig via de Python Launcher te
+installeren. Als `.venv` eerder met een incompatibele Python-versie is
+aangemaakt, wordt alleen die virtuele omgeving opnieuw opgebouwd. De
 examendatabase en bronbestanden blijven behouden. Open daarna
 `http://127.0.0.1:8000`.
 
