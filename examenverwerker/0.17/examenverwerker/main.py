@@ -798,7 +798,7 @@ def _load_document_fragments(exam_id: str, document_type: str):
                         ),
                         "last_page": next(
                             (page["page_number"] for page in reversed(stitched_metadata["pages"])
-                             if float(page["top"]) < bottom <= float(page["bottom"])),
+                             if float(page["top"]) < bottom and float(page["bottom"]) > top),
                             start["page_index"] + 1,
                         ),
                         "segments": [{"page_number": start["page_index"] + 1, "filename": filename, "url": url}],
