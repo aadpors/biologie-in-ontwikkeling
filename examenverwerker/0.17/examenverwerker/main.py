@@ -1998,10 +1998,27 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             raise HTTPException(422, "Controleer de antwoorden bij alle vragen.")
     if step_key == "relaties":
         questions = previous.get("questions", [])
-        if not previous.get("reviewed_all_questions") or not questions or any(not item.get("reviewed") for item in questions):
-            raise HTTPException(422, "Controleer de documentkoppelingen bij alle vragen.")
+        if not previous.get("reviewed_all_questions") or not questions:
+            raise HTTPException(422, "Voer eerst de automatische document- en vraagkoppelingen uit.")
         if previous.get("missing_cv"):
             raise HTTPException(422, "Er ontbreken correctievoorschriftvragen: " + str(previous["missing_cv"]))
+        # Een scoreverschil is geen automatische fout: het kan bijvoorbeeld
+        # ontstaan door een gewijzigde beoordelingsregel. Wel moet stap 11
+        # vastleggen waarom de twee maximumscores bewust niet gelijk zijn.
+        notes_by_number = {
+            item["question_number"]: str(item.get("note", "")).strip()
+            for item in questions
+        }
+        mismatches = previous.get("score_mismatches", [])
+        unresolved = [
+            str(item["question_number"]) for item in mismatches
+            if not notes_by_number.get(item["question_number"])
+        ]
+        if unresolved:
+            raise HTTPException(
+                422,
+                "Licht de afwijkende maximumscore toe bij vraag/vraagvragen: " + ", ".join(unresolved)
+            )
     if step_key == "snippets":
         if (not previous.get("reviewed_all_questions") or not previous.get("reviewed_all_contexts")
                 or not previous.get("reviewed_all_uitwerk") or not previous.get("reviewed_all_cv")
