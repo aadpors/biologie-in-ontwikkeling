@@ -24,7 +24,8 @@ from .domain import WORKFLOW, STEP_BY_KEY, unmet_requirements, invalidate_depend
 from .metadata import suggest_metadata
 from .question_detection import detect_question_starts, validate_review
 from .question_fragments import (generate_question_fragments, build_stitched_exam,
-                                  propose_stitched_question_selections, normalise_stitched_selections)
+                                  propose_stitched_question_selections, normalise_stitched_selections,
+                                  cv_content_end_page)
 from .question_analysis import analyse_questions, validate_question_analysis
 from .answer_detection import analyse_answers, detect_cv_max_points, validate_answer_review
 from .cv_supplement import analyse_supplement, validate_supplement_review
@@ -229,48 +230,6 @@ def _document_for_type(exam: dict, document_type: str):
 
 
 
-def _cv_content_end_page(pdf: fitz.Document) -> int:
-    """Bepaal de laatste inhoudspagina vóór de echte CV-slotsectie.
-
-    Een inhoudsopgave kan de regel '5 Aanleveren scores' letterlijk noemen.
-    De oude tekstzoekactie behandelde zo'n vermelding als het begin van de
-    administratieve slotpagina en verwijderde daardoor alle vraagstarts uit
-    het beoordelingsmodel. We accepteren de grens daarom alleen wanneer de
-    volledige regel als zelfstandige kop in het bovenste deel van de pagina
-    staat. De originele PDF blijft uiteraard ongewijzigd.
-    """
-    for page_index, page in enumerate(pdf):
-        page_dict = page.get_text("dict")
-        for block in page_dict.get("blocks", []):
-            if block.get("type") != 0:
-                continue
-            for line in block.get("lines", []):
-                # Maak de regel op dezelfde manier als de overige CV-koppen:
-                # spans worden samengevoegd, waarna alleen de volledige kop
-                # mag matchen. Een verwijzing met extra tekst telt niet mee.
-                line_text = " ".join(
-                    span.get("text", "") for span in line.get("spans", [])
-                ).strip()
-                bbox = line.get("bbox", [])
-                if len(bbox) != 4:
-                    continue
-                heading_top = float(bbox[1])
-                if (
-                    heading_top <= page.rect.height * 0.20
-                    and re.fullmatch(
-                        r"5\s+aanleveren scores",
-                        line_text,
-                        re.IGNORECASE,
-                    )
-                ):
-                    # De slotsectie begint op deze pagina; de laatste
-                    # inhoudspagina is dus de voorgaande pagina.
-                    return max(0, page_index - 1)
-    # Sommige correctievoorschriften hebben geen afzonderlijke slotsectie.
-    # In dat geval blijft het volledige document beschikbaar.
-    return max(0, len(pdf) - 1)
-
-
 def _load_document_question_starts(exam_id: str, document_type: str):
     """Deel de detectie- en herstelroute voor alle drie documentsoorten."""
     exam = STORE.get_exam(exam_id)
@@ -451,7 +410,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                 # vraagregels zijn gelezen; een gesloten PyMuPDF-document mag
                 # niet worden hergebruikt voor paginatoegang.
                 with fitz.open(path) as cv_end_pdf:
-                    cv_content_end_page = _cv_content_end_page(cv_end_pdf)
+                    cv_content_end_page = cv_content_end_page(cv_end_pdf)
                 cv_valid_candidates = [
                     candidate for candidate in cv_valid_candidates
                     if candidate["page_index"] <= cv_content_end_page
@@ -488,7 +447,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
         # handmatige kandidaten toe. Anders kan een oude handmatige start op
         # een administratieve pagina opnieuw een leeg CV-fragment veroorzaken.
         with fitz.open(path) as cv_end_pdf:
-            cv_content_end_page = _cv_content_end_page(cv_end_pdf)
+            cv_content_end_page = cv_content_end_page(cv_end_pdf)
         result["candidates"] = [
             item for item in result["candidates"]
             if item["page_index"] <= cv_content_end_page
