@@ -41,6 +41,46 @@ STORE = Store(DATA)
 app = FastAPI(title="Examenverwerker", version="0.17.0")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
+def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sha256: str) -> dict[str, Any]:
+    """Herbruik de bestaande lange examenafbeelding zolang de bron gelijk is.
+
+    Teruggaan van stap 4 naar stap 3 is een normale navigatiehandeling en mag
+    geen volledige PDF-render-, crop- en stitchronde starten. Bewaar daarom
+    naast de PNG ook de bijbehorende paginametadata en witte grensrijen.
+    De bronhash voorkomt dat een oude afbeelding wordt hergebruikt wanneer
+    een examenbestand daadwerkelijk is vervangen.
+    """
+    cache_path = output_path.with_suffix(".metadata.json")
+    if output_path.is_file() and cache_path.is_file():
+        try:
+            cached = json.loads(cache_path.read_text(encoding="utf-8"))
+            if (cached.get("source_sha256") == source_sha256
+                    and cached.get("cache_version") == 1
+                    and isinstance(cached.get("metadata"), dict)
+                    and isinstance(cached.get("white_row_ranges"), list)):
+                metadata = dict(cached["metadata"])
+                metadata["white_row_ranges"] = cached["white_row_ranges"]
+                return metadata
+        except (OSError, ValueError, TypeError):
+            # Een beschadigde of verouderde cache wordt veilig opnieuw opgebouwd.
+            pass
+
+    metadata = build_stitched_exam(source_path, output_path)
+    white_rows = _white_row_ranges(output_path)
+    cache_payload = {
+        "cache_version": 1,
+        "source_sha256": source_sha256,
+        "metadata": metadata,
+        "white_row_ranges": white_rows,
+    }
+    cache_path.write_text(
+        json.dumps(cache_payload, ensure_ascii=False, separators=(",", ":")),
+        encoding="utf-8",
+    )
+    metadata["white_row_ranges"] = white_rows
+    return metadata
+
+
 
 def _safe_filename(filename: str) -> str:
     """Normaliseer een uploadnaam zodat deze nooit een pad kan schrijven."""
@@ -791,7 +831,7 @@ def get_stitched_opgaven(exam_id: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     target = output_dir / "exam-long.png"
     try:
-        metadata = build_stitched_exam(source, target)
+        metadata = _load_or_build_stitched_exam(source, target, document["sha256"])
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, str(exc)) from exc
     previous = exam["steps"].get("opgaven_fragments", {}).get("evidence", {})
@@ -830,6 +870,7 @@ def get_stitched_opgaven(exam_id: str):
             target,
             image_height=int(metadata["height"]),
             leading_top=min((float(page["top"]) for page in metadata.get("pages", [])), default=0.0),
+            context_candidates_only=True,
         )
 
     # De voorstelgenerator levert nu zowel vraagfragmenten als contexten.
@@ -877,7 +918,9 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
     stitched_path = DATA / "exams" / exam_id / "derived" / "opgaven_stitched" / "exam-long.png"
     if not stitched_path.is_file():
         document = _document_for_type(exam, "opgaven")
-        build_stitched_exam(DATA / document["relative_path"], stitched_path)
+        _load_or_build_stitched_exam(
+            DATA / document["relative_path"], stitched_path, document["sha256"]
+        )
     with Image.open(stitched_path) as stitched_image:
         stitched_height = stitched_image.height
     # De server herhaalt de pixelcontrole. Zo kunnen verouderde browsers of
