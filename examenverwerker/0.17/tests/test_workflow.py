@@ -133,6 +133,28 @@ class WorkflowApplicationTests(unittest.TestCase):
             # zelf slechts een smalle strook in het midden van de pagina beslaat.
             self.assertEqual(rendered.width, 750)
 
+    def test_cv_stitched_image_stops_before_administrative_end_section(self):
+        """De lange CV-werkstrook eindigt vóór de administratieve slotpagina."""
+        document = fitz.open()
+        model = document.new_page(width=600, height=800)
+        model.insert_text((70, 100), "4 Beoordelingsmodel")
+        model.insert_text((70, 140), "1 maximumscore 1")
+        model.insert_text((70, 170), "B 1")
+        administration = document.new_page(width=600, height=800)
+        administration.insert_text((70, 60), "5 Aanleveren scores")
+        root = Path(self.temp.name)
+        pdf_path = root / "cv-with-administration.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        self.assertEqual(main._stitched_end_page(pdf_path, "correctievoorschrift"), 0)
+        output_path = root / "derived" / "cv-long.png"
+        metadata = main._load_or_build_stitched_exam(
+            pdf_path, output_path, main.STORE.sha256(pdf_path),
+            start_page=0, end_page=0,
+        )
+        self.assertEqual([page["page_number"] for page in metadata["pages"]], [1])
+
     def test_single_page_workbook_is_not_mistaken_for_a_cover_only_opgavenboekje(self):
         """Een uitwerkbijlage van één pagina bevat vaak direct de antwoorden."""
         opgaven = fitz.open()
