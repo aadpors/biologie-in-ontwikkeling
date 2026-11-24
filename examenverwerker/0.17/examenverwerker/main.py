@@ -1966,16 +1966,17 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             duplicates = sorted(number for number in set(accepted_numbers)
                                 if accepted_numbers.count(number) > 1)
             raise HTTPException(422, "Los eerst de dubbele hoofdvraagstarts op: " + str(duplicates))
-    # De analysefase vereist expliciete controle van type, punten en opties
-    # voor iedere vraag. Een algemene reviewed-vlag mag dit niet omzeilen.
+    # De vraaganalyse wordt als complete set opgeslagen. De docent bevestigt
+    # de set met de afrondactie; reviewed=True wordt intern voor alle vragen
+    # vastgelegd zodat geen administratieve vinkjes per vraag nodig zijn.
     if step_key == "opgaven_analyse":
         questions = previous.get("questions", [])
         if (not previous.get("reviewed_all_questions") or not questions
                 or any(not item.get("reviewed") for item in questions)):
             raise HTTPException(422, "Controleer vraagtype, punten en antwoordopties voor iedere vraag.")
-    # Vraagfragmenten mogen alleen worden goedgekeurd als ieder voorgesteld
-    # fragment expliciet is bekeken. Een generiek {reviewed:true} is hiervoor
-    # onvoldoende en kan dus niet worden gebruikt om deze stap over te slaan.
+    # De visuele fragmentset wordt als één geheel goedgekeurd. De browser zet
+    # de interne reviewed-markeringen bij de expliciete afrondactie; de gebruiker
+    # hoeft niet ieder fragment afzonderlijk af te vinken.
     if step_key in {"opgaven_fragments", "uitwerk_fragments", "cv_fragments"}:
         expected = set(previous.get("expected_question_numbers", []))
         reviewed_numbers = set(previous.get("reviewed_question_numbers", []))
@@ -1994,8 +1995,8 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             raise HTTPException(422, "Bevestig dat er geen CV-aanvulling bij dit examen hoort.")
     if step_key == "antwoorden":
         questions = previous.get("questions", [])
-        if not previous.get("reviewed_all_questions") or not questions or any(not item.get("reviewed") for item in questions):
-            raise HTTPException(422, "Controleer de antwoorden bij alle vragen.")
+        if not previous.get("reviewed_all_questions") or not questions:
+            raise HTTPException(422, "Sla de complete antwoordset op voordat je doorgaat.")
     if step_key == "relaties":
         questions = previous.get("questions", [])
         if not previous.get("reviewed_all_questions") or not questions:
