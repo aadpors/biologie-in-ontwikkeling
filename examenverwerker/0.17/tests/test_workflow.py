@@ -94,11 +94,12 @@ class WorkflowApplicationTests(unittest.TestCase):
         document.new_page()  # Voorblad wordt standaard overgeslagen.
         page = document.new_page()
         page.insert_text((70, 100), "Vraag 1: beschrijf de cel.")
-        pdf_path = self.root / "cache-source.pdf"
+        root = Path(self.temp.name)
+        pdf_path = root / "cache-source.pdf"
         document.save(pdf_path)
         document.close()
 
-        output_path = self.root / "derived" / "exam-long.png"
+        output_path = root / "derived" / "exam-long.png"
         source_hash = main.STORE.sha256(pdf_path)
         first = main._load_or_build_stitched_exam(pdf_path, output_path, source_hash)
         self.assertTrue(output_path.is_file())
