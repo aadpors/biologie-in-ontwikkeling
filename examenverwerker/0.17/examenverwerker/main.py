@@ -281,7 +281,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                         if direct or direct_mc:
                             cv_valid_candidates.append(candidate)
                             continue
-                        if re.fullmatch(r"\\d{1,2}", candidate_text):
+                        if re.fullmatch(r"\d{1,2}", candidate_text):
                             # Meerkeuzeantwoorden staan in sommige CV's in drie
                             # aparte tekstkolommen. De PDF-extractor levert dan
                             # het vraagnummer, de antwoordletter en de score als
@@ -300,11 +300,11 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                             )
                             following = lines[matching + 1:matching + 6] if matching is not None else []
                             has_maximumscore = any(
-                                re.match(r"^maximumscore\\s+\\d+", line, re.IGNORECASE)
+                                re.match(r"^maximumscore\s+\d+", line, re.IGNORECASE)
                                 for line in following
                             )
                             has_inline_mc_answer = any(
-                                re.fullmatch(r"[A-E][.)]?\\s+[012]", line, re.IGNORECASE)
+                                re.fullmatch(r"[A-E][.)]?\s+[012]", line, re.IGNORECASE)
                                 for line in following
                             )
                             has_split_mc_answer = any(
@@ -321,7 +321,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                 # fragment opleveren en later een interne stitchfout geven.
                 cv_content_end_page = len(cv_pdf) - 1
                 for page_index, page in enumerate(cv_pdf):
-                    if re.search(r"(?m)^\\s*5\\s+aanleveren scores\\b",
+                    if re.search(r"(?m)^\s*5\s+aanleveren scores\b",
                                  page.get_text("text").casefold()):
                         cv_content_end_page = max(0, page_index - 1)
                         break
