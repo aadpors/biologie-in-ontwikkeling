@@ -467,7 +467,11 @@ def propose_stitched_question_selections(
                 float(first_question["top"]),
                 first_start_y - 8.0,
             )
-            if leading_bottom - leading_top >= 24:
+            if (leading_bottom - leading_top >= 24
+                    and _looks_like_context_region(
+                        pdf, page_metadata, leading_top, leading_bottom,
+                        render_scale=render_scale,
+                    )):
                 first_question["top"] = round(leading_bottom, 2)
                 context_selections.append({
                     "id": f"auto-context-before-{first_number}",
@@ -479,19 +483,29 @@ def propose_stitched_question_selections(
                     "source": "automatic_leading_context",
                 })
 
-    for question_index, question in enumerate(ordered_questions[:-1]):
-        following = ordered_questions[question_index + 1]
-        gap_top = float(question["bottom"])
-        gap_bottom = float(following["top"])
-        if gap_bottom - gap_top < 24:
-            continue
-        context_gaps.append({
-            "question_index": question_index,
-            "top": round(gap_top, 2),
-            "bottom": round(gap_bottom, 2),
-            "previous_number": int(question["question_numbers"][0]),
-            "following_number": int(following["question_numbers"][0]),
-        })
+    with fitz.open(pdf_path) as source_pdf:
+        for question_index, question in enumerate(ordered_questions[:-1]):
+            following = ordered_questions[question_index + 1]
+            gap_top = float(question["bottom"])
+            gap_bottom = float(following["top"])
+            if gap_bottom - gap_top < 24:
+                continue
+            # Classificeer een tussenblok pas als context wanneer de oorspronkelijke
+            # PDF concrete aanwijzingen voor gedeelde achtergrondinformatie bevat.
+            # Anders blijft de inhoud bij de voorafgaande vraag horen.
+            is_context = _looks_like_context_region(
+                source_pdf, page_metadata, gap_top, gap_bottom,
+                render_scale=render_scale,
+            )
+            if not is_context:
+                continue
+            context_gaps.append({
+                "question_index": question_index,
+                "top": round(gap_top, 2),
+                "bottom": round(gap_bottom, 2),
+                "previous_number": int(question["question_numbers"][0]),
+                "following_number": int(following["question_numbers"][0]),
+            })
 
     for gap_index, gap in enumerate(context_gaps):
         next_context_question_index = (
@@ -525,6 +539,7 @@ def normalise_stitched_selections(
     *,
     image_height: int,
     leading_top: float = 0.0,
+    context_candidates_only: bool = False,
 ) -> list[dict[str, Any]]:
     """Maak automatische vraag/contextvoorstellen visueel sluitend.
 
@@ -682,6 +697,12 @@ def normalise_stitched_selections(
         # vraag 38 zelf.
         contexts: list[dict[str, Any]] = []
         context_gaps: list[dict[str, Any]] = []
+        # Wanneer de PDF-analyse contextkandidaten heeft aangeleverd, zijn die
+        # kandidaten leidend. Zonder zo'n kandidaat wordt de ruimte aan de
+        # vorige vraag toegevoegd in plaats van automatisch context te worden.
+        proposed_contexts = [
+            item for item in selections if item.get("type") == "context"
+        ]
 
         for question_index, (previous, following) in enumerate(
             zip(cleaned_questions, cleaned_questions[1:])
@@ -690,6 +711,18 @@ def normalise_stitched_selections(
             gap_bottom = int(following["top"])
             if gap_bottom - gap_top < 12 or not has_visible_content(gap_top, gap_bottom):
                 continue
+            if context_candidates_only:
+                has_candidate = any(
+                    min(gap_bottom, float(candidate.get("bottom", 0)))
+                    - max(gap_top, float(candidate.get("top", 0))) >= 12
+                    for candidate in proposed_contexts
+                )
+                if not has_candidate:
+                    # Dit is geen betrouwbaar herkend contextblok. Neem de
+                    # tussenliggende inhoud op in de voorafgaande vraag zodat
+                    # vraagtekst nooit ongemerkt uit de fragmenten verdwijnt.
+                    previous["bottom"] = gap_bottom
+                    continue
 
             # Leg eerst alleen de fysieke positie van het contextblok vast.
             # De vraagkoppeling wordt pas bepaald nadat alle contextblokken
@@ -709,7 +742,14 @@ def normalise_stitched_selections(
         first_question = cleaned_questions[0]
         first_top = snap_before(leading_top)
         first_bottom = first_question["top"]
-        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
+        leading_context_detected = (
+            not context_candidates_only or any(
+                min(first_bottom, float(candidate.get("bottom", 0)))
+                - max(first_top, float(candidate.get("top", 0))) >= 12
+                for candidate in proposed_contexts
+            )
+        )
+        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom) and leading_context_detected:
             first_group_end = (
                 context_gaps[0]["question_index"] + 1
                 if context_gaps else len(cleaned_questions)
@@ -727,6 +767,10 @@ def normalise_stitched_selections(
                 "label": "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vragen",
                 "source": "automatic_leading_context",
             })
+        elif first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
+            # De ruimte vóór de eerste vraag bevat geen contextsignalen; houd
+            # deze inhoud daarom bij de eerste vraag in plaats van haar weg te laten.
+            first_question["top"] = first_top
 
         # Een context tussen vraag A en vraag B hoort bij B en de vragen
         # daarna, zolang er geen nieuw contextblok verschijnt. De volgende
