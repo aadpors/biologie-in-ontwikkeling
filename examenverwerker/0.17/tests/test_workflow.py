@@ -113,6 +113,26 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(first["height"], second["height"])
         self.assertTrue(second["white_row_ranges"])
 
+    def test_stitched_fragments_preserve_the_full_page_width(self):
+        """Een lange fragmentafbeelding mag geen linker- of rechterkolom afsnijden."""
+        document = fitz.open()
+        page = document.new_page(width=600, height=800)
+        page.insert_text((90, 110), "Vraag 1: beschrijf de functie van het celmembraan.")
+        root = Path(self.temp.name)
+        pdf_path = root / "full-width-source.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        output_path = root / "derived" / "full-width.png"
+        main.build_stitched_exam(pdf_path, output_path, start_page=0)
+
+        from PIL import Image
+        with Image.open(output_path) as rendered:
+            # 600 PDF-punten × 1,25 renderfactor = 750 pixels.
+            # De volledige paginabreedte blijft behouden, ook als de inhoud
+            # zelf slechts een smalle strook in het midden van de pagina beslaat.
+            self.assertEqual(rendered.width, 750)
+
     def test_single_page_workbook_is_not_mistaken_for_a_cover_only_opgavenboekje(self):
         """Een uitwerkbijlage van één pagina bevat vaak direct de antwoorden."""
         opgaven = fitz.open()
