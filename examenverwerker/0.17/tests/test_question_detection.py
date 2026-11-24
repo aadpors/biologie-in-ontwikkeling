@@ -146,13 +146,18 @@ class QuestionDetectionTests(unittest.TestCase):
         # noemen vóór de zelfstandige hoofdstukkop. Alleen die echte kop
         # mag bepalen waar de vraagstartdetectie begint.
         document = fitz.open()
-        page = document.new_page()
-        page.insert_text((60, 80), "Het beoordelingsmodel wordt hieronder toegelicht.")
-        page.insert_text((60, 120), "1")
-        page.insert_text((60, 145), "Regels voor de beoordeling")
-        page.insert_text((60, 190), "4 Beoordelingsmodel")
-        page.insert_text((60, 230), "1")
-        page.insert_text((60, 255), "maximumscore 2")
+        intro_page = document.new_page()
+        intro_page.insert_text((60, 80), "Het beoordelingsmodel wordt hieronder toegelicht.")
+        intro_page.insert_text((60, 120), "1")
+        intro_page.insert_text((60, 145), "Regels voor de beoordeling")
+        # Een inhoudsopgave kan de zelfstandige kop letterlijk herhalen,
+        # maar staat niet bovenaan de pagina en mag de modelgrens niet bepalen.
+        intro_page.insert_text((60, 400), "Beoordelingsmodel")
+
+        model_page = document.new_page()
+        model_page.insert_text((60, 80), "4 Beoordelingsmodel")
+        model_page.insert_text((60, 130), "1")
+        model_page.insert_text((60, 155), "maximumscore 2")
         path = self.root / "cv-heading.pdf"
         document.save(path)
         document.close()
@@ -172,8 +177,9 @@ class QuestionDetectionTests(unittest.TestCase):
         )
         self.assertEqual(result.status_code, 200, result.text)
         self.assertEqual(
-            [item["question_number"] for item in result.json()["candidates"]],
-            [1],
+            [(item["question_number"], item["page_index"])
+             for item in result.json()["candidates"]],
+            [(1, 1)],
         )
 
     def test_detector_uses_only_standalone_main_question_lines(self):
