@@ -804,9 +804,19 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
    meer vraagnummers; de selectiecoördinaten blijven in pixels van de stitchbron. */
 async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, stageTitle, documentType = 'opgaven') {
   const panel = $('#stagePanel');
-  panel.innerHTML = '<p class="muted">Het examen wordt samengevoegd tot één lange afbeelding…</p>';
+  panel.innerHTML = '<p class="muted">Het document wordt samengevoegd tot één lange afbeelding…</p>';
+  // Dezelfde werkruimte wordt gebruikt voor opgaven en uitwerkbijlage.
+  // Alleen de API-route en toegestane fragmentsoort verschillen.
+  const isWorkbook = documentType === 'uitwerkbijlage';
+  const stitchedReviewUrl = isWorkbook
+    ? `/api/exams/${state.examId}/stitched-document/${documentType}/review`
+    : `/api/exams/${state.examId}/stitched-opgaven/review`;
+  const startsUrl = `/api/exams/${state.examId}/document-question-starts/${documentType}`;
+  const fragmentsReviewUrl = `/api/exams/${state.examId}/document-question-fragments/${documentType}/review`;
   try {
-    const result = await api(`/api/exams/${state.examId}/stitched-opgaven`);
+    const result = await api(isWorkbook
+      ? `/api/exams/${state.examId}/stitched-document/${documentType}`
+      : `/api/exams/${state.examId}/stitched-opgaven`);
     // Herstel altijd de serverversie van eerder opgeslagen werk. Automatische
     // voorstellen worden alleen gebruikt als er nog geen concept bestaat.
     let selections = (result.selections?.length ? result.selections : (result.proposed_selections || []))
