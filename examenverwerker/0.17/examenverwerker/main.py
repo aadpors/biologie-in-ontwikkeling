@@ -1065,7 +1065,9 @@ def get_stitched_document(exam_id: str, document_type: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     target = output_dir / "exam-long.png"
     try:
-        metadata = _load_or_build_stitched_exam(\n            source, target, document["sha256"], start_page=0\n        )
+        metadata = _load_or_build_stitched_exam(
+            source, target, document["sha256"], start_page=0
+        )
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, str(exc)) from exc
 
