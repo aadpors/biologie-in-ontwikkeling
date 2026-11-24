@@ -11,7 +11,7 @@ from examenverwerker import main
 from examenverwerker.storage import Store
 from examenverwerker.question_detection import detect_question_starts, validate_review
 from examenverwerker.question_fragments import generate_question_fragments, build_stitched_exam, normalise_stitched_selections
-from examenverwerker.question_analysis import analyse_questions, detect_options, detect_question_type, detect_max_points, validate_question_analysis
+from examenverwerker.question_analysis import analyse_questions, detect_options, detect_question_type, detect_max_points, detect_closed_answer_form, validate_question_analysis
 
 
 class QuestionDetectionTests(unittest.TestCase):
@@ -36,6 +36,28 @@ class QuestionDetectionTests(unittest.TestCase):
         data = doc.tobytes()
         doc.close()
         return data
+
+    def test_multiple_choice_options_support_separate_letter_lines_and_two_options(self):
+        # PDF-tekstextractie kan de antwoordletter en antwoordtekst splitsen.
+        extracted = "Kies het juiste antwoord.\nA.\nDe celkern bevat DNA.\nB.\nHet celmembraan bevat cellulose."
+        options = detect_options(extracted)
+        self.assertEqual([item["letter"] for item in options], ["A", "B"])
+        self.assertEqual(options[0]["text"], "De celkern bevat DNA.")
+        self.assertEqual(detect_question_type(extracted, options)[0], "meerkeuze")
+
+    def test_closed_answer_form_is_reported_explicitly(self):
+        self.assertEqual(
+            detect_closed_answer_form("Is de concentratie hoger, gelijk of lager?"),
+            "hoger / gelijk / lager",
+        )
+        self.assertEqual(
+            detect_closed_answer_form("Is de stof wel of niet aanwezig?"),
+            "wel / niet",
+        )
+        self.assertEqual(
+            detect_closed_answer_form("Is de uitspraak juist of onjuist?"),
+            "juist / onjuist",
+        )
 
     def test_detector_uses_only_standalone_main_question_lines(self):
         path = self.root / "sample.pdf"
@@ -640,6 +662,38 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual(contexts[0]["question_numbers"], [2, 3])
         self.assertEqual(contexts[0]["top"], questions[0]["bottom"])
         self.assertEqual(contexts[0]["bottom"], questions[1]["top"])
+
+    def test_stitched_normalisation_keeps_non_context_gap_inside_previous_question(self):
+        # Niet iedere zichtbare ruimte tussen vragen is een context. Zonder
+        # inhoudelijke contextkandidaat moet de tekst behouden blijven bij de
+        # voorafgaande vraag en mag geen contextfragment ontstaan.
+        image_path = self.root / "question-gap.png"
+        image = Image.new("RGB", (20, 120), (255, 255, 255))
+        for y in range(10, 25):
+            for x in range(2, 18):
+                image.putpixel((x, y), (0, 0, 0))
+        for y in range(45, 62):
+            for x in range(2, 18):
+                image.putpixel((x, y), (20, 20, 20))
+        for y in range(82, 100):
+            for x in range(2, 18):
+                image.putpixel((x, y), (0, 0, 0))
+        image.save(image_path)
+        image.close()
+        white_rows = main._white_row_ranges(image_path)
+        selections = [
+            {"id":"q1", "type":"vraag", "top":8, "bottom":28,
+             "question_numbers":[1], "label":"Vraag 1"},
+            {"id":"q2", "type":"vraag", "top":80, "bottom":102,
+             "question_numbers":[2], "label":"Vraag 2"},
+        ]
+        normalised = normalise_stitched_selections(
+            selections, white_rows, image_path, image_height=120,
+            context_candidates_only=True,
+        )
+        self.assertFalse(any(item["type"] == "context" for item in normalised))
+        questions = [item for item in normalised if item["type"] == "vraag"]
+        self.assertEqual(questions[0]["bottom"], questions[1]["top"])
 
     def test_selected_stitched_text_is_read_from_the_matching_source_page(self):
         # Pagina 1 is de omslag en wordt niet in het stitchwerkvlak opgenomen.
