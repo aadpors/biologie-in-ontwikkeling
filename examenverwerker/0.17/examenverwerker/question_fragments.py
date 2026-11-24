@@ -95,7 +95,7 @@ def cv_model_start(pdf: fitz.Document) -> tuple[int, float]:
     if candidates:
         # Kies de meest opvallende zelfstandige kop, niet de kleinere
         # verwijzing in de inhoudsopgave.
-        _, page_index, top = max(candidates, key=lambda item: (item[0], -item[1]))
+        _, page_index, top = max(candidates, key=lambda item: (item[0], item[1]))
         return page_index, top
     # Niet ieder correctievoorschrift gebruikt exact deze hoofdstuknummering.
     # Als de kop ontbreekt, laat de volledige PDF beschikbaar in plaats van
