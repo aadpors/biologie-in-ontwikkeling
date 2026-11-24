@@ -309,7 +309,9 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                                     if line_text and len(bbox) == 4:
                                         positioned_lines.append({
                                             "text": line_text,
+                                            "left": float(bbox[0]),
                                             "top": float(bbox[1]),
+                                            "right": float(bbox[2]),
                                             "bottom": float(bbox[3]),
                                         })
 
@@ -322,7 +324,10 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                                 item["text"] for item in positioned_lines
                                 if item["bottom"] >= candidate_top - 8
                                 and item["top"] <= candidate_bottom + 48
-                                and item["text"] != candidate_text
+                                and not (
+                                    abs(item["left"] - float(candidate["pdf_bbox"][0])) < 0.5
+                                    and abs(item["top"] - candidate_top) < 0.5
+                                )
                             ]
                             has_maximumscore = any(
                                 re.search(r"\bmaximumscore\s+\d+", line, re.IGNORECASE)
@@ -340,7 +345,10 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                                 item for item in positioned_lines
                                 if item["bottom"] >= candidate_top - 8
                                 and item["top"] <= candidate_bottom + 48
-                                and item["text"] != candidate_text
+                                and not (
+                                    abs(item["left"] - float(candidate["pdf_bbox"][0])) < 0.5
+                                    and abs(item["top"] - candidate_top) < 0.5
+                                )
                             ]
                             has_split_mc_answer = any(
                                 re.fullmatch(r"[A-E][.)]?", item["text"], re.IGNORECASE)
