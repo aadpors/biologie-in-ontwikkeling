@@ -462,6 +462,13 @@ class WorkflowApplicationTests(unittest.TestCase):
     def test_relation_audit_does_not_require_per_question_checkboxes(self):
         """Normale koppelingen worden automatisch gecontroleerd; één afrondactie volstaat."""
         exam_id = self.import_sample()["exam_id"]
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{
+                "biologie-vwo-2026-tv2-o.pdf":"opgaven",
+                "biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift",
+            },
+        })
         main.STORE.save_step_draft(exam_id, "opgaven_starts", {
             "candidates":[{"question_number":1,"accepted":True,"removed":False}]
         })
@@ -487,8 +494,9 @@ class WorkflowApplicationTests(unittest.TestCase):
 
         # Alleen de echte voorgangers van stap 11 hoeven voor deze API-test
         # als afgerond te zijn vastgelegd.
-        for key in ("uitwerk_fragments", "cv_aanvulling", "antwoorden"):
-            main.STORE.complete_step(exam_id, key, {})
+        # Dit examen heeft geen uitwerkbijlage en geen CV-aanvulling. Alleen
+        # de werkelijk aanwezige antwoordstap is daarom een vereiste voorganger.
+        main.STORE.complete_step(exam_id, "antwoorden", {})
         completed = self.client.post(
             f"/api/exams/{exam_id}/steps/relaties/complete",
             json={"reviewed":True,"reviewed_all_questions":True},
