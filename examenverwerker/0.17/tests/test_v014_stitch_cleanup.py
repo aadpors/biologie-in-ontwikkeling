@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 import fitz
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from examenverwerker.question_fragments import build_stitched_exam, propose_stitched_question_selections, cv_model_start, normalise_stitched_selections
 from examenverwerker.context_detection import generate_context_candidates
