@@ -1044,7 +1044,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         oldPage.candidate_count = oldPage.candidates.length;
         newPage.candidate_count = newPage.candidates.length;
         renderAll();
-        saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+        queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
       }));
 
       // Een bestaande vraagstart kan ook exact opnieuw worden geplaatst.
@@ -1074,7 +1074,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
             Number((item.pdf_bbox[2] * page.scale_x).toFixed(2)),
             Number((item.pdf_bbox[3] * page.scale_y).toFixed(2))];
           renderAll();
-          saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+          queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
         }, {once:true});
       }));
 
@@ -1092,18 +1092,18 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         page.candidates = page.candidates.filter(candidate => candidate.id !== item.id);
         page.candidate_count = page.candidates.length;
         renderAll();
-        saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+        queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
       }));
 
       $('#saveStartReview').addEventListener('click', async () => {
         try {
-          const saved = await saveReview();
+          const saved = await flushStartAutosave();
           $('#startReviewMessage').textContent = `${saved.review.accepted_count} vraagstarts geaccepteerd; ${saved.review.rejected_count} afgewezen. Conceptreview opgeslagen.`;
         } catch (error) { $('#startReviewMessage').textContent = error.message; }
       });
       $('#completeStartReview').addEventListener('click', async () => {
         try {
-          const saved = await saveReview();
+          const saved = await flushStartAutosave();
           if (!saved.review.accepted_count) throw new Error('Er is geen enkele vraagstart geaccepteerd. Controleer eerst de detectie.');
           await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`, {
             method:'POST', headers:{'Content-Type':'application/json'},
