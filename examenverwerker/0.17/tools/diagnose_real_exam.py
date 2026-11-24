@@ -9,6 +9,8 @@ from __future__ import annotations
 import json
 import os
 import sys
+
+import fitz
 from pathlib import Path
 
 # Scriptbestanden worden door Python met hun eigen map als sys.path[0]
@@ -133,26 +135,37 @@ if CV_SOURCE.is_file():
             if model_page is not None and candidate["page_index"] < model_page:
                 continue
             page = cv_pdf[candidate["page_index"]]
-            lines = [
-                line.strip() for line in page.get_text("text").splitlines()
-                if line.strip()
-            ]
-            # Koppel de kandidaat aan de dichtstbijzijnde tekstregel op basis
-            # van de y-coördinaat. Bewaar daarnaast enkele volgende regels om
-            # de opmaak van het bijbehorende beoordelingscriterium te zien.
+            # Gebruik de originele PDF-regels met hun y-coördinaten; zo
+            # blijft de diagnose betrouwbaar bij herhaalde korte regels zoals
+            # "1", "2" en "juist".
+            positioned_lines = []
+            for block in page.get_text("dict").get("blocks", []):
+                if block.get("type") != 0:
+                    continue
+                for line in block.get("lines", []):
+                    line_text = " ".join(
+                        span.get("text", "") for span in line.get("spans", [])
+                    ).strip()
+                    if line_text:
+                        positioned_lines.append((
+                            float(line.get("bbox", [0, 0, 0, 0])[1]),
+                            line_text,
+                        ))
+            positioned_lines.sort(key=lambda item: item[0])
             candidate_y = float(candidate["pdf_bbox"][1])
             line_index = min(
-                range(len(lines)),
-                key=lambda index: abs(
-                    page.search_for(lines[index])[0].y0 - candidate_y
-                ) if page.search_for(lines[index]) else float("inf"),
+                range(len(positioned_lines)),
+                key=lambda index: abs(positioned_lines[index][0] - candidate_y),
                 default=0,
             )
             cv_debug.append({
                 "page": candidate["page_index"] + 1,
                 "y": candidate_y,
                 "candidate_text": candidate["text"],
-                "nearby_lines": lines[max(0, line_index - 1):line_index + 7],
+                "nearby_lines": [
+                    text for _, text in
+                    positioned_lines[max(0, line_index - 1):line_index + 7]
+                ],
             })
     (OUTPUT / "cv-candidates.json").write_text(
         json.dumps({
