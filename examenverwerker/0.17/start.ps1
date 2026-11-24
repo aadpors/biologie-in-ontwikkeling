@@ -1,22 +1,55 @@
 # Start de geïntegreerde Examenverwerker op Windows.
-# De virtuele omgeving staat naast dit script; bestaande Python-installaties
-# en andere projecten blijven daardoor ongemoeid.
+# Python 3.12 wordt bewust gekozen omdat de lokale OCR-engine ONNX Runtime
+# nodig heeft en daarvoor op Windows stabiele Python 3.12-wheels beschikbaar
+# zijn. Zo voorkomt dit script incompatibele Python-versies op de PATH.
+
 $ErrorActionPreference = 'Stop'
 Set-Location -Path $PSScriptRoot
 
+# Gebruik de Windows Python Launcher om niet per ongeluk een andere
+# Python-versie te kiezen die toevallig als eerste op de PATH staat.
+$Launcher = Get-Command py -ErrorAction SilentlyContinue
+if (-not $Launcher) {
+    throw "De Windows Python Launcher (py) is niet gevonden. Installeer Python 3.12 via https://www.python.org/downloads/ en vink 'Python Launcher' aan."
+}
+
+& py -3.12 --version
+if ($LASTEXITCODE -ne 0) {
+    throw "Python 3.12 is niet geïnstalleerd. Installeer Python 3.12 via https://www.python.org/downloads/ en start opnieuw."
+}
+
 $Python = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
-if (-not (Test-Path $Python)) {
-    Write-Host 'Virtuele Python-omgeving aanmaken…'
-    python -m venv .venv
+
+# Een bestaande virtuele omgeving kan met een nieuwere, incompatibele
+# Python-versie zijn aangemaakt. Verwijder in dat geval uitsluitend .venv;
+# de examendatabase en alle bronbestanden staan buiten deze omgeving.
+if (Test-Path $Python) {
+    & $Python -c "import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 12) else 1)"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host 'Bestaande Python-omgeving is niet compatibel; omgeving opnieuw aanmaken…'
+        Remove-Item -Recurse -Force (Join-Path $PSScriptRoot '.venv')
+    }
 }
 
 if (-not (Test-Path $Python)) {
-    throw 'Python 3.10 of hoger is niet gevonden. Installeer Python en probeer opnieuw.'
+    Write-Host 'Python 3.12-omgeving aanmaken…'
+    & py -3.12 -m venv .venv
+    if ($LASTEXITCODE -ne 0) {
+        throw 'De virtuele Python 3.12-omgeving kon niet worden aangemaakt.'
+    }
 }
 
+# Werk pip bij en installeer alle applicatieafhankelijkheden in de
+# gecontroleerde Python 3.12-omgeving.
 Write-Host 'Benodigde Python-pakketten controleren…'
 & $Python -m pip install --upgrade pip
+if ($LASTEXITCODE -ne 0) {
+    throw 'pip kon niet worden bijgewerkt.'
+}
 & $Python -m pip install -r requirements.txt
+if ($LASTEXITCODE -ne 0) {
+    throw 'De benodigde Python-pakketten konden niet worden geïnstalleerd.'
+}
 
 Write-Host ''
 Write-Host 'Examenverwerker starten op http://127.0.0.1:8000'
