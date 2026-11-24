@@ -113,6 +113,44 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(first["height"], second["height"])
         self.assertTrue(second["white_row_ranges"])
 
+    def test_single_page_workbook_is_not_mistaken_for_a_cover_only_opgavenboekje(self):
+        """Een uitwerkbijlage van één pagina bevat vaak direct de antwoorden."""
+        opgaven = fitz.open()
+        opgaven.new_page().insert_text((70, 100), "Omslag opgaven")
+        opgaven.new_page().insert_text((70, 100), "1. Beschrijf de functie van het celmembraan.")
+        opgaven_bytes = opgaven.tobytes()
+        opgaven.close()
+
+        # Deze uitwerkbijlage heeft bewust maar één pagina. Anders dan bij het
+        # opgavenboekje mag de renderer de eerste pagina hier niet overslaan:
+        # er is geen afzonderlijke omslagpagina verondersteld.
+        workbook = fitz.open()
+        workbook.new_page().insert_text((70, 100), "Vraag 1 — Noteer uw antwoord.")
+        workbook_bytes = workbook.tobytes()
+        workbook.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-o.pdf", opgaven_bytes, "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-u.pdf", workbook_bytes, "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{
+                "biologie-vwo-2026-tv2-o.pdf":"opgaven",
+                "biologie-vwo-2026-tv2-u.pdf":"uitwerkbijlage",
+            },
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        stitched = self.client.get(
+            f"/api/exams/{exam_id}/stitched-document/uitwerkbijlage"
+        )
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        self.assertEqual(len(stitched.json()["pages"]), 1)
+        self.assertEqual(stitched.json()["pages"][0]["page_index"], 0)
+
     def test_step_six_uses_stitched_workbook_selections_for_final_fragments(self):
         """Stap 6 gebruikt dezelfde doorlopende selectiewerkruimte als stap 3."""
         opgaven = fitz.open()
