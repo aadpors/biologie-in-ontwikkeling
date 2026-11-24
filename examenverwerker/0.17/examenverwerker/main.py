@@ -42,7 +42,14 @@ STORE = Store(DATA)
 app = FastAPI(title="Examenverwerker", version="0.17.0")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
-def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sha256: str, *, start_page: int = 1) -> dict[str, Any]:
+def _load_or_build_stitched_exam(
+    source_path: Path,
+    output_path: Path,
+    source_sha256: str,
+    *,
+    start_page: int = 1,
+    end_page: int | None = None,
+) -> dict[str, Any]:
     """Herbruik de lange examenafbeelding met de juiste paginaselectie.
 
     Het opgavenboekje begint normaal gesproken op PDF-pagina 2, omdat de
@@ -59,8 +66,9 @@ def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sh
         try:
             cached = json.loads(cache_path.read_text(encoding="utf-8"))
             if (cached.get("source_sha256") == source_sha256
-                    and cached.get("cache_version") == 3
+                    and cached.get("cache_version") == 4
                     and cached.get("start_page") == start_page
+                    and cached.get("end_page") == end_page
                     and isinstance(cached.get("metadata"), dict)
                     and isinstance(cached.get("white_row_ranges"), list)):
                 metadata = dict(cached["metadata"])
@@ -72,12 +80,15 @@ def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sh
 
     # Geef de paginakeuze expliciet door aan de renderer. Zonder dit argument
     # zou ook een uitwerkbijlage standaard de eerste pagina overslaan.
-    metadata = build_stitched_exam(source_path, output_path, start_page=start_page)
+    metadata = build_stitched_exam(
+        source_path, output_path, start_page=start_page, end_page=end_page
+    )
     white_rows = _white_row_ranges(output_path)
     cache_payload = {
-        "cache_version": 3,
+        "cache_version": 4,
         "source_sha256": source_sha256,
         "start_page": start_page,
+        "end_page": end_page,
         "metadata": metadata,
         "white_row_ranges": white_rows,
     }
@@ -88,6 +99,19 @@ def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sh
     metadata["white_row_ranges"] = white_rows
     return metadata
 
+
+def _stitched_end_page(source_path: Path, document_type: str) -> int | None:
+    """Bepaal de laatste pagina die in een lange documentstrook thuishoort.
+
+    Bij een correctievoorschrift hoort de administratieve slotsectie niet bij
+    de vraagfragmenten. Gebruik daarom exact dezelfde herkenning als de
+    vraagstartdetectie en de fragmentgenerator. Voor andere documenttypen
+    blijft de volledige PDF beschikbaar.
+    """
+    if document_type != "correctievoorschrift":
+        return None
+    with fitz.open(source_path) as pdf:
+        return cv_content_end_page(pdf)
 
 
 def _safe_filename(filename: str) -> str:
@@ -746,6 +770,7 @@ def _load_document_fragments(exam_id: str, document_type: str):
         stitched_metadata = _load_or_build_stitched_exam(
             source_path, stitched_path, document["sha256"],
             start_page=1 if document_type == "opgaven" else 0,
+            end_page=_stitched_end_page(source_path, document_type),
         )
         stitched_questions = [item for item in previous["stitched_selections"] if item.get("type") == "vraag"]
         stitched_contexts = [item for item in previous["stitched_selections"] if item.get("type") == "context"]
@@ -1076,7 +1101,8 @@ def get_stitched_document(exam_id: str, document_type: str):
     target = output_dir / "exam-long.png"
     try:
         metadata = _load_or_build_stitched_exam(
-            source, target, document["sha256"], start_page=0
+            source, target, document["sha256"], start_page=0,
+            end_page=_stitched_end_page(source, document_type),
         )
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, str(exc)) from exc
@@ -1159,6 +1185,7 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
         _load_or_build_stitched_exam(
             DATA / document["relative_path"], stitched_path, document["sha256"],
             start_page=0,
+            end_page=_stitched_end_page(DATA / document["relative_path"], document_type),
         )
     with Image.open(stitched_path) as image:
         stitched_height = image.height
@@ -1174,9 +1201,9 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
                 or not isinstance(top, (int, float)) or not isinstance(bottom, (int, float))
                 or not float(top).is_integer() or not float(bottom).is_integer()
                 or top < 0 or bottom <= top or bottom >= stitched_height):
-            raise HTTPException(422, "Een uitwerkfragment moet een geldig vraagfragment met gehele pixelgrenzen zijn.")
+            raise HTTPException(422, "Een vraagfragment moet een geldige selectie met gehele pixelgrenzen binnen de lange afbeelding zijn.")
         if not _is_white_boundary(top, white_rows) or not _is_white_boundary(bottom, white_rows):
-            raise HTTPException(422, "Plaats beide fragmentgrenzen op een volledig witte horizontale regel.")
+            raise HTTPException(422, "Plaats beide fragmentgrenzen op een volledig witte horizontale regel over de volledige paginabreedte.")
         if (not isinstance(numbers, list) or not numbers
                 or any(not isinstance(number, int) or not 1 <= number <= 60 for number in numbers)):
             raise HTTPException(422, "Koppel ieder uitwerkfragment aan minimaal één geldig vraagnummer.")
@@ -1195,7 +1222,7 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
         covered = {number for item in clean for number in item["question_numbers"]}
         missing = sorted(expected - covered)
         if missing:
-            raise HTTPException(422, "Selecteer nog uitwerkfragmenten voor vraag: " +
+            raise HTTPException(422, "Selecteer nog vraagfragmenten voor vraag: " +
                                 ", ".join(map(str, missing)))
 
     evidence = {
