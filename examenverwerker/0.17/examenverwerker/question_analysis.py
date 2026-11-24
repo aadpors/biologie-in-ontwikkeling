@@ -115,7 +115,9 @@ def _get_ocr_engine():
     try:
         # RapidOCR draait lokaal. Er worden geen vraagafbeeldingen naar een
         # externe dienst verstuurd; de OCR-modellen worden lokaal uitgevoerd.
-        from rapidocr_onnxruntime import RapidOCR
+        # De actuele RapidOCR-distributie bundelt de standaardmodellen. ONNX
+        # Runtime voert de herkenning lokaal op de computer van de docent uit.
+        from rapidocr import RapidOCR
         _OCR_ENGINE = RapidOCR()
     except Exception:
         # OCR is een aanvullende herkenningslaag. Een ontbrekende of niet
@@ -205,7 +207,7 @@ def _ocr_image_text(image_paths: list[str | Path]) -> str:
             line["items"].sort(key=lambda item: float(item["x"]))
             recognised_lines.append(" ".join(str(item["text"]) for item in line["items"]))
 
-    return "\\n".join(recognised_lines)
+    return "\n".join(recognised_lines)
 
 def detect_closed_answer_form(text: str) -> str | None:
     """Benoem de concrete gesloten antwoordvorm die in de vraag wordt genoemd.
@@ -317,7 +319,7 @@ def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
         # Combineer beide bronnen uitsluitend voor de typeherkenning. De
         # originele PDF-tekst blijft apart bewaard en wordt niet overschreven
         # door mogelijke OCR-fouten.
-        analysis_text = "\\n".join(part for part in (text, ocr_text) if part)
+        analysis_text = "\n".join(part for part in (text, ocr_text) if part)
         question_type, type_reason = detect_question_type(analysis_text, options)
         if ocr_text and len(options) >= 2:
             type_reason += " De antwoordopties zijn aanvullend herkend vanuit de vraagafbeelding."
