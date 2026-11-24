@@ -75,8 +75,10 @@ function bindStageAutoSave(panel, save, statusSelector) {
   document.addEventListener('visibilitychange', onVisibilityChange);
   window.addEventListener('pagehide', flushOnHide);
 
+  panel._stageAutoSaveFlush = saveNow;
   panel._stageAutoSaveCleanup = () => {
     clearTimeout(timer);
+    panel._stageAutoSaveFlush = null;
     panel.removeEventListener('change', schedule);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('pagehide', flushOnHide);
@@ -382,9 +384,20 @@ async function renderAnswersStage() {
   try {
     const result = await api(`/api/exams/${state.examId}/answers`);
     panel.innerHTML = `<p class="eyebrow">FASE 6 · ANTWOORDEN HERKENNEN</p><h2>Antwoorden controleren</h2><p class="lead">Per vraag staat het bijbehorende fragment uit het correctievoorschrift. Herkende meerkeuzeletters en gesloten antwoorden zijn voorstellen. Controleer de bronafbeelding en corrigeer de antwoordtekst waar nodig.</p><div class="notice">${result.question_count} CV-fragmenten · lage zekerheid betekent dat de tekst handmatig moet worden nagekeken.</div>
-      ${result.questions.map(q => `<article class="analysis-card" data-answer-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${escapeHtml(q.confidence)} zekerheid</span></div><p class="analysis-reason">${escapeHtml(q.reason)} · Maximumscore CV: ${q.cv_max_points ?? 'onbekend'} · Opgaven: ${q.opgaven_max_points ?? 'onbekend'}${q.points_match===false?' · SCORES VERSCHILLEN':''}</p>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" alt="Correctievoorschrift vraag ${q.question_number}" src="${escapeHtml(seg.url)}">`).join('')}${(q.supplement_pages||[]).map(page=>`<div class="notice">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}</div><img class="fragment-image" loading="lazy" alt="CV-aanvulling bij vraag ${q.question_number}" src="${escapeHtml(page.url)}">`).join('')}<div class="analysis-fields"><label>Antwoordvorm<select data-answer-kind="${q.question_number}"><option value="meerkeuze" ${q.answer_kind==='meerkeuze'?'selected':''}>Meerkeuze</option><option value="gesloten" ${q.answer_kind==='gesloten'?'selected':''}>Gesloten antwoord</option><option value="open" ${q.answer_kind==='open'?'selected':''}>Open antwoord / beoordelingscriteria</option><option value="handmatig" ${q.answer_kind==='handmatig'?'selected':''}>Handmatig bepalen</option></select></label></div><label>Antwoord of beoordelingscriteria<textarea rows="4" data-answer-text="${q.question_number}">${escapeHtml(q.answer_text)}</textarea></label><label class="review-warning"><input type="checkbox" data-answer-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het antwoord van vraag ${q.question_number} aan de hand van het CV-fragment gecontroleerd.</label></article>`).join('')}
+      ${result.questions.map(q => `<article class="analysis-card" data-answer-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${escapeHtml(q.confidence)} zekerheid</span></div><p class="analysis-reason">${escapeHtml(q.reason)} · Maximumscore CV: ${q.cv_max_points ?? 'onbekend'} · Opgaven: ${q.opgaven_max_points ?? 'onbekend'}${q.points_match===false?' · SCORES VERSCHILLEN':''}</p>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" alt="Correctievoorschrift vraag ${q.question_number}" src="${escapeHtml(seg.url)}">`).join('')}${(q.supplement_pages||[]).map(page=>`<div class="notice">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}</div><img class="fragment-image" loading="lazy" alt="CV-aanvulling bij vraag ${q.question_number}" src="${escapeHtml(page.url)}">`).join('')}<div class="analysis-fields"><label>Antwoordvorm<select data-answer-kind="${q.question_number}"><option value="meerkeuze" ${q.answer_kind==='meerkeuze'?'selected':''}>Meerkeuze</option><option value="gesloten" ${q.answer_kind==='gesloten'?'selected':''}>Gesloten antwoord</option><option value="open" ${q.answer_kind==='open'?'selected':''}>Open antwoord / beoordelingscriteria</option><option value="handmatig" ${q.answer_kind==='handmatig'?'selected':''}>Handmatig bepalen</option></select></label></div><label class="answer-text-field">Antwoord of beoordelingscriteria<textarea class="answer-textarea" rows="2" data-answer-text="${q.question_number}">${escapeHtml(q.answer_text)}</textarea></label><label class="review-warning"><input type="checkbox" data-answer-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het antwoord van vraag ${q.question_number} aan de hand van het CV-fragment gecontroleerd.</label></article>`).join('')}
       <div class="review-actions"><button class="primary" id="saveAnswers" type="button">Controle opslaan</button><button class="primary" id="completeAnswers" type="button" disabled>Antwoorden goedkeuren en doorgaan</button></div><p id="answersMessage" class="form-error" role="status"></p>`;
     const cards=[...document.querySelectorAll('[data-answer-card]')];
+    // Het antwoordveld gebruikt de volledige breedte en groeit mee met de
+    // ingevoerde antwoordtekst of beoordelingscriteria.
+    const answerFields = [...document.querySelectorAll('[data-answer-text]')];
+    const resizeAnswerField = field => {
+      field.style.height = 'auto';
+      field.style.height = `${Math.max(field.scrollHeight, 72)}px`;
+    };
+    answerFields.forEach(field => {
+      resizeAnswerField(field);
+      field.addEventListener('input', () => resizeAnswerField(field));
+    });
     const checks=()=>[...document.querySelectorAll('[data-answer-reviewed]')];
     const refresh=()=>{$('#completeAnswers').disabled=checks().some(input=>!input.checked);};
     checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
@@ -392,7 +405,32 @@ async function renderAnswersStage() {
     const save=()=>api(`/api/exams/${state.examId}/answers/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
     bindStageAutoSave(panel, save, '#answersMessage');
     $('#saveAnswers').addEventListener('click',async()=>{try{const r=await save();$('#answersMessage').textContent=`${r.reviewed_count} van ${result.question_count} antwoorden gecontroleerd. Concept opgeslagen.`;}catch(error){$('#answersMessage').textContent=error.message;}});
-    $('#completeAnswers').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle antwoorden.');await api(`/api/exams/${state.examId}/steps/antwoorden/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#answersMessage').textContent=error.message;}});
+    let completingAnswers = false;
+    $('#completeAnswers').addEventListener('click',async()=>{
+      const button = $('#completeAnswers');
+      if (completingAnswers) return;
+      completingAnswers = true;
+      button.disabled = true;
+      button.textContent = 'Controleren en afronden…';
+      try {
+        // Wacht op de gedeelde autosaveketen zodat een recente wijziging
+        // niet gelijktijdig met de definitieve goedkeuring wordt opgeslagen.
+        const r = panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save();
+        if(!r.complete) throw new Error('Controleer eerst alle antwoorden.');
+        await api(`/api/exams/${state.examId}/steps/antwoorden/complete`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true,reviewed_all_questions:true})
+        });
+        await openWorkspace(state.examId);
+      } catch(error) {
+        completingAnswers = false;
+        button.disabled = false;
+        button.textContent = 'Antwoorden goedkeuren en doorgaan';
+        $('#answersMessage').textContent=error.message;
+      }
+    });
   } catch(error) { panel.innerHTML=`<h2>Antwoorden herkennen</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
 
@@ -829,6 +867,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     let pointerStart = null;
     let saveTimer = null;
     let saveChain = Promise.resolve();
+    let completingStep = false;
 
     panel.innerHTML = `
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
@@ -971,6 +1010,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // wisselen naar een andere applicatie op. keepalive laat de request lopen
     // wanneer de browser de pagina direct daarna inactief maakt.
     const saveOnHide = () => {
+      if (completingStep) return;
       clearTimeout(saveTimer);
       const body = JSON.stringify({selections, reviewed:false});
       fetch(stitchedReviewUrl, {
@@ -1001,7 +1041,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         element.classList.toggle('active', elementIndex === index);
         // De actieve oranje selectie blijft als eigen laag herkenbaar, maar
       // wordt niet meer boven alle blauwe fragmentvlakken gelegd.
-      element.style.zIndex = elementIndex === index ? '2' : '3';
+      element.style.zIndex = elementIndex === index ? '4' : '2';
       });
       list.querySelectorAll('[data-select-fragment]').forEach((button, buttonIndex) => {
         button.classList.toggle('active', buttonIndex === index);
@@ -1168,7 +1208,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       }).join('') || '<p class="muted">Nog geen fragmenten geselecteerd.</p>';
 
       overlay.innerHTML = selections.map((item,index) =>
-        `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?2:3}" data-overlay-select="${index}">
+        `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?4:2}" data-overlay-select="${index}">
           <button type="button" class="stitched-boundary stitched-boundary-top" data-boundary="top" data-boundary-index="${index}" aria-label="Bovengrens verslepen"></button>
           <span>${escapeHtml(questionLabel(item))}</span>
           <button type="button" class="stitched-boundary stitched-boundary-bottom" data-boundary="bottom" data-boundary-index="${index}" aria-label="Ondergrens verslepen"></button>
@@ -1276,7 +1316,12 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         $('#stitchedMessage').textContent=`${selections.length} fragmentselecties opgeslagen.`;
       } catch(error) { $('#stitchedMessage').textContent=error.message; }
     });
-    $('#completeStitched').addEventListener('click',async()=>{
+    $('#completeStitched').addEventListener('click', async () => {
+      const button = $('#completeStitched');
+      if (completingStep) return;
+      completingStep = true;
+      button.disabled = true;
+      button.textContent = 'Controleren en afronden…';
       try {
         if(!selections.length) throw new Error('Selecteer eerst de contexten en vragen.');
         if(selections.some(item=>!item.question_numbers.length)) throw new Error('Elk fragment moet aan minimaal één vraagnummer gekoppeld zijn.');
@@ -1286,21 +1331,20 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         const covered=new Set(selections.filter(item=>item.type==='vraag').flatMap(item=>item.question_numbers));
         const missing=numbers.filter(number=>!covered.has(number));
         if(missing.length) throw new Error(`Nog geen vraagfragment geselecteerd voor vraag/vraagvragen: ${missing.join(', ')}.`);
+        // Eerst alle bestaande autosaves afwachten; daarna worden selectie,
+        // inhoudelijke review en workflowstatus serieel opgeslagen.
         clearTimeout(saveTimer);
-        await api(stitchedReviewUrl,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({selections,reviewed:true})
-        });
-        await api(fragmentsReviewUrl,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({reviewed_question_numbers:[...new Set(numbers)],reviewed_all_questions:true,boundary_overrides:[]})
-        });
-        await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)]})
-        });
+        await saveChain;
+        await api(stitchedReviewUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({selections,reviewed:true})});
+        await api(fragmentsReviewUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed_question_numbers:[...new Set(numbers)],reviewed_all_questions:true,boundary_overrides:[]})});
+        await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)]})});
         await openWorkspace(state.examId);
-      } catch(error) { $('#stitchedMessage').textContent=error.message; }
+      } catch(error) {
+        completingStep = false;
+        button.disabled = false;
+        button.textContent = 'Fragmentcontrole goedkeuren en doorgaan';
+        $('#stitchedMessage').textContent=error.message;
+      }
     });
     render();
   } catch(error) {
