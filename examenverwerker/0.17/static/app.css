@@ -93,7 +93,7 @@
 .stitched-image-wrap img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
 .stitched-overlay{position:absolute;inset:0;pointer-events:none}
 .stitched-selection{position:absolute;left:0;right:0;z-index:3;border-top:2px solid #1874c8;border-bottom:2px solid #1874c8;background:#1874c81a;pointer-events:auto;cursor:pointer;touch-action:pan-y}
-.stitched-selection.active{z-index:2!important;background:#f59e0b24;border-color:#c77700}
+.stitched-selection.active{z-index:4!important;background:#f59e0b24;border-color:#c77700}
 .stitched-boundary{position:absolute;left:0;right:0;height:14px;padding:0;border:0;background:transparent;cursor:ns-resize;z-index:3;touch-action:none}
 .stitched-boundary::after{content:"";position:absolute;left:0;right:0;top:6px;border-top:3px solid #1874c8}
 .stitched-boundary-top{top:-7px}
@@ -169,3 +169,33 @@
 }
 .analysis-card .review-warning input { flex:0 0 auto; width:auto; margin:.1rem 0 0; }
 .closed-answer-form { margin-top:.25rem; }
+
+
+/* De actieve oranje fragmentselectie moet altijd boven blauwe selecties
+   zichtbaar blijven; de bedieningselementen volgen dezelfde stapellaag. */
+.stitched-selection.active { z-index: 4 !important; }
+.stitched-selection.active .stitched-boundary { z-index: 5; }
+
+/* Het antwoord of de beoordelingscriteria horen onder hun eigen kop en
+   gebruiken de volledige kaartbreedte. De hoogte wordt door app.js aan de
+   werkelijke tekstinhoud aangepast; verticaal handmatig vergroten blijft
+   daarnaast mogelijk. */
+.answer-text-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+}
+.answer-textarea {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 72px;
+  box-sizing: border-box;
+  padding: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  white-space: pre-wrap;
+}
