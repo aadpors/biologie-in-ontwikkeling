@@ -61,6 +61,40 @@ class QuestionDetectionTests(unittest.TestCase):
         # worden geïnterpreteerd.
         self.assertEqual(detect_options("A. Dit is een gewone zin. Daarna volgt optie C in de uitleg."), [])
 
+    def test_visual_ocr_rebuilds_lines_from_separate_option_labels_and_text(self):
+        # RapidOCR levert tekstregels met bounding boxes. Deze test bootst
+        # antwoordletters en antwoordteksten na die visueel op dezelfde regel
+        # staan, maar als losse OCR-detecties worden teruggegeven.
+        image_path = self.root / "visual-options.png"
+        Image.new("RGB", (120, 50), "white").save(image_path)
+
+        class FakeOCRResult:
+            boxes = [
+                [[0, 0], [12, 0], [12, 10], [0, 10]],
+                [[18, 0], [110, 0], [110, 10], [18, 10]],
+                [[0, 20], [12, 20], [12, 30], [0, 30]],
+                [[18, 20], [110, 20], [110, 30], [18, 30]],
+            ]
+            txts = ["A.", "De celkern bevat DNA.", "B.", "Het celmembraan bevat cellulose."]
+
+        class FakeEngine:
+            def __call__(self, _path):
+                return FakeOCRResult()
+
+        with patch("examenverwerker.question_analysis._get_ocr_engine", return_value=FakeEngine()):
+            recognised = main.question_analysis._ocr_image_text([image_path]) if hasattr(main, "question_analysis") else None
+
+        # Gebruik de modulefunctie rechtstreeks; de expliciete import houdt
+        # de test onafhankelijk van interne attributen van main.py.
+        from examenverwerker.question_analysis import _ocr_image_text
+        with patch("examenverwerker.question_analysis._get_ocr_engine", return_value=FakeEngine()):
+            recognised = _ocr_image_text([image_path])
+
+        self.assertEqual(
+            recognised.splitlines(),
+            ["A. De celkern bevat DNA.", "B. Het celmembraan bevat cellulose."],
+        )
+
     def test_question_analysis_uses_visual_ocr_when_pdf_text_has_no_options(self):
         # De PDF-tekstlaag kan een meerkeuzevraag wel herkennen als tekst,
         # maar de antwoordopties missen doordat ze als afbeelding of in aparte
