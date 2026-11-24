@@ -259,6 +259,78 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
 
 
 
+def _looks_like_context_region(
+    pdf: fitz.Document,
+    page_metadata: list[dict[str, Any]],
+    top: float,
+    bottom: float,
+    *,
+    render_scale: float,
+) -> bool:
+    """Herken een context aan inhoudelijke tekst- of afbeeldingssignalen.
+
+    Een willekeurige zichtbare tussenruimte is niet automatisch context: het
+    kan ook het vervolg of slot van de voorafgaande vraag zijn. Daarom worden
+    contexten alleen voorgesteld wanneer de strook expliciete verwijzingen
+    naar gedeelde informatie bevat, een zelfstandig tekstblok vormt of een
+    substantieel figuurblok met een tekstanker bevat. Bij twijfel blijft de
+    inhoud bij de vraag en kan de docent haar handmatig als context markeren.
+    """
+    cues = re.compile(
+        r"\\b(?:gebruik de informatie|gebruik onderstaande|gebruik de tekst|"
+        r"lees de tekst|bekijk de afbeelding|onderstaande afbeelding|"
+        r"de volgende informatie|de volgende tekst|in de tekst hieronder|"
+        r"bij de volgende vragen|voor de volgende vragen|"
+        r"een onderzoek naar|bij dit onderzoek|de onderzoekers|"
+        r"een experiment|de proefpersonen|in deze situatie|"
+        r"de afbeelding hieronder|de tabel hieronder|context)\\b",
+        re.IGNORECASE,
+    )
+    for info in page_metadata:
+        page_top = float(info.get("top", 0))
+        page_bottom = float(info.get("bottom", 0))
+        overlap_top = max(float(top), page_top)
+        overlap_bottom = min(float(bottom), page_bottom)
+        if overlap_bottom - overlap_top < 18:
+            continue
+        page_number = int(info["page_number"])
+        if not 1 <= page_number <= pdf.page_count:
+            continue
+        page = pdf[page_number - 1]
+        crop = info.get("crop_pixels", [0, 0, 0, 0])
+        resize_factor = float(info.get("stitched_width", info.get("render_width", 1))) / max(
+            1.0, float(info.get("render_width", 1))
+        )
+        # Zet de strook uit de lange afbeelding terug naar PDF-coördinaten.
+        local_top = (overlap_top - page_top) / resize_factor + float(crop[1])
+        local_bottom = (overlap_bottom - page_top) / resize_factor + float(crop[1])
+        pdf_top = max(0.0, local_top / render_scale)
+        pdf_bottom = min(page.rect.height, local_bottom / render_scale)
+        if pdf_bottom <= pdf_top:
+            continue
+        clip = fitz.Rect(0, pdf_top, page.rect.width, pdf_bottom)
+        text = page.get_text("text", clip=clip).strip()
+        words = re.findall(r"\\w+", text, flags=re.UNICODE)
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        if len(words) >= 6 and cues.search(text):
+            return True
+        sentence_count = len(re.findall(r"[.!?](?:\\s|$)", text))
+        if len(words) >= 28 and len(lines) >= 3 and sentence_count >= 2:
+            return True
+        # Een figuur kan zelfstandig context zijn; een klein icoon of
+        # decoratief plaatje is daarvoor niet voldoende.
+        for image_info in page.get_image_info():
+            bbox = image_info.get("bbox")
+            if not bbox:
+                continue
+            image_rect = fitz.Rect(bbox)
+            overlaps = image_rect.y1 > pdf_top and image_rect.y0 < pdf_bottom
+            if (overlaps and image_rect.width >= page.rect.width * 0.22
+                    and image_rect.height >= 36 and len(words) >= 5):
+                return True
+    return False
+
+
 def propose_stitched_question_selections(
     page_metadata: list[dict[str, Any]],
     accepted_starts: list[dict[str, Any]],
@@ -467,11 +539,12 @@ def propose_stitched_question_selections(
                 float(first_question["top"]),
                 first_start_y - 8.0,
             )
-            if (leading_bottom - leading_top >= 24
-                    and _looks_like_context_region(
-                        pdf, page_metadata, leading_top, leading_bottom,
-                        render_scale=render_scale,
-                    )):
+            with fitz.open(pdf_path) as source_pdf:
+                leading_is_context = _looks_like_context_region(
+                    source_pdf, page_metadata, leading_top, leading_bottom,
+                    render_scale=render_scale,
+                )
+            if leading_bottom - leading_top >= 24 and leading_is_context:
                 first_question["top"] = round(leading_bottom, 2)
                 context_selections.append({
                     "id": f"auto-context-before-{first_number}",
