@@ -162,8 +162,14 @@ $('#importForm').addEventListener('submit', async event => {
     try {
       result = await api('/api/exams/import', { method: 'POST', body: form });
     } catch (error) {
-      let detail = null;
-      try { detail = JSON.parse(error.message); } catch (_) {}
+      // api() bewaart de oorspronkelijke FastAPI-detailpayload op
+      // error.detail. Gebruik die gestructureerde payload rechtstreeks:
+      // error.message bevat alleen de leesbare melding en kan dus niet als
+      // JSON worden geparseerd. De fallback ondersteunt oudere API-fouten.
+      let detail = error.detail || null;
+      if (!detail) {
+        try { detail = JSON.parse(error.message); } catch (_) {}
+      }
       if (detail?.code !== 'duplicate_exam') throw error;
 
       // Een dubbele import is niet automatisch een fout: de gebruiker kan
