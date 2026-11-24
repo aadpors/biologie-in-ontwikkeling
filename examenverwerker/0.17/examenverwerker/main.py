@@ -1650,7 +1650,7 @@ def save_relations_review(exam_id: str, payload: dict):
     return {
         "ok": True, **evidence,
         "unresolved_score_mismatches": unresolved_scores,
-        "complete": not result["missing_cv"] and not unresolved_scores,
+        "complete": not result["missing_cv"] and not result["extra_cv"] and not unresolved_scores,
     }
 
 
@@ -2002,6 +2002,8 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             raise HTTPException(422, "Voer eerst de automatische document- en vraagkoppelingen uit.")
         if previous.get("missing_cv"):
             raise HTTPException(422, "Er ontbreken correctievoorschriftvragen: " + str(previous["missing_cv"]))
+        if previous.get("extra_cv"):
+            raise HTTPException(422, "Er zijn CV-vragen zonder overeenkomstige opgave: " + str(previous["extra_cv"]))
         # Een scoreverschil is geen automatische fout: het kan bijvoorbeeld
         # ontstaan door een gewijzigde beoordelingsregel. Wel moet stap 11
         # vastleggen waarom de twee maximumscores bewust niet gelijk zijn.
