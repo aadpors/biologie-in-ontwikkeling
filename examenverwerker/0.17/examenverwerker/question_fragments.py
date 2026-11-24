@@ -173,14 +173,17 @@ def _stitch_vertical(segment_paths: list[Path], output_path: Path, *, gap: int =
 
 def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         render_scale: float = 1.25, page_gap: int = 32,
-                        start_page: int = 1) -> dict[str, Any]:
+                        start_page: int = 1,
+                        end_page: int | None = None) -> dict[str, Any]:
     """Maak één lange, opgeschoonde werkafbeelding van het examen.
 
-    Pagina 1 wordt standaard overgeslagen omdat dit de omslag/instructiepagina
-    is. Elke volgende pagina wordt eerst gerenderd, herhaalde kop- en
-    voetteksten worden gemaskeerd en vervolgens wordt alleen de inhoudelijke
-    bounding box met een kleine marge behouden. De pagina's worden daarna
-    op gelijke breedte verticaal gestitcht. De oorspronkelijke PDF blijft
+    Pagina 1 wordt standaard overgeslagen omdat dit bij opgaven vaak de
+    omslag/instructiepagina is. Voor documenten die op pagina 1 beginnen,
+    wordt start_page=0 meegegeven. end_page is optioneel en inclusief; hiermee
+    kan een CV-strook eindigen vóór de administratieve slotsectie.
+    Elke pagina wordt gerenderd en de herhaalde kop-/voettekst wordt gemaskeerd.
+    Alleen verticale witmarges worden verkleind: de volledige paginabreedte
+    blijft behouden. De pagina's worden daarna verticaal gestitcht. De oorspronkelijke PDF blijft
     volledig onaangeraakt; deze PNG is uitsluitend een selectiewerkvlak.
 
     De metadata bevat per bronpagina de positie in de lange afbeelding.
@@ -193,10 +196,11 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
     page_meta: list[dict[str, Any]] = []
     try:
         with fitz.open(pdf_path) as pdf:
-            if len(pdf) <= start_page:
-                raise ValueError("Het opgavenboekje bevat na de eerste pagina geen inhoudspagina's.")
+            last_page = len(pdf) - 1 if end_page is None else min(int(end_page), len(pdf) - 1)
+            if start_page < 0 or start_page > last_page:
+                raise ValueError("De gekozen paginagrens bevat geen renderbare inhoudspagina's.")
             marginal_boxes = _repeated_marginal_boxes(pdf)
-            for page_index in range(start_page, len(pdf)):
+            for page_index in range(start_page, last_page + 1):
                 page = pdf[page_index]
                 pix = page.get_pixmap(matrix=fitz.Matrix(render_scale, render_scale), alpha=False)
                 page_path = destination.parent / f"_stitch-page-{page_index + 1:03d}.png"
