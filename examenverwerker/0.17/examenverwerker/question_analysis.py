@@ -314,8 +314,11 @@ def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
         # nauwkeurigst is voor puntenaantallen en gewone vraagtekst. Wanneer
         # daarin geen volledige antwoordopties staan, lezen we aanvullend de
         # gekoppelde vraagafbeelding. Daarmee worden ook gescande opties en
-        # afwijkende kolomindelingen meegenomen.
-        if len(options) < 2 and question.get("image_paths"):
+        # afwijkende kolomindelingen meegenomen. Vier opties (A-D) vormen de
+        # gebruikelijke complete set; bij minder opties controleren we de
+        # afbeelding alsnog, zodat een gedeeltelijke tekstextractie niet als
+        # een volledige antwoordset wordt aangezien.
+        if len(options) < 4 and question.get("image_paths"):
             ocr_text = _ocr_image_text(question["image_paths"])
             ocr_options = detect_options(ocr_text)
             if len(ocr_options) > len(options):
