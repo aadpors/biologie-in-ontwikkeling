@@ -442,8 +442,9 @@ async function renderCvSupplementStage() {
 }
 
 /* Antwoordvoorstellen komen uit de bijbehorende CV-fragmenten. De gebruiker
-   ziet altijd de bronafbeelding, kan de tekst corrigeren en moet elk antwoord
-   afzonderlijk afvinken. De tekstherkenning is dus nooit een eindbeslissing. */
+   ziet altijd de bronafbeelding en kan de tekst corrigeren. De expliciete
+   afrondactie bevestigt de complete set; losse vinkjes per antwoord zijn niet
+   nodig. De tekstherkenning is dus nooit een eindbeslissing. */
 async function renderAnswersStage() {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Antwoorden uit het correctievoorschrift analyseren…</p>';
@@ -513,8 +514,6 @@ async function renderRelationsStage() {
     const previousNotes = Object.fromEntries(previous.map(item=>[item.question_number,item.note||'']));
     const mismatches = result.score_mismatches || [];
     const mismatchNumbers = new Set(mismatches.map(item=>item.question_number));
-    const normalQuestions = result.questions.filter(q=>!mismatchNumbers.has(q.question_number));
-    const issueCount = result.missing_cv.length + mismatches.length + result.extra_cv.length;
     panel.innerHTML=`
       <p class="eyebrow">FASE 7 · AANVULLENDE CONTROLES</p>
       <h2>Automatische integriteitscontrole</h2>
@@ -643,7 +642,8 @@ async function renderSnippetsStage() {
 
 /* De integrale eindcontrole toont alle bronnen in één vraagkaart. Problemen
    worden niet verborgen: ontbrekende koppelingen en afwijkende scores blijven
-   zichtbaar en vragen een toelichting voordat het examen kan worden afgerond. */
+   zichtbaar en vragen een toelichting voordat het examen kan worden afgerond.
+   De afrondknop is de bevestiging; per vraag afvinken is overbodig. */
 async function renderFinalReviewStage() {
   const panel=$('#stagePanel');
   panel.innerHTML='<p class="muted">Integrale eindcontrole samenstellen…</p>';
