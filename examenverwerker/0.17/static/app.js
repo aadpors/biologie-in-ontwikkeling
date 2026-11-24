@@ -893,10 +893,17 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
       // automatisch als concept opgeslagen. De expliciete knop blijft bestaan
       // als handmatige bevestiging dat de docent de opslag heeft uitgevoerd.
       let autosaveTimer = null;
+      let startSaveChain = Promise.resolve();
+      const queueStartSave = () => {
+        // Seriële opslag voorkomt dat twee snel opeenvolgende wijzigingen
+        // elkaar in SQLite in een andere volgorde overschrijven.
+        startSaveChain = startSaveChain.catch(() => {}).then(() => saveReview());
+        return startSaveChain;
+      };
       const scheduleStartAutosave = () => {
         clearTimeout(autosaveTimer);
         autosaveTimer = setTimeout(() => {
-          saveReview().then(saved => {
+          queueStartSave().then(saved => {
             const status = $('#startReviewMessage');
             if (status) status.textContent = 'Wijziging automatisch opgeslagen.';
           }).catch(error => {
@@ -905,7 +912,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
           });
         }, 250);
       };
-      panel.onchange = event => {
+            panel.onchange = event => {
         if (event.target.matches('[data-candidate], [data-number], [data-move]')) {
           scheduleStartAutosave();
         }
@@ -917,12 +924,13 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
       };
       const flushStartAutosave = () => {
         clearTimeout(autosaveTimer);
-        saveReview().catch(error => {
+        return queueStartSave().catch(error => {
           const status = $('#startReviewMessage');
           if (status) status.textContent = 'Automatisch opslaan mislukt: ' + error.message;
+          throw error;
         });
       };
-      const startVisibilityChange = () => {
+            const startVisibilityChange = () => {
         if (document.visibilityState === 'hidden') flushStartAutosave();
       };
       document.addEventListener('visibilitychange', startVisibilityChange);
@@ -1004,7 +1012,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
           page.candidates.push(candidate);
           page.candidate_count = page.candidates.length;
           renderAll();
-          saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+          queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
         };
         canvas.addEventListener('click', place, {once:true});
       }));
