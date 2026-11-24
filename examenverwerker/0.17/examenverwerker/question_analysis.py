@@ -8,6 +8,8 @@ controleren. Bij onvoldoende aanwijzingen blijft een veld leeg/onbekend.
 from __future__ import annotations
 
 import re
+from pathlib import Path
+from statistics import median
 from typing import Any
 
 # Alleen opties aan het begin van een tekstregel tellen mee. Een letter A-E
@@ -95,6 +97,116 @@ def detect_options(text: str) -> list[dict[str, str]]:
     return [{"letter": letter, "text": found[letter]} for letter in ordered]
 
 
+
+# De OCR-engine wordt pas geladen wanneer de PDF-tekstlaag onvoldoende
+# informatie bevat. Zo blijft de normale route snel en worden onnodige
+# modelinitialisaties tijdens het openen van stap 4 voorkomen.
+_OCR_ENGINE = None
+_OCR_INITIALISATION_ATTEMPTED = False
+
+
+def _get_ocr_engine():
+    """Initialiseer RapidOCR één keer en hergebruik de engine per proces."""
+    global _OCR_ENGINE, _OCR_INITIALISATION_ATTEMPTED
+    if _OCR_INITIALISATION_ATTEMPTED:
+        return _OCR_ENGINE
+
+    _OCR_INITIALISATION_ATTEMPTED = True
+    try:
+        # RapidOCR draait lokaal. Er worden geen vraagafbeeldingen naar een
+        # externe dienst verstuurd; de OCR-modellen worden lokaal uitgevoerd.
+        from rapidocr_onnxruntime import RapidOCR
+        _OCR_ENGINE = RapidOCR()
+    except Exception:
+        # OCR is een aanvullende herkenningslaag. Een ontbrekende of niet
+        # laadbare OCR-installatie mag de hele examenverwerking niet blokkeren.
+        _OCR_ENGINE = None
+    return _OCR_ENGINE
+
+
+def _ocr_image_text(image_paths: list[str | Path]) -> str:
+    """Lees de zichtbare tekst uit vraagfragmentafbeeldingen met lokale OCR.
+
+    De PDF-tekstlaag kan antwoordopties missen wanneer letters en teksten in
+    aparte kolommen, losse tekstblokken of als afbeelding zijn opgeslagen.
+    Daarom wordt alleen wanneer de tekstlaag onvoldoende opties oplevert ook
+    de daadwerkelijke vraagafbeelding gelezen. OCR blijft een voorstel: de
+    docent ziet en beoordeelt altijd het oorspronkelijke fragment in stap 4.
+    """
+    engine = _get_ocr_engine()
+    if engine is None:
+        return ""
+
+    recognised_lines: list[str] = []
+    for image_path in image_paths:
+        path = Path(image_path)
+        if not path.is_file():
+            continue
+        try:
+            response = engine(str(path))
+        except Exception:
+            # Een beschadigd of niet-ondersteund fragment mag andere vragen
+            # niet verhinderen; ga door met de volgende afbeelding.
+            continue
+
+        # RapidOCR retourneert normaal (resultaten, verwerkingstijden). De
+        # tweede vorm wordt ook ondersteund om versieverschillen op te vangen.
+        detections = response[0] if isinstance(response, tuple) else response
+        if not detections:
+            continue
+
+        entries: list[dict[str, float | str]] = []
+        for detection in detections:
+            if not isinstance(detection, (list, tuple)) or len(detection) < 2:
+                continue
+            box, detected_text = detection[0], str(detection[1]).strip()
+            if not detected_text:
+                continue
+            try:
+                points = box.tolist() if hasattr(box, "tolist") else box
+                x_values = [float(point[0]) for point in points]
+                y_values = [float(point[1]) for point in points]
+            except (TypeError, ValueError, IndexError):
+                # Bij een afwijkend OCR-resultaat behouden we de tekst, maar
+                # gebruiken we de oorspronkelijke herkenningsvolgorde.
+                entries.append({"x": float(len(entries)), "y": float(len(entries)),
+                                "height": 1.0, "text": detected_text})
+                continue
+            entries.append({
+                "x": min(x_values),
+                "y": (min(y_values) + max(y_values)) / 2,
+                "height": max(1.0, max(y_values) - min(y_values)),
+                "text": detected_text,
+            })
+
+        if not entries:
+            continue
+
+        # Ordeneer OCR-fragmenten op visuele leesvolgorde. Antwoordletters en
+        # antwoordteksten staan in sommige examens in aparte kolommen; door
+        # eerst op regelhoogte en daarna op x-positie te sorteren, komen die
+        # onderdelen weer op dezelfde tekstregel terecht.
+        line_tolerance = max(5.0, median(float(item["height"]) for item in entries) * 0.65)
+        entries.sort(key=lambda item: (float(item["y"]), float(item["x"])))
+        lines: list[dict[str, Any]] = []
+        for entry in entries:
+            matching_line = next(
+                (line for line in reversed(lines)
+                 if abs(float(line["y"]) - float(entry["y"])) <= line_tolerance),
+                None,
+            )
+            if matching_line is None:
+                lines.append({"y": float(entry["y"]), "items": [entry]})
+            else:
+                matching_line["items"].append(entry)
+                matching_line["y"] = sum(float(item["y"]) for item in matching_line["items"]) / len(matching_line["items"])
+
+        for line in lines:
+            line["items"].sort(key=lambda item: float(item["x"]))
+            recognised_lines.append(" ".join(str(item["text"]) for item in line["items"]))
+
+    return "\\n".join(recognised_lines)
+
 def detect_closed_answer_form(text: str) -> str | None:
     """Benoem de concrete gesloten antwoordvorm die in de vraag wordt genoemd.
 
@@ -150,9 +262,14 @@ def detect_question_type(text: str, options: list[dict[str, str]]) -> tuple[str,
     # losse tekstregels zijn geëxtraheerd. De vraagformulering is dan genoeg
     # voor een voorstel; het ontbreken van opties verhindert de classificatie niet.
     multiple_choice_signals = (
-        "kies het juiste antwoord", "welke van de volgende",
-        "welke uitspraak is juist", "welke bewering is juist",
+        "kies het juiste antwoord", "kies de juiste optie",
+        "welke van de volgende", "welke van onderstaande",
+        "welke uitspraak is juist", "welke uitspraak is onjuist",
+        "welke bewering is juist", "welke bewering is onjuist",
+        "welke combinatie is juist", "welke combinatie is correct",
+        "welke volgorde is juist", "wat is de juiste volgorde",
         "wat is het juiste antwoord", "welk antwoord is juist",
+        "welke optie is juist", "welke letter hoort",
     )
     if len(options) >= 2 or any(signal in lowered for signal in multiple_choice_signals):
         reason = ("Er is een aaneengesloten reeks van minimaal twee antwoordopties gevonden."
@@ -184,9 +301,32 @@ def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
     for question in fragment_result.get("questions", []):
         text = question.get("extracted_text", "")
         options = detect_options(text)
-        question_type, type_reason = detect_question_type(text, options)
-        closed_answer_form = detect_closed_answer_form(text) if question_type == "gesloten" else None
+        ocr_text = ""
+
+        # De PDF-tekstlaag blijft de eerste bron, omdat die doorgaans het
+        # nauwkeurigst is voor puntenaantallen en gewone vraagtekst. Wanneer
+        # daarin geen volledige antwoordopties staan, lezen we aanvullend de
+        # gekoppelde vraagafbeelding. Daarmee worden ook gescande opties en
+        # afwijkende kolomindelingen meegenomen.
+        if len(options) < 2 and question.get("image_paths"):
+            ocr_text = _ocr_image_text(question["image_paths"])
+            ocr_options = detect_options(ocr_text)
+            if len(ocr_options) > len(options):
+                options = ocr_options
+
+        # Combineer beide bronnen uitsluitend voor de typeherkenning. De
+        # originele PDF-tekst blijft apart bewaard en wordt niet overschreven
+        # door mogelijke OCR-fouten.
+        analysis_text = "\\n".join(part for part in (text, ocr_text) if part)
+        question_type, type_reason = detect_question_type(analysis_text, options)
+        if ocr_text and len(options) >= 2:
+            type_reason += " De antwoordopties zijn aanvullend herkend vanuit de vraagafbeelding."
+        closed_answer_form = detect_closed_answer_form(analysis_text) if question_type == "gesloten" else None
         max_points, points_reason = detect_max_points(text)
+        if max_points is None and ocr_text:
+            ocr_points, ocr_reason = detect_max_points(ocr_text)
+            if ocr_points is not None:
+                max_points, points_reason = ocr_points, ocr_reason + " (herkend vanuit de vraagafbeelding via OCR.)"
         questions.append({
             "question_number": question["question_number"],
             "question_type": question_type,
