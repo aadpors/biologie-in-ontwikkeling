@@ -277,8 +277,14 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         is_page_counter = bool(re.search(r"\b\d{1,3}\s*/\s*\d{1,3}\b", line_text))
                         is_read_on_footer = "lees verder" in lower_text or "►" in line_text
                         is_isolated_number = bool(re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", line_text))
-                        if (float(line_bbox[1]) >= page.rect.height * 0.90
-                                and (is_page_counter or is_read_on_footer or
+                        # Cito-documentcodes staan soms als enige tekstregel
+                        # in de voettekst, zonder paginateller of 'lees verder'.
+                        # Herken die daarom apart in de onderste paginamarge.
+                        is_exam_document_code = bool(re.search(
+                            r"\b(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}", line_text, re.IGNORECASE
+                        ))
+                        if (float(line_bbox[1]) >= page.rect.height * 0.85
+                                and (is_page_counter or is_read_on_footer or is_exam_document_code or
                                      (is_isolated_number and float(line_bbox[1]) >= page.rect.height * 0.93))):
                             footer_numbers.append(line_bbox)
                 if footer_numbers:
