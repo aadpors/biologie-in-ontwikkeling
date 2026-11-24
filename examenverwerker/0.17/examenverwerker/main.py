@@ -1428,7 +1428,8 @@ def get_cv_supplement(exam_id: str):
     if not exam:
         raise HTTPException(404, "Examen niet gevonden.")
     documents = [doc for doc in exam["documents"]
-                 if exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"]
+                 if (exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"
+                     or doc.get("metadata", {}).get("document_type") == "aanvulling_correctievoorschrift")]
     if not documents:
         return {"not_required": True, "items": [], "page_count": 0}
     if len(documents) != 1:
@@ -1665,8 +1666,11 @@ def skip_optional_workbook(exam_id: str):
     exam = STORE.get_exam(exam_id)
     if not exam:
         raise HTTPException(404, "Examen niet gevonden.")
-    has_uitwerk = any(exam["metadata"].get("document_types", {}).get(doc["filename"]) == "uitwerkbijlage"
-                      for doc in exam["documents"])
+    has_uitwerk = any(
+        exam["metadata"].get("document_types", {}).get(doc["filename"]) == "uitwerkbijlage" or
+        doc.get("metadata", {}).get("document_type") == "uitwerkbijlage"
+        for doc in exam["documents"]
+    )
     if has_uitwerk:
         raise HTTPException(409, "Er is wel een uitwerkbijlage toegewezen; verwerk die normaal.")
     if not exam["confirmed"]:
