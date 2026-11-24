@@ -297,6 +297,60 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertEqual(question["cv_max_points"], 2)
         self.assertEqual(question["supplement_pages"][0]["action"], "vervangen")
 
+    def test_cv_fragment_review_uses_the_same_stitched_pagewide_workspace(self):
+        """Stap 8 gebruikt dezelfde lange, paginabrede selectie als stap 3 en 6."""
+        exam_id = self.create_exam()
+
+        starts = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(starts.status_code, 200, starts.text)
+        self.assertEqual([item["question_number"] for item in starts.json()["candidates"]], [1])
+        saved_starts = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift/review",
+            json={"candidates": starts.json()["candidates"]},
+        )
+        self.assertEqual(saved_starts.status_code, 200, saved_starts.text)
+        main.STORE.complete_step(exam_id, "cv_starts", {
+            "candidates": starts.json()["candidates"],
+            "reviewed_all_pages": True,
+            "document_sha256": starts.json()["document"]["sha256"],
+        })
+
+        stitched = self.client.get(
+            f"/api/exams/{exam_id}/stitched-document/correctievoorschrift"
+        )
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        self.assertGreater(stitched.json()["width"], 0)
+        self.assertGreater(stitched.json()["height"], 0)
+        self.assertIn("correctievoorschrift_stitched", stitched.json()["image_url"])
+        proposals = stitched.json()["proposed_selections"]
+        self.assertTrue(proposals, "Voor de goedgekeurde CV-vraagstart moet een fragmentvoorstel bestaan.")
+
+        selection = dict(proposals[0])
+        selection.update({
+            "type": "vraag",
+            "question_numbers": [1],
+            "label": "Vraag 1",
+        })
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/stitched-document/correctievoorschrift/review",
+            json={"selections": [selection], "reviewed": False},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        self.assertEqual(saved.json()["selection_count"], 1)
+
+        fragments = self.client.get(
+            f"/api/exams/{exam_id}/document-question-fragments/correctievoorschrift"
+        )
+        self.assertEqual(fragments.status_code, 200, fragments.text)
+        self.assertEqual(fragments.json()["question_count"], 1)
+        question = fragments.json()["questions"][0]
+        self.assertTrue(question["stitched"])
+        self.assertEqual(question["first_page"], 1)
+        self.assertEqual(question["last_page"], 1)
+        self.assertIn("correctievoorschrift", question["segments"][0]["url"])
+
     def test_cv_detector_excludes_numbered_closed_answer_items(self):
         opgaven = self.pdf([["1p 1 Geef een verklaring."]])
         cv = self.pdf([["4 Beoordelingsmodel", "1 maximumscore 1", "2 B 2", "3 maximumscore 2", "1 onjuist", "2 juist", "3 juist"]])
