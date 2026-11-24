@@ -297,12 +297,12 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                         if page_index == first_model_page and candidate["pdf_bbox"][1] <= model_heading[1] + 4.0:
                             continue
                         candidate_text = candidate["text"].strip()
-                        direct = re.match(r"^\d{1,2}\s+maximumscore\b", candidate_text, re.IGNORECASE)
-                        direct_mc = re.match(r"^\d{1,2}\s+[A-E]\s+\d{1,2}\s*$", candidate_text, re.IGNORECASE)
+                        direct = re.match(r"^\d{1,2}\.?\s+maximumscore\b", candidate_text, re.IGNORECASE)
+                        direct_mc = re.match(r"^\d{1,2}\.?\s+[A-E]\s+\d{1,2}\s*$", candidate_text, re.IGNORECASE)
                         if direct or direct_mc:
                             cv_valid_candidates.append(candidate)
                             continue
-                        if re.fullmatch(r"\d{1,2}", candidate_text):
+                        if re.fullmatch(r"\d{1,2}\.?", candidate_text):
                             # Een CV is vaak als tabel opgebouwd. De vraagkolom
                             # staat links, terwijl "maximumscore" of het MC-
                             # antwoord in een andere tekstkolom staat. De PDF-
