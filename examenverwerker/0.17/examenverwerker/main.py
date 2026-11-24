@@ -249,7 +249,15 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                             continue
                         for line in block.get("lines", []):
                             line_text = " ".join(span.get("text", "") for span in line.get("spans", []))
-                            if "beoordelingsmodel" in line_text.casefold():
+                            # Het woord "beoordelingsmodel" komt ook in
+                            # de juridische toelichting vóór het echte model
+                            # voor. Herken uitsluitend de zelfstandige kop,
+                            # eventueel voorafgegaan door het hoofdstuknummer.
+                            if re.fullmatch(
+                                r"\s*(?:\d{1,2}\s+)?beoordelingsmodel\s*",
+                                line_text,
+                                re.IGNORECASE,
+                            ):
                                 heading_y = float(line.get("bbox", [0, 0, 0, 0])[1])
                                 break
                         if heading_y is not None:
