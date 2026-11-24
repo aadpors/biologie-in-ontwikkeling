@@ -45,6 +45,21 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual(options[0]["text"], "De celkern bevat DNA.")
         self.assertEqual(detect_question_type(extracted, options)[0], "meerkeuze")
 
+    def test_multiple_choice_options_support_inline_and_parenthesised_markers(self):
+        # Sommige PDF-tekstlagen zetten meerdere antwoordopties achter elkaar
+        # op één regel; andere gebruiken haakjes of een dubbele punt.
+        inline = "Kies het juiste antwoord. A. De celkern bevat DNA. B) Het membraan bevat cellulose. C: Ribosomen maken eiwitten."
+        options = detect_options(inline)
+        self.assertEqual([item["letter"] for item in options], ["A", "B", "C"])
+        self.assertIn("De celkern bevat DNA", options[0]["text"])
+        self.assertIn("Het membraan bevat cellulose", options[1]["text"])
+        self.assertIn("Ribosomen maken eiwitten", options[2]["text"])
+
+    def test_multiple_choice_options_reject_nonconsecutive_letter_noise(self):
+        # Een losse letter in lopende tekst mag niet als complete antwoordset
+        # worden geïnterpreteerd.
+        self.assertEqual(detect_options("A. Dit is een gewone zin. Daarna volgt optie C in de uitleg."), [])
+
     def test_closed_answer_form_is_reported_explicitly(self):
         self.assertEqual(
             detect_closed_answer_form("Is de concentratie hoger, gelijk of lager?"),
