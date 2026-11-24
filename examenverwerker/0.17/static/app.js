@@ -211,7 +211,7 @@ async function openWorkspace(examId) {
   // een vervolgstap onterecht melden dat een voorganger nog openstaat.
   if (state.exam.confirmed) {
     let next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
-    if (next?.key === 'uitwerk_starts' && !examHasDocumentType('uitwerkbijlage')) {
+    if (['uitwerk_starts', 'uitwerk_fragments'].includes(next?.key) && !examHasDocumentType('uitwerkbijlage')) {
       await api(`/api/exams/${examId}/skip-optional-workbook`, {method:'POST'});
       state.exam = await api(`/api/exams/${examId}`);
       next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
