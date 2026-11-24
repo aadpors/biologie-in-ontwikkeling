@@ -348,7 +348,7 @@ class IntegratedReviewTests(unittest.TestCase):
         question = fragments.json()["questions"][0]
         self.assertTrue(question["stitched"])
         self.assertEqual(question["first_page"], 1)
-        self.assertEqual(question["last_page"], 1)
+        self.assertEqual(question["last_page"], 2)
         self.assertIn("correctievoorschrift", question["segments"][0]["url"])
 
     def test_cv_detector_excludes_numbered_closed_answer_items(self):
