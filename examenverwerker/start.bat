@@ -60,18 +60,18 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Open de webinterface in de standaardbrowser. De server wordt
-REM vervolgens in dit venster gestart; dit venster moet open blijven.
+REM Start Uvicorn via het Python-startscript. Dit controleert eerst de
+REM daadwerkelijke HTTP-route en opent de browser pas nadat FastAPI antwoordt.
 echo.
 echo Examenverwerker wordt gestart op http://127.0.0.1:8000
+echo De browser wordt geopend zodra de server klaar is.
 echo Laat dit venster open zolang je de applicatie gebruikt.
 echo Sluit de applicatie met Ctrl+C.
 echo.
-start "" "http://127.0.0.1:8000"
-"%PYTHON_EXE%" -m uvicorn examenverwerker.main:app --host 127.0.0.1 --port 8000
+"%PYTHON_EXE%" run_server.py
 
 REM Als de server stopt door een fout, blijft de melding zichtbaar.
 echo.
 echo De Examenverwerker is gestopt.
 pause
-endlocal
+endlocall
