@@ -82,7 +82,7 @@ def cv_model_start(pdf: fitz.Document) -> tuple[int, float]:
                     continue
                 top = float(bbox[1])
                 if (top <= page.rect.height * 0.25
-                        and re.fullmatch(r"4\\s+beoordelingsmodel", text, re.IGNORECASE)):
+                        and re.fullmatch(r"4\s+beoordelingsmodel", text, re.IGNORECASE)):
                     return page_index, top
     # Niet ieder correctievoorschrift gebruikt exact deze hoofdstuknummering.
     # Als de kop ontbreekt, laat de volledige PDF beschikbaar in plaats van
