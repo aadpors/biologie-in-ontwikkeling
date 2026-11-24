@@ -610,11 +610,19 @@ async function renderRelationsStage() {
         refresh();
       } catch(error) { $('#relationsMessage').textContent=error.message; }
     });
+    let completingRelations=false;
     $('#completeRelations').addEventListener('click',async()=>{
       const button=$('#completeRelations');
+      if(completingRelations) return;
+      completingRelations=true;
       button.disabled=true;
+      button.textContent='Controleren en afronden…';
       try {
-        const saved=await save();
+        // Wacht eerst op een eventuele autosave van de laatste toelichting.
+        // Zo kan een vertraagde conceptopslag de afgeronde stap niet terugzetten.
+        const saved=panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save();
         if(!saved.complete) throw new Error('Los eerst de getoonde afwijkingen op.');
         await api(`/api/exams/${state.examId}/steps/relaties/complete`,{
           method:'POST',headers:{'Content-Type':'application/json'},
@@ -622,6 +630,8 @@ async function renderRelationsStage() {
         });
         await openWorkspace(state.examId);
       } catch(error) {
+        completingRelations=false;
+        button.textContent='Controles afronden en doorgaan';
         $('#relationsMessage').textContent=error.message;
         refresh();
       }
