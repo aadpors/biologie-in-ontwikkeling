@@ -352,6 +352,11 @@ function renderWorkspace() {
   else if (next?.key === 'eindcontrole') renderFinalReviewStage();
   else if (next?.key === 'publicatie') renderPublicationStage();
   else renderStageOverview(next, completed);
+
+  // Iedere nieuwe workflowstap begint bovenaan het scherm. Dit gebeurt
+  // centraal na het renderen, zodat alle routes (afronden, heropenen en
+  // opnieuw laden) hetzelfde navigatiegedrag gebruiken.
+  window.scrollTo(0, 0);
 }
 
 function renderMetadataStage() {
