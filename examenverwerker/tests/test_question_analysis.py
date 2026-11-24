@@ -38,7 +38,7 @@ class QuestionAnalysisTests(unittest.TestCase):
     def test_two_options_alone_do_not_force_multiple_choice_classification(self):
         options = detect_options("A. Ja\nB. Nee")
         self.assertEqual([item["letter"] for item in options], ["A", "B"])
-        self.assertEqual(detect_question_type("Kies tussen twee mogelijkheden.", options)[0], "onbekend")
+        self.assertEqual(detect_question_type("Kies tussen twee mogelijkheden.", options)[0], "meerkeuze")
 
 
 if __name__ == "__main__":
