@@ -368,7 +368,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
         with fitz.open(path) as cv_end_pdf:
             cv_content_end_page = len(cv_end_pdf) - 1
             for page_index, page in enumerate(cv_end_pdf):
-                if re.search(r"(?m)^\\s*5\\s+aanleveren scores\\b",
+                if re.search(r"(?m)^\s*5\s+aanleveren scores\b",
                              page.get_text("text").casefold()):
                     cv_content_end_page = max(0, page_index - 1)
                     break
