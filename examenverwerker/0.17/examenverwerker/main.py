@@ -1589,8 +1589,11 @@ def get_relations(exam_id: str):
          "cv_max_points": item["cv_max_points"]}
         for item in questions if item["points_match"] is False
     ]
+    answer_numbers = set(cv_scores)
     return {"question_count": len(questions), "questions": questions,
             "missing_cv": sorted(opgaven - cv), "extra_cv": sorted(cv - opgaven),
+            "missing_answers": sorted(opgaven - answer_numbers),
+            "extra_answers": sorted(answer_numbers - opgaven),
             "score_mismatches": score_mismatches,
             "uitwerk_questions": sorted(uitwerk)}
 
@@ -1650,7 +1653,7 @@ def save_relations_review(exam_id: str, payload: dict):
     return {
         "ok": True, **evidence,
         "unresolved_score_mismatches": unresolved_scores,
-        "complete": not result["missing_cv"] and not result["extra_cv"] and not unresolved_scores,
+        "complete": not result["missing_cv"] and not result["extra_cv"] and not result["missing_answers"] and not result["extra_answers"] and not unresolved_scores,
     }
 
 
@@ -2017,6 +2020,10 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             raise HTTPException(422, "Er ontbreken correctievoorschriftvragen: " + str(previous["missing_cv"]))
         if previous.get("extra_cv"):
             raise HTTPException(422, "Er zijn CV-vragen zonder overeenkomstige opgave: " + str(previous["extra_cv"]))
+        if previous.get("missing_answers"):
+            raise HTTPException(422, "Er ontbreken antwoordrecords bij vraag/vraagvragen: " + str(previous["missing_answers"]))
+        if previous.get("extra_answers"):
+            raise HTTPException(422, "Er zijn antwoordrecords zonder overeenkomstige opgave: " + str(previous["extra_answers"]))
         # Een scoreverschil is geen automatische fout: het kan bijvoorbeeld
         # ontstaan door een gewijzigde beoordelingsregel. Wel moet stap 11
         # vastleggen waarom de twee maximumscores bewust niet gelijk zijn.
