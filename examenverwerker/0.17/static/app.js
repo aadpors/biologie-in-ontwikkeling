@@ -2102,7 +2102,11 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         hint.textContent='Tussen deze punten ligt geen bruikbare volledig witte grens. Kies opnieuw.';
         pendingTop=null;render();return;
       }
-      selections.push({id:`fragment-${Date.now()}-${selections.length}`,type:'vraag',top:snappedTop,bottom:snappedBottom,question_numbers:[],label:''});
+      // Een handmatig nieuw fragment is standaard context. Dat sluit aan bij
+      // de gebruikelijke werkwijze: eerst contextblokken markeren en daarna
+      // de daadwerkelijke vraagfragmenten. De docent kan het type rechts
+      // altijd expliciet wijzigen naar 'Vraag'.
+      selections.push({id:`fragment-${Date.now()}-${selections.length}`,type:'context',top:snappedTop,bottom:snappedBottom,question_numbers:[],label:''});
       activeIndex=selections.length-1;pendingTop=null;wrap.classList.remove('selecting');
       hint.textContent='Fragment toegevoegd. Vul rechts type en vraagnummers in.';
       render();scheduleSave();
