@@ -281,14 +281,54 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                         if direct or direct_mc:
                             cv_valid_candidates.append(candidate)
                             continue
-                        if re.fullmatch(r"\d{1,2}", candidate_text):
-                            lines = [line.strip() for line in cv_pdf[page_index].get_text("text").splitlines() if line.strip()]
-                            matching = next((index for index, line in enumerate(lines) if line == candidate_text), None)
-                            following = lines[matching + 1:matching + 4] if matching is not None else []
-                            if any(re.match(r"^maximumscore\s+\d+", line, re.IGNORECASE) or
-                                   re.match(r"^[A-E]\s+\d+\s*$", line, re.IGNORECASE)
-                                   for line in following):
+                        if re.fullmatch(r"\\d{1,2}", candidate_text):
+                            # Meerkeuzeantwoorden staan in sommige CV's in drie
+                            # aparte tekstkolommen. De PDF-extractor levert dan
+                            # het vraagnummer, de antwoordletter en de score als
+                            # losse regels op ("2", "B", "1"), niet als "2 B 1".
+                            # Herken beide vormen, maar alleen direct na een
+                            # los vraagnummer binnen het beoordelingsmodel.
+                            lines = [
+                                line.strip()
+                                for line in cv_pdf[page_index].get_text("text").splitlines()
+                                if line.strip()
+                            ]
+                            matching = next(
+                                (index for index, line in enumerate(lines)
+                                 if line == candidate_text),
+                                None,
+                            )
+                            following = lines[matching + 1:matching + 6] if matching is not None else []
+                            has_maximumscore = any(
+                                re.match(r"^maximumscore\\s+\\d+", line, re.IGNORECASE)
+                                for line in following
+                            )
+                            has_inline_mc_answer = any(
+                                re.fullmatch(r"[A-E][.)]?\\s+[012]", line, re.IGNORECASE)
+                                for line in following
+                            )
+                            has_split_mc_answer = any(
+                                re.fullmatch(r"[A-E][.)]?", line, re.IGNORECASE)
+                                and index + 1 < len(following)
+                                and re.fullmatch(r"[012]", following[index + 1])
+                                for index, line in enumerate(following)
+                            )
+                            if has_maximumscore or has_inline_mc_answer or has_split_mc_answer:
                                 cv_valid_candidates.append(candidate)
+                # Sluit kandidaten uit administratieve slotpagina's. De
+                # fragmentgenerator kapt het CV vóór "5 Aanleveren scores"
+                # af; een vraagstart ná die grens zou anders een leeg
+                # fragment opleveren en later een interne stitchfout geven.
+                cv_content_end_page = len(cv_pdf) - 1
+                for page_index, page in enumerate(cv_pdf):
+                    if re.search(r"(?m)^\\s*5\\s+aanleveren scores\\b",
+                                 page.get_text("text").casefold()):
+                        cv_content_end_page = max(0, page_index - 1)
+                        break
+                cv_valid_candidates = [
+                    candidate for candidate in cv_valid_candidates
+                    if candidate["page_index"] <= cv_content_end_page
+                ]
                 # Pas de oplopende nummerreeks pas toe nadat de CV-inleiding
                 # en genummerde antwoordonderdelen zijn uitgesloten.
                 ordered_cv = sorted(cv_valid_candidates, key=lambda item: (item["page_index"], item["pdf_bbox"][1]))
