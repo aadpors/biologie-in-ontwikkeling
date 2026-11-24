@@ -42,20 +42,24 @@ app = FastAPI(title="Examenverwerker", version="0.17.0")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sha256: str, *, start_page: int = 1) -> dict[str, Any]:
-    """Herbruik de bestaande lange examenafbeelding zolang de bron gelijk is.
+    """Herbruik de lange examenafbeelding met de juiste paginaselectie.
 
-    Teruggaan van stap 4 naar stap 3 is een normale navigatiehandeling en mag
-    geen volledige PDF-render-, crop- en stitchronde starten. Bewaar daarom
-    naast de PNG ook de bijbehorende paginametadata en witte grensrijen.
-    De bronhash voorkomt dat een oude afbeelding wordt hergebruikt wanneer
-    een examenbestand daadwerkelijk is vervangen.
+    Het opgavenboekje begint normaal gesproken op PDF-pagina 2, omdat de
+    eerste pagina de omslag/instructies bevat. Een uitwerkbijlage begint
+    daarentegen op pagina 1. Daarom is start_page onderdeel van de cache-
+    identiteit: een afbeelding die met een andere beginpagina is opgebouwd,
+    mag nooit voor deze workflowstap worden hergebruikt.
+
+    De bronhash voorkomt daarnaast dat een oude afbeelding wordt hergebruikt
+    wanneer een examenbestand daadwerkelijk is vervangen.
     """
     cache_path = output_path.with_suffix(".metadata.json")
     if output_path.is_file() and cache_path.is_file():
         try:
             cached = json.loads(cache_path.read_text(encoding="utf-8"))
             if (cached.get("source_sha256") == source_sha256
-                    and cached.get("cache_version") == 1
+                    and cached.get("cache_version") == 2
+                    and cached.get("start_page") == start_page
                     and isinstance(cached.get("metadata"), dict)
                     and isinstance(cached.get("white_row_ranges"), list)):
                 metadata = dict(cached["metadata"])
@@ -65,11 +69,14 @@ def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sh
             # Een beschadigde of verouderde cache wordt veilig opnieuw opgebouwd.
             pass
 
-    metadata = build_stitched_exam(source_path, output_path)
+    # Geef de paginakeuze expliciet door aan de renderer. Zonder dit argument
+    # zou ook een uitwerkbijlage standaard de eerste pagina overslaan.
+    metadata = build_stitched_exam(source_path, output_path, start_page=start_page)
     white_rows = _white_row_ranges(output_path)
     cache_payload = {
-        "cache_version": 1,
+        "cache_version": 2,
         "source_sha256": source_sha256,
+        "start_page": start_page,
         "metadata": metadata,
         "white_row_ranges": white_rows,
     }
