@@ -479,6 +479,10 @@ class WorkflowApplicationTests(unittest.TestCase):
         main.STORE.save_step_draft(exam_id, "opgaven_analyse", {
             "questions":[{"question_number":1,"max_points":2}]
         })
+        self.assertEqual(
+            self.client.get(f"/api/exams/{exam_id}/relations").json()["missing_answers"],
+            [1],
+        )
         main.STORE.save_step_draft(exam_id, "antwoorden", {
             "questions":[{"question_number":1,"cv_max_points":2}]
         })
