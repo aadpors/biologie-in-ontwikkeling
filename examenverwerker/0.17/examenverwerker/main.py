@@ -59,7 +59,7 @@ def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sh
         try:
             cached = json.loads(cache_path.read_text(encoding="utf-8"))
             if (cached.get("source_sha256") == source_sha256
-                    and cached.get("cache_version") == 2
+                    and cached.get("cache_version") == 3
                     and cached.get("start_page") == start_page
                     and isinstance(cached.get("metadata"), dict)
                     and isinstance(cached.get("white_row_ranges"), list)):
@@ -75,7 +75,7 @@ def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sh
     metadata = build_stitched_exam(source_path, output_path, start_page=start_page)
     white_rows = _white_row_ranges(output_path)
     cache_payload = {
-        "cache_version": 2,
+        "cache_version": 3,
         "source_sha256": source_sha256,
         "start_page": start_page,
         "metadata": metadata,
@@ -836,12 +836,11 @@ def _save_document_fragment_review(exam_id: str, document_type: str, payload: di
     source_path = DATA / _document_for_type(exam, document_type)["relative_path"]
     with fitz.open(source_path) as source_pdf:
         page_sizes = [(page.rect.width, page.rect.height) for page in source_pdf]
-        cv_content_end_page = len(page_sizes) - 1
-        if document_type == "correctievoorschrift":
-            for page_index, page in enumerate(source_pdf):
-                if re.search(r"(?m)^\s*5\s+aanleveren scores\b", page.get_text("text").casefold()):
-                    cv_content_end_page = max(0, page_index - 1)
-                    break
+        cv_content_end_page_index = (
+            cv_content_end_page(source_pdf)
+            if document_type == "correctievoorschrift"
+            else len(page_sizes) - 1
+        )
     ordered_starts = sorted(starts_by_number.values(),
                             key=lambda value: (value["page_index"], value["pdf_bbox"][1]))
     clean_boundaries = []
@@ -858,7 +857,7 @@ def _save_document_fragment_review(exam_id: str, document_type: str, payload: di
         next_start = ordered_starts[index + 1] if index + 1 < len(ordered_starts) else None
         first_page = start["page_index"]
         last_page = next_start["page_index"] if next_start else (
-            cv_content_end_page if document_type == "correctievoorschrift" else len(page_sizes) - 1
+            cv_content_end_page_index
         )
         start_y = float(item.get("start_y"))
         end_y = float(item.get("end_y"))
