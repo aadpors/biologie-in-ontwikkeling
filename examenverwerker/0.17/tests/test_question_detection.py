@@ -2,6 +2,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import fitz
 from PIL import Image
@@ -59,6 +60,46 @@ class QuestionDetectionTests(unittest.TestCase):
         # Een losse letter in lopende tekst mag niet als complete antwoordset
         # worden geïnterpreteerd.
         self.assertEqual(detect_options("A. Dit is een gewone zin. Daarna volgt optie C in de uitleg."), [])
+
+    def test_question_analysis_uses_visual_ocr_when_pdf_text_has_no_options(self):
+        # De PDF-tekstlaag kan een meerkeuzevraag wel herkennen als tekst,
+        # maar de antwoordopties missen doordat ze als afbeelding of in aparte
+        # kolommen zijn opgeslagen. De zichtbare vraagafbeelding is dan de
+        # aanvullende bron voor de opties.
+        question = {
+            "question_number": 7,
+            "extracted_text": "Welke uitspraak over fotosynthese is juist?",
+            "segments": [],
+            "image_paths": ["vraag-7.png"],
+        }
+        visual_text = (
+            "A De lichtreactie vindt plaats in de mitochondriën.\\n"
+            "B De donkerreactie vindt plaats in de stroma.\\n"
+            "C Bij fotosynthese ontstaat zuurstof uit koolstofdioxide."
+        )
+        with patch("examenverwerker.question_analysis._ocr_image_text", return_value=visual_text) as ocr:
+            result = analyse_questions({"questions": [question]})
+
+        ocr.assert_called_once_with(["vraag-7.png"])
+        detected = result["questions"][0]
+        self.assertEqual(detected["question_type"], "meerkeuze")
+        self.assertEqual([option["letter"] for option in detected["options"]], ["A", "B", "C"])
+        self.assertIn("vraagafbeelding", detected["type_reason"])
+
+    def test_question_type_recognises_common_dutch_multiple_choice_formulations(self):
+        # Niet ieder examen gebruikt letterlijk de instructie 'kies het juiste
+        # antwoord'. Deze formuleringen zijn ook sterke aanwijzingen voor een
+        # meerkeuzevraag wanneer de antwoordopties visueel nog gecontroleerd
+        # moeten worden.
+        examples = (
+            "Welke uitspraak is onjuist?",
+            "Welke combinatie is correct?",
+            "Wat is de juiste volgorde van deze processen?",
+            "Welke letter hoort bij de juiste afbeelding?",
+        )
+        for text in examples:
+            with self.subTest(text=text):
+                self.assertEqual(detect_question_type(text, [])[0], "meerkeuze")
 
     def test_closed_answer_form_is_reported_explicitly(self):
         self.assertEqual(
