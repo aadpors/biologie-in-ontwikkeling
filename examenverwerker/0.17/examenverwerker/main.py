@@ -135,6 +135,31 @@ def _stitched_page_selection(source_path: Path, document_type: str) -> tuple[int
     return 0, None, 0.0
 
 
+def _stitched_image_fingerprint(image_path: Path) -> str:
+    """Return the content hash of the exact long image used for pixel selections.
+
+    Fragment selections are stored as pixel coordinates, not PDF coordinates.
+    If rendering or cropping changes, those coordinates can silently point to
+    different content. Persisting this fingerprint lets the workflow detect
+    that situation and ask for a new visual check instead of producing shifted
+    snippets that look plausible but refer to the wrong source region.
+    """
+    if not image_path.is_file():
+        raise HTTPException(409, "De lange examenafbeelding ontbreekt. Open de fragmentcontrole opnieuw.")
+    return STORE.sha256(image_path)
+
+
+def _stitched_selection_matches_image(evidence: dict, image_path: Path) -> bool:
+    """Check whether saved pixel selections belong to the current stitched PNG.
+
+    Older project files do not contain a fingerprint. They are deliberately
+    treated as stale: without proof of the coordinate system, reusing their
+    pixel positions could silently crop the wrong part of the PDF.
+    """
+    saved_fingerprint = evidence.get("stitched_image_sha256")
+    return bool(saved_fingerprint) and saved_fingerprint == _stitched_image_fingerprint(image_path)
+
+
 def _safe_filename(filename: str) -> str:
     """Normaliseer een uploadnaam zodat deze nooit een pad kan schrijven."""
     name = Path(filename or "document.pdf").name
@@ -794,6 +819,18 @@ def _load_document_fragments(exam_id: str, document_type: str):
             end_page=_stitched_page_selection(source_path, document_type)[1],
             start_y=_stitched_page_selection(source_path, document_type)[2],
         )
+        if not _stitched_selection_matches_image(previous, stitched_path):
+            step_label = {
+                "opgaven": "stap 3 (Vraagfragmenten opgaven)",
+                "uitwerkbijlage": "stap 6 (Fragmenten uitwerkbijlage)",
+                "correctievoorschrift": "stap 8 (Correctievoorschrift verwerken)",
+            }[document_type]
+            raise HTTPException(
+                409,
+                f"De opgeslagen fragmentgrenzen horen bij een oudere versie van de lange afbeelding. "
+                f"Heropen {step_label}, controleer de grenzen opnieuw en sla ze op. "
+                "Het examen hoeft niet opnieuw geïmporteerd te worden."
+            )
         stitched_questions = [item for item in previous["stitched_selections"] if item.get("type") == "vraag"]
         stitched_contexts = [item for item in previous["stitched_selections"] if item.get("type") == "context"]
         question_map = {int(item["question_number"]): item for item in accepted}
@@ -1055,6 +1092,19 @@ def get_stitched_opgaven(exam_id: str):
     saved_selections = _repair_automatic_context_links(
         previous.get("stitched_selections", [])
     )
+    current_image_fingerprint = _stitched_image_fingerprint(target)
+    selection_warning = None
+    if saved_selections and not _stitched_selection_matches_image(previous, target):
+        # Legacy selections have no reliable record of the image version they
+        # were drawn on. Do not reuse their old pixel positions: generate fresh
+        # proposals and ask for a new visual approval instead.
+        saved_selections = []
+        selection_warning = (
+            "De eerder opgeslagen fragmentgrenzen zijn gemaakt op een andere "
+            "versie van de lange afbeelding. Daarom worden nieuwe voorstellen "
+            "getoond. Controleer en sla de fragmenten opnieuw op; opnieuw "
+            "importeren is niet nodig."
+        )
     starts_evidence = exam["steps"].get("opgaven_starts", {}).get("evidence", {})
     accepted_starts = [
         item for item in starts_evidence.get("candidates", [])
@@ -1091,6 +1141,8 @@ def get_stitched_opgaven(exam_id: str):
     metadata.update({
         "image_url": f"/api/stitched-opgaven-images/{exam_id}/exam-long.png",
         "document_sha256": document["sha256"],
+        "stitched_image_sha256": current_image_fingerprint,
+        "selection_warning": selection_warning,
         "selections": saved_selections,
         "proposed_selections": proposed,
         "white_row_ranges": white_rows,
@@ -1135,6 +1187,15 @@ def get_stitched_document(exam_id: str, document_type: str):
     starts_step_key, fragments_step_key = _fragment_step_keys(document_type)
     previous = exam["steps"].get(fragments_step_key, {}).get("evidence", {})
     saved = previous.get("stitched_selections", [])
+    current_image_fingerprint = _stitched_image_fingerprint(target)
+    selection_warning = None
+    if saved and not _stitched_selection_matches_image(previous, target):
+        saved = []
+        selection_warning = (
+            "De eerder opgeslagen fragmentgrenzen horen bij een oudere versie "
+            "van deze afbeelding. Nieuwe voorstellen worden getoond; controleer "
+            "en sla ze opnieuw op."
+        )
     starts = exam["steps"].get(starts_step_key, {}).get("evidence", {})
     accepted = [
         item for item in starts.get("candidates", [])
@@ -1167,6 +1228,8 @@ def get_stitched_document(exam_id: str, document_type: str):
     metadata.update({
         "image_url": f"/api/stitched-document-images/{exam_id}/{document_type}/exam-long.png",
         "document_sha256": document["sha256"],
+        "stitched_image_sha256": current_image_fingerprint,
+        "selection_warning": selection_warning,
         "selections": saved,
         "proposed_selections": proposed,
         "white_row_ranges": white_rows,
@@ -1261,10 +1324,11 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
         # het nieuwe coördinatenstelsel thuis.
         "boundary_overrides": [],
         "document_sha256": starts.get("evidence", {}).get("document_sha256"),
+        "stitched_image_sha256": _stitched_image_fingerprint(stitched_path),
     }
     saved_as_draft = STORE.save_step_draft_preserving_identical_complete(
         exam_id, fragments_step_key, evidence,
-        identity_fields=("stitched_selections", "document_sha256"),
+        identity_fields=("stitched_selections", "document_sha256", "stitched_image_sha256"),
     )
     return {"ok": True, "selection_count": len(clean),
             "reviewed": evidence["stitched_reviewed"],
@@ -1340,7 +1404,8 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
     evidence = exam["steps"].get("opgaven_fragments", {}).get("evidence", {})
     evidence.update({"stitched_selections": clean,
                      "stitched_reviewed": bool(payload.get("reviewed")),
-                     "document_sha256": starts.get("evidence", {}).get("document_sha256")})
+                     "document_sha256": starts.get("evidence", {}).get("document_sha256"),
+                     "stitched_image_sha256": _stitched_image_fingerprint(stitched_path)})
 
     # Ook voor de fragmentreview kan een autosave vanaf pagehide of
     # visibilitychange pas na de afrondactie aankomen. Een identieke
@@ -1350,7 +1415,7 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
         exam_id,
         "opgaven_fragments",
         evidence,
-        identity_fields=("stitched_selections", "document_sha256"),
+        identity_fields=("stitched_selections", "document_sha256", "stitched_image_sha256"),
     )
     return {"ok": True, "selection_count": len(clean),
             "reviewed": evidence["stitched_reviewed"],
@@ -1722,6 +1787,13 @@ def get_snippets(exam_id: str):
         stitched_metadata = _load_or_build_stitched_exam(
             source, stitched_path, opgaven_doc["sha256"]
         )
+        if not _stitched_selection_matches_image(fragment_evidence, stitched_path):
+            raise HTTPException(
+                409,
+                "De opgeslagen fragmentgrenzen horen bij een oudere versie van de lange examenafbeelding. "
+                "Heropen stap 3 (Vraagfragmenten opgaven), controleer de grenzen opnieuw en sla ze op. "
+                "Het examen hoeft niet opnieuw geïmporteerd te worden."
+            )
         selected_output = DATA / "exams" / exam_id / "derived" / "contexts"
         selected_output.mkdir(parents=True, exist_ok=True)
         selected_items = []
@@ -1733,7 +1805,16 @@ def get_snippets(exam_id: str):
                 filename = f"selected-context-{index:02d}.png"
                 crop.save(selected_output / filename, format="PNG", optimize=True)
                 crop.close()
-                numbers = sorted(set(int(n) for n in selection.get("question_numbers", [])))
+                numbers = sorted(set(
+                    int(n) for n in selection.get("question_numbers", [])
+                    if isinstance(n, int) and 1 <= n <= 60
+                ))
+                if not numbers:
+                    raise HTTPException(
+                        422,
+                        f"Contextfragment '{selection.get('label') or selection.get('id')}' "
+                        "heeft geen geldige vraagkoppeling. Herstel de koppeling in stap 3."
+                    )
                 source_page = next((page["page_number"] for page in stitched_metadata["pages"]
                                     if page["top"] <= top <= page["bottom"]), 0)
                 selected_items.append({
