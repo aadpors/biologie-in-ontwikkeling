@@ -111,8 +111,8 @@ def detect_question_type(text: str, options: list[dict[str, str]]) -> tuple[str,
     )
     normalised = re.sub(r"\s+", " ", lowered)
     prompt_detected = any(signal in normalised for signal in multiple_choice_signals)
-    if len(options) >= 3 or prompt_detected:
-        reason = ("Er zijn minimaal drie verschillende antwoordlabels herkend."
+    if len(options) >= 2 or prompt_detected:
+        reason = ("Er zijn twee of meer verschillende antwoordlabels herkend."
                   if len(options) >= 3 else
                   "De vraagformulering bevat een herkenbare meerkeuze-instructie; "
                   "de opties worden zo nodig handmatig gecontroleerd.")
