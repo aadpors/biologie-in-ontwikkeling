@@ -521,6 +521,8 @@ async function renderRelationsStage() {
       <div class="relation-grid">
         <span>${result.missing_cv.length ? 'CV-fragmenten ontbreken: '+result.missing_cv.join(', ') : 'Alle opgaven hebben een CV-koppeling'}</span>
         <span>${result.extra_cv.length ? 'CV-vragen zonder opgave: '+result.extra_cv.join(', ') : 'Geen extra CV-vragen'}</span>
+        <span>${result.missing_answers.length ? 'Antwoorden ontbreken: '+result.missing_answers.join(', ') : 'Antwoordrecords volledig gekoppeld'}</span>
+        <span>${result.extra_answers.length ? 'Antwoorden zonder opgave: '+result.extra_answers.join(', ') : 'Geen extra antwoordrecords'}</span>
         <span>${mismatches.length ? mismatches.length+' afwijkende maximumscores' : 'Maximumscores komen overeen waar vergelijkbaar'}</span>
         <span>${result.uitwerk_questions.length} vragen in de uitwerkbijlage · gedeeltelijke dekking is toegestaan</span>
       </div>
@@ -534,6 +536,18 @@ async function renderRelationsStage() {
         <section class="analysis-card">
           <h3>CV-vragen zonder opgave</h3>
           <p>Deze nummers komen wel in het CV voor, maar niet in de opgaven: ${result.extra_cv.join(', ')}. Controleer of het om een afwijkende nummering of een onbedoeld extra fragment gaat.</p><button class="quiet" type="button" id="repairExtraCv">CV-vraagstarts herstellen</button>
+        </section>` : ''}
+      ${result.missing_answers.length ? `
+        <section class="analysis-card">
+          <h3>Antwoorden ontbreken</h3>
+          <p class="form-error">Er is geen antwoordrecord gekoppeld aan vraag ${result.missing_answers.join(', ')}. Controleer de antwoordherkenning in stap 10.</p>
+          <button class="quiet" type="button" id="repairMissingAnswers">Antwoorden herstellen</button>
+        </section>` : ''}
+      ${result.extra_answers.length ? `
+        <section class="analysis-card">
+          <h3>Antwoorden zonder opgave</h3>
+          <p class="form-error">Er zijn antwoordrecords voor vraag ${result.extra_answers.join(', ')}, maar deze nummers komen niet voor in de opgaven.</p>
+          <button class="quiet" type="button" id="repairExtraAnswers">Antwoorden herstellen</button>
         </section>` : ''}
       ${mismatches.length ? `
         <h3>Afwijkende maximumscores</h3>
@@ -551,7 +565,7 @@ async function renderRelationsStage() {
       </details>
       <div class="review-actions">
         <button class="primary" id="saveRelations" type="button">Toelichtingen opslaan</button>
-        <button class="primary" id="completeRelations" type="button" ${result.missing_cv.length||result.extra_cv.length||mismatches.some(item=>!(previousNotes[item.question_number]||'').trim())?'disabled':''}>Controles afronden en doorgaan</button>
+        <button class="primary" id="completeRelations" type="button" ${result.missing_cv.length||result.extra_cv.length||result.missing_answers.length||result.extra_answers.length||mismatches.some(item=>!(previousNotes[item.question_number]||'').trim())?'disabled':''}>Controles afronden en doorgaan</button>
       </div>
       <p id="relationsMessage" class="form-error" role="status"></p>`;
     const cards=[...document.querySelectorAll('[data-relation-issue]')];
@@ -566,7 +580,7 @@ async function renderRelationsStage() {
     bindStageAutoSave(panel,save,'#relationsMessage');
     const refresh=()=>{
       const unresolved=cards.some(card=>!card.querySelector('textarea').value.trim());
-      $('#completeRelations').disabled=result.missing_cv.length>0||result.extra_cv.length>0||unresolved;
+      $('#completeRelations').disabled=result.missing_cv.length>0||result.extra_cv.length>0||result.missing_answers.length>0||result.extra_answers.length>0||unresolved;
     };
     cards.forEach(card=>card.querySelector('textarea').addEventListener('input',refresh));
     $('#saveRelations').addEventListener('click',async()=>{
@@ -601,6 +615,12 @@ async function renderRelationsStage() {
     $('#repairExtraCv')?.addEventListener('click',async()=>{
       try {
         await api(`/api/exams/${state.examId}/steps/cv_starts/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    $('#repairMissingAnswers, #repairExtraAnswers')?.addEventListener?.('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/antwoorden/reopen`,{method:'POST'});
         await openWorkspace(state.examId);
       } catch(error) { $('#relationsMessage').textContent=error.message; }
     });
