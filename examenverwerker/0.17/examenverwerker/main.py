@@ -962,7 +962,12 @@ def _save_document_fragment_review(exam_id: str, document_type: str, payload: di
                 "reviewed_all_questions": bool(payload.get("reviewed_all_questions")),
                 "boundary_overrides": clean_boundaries,
                 "document_sha256": starts_step["evidence"].get("document_sha256")}
-    STORE.save_step_draft(exam_id, fragments_step_key, evidence)
+    # Een autosave die na de afrondactie aankomt, mag een identieke goedkeuring
+    # niet terugzetten naar 'pending'. Bij een echte inhoudelijke wijziging
+    # wordt de bestaande goedkeuring juist wel ingetrokken.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, fragments_step_key, evidence, identity_fields=tuple(evidence.keys())
+    )
     return {"ok": True, "reviewed_count": len(reviewed_set), "expected_count": len(expected),
             "complete": evidence["reviewed_all_questions"] and reviewed_set == expected}
 
@@ -1481,7 +1486,11 @@ def save_question_analysis_review(exam_id: str, payload: dict):
     except (ValueError, TypeError) as exc:
         raise HTTPException(422, str(exc)) from exc
     review["document_sha256"] = fragments["document"]["sha256"]
-    STORE.save_step_draft(exam_id, "opgaven_analyse", review)
+    # Bewaar conceptwijzigingen, maar laat een identieke late autosave een
+    # reeds afgeronde stap niet onbedoeld terugzetten naar 'pending'.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "opgaven_analyse", review, identity_fields=tuple(review.keys())
+    )
     return {"ok": True, **review, "complete": review["reviewed_all_questions"]}
 
 
@@ -1533,7 +1542,10 @@ def save_cv_supplement_review(exam_id: str, payload: dict):
         if unknown:
             raise HTTPException(422, f"Supplementpagina {item['page_number']} verwijst naar onbekende examenvragen: {sorted(unknown)}.")
     review["document_sha256"] = result["document"]["sha256"]
-    STORE.save_step_draft(exam_id, "cv_aanvulling", review)
+    # Een identieke autosave na afronden behoudt de bestaande goedkeuring.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "cv_aanvulling", review, identity_fields=tuple(review.keys())
+    )
     return {"ok": True, **review, "complete": review["reviewed_all_pages"]}
 
 
@@ -1615,7 +1627,12 @@ def save_answers_review(exam_id: str, payload: dict):
     except (ValueError, TypeError) as exc:
         raise HTTPException(422, str(exc)) from exc
     review["cv_sha256"] = result.get("document", {}).get("sha256")
-    STORE.save_step_draft(exam_id, "antwoorden", review)
+    # Antwoordvelden worden automatisch opgeslagen. Als een al gestarte
+    # autosave pas na de afrondactie aankomt, mag identieke inhoud de status
+    # 'complete' niet terugzetten naar 'pending'.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "antwoorden", review, identity_fields=tuple(review.keys())
+    )
     return {"ok": True, **review, "complete": review["reviewed_all_questions"]}
 
 
@@ -1723,7 +1740,11 @@ def save_relations_review(exam_id: str, payload: dict):
         "extra_cv": result["extra_cv"],
         "score_mismatches": result["score_mismatches"],
     }
-    STORE.save_step_draft(exam_id, "relaties", evidence)
+    # Ook toelichtingen worden automatisch opgeslagen. Behoud een afgeronde
+    # status wanneer een vertraagde autosave exact hetzelfde bewijs bevat.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "relaties", evidence, identity_fields=tuple(evidence.keys())
+    )
     unresolved_scores = [
         item["question_number"] for item in result["score_mismatches"]
         if not next((row["note"].strip() for row in cleaned
@@ -1897,7 +1918,11 @@ def save_snippets_review(exam_id: str, payload: dict):
                 "expected_cv_numbers": sorted(expected_cv),
                 "reviewed_all_cv": set(reviewed_cv) == expected_cv,
                 "document_sha256": result["opgaven"]["document"]["sha256"]}
-    STORE.save_step_draft(exam_id, "snippets", evidence)
+    # De snippetset kan groot zijn en wordt automatisch opgeslagen. Een
+    # identieke late request mag de afgeronde stap niet opnieuw openen.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "snippets", evidence, identity_fields=tuple(evidence.keys())
+    )
     return {"ok": True, **evidence,
             "complete": (evidence["reviewed_all_questions"] and evidence["reviewed_all_contexts"]
                          and evidence["reviewed_all_uitwerk"] and evidence["reviewed_all_cv"]
@@ -1978,7 +2003,12 @@ def save_final_review(exam_id: str, payload: dict):
     reviewed = sum(item["reviewed"] for item in cleaned)
     evidence = {"questions": cleaned, "reviewed_count": reviewed,
                 "reviewed_all_questions": reviewed == len(cleaned)}
-    STORE.save_step_draft(exam_id, "eindcontrole", evidence)
+    # Voorkom dat een identieke autosave die na het afronden arriveert de
+    # eindcontrole weer op 'pending' zet. Gewijzigde vraagnotities of inhoud
+    # trekken de goedkeuring nog steeds in.
+    STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "eindcontrole", evidence, identity_fields=tuple(evidence.keys())
+    )
     unresolved = any(
         question["points_match"] is False and
         not next(item for item in cleaned if item["question_number"] == question["question_number"])["resolution_note"].strip()
