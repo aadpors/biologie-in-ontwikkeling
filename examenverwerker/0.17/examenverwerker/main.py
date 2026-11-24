@@ -1591,11 +1591,24 @@ def get_relations(exam_id: str):
         for item in questions if item["points_match"] is False
     ]
     answer_numbers = set(cv_scores)
+    # De vraaganalyse en antwoordherkenning leveren ook onzekerheden op die
+    # eerder al inhoudelijk zijn goedgekeurd. Toon ze hier nogmaals als
+    # aandachtspunt, zodat de integriteitscontrole niets stilzwijgend verbergt.
+    uncertain_analysis = sorted(
+        item["question_number"] for item in analysis
+        if item.get("question_type") == "onbekend" or item.get("max_points") is None
+    )
+    uncertain_answers = sorted(
+        item["question_number"] for item in answer_evidence
+        if item.get("answer_kind") == "handmatig" or not str(item.get("answer_text", "")).strip()
+    )
     return {"question_count": len(questions), "questions": questions,
             "missing_cv": sorted(opgaven - cv), "extra_cv": sorted(cv - opgaven),
             "missing_answers": sorted(opgaven - answer_numbers),
             "extra_answers": sorted(answer_numbers - opgaven),
             "score_mismatches": score_mismatches,
+            "uncertain_analysis": uncertain_analysis,
+            "uncertain_answers": uncertain_answers,
             "uitwerk_questions": sorted(uitwerk)}
 
 
