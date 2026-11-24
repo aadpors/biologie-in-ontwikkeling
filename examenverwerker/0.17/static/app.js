@@ -443,7 +443,27 @@ async function renderCvSupplementStage() {
     const save = () => api(`/api/exams/${state.examId}/cv-supplement/review`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:collect()})});
     bindStageAutoSave(panel, save, '#supplementMessage');
     $('#saveSupplement').addEventListener('click', async () => { try { const r=await save(); $('#supplementMessage').textContent=`${r.reviewed_count} van ${r.page_count} pagina's gecontroleerd. Concept opgeslagen.`; } catch(error) { $('#supplementMessage').textContent=error.message; } });
-    $('#completeSupplement').addEventListener('click', async () => { try { const r=await save(); if(!r.complete) throw new Error('Controleer eerst alle pagina’s.'); await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_pages:true})}); await openWorkspace(state.examId); } catch(error) { $('#supplementMessage').textContent=error.message; } });
+    let completingSupplement=false;
+    $('#completeSupplement').addEventListener('click', async () => {
+      const button=$('#completeSupplement');
+      if(completingSupplement) return;
+      completingSupplement=true;
+      button.disabled=true;
+      try {
+        // Wacht op de laatste paginakeuze voordat de stapstatus definitief wordt.
+        const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
+        if(!saved.complete) throw new Error('Controleer eerst alle pagina’s.');
+        await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true,reviewed_all_pages:true})
+        });
+        await openWorkspace(state.examId);
+      } catch(error) {
+        completingSupplement=false;
+        refresh();
+        $('#supplementMessage').textContent=error.message;
+      }
+    });
   } catch (error) { panel.innerHTML = `<h2>Aanvulling correctievoorschrift</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
 
@@ -699,7 +719,26 @@ async function renderSnippetsStage() {
     const save=(options={})=>api(`/api/exams/${state.examId}/snippets/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...collect(),...options})});
     bindStageAutoSave(panel, save, '#snippetsMessage');
     $('#saveSnippets').addEventListener('click',async()=>{try{const r=await save();$('#snippetsMessage').textContent=`${r.reviewed_count} vragen en ${r.reviewed_all_contexts?result.context_count:contextChecks().filter(x=>x.checked).length} contexten gecontroleerd.`;}catch(error){$('#snippetsMessage').textContent=error.message;}});
-    $('#completeSnippets').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle contexten en vraagfragmenten.');await api(`/api/exams/${state.examId}/steps/snippets/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_all_contexts:true})});await openWorkspace(state.examId);}catch(error){$('#snippetsMessage').textContent=error.message;}});
+     let completingSnippets=false;
+     $('#completeSnippets').addEventListener('click',async()=>{
+       const button=$('#completeSnippets');
+       if(completingSnippets) return;
+       completingSnippets=true;
+       button.disabled=true;
+       try {
+         const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
+         if(!saved.complete) throw new Error('Controleer eerst alle contexten en vraagfragmenten.');
+         await api(`/api/exams/${state.examId}/steps/snippets/complete`,{
+           method:'POST',headers:{'Content-Type':'application/json'},
+           body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_all_contexts:true})
+         });
+         await openWorkspace(state.examId);
+       } catch(error) {
+         completingSnippets=false;
+         refresh();
+         $('#snippetsMessage').textContent=error.message;
+       }
+     });
   } catch(error) { panel.innerHTML=`<h2>Definitieve snippets</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
 
@@ -725,7 +764,26 @@ async function renderFinalReviewStage() {
     const save=(options={})=>api(`/api/exams/${state.examId}/final-review/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect(),...options})});
     bindStageAutoSave(panel, save, '#finalReviewMessage');
     $('#saveFinalReview').addEventListener('click',async()=>{try{const r=await save();$('#finalReviewMessage').textContent=`${r.reviewed_count} van ${result.question_count} vragen gecontroleerd.`;}catch(error){$('#finalReviewMessage').textContent=error.message;}});
-    $('#completeFinalReview').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle vragen.');await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}});
+     let completingFinalReview=false;
+     $('#completeFinalReview').addEventListener('click',async()=>{
+       const button=$('#completeFinalReview');
+       if(completingFinalReview) return;
+       completingFinalReview=true;
+       button.disabled=true;
+       try {
+         const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
+         if(!saved.complete) throw new Error('Controleer eerst alle vragen.');
+         await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`,{
+           method:'POST',headers:{'Content-Type':'application/json'},
+           body:JSON.stringify({reviewed:true,reviewed_all_questions:true})
+         });
+         await openWorkspace(state.examId);
+       } catch(error) {
+         completingFinalReview=false;
+         refresh();
+         $('#finalReviewMessage').textContent=error.message;
+       }
+     });
     document.querySelectorAll('[data-repair]').forEach(button=>button.addEventListener('click',async()=>{try{await api(`/api/exams/${state.examId}/steps/${button.dataset.repair}/reopen`,{method:'POST'});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}}));
   } catch(error) { panel.innerHTML=`<h2>Integrale eindcontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
@@ -1754,9 +1812,17 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
         $('#fragmentReviewMessage').textContent = `${saved.reviewed_count} van ${saved.expected_count} vraagfragmenten gecontroleerd. Conceptreview opgeslagen.`;
       } catch (error) { $('#fragmentReviewMessage').textContent = error.message; }
     });
+    let completingFragmentReview=false;
     $('#completeFragmentReview').addEventListener('click', async () => {
+      const button=$('#completeFragmentReview');
+      if(completingFragmentReview) return;
+      completingFragmentReview=true;
+      button.disabled=true;
       try {
-        const {saved,changedNumbers} = await save();
+        // Flush de laatste grenswijziging voordat de stap wordt afgerond.
+        const {saved,changedNumbers} = panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save();
         if (changedNumbers.size) {
           $('#fragmentReviewMessage').textContent = 'De gewijzigde grenzen zijn opgeslagen. Controleer eerst de opnieuw gerenderde fragmenten.';
           await openWorkspace(state.examId);
@@ -1769,7 +1835,11 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
             reviewed_question_numbers:saved.reviewed_count})
         });
         await openWorkspace(state.examId);
-      } catch (error) { $('#fragmentReviewMessage').textContent = error.message; }
+      } catch (error) {
+        completingFragmentReview=false;
+        refreshComplete();
+        $('#fragmentReviewMessage').textContent = error.message;
+      }
     });
   } catch (error) {
     panel.innerHTML = `<h2>Vraagfragmenten controleren</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
@@ -1863,16 +1933,25 @@ async function renderQuestionAnalysisStage() {
         $('#questionAnalysisMessage').textContent = `${saved.reviewed_count} van ${result.question_count} vragen gecontroleerd. Conceptreview opgeslagen.`;
       } catch (error) { $('#questionAnalysisMessage').textContent = error.message; }
     });
+    let completingQuestionAnalysis=false;
     $('#completeQuestionAnalysis').addEventListener('click', async () => {
+      const button=$('#completeQuestionAnalysis');
+      if(completingQuestionAnalysis) return;
+      completingQuestionAnalysis=true;
+      button.disabled=true;
       try {
-        const saved = await save();
+        const saved = panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
         if (!saved.complete) throw new Error('Controleer eerst alle vragen.');
         await api(`/api/exams/${state.examId}/steps/opgaven_analyse/complete`, {
           method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({reviewed:true, reviewed_all_questions:true, reviewed_count:saved.reviewed_count})
         });
         await openWorkspace(state.examId);
-      } catch (error) { $('#questionAnalysisMessage').textContent = error.message; }
+      } catch (error) {
+        completingQuestionAnalysis=false;
+        refreshComplete();
+        $('#questionAnalysisMessage').textContent = error.message;
+      }
     });
   } catch (error) {
     panel.innerHTML = `<h2>Vraagtype, punten en antwoordopties</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
