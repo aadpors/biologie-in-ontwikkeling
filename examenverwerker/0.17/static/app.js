@@ -930,17 +930,18 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
           throw error;
         });
       };
-            const startVisibilityChange = () => {
-        if (document.visibilityState === 'hidden') flushStartAutosave();
+      const startVisibilityChange = () => {
+        if (document.visibilityState === 'hidden') flushStartAutosave().catch(() => {});
       };
+      const flushStartOnPageHide = () => flushStartAutosave().catch(() => {});
       document.addEventListener('visibilitychange', startVisibilityChange);
-      window.addEventListener('pagehide', flushStartAutosave);
+      window.addEventListener('pagehide', flushStartOnPageHide);
       panel._stageAutoSaveCleanup = () => {
         clearTimeout(autosaveTimer);
         panel.onchange = null;
         panel.onclick = null;
         document.removeEventListener('visibilitychange', startVisibilityChange);
-        window.removeEventListener('pagehide', flushStartAutosave);
+        window.removeEventListener('pagehide', flushStartOnPageHide);
         panel._stageAutoSaveCleanup = null;
       };
 
