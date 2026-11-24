@@ -323,13 +323,38 @@ def _load_document_question_starts(exam_id: str, document_type: str):
 
                             candidate_top = float(candidate["pdf_bbox"][1])
                             candidate_bottom = float(candidate["pdf_bbox"][3])
-                            # Score-informatie kan vóór, naast of direct onder
-                            # het nummer staan. De ruime verticale marge vangt
-                            # verschillende regelafstanden en kolomvolgordes op.
+                            candidate_left = float(candidate["pdf_bbox"][0])
+
+                            # Open-vraagbeoordelingen kunnen tientallen regels
+                            # onder het vraagnummer staan. Een vaste marge van
+                            # 48 PDF-punten kapt zulke beoordelingsblokken af.
+                            # Bepaal daarom de ondergrens aan de hand van de
+                            # eerstvolgende kandidaat op dezelfde vraagnummer-
+                            # kolom. Genummerde subonderdelen staan doorgaans
+                            # ingesprongen en begrenzen het hoofdvraagblok dus
+                            # niet. Als er geen volgende hoofdvraagstart op deze
+                            # pagina staat, loopt het zoekgebied tot de paginavoet.
+                            later_column_starts = [
+                                float(other["pdf_bbox"][1])
+                                for other in result["candidates"]
+                                if other is not candidate
+                                and other["page_index"] == page_index
+                                and float(other["pdf_bbox"][1]) > candidate_top
+                                and abs(float(other["pdf_bbox"][0]) - candidate_left) <= 12.0
+                            ]
+                            search_bottom = min(
+                                later_column_starts,
+                                default=float(cv_pdf[page_index].rect.height),
+                            ) - 2.0
+                            # Een kandidaat kan nooit voorbij het einde van
+                            # zijn pagina zoeken; een zeer dicht volgend nummer
+                            # krijgt bovendien geen negatief zoekvenster.
+                            search_bottom = max(candidate_bottom, search_bottom)
+
                             nearby_lines = [
                                 item["text"] for item in positioned_lines
                                 if item["bottom"] >= candidate_top - 8
-                                and item["top"] <= candidate_bottom + 48
+                                and item["top"] <= search_bottom
                                 and not (
                                     abs(item["left"] - float(candidate["pdf_bbox"][0])) < 0.5
                                     and abs(item["top"] - candidate_top) < 0.5
@@ -350,7 +375,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                             nearby_positioned = [
                                 item for item in positioned_lines
                                 if item["bottom"] >= candidate_top - 8
-                                and item["top"] <= candidate_bottom + 48
+                                and item["top"] <= search_bottom
                                 and not (
                                     abs(item["left"] - float(candidate["pdf_bbox"][0])) < 0.5
                                     and abs(item["top"] - candidate_top) < 0.5
