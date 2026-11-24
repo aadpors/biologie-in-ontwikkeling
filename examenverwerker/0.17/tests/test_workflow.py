@@ -7,6 +7,7 @@ server-side stapbeveiliging en het ongeldig maken van afhankelijke stappen.
 import io
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 import fitz
@@ -86,6 +87,30 @@ class WorkflowApplicationTests(unittest.TestCase):
             main.STORE.get_exam(exam_id)["steps"]["opgaven_starts"]["status"],
             "pending",
         )
+
+    def test_stitched_exam_cache_avoids_rebuilding_unchanged_source(self):
+        """Terugnavigeren naar stap 3 mag geen nieuwe render-/stitchronde starten."""
+        document = fitz.open()
+        document.new_page()  # Voorblad wordt standaard overgeslagen.
+        page = document.new_page()
+        page.insert_text((70, 100), "Vraag 1: beschrijf de cel.")
+        pdf_path = self.root / "cache-source.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        output_path = self.root / "derived" / "exam-long.png"
+        source_hash = main.STORE.sha256(pdf_path)
+        first = main._load_or_build_stitched_exam(pdf_path, output_path, source_hash)
+        self.assertTrue(output_path.is_file())
+        self.assertTrue(output_path.with_suffix(".metadata.json").is_file())
+
+        # De tweede aanroep moet de PNG en metadata uit de cache lezen. Als
+        # de renderer toch wordt aangeroepen, faalt deze test direct.
+        with patch.object(main, "build_stitched_exam", side_effect=AssertionError("onverwachte herbouw")):
+            second = main._load_or_build_stitched_exam(pdf_path, output_path, source_hash)
+        self.assertEqual(first["pages"], second["pages"])
+        self.assertEqual(first["height"], second["height"])
+        self.assertTrue(second["white_row_ranges"])
 
     def test_legacy_automatic_context_link_is_repaired_without_changing_manual_links(self):
         """Heropenen van oude examens herstelt alleen de oude automatische koppeling."""
