@@ -317,6 +317,12 @@ class IntegratedReviewTests(unittest.TestCase):
             "document_sha256": starts.json()["document"]["sha256"],
         })
 
+        # Een eerder concept kan nog oude PDF-puntgrenzen bevatten.
+        # De nieuwe doorlopende review moet die verouderde coördinaten wissen.
+        main.STORE.save_step_draft(exam_id, "cv_fragments", {
+            "boundary_overrides": [{"question_number": 1, "start_y": 900.0, "end_y": 950.0}]
+        })
+
         stitched = self.client.get(
             f"/api/exams/{exam_id}/stitched-document/correctievoorschrift"
         )
@@ -339,6 +345,8 @@ class IntegratedReviewTests(unittest.TestCase):
         )
         self.assertEqual(saved.status_code, 200, saved.text)
         self.assertEqual(saved.json()["selection_count"], 1)
+        saved_evidence = self.client.get(f"/api/exams/{exam_id}").json()["steps"]["cv_fragments"]["evidence"]
+        self.assertEqual(saved_evidence["boundary_overrides"], [])
 
         fragments = self.client.get(
             f"/api/exams/{exam_id}/document-question-fragments/correctievoorschrift"
