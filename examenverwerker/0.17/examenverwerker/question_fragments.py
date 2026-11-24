@@ -804,6 +804,34 @@ def normalise_stitched_selections(
             rgb_crop.close()
             return has_content
 
+        def last_content_boundary(top: int, bottom: int) -> int:
+            """Plaats de ondergrens direct na de laatste niet-witte beeldrij.
+
+            Zoek binnen het vraagbereik van onder naar boven naar de laatste
+            zichtbare pixel. De grens wordt de eerste volledig witte rij
+            erna. Zo blijft de laatste tekstregel behouden, maar verdwijnt
+            overtollige witruimte onder het antwoordfragment.
+            """
+            y0 = max(0, min(height, int(top)))
+            y1 = max(y0, min(height, int(bottom)))
+            if y1 <= y0:
+                return int(bottom)
+            gray = image.crop((0, y0, width, y1)).convert("L")
+            pixels = gray.load()
+            last_row = -1
+            for local_y in range(gray.height - 1, -1, -1):
+                if any(pixels[x, local_y] < 252 for x in range(gray.width)):
+                    last_row = local_y
+                    break
+            gray.close()
+            if last_row < 0:
+                return int(bottom)
+            last_content_y = y0 + last_row
+            next_white = next(
+                (start for start, end in white_row_ranges if start > last_content_y),
+                None,
+            )
+            return int(next_white if next_white is not None else last_content_y + 1)
         # Vraagfragmenten zijn de ankers. Sorteer ze op hun visuele positie,
         # zodat ook meerdere vragen op dezelfde pagina in leesvolgorde staan.
         questions = [
@@ -833,6 +861,14 @@ def normalise_stitched_selections(
                 # De laatste vraag eindigt op de bovenste rij van de laatste
                 # volledig witte strook na de laatste inhoudsregel.
                 question["bottom"] = snap_after(height - 1)
+
+            # Scherp de automatische voorstelgrens aan tot de eerste volledig
+            # witte rij na de laatste niet-witte pixel. De volledige breedte
+            # wordt onderzocht, zodat ook figuren en rechterkolommen meetellen.
+            question["bottom"] = min(
+                int(question["bottom"]),
+                last_content_boundary(int(question["top"]), int(question["bottom"])),
+            )
 
             if question["bottom"] <= question["top"]:
                 number = question.get("question_numbers", ["?"])[0]
