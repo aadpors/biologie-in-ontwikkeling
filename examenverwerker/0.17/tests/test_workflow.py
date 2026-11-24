@@ -113,6 +113,86 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(first["height"], second["height"])
         self.assertTrue(second["white_row_ranges"])
 
+    def test_step_six_uses_stitched_workbook_selections_for_final_fragments(self):
+        """Stap 6 gebruikt dezelfde doorlopende selectiewerkruimte als stap 3."""
+        opgaven = fitz.open()
+        cover = opgaven.new_page()
+        cover.insert_text((70, 100), "Biologie vwo 2026")
+        question_page = opgaven.new_page()
+        question_page.insert_text((70, 100), "1. Beschrijf de functie van het celmembraan.")
+        opgaven_bytes = opgaven.tobytes()
+        opgaven.close()
+
+        workbook = fitz.open()
+        workbook.new_page().insert_text((70, 100), "Uitwerkbijlage biologie")
+        workbook_page = workbook.new_page()
+        workbook_page.insert_text((70, 100), "1. Noteer uw antwoord.")
+        workbook_bytes = workbook.tobytes()
+        workbook.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-o.pdf", opgaven_bytes, "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-u.pdf", workbook_bytes, "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{
+                "biologie-vwo-2026-tv2-o.pdf":"opgaven",
+                "biologie-vwo-2026-tv2-u.pdf":"uitwerkbijlage",
+            },
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        starts = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/uitwerkbijlage"
+        )
+        self.assertEqual(starts.status_code, 200, starts.text)
+        candidates = starts.json()["candidates"]
+        self.assertEqual([item["question_number"] for item in candidates], [1])
+        saved_starts = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/uitwerkbijlage/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(saved_starts.status_code, 200, saved_starts.text)
+        completed_starts = self.client.post(
+            f"/api/exams/{exam_id}/steps/uitwerk_starts/complete",
+            json={"reviewed":True, "reviewed_all_pages":True},
+        )
+        self.assertEqual(completed_starts.status_code, 200, completed_starts.text)
+
+        stitched = self.client.get(
+            f"/api/exams/{exam_id}/stitched-document/uitwerkbijlage"
+        )
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        white_ranges = stitched.json()["white_row_ranges"]
+        self.assertTrue(white_ranges)
+        # Kies twee geldige witte rijen rond de tekststrook. De test gebruikt
+        # uitsluitend servergerapporteerde grenzen, net als de browser.
+        first = white_ranges[0]
+        last = white_ranges[-1]
+        top = first[0]
+        bottom = last[1]
+        self.assertGreater(bottom, top)
+
+        saved_selection = self.client.post(
+            f"/api/exams/{exam_id}/stitched-document/uitwerkbijlage/review",
+            json={"selections":[{
+                "id":"workbook-q1", "type":"vraag", "top":top, "bottom":bottom,
+                "question_numbers":[1], "label":"Vraag 1",
+            }], "reviewed":True},
+        )
+        self.assertEqual(saved_selection.status_code, 200, saved_selection.text)
+
+        fragments = self.client.get(
+            f"/api/exams/{exam_id}/document-question-fragments/uitwerkbijlage"
+        )
+        self.assertEqual(fragments.status_code, 200, fragments.text)
+        self.assertEqual(fragments.json()["question_count"], 1)
+        self.assertTrue(fragments.json()["questions"][0]["stitched"])
+        self.assertEqual(fragments.json()["questions"][0]["question_number"], 1)
+
     def test_legacy_automatic_context_link_is_repaired_without_changing_manual_links(self):
         """Heropenen van oude examens herstelt alleen de oude automatische koppeling."""
         selections = [
