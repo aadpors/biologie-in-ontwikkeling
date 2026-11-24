@@ -1604,7 +1604,7 @@ def get_relations(exam_id: str):
     )
     return {"question_count": len(questions), "questions": questions,
             "missing_cv": sorted(opgaven - cv), "extra_cv": sorted(cv - opgaven),
-            "missing_answers": sorted(opgaven - answer_numbers),
+            "missing_answers": sorted((opgaven & cv) - answer_numbers),
             "extra_answers": sorted(answer_numbers - opgaven),
             "score_mismatches": score_mismatches,
             "uncertain_analysis": uncertain_analysis,
