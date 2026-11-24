@@ -69,6 +69,7 @@ def cv_model_start(pdf: fitz.Document) -> tuple[int, float]:
     de pagina. De functie retourneert de nulgebaseerde pagina-index en de
     verticale PDF-coördinaat van de kop.
     """
+    candidates: list[tuple[float, int, float]] = []
     for page_index, page in enumerate(pdf):
         for block in page.get_text("dict").get("blocks", []):
             if block.get("type") != 0:
@@ -83,7 +84,19 @@ def cv_model_start(pdf: fitz.Document) -> tuple[int, float]:
                 top = float(bbox[1])
                 if (top <= page.rect.height * 0.25
                         and re.fullmatch(r"4\s+beoordelingsmodel", text, re.IGNORECASE)):
-                    return page_index, top
+                    # Een inhoudsopgave kan dezelfde regel bevatten. De echte
+                    # hoofdstukkop heeft doorgaans een grotere lettergrootte;
+                    # bewaar daarom de maximale span-grootte als extra signaal.
+                    font_size = max(
+                        (float(span.get("size", 0)) for span in line.get("spans", [])),
+                        default=0.0,
+                    )
+                    candidates.append((font_size, page_index, top))
+    if candidates:
+        # Kies de meest opvallende zelfstandige kop, niet de kleinere
+        # verwijzing in de inhoudsopgave.
+        _, page_index, top = max(candidates, key=lambda item: (item[0], -item[1]))
+        return page_index, top
     # Niet ieder correctievoorschrift gebruikt exact deze hoofdstuknummering.
     # Als de kop ontbreekt, laat de volledige PDF beschikbaar in plaats van
     # mogelijk inhoudelijke beoordelingsregels stilzwijgend weg te laten.
