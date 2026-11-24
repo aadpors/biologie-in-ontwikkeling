@@ -829,7 +829,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
 
     panel.innerHTML = `
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
-      <p class="lead">De pagina's zijn eerst afzonderlijk bijgesneden en daarna samengevoegd. Contexten en vragen staan in één doorlopende afbeelding. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.</p>
+      <p class="lead">${isWorkbook
+        ? 'De pagina’s van de uitwerkbijlage zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.'
+        : 'De pagina’s zijn eerst afzonderlijk bijgesneden en daarna samengevoegd. Contexten en vragen staan in één doorlopende afbeelding. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
