@@ -355,7 +355,9 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertEqual(fragments.json()["question_count"], 1)
         question = fragments.json()["questions"][0]
         self.assertTrue(question["stitched"])
-        self.assertEqual(question["first_page"], 1)
+        # De eerste PDF-pagina bevat alleen algemene regels. Stap 8 begint
+        # bewust pas op de pagina met de echte kop Beoordelingsmodel.
+        self.assertEqual(question["first_page"], 2)
         self.assertEqual(question["last_page"], 2)
         self.assertIn("correctievoorschrift", question["segments"][0]["url"])
 
