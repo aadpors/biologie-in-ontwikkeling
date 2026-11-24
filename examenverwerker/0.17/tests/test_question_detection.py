@@ -92,6 +92,75 @@ class QuestionDetectionTests(unittest.TestCase):
             ["A. De celkern bevat DNA.", "B. Het celmembraan bevat cellulose."],
         )
 
+    def test_new_ocr_proposals_update_old_unreviewed_analysis_drafts(self):
+        # Oude concepten konden een eerder onjuist voorstel 'open' met lege
+        # opties blijven terugzetten. Een nieuwe OCR-herkenning moet die lege
+        # velden aanvullen, zonder bestaande handmatige antwoordteksten kwijt
+        # te raken.
+        question = {
+            "question_number": 4,
+            "question_type": "meerkeuze",
+            "max_points": 2,
+            "options": [
+                {"letter": "A", "text": "Nieuwe optie A"},
+                {"letter": "B", "text": "Nieuwe optie B"},
+            ],
+            "reviewed": False,
+        }
+        old_draft = {
+            "question_type": "open",
+            "max_points": None,
+            "options": [],
+            "reviewed": False,
+        }
+        main._merge_saved_question_analysis(question, old_draft)
+        self.assertEqual(question["question_type"], "meerkeuze")
+        self.assertEqual([item["letter"] for item in question["options"]], ["A", "B"])
+
+        # Een bestaande handmatige tekst blijft behouden, terwijl een optie
+        # die pas door de nieuwe OCR is gevonden alsnog wordt toegevoegd.
+        question["options"] = [
+            {"letter": "A", "text": "Nieuwe optie A"},
+            {"letter": "B", "text": "Nieuwe optie B"},
+        ]
+        manual_draft = {
+            "question_type": "open",
+            "max_points": None,
+            "options": [{"letter": "A", "text": "Handmatig gecorrigeerde optie A"}],
+            "reviewed": False,
+        }
+        main._merge_saved_question_analysis(question, manual_draft)
+        self.assertEqual(question["question_type"], "meerkeuze")
+        self.assertEqual(
+            question["options"],
+            [
+                {"letter": "A", "text": "Handmatig gecorrigeerde optie A"},
+                {"letter": "B", "text": "Nieuwe optie B"},
+            ],
+        )
+
+    def test_reviewed_question_analysis_is_never_overwritten_by_new_detection(self):
+        # Een expliciet door de docent gecontroleerde keuze blijft leidend,
+        # ook wanneer de automatische analyse later andere signalen vindt.
+        question = {
+            "question_number": 5,
+            "question_type": "meerkeuze",
+            "max_points": 2,
+            "options": [{"letter": "A", "text": "OCR-voorstel"}],
+            "reviewed": False,
+        }
+        reviewed = {
+            "question_type": "open",
+            "max_points": 4,
+            "options": [],
+            "reviewed": True,
+        }
+        main._merge_saved_question_analysis(question, reviewed)
+        self.assertEqual(question["question_type"], "open")
+        self.assertEqual(question["max_points"], 4)
+        self.assertEqual(question["options"], [])
+        self.assertTrue(question["reviewed"])
+
     def test_question_analysis_uses_visual_ocr_when_pdf_text_has_no_options(self):
         # De PDF-tekstlaag kan een meerkeuzevraag wel herkennen als tekst,
         # maar de antwoordopties missen doordat ze als afbeelding of in aparte
