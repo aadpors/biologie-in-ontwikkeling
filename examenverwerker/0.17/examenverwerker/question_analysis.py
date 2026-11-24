@@ -151,9 +151,14 @@ def _ocr_image_text(image_paths: list[str | Path]) -> str:
             # niet verhinderen; ga door met de volgende afbeelding.
             continue
 
-        # RapidOCR retourneert normaal (resultaten, verwerkingstijden). De
-        # tweede vorm wordt ook ondersteund om versieverschillen op te vangen.
-        detections = response[0] if isinstance(response, tuple) else response
+        # De actuele RapidOCR-versie retourneert een object met aparte
+        # arrays voor bounding boxes en herkende tekst. Ondersteun daarnaast
+        # het oudere tupleformaat, zodat de helper ook met eerdere releases
+        # en eenvoudige testdubbels kan blijven werken.
+        if hasattr(response, "boxes") and hasattr(response, "txts"):
+            detections = list(zip(response.boxes, response.txts))
+        else:
+            detections = response[0] if isinstance(response, tuple) else response
         if not detections:
             continue
 
