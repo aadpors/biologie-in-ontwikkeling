@@ -92,8 +92,8 @@
 .stitched-image-wrap.selecting{cursor:crosshair}
 .stitched-image-wrap img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
 .stitched-overlay{position:absolute;inset:0;pointer-events:none}
-.stitched-selection{position:absolute;left:0;right:0;z-index:1;border-top:2px solid #1874c8;border-bottom:2px solid #1874c8;background:#1874c81a;pointer-events:auto;cursor:pointer;touch-action:pan-y}
-.stitched-selection.active{z-index:20!important;background:#f59e0b24;border-color:#c77700}
+.stitched-selection{position:absolute;left:0;right:0;z-index:3;border-top:2px solid #1874c8;border-bottom:2px solid #1874c8;background:#1874c81a;pointer-events:auto;cursor:pointer;touch-action:pan-y}
+.stitched-selection.active{z-index:2!important;background:#f59e0b24;border-color:#c77700}
 .stitched-boundary{position:absolute;left:0;right:0;height:14px;padding:0;border:0;background:transparent;cursor:ns-resize;z-index:3;touch-action:none}
 .stitched-boundary::after{content:"";position:absolute;left:0;right:0;top:6px;border-top:3px solid #1874c8}
 .stitched-boundary-top{top:-7px}
@@ -151,3 +151,21 @@
 @media(max-width:900px) {
   .stitched-image-scroll, .stitched-inspector { max-height: 65vh; }
 }
+
+
+/* Contextvraagbereiken mogen compact worden ingevoerd, bijvoorbeeld 1–7. */
+.field-help { display:block; margin-top:.25rem; color:var(--muted,#667085); font-size:.72rem; }
+
+/* De verplichte visuele bevestiging blijft duidelijk zichtbaar, maar neemt
+   minder ruimte in dan de vraagafbeelding en de inhoudelijke invoervelden. */
+.analysis-card .review-warning {
+  display:flex;
+  align-items:flex-start;
+  gap:.45rem;
+  padding:.45rem .65rem;
+  margin-top:.55rem;
+  font-size:.72rem;
+  line-height:1.35;
+}
+.analysis-card .review-warning input { flex:0 0 auto; width:auto; margin:.1rem 0 0; }
+.closed-answer-form { margin-top:.25rem; }
