@@ -25,7 +25,7 @@ from .metadata import suggest_metadata
 from .question_detection import detect_question_starts, validate_review
 from .question_fragments import (generate_question_fragments, build_stitched_exam,
                                   propose_stitched_question_selections, normalise_stitched_selections,
-                                  cv_content_end_page)
+                                  cv_content_end_page, cv_model_start)
 from .question_analysis import analyse_questions, validate_question_analysis
 from .answer_detection import analyse_answers, detect_cv_max_points, validate_answer_review
 from .cv_supplement import analyse_supplement, validate_supplement_review
@@ -49,6 +49,7 @@ def _load_or_build_stitched_exam(
     *,
     start_page: int = 1,
     end_page: int | None = None,
+    start_y: float = 0.0,
 ) -> dict[str, Any]:
     """Herbruik de lange examenafbeelding met de juiste paginaselectie.
 
@@ -70,6 +71,7 @@ def _load_or_build_stitched_exam(
                     and cached.get("cache_version") == 4
                     and cached.get("start_page") == start_page
                     and cached.get("end_page") == end_page
+                    and cached.get("start_y") == start_y
                     and isinstance(cached.get("metadata"), dict)
                     and isinstance(cached.get("white_row_ranges"), list)):
                 metadata = dict(cached["metadata"])
@@ -82,7 +84,8 @@ def _load_or_build_stitched_exam(
     # Geef de paginakeuze expliciet door aan de renderer. Zonder dit argument
     # zou ook een uitwerkbijlage standaard de eerste pagina overslaan.
     metadata = build_stitched_exam(
-        source_path, output_path, start_page=start_page, end_page=end_page
+        source_path, output_path, start_page=start_page, end_page=end_page,
+        start_y=start_y,
     )
     white_rows = _white_row_ranges(output_path)
     cache_payload = {
@@ -90,6 +93,7 @@ def _load_or_build_stitched_exam(
         "source_sha256": source_sha256,
         "start_page": start_page,
         "end_page": end_page,
+        "start_y": start_y,
         "metadata": metadata,
         "white_row_ranges": white_rows,
     }
@@ -113,6 +117,22 @@ def _stitched_end_page(source_path: Path, document_type: str) -> int | None:
         return None
     with fitz.open(source_path) as pdf:
         return cv_content_end_page(pdf)
+
+
+def _stitched_page_selection(source_path: Path, document_type: str) -> tuple[int, int | None, float]:
+    """Bepaal de eerste en laatste pagina voor de lange documentafbeelding.
+
+    Voor het CV begint de werkruimte bij de kop '4 Beoordelingsmodel' en
+    eindigt zij vóór de administratieve slotsectie. De eerste pagina wordt
+    zo nodig ook bovenaan de kop bijgesneden. De uitwerkbijlage begint op
+    pagina 1 en gebruikt geen extra verticale startuitsnede.
+    """
+    if document_type == "correctievoorschrift":
+        with fitz.open(source_path) as pdf:
+            first_page, first_y = cv_model_start(pdf)
+            last_page = cv_content_end_page(pdf)
+        return first_page, last_page, first_y
+    return 0, None, 0.0
 
 
 def _safe_filename(filename: str) -> str:
@@ -770,8 +790,9 @@ def _load_document_fragments(exam_id: str, document_type: str):
         # op pagina 1. De cache gebruikt dezelfde paginakeuze als de review.
         stitched_metadata = _load_or_build_stitched_exam(
             source_path, stitched_path, document["sha256"],
-            start_page=1 if document_type == "opgaven" else 0,
-            end_page=_stitched_end_page(source_path, document_type),
+            start_page=1 if document_type == "opgaven" else _stitched_page_selection(source_path, document_type)[0],
+            end_page=_stitched_page_selection(source_path, document_type)[1],
+            start_y=_stitched_page_selection(source_path, document_type)[2],
         )
         stitched_questions = [item for item in previous["stitched_selections"] if item.get("type") == "vraag"]
         stitched_contexts = [item for item in previous["stitched_selections"] if item.get("type") == "context"]
@@ -1103,9 +1124,10 @@ def get_stitched_document(exam_id: str, document_type: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     target = output_dir / "exam-long.png"
     try:
+        start_page, end_page, start_y = _stitched_page_selection(source, document_type)
         metadata = _load_or_build_stitched_exam(
-            source, target, document["sha256"], start_page=0,
-            end_page=_stitched_end_page(source, document_type),
+            source, target, document["sha256"], start_page=start_page,
+            end_page=end_page, start_y=start_y,
         )
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, str(exc)) from exc
@@ -1185,10 +1207,11 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
     stitched_path = DATA / "exams" / exam_id / "derived" / f"{document_type}_stitched" / "exam-long.png"
     if not stitched_path.is_file():
         document = _document_for_type(exam, document_type)
+        source_path = DATA / document["relative_path"]
+        start_page, end_page, start_y = _stitched_page_selection(source_path, document_type)
         _load_or_build_stitched_exam(
-            DATA / document["relative_path"], stitched_path, document["sha256"],
-            start_page=0,
-            end_page=_stitched_end_page(DATA / document["relative_path"], document_type),
+            source_path, stitched_path, document["sha256"],
+            start_page=start_page, end_page=end_page, start_y=start_y,
         )
     with Image.open(stitched_path) as image:
         stitched_height = image.height
