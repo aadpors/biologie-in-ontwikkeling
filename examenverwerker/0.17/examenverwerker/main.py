@@ -860,7 +860,7 @@ def get_stitched_opgaven(exam_id: str):
     # Bereken de enige toegestane grensposities op basis van de werkelijk
     # gerenderde afbeelding. Automatische voorstellen worden naar de dichtstbijzijnde
     # volledig witte rij verschoven voordat ze aan de browser worden geleverd.
-    white_rows = _white_row_ranges(target)
+    white_rows = metadata.get("white_row_ranges") or _white_row_ranges(target)
     if proposed:
         # Normaliseer vraagfragmenten vóórdat de browser ze ziet. Daardoor
         # overlappen twee vragen nooit en worden lege witruimtes geen context.
