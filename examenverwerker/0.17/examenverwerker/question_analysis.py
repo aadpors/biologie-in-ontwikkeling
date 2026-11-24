@@ -27,43 +27,69 @@ def _normalise_lines(text: str) -> list[str]:
 
 
 def detect_options(text: str) -> list[dict[str, str]]:
-    """Herken antwoordopties in zowel compacte als regel-voor-regel-PDF-tekst.
+    """Herken antwoordopties in de meest voorkomende PDF-tekstindelingen.
 
-    PDF-tekstextractie zet de letter en de antwoordtekst niet altijd op
-    dezelfde regel. Soms staat er bijvoorbeeld eerst alleen "A." en pas op
-    de volgende regel de antwoordtekst. Ook kan een optie met een haakje in
-    plaats van een punt beginnen. Deze parser herkent die varianten, maar
-    accepteert alleen een aaneengesloten reeks vanaf A om toevallige letters
-    in gewone zinnen niet als antwoordopties te behandelen.
+    PDF-extractie is niet layoutvast: de letters kunnen op een eigen regel
+    staan, de opties kunnen achter elkaar op één regel staan of de letters
+    kunnen tussen haakjes of met een dubbele punt zijn vormgegeven. Daarom
+    combineren we een herkenning van expliciete A-E-markeringen met een
+    regelgerichte terugvaloptie. Een voorstel wordt alleen geaccepteerd als
+    ten minste twee opeenvolgende opties vanaf A zijn gevonden.
     """
-    lines = _normalise_lines(text)
+    normalised_text = text.replace("\\r", "\\n")
+    lines = _normalise_lines(normalised_text)
     found: dict[str, str] = {}
+
+    # Herken expliciete markeringen zoals 'A. tekst', '(A) tekst', 'A) tekst'
+    # en 'A: tekst'. Door de tekst tussen opeenvolgende markeringen te nemen,
+    # blijven opties herkenbaar wanneer de PDF ze op één regel of in kolommen
+    # achter elkaar uitleest.
+    marker_pattern = re.compile(
+        r"(?<![A-Za-z0-9])(?:\\(([A-E])\\)|([A-E])\\s*[.):])\\s*",
+        re.IGNORECASE,
+    )
+    matches = list(marker_pattern.finditer(normalised_text))
+    for index, match in enumerate(matches):
+        letter = (match.group(1) or match.group(2)).upper()
+        if letter in found:
+            continue
+        content_start = match.end()
+        content_end = matches[index + 1].start() if index + 1 < len(matches) else len(normalised_text)
+        option_text = normalised_text[content_start:content_end].strip(" \\t\\r\\n;|")
+        # Een volgende optieletter zonder antwoordtekst is geen bruikbare optie.
+        if len(option_text) >= 2:
+            found[letter] = option_text
+
+    # Regelgerichte fallback voor PDF's die alleen een letter op een regel
+    # zetten en de antwoordtekst op de volgende regel plaatsen. Deze route
+    # vult alleen nog ontbrekende letters aan en overschrijft geen expliciet
+    # herkende optie uit de tekststroom.
     index = 0
     while index < len(lines):
         line = lines[index]
-        # Gebruik eerst de gebruikelijke notatie: "A. antwoord" of "A) antwoord".
-        match = re.match(r"^\s*([A-E])[.)]?\s+(.+?)\s*$", line, re.IGNORECASE)
-        if match:
-            letter, option_text = match.group(1).upper(), match.group(2).strip()
+        compact = re.match(r"^\\s*([A-E])[.)]?\\s+(.+?)\\s*$", line, re.IGNORECASE)
+        if compact:
+            letter, option_text = compact.group(1).upper(), compact.group(2).strip()
             if len(option_text) >= 2:
                 found.setdefault(letter, option_text)
             index += 1
             continue
 
-        # In sommige PDF's staat de letter als afzonderlijke tekstregel.
-        # Neem dan de eerstvolgende regel als antwoordtekst, tenzij die zelf
-        # al een volgende optieletter is.
-        standalone = re.fullmatch(r"\s*([A-E])[.)]?\s*", line, re.IGNORECASE)
+        standalone = re.fullmatch(r"\\s*([A-E])[.)]?\\s*", line, re.IGNORECASE)
         if standalone and index + 1 < len(lines):
             next_line = lines[index + 1]
-            next_is_option = bool(re.match(r"^\s*[A-E][.)]?\s+", next_line, re.IGNORECASE)
-                                   or re.fullmatch(r"\s*[A-E][.)]?\s*", next_line, re.IGNORECASE))
+            next_is_option = bool(
+                re.match(r"^\\s*[A-E](?:[.)]|:)\\s*", next_line, re.IGNORECASE)
+                or re.fullmatch(r"\\s*\\(?[A-E]\\)?[.)]?\\s*", next_line, re.IGNORECASE)
+            )
             if not next_is_option and len(next_line.strip()) >= 2:
                 found.setdefault(standalone.group(1).upper(), next_line.strip())
                 index += 2
                 continue
         index += 1
 
+    # Een losse C of D in lopende tekst is geen meerkeuzereeks. Alleen een
+    # aaneengesloten prefix vanaf A wordt als betrouwbaar voorstel getoond.
     ordered = [letter for letter in "ABCDE" if letter in found]
     if len(ordered) < 2 or ordered != list("ABCDE")[:len(ordered)]:
         return []
