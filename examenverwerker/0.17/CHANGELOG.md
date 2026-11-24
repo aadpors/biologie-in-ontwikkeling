@@ -50,3 +50,24 @@ dat alle 39 hoofdvragen precies één vraagfragment hebben, dat geen vraagfragme
 overlappen en dat iedere context- en vraaggrens op een volledig witte rij ligt.
 In de uitgevoerde diagnose leverde dit 39 vraagfragmenten en 23 contextfragmenten
 op, zonder overlappende vraagfragmenten.
+
+
+## Aanvullende correcties na praktijktest
+
+### Stap 3 — context en bediening
+- Een zichtbare tussenruimte wordt niet langer automatisch als context aangemerkt. De detectie zoekt nu ook naar inhoudelijke contextsignalen: expliciete verwijzingen naar gedeelde informatie, zelfstandige tekstblokken en substantiële figuren met een tekstanker.
+- Als een tussenruimte onvoldoende contextsignalen bevat, blijft de inhoud onderdeel van de voorafgaande vraag. Zo verdwijnt tekst niet uit de vraagfragmenten en ontstaan minder foutieve contextfragmenten.
+- De contextkoppeling accepteert nu compacte bereiken, bijvoorbeeld `1–7, 9, 12–14`. De server ontvangt en bewaart nog steeds de expliciete vraagnummers; labels worden eveneens compact weergegeven.
+- De actieve oranje selectie blijft op een eigen laag, maar ligt achter de blauwe fragmentvlakken in plaats van erboven.
+- Het lange examenbeeld, de paginametadata en de witte grensrijen worden op basis van de bronbestandshash gecachet. Terugnavigeren naar stap 3 en het opnieuw openen van stap 4 veroorzaakt daardoor geen nieuwe crop- en stitchronde zolang de PDF niet is gewijzigd.
+
+### Stap 4 — vraaganalyse
+- Meerkeuzeopties worden ook herkend wanneer de optieletter en de antwoordtekst op afzonderlijke PDF-tekstregels staan.
+- Een aaneengesloten reeks van twee of meer antwoordopties kan als meerkeuze worden voorgesteld.
+- Bij gesloten vragen wordt naast het algemene vraagtype ook de concrete antwoordvorm getoond, bijvoorbeeld juist/onjuist, wel/niet, hoger/gelijk/lager of meer/gelijk/minder.
+- De verplichte visuele controlebevestiging gebruikt een kleinere tekst en neemt minder schermruimte in.
+
+### Regressiecontrole
+- Tests toegevoegd voor gesplitste antwoordopties, gesloten antwoordvormen, niet-contextinhoud tussen vragen en het hergebruiken van de stitchcache.
+- De volledige testset, de diagnose op het echte examen en de JavaScript-syntaxiscontrole zijn op de laatste branchversie geslaagd.
+- De diagnose op `vw-1018-a-26-2-o.pdf` vond 39 vraagfragmenten en 22 contextfragmenten; er waren geen overlappende vraagfragmenten en alle fragmentgrenzen lagen op volledig witte rijen.
