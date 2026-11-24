@@ -767,8 +767,6 @@ async function renderSnippetsStage() {
       </div>
       <p id="snippetsMessage" class="form-error" role="status"></p>`;
 
-    const contextCardsInDom = [...panel.querySelectorAll('[data-context-card]')];
-
     // De server bewaart voor compatibiliteit nog steeds expliciete
     // reviewed-markeringen. Die worden nu in één keer gezet door de
     // afrondactie, niet door een reeks vinkjes naast afzonderlijke plaatjes.
@@ -1176,9 +1174,18 @@ async function renderFinalReviewStage() {
 
     // Expose one flush hook so any workflow navigation waits for the final
     // pending autosave before replacing this panel.
+    const saveWhenHidden = () => {
+      if (document.visibilityState === 'hidden') saveDraft().catch(() => {});
+    };
+    const saveOnPageHide = () => saveDraft().catch(() => {});
+    document.addEventListener('visibilitychange', saveWhenHidden);
+    window.addEventListener('pagehide', saveOnPageHide);
+
     panel._stageAutoSaveFlush = saveDraft;
     panel._stageAutoSaveCleanup = () => {
       clearTimeout(saveTimer);
+      document.removeEventListener('visibilitychange', saveWhenHidden);
+      window.removeEventListener('pagehide', saveOnPageHide);
       panel._stageAutoSaveFlush = null;
       panel._stageAutoSaveCleanup = null;
     };
@@ -2010,11 +2017,22 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       render();scheduleSave();
     });
 
-    $('#saveStitched').addEventListener('click',async()=>{
+    $('#saveStitched').addEventListener('click',async event=>{
+      const button = event.currentTarget;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Opslaan…';
       try {
         await persistSelections();
         $('#stitchedMessage').textContent=`${selections.length} fragmentselecties opgeslagen.`;
-      } catch(error) { $('#stitchedMessage').textContent=error.message; }
+      } catch(error) {
+        $('#stitchedMessage').textContent=error.message;
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      }
     });
     $('#completeStitched').addEventListener('click', async () => {
       const button = $('#completeStitched');
