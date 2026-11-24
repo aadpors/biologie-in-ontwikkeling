@@ -980,6 +980,18 @@ def generate_question_fragments(
             segments = []
             extracted_text_parts: list[str] = []
 
+            # Een CV-vraagstart mag nooit buiten het afgebakende
+            # beoordelingsmodel vallen. Als een start door een verouderde
+            # review of een afwijkende slotsectie toch ná de laatste
+            # inhoudspagina staat, stop dan met een gerichte validatiefout.
+            # Zo bereikt een lege lijst nooit de afbeeldingsstitcher.
+            if first_page > last_page:
+                raise ValueError(
+                    f"CV-vraag {start['question_number']} begint na de laatste "
+                    "pagina van het beoordelingsmodel. Controleer de vraagstart "
+                    "en de grens van de administratieve slotsectie."
+                )
+
             for page_index in range(first_page, last_page + 1):
                 page = pdf[page_index]
                 page_rect = page.rect
