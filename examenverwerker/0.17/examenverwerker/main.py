@@ -319,12 +319,17 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                 # fragmentgenerator kapt het CV vóór "5 Aanleveren scores"
                 # af; een vraagstart ná die grens zou anders een leeg
                 # fragment opleveren en later een interne stitchfout geven.
-                cv_content_end_page = len(cv_pdf) - 1
-                for page_index, page in enumerate(cv_pdf):
-                    if re.search(r"(?m)^\s*5\s+aanleveren scores\b",
-                                 page.get_text("text").casefold()):
-                        cv_content_end_page = max(0, page_index - 1)
-                        break
+                # Open de PDF opnieuw voor de slotsectiecontrole. De
+                # eerdere contextmanager is bewust al gesloten nadat de
+                # vraagregels zijn gelezen; een gesloten PyMuPDF-document mag
+                # niet worden hergebruikt voor paginatoegang.
+                with fitz.open(path) as cv_end_pdf:
+                    cv_content_end_page = len(cv_end_pdf) - 1
+                    for page_index, page in enumerate(cv_end_pdf):
+                        if re.search(r"(?m)^\s*5\s+aanleveren scores\b",
+                                     page.get_text("text").casefold()):
+                            cv_content_end_page = max(0, page_index - 1)
+                            break
                 cv_valid_candidates = [
                     candidate for candidate in cv_valid_candidates
                     if candidate["page_index"] <= cv_content_end_page
