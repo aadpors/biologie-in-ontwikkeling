@@ -618,11 +618,13 @@ async function renderRelationsStage() {
         await openWorkspace(state.examId);
       } catch(error) { $('#relationsMessage').textContent=error.message; }
     });
-    $('#repairMissingAnswers, #repairExtraAnswers')?.addEventListener?.('click',async()=>{
-      try {
-        await api(`/api/exams/${state.examId}/steps/antwoorden/reopen`,{method:'POST'});
-        await openWorkspace(state.examId);
-      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    document.querySelectorAll('#repairMissingAnswers, #repairExtraAnswers').forEach(button=>{
+      button.addEventListener('click',async()=>{
+        try {
+          await api(`/api/exams/${state.examId}/steps/antwoorden/reopen`,{method:'POST'});
+          await openWorkspace(state.examId);
+        } catch(error) { $('#relationsMessage').textContent=error.message; }
+      });
     });
   } catch(error) {
     panel.innerHTML=`<h2>Integriteitscontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
