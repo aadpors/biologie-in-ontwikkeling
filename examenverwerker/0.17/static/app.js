@@ -984,7 +984,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       handle.setPointerCapture?.(event.pointerId);
       overlay.querySelectorAll('[data-overlay-select]').forEach((element, elementIndex) => {
         element.classList.toggle('active', elementIndex === index);
-        element.style.zIndex = elementIndex === index ? '20' : '1';
+        // De actieve oranje selectie blijft als eigen laag herkenbaar, maar
+      // wordt niet meer boven alle blauwe fragmentvlakken gelegd.
+      element.style.zIndex = elementIndex === index ? '2' : '3';
       });
       list.querySelectorAll('[data-select-fragment]').forEach((button, buttonIndex) => {
         button.classList.toggle('active', buttonIndex === index);
@@ -1026,6 +1028,49 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     };
     overlay.addEventListener('pointerup', stopBoundaryDrag);
     overlay.addEventListener('pointercancel', stopBoundaryDrag);
+
+    // Maak vraagbereiken compact leesbaar in de inspector. Een reeks van
+    // zeven opeenvolgende vragen wordt bijvoorbeeld "1–7" in plaats van
+    // "1, 2, 3, 4, 5, 6, 7".
+    const formatQuestionRanges = values => {
+      const numbers = [...new Set((values || []).map(Number).filter(n => Number.isInteger(n) && n > 0))]
+        .sort((a, b) => a - b);
+      const ranges = [];
+      for (let index = 0; index < numbers.length;) {
+        const start = numbers[index];
+        let end = start;
+        while (index + 1 < numbers.length && numbers[index + 1] === end + 1) {
+          end = numbers[++index];
+        }
+        ranges.push(start === end ? String(start) : `${start}–${end}`);
+        index += 1;
+      }
+      return ranges.join(', ');
+    };
+
+    // Accepteer losse nummers én compacte bereiken zoals "1-7, 10, 12-14".
+    // De server ontvangt altijd de expliciete, unieke lijst met vraagnummers.
+    const parseQuestionRanges = value => {
+      const numbers = new Set();
+      const tokens = value.split(/[;,]/).map(token => token.trim()).filter(Boolean);
+      if (!tokens.length) return null;
+      for (const token of tokens) {
+        const range = token.match(/^(\\d{1,2})\\s*[-–]\\s*(\\d{1,2})$/);
+        if (range) {
+          let first = Number(range[1]);
+          let last = Number(range[2]);
+          if (first < 1 || last > 60) return null;
+          if (first > last) [first, last] = [last, first];
+          for (let number = first; number <= last; number += 1) numbers.add(number);
+          continue;
+        }
+        if (!/^\\d{1,2}$/.test(token)) return null;
+        const number = Number(token);
+        if (number < 1 || number > 60) return null;
+        numbers.add(number);
+      }
+      return [...numbers].sort((a, b) => a - b);
+    };
 
     // Toon geen technische fragmentnummers. De inhoudelijke naam volgt
     // uit het fragmenttype en de gekoppelde vraag-/vraagnummers.
@@ -1091,7 +1136,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
               </select>
             </label>
             <label>Bij welk(e) vraagnummer(s)?
-              <input id="fragmentQuestions" value="${item.question_numbers.join(', ')}" placeholder="bijvoorbeeld 1, 2, 3">
+              <input id="fragmentQuestions" value="${escapeHtml(formatQuestionRanges(item.question_numbers))}" placeholder="bijvoorbeeld 1–7, 9, 12–14" aria-describedby="fragmentQuestionsHelp">
+              <small id="fragmentQuestionsHelp" class="field-help">Gebruik bijvoorbeeld 1–7 of 1, 3, 5–8.</small>
             </label>
             <label>Omschrijving (optioneel)
               <input id="fragmentLabel" value="${escapeHtml(item.label||'')}" placeholder="Korte herkenbare omschrijving">
@@ -1113,7 +1159,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       }).join('') || '<p class="muted">Nog geen fragmenten geselecteerd.</p>';
 
       overlay.innerHTML = selections.map((item,index) =>
-        `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?20:1}" data-overlay-select="${index}">
+        `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?2:3}" data-overlay-select="${index}">
           <button type="button" class="stitched-boundary stitched-boundary-top" data-boundary="top" data-boundary-index="${index}" aria-label="Bovengrens verslepen"></button>
           <span>${escapeHtml(questionLabel(item))}</span>
           <button type="button" class="stitched-boundary stitched-boundary-bottom" data-boundary="bottom" data-boundary-index="${index}" aria-label="Ondergrens verslepen"></button>
@@ -1132,10 +1178,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           scheduleSave();
         });
         $('#fragmentQuestions').addEventListener('change', event => {
-          const numbers = event.target.value.split(',')
-            .map(value => Number(value.trim()))
-            .filter(number => Number.isInteger(number) && number > 0 && number <= 60);
-          item.question_numbers = [...new Set(numbers)];
+          const numbers = parseQuestionRanges(event.target.value);
+          if (!numbers) {
+            event.target.setCustomValidity('Gebruik losse vraagnummers of bereiken, bijvoorbeeld 1–7, 9, 12–14.');
+            event.target.reportValidity();
+            return;
+          }
+          event.target.setCustomValidity('');
+          item.question_numbers = numbers;
+          event.target.value = formatQuestionRanges(numbers);
           render();
           scrollInspectorToFragment(activeIndex);
           scheduleSave();
@@ -1486,6 +1537,7 @@ async function renderQuestionAnalysisStage() {
             <textarea rows="4" data-analysis-options="${question.question_number}">${escapeHtml(optionText)}</textarea>
           </label>
           <p class="analysis-reason">Type: ${escapeHtml(question.type_reason)} Score: ${escapeHtml(question.points_reason)}</p>
+          ${question.closed_answer_form ? `<p class="analysis-reason closed-answer-form"><strong>Gesloten antwoordvorm:</strong> ${escapeHtml(question.closed_answer_form)}</p>` : ''}
           <details class="analysis-text"><summary>Tekstlaag uit dit fragment (hulpmiddel, niet leidend)</summary><pre>${escapeHtml(question.extracted_text || 'Geen selecteerbare tekstlaag aangetroffen. Controleer de afbeelding.')}</pre></details>
           <label class="review-warning"><input type="checkbox" data-analysis-reviewed="${question.question_number}" ${question.reviewed ? 'checked' : ''}> Ik heb vraag ${question.question_number}, het vraagtype, de maximumscore en eventuele antwoordopties visueel gecontroleerd.</label>
         </article>`;
