@@ -74,4 +74,4 @@ REM Als de server stopt door een fout, blijft de melding zichtbaar.
 echo.
 echo De Examenverwerker is gestopt.
 pause
-endlocall
+endlocal
