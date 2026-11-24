@@ -1077,13 +1077,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const questionLabel = item => {
       const numbers = [...(item.question_numbers || [])].sort((a, b) => a - b);
       if (!numbers.length) return 'Nog niet gekoppeld';
-      if (item.type === 'vraag') return numbers.length === 1 ? `Vraag ${numbers[0]}` : `Vragen ${numbers.join(', ')}`;
-      const joined = numbers.length === 1
-        ? String(numbers[0])
-        : numbers.length === 2
-          ? `${numbers[0]} en ${numbers[1]}`
-          : `${numbers.slice(0, -1).join(', ')} en ${numbers[numbers.length - 1]}`;
-      return `Context bij vraag ${joined}`;
+      if (item.type === 'vraag') return numbers.length === 1 ? `Vraag ${numbers[0]}` : `Vragen ${formatQuestionRanges(numbers)}`;
+      return `Context bij vraag ${formatQuestionRanges(numbers)}`;
     };
 
     // Verplaats het middendeel naar het verticale midden van een fragment.
