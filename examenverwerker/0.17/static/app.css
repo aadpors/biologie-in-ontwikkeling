@@ -229,3 +229,54 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+
+/* De dubbele-importkeuze gebruikt een eigen dialoog in plaats van de
+   browserdialoog met de nietszeggende knoppen 'OK' en 'Annuleren'. */
+.import-decision-dialog {
+  width: min(540px, calc(100vw - 32px));
+  max-width: 540px;
+  padding: 0;
+  border: 1px solid #dce4e8;
+  border-radius: 16px;
+  color: #202a35;
+  background: #fff;
+  box-shadow: 0 24px 80px #102b3a35;
+}
+.import-decision-dialog::backdrop {
+  background: #172b3a80;
+  backdrop-filter: blur(2px);
+}
+.import-dialog-content { padding: 26px; }
+.import-dialog-content h2 { margin: 0 0 10px; font-size: 21px; letter-spacing: -.02em; }
+.import-dialog-content p:not(.eyebrow) { margin: 0; color: #5e6c75; font-size: 14px; line-height: 1.6; }
+.import-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 24px;
+}
+.import-dialog-actions button { margin: 0; }
+.import-dialog-actions .primary { order: -1; }
+.import-dialog-actions .danger {
+  border: 1px solid #a83232;
+  border-radius: 9px;
+  padding: 12px 17px;
+  color: #fff;
+  background: #a83232;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.import-dialog-actions .danger:hover { background: #872727; }
+.import-decision-dialog button:focus-visible {
+  outline: 3px solid #7aa9c0;
+  outline-offset: 3px;
+}
+@media (max-width: 520px) {
+  .import-dialog-content { padding: 21px; }
+  .import-dialog-actions { flex-direction: column; }
+  .import-dialog-actions button { width: 100%; }
+  .import-dialog-actions .primary { order: 0; }
+}
