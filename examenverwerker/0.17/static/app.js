@@ -143,6 +143,41 @@ function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+/* Toon een eigen, toegankelijke dialoog voor beslissingen rond importeren.
+   De Promise geeft uitsluitend de expliciete waarde van de gekozen knop terug.
+   Escape en sluiten leveren een lege waarde op en voeren dus nooit een
+   destructieve actie uit. */
+function showImportDialog({title, message, actions}) {
+  const dialog = $('#importDecisionDialog');
+  dialog.innerHTML = `
+    <div class="import-dialog-content">
+      <p class="eyebrow">EXAMEN IMPORTEREN</p>
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(message)}</p>
+      <div class="import-dialog-actions">
+        ${actions.map(action => `
+          <button type="button"
+            class="${action.danger ? 'danger' : action.primary ? 'primary' : 'quiet'}"
+            data-dialog-value="${escapeHtml(action.value)}">${escapeHtml(action.label)}</button>
+        `).join('')}
+      </div>
+    </div>`;
+  return new Promise(resolve => {
+    // Een dialoog die al openstaat wijst op een programmeerfout; voorkom dat
+    // een tweede beslissing stilzwijgend de eerste dialoog overschrijft.
+    if (dialog.open) {
+      resolve('');
+      return;
+    }
+    const finish = () => resolve(dialog.returnValue || '');
+    dialog.addEventListener('close', finish, {once:true});
+    dialog.querySelectorAll('[data-dialog-value]').forEach(button => {
+      button.addEventListener('click', () => dialog.close(button.dataset.dialogValue));
+    });
+    dialog.showModal();
+  });
+}
+
 $('#importForm').addEventListener('submit', async event => {
   event.preventDefault();
   $('#importError').textContent = '';
@@ -172,31 +207,41 @@ $('#importForm').addEventListener('submit', async event => {
       }
       if (detail?.code !== 'duplicate_exam') throw error;
 
-      // Een dubbele import is niet automatisch een fout: de gebruiker kan
-      // bewust verder willen met de bestaande verwerking, of juist opnieuw
-      // willen beginnen. Bied die twee keuzes expliciet en in die volgorde aan.
-      const continueExisting = window.confirm(
-        `Dit examen is al geïmporteerd: "${detail.title}".\n\n` +
-        'Wil je doorgaan met de bestaande import en verdergaan waar je gebleven was?\n\n' +
-        'Kies OK om de bestaande verwerking te openen. Kies Annuleren om opnieuw te beginnen.'
-      );
-      if (continueExisting) {
+      // Gebruik een eigen dialoog met benoemde acties. Een browservenster met
+      // alleen 'OK' en 'Annuleren' maakt niet duidelijk welke handeling achter
+      // Annuleren zit en past niet bij de vormgeving van de werkruimte.
+      const duplicateAction = await showImportDialog({
+        title: 'Dit examen is al geïmporteerd',
+        message: `"${detail.title}" staat al in de examenbibliotheek. Je kunt de bestaande verwerking openen en verdergaan waar je gebleven was, of een volledig nieuwe verwerking starten.`,
+        actions: [
+          {value: 'continue', label: 'Verdergaan met bestaande import', primary: true},
+          {value: 'restart', label: 'Opnieuw importeren'},
+          {value: 'cancel', label: 'Annuleren'}
+        ]
+      });
+      if (duplicateAction === 'continue') {
         $('#pdfFiles').value = '';
         button.textContent = 'Bestaande verwerking openen…';
         await openWorkspace(detail.exam_id);
         return;
       }
+      if (duplicateAction !== 'restart') {
+        $('#importError').textContent = 'Importeren geannuleerd. De bestaande verwerking is behouden.';
+        return;
+      }
 
-      // Verwijderen is onomkeerbaar. Vraag daarom na de keuze 'opnieuw
-      // beginnen' nog één keer expliciet bevestiging voordat de oude import
-      // daadwerkelijk wordt vervangen.
-      const replaceExisting = window.confirm(
-        'Opnieuw beginnen verwijdert de bestaande import en alle bijbehorende ' +
-        'verwerking definitief. De geselecteerde PDF-bestanden worden daarna ' +
-        'opnieuw geïmporteerd.\n\nWeet je zeker dat je opnieuw wilt beginnen?'
-      );
-      if (!replaceExisting) {
-        $('#importError').textContent = 'Opnieuw beginnen geannuleerd. De bestaande verwerking is behouden.';
+      // De tweede dialoog benoemt expliciet wat verloren gaat. Alleen de
+      // nadrukkelijke knop 'Import opnieuw starten' voert de vervanging uit.
+      const replaceExisting = await showImportDialog({
+        title: 'Bestaande verwerking vervangen?',
+        message: 'Opnieuw importeren verwijdert de bestaande import en alle bijbehorende verwerking definitief. De geselecteerde PDF-bestanden worden daarna opnieuw geïmporteerd. Deze handeling kan niet ongedaan worden gemaakt.',
+        actions: [
+          {value: 'replace', label: 'Import opnieuw starten', danger: true},
+          {value: 'back', label: 'Terug'}
+        ]
+      });
+      if (replaceExisting !== 'replace') {
+        $('#importError').textContent = 'Opnieuw importeren geannuleerd. De bestaande verwerking is behouden.';
         return;
       }
 
