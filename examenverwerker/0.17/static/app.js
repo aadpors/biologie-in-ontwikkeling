@@ -1164,6 +1164,18 @@ async function renderFinalReviewStage() {
 
     const navigateTo = async nextIndex => {
       if (nextIndex < 0 || nextIndex >= result.questions.length || nextIndex === currentIndex) return;
+
+      // Laat zichtbaar zien dat de huidige vraag eerst wordt opgeslagen.
+      // Voorkom ook dubbele navigatieverzoeken zolang die opslag loopt.
+      const navigationButtons = [
+        $('#previousFinalQuestion'),
+        $('#nextFinalQuestion'),
+        ...panel.querySelectorAll('[data-final-jump]')
+      ].filter(Boolean);
+      navigationButtons.forEach(button => { button.disabled = true; });
+      const status = $('#finalReviewSaveStatus');
+      if (status) status.textContent = 'Vraag opslaan en volgende openen…';
+
       try {
         await saveDraft();
         currentIndex = nextIndex;
@@ -1171,6 +1183,8 @@ async function renderFinalReviewStage() {
       } catch (error) {
         const message = $('#finalReviewMessage');
         if (message) message.textContent = `Opslaan is niet gelukt; de vraag is niet gewisseld. ${error.message}`;
+        navigationButtons.forEach(button => { if (button.isConnected) button.disabled = false; });
+        if (status) status.textContent = 'Niet opgeslagen';
       }
     };
 
