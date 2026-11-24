@@ -13,9 +13,22 @@ if (-not $Launcher) {
     throw "De Windows Python Launcher (py) is niet gevonden. Installeer Python 3.12 via https://www.python.org/downloads/ en vink 'Python Launcher' aan."
 }
 
+# Installeer de runtime met de moderne Python-installatiemanager wanneer
+# de launcher 3.12 nog niet kan vinden. Dit voorkomt dat gebruikers zelf
+# eerst een aparte installer moeten downloaden en configureren.
+& py -3.12 --version *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host 'Python 3.12 is nog niet geïnstalleerd. Installatie starten…'
+    & py install 3.12
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Python 3.12 kon niet automatisch worden geïnstalleerd. Voer handmatig "py install 3.12" uit en start daarna opnieuw.'
+    }
+}
+
+# Verifieer dat de runtime na installatie daadwerkelijk vindbaar is.
 & py -3.12 --version
 if ($LASTEXITCODE -ne 0) {
-    throw "Python 3.12 is niet geïnstalleerd. Installeer Python 3.12 via https://www.python.org/downloads/ en start opnieuw."
+    throw 'Python 3.12 is na installatie niet beschikbaar via de launcher. Voer "py install 3.12" handmatig uit en start opnieuw.'
 }
 
 $Python = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
