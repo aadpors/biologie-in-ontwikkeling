@@ -1,3 +1,11 @@
+## Nog te valideren — workflowstappen 6, 7 en 8
+
+- Stap 6 gebruikt voor de uitwerkbijlage dezelfde doorlopende afbeeldingswerkruimte, grensselectie, automatische opslag en visuele controle als stap 3. De uitwerkbijlage kent daarbij uitsluitend vraagfragmenten; de goedgekeurde selecties worden ook gebruikt voor de definitieve vraagafbeeldingen.
+- De vraagstartdetectie voor het correctievoorschrift herkent nu ook meerkeuzeantwoorden waarbij vraagnnummer, antwoordletter en score door de PDF-tekstextractie over afzonderlijke regels zijn verdeeld.
+- Kandidaten op administratieve slotpagina's na "5 Aanleveren scores" worden uitgesloten, zodat stap 8 geen vraagfragment probeert samen te voegen dat buiten het beoordelingsmodel valt.
+- De CV-fragmentgenerator geeft een gerichte validatiefout wanneer een vraagstart na de laatste inhoudspagina staat; een lege set paginadelen bereikt de afbeeldingsstitcher niet meer.
+- Regressietests toegevoegd voor de gesplitste CV-meerkeuzeregel en de volledige stap-6-selectie-naar-fragmentroute.
+
 # Examenverwerker 0.17
 
 ## Stap 3 — fragmentselectie en bediening
