@@ -981,6 +981,18 @@ def get_stitched_document(exam_id: str, document_type: str):
         proposed = [item for item in proposed if item.get("type") == "vraag"]
 
     white_rows = metadata.get("white_row_ranges") or _white_row_ranges(target)
+    if proposed:
+        # Net als in stap 3 worden automatische grenzen vóór weergave op
+        # volledig witte pixelrijen gelegd. De docent kan ze daarna verfijnen.
+        proposed = normalise_stitched_selections(
+            proposed, white_rows, target,
+            image_height=int(metadata["height"]),
+            leading_top=min(
+                (float(page["top"]) for page in metadata.get("pages", [])),
+                default=0.0,
+            ),
+            context_candidates_only=True,
+        )
     metadata.update({
         "image_url": f"/api/stitched-document-images/{exam_id}/{document_type}/exam-long.png",
         "document_sha256": document["sha256"],
