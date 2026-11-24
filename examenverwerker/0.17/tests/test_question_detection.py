@@ -141,6 +141,52 @@ class QuestionDetectionTests(unittest.TestCase):
             [1, 2, 3],
         )
 
+    def test_cv_open_question_can_have_a_long_scoring_block(self):
+        # Een open vraag kan veel beoordelingsregels bevatten voordat
+        # maximumscore wordt vermeld. De vraagstart moet daarom niet worden
+        # afgewezen omdat de score meer dan 48 PDF-punten lager staat.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Beoordelingsmodel", fontsize=12)
+
+        # Vraag 1 begint in de vaste vraagnummerkolom. Een ingesprongen
+        # los nummer in de antwoordcriteria is een subonderdeel en mag de
+        # zoekruimte naar de maximumscore niet voortijdig afkappen.
+        page.insert_text((60, 130), "1", fontsize=11)
+        page.insert_text((95, 160), "1", fontsize=10)
+        page.insert_text((95, 185), "De kandidaat noemt het eerste criterium.", fontsize=10)
+        page.insert_text((95, 210), "De kandidaat licht dit verder toe.", fontsize=10)
+        page.insert_text((350, 255), "maximumscore 3", fontsize=10)
+
+        # Een volgende hoofdvraag op dezelfde vraagnummerkolom vormt wel
+        # de bovengrens van het beoordelingsblok van vraag 1.
+        page.insert_text((60, 320), "2", fontsize=11)
+        page.insert_text((350, 345), "maximumscore 2", fontsize=10)
+
+        path = self.root / "cv-long-open-question.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [item["question_number"] for item in result.json()["candidates"]],
+            [1, 2],
+        )
+
     def test_cv_heading_ignores_mentions_in_introductory_text(self):
         # Een juridische toelichting kan het woord "beoordelingsmodel"
         # noemen vóór de zelfstandige hoofdstukkop. Alleen die echte kop
