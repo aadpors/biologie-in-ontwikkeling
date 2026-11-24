@@ -748,6 +748,42 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual(clip[1], 150)
         self.assertEqual(clip[3], 260)
 
+    def test_cv_fragment_generator_uses_real_slot_section_not_contents_reference(self):
+        # Stap 7 en stap 8 moeten dezelfde grens hanteren. Een vermelding van
+        # "5 Aanleveren scores" in de inhoudsopgave mag een laatste examenvraag
+        # op een latere pagina van het beoordelingsmodel niet uitsluiten.
+        document = fitz.open()
+        contents_page = document.new_page()
+        contents_page.insert_text((60, 80), "Inhoud", fontsize=12)
+        contents_page.insert_text((60, 400), "5 Aanleveren scores", fontsize=10)
+
+        model_page = document.new_page()
+        model_page.insert_text((60, 80), "4 Beoordelingsmodel", fontsize=12)
+        model_page.insert_text((60, 130), "39", fontsize=11)
+        model_page.insert_text((60, 155), "maximumscore 2", fontsize=10)
+        model_page.insert_text((90, 180), "De kandidaat noemt twee juiste kenmerken.", fontsize=10)
+
+        final_page = document.new_page()
+        final_page.insert_text((60, 80), "5 Aanleveren scores", fontsize=12)
+        final_page.insert_text((60, 120), "Verwerk de scores in de applicatie Wolf.", fontsize=10)
+
+        pdf_path = self.root / "cv-fragment-end-section-contents.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        result = generate_question_fragments(
+            pdf_path,
+            [{"id":"cv-q39", "question_number":39, "page_index":1,
+              "pdf_bbox":[60,120,80,135]}],
+            self.root / "cv-fragment-end-section",
+            document_type="correctievoorschrift",
+        )
+
+        self.assertEqual(result["question_count"], 1)
+        self.assertEqual(result["questions"][0]["first_page"], 2)
+        self.assertEqual(result["questions"][0]["last_page"], 2)
+        self.assertIn("maximumscore 2", result["questions"][0]["extracted_text"])
+
     def test_last_cv_question_stops_before_administrative_pages(self):
         document = fitz.open()
         first = document.new_page()
