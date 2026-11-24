@@ -1,3 +1,11 @@
+## CV-vraagstartdetectie — herstel open vragen
+
+- De herkenning van CV-vraagstarts gebruikt niet langer uitsluitend de volgorde waarin PDF-tekstregels worden uitgelezen. Bij tabelopmaak kunnen vraagnummer en scorekolom immers in een andere leesvolgorde staan.
+- Voor losse vraagnummerregels wordt de score-informatie nu ruimtelijk op de PDF-pagina gezocht. Daardoor blijven open vragen met een afzonderlijke maximumscorekolom herkenbaar, ook als die kolom vóór of naast het vraagnummer wordt uitgelezen.
+- De hoofdstukgrens wordt uitsluitend bepaald door de zelfstandige kop "Beoordelingsmodel" (eventueel met hoofdstuknummer). Een eerdere tekstverwijzing naar het beoordelingsmodel in de juridische inleiding wordt niet langer als begin van de vragen gebruikt.
+- Regressietests toegevoegd voor open vragen met een aparte scorekolom, meerkeuzevragen met gesplitste antwoordkolommen en de juiste herkenning van de CV-hoofdstukkop.
+- De diagnose op het echte vwo-correctievoorschrift is uitgebreid, zodat de aangetroffen vraagstarts en hun omringende PDF-regels controleerbaar blijven.
+
 ## Nog te valideren — workflowstappen 6, 7 en 8
 
 - Stap 6 gebruikt voor de uitwerkbijlage dezelfde doorlopende afbeeldingswerkruimte, grensselectie, automatische opslag en visuele controle als stap 3. De uitwerkbijlage kent daarbij uitsluitend vraagfragmenten; de goedgekeurde selecties worden ook gebruikt voor de definitieve vraagafbeeldingen.
