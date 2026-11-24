@@ -152,7 +152,7 @@ function showImportDialog({title, message, actions}) {
   dialog.innerHTML = `
     <div class="import-dialog-content">
       <p class="eyebrow">EXAMEN IMPORTEREN</p>
-      <h2>${escapeHtml(title)}</h2>
+      <h2 id="importDialogTitle">${escapeHtml(title)}</h2>
       <p>${escapeHtml(message)}</p>
       <div class="import-dialog-actions">
         ${actions.map(action => `
