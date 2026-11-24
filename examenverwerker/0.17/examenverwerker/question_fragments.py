@@ -830,16 +830,15 @@ def normalise_stitched_selections(
             if y1 <= y0:
                 return int(bottom)
             gray = image.crop((0, y0, width, y1)).convert("L")
-            pixels = gray.load()
-            last_row = -1
-            for local_y in range(gray.height - 1, -1, -1):
-                if any(pixels[x, local_y] < 252 for x in range(gray.width)):
-                    last_row = local_y
-                    break
+            # Laat Pillow de pixelmaskering uitvoeren in plaats van per pixel
+            # door Python te itereren; dit blijft efficiënt bij lange examens.
+            mask = Image.eval(gray, lambda value: 255 if value < 252 else 0)
+            bbox = mask.getbbox()
             gray.close()
-            if last_row < 0:
+            mask.close()
+            if not bbox:
                 return int(bottom)
-            last_content_y = y0 + last_row
+            last_content_y = y0 + bbox[3] - 1
             next_white = next(
                 (start for start, end in white_row_ranges if start > last_content_y),
                 None,
