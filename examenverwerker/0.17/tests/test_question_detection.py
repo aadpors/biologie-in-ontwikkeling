@@ -59,6 +59,40 @@ class QuestionDetectionTests(unittest.TestCase):
             "juist / onjuist",
         )
 
+    def test_cv_detector_recognises_multiple_choice_answer_split_over_three_lines(self):
+        # In een CV kan de MC-regel door de tabelopmaak in drie regels worden
+        # geëxtraheerd: eerst het vraagnnummer, dan de antwoordletter en dan
+        # de score. De CV-vraagstart moet ondanks die splitsing behouden blijven.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Beoordelingsmodel", fontsize=12)
+        page.insert_text((60, 130), "1", fontsize=11)
+        page.insert_text((100, 130), "B", fontsize=11)
+        page.insert_text((160, 130), "1", fontsize=11)
+        page.insert_text((60, 190), "2", fontsize=11)
+        page.insert_text((60, 215), "maximumscore 2", fontsize=10)
+        path = self.root / "cv-split-mc.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertIn(1, [item["question_number"] for item in result.json()["candidates"]])
+        self.assertIn(2, [item["question_number"] for item in result.json()["candidates"]])
+
     def test_detector_uses_only_standalone_main_question_lines(self):
         path = self.root / "sample.pdf"
         path.write_bytes(self.make_pdf())
