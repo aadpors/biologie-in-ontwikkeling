@@ -591,7 +591,9 @@ def _load_document_fragments(exam_id: str, document_type: str):
         # Bouw de metadata opnieuw op naast de afbeelding. Die metadata is
         # nodig om de geselecteerde pixelstrook terug te rekenen naar de
         # exacte bronpagina's en PDF-tekstcoördinaten.
-        stitched_metadata = build_stitched_exam(source_path, stitched_path)
+        stitched_metadata = _load_or_build_stitched_exam(
+            source_path, stitched_path, document["sha256"]
+        )
         stitched_questions = [item for item in previous["stitched_selections"] if item.get("type") == "vraag"]
         stitched_contexts = [item for item in previous["stitched_selections"] if item.get("type") == "context"]
         question_map = {int(item["question_number"]): item for item in accepted}
