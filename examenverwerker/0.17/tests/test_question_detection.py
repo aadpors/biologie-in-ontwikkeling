@@ -152,7 +152,7 @@ class QuestionDetectionTests(unittest.TestCase):
         # Vraag 1 begint in de vaste vraagnummerkolom. Een ingesprongen
         # los nummer in de antwoordcriteria is een subonderdeel en mag de
         # zoekruimte naar de maximumscore niet voortijdig afkappen.
-        page.insert_text((60, 130), "1", fontsize=11)
+        page.insert_text((60, 130), "1.", fontsize=11)
         page.insert_text((95, 160), "1", fontsize=10)
         page.insert_text((95, 185), "De kandidaat noemt het eerste criterium.", fontsize=10)
         page.insert_text((95, 210), "De kandidaat licht dit verder toe.", fontsize=10)
@@ -160,7 +160,7 @@ class QuestionDetectionTests(unittest.TestCase):
 
         # Een volgende hoofdvraag op dezelfde vraagnummerkolom vormt wel
         # de bovengrens van het beoordelingsblok van vraag 1.
-        page.insert_text((60, 320), "2", fontsize=11)
+        page.insert_text((60, 320), "2.", fontsize=11)
         page.insert_text((350, 345), "maximumscore 2", fontsize=10)
 
         path = self.root / "cv-long-open-question.pdf"
