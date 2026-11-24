@@ -1959,8 +1959,16 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
         # die vóór de automatische 'niet van toepassing'-afhandeling zijn
         # aangemaakt.
         document_types = exam["metadata"].get("document_types", {})
-        has_workbook = any(value == "uitwerkbijlage" for value in document_types.values())
-        has_supplement = any(value == "aanvulling_correctievoorschrift" for value in document_types.values())
+        has_workbook = (
+            any(value == "uitwerkbijlage" for value in document_types.values()) or
+            any(doc.get("metadata", {}).get("document_type") == "uitwerkbijlage"
+                for doc in exam["documents"])
+        )
+        has_supplement = (
+            any(value == "aanvulling_correctievoorschrift" for value in document_types.values()) or
+            any(doc.get("metadata", {}).get("document_type") == "aanvulling_correctievoorschrift"
+                for doc in exam["documents"])
+        )
         if not has_workbook:
             missing = [key for key in missing if key != "uitwerk_fragments"]
         if not has_supplement:
