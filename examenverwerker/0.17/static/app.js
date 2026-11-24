@@ -1856,8 +1856,8 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
 
 /* De analysefase gebruikt het volledige vraagfragment als visuele bron.
    Tekstlaagherkenning levert alleen voorlopige suggesties voor type, score en
-   antwoordopties; elk veld blijft door de docent aanpasbaar en moet per vraag
-   expliciet worden gecontroleerd voordat de fase kan worden afgerond. */
+   antwoordopties; elk veld blijft door de docent aanpasbaar. De afrondknop
+   bevestigt de complete analyse, zonder een vinkje per vraag te verlangen. */
 async function renderQuestionAnalysisStage() {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Vraagtypen en antwoordopties analyseren…</p>';
