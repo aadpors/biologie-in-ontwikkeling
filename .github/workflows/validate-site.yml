@@ -144,6 +144,10 @@ jobs:
           python scripts/fix-mcq-options.py
           python scripts/fix-open-question-crops.py
           python scripts/trim-question-image-edges.py
+          # Regeneration rebuilds the question JSON from source PDFs. Restore the
+          # manually reviewed syllabus labels afterwards so generated records do
+          # not lose their curated theme, concept and attainment-target fields.
+          python scripts/restore-exam-rubricering.py
       - name: Validate every generated question, image and appendix link
         run: python scripts/validate-exam-snippets.py
       - name: Validate complete website data
@@ -195,6 +199,8 @@ jobs:
           python scripts/fix-open-question-crops.py
           python scripts/trim-question-image-edges.py
           python scripts/render-cv-snippets.py
+          # Apply the same curated labels before the browser checks topic filtering.
+          python scripts/restore-exam-rubricering.py
       - name: Audit official marking criteria for binary questions
         run: python scripts/extract-binary-cv-text.py
       - name: Serve the exact PR website
