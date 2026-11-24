@@ -15,8 +15,8 @@ from typing import Any
 # de antwoordtekst op de volgende regel. Na de letter moet witruimte,
 # leesteken of regeleinde volgen, zodat woorden als "Als" niet meetellen.
 OPTION_LINE = re.compile(
-    r"^\\s*(?:\\(([A-E])\\)|\\[([A-E])\\]|([A-E])(?=\\s|[.):]|$))"
-    r"\\s*[.):]?\\s*(.*?)\\s*$",
+    r"^\s*(?:\(([A-E])\)|\[([A-E])\]|([A-E])(?=\s|[.):]|$))"
+    r"\s*[.):]?\s*(.*?)\s*$",
     re.IGNORECASE,
 )
 # Puntennotaties verschillen tussen examens. De regex vangt expliciete
@@ -109,7 +109,7 @@ def detect_question_type(text: str, options: list[dict[str, str]]) -> tuple[str,
         "wat is het juiste antwoord", "wat is juist",
         "welk antwoord is juist", "welke optie is juist",
     )
-    normalised = re.sub(r"\\s+", " ", lowered)
+    normalised = re.sub(r"\s+", " ", lowered)
     prompt_detected = any(signal in normalised for signal in multiple_choice_signals)
     if len(options) >= 3 or prompt_detected:
         reason = ("Er zijn minimaal drie verschillende antwoordlabels herkend."
