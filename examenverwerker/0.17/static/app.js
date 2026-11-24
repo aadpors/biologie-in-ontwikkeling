@@ -814,7 +814,7 @@ async function renderSnippetsStage() {
       try {
         const saved = await save({draft: true});
         $('#snippetsMessage').textContent =
-          `${saved.reviewed_question_numbers.length} vraagfragmenten en ${saved.context_count} contexten opgeslagen.`;
+          `${saved.reviewed_question_numbers.length} vraagfragmenten en ${result.context_count} contexten opgeslagen.`;
       } catch (error) {
         $('#snippetsMessage').textContent = error.message;
       } finally {
