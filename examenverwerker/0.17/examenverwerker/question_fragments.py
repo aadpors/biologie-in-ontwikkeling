@@ -60,12 +60,14 @@ def cv_content_end_page(pdf: fitz.Document) -> int:
 
 
 def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
-    """Snijd uitsluitend buitenste witte randen weg, met behoud van marge.
+    """Verklein alleen verticale witmarges en behoud de volledige paginabreedte.
 
-    De renderclip bepaalt de inhoudelijke bovengrens en ondergrens. Deze
-    tweede stap verwijdert alleen overbodige witte ruimte binnen die clip.
-    Een lichte drempel voorkomt dat anti-aliasing of een vrijwel witte
-    achtergrond als harde inhoudsgrens wordt behandeld.
+    De renderclip bepaalt al de inhoudelijke bovengrens en ondergrens. Deze
+    tweede stap verwijdert alleen extra witruimte boven en onder de fragment-
+    afbeelding. De linker- en rechterrand blijven altijd gelijk aan de
+    oorspronkelijke pagina, zodat geen kolommen, figuren of bijschriften
+    buiten beeld raken. Een lichte drempel voorkomt dat anti-aliasing of een
+    vrijwel witte achtergrond als harde inhoudsgrens wordt behandeld.
     """
     with Image.open(image_path) as source:
         image = source.convert("RGB")
