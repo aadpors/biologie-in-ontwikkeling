@@ -187,6 +187,50 @@ class QuestionDetectionTests(unittest.TestCase):
             [1, 2],
         )
 
+    def test_cv_end_section_ignores_table_of_contents_entry(self):
+        # De inhoudsopgave kan de kop "5 Aanleveren scores" noemen. Die
+        # vermelding mag het beoordelingsmodel niet afkappen: alleen de echte
+        # zelfstandige kop bovenaan de administratieve slotpagina telt.
+        document = fitz.open()
+        contents_page = document.new_page()
+        contents_page.insert_text((60, 80), "Inhoud", fontsize=12)
+        contents_page.insert_text((60, 400), "5 Aanleveren scores", fontsize=10)
+
+        model_page = document.new_page()
+        model_page.insert_text((60, 80), "4 Beoordelingsmodel", fontsize=12)
+        model_page.insert_text((60, 130), "1", fontsize=11)
+        model_page.insert_text((60, 155), "maximumscore 2", fontsize=10)
+        model_page.insert_text((90, 180), "De kandidaat noemt twee juiste kenmerken.", fontsize=10)
+
+        final_page = document.new_page()
+        final_page.insert_text((60, 80), "5 Aanleveren scores", fontsize=12)
+        final_page.insert_text((60, 120), "Verwerk de scores in de applicatie Wolf.", fontsize=10)
+
+        path = self.root / "cv-end-section-contents.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [(item["question_number"], item["page_index"])
+             for item in result.json()["candidates"]],
+            [(1, 1)],
+        )
+
     def test_cv_heading_ignores_mentions_in_introductory_text(self):
         # Een juridische toelichting kan het woord "beoordelingsmodel"
         # noemen vóór de zelfstandige hoofdstukkop. Alleen die echte kop
