@@ -53,10 +53,11 @@ def _load_or_build_stitched_exam(
     """Herbruik de lange examenafbeelding met de juiste paginaselectie.
 
     Het opgavenboekje begint normaal gesproken op PDF-pagina 2, omdat de
-    eerste pagina de omslag/instructies bevat. Een uitwerkbijlage begint
-    daarentegen op pagina 1. Daarom is start_page onderdeel van de cache-
-    identiteit: een afbeelding die met een andere beginpagina is opgebouwd,
-    mag nooit voor deze workflowstap worden hergebruikt.
+    eerste pagina de omslag/instructies bevat. Een uitwerkbijlage en een
+    correctievoorschrift beginnen op pagina 1. start_page én end_page zijn
+    onderdeel van de cache-identiteit: een afbeelding met een andere
+    paginaselectie mag nooit voor deze workflowstap worden hergebruikt.
+    De optionele end_page sluit bij CV's de administratieve slotsectie uit.
 
     De bronhash voorkomt daarnaast dat een oude afbeelding wordt hergebruikt
     wanneer een examenbestand daadwerkelijk is vervangen.
@@ -1081,10 +1082,12 @@ def get_stitched_opgaven(exam_id: str):
 def get_stitched_document(exam_id: str, document_type: str):
     """Lever een doorlopende afbeelding voor de fragmentreview van een document.
 
-    De route wordt gebruikt voor de uitwerkbijlage (workflowstap 6). Dezelfde
-    render- en selectietechniek als bij de opgaven wordt hergebruikt, maar
-    uitwerkfragmenten zijn uitsluitend vraagfragmenten: er worden geen
-    contextfragmenten voorgesteld of opgeslagen.
+    De route wordt gebruikt voor de uitwerkbijlage (stap 6) en het
+    correctievoorschrift (stap 8). Beide documenten gebruiken dezelfde
+    doorlopende, paginabrede selectiewerkruimte als de opgaven (stap 3).
+    Alleen vraagfragmenten worden voorgesteld; contextfragmenten zijn hier
+    niet van toepassing. Bij CV's eindigt de afbeelding vóór de administratieve
+    slotsectie, zodat die nooit in het laatste vraagfragment terechtkomt.
     """
     if document_type not in {"uitwerkbijlage", "correctievoorschrift"}:
         raise HTTPException(404, "Deze doorlopende fragmentreview is niet beschikbaar voor dit documenttype.")
@@ -1165,7 +1168,7 @@ def stitched_document_image(exam_id: str, document_type: str, filename: str):
 
 @app.post("/api/exams/{exam_id}/stitched-document/{document_type}/review")
 def save_stitched_document_review(exam_id: str, document_type: str, payload: dict):
-    """Bewaar uitsluitend vraagfragmenten van de doorlopende uitwerkbijlage."""
+    """Bewaar vraagfragmenten van de doorlopende uitwerkbijlage of het CV."""
     if document_type not in {"uitwerkbijlage", "correctievoorschrift"}:
         raise HTTPException(404, "Deze fragmentreview is niet beschikbaar voor dit documenttype.")
     exam = STORE.get_exam(exam_id)
@@ -1206,7 +1209,7 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
             raise HTTPException(422, "Plaats beide fragmentgrenzen op een volledig witte horizontale regel over de volledige paginabreedte.")
         if (not isinstance(numbers, list) or not numbers
                 or any(not isinstance(number, int) or not 1 <= number <= 60 for number in numbers)):
-            raise HTTPException(422, "Koppel ieder uitwerkfragment aan minimaal één geldig vraagnummer.")
+            raise HTTPException(422, "Koppel ieder vraagfragment aan minimaal één geldig vraagnummer.")
         clean.append({
             "id": str(item.get("id") or f"fragment-{index + 1}"),
             "type": "vraag", "top": int(top), "bottom": int(bottom),
