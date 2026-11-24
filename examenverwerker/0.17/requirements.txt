@@ -4,4 +4,5 @@ python-multipart>=0.0.9
 PyMuPDF>=1.24
 Pillow>=10
 # Lokale OCR voor antwoordopties die alleen visueel in het vraagfragment staan.
-rapidocr-onnxruntime>=1.4,<2
+rapidocr>=3.10,<4
+onnxruntime>=1.18
