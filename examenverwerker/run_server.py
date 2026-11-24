@@ -34,7 +34,7 @@ def open_browser_when_ready() -> None:
         try:
             with urllib.request.urlopen(URL, timeout=1.0) as response:
                 if response.status == 200:
-                    print("\\nServer reageert. De browser wordt geopend.", flush=True)
+                    print("\nServer reageert. De browser wordt geopend.", flush=True)
                     webbrowser.open(URL)
                     return
         except (urllib.error.URLError, TimeoutError, OSError):
@@ -42,7 +42,7 @@ def open_browser_when_ready() -> None:
             time.sleep(0.25)
 
     print(
-        "\\nWAARSCHUWING: de server gaf binnen 30 seconden geen HTTP-antwoord. "
+        "\nWAARSCHUWING: de server gaf binnen 30 seconden geen HTTP-antwoord. "
         "Controleer de foutmeldingen hierboven.",
         flush=True,
     )
