@@ -203,6 +203,125 @@ if CV_SOURCE.is_file():
         "cv_candidates": cv_debug,
     }, ensure_ascii=False))
 
+# Leg per kandidaat vast waarom de CV-specifieke filter hem wel of niet
+# behoudt. De ruwe detector kan immers correct zijn terwijl een latere
+# geometrische controle een echte open vraag afwijst.
+cv_filter_debug = []
+if CV_SOURCE.is_file():
+    with fitz.open(CV_SOURCE) as cv_pdf:
+        for candidate in cv_result["candidates"]:
+            page_index = candidate["page_index"]
+            if model_page is not None and page_index < model_page:
+                continue
+            candidate_text = candidate["text"].strip()
+            debug_item = {
+                "page": page_index + 1,
+                "number": candidate["question_number"],
+                "text": candidate_text,
+                "pdf_bbox": candidate["pdf_bbox"],
+                "accepted_by_filter": False,
+                "reason": "geen passend vraagstartpatroon",
+            }
+            direct = re.match(r"^\\d{1,2}\\.?\\s+maximumscore\\b", candidate_text, re.IGNORECASE)
+            direct_mc = re.match(r"^\\d{1,2}\\.?\\s+[A-E]\\s+\\d{1,2}\\s*$", candidate_text, re.IGNORECASE)
+            if direct or direct_mc:
+                debug_item["accepted_by_filter"] = True
+                debug_item["reason"] = "directe CV-regel"
+                cv_filter_debug.append(debug_item)
+                continue
+            if re.fullmatch(r"\\d{1,2}\\.?", candidate_text):
+                positioned_lines = []
+                for block in cv_pdf[page_index].get_text("dict").get("blocks", []):
+                    if block.get("type") != 0:
+                        continue
+                    for line in block.get("lines", []):
+                        line_text = " ".join(
+                            span.get("text", "") for span in line.get("spans", [])
+                        ).strip()
+                        bbox = line.get("bbox", [])
+                        if line_text and len(bbox) == 4:
+                            positioned_lines.append({
+                                "text": line_text,
+                                "left": float(bbox[0]),
+                                "top": float(bbox[1]),
+                                "right": float(bbox[2]),
+                                "bottom": float(bbox[3]),
+                            })
+                candidate_top = float(candidate["pdf_bbox"][1])
+                candidate_bottom = float(candidate["pdf_bbox"][3])
+                candidate_left = float(candidate["pdf_bbox"][0])
+                later_column_starts = [
+                    float(other["pdf_bbox"][1])
+                    for other in cv_result["candidates"]
+                    if other is not candidate
+                    and other["page_index"] == page_index
+                    and float(other["pdf_bbox"][1]) > candidate_top
+                    and abs(float(other["pdf_bbox"][0]) - candidate_left) <= 12.0
+                ]
+                search_bottom = min(
+                    later_column_starts,
+                    default=float(cv_pdf[page_index].rect.height),
+                ) - 2.0
+                search_bottom = max(candidate_bottom, search_bottom)
+                nearby = [
+                    item for item in positioned_lines
+                    if item["bottom"] >= candidate_top - 8
+                    and item["top"] <= search_bottom
+                    and not (
+                        abs(item["left"] - candidate_left) < 0.5
+                        and abs(item["top"] - candidate_top) < 0.5
+                    )
+                ]
+                has_maximumscore = any(
+                    re.search(r"\\bmaximumscore\\s+\\d+", item["text"], re.IGNORECASE)
+                    for item in nearby
+                )
+                has_inline_mc_answer = any(
+                    re.fullmatch(r"[A-E][.)]?\\s+[012]", item["text"], re.IGNORECASE)
+                    for item in nearby
+                )
+                has_split_mc_answer = any(
+                    re.fullmatch(r"[A-E][.)]?", item["text"], re.IGNORECASE)
+                    and any(
+                        re.fullmatch(r"[012]", other["text"])
+                        and abs(other["top"] - item["top"]) <= 24
+                        for other in nearby
+                    )
+                    for item in nearby
+                )
+                debug_item.update({
+                    "candidate_top": candidate_top,
+                    "search_bottom": search_bottom,
+                    "later_column_starts": later_column_starts,
+                    "has_maximumscore": has_maximumscore,
+                    "has_inline_mc_answer": has_inline_mc_answer,
+                    "has_split_mc_answer": has_split_mc_answer,
+                    "nearby_lines": [
+                        {"text": item["text"], "left": round(item["left"], 2),
+                         "top": round(item["top"], 2), "bottom": round(item["bottom"], 2)}
+                        for item in nearby
+                    ],
+                })
+                if has_maximumscore or has_inline_mc_answer or has_split_mc_answer:
+                    debug_item["accepted_by_filter"] = True
+                    debug_item["reason"] = "beoordelingsregel binnen zoekvenster"
+                else:
+                    debug_item["reason"] = "geen score-/antwoordregel binnen zoekvenster"
+            cv_filter_debug.append(debug_item)
+(OUTPUT / "cv-filter-debug.json").write_text(
+    json.dumps(cv_filter_debug, ensure_ascii=False, indent=2),
+    encoding="utf-8",
+)
+print(json.dumps({
+    "cv_filter_candidates": len(cv_filter_debug),
+    "cv_filter_accepted": sum(item["accepted_by_filter"] for item in cv_filter_debug),
+    "cv_filter_rejected_examples": [
+        {"page": item["page"], "number": item["number"], "text": item["text"],
+         "reason": item["reason"], "nearby_lines": item.get("nearby_lines", [])[:8]}
+        for item in cv_filter_debug if not item["accepted_by_filter"]
+    ][:12],
+}, ensure_ascii=False))
+
 # Controleer ook de volledige API-route van stap 7 op het echte CV.
 # De losse detector hierboven is niet voldoende: de applicatie past daarna
 # nog CV-specifieke filters toe om juridische nummering en subonderdelen uit
