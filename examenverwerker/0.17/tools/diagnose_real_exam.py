@@ -114,6 +114,62 @@ report = {
     json.dumps(report, ensure_ascii=False, indent=2),
     encoding="utf-8",
 )
+# Diagnoseer ook het officiële correctievoorschrift van hetzelfde examen.
+# Deze extra uitvoer maakt zichtbaar welke open-vraagregels door de algemene
+# detector worden gevonden en welke inhoudsregels direct bij die regels staan.
+CV_SOURCE = ROOT / "examens" / "vw-1018-a-26-2-c.pdf"
+if CV_SOURCE.is_file():
+    cv_result = detect_question_starts(
+        str(CV_SOURCE), enforce_sequence=False, allow_lowercase_text=True
+    )
+    cv_debug = []
+    with fitz.open(CV_SOURCE) as cv_pdf:
+        model_page = None
+        for page_index, page in enumerate(cv_pdf):
+            if "beoordelingsmodel" in page.get_text("text").casefold():
+                model_page = page_index
+                break
+        for candidate in cv_result["candidates"]:
+            if model_page is not None and candidate["page_index"] < model_page:
+                continue
+            page = cv_pdf[candidate["page_index"]]
+            lines = [
+                line.strip() for line in page.get_text("text").splitlines()
+                if line.strip()
+            ]
+            # Koppel de kandidaat aan de dichtstbijzijnde tekstregel op basis
+            # van de y-coördinaat. Bewaar daarnaast enkele volgende regels om
+            # de opmaak van het bijbehorende beoordelingscriterium te zien.
+            candidate_y = float(candidate["pdf_bbox"][1])
+            line_index = min(
+                range(len(lines)),
+                key=lambda index: abs(
+                    page.search_for(lines[index])[0].y0 - candidate_y
+                ) if page.search_for(lines[index]) else float("inf"),
+                default=0,
+            )
+            cv_debug.append({
+                "page": candidate["page_index"] + 1,
+                "y": candidate_y,
+                "candidate_text": candidate["text"],
+                "nearby_lines": lines[max(0, line_index - 1):line_index + 7],
+            })
+    (OUTPUT / "cv-candidates.json").write_text(
+        json.dumps({
+            "source_pdf": CV_SOURCE.name,
+            "model_page": (model_page + 1) if model_page is not None else None,
+            "candidate_count": len(cv_debug),
+            "candidates": cv_debug,
+        }, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(json.dumps({
+        "cv_source": CV_SOURCE.name,
+        "cv_model_page": (model_page + 1) if model_page is not None else None,
+        "cv_candidate_count": len(cv_debug),
+        "cv_candidates": cv_debug,
+    }, ensure_ascii=False))
+
 print(json.dumps({
     "source": SOURCE.name,
     "pages": report["page_count"],
