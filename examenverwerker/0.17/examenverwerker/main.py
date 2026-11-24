@@ -731,7 +731,7 @@ def _load_document_fragments(exam_id: str, document_type: str):
     # examenstrook leidend. Zo gebruikt de analyse exact dezelfde grenzen als
     # de docent in stap 3 heeft vastgesteld; de oude automatische voorstellen
     # blijven alleen als terugval beschikbaar voor oudere examendossiers.
-    if document_type in {"opgaven", "uitwerkbijlage"} and previous.get("stitched_selections"):
+    if document_type in {"opgaven", "uitwerkbijlage", "correctievoorschrift"} and previous.get("stitched_selections"):
         # Zowel de opgaven als de uitwerkbijlage gebruiken nu de visueel
         # goedgekeurde lange afbeelding als bron voor definitieve vraag-PNG's.
         # De selectiecoördinaten zijn daardoor exact gelijk aan de grenzen die
@@ -741,8 +741,11 @@ def _load_document_fragments(exam_id: str, document_type: str):
         # Bouw de metadata opnieuw op naast de afbeelding. Die metadata is
         # nodig om de geselecteerde pixelstrook terug te rekenen naar de
         # exacte bronpagina's en PDF-tekstcoördinaten.
+        # Opgaven slaan de omslag over; uitwerkbijlagen en CV's beginnen
+        # op pagina 1. De cache gebruikt dezelfde paginakeuze als de review.
         stitched_metadata = _load_or_build_stitched_exam(
-            source_path, stitched_path, document["sha256"]
+            source_path, stitched_path, document["sha256"],
+            start_page=1 if document_type == "opgaven" else 0,
         )
         stitched_questions = [item for item in previous["stitched_selections"] if item.get("type") == "vraag"]
         stitched_contexts = [item for item in previous["stitched_selections"] if item.get("type") == "context"]
@@ -763,7 +766,16 @@ def _load_document_fragments(exam_id: str, document_type: str):
                         continue
                     rebuilt_questions.append({
                         "question_number": int(number), "start_id": start["id"],
-                        "first_page": start["page_index"] + 1, "last_page": start["page_index"] + 1,
+                        "first_page": next(
+                            (page["page_number"] for page in stitched_metadata["pages"]
+                             if float(page["top"]) <= top < float(page["bottom"])),
+                            start["page_index"] + 1,
+                        ),
+                        "last_page": next(
+                            (page["page_number"] for page in reversed(stitched_metadata["pages"])
+                             if float(page["top"]) < bottom <= float(page["bottom"])),
+                            start["page_index"] + 1,
+                        ),
                         "segments": [{"page_number": start["page_index"] + 1, "filename": filename, "url": url}],
                         "source_segments": None, "stitched": True,
                         # Analyseer uitsluitend de tekst binnen de goedgekeurde
@@ -1050,7 +1062,7 @@ def get_stitched_document(exam_id: str, document_type: str):
     uitwerkfragmenten zijn uitsluitend vraagfragmenten: er worden geen
     contextfragmenten voorgesteld of opgeslagen.
     """
-    if document_type != "uitwerkbijlage":
+    if document_type not in {"uitwerkbijlage", "correctievoorschrift"}:
         raise HTTPException(404, "Deze doorlopende fragmentreview is niet beschikbaar voor dit documenttype.")
     exam = STORE.get_exam(exam_id)
     if not exam:
@@ -1070,9 +1082,10 @@ def get_stitched_document(exam_id: str, document_type: str):
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, str(exc)) from exc
 
-    previous = exam["steps"].get("uitwerk_fragments", {}).get("evidence", {})
+    starts_step_key, fragments_step_key = _fragment_step_keys(document_type)
+    previous = exam["steps"].get(fragments_step_key, {}).get("evidence", {})
     saved = previous.get("stitched_selections", [])
-    starts = exam["steps"].get("uitwerk_starts", {}).get("evidence", {})
+    starts = exam["steps"].get(starts_step_key, {}).get("evidence", {})
     accepted = [
         item for item in starts.get("candidates", [])
         if item.get("accepted") and not item.get("removed")
@@ -1084,8 +1097,8 @@ def get_stitched_document(exam_id: str, document_type: str):
             render_scale=1.25, image_height=int(metadata["height"]),
             pdf_path=source,
         )
-        # De uitwerkbijlage kent alleen vraagfragmenten. Verwijder eventuele
-        # contextvoorstellen en houd de automatische vraaggrenzen intact.
+        # Uitwerkbijlage en CV bestaan hier uitsluitend uit vraagfragmenten;
+        # contextselecties zijn niet van toepassing in deze documenttypen.
         proposed = [item for item in proposed if item.get("type") == "vraag"]
 
     white_rows = metadata.get("white_row_ranges") or _white_row_ranges(target)
@@ -1115,7 +1128,7 @@ def get_stitched_document(exam_id: str, document_type: str):
 @app.get("/api/stitched-document-images/{exam_id}/{document_type}/{filename}")
 def stitched_document_image(exam_id: str, document_type: str, filename: str):
     """Serveer de afgeleide lange afbeelding voor de geselecteerde documentsoort."""
-    if document_type != "uitwerkbijlage" or filename != "exam-long.png":
+    if document_type not in {"uitwerkbijlage", "correctievoorschrift"} or filename != "exam-long.png":
         raise HTTPException(404, "Afbeelding niet gevonden.")
     if not re.fullmatch(r"[a-f0-9]{12}", exam_id) or not STORE.get_exam(exam_id):
         raise HTTPException(404, "Examen niet gevonden.")
@@ -1128,23 +1141,25 @@ def stitched_document_image(exam_id: str, document_type: str, filename: str):
 @app.post("/api/exams/{exam_id}/stitched-document/{document_type}/review")
 def save_stitched_document_review(exam_id: str, document_type: str, payload: dict):
     """Bewaar uitsluitend vraagfragmenten van de doorlopende uitwerkbijlage."""
-    if document_type != "uitwerkbijlage":
+    if document_type not in {"uitwerkbijlage", "correctievoorschrift"}:
         raise HTTPException(404, "Deze fragmentreview is niet beschikbaar voor dit documenttype.")
     exam = STORE.get_exam(exam_id)
     if not exam:
         raise HTTPException(404, "Examen niet gevonden.")
-    starts = exam["steps"].get("uitwerk_starts", {})
+    starts_step_key, fragments_step_key = _fragment_step_keys(document_type)
+    starts = exam["steps"].get(starts_step_key, {})
     if starts.get("status") != "complete":
-        raise HTTPException(409, "Rond eerst de vraagstartcontrole van de uitwerkbijlage af.")
+        raise HTTPException(409, "Rond eerst de vraagstartcontrole van dit document af.")
     selections = payload.get("selections")
     if not isinstance(selections, list):
         raise HTTPException(422, "De fragmentselecties ontbreken.")
 
-    stitched_path = DATA / "exams" / exam_id / "derived" / "uitwerkbijlage_stitched" / "exam-long.png"
+    stitched_path = DATA / "exams" / exam_id / "derived" / f"{document_type}_stitched" / "exam-long.png"
     if not stitched_path.is_file():
         document = _document_for_type(exam, document_type)
         _load_or_build_stitched_exam(
-            DATA / document["relative_path"], stitched_path, document["sha256"]
+            DATA / document["relative_path"], stitched_path, document["sha256"],
+            start_page=0,
         )
     with Image.open(stitched_path) as image:
         stitched_height = image.height
@@ -1185,13 +1200,13 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
                                 ", ".join(map(str, missing)))
 
     evidence = {
-        **exam["steps"].get("uitwerk_fragments", {}).get("evidence", {}),
+        **exam["steps"].get(fragments_step_key, {}).get("evidence", {}),
         "stitched_selections": clean,
         "stitched_reviewed": bool(payload.get("reviewed")),
         "document_sha256": starts.get("evidence", {}).get("document_sha256"),
     }
     saved_as_draft = STORE.save_step_draft_preserving_identical_complete(
-        exam_id, "uitwerk_fragments", evidence,
+        exam_id, fragments_step_key, evidence,
         identity_fields=("stitched_selections", "document_sha256"),
     )
     return {"ok": True, "selection_count": len(clean),
