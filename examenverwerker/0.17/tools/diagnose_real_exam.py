@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 
 import fitz
@@ -128,7 +129,22 @@ if CV_SOURCE.is_file():
     with fitz.open(CV_SOURCE) as cv_pdf:
         model_page = None
         for page_index, page in enumerate(cv_pdf):
-            if "beoordelingsmodel" in page.get_text("text").casefold():
+            # Zoek de zelfstandige hoofdstukkop; een gewone verwijzing
+            # naar het beoordelingsmodel in de inleiding is geen startpunt.
+            has_model_heading = any(
+                re.fullmatch(
+                    r"\s*(?:\d{1,2}\s+)?beoordelingsmodel\s*",
+                    " ".join(
+                        span.get("text", "")
+                        for span in line.get("spans", [])
+                    ),
+                    re.IGNORECASE,
+                )
+                for block in page.get_text("dict").get("blocks", [])
+                if block.get("type") == 0
+                for line in block.get("lines", [])
+            )
+            if has_model_heading:
                 model_page = page_index
                 break
         for candidate in cv_result["candidates"]:
