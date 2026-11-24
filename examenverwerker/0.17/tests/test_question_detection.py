@@ -73,8 +73,8 @@ class QuestionDetectionTests(unittest.TestCase):
             "image_paths": ["vraag-7.png"],
         }
         visual_text = (
-            "A De lichtreactie vindt plaats in de mitochondriën.\\n"
-            "B De donkerreactie vindt plaats in de stroma.\\n"
+            "A De lichtreactie vindt plaats in de mitochondriën.\n"
+            "B De donkerreactie vindt plaats in de stroma.\n"
             "C Bij fotosynthese ontstaat zuurstof uit koolstofdioxide."
         )
         with patch("examenverwerker.question_analysis._ocr_image_text", return_value=visual_text) as ocr:
