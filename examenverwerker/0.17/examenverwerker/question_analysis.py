@@ -29,23 +29,23 @@ def _normalise_lines(text: str) -> list[str]:
 def detect_options(text: str) -> list[dict[str, str]]:
     """Herken antwoordopties in de meest voorkomende PDF-tekstindelingen.
 
-    PDF-extractie is niet layoutvast: de letters kunnen op een eigen regel
-    staan, de opties kunnen achter elkaar op één regel staan of de letters
-    kunnen tussen haakjes of met een dubbele punt zijn vormgegeven. Daarom
-    combineren we een herkenning van expliciete A-E-markeringen met een
-    regelgerichte terugvaloptie. Een voorstel wordt alleen geaccepteerd als
-    ten minste twee opeenvolgende opties vanaf A zijn gevonden.
+    PDF-extractie is niet layoutvast: letters kunnen op een eigen regel
+    staan, opties kunnen achter elkaar op één regel staan of letters kunnen
+    tussen haakjes of met een dubbele punt zijn vormgegeven. Daarom combineren
+    we expliciete A-E-markeringen met een regelgerichte terugvaloptie. Een
+    voorstel wordt alleen geaccepteerd bij minimaal twee opeenvolgende opties
+    vanaf A.
     """
-    normalised_text = text.replace("\\r", "\\n")
+    normalised_text = text.replace("\r", "\n")
     lines = _normalise_lines(normalised_text)
     found: dict[str, str] = {}
 
     # Herken expliciete markeringen zoals 'A. tekst', '(A) tekst', 'A) tekst'
-    # en 'A: tekst'. Door de tekst tussen opeenvolgende markeringen te nemen,
+    # en 'A: tekst'. Door tekst tussen opeenvolgende markeringen te nemen,
     # blijven opties herkenbaar wanneer de PDF ze op één regel of in kolommen
     # achter elkaar uitleest.
     marker_pattern = re.compile(
-        r"(?<![A-Za-z0-9])(?:\\(([A-E])\\)|([A-E])\\s*[.):])\\s*",
+        r"(?<![A-Za-z0-9])(?:\(([A-E])\)|([A-E])\s*[.):])\s*",
         re.IGNORECASE,
     )
     matches = list(marker_pattern.finditer(normalised_text))
@@ -55,19 +55,18 @@ def detect_options(text: str) -> list[dict[str, str]]:
             continue
         content_start = match.end()
         content_end = matches[index + 1].start() if index + 1 < len(matches) else len(normalised_text)
-        option_text = normalised_text[content_start:content_end].strip(" \\t\\r\\n;|")
-        # Een volgende optieletter zonder antwoordtekst is geen bruikbare optie.
+        option_text = normalised_text[content_start:content_end].strip(" \t\r\n;|")
         if len(option_text) >= 2:
             found[letter] = option_text
 
     # Regelgerichte fallback voor PDF's die alleen een letter op een regel
     # zetten en de antwoordtekst op de volgende regel plaatsen. Deze route
-    # vult alleen nog ontbrekende letters aan en overschrijft geen expliciet
+    # vult alleen ontbrekende letters aan en overschrijft geen expliciet
     # herkende optie uit de tekststroom.
     index = 0
     while index < len(lines):
         line = lines[index]
-        compact = re.match(r"^\\s*([A-E])[.)]?\\s+(.+?)\\s*$", line, re.IGNORECASE)
+        compact = re.match(r"^\s*([A-E])[.)]?\s+(.+?)\s*$", line, re.IGNORECASE)
         if compact:
             letter, option_text = compact.group(1).upper(), compact.group(2).strip()
             if len(option_text) >= 2:
@@ -75,12 +74,12 @@ def detect_options(text: str) -> list[dict[str, str]]:
             index += 1
             continue
 
-        standalone = re.fullmatch(r"\\s*([A-E])[.)]?\\s*", line, re.IGNORECASE)
+        standalone = re.fullmatch(r"\s*([A-E])[.)]?\s*", line, re.IGNORECASE)
         if standalone and index + 1 < len(lines):
             next_line = lines[index + 1]
             next_is_option = bool(
-                re.match(r"^\\s*[A-E](?:[.)]|:)\\s*", next_line, re.IGNORECASE)
-                or re.fullmatch(r"\\s*\\(?[A-E]\\)?[.)]?\\s*", next_line, re.IGNORECASE)
+                re.match(r"^\s*[A-E](?:[.)]|:)\s*", next_line, re.IGNORECASE)
+                or re.fullmatch(r"\s*\(?[A-E]\)?[.)]?\s*", next_line, re.IGNORECASE)
             )
             if not next_is_option and len(next_line.strip()) >= 2:
                 found.setdefault(standalone.group(1).upper(), next_line.strip())
