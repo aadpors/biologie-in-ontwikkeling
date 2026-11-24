@@ -119,15 +119,6 @@ function prepareStageApproval(panel) {
   panel.querySelectorAll('button[id^="complete"]').forEach(button => {
     button.disabled = false;
   });
-  if (!panel.querySelector('.stage-approval-note')) {
-    const note = document.createElement('p');
-    note.className = 'stage-approval-note muted';
-    note.textContent = 'Afzonderlijke controlevinkjes zijn niet nodig. De knop onderaan bevestigt dat je de getoonde onderdelen hebt gecontroleerd.';
-    const actions = [...panel.querySelectorAll('.review-actions')];
-    const finalActions = actions[actions.length - 1];
-    if (finalActions) finalActions.before(note);
-    else panel.append(note);
-  }
 }
 
 function showLibrary() {
@@ -697,49 +688,198 @@ async function renderRelationsStage() {
    contextbereik wordt alleen als voorstel ingevuld; de docent controleert en
    corrigeert de reeks vragen waarop de context van toepassing is. */
 async function renderSnippetsStage() {
-  const panel=$('#stagePanel');
-  panel.innerHTML='<p class="muted">Contexten en definitieve snippets voorbereiden…</p>';
+  const panel = $('#stagePanel');
+  panel.innerHTML = '<p class="muted">Contexten en definitieve snippets voorbereiden…</p>';
+
   try {
-    const result=await api(`/api/exams/${state.examId}/snippets`);
-    const contextCards=result.contexts.map(context=>`<article class="analysis-card" data-context-card="${escapeHtml(context.id)}"><div class="card-heading"><h3>Context · pagina ${context.page_number}</h3><span class="muted">Voorstel: vraag ${context.suggested_from_question}–${context.to_question}</span></div><img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Contextfragment op pagina ${context.page_number}"><p class="analysis-reason">${escapeHtml(context.label)}</p><div class="analysis-fields"><label>Vanaf vraag<input type="number" min="1" max="60" data-context-from="${escapeHtml(context.id)}" value="${context.from_question}"></label><label>Tot en met vraag<input type="number" min="1" max="60" data-context-to="${escapeHtml(context.id)}" value="${context.to_question}"></label></div><details class="analysis-text"><summary>Tekstlaag (hulpmiddel)</summary><pre>${escapeHtml(context.extracted_text)}</pre></details><label class="review-warning"><input type="checkbox" data-context-reviewed="${escapeHtml(context.id)}" ${context.reviewed?'checked':''}> Ik heb deze context en het vraagbereik gecontroleerd.</label></article>`).join('');
-    const questionCards=result.opgaven.questions.map(q=>`<article class="analysis-card" data-snippet-question="${q.question_number}"><h3>Vraag ${q.question_number}</h3><div class="fragment-images">${q.segments.map(seg=>`<figure><figcaption>Pagina ${seg.page_number}</figcaption><img loading="lazy" src="${escapeHtml(seg.url)}" alt="Definitief vraagfragment ${q.question_number}"></figure>`).join('')}</div><label class="review-warning"><input type="checkbox" data-snippet-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het definitieve vraagfragment gecontroleerd.</label></article>`).join('');
-    const workbookCards=result.uitwerkbijlage.questions.map(q=>`<article class="analysis-card"><h3>Uitwerkbijlage · vraag ${q.question_number}</h3>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Uitwerkbijlagevraag ${q.question_number}">`).join('')}<label class="review-warning"><input type="checkbox" data-snippet-uitwerk="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb dit fragment gecontroleerd.</label></article>`).join('');
-    const cvCards=result.correctievoorschrift.questions.map(q=>`<article class="analysis-card"><h3>Correctievoorschrift · vraag ${q.question_number}</h3>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="CV-fragment ${q.question_number}">`).join('')}<label class="review-warning"><input type="checkbox" data-snippet-cv="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb dit CV-fragment gecontroleerd.</label></article>`).join('');
-    panel.innerHTML=`<p class="eyebrow">FASE 8 · DEFINITIEVE SNIPPETS</p><h2>Contexten en snippets controleren</h2><p class="lead">De vraag-, uitwerkbijlage- en CV-fragmenten zijn uit de oorspronkelijke PDF's opgebouwd. Contexten worden afzonderlijk voorgesteld, zodat één context aan een reeks vragen gekoppeld kan worden.</p><div class="notice">${result.question_count} vragen · ${result.context_count} contextvoorstellen · ${result.uitwerkbijlage.question_count} uitwerkbijlagefragmenten · ${result.correctievoorschrift.question_count} CV-fragmenten.</div><h3>Contexten</h3>${contextCards||'<p class="muted">Geen contextvoorstellen op basis van de tekstlaag. Controleer de oorspronkelijke opgaven visueel en bevestig hieronder of er geen afzonderlijke contexten zijn.</p><label class="review-warning"><input type="checkbox" id="confirmNoContexts"> Ik heb gecontroleerd dat er geen afzonderlijke contextfragmenten gekoppeld hoeven te worden.</label>'}<h3>Vraagfragmenten</h3>${questionCards}<h3>Uitwerkbijlagefragmenten</h3>${workbookCards||'<p class="muted">Geen uitwerkbijlagefragmenten van toepassing.</p>'}<h3>Correctievoorschriftfragmenten</h3>${cvCards}<div class="review-actions"><button class="primary" id="saveSnippets">Snippetcontrole opslaan</button><button class="primary" id="completeSnippets" disabled>Snippets goedkeuren en doorgaan</button></div><p id="snippetsMessage" class="form-error" role="status"></p>`;
-    const contextChecks=()=>[...document.querySelectorAll('[data-context-reviewed]')];
-      prepareStageApproval(panel);
-    const questionChecks=()=>[...document.querySelectorAll('[data-snippet-reviewed]')];
-    const workbookChecks=()=>[...document.querySelectorAll('[data-snippet-uitwerk]')];
-    const cvChecks=()=>[...document.querySelectorAll('[data-snippet-cv]')];
-    const noContextConfirmed=()=>!result.contexts.length && $('#confirmNoContexts')?.checked;
-    const refresh=()=>{$('#completeSnippets').disabled=contextChecks().some(x=>!x.checked)||questionChecks().some(x=>!x.checked)||workbookChecks().some(x=>!x.checked)||cvChecks().some(x=>!x.checked)||(!result.contexts.length&&!noContextConfirmed());};
-    [...contextChecks(),...questionChecks(),...workbookChecks(),...cvChecks()].forEach(x=>x.addEventListener('change',refresh));
-    $('#confirmNoContexts')?.addEventListener('change',refresh); refresh();
-    const collect=()=>({contexts:result.contexts.map(c=>({id:c.id,from_question:Number(document.querySelector(`[data-context-from="${c.id}"]`).value),to_question:Number(document.querySelector(`[data-context-to="${c.id}"]`).value),reviewed:document.querySelector(`[data-context-reviewed="${c.id}"]`).checked})),reviewed_question_numbers:questionChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetReviewed)),reviewed_uitwerk_numbers:workbookChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetUitwerk)),reviewed_cv_numbers:cvChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetCv)),confirmed_no_contexts:noContextConfirmed()});
-    const save=(options={})=>api(`/api/exams/${state.examId}/snippets/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...collect(),...options})});
+    const result = await api(`/api/exams/${state.examId}/snippets`);
+
+    // De fragmenten zijn inhoudelijk al afgebakend in de eerdere stappen.
+    // Hier worden alleen contextbereiken gecontroleerd en de volledige set
+    // visueel beoordeeld. Er zijn daarom geen losse controlevinkjes nodig.
+    const contextCards = result.contexts.map(context => `
+      <article class="analysis-card" data-context-card="${escapeHtml(context.id)}">
+        <div class="card-heading">
+          <h3>Context · pagina ${context.page_number}</h3>
+          <span class="muted">Voorstel: vraag ${context.suggested_from_question}–${context.to_question}</span>
+        </div>
+        <img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Contextfragment op pagina ${context.page_number}">
+        <p class="analysis-reason">${escapeHtml(context.label)}</p>
+        <div class="analysis-fields">
+          <label>Vanaf vraag
+            <input type="number" min="1" max="60" data-context-from="${escapeHtml(context.id)}" value="${context.from_question}">
+          </label>
+          <label>Tot en met vraag
+            <input type="number" min="1" max="60" data-context-to="${escapeHtml(context.id)}" value="${context.to_question}">
+          </label>
+        </div>
+        <details class="analysis-text">
+          <summary>Tekstlaag (hulpmiddel)</summary>
+          <pre>${escapeHtml(context.extracted_text || context.text || '')}</pre>
+        </details>
+      </article>`).join('');
+
+    const renderFragmentCards = (questions, heading, altPrefix) => questions.map(question => `
+      <article class="analysis-card">
+        <h3>${heading} · vraag ${question.question_number}</h3>
+        <div class="fragment-images">
+          ${question.segments.map(segment => `
+            <figure>
+              ${segment.page_number ? `<figcaption>Pagina ${segment.page_number}</figcaption>` : ''}
+              <img class="fragment-image" loading="lazy" src="${escapeHtml(segment.url)}" alt="${altPrefix} vraag ${question.question_number}">
+            </figure>`).join('')}
+        </div>
+      </article>`).join('');
+
+    const questionCards = result.opgaven.questions.map(question => `
+      <article class="analysis-card">
+        <h3>Opgave · vraag ${question.question_number}</h3>
+        <div class="fragment-images">
+          ${question.segments.map(segment => `
+            <figure>
+              <figcaption>Pagina ${segment.page_number}</figcaption>
+              <img loading="lazy" src="${escapeHtml(segment.url)}" alt="Definitief vraagfragment ${question.question_number}">
+            </figure>`).join('')}
+        </div>
+      </article>`).join('');
+
+    panel.innerHTML = `
+      <p class="eyebrow">FASE 8 · DEFINITIEVE SNIPPETS</p>
+      <h2>Contexten en snippets controleren</h2>
+      <p class="lead">Bekijk de definitieve uitsneden en controleer of context, vraag, uitwerkbijlage en correctievoorschrift volledig en correct zijn weergegeven. Pas alleen een contextbereik aan als de koppeling met de vragen niet klopt.</p>
+      <div class="notice">
+        ${result.question_count} vragen · ${result.context_count} contextvoorstellen ·
+        ${result.uitwerkbijlage.question_count} uitwerkbijlagefragmenten ·
+        ${result.correctievoorschrift.question_count} CV-fragmenten.
+      </div>
+      <h3>Contexten</h3>
+      ${contextCards || '<p class="muted">Er zijn geen afzonderlijke contextvoorstellen gevonden. De afrondknop bevestigt dat dit bewust is gecontroleerd.</p>'}
+      <h3>Vraagfragmenten</h3>
+      ${questionCards}
+      <h3>Uitwerkbijlagefragmenten</h3>
+      ${renderFragmentCards(result.uitwerkbijlage.questions, 'Uitwerkbijlage', 'Uitwerkbijlage')}
+      ${result.uitwerkbijlage.questions.length ? '' : '<p class="muted">Geen uitwerkbijlagefragmenten van toepassing.</p>'}
+      <h3>Correctievoorschriftfragmenten</h3>
+      ${renderFragmentCards(result.correctievoorschrift.questions, 'Correctievoorschrift', 'Correctievoorschrift')}
+      <div class="review-actions">
+        <button class="primary" id="saveSnippets" type="button">Controle opslaan</button>
+        <button class="primary" id="completeSnippets" type="button">Snippets goedkeuren en doorgaan</button>
+      </div>
+      <p id="snippetsMessage" class="form-error" role="status"></p>`;
+
+    const contextCardsInDom = [...panel.querySelectorAll('[data-context-card]')];
+
+    // De server bewaart voor compatibiliteit nog steeds expliciete
+    // reviewed-markeringen. Die worden nu in één keer gezet door de
+    // afrondactie, niet door een reeks vinkjes naast afzonderlijke plaatjes.
+    const collect = () => ({
+      contexts: result.contexts.map(context => ({
+        id: context.id,
+        from_question: Number(panel.querySelector(`[data-context-from="${CSS.escape(context.id)}"]`)?.value),
+        to_question: Number(panel.querySelector(`[data-context-to="${CSS.escape(context.id)}"]`)?.value),
+        reviewed: true
+      })),
+      reviewed_question_numbers: result.opgaven.questions.map(item => Number(item.question_number)),
+      reviewed_uitwerk_numbers: result.uitwerkbijlage.questions.map(item => Number(item.question_number)),
+      reviewed_cv_numbers: result.correctievoorschrift.questions.map(item => Number(item.question_number)),
+      confirmed_no_contexts: result.contexts.length === 0
+    });
+
+    const validate = () => {
+      for (const context of collect().contexts) {
+        if (!Number.isInteger(context.from_question) || !Number.isInteger(context.to_question)
+            || context.from_question < 1 || context.to_question < context.from_question
+            || context.to_question > 60) {
+          return 'Controleer het vraagbereik van iedere context.';
+        }
+      }
+      return null;
+    };
+
+    const save = (options = {}) => {
+      const problem = validate();
+      if (problem) throw new Error(problem);
+      return api(`/api/exams/${state.examId}/snippets/review`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({...collect(), ...options})
+      });
+    };
+
     bindStageAutoSave(panel, save, '#snippetsMessage');
-    $('#saveSnippets').addEventListener('click',async()=>{try{const r=await save();$('#snippetsMessage').textContent=`${r.reviewed_count} vragen en ${r.reviewed_all_contexts?result.context_count:contextChecks().filter(x=>x.checked).length} contexten gecontroleerd.`;}catch(error){$('#snippetsMessage').textContent=error.message;}});
-     let completingSnippets=false;
-     $('#completeSnippets').addEventListener('click',async()=>{
-       const button=$('#completeSnippets');
-       if(completingSnippets) return;
-       completingSnippets=true;
-       button.disabled=true;
-       try {
-         const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
-         if(!saved.complete) throw new Error('Controleer eerst alle contexten en vraagfragmenten.');
-         await api(`/api/exams/${state.examId}/steps/snippets/complete`,{
-           method:'POST',headers:{'Content-Type':'application/json'},
-           body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_all_contexts:true})
-         });
-         await openWorkspace(state.examId);
-       } catch(error) {
-         completingSnippets=false;
-         refresh();
-         $('#snippetsMessage').textContent=error.message;
-       }
-     });
-  } catch(error) { panel.innerHTML=`<h2>Definitieve snippets</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+
+    $('#saveSnippets').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Opslaan…';
+      try {
+        const saved = await save({draft: true});
+        $('#snippetsMessage').textContent =
+          `${saved.reviewed_question_numbers.length} vraagfragmenten en ${saved.context_count} contexten opgeslagen.`;
+      } catch (error) {
+        $('#snippetsMessage').textContent = error.message;
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      }
+    });
+
+    let completingSnippets = false;
+    $('#completeSnippets').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      if (completingSnippets) return;
+      completingSnippets = true;
+      button.disabled = true;
+      button.textContent = 'Controleren en afronden…';
+      try {
+        // Flush de laatste contextwijziging vóór het expliciet afronden.
+        const saved = panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save({draft: true});
+        if (!saved.complete) throw new Error('De snippetcontrole is nog niet volledig opgeslagen.');
+
+        await api(`/api/exams/${state.examId}/steps/snippets/complete`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({reviewed: true, reviewed_all_questions: true, reviewed_all_contexts: true})
+        });
+        button.textContent = 'Volgende stap openen…';
+        await openWorkspace(state.examId);
+      } catch (error) {
+        completingSnippets = false;
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = 'Snippets goedkeuren en doorgaan';
+        }
+        $('#snippetsMessage').textContent = error.message;
+        if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+          $('#snippetsMessage').insertAdjacentHTML('afterend',
+            '<button class="quiet" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
+          $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+            await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+            await openWorkspace(state.examId);
+          });
+        }
+      }
+    });
+  } catch (error) {
+    panel.innerHTML = `<h2>Definitieve snippets</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+    if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+      panel.insertAdjacentHTML('beforeend',
+        '<button class="primary" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
+      $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+        try {
+          await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+          await openWorkspace(state.examId);
+        } catch (reopenError) {
+          panel.insertAdjacentHTML('beforeend', `<p class="form-error">${escapeHtml(reopenError.message)}</p>`);
+        }
+      });
+    }
+  }
 }
 
 /* De integrale eindcontrole toont alle bronnen in één vraagkaart. Problemen
@@ -747,45 +887,318 @@ async function renderSnippetsStage() {
    zichtbaar en vragen een toelichting voordat het examen kan worden afgerond.
    De afrondknop is de bevestiging; per vraag afvinken is overbodig. */
 async function renderFinalReviewStage() {
-  const panel=$('#stagePanel');
-  panel.innerHTML='<p class="muted">Integrale eindcontrole samenstellen…</p>';
+  const panel = $('#stagePanel');
+  panel.innerHTML = '<p class="muted">Integrale eindcontrole samenstellen…</p>';
+
   try {
-    const result=await api(`/api/exams/${state.examId}/final-review`);
-    panel.innerHTML=`<p class="eyebrow">FASE 9 · INTEGRALE EINDCONTROLE</p><h2>Iedere vraag in samenhang controleren</h2><p class="lead">Controleer per vraag de context, opgave, eventuele uitwerkbijlage, correctievoorschrift, antwoord en punten. Bij een verschil tussen de maximumscore in opgave en CV moet de oplossing worden toegelicht.</p><div class="notice">${result.question_count} vragen · controleer de volledige visuele samenhang vóór publicatie.</div>
-      ${result.questions.map(q=>`<article class="analysis-card final-review-card" data-final-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${q.points_match===false?'Scoreverschil':q.correctievoorschrift.length?'CV gekoppeld':'CV ontbreekt'}</span></div><h4>Gekoppelde context</h4>${q.context.length?q.context.map(c=>`<figure><figcaption>Context · pagina ${c.page_number} · vragen ${c.from_question}–${c.to_question}</figcaption><img class="fragment-image" loading="lazy" src="${escapeHtml(c.url)}" alt="Context bij vraag ${q.question_number}"></figure>`).join(''):'<p class="muted">Geen context gekoppeld.</p>'}<h4>Opgave</h4>${q.opgaven.map(seg=>`<figure><figcaption>Pagina ${seg.page_number}</figcaption><img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Opgave ${q.question_number}"></figure>`).join('')}<h4>Uitwerkbijlage</h4>${q.uitwerkbijlage.length?q.uitwerkbijlage.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Uitwerkbijlage ${q.question_number}">`).join(''):'<p class="muted">Geen bijbehorend onderdeel in de uitwerkbijlage.</p>'}<h4>Correctievoorschrift</h4>${q.correctievoorschrift.length?q.correctievoorschrift.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Correctievoorschrift ${q.question_number}">`).join(''):'<p class="form-error">Geen CV-fragment gekoppeld.</p>'}${(q.supplement_pages||[]).map(page=>`<p class="analysis-reason">Aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}${page.action==='vervangen'?' (vervangt het oorspronkelijke antwoordvoorstel)':''}</p><img class="fragment-image" loading="lazy" src="${escapeHtml(page.url)}" alt="Aanvulling correctievoorschrift bij vraag ${q.question_number}">`).join('')}${q.options?.length?`<h4>Herkende antwoordopties</h4><ul>${q.options.map(option=>`<li><strong>${escapeHtml(option.letter)}.</strong> ${escapeHtml(option.text)}</li>`).join('')}</ul>`:''}<div class="relation-grid"><span>Vraagtype: ${escapeHtml(q.question_type)}</span><span>Maximumscore opgave: ${q.max_points??'onbekend'}</span><span>Maximumscore CV: ${q.cv_max_points??'onbekend'}</span><span>Antwoordvorm: ${escapeHtml(q.answer_kind)}</span></div><details><summary>Antwoord / beoordelingscriteria</summary><pre>${escapeHtml(q.answer_text)}</pre></details>${q.points_match===false?'<p class="form-error">De maximumscores komen niet overeen. Leg vast hoe dit verschil is gecontroleerd.</p>':''}<label>Toelichting bij afwijking / herstel<textarea rows="2" data-final-note="${q.question_number}">${escapeHtml(q.resolution_note)}</textarea></label><label class="review-warning"><input type="checkbox" data-final-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb vraag ${q.question_number} in samenhang gecontroleerd.</label><div class="review-actions"><button class="quiet" type="button" data-repair="opgaven_fragments">Opgavefragment herstellen</button><button class="quiet" type="button" data-repair="opgaven_analyse">Vraagtype / punten / opties</button>${examHasDocumentType('uitwerkbijlage')?'<button class="quiet" type="button" data-repair="uitwerk_fragments">Uitwerkfragment herstellen</button>':''}<button class="quiet" type="button" data-repair="cv_fragments">CV-fragment herstellen</button><button class="quiet" type="button" data-repair="cv_aanvulling">CV-aanvulling aanpassen</button><button class="quiet" type="button" data-repair="antwoorden">Antwoord aanpassen</button><button class="quiet" type="button" data-repair="relaties">Koppeling herstellen</button></div></article>`).join('')}
-      <div class="review-actions"><button class="primary" id="saveFinalReview">Eindcontrole opslaan</button><button class="primary" id="completeFinalReview" disabled>Eindcontrole afronden</button></div><p id="finalReviewMessage" class="form-error" role="status"></p>`;
-    const cards=[...document.querySelectorAll('[data-final-card]')];
-      prepareStageApproval(panel);
-    const checks=()=>[...document.querySelectorAll('[data-final-reviewed]')];
-    const refresh=()=>{$('#completeFinalReview').disabled=checks().some(x=>!x.checked)||result.questions.some(q=>q.points_match===false&&!document.querySelector(`[data-final-note="${q.question_number}"]`).value.trim());};
-    checks().forEach(x=>x.addEventListener('change',refresh));
-    document.querySelectorAll('[data-final-note]').forEach(x=>x.addEventListener('input',refresh)); refresh();
-    const collect=()=>cards.map(card=>{const n=Number(card.dataset.finalCard);return {question_number:n,reviewed:card.querySelector(`[data-final-reviewed="${n}"]`).checked,resolution_note:card.querySelector(`[data-final-note="${n}"]`).value};});
-    const save=(options={})=>api(`/api/exams/${state.examId}/final-review/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect(),...options})});
-    bindStageAutoSave(panel, save, '#finalReviewMessage');
-    $('#saveFinalReview').addEventListener('click',async()=>{try{const r=await save();$('#finalReviewMessage').textContent=`${r.reviewed_count} van ${result.question_count} vragen gecontroleerd.`;}catch(error){$('#finalReviewMessage').textContent=error.message;}});
-     let completingFinalReview=false;
-     $('#completeFinalReview').addEventListener('click',async()=>{
-       const button=$('#completeFinalReview');
-       if(completingFinalReview) return;
-       completingFinalReview=true;
-       button.disabled=true;
-       try {
-         const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
-         if(!saved.complete) throw new Error('Controleer eerst alle vragen.');
-         await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`,{
-           method:'POST',headers:{'Content-Type':'application/json'},
-           body:JSON.stringify({reviewed:true,reviewed_all_questions:true})
-         });
-         await openWorkspace(state.examId);
-       } catch(error) {
-         completingFinalReview=false;
-         refresh();
-         $('#finalReviewMessage').textContent=error.message;
-       }
-     });
-    document.querySelectorAll('[data-repair]').forEach(button=>button.addEventListener('click',async()=>{try{await api(`/api/exams/${state.examId}/steps/${button.dataset.repair}/reopen`,{method:'POST'});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}}));
-  } catch(error) { panel.innerHTML=`<h2>Integrale eindcontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+    const result = await api(`/api/exams/${state.examId}/final-review`);
+    if (!result.questions?.length) {
+      throw new Error('Er zijn geen vraagrecords beschikbaar voor de integrale eindcontrole.');
+    }
+
+    let currentIndex = 0;
+    const visited = new Set(
+      result.questions.filter(question => question.reviewed).map(question => question.question_number)
+    );
+    const notes = Object.fromEntries(
+      result.questions.map(question => [question.question_number, question.resolution_note || ''])
+    );
+    let saveTimer = null;
+    let saveChain = Promise.resolve();
+    let completing = false;
+
+    const currentQuestion = () => result.questions[currentIndex];
+    const allVisited = () => visited.size === result.questions.length;
+    const unresolvedMismatches = () => result.questions.filter(question =>
+      question.points_match === false && !String(notes[question.question_number] || '').trim()
+    );
+
+    const contextHtml = question => question.context.length
+      ? question.context.map(context => `
+          <figure>
+            <figcaption>Context · pagina ${context.page_number} · vragen ${context.from_question}–${context.to_question}</figcaption>
+            <img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Context bij vraag ${question.question_number}">
+          </figure>`).join('')
+      : '<p class="muted">Geen afzonderlijke context gekoppeld.</p>';
+
+    const segmentHtml = (segments, alt, emptyMessage) => segments.length
+      ? segments.map(segment => `
+          <figure>
+            ${segment.page_number ? `<figcaption>Pagina ${segment.page_number}</figcaption>` : ''}
+            <img class="fragment-image" loading="lazy" src="${escapeHtml(segment.url)}" alt="${alt}">
+          </figure>`).join('')
+      : `<p class="muted">${emptyMessage}</p>`;
+
+    const questionCardHtml = question => `
+      <article class="analysis-card final-review-card" data-final-card="${question.question_number}">
+        <div class="card-heading">
+          <h3>Vraag ${question.question_number}</h3>
+          <span class="status-pill">${question.points_match === false ? 'Scoreverschil' : question.correctievoorschrift.length ? 'CV gekoppeld' : 'CV ontbreekt'}</span>
+        </div>
+
+        <h4>Gekoppelde context</h4>
+        ${contextHtml(question)}
+
+        <h4>Opgave</h4>
+        ${segmentHtml(question.opgaven, `Opgave ${question.question_number}`, 'Geen opgavefragment gevonden.')}
+
+        <h4>Uitwerkbijlage</h4>
+        ${segmentHtml(question.uitwerkbijlage, `Uitwerkbijlage vraag ${question.question_number}`, 'Geen bijbehorend onderdeel in de uitwerkbijlage.')}
+
+        <h4>Correctievoorschrift</h4>
+        ${segmentHtml(question.correctievoorschrift, `Correctievoorschrift vraag ${question.question_number}`, 'Geen CV-fragment gekoppeld.')}
+
+        ${(question.supplement_pages || []).map(page => `
+          <p class="analysis-reason">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}${page.action === 'vervangen' ? ' (vervangt het oorspronkelijke antwoordvoorstel)' : ''}</p>
+          <img class="fragment-image" loading="lazy" src="${escapeHtml(page.url)}" alt="CV-aanvulling bij vraag ${question.question_number}">
+        `).join('')}
+
+        ${question.options?.length ? `
+          <h4>Herkende antwoordopties</h4>
+          <ul>${question.options.map(option => `<li><strong>${escapeHtml(option.letter)}.</strong> ${escapeHtml(option.text)}</li>`).join('')}</ul>
+        ` : ''}
+
+        <div class="relation-grid">
+          <span>Vraagtype: ${escapeHtml(question.question_type)}</span>
+          <span>Maximumscore opgave: ${question.max_points ?? 'onbekend'}</span>
+          <span>Maximumscore CV: ${question.cv_max_points ?? 'onbekend'}</span>
+          <span>Antwoordvorm: ${escapeHtml(question.answer_kind)}</span>
+        </div>
+
+        <details>
+          <summary>Antwoord / beoordelingscriteria</summary>
+          <pre>${escapeHtml(question.answer_text || 'Geen antwoordtekst opgeslagen.')}</pre>
+        </details>
+
+        ${question.points_match === false ? `
+          <section class="analysis-card">
+            <p class="form-error">De maximumscores komen niet overeen. Leg kort vast waarom dit verschil klopt of hoe het is hersteld.</p>
+            <label>Toelichting scoreverschil
+              <textarea rows="3" data-final-note="${question.question_number}">${escapeHtml(notes[question.question_number])}</textarea>
+            </label>
+          </section>
+        ` : ''}
+
+        <h4>Herstelmogelijkheden</h4>
+        <div class="review-actions">
+          <button class="quiet" type="button" data-repair="opgaven_fragments">Opgavefragment herstellen</button>
+          <button class="quiet" type="button" data-repair="opgaven_analyse">Vraagtype / punten / opties</button>
+          ${examHasDocumentType('uitwerkbijlage') ? '<button class="quiet" type="button" data-repair="uitwerk_fragments">Uitwerkfragment herstellen</button>' : ''}
+          <button class="quiet" type="button" data-repair="cv_fragments">CV-fragment herstellen</button>
+          <button class="quiet" type="button" data-repair="cv_aanvulling">CV-aanvulling aanpassen</button>
+          <button class="quiet" type="button" data-repair="antwoorden">Antwoord aanpassen</button>
+          <button class="quiet" type="button" data-repair="relaties">Koppeling herstellen</button>
+        </div>
+      </article>`;
+
+    const overviewHtml = () => result.questions.map((question, index) => {
+      const number = question.question_number;
+      const isVisited = visited.has(number);
+      const hasIssue = question.points_match === false;
+      const label = hasIssue ? `${number} · !` : isVisited ? `${number} · ✓` : String(number);
+      return `<button class="quiet small" type="button" data-final-jump="${index}" aria-label="Ga naar vraag ${number}" title="${hasIssue ? 'Scoreverschil toelichten' : isVisited ? 'Bekeken' : 'Nog niet bekeken'}">${label}</button>`;
+    }).join('');
+
+    const collect = (markAllReviewed = false) => result.questions.map(question => ({
+      question_number: question.question_number,
+      reviewed: markAllReviewed || visited.has(question.question_number),
+      resolution_note: String(notes[question.question_number] || '')
+    }));
+
+    const save = (options = {}) => {
+      const questions = collect(Boolean(options.mark_all_reviewed));
+      const payload = {...options, questions};
+      delete payload.mark_all_reviewed;
+      return api(`/api/exams/${state.examId}/final-review/review`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+    };
+
+    const saveDraft = () => {
+      clearTimeout(saveTimer);
+      // Serialiseer autosaves. Een oudere, tragere request mag een nieuwere
+      // vraagnotitie of bekeken-status nooit terugschrijven.
+      saveChain = saveChain.catch(() => {}).then(() => save({draft: true}));
+      return saveChain;
+    };
+
+    const scheduleSave = () => {
+      clearTimeout(saveTimer);
+      const status = $('#finalReviewSaveStatus');
+      if (status) status.textContent = 'Wijziging wordt opgeslagen…';
+      saveTimer = setTimeout(() => {
+        saveDraft().then(() => {
+          const currentStatus = $('#finalReviewSaveStatus');
+          if (currentStatus) currentStatus.textContent = 'Opgeslagen';
+        }).catch(error => {
+          const currentStatus = $('#finalReviewSaveStatus');
+          if (currentStatus) currentStatus.textContent = error.message;
+        });
+      }, 450);
+    };
+
+    const refreshControls = () => {
+      const previous = $('#previousFinalQuestion');
+      const next = $('#nextFinalQuestion');
+      const complete = $('#completeFinalReview');
+      const progress = $('#finalReviewProgress');
+      if (previous) previous.disabled = currentIndex === 0;
+      if (next) next.disabled = currentIndex === result.questions.length - 1;
+      if (progress) {
+        const remaining = result.questions.length - visited.size;
+        progress.textContent = `Vraag ${currentIndex + 1} van ${result.questions.length} · ${remaining} nog te bekijken`;
+      }
+      if (complete) {
+        complete.disabled = !allVisited() || unresolvedMismatches().length > 0 || completing;
+        complete.textContent = completing ? 'Eindcontrole afronden…' : 'Eindcontrole afronden';
+      }
+      panel.querySelectorAll('[data-final-jump]').forEach(button => {
+        const index = Number(button.dataset.finalJump);
+        button.classList.toggle('active', index === currentIndex);
+        const question = result.questions[index];
+        button.classList.toggle('candidate-suspect',
+          question.points_match === false && !String(notes[question.question_number] || '').trim());
+      });
+    };
+
+    const renderQuestion = () => {
+      const question = currentQuestion();
+      visited.add(question.question_number);
+      panel.innerHTML = `
+        <p class="eyebrow">FASE 9 · INTEGRALE EINDCONTROLE</p>
+        <h2>Vraag voor vraag controleren</h2>
+        <p class="lead">Bekijk per vraag de context, opgave, eventuele uitwerkbijlage, correctievoorschrift en antwoord. Met Vorige en Volgende doorloop je het examen. Een toelichting is alleen nodig bij een afwijkende maximumscore.</p>
+        <div class="notice" id="finalReviewProgress"></div>
+        <div class="final-review-overview" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin:0.75rem 0 1rem">
+          ${overviewHtml()}
+        </div>
+        <div class="review-actions" style="justify-content:space-between">
+          <button class="quiet" id="previousFinalQuestion" type="button">← Vorige vraag</button>
+          <button class="quiet" id="nextFinalQuestion" type="button">Volgende vraag →</button>
+        </div>
+        ${questionCardHtml(question)}
+        <div class="review-actions">
+          <button class="primary" id="saveFinalReview" type="button">Voortgang opslaan</button>
+          <button class="primary" id="completeFinalReview" type="button">Eindcontrole afronden</button>
+        </div>
+        <p id="finalReviewSaveStatus" class="muted" role="status"></p>
+        <p id="finalReviewMessage" class="form-error" role="status"></p>`;
+
+      const noteField = panel.querySelector('[data-final-note]');
+      if (noteField) {
+        noteField.addEventListener('input', () => {
+          notes[question.question_number] = noteField.value;
+          refreshControls();
+          scheduleSave();
+        });
+      }
+
+      $('#previousFinalQuestion').addEventListener('click', () => navigateTo(currentIndex - 1));
+      $('#nextFinalQuestion').addEventListener('click', () => navigateTo(currentIndex + 1));
+      panel.querySelectorAll('[data-final-jump]').forEach(button => {
+        button.addEventListener('click', () => navigateTo(Number(button.dataset.finalJump)));
+      });
+
+      $('#saveFinalReview').addEventListener('click', async event => {
+        const button = event.currentTarget;
+        const original = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Opslaan…';
+        try {
+          await saveDraft();
+          $('#finalReviewSaveStatus').textContent = 'Voortgang opgeslagen.';
+        } catch (error) {
+          $('#finalReviewMessage').textContent = error.message;
+        } finally {
+          if (button.isConnected) button.textContent = original;
+          refreshControls();
+        }
+      });
+
+      $('#completeFinalReview').addEventListener('click', async () => {
+        if (completing || !allVisited() || unresolvedMismatches().length) return;
+        completing = true;
+        refreshControls();
+        try {
+          clearTimeout(saveTimer);
+          // De expliciete afrondactie bevestigt de volledige reeks. De server
+          // krijgt alle vragen als gecontroleerd, zonder verborgen vinkjes.
+          const saved = await save({draft: false, mark_all_reviewed: true});
+          if (!saved.complete) throw new Error('De integrale eindcontrole is nog niet volledig opgeslagen.');
+          await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({reviewed: true, reviewed_all_questions: true})
+          });
+          await openWorkspace(state.examId);
+        } catch (error) {
+          completing = false;
+          const message = $('#finalReviewMessage');
+          if (message) message.textContent = error.message;
+          refreshControls();
+        }
+      });
+
+      panel.querySelectorAll('[data-repair]').forEach(button => {
+        button.addEventListener('click', async () => {
+          const original = button.textContent;
+          button.disabled = true;
+          button.textContent = 'Stap heropenen…';
+          try {
+            await saveDraft();
+            await api(`/api/exams/${state.examId}/steps/${button.dataset.repair}/reopen`, {method: 'POST'});
+            await openWorkspace(state.examId);
+          } catch (error) {
+            button.disabled = false;
+            button.textContent = original;
+            const message = $('#finalReviewMessage');
+            if (message) message.textContent = error.message;
+          }
+        });
+      });
+
+      refreshControls();
+    };
+
+    const navigateTo = async nextIndex => {
+      if (nextIndex < 0 || nextIndex >= result.questions.length || nextIndex === currentIndex) return;
+      try {
+        await saveDraft();
+        currentIndex = nextIndex;
+        renderQuestion();
+      } catch (error) {
+        const message = $('#finalReviewMessage');
+        if (message) message.textContent = `Opslaan is niet gelukt; de vraag is niet gewisseld. ${error.message}`;
+      }
+    };
+
+    // Expose one flush hook so any workflow navigation waits for the final
+    // pending autosave before replacing this panel.
+    panel._stageAutoSaveFlush = saveDraft;
+    panel._stageAutoSaveCleanup = () => {
+      clearTimeout(saveTimer);
+      panel._stageAutoSaveFlush = null;
+      panel._stageAutoSaveCleanup = null;
+    };
+
+    renderQuestion();
+  } catch (error) {
+    panel.innerHTML = `<h2>Integrale eindcontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+    if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+      panel.insertAdjacentHTML('beforeend',
+        '<button class="primary" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
+      $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+        try {
+          await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+          await openWorkspace(state.examId);
+        } catch (reopenError) {
+          panel.insertAdjacentHTML('beforeend', `<p class="form-error">${escapeHtml(reopenError.message)}</p>`);
+        }
+      });
+    }
+  }
 }
 
 async function renderPublicationStage() {
@@ -1161,6 +1574,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
         : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Contexten en vragen staan in dezelfde strook. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
+      ${result.selection_warning ? `<p class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
           <div class="stitched-image-scroll" id="stitchedImageScroll"><div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div></div>
