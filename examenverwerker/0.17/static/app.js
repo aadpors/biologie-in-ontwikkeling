@@ -214,7 +214,7 @@ function renderWorkspace() {
   else if (next?.key === 'opgaven_analyse') renderQuestionAnalysisStage();
   else if (next?.key === 'uitwerk_starts' && !examHasDocumentType('uitwerkbijlage')) renderSkipWorkbookStage();
   else if (next?.key === 'uitwerk_starts') renderQuestionStartsStage('uitwerk_starts', 'uitwerkbijlage', 'FASE 3 · UITWERKBIJLAGE', 'Vraagstarts uitwerkbijlage');
-  else if (next?.key === 'uitwerk_fragments') renderQuestionFragmentsStage('uitwerk_fragments', 'uitwerkbijlage', 'uitwerk_starts', 'FASE 3 · UITWERKBIJLAGE', 'Fragmenten uitwerkbijlage');
+  else if (next?.key === 'uitwerk_fragments') renderStitchedOpgavenStage('uitwerk_fragments', 'uitwerk_starts', 'FASE 3 · UITWERKBIJLAGE', 'Fragmenten uitwerkbijlage', 'uitwerkbijlage');
   else if (next?.key === 'cv_starts') renderQuestionStartsStage('cv_starts', 'correctievoorschrift', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Vraagstarts correctievoorschrift');
   else if (next?.key === 'cv_fragments') renderQuestionFragmentsStage('cv_fragments', 'correctievoorschrift', 'cv_starts', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Correctievoorschriftfragmenten');
   else if (next?.key === 'cv_aanvulling') renderCvSupplementStage();
@@ -802,7 +802,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
    selecteert daarop rechthoekige verticale bereiken en classificeert elk bereik
    als context of vraag. De rechter inspector beheert de koppeling met één of
    meer vraagnummers; de selectiecoördinaten blijven in pixels van de stitchbron. */
-async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, stageTitle) {
+async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, stageTitle, documentType = 'opgaven') {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Het examen wordt samengevoegd tot één lange afbeelding…</p>';
   try {
@@ -932,7 +932,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const snapshot = JSON.parse(JSON.stringify(selections));
       saveStatus.textContent = 'Opslaan…';
       saveChain = saveChain.catch(() => {}).then(() => api(
-        `/api/exams/${state.examId}/stitched-opgaven/review`,
+        stitchedReviewUrl,
         {method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({selections:snapshot, reviewed:false})}
       )).then(response => {
@@ -958,7 +958,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const saveOnHide = () => {
       clearTimeout(saveTimer);
       const body = JSON.stringify({selections, reviewed:false});
-      fetch(`/api/exams/${state.examId}/stitched-opgaven/review`, {
+      fetch(stitchedReviewUrl, {
         method:'POST', keepalive:true,
         headers:{'Content-Type':'application/json'}, body
       }).catch(() => {});
@@ -1125,9 +1125,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           <div class="stitched-editor" id="stitchedEditor">
             <h3>Geselecteerd fragment</h3>
             <label>Type fragment
-              <select id="fragmentType">
-                <option value="context" ${item.type==='context'?'selected':''}>Context</option>
-                <option value="vraag" ${item.type==='vraag'?'selected':''}>Vraag</option>
+              <select id="fragmentType" ${isWorkbook?'disabled':''}>
+                ${isWorkbook ? '<option value="vraag" selected>Vraag uit de uitwerkbijlage</option>' : `<option value="context" ${item.type==='context'?'selected':''}>Context</option><option value="vraag" ${item.type==='vraag'?'selected':''}>Vraag</option>`}
               </select>
             </label>
             <label>Bij welk(e) vraagnummer(s)?
@@ -1267,17 +1266,17 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         if(!selections.length) throw new Error('Selecteer eerst de contexten en vragen.');
         if(selections.some(item=>!item.question_numbers.length)) throw new Error('Elk fragment moet aan minimaal één vraagnummer gekoppeld zijn.');
         if(!selections.some(item=>item.type==='vraag')) throw new Error('Er moet minimaal één vraagfragment zijn.');
-        const starts=await api(`/api/exams/${state.examId}/question-starts`);
+        const starts=await api(startsUrl);
         const numbers=(starts.candidates||[]).filter(item=>item.accepted&&!item.removed).map(item=>item.question_number);
         const covered=new Set(selections.filter(item=>item.type==='vraag').flatMap(item=>item.question_numbers));
         const missing=numbers.filter(number=>!covered.has(number));
         if(missing.length) throw new Error(`Nog geen vraagfragment geselecteerd voor vraag/vraagvragen: ${missing.join(', ')}.`);
         clearTimeout(saveTimer);
-        await api(`/api/exams/${state.examId}/stitched-opgaven/review`,{
+        await api(stitchedReviewUrl,{
           method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({selections,reviewed:true})
         });
-        await api(`/api/exams/${state.examId}/document-question-fragments/opgaven/review`,{
+        await api(fragmentsReviewUrl,{
           method:'POST',headers:{'Content-Type':'application/json'},
           body:JSON.stringify({reviewed_question_numbers:[...new Set(numbers)],reviewed_all_questions:true,boundary_overrides:[]})
         });
