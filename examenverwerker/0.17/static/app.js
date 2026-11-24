@@ -204,6 +204,27 @@ async function openWorkspace(examId) {
   state.examId = examId;
   state.exam = await api(`/api/exams/${examId}`);
   state.workflow = await api('/api/workflow');
+
+  // Documenttypen die ontbreken zijn geen inhoudelijke reviewtaak. Rond
+  // optionele fasen daarom automatisch als 'niet van toepassing' af; anders
+  // moet de gebruiker later een overbodige bevestigingsknop indrukken en kan
+  // een vervolgstap onterecht melden dat een voorganger nog openstaat.
+  if (state.exam.confirmed) {
+    let next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
+    if (next?.key === 'uitwerk_starts' && !examHasDocumentType('uitwerkbijlage')) {
+      await api(`/api/exams/${examId}/skip-optional-workbook`, {method:'POST'});
+      state.exam = await api(`/api/exams/${examId}`);
+      next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
+    }
+    if (next?.key === 'cv_aanvulling' && !examHasDocumentType('aanvulling_correctievoorschrift')) {
+      await api(`/api/exams/${examId}/steps/cv_aanvulling/complete`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({reviewed:true, not_required:true})
+      });
+      state.exam = await api(`/api/exams/${examId}`);
+    }
+  }
+
   $('#libraryView').hidden = true;
   $('#workspaceView').hidden = false;
   $('#backLibrary').hidden = false;
