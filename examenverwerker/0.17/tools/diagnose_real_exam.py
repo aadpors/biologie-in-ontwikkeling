@@ -140,6 +140,7 @@ if CV_SOURCE.is_file():
                     ),
                     re.IGNORECASE,
                 )
+                and float(line.get("bbox", [0, 0, 0, 0])[1]) <= page.rect.height * 0.25
                 for block in page.get_text("dict").get("blocks", [])
                 if block.get("type") == 0
                 for line in block.get("lines", [])
