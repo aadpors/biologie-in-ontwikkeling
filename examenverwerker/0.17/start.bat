@@ -36,11 +36,28 @@ if errorlevel 1 (
 
 py -3.12 --version >nul 2>nul
 if errorlevel 1 (
+    echo Python 3.12 is nog niet geinstalleerd. Installatie starten...
+    REM Moderne versies van de Python Launcher gebruiken de opdracht
+    REM "py install" om een runtime te downloaden en te registreren.
+    py install 3.12
+    if errorlevel 1 (
+        echo.
+        echo FOUT: Python 3.12 kon niet automatisch worden geinstalleerd.
+        echo Voer handmatig "py install 3.12" uit in een terminal.
+        echo Controleer daarna met "py -3.12 --version".
+        echo.
+        pause
+        exit /b 1
+    )
+)
+
+REM Controleer opnieuw: een geslaagde installer-exitcode is niet voldoende
+REM als de runtime niet door de launcher geregistreerd is.
+py -3.12 --version >nul 2>nul
+if errorlevel 1 (
     echo.
-    echo FOUT: Python 3.12 is niet geinstalleerd.
-    echo De lokale OCR-engine vereist momenteel Python 3.12.
-    echo Installeer Python 3.12 vanaf https://www.python.org/downloads/
-    echo en start daarna start.bat opnieuw.
+    echo FOUT: Python 3.12 is na installatie niet beschikbaar via de launcher.
+    echo Voer "py install 3.12" handmatig uit en start opnieuw.
     echo.
     pause
     exit /b 1
