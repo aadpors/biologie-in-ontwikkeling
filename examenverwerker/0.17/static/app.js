@@ -166,15 +166,34 @@ $('#importForm').addEventListener('submit', async event => {
       try { detail = JSON.parse(error.message); } catch (_) {}
       if (detail?.code !== 'duplicate_exam') throw error;
 
-      const confirmed = window.confirm(
+      // Een dubbele import is niet automatisch een fout: de gebruiker kan
+      // bewust verder willen met de bestaande verwerking, of juist opnieuw
+      // willen beginnen. Bied die twee keuzes expliciet en in die volgorde aan.
+      const continueExisting = window.confirm(
         `Dit examen is al geïmporteerd: "${detail.title}".\n\n` +
-        'Wil je de bestaande import en alle bijbehorende verwerking verwijderen ' +
-        'en vervangen door deze nieuwe import? Deze actie kan niet ongedaan worden gemaakt.'
+        'Wil je doorgaan met de bestaande import en verdergaan waar je gebleven was?\n\n' +
+        'Kies OK om de bestaande verwerking te openen. Kies Annuleren om opnieuw te beginnen.'
       );
-      if (!confirmed) {
-        $('#importError').textContent = 'Import geannuleerd. De bestaande verwerking is behouden.';
+      if (continueExisting) {
+        $('#pdfFiles').value = '';
+        button.textContent = 'Bestaande verwerking openen…';
+        await openWorkspace(detail.exam_id);
         return;
       }
+
+      // Verwijderen is onomkeerbaar. Vraag daarom na de keuze 'opnieuw
+      // beginnen' nog één keer expliciet bevestiging voordat de oude import
+      // daadwerkelijk wordt vervangen.
+      const replaceExisting = window.confirm(
+        'Opnieuw beginnen verwijdert de bestaande import en alle bijbehorende ' +
+        'verwerking definitief. De geselecteerde PDF-bestanden worden daarna ' +
+        'opnieuw geïmporteerd.\n\nWeet je zeker dat je opnieuw wilt beginnen?'
+      );
+      if (!replaceExisting) {
+        $('#importError').textContent = 'Opnieuw beginnen geannuleerd. De bestaande verwerking is behouden.';
+        return;
+      }
+
       form.append('replace_exam_id', detail.exam_id);
       button.textContent = 'Bestaande import vervangen…';
       result = await api('/api/exams/import', { method: 'POST', body: form });
