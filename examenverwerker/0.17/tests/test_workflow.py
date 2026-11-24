@@ -530,6 +530,12 @@ class WorkflowApplicationTests(unittest.TestCase):
         )
         self.assertTrue(saved.json()["complete"])
         self.assertEqual(saved.json()["unresolved_score_mismatches"], [])
+        main.STORE.complete_step(exam_id, "antwoorden", {})
+        completed = self.client.post(
+            f"/api/exams/{exam_id}/steps/relaties/complete",
+            json={"reviewed":True,"reviewed_all_questions":True},
+        )
+        self.assertEqual(completed.status_code, 200, completed.text)
 
     def test_non_pdf_upload_is_rejected(self):
         response = self.client.post("/api/exams/import", files=[("files", ("not-a-pdf.txt", b"hello", "text/plain"))])
