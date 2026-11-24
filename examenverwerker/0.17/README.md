@@ -7,17 +7,19 @@ worden beheerd door één FastAPI-app en één SQLite-opslag.
 
 ## Starten
 
-Vereist Python 3.10 of hoger.
+Vereist Python 3.12 (de Windows-startscripts selecteren deze versie expliciet vanwege de lokale OCR-engine en ONNX Runtime).
 
 ```powershell
-python -m venv .venv
+py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m uvicorn examenverwerker.main:app --reload
 ```
 
-Op Windows kan dit ook met `start.ps1`; het script maakt de virtuele omgeving
-aan, installeert de benodigde pakketten en start de server. Open daarna
+Op Windows kan dit ook met `start.bat` of `start.ps1`; beide scripts selecteren
+Python 3.12 expliciet. Als `.venv` eerder met een incompatibele Python-versie
+is aangemaakt, wordt alleen die virtuele omgeving opnieuw opgebouwd. De
+examendatabase en bronbestanden blijven behouden. Open daarna
 `http://127.0.0.1:8000`.
 
 ## Geïntegreerde verwerkingsstappen
