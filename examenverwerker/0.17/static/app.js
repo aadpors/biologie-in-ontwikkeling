@@ -112,6 +112,13 @@ function prepareStageApproval(panel) {
     }
     label.hidden = true;
   });
+  // Sommige bestaande schermen schakelden de afrondknop uitsluitend uit
+  // zolang deze vinkjes niet waren gezet. Die blokkade vervalt nu; eventuele
+  // inhoudelijke blokkades worden direct daarna door de eigen refresh-functie
+  // van de stap opnieuw toegepast.
+  panel.querySelectorAll('button[id^="complete"]').forEach(button => {
+    button.disabled = false;
+  });
   if (!panel.querySelector('.stage-approval-note')) {
     const note = document.createElement('p');
     note.className = 'stage-approval-note muted';
