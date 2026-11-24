@@ -282,36 +282,66 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                             cv_valid_candidates.append(candidate)
                             continue
                         if re.fullmatch(r"\d{1,2}", candidate_text):
-                            # Meerkeuzeantwoorden staan in sommige CV's in drie
-                            # aparte tekstkolommen. De PDF-extractor levert dan
-                            # het vraagnummer, de antwoordletter en de score als
-                            # losse regels op ("2", "B", "1"), niet als "2 B 1".
-                            # Herken beide vormen, maar alleen direct na een
-                            # los vraagnummer binnen het beoordelingsmodel.
-                            lines = [
-                                line.strip()
-                                for line in cv_pdf[page_index].get_text("text").splitlines()
-                                if line.strip()
+                            # Een CV is vaak als tabel opgebouwd. De vraagkolom
+                            # staat links, terwijl "maximumscore" of het MC-
+                            # antwoord in een andere tekstkolom staat. De PDF-
+                            # extractor geeft die kolommen niet altijd in
+                            # leesvolgorde terug. Zoek daarom op PDF-coördinaten
+                            # rond de vraagstart, niet uitsluitend in de vijf
+                            # volgende geëxtraheerde tekstregels.
+                            positioned_lines = []
+                            for block in cv_pdf[page_index].get_text("dict").get("blocks", []):
+                                if block.get("type") != 0:
+                                    continue
+                                for line in block.get("lines", []):
+                                    line_text = " ".join(
+                                        span.get("text", "") for span in line.get("spans", [])
+                                    ).strip()
+                                    bbox = line.get("bbox", [])
+                                    if line_text and len(bbox) == 4:
+                                        positioned_lines.append({
+                                            "text": line_text,
+                                            "top": float(bbox[1]),
+                                            "bottom": float(bbox[3]),
+                                        })
+
+                            candidate_top = float(candidate["pdf_bbox"][1])
+                            candidate_bottom = float(candidate["pdf_bbox"][3])
+                            # Score-informatie kan vóór, naast of direct onder
+                            # het nummer staan. De ruime verticale marge vangt
+                            # verschillende regelafstanden en kolomvolgordes op.
+                            nearby_lines = [
+                                item["text"] for item in positioned_lines
+                                if item["bottom"] >= candidate_top - 8
+                                and item["top"] <= candidate_bottom + 48
+                                and item["text"] != candidate_text
                             ]
-                            matching = next(
-                                (index for index, line in enumerate(lines)
-                                 if line == candidate_text),
-                                None,
-                            )
-                            following = lines[matching + 1:matching + 6] if matching is not None else []
                             has_maximumscore = any(
-                                re.match(r"^maximumscore\s+\d+", line, re.IGNORECASE)
-                                for line in following
+                                re.search(r"\bmaximumscore\s+\d+", line, re.IGNORECASE)
+                                for line in nearby_lines
                             )
                             has_inline_mc_answer = any(
                                 re.fullmatch(r"[A-E][.)]?\s+[012]", line, re.IGNORECASE)
-                                for line in following
+                                for line in nearby_lines
                             )
+                            # In sommige tabellen zijn antwoordletter en score
+                            # afzonderlijke regels. Vergelijk regels op hun
+                            # positie, zodat een andere tekstkolom of afwijkende
+                            # PDF-leesvolgorde de herkenning niet verhindert.
+                            nearby_positioned = [
+                                item for item in positioned_lines
+                                if item["bottom"] >= candidate_top - 8
+                                and item["top"] <= candidate_bottom + 48
+                                and item["text"] != candidate_text
+                            ]
                             has_split_mc_answer = any(
-                                re.fullmatch(r"[A-E][.)]?", line, re.IGNORECASE)
-                                and index + 1 < len(following)
-                                and re.fullmatch(r"[012]", following[index + 1])
-                                for index, line in enumerate(following)
+                                re.fullmatch(r"[A-E][.)]?", item["text"], re.IGNORECASE)
+                                and any(
+                                    re.fullmatch(r"[012]", other["text"])
+                                    and abs(other["top"] - item["top"]) <= 24
+                                    for other in nearby_positioned
+                                )
+                                for item in nearby_positioned
                             )
                             if has_maximumscore or has_inline_mc_answer or has_split_mc_answer:
                                 cv_valid_candidates.append(candidate)
