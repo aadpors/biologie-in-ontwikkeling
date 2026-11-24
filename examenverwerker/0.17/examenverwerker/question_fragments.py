@@ -59,6 +59,37 @@ def cv_content_end_page(pdf: fitz.Document) -> int:
 
 
 
+def cv_model_start(pdf: fitz.Document) -> tuple[int, float]:
+    """Vind de echte start van hoofdstuk 4, het beoordelingsmodel.
+
+    De eerdere pagina's van een correctievoorschrift bevatten onder meer
+    toelichting, correctieregels en soms een inhoudsopgave. Die horen niet in
+    de fragmentwerkruimte van stap 8. Herken daarom de zelfstandige kop
+    '4 Beoordelingsmodel' als volledige tekstregel in het bovenste kwart van
+    de pagina. De functie retourneert de nulgebaseerde pagina-index en de
+    verticale PDF-coördinaat van de kop.
+    """
+    for page_index, page in enumerate(pdf):
+        for block in page.get_text("dict").get("blocks", []):
+            if block.get("type") != 0:
+                continue
+            for line in block.get("lines", []):
+                text = " ".join(
+                    span.get("text", "") for span in line.get("spans", [])
+                ).strip()
+                bbox = line.get("bbox", [])
+                if len(bbox) != 4:
+                    continue
+                top = float(bbox[1])
+                if (top <= page.rect.height * 0.25
+                        and re.fullmatch(r"4\\s+beoordelingsmodel", text, re.IGNORECASE)):
+                    return page_index, top
+    # Niet ieder correctievoorschrift gebruikt exact deze hoofdstuknummering.
+    # Als de kop ontbreekt, laat de volledige PDF beschikbaar in plaats van
+    # mogelijk inhoudelijke beoordelingsregels stilzwijgend weg te laten.
+    return 0, 0.0
+
+
 def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
     """Verklein alleen verticale witmarges en behoud de volledige paginabreedte.
 
@@ -98,7 +129,7 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
 def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
     """Vind herhaalde kop-/voettekstregels in de buitenste paginamarges.
 
-    Alleen regels die in de bovenste 6% of onderste 6% van een pagina staan
+    Alleen regels die in de bovenste 6% of onderste 12% van een pagina staan
     worden onderzocht. Een identieke regel moet op ten minste twee pagina's
     voorkomen voordat deze als niet-inhoudelijke herhaling wordt gemaskeerd.
     Losse paginanummers in de marge worden eveneens herkend.
@@ -118,7 +149,7 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                 bbox = [float(value) for value in line.get("bbox", [])]
                 if len(bbox) != 4:
                     continue
-                in_margin = bbox[1] <= height * 0.06 or bbox[3] >= height * 0.94
+                in_margin = bbox[1] <= height * 0.06 or bbox[3] >= height * 0.88
                 if not in_margin:
                     continue
                 key = " ".join(text.casefold().split())
@@ -253,27 +284,39 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         cleaned.save(page_path, format="PNG", optimize=True)
                 with Image.open(page_path) as source:
                     image = source.convert("RGB")
-                    # Snij grote lege boven-, onder- en zijmarges weg. De
-                    # drempel behoudt ook lichte lijnen, kleine labels en
-                    # dunne illustraties die inhoudelijk bij de pagina horen.
+                    # Bij het CV begint de werkstrook midden in het document:
+                    # snij op de eerste pagina alles boven de echte kop
+                    # '4 Beoordelingsmodel' weg. De offset blijft bewaard in
+                    # crop_pixels zodat latere fragmenten exact naar de
+                    # oorspronkelijke PDF-coördinaten terug te rekenen zijn.
+                    crop_origin_y = (
+                        max(0, min(image.height, round(float(start_y) * render_scale)))
+                        if page_index == start_page else 0
+                    )
+                    if crop_origin_y:
+                        image = image.crop((0, crop_origin_y, image.width, image.height))
+
+                    # Verwijder daarna alleen de lege verticale marges. De
+                    # volledige paginabreedte blijft bewust behouden.
                     mask = Image.eval(image.convert("L"), lambda value: 255 if value < 246 else 0)
                     bbox = mask.getbbox()
                     if bbox:
-                        # Behoud de volledige paginabreedte. Alleen de
-                        # verticale lege boven- en ondermarges worden beperkt.
-                        # Zo blijven zijstroken, kolommen en brede figuren
-                        # zichtbaar in ieder fragment, ongeacht de stap.
                         _, top, _, bottom = bbox
                         pad = max(12, int(render_scale * 8))
                         bbox = (0, max(0, top-pad), image.width,
                                 min(image.height, bottom+pad))
                         image = image.crop(bbox)
+                    else:
+                        bbox = (0, 0, image.width, image.height)
                     page_images.append(image.copy())
                     page_meta.append({
                         "page_number": page_index + 1,
                         "source_width": page.rect.width,
                         "source_height": page.rect.height,
-                        "crop_pixels": list(bbox) if bbox else [0, 0, image.width, image.height],
+                        "crop_pixels": [
+                            0, crop_origin_y + bbox[1],
+                            image.width, crop_origin_y + bbox[3]
+                        ],
                         "render_width": image.width,
                         "render_height": image.height,
                     })
