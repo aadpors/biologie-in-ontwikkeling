@@ -216,7 +216,7 @@ function renderWorkspace() {
   else if (next?.key === 'uitwerk_starts') renderQuestionStartsStage('uitwerk_starts', 'uitwerkbijlage', 'FASE 3 · UITWERKBIJLAGE', 'Vraagstarts uitwerkbijlage');
   else if (next?.key === 'uitwerk_fragments') renderStitchedOpgavenStage('uitwerk_fragments', 'uitwerk_starts', 'FASE 3 · UITWERKBIJLAGE', 'Fragmenten uitwerkbijlage', 'uitwerkbijlage');
   else if (next?.key === 'cv_starts') renderQuestionStartsStage('cv_starts', 'correctievoorschrift', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Vraagstarts correctievoorschrift');
-  else if (next?.key === 'cv_fragments') renderQuestionFragmentsStage('cv_fragments', 'correctievoorschrift', 'cv_starts', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Correctievoorschriftfragmenten');
+  else if (next?.key === 'cv_fragments') renderStitchedOpgavenStage('cv_fragments', 'cv_starts', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Fragmenten correctievoorschrift', 'correctievoorschrift');
   else if (next?.key === 'cv_aanvulling') renderCvSupplementStage();
   else if (next?.key === 'antwoorden') renderAnswersStage();
   else if (next?.key === 'relaties') renderRelationsStage();
@@ -808,13 +808,16 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
   // Dezelfde werkruimte wordt gebruikt voor opgaven en uitwerkbijlage.
   // Alleen de API-route en toegestane fragmentsoort verschillen.
   const isWorkbook = documentType === 'uitwerkbijlage';
-  const stitchedReviewUrl = isWorkbook
+  const isCv = documentType === 'correctievoorschrift';
+  const isStitchedDocument = isWorkbook || isCv;
+  const documentLabel = isWorkbook ? 'uitwerkbijlage' : isCv ? 'correctievoorschrift' : 'opgavenboekje';
+  const stitchedReviewUrl = isStitchedDocument
     ? `/api/exams/${state.examId}/stitched-document/${documentType}/review`
     : `/api/exams/${state.examId}/stitched-opgaven/review`;
   const startsUrl = `/api/exams/${state.examId}/document-question-starts/${documentType}`;
   const fragmentsReviewUrl = `/api/exams/${state.examId}/document-question-fragments/${documentType}/review`;
   try {
-    const result = await api(isWorkbook
+    const result = await api(isStitchedDocument
       ? `/api/exams/${state.examId}/stitched-document/${documentType}`
       : `/api/exams/${state.examId}/stitched-opgaven`);
     // Herstel altijd de serverversie van eerder opgeslagen werk. Automatische
@@ -829,9 +832,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
 
     panel.innerHTML = `
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
-      <p class="lead">${isWorkbook
-        ? 'De pagina’s van de uitwerkbijlage zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.'
-        : 'De pagina’s zijn eerst afzonderlijk bijgesneden en daarna samengevoegd. Contexten en vragen staan in één doorlopende afbeelding. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.'}</p>
+      <p class="lead">${isStitchedDocument
+        ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
+        : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Contexten en vragen staan in dezelfde strook. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
@@ -1137,8 +1140,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           <div class="stitched-editor" id="stitchedEditor">
             <h3>Geselecteerd fragment</h3>
             <label>Type fragment
-              <select id="fragmentType" ${isWorkbook?'disabled':''}>
-                ${isWorkbook ? '<option value="vraag" selected>Vraag uit de uitwerkbijlage</option>' : `<option value="context" ${item.type==='context'?'selected':''}>Context</option><option value="vraag" ${item.type==='vraag'?'selected':''}>Vraag</option>`}
+              <select id="fragmentType" ${isStitchedDocument?'disabled':''}>
+                ${isStitchedDocument ? `<option value="vraag" selected>Vraag uit het ${documentLabel}</option>` : `<option value="context" ${item.type==='context'?'selected':''}>Context</option><option value="vraag" ${item.type==='vraag'?'selected':''}>Vraag</option>`}
               </select>
             </label>
             <label>Bij welk(e) vraagnummer(s)?
