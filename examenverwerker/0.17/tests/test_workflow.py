@@ -546,6 +546,38 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
 
+    def test_identical_late_autosave_does_not_reopen_completed_step(self):
+        """Een vertraagde identieke autosave mag de workflowstatus niet terugzetten."""
+        exam_id = self.import_sample()["exam_id"]
+        approved = {
+            "questions": [{"question_number": 1, "answer_text": "juist", "reviewed": True}],
+            "reviewed_count": 1,
+            "reviewed_all_questions": True,
+        }
+        main.STORE.complete_step(exam_id, "antwoorden", approved)
+
+        # Een tweede request kan door netwerkvertraging ná de afrondactie
+        # aankomen. Omdat de inhoud identiek is, blijft de goedkeuring staan.
+        saved_as_draft = main.STORE.save_step_draft_preserving_identical_complete(
+            exam_id, "antwoorden", approved, identity_fields=tuple(approved.keys())
+        )
+        self.assertFalse(saved_as_draft)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["antwoorden"]["status"], "complete")
+
+        # Een echte inhoudelijke wijziging moet de oude goedkeuring juist wel
+        # intrekken, zodat gewijzigde antwoorden opnieuw gecontroleerd worden.
+        changed = {**approved, "questions": [
+            {"question_number": 1, "answer_text": "gewijzigd", "reviewed": True}
+        ]}
+        saved_as_draft = main.STORE.save_step_draft_preserving_identical_complete(
+            exam_id, "antwoorden", changed, identity_fields=tuple(changed.keys())
+        )
+        self.assertTrue(saved_as_draft)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["antwoorden"]["status"], "pending")
+
+
     def test_stitched_selection_fingerprint_rejects_stale_pixel_coordinates(self):
         """Pixelgrenzen mogen alleen bij exact dezelfde lange bronafbeelding worden hergebruikt."""
         image_path = Path(self.temp.name) / "exam-long.png"
