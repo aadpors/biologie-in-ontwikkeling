@@ -315,7 +315,7 @@ def _looks_like_context_region(
         if len(words) >= 6 and cues.search(text):
             return True
         sentence_count = len(re.findall(r"[.!?](?:\s|$)", text))
-        if len(words) >= 28 and len(lines) >= 3 and sentence_count >= 2:
+        if len(words) >= 8 and len(lines) >= 2 and sentence_count >= 2:
             return True
         # Een figuur kan zelfstandig context zijn; een klein icoon of
         # decoratief plaatje is daarvoor niet voldoende.
