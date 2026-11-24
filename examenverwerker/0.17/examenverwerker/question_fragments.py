@@ -16,6 +16,49 @@ import fitz
 from PIL import Image, ImageDraw
 
 
+def cv_content_end_page(pdf: fitz.Document) -> int:
+    """Bepaal de laatste inhoudspagina vóór de echte CV-slotsectie.
+
+    Een inhoudsopgave kan de regel '5 Aanleveren scores' letterlijk noemen.
+    De oude tekstzoekactie behandelde zo'n vermelding als het begin van de
+    administratieve slotpagina en verwijderde daardoor alle vraagstarts uit
+    het beoordelingsmodel. We accepteren de grens daarom alleen wanneer de
+    volledige regel als zelfstandige kop in het bovenste deel van de pagina
+    staat. De originele PDF blijft uiteraard ongewijzigd.
+    """
+    for page_index, page in enumerate(pdf):
+        page_dict = page.get_text("dict")
+        for block in page_dict.get("blocks", []):
+            if block.get("type") != 0:
+                continue
+            for line in block.get("lines", []):
+                # Maak de regel op dezelfde manier als de overige CV-koppen:
+                # spans worden samengevoegd, waarna alleen de volledige kop
+                # mag matchen. Een verwijzing met extra tekst telt niet mee.
+                line_text = " ".join(
+                    span.get("text", "") for span in line.get("spans", [])
+                ).strip()
+                bbox = line.get("bbox", [])
+                if len(bbox) != 4:
+                    continue
+                heading_top = float(bbox[1])
+                if (
+                    heading_top <= page.rect.height * 0.20
+                    and re.fullmatch(
+                        r"5\s+aanleveren scores",
+                        line_text,
+                        re.IGNORECASE,
+                    )
+                ):
+                    # De slotsectie begint op deze pagina; de laatste
+                    # inhoudspagina is dus de voorgaande pagina.
+                    return max(0, page_index - 1)
+    # Sommige correctievoorschriften hebben geen afzonderlijke slotsectie.
+    # In dat geval blijft het volledige document beschikbaar.
+    return max(0, len(pdf) - 1)
+
+
+
 def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
     """Snijd uitsluitend buitenste witte randen weg, met behoud van marge.
 
@@ -959,13 +1002,15 @@ def generate_question_fragments(
         # administratieve instructies en bronvermeldingen. Die horen niet bij
         # het antwoord van de laatste examenvraag. Als zo'n afsluitende sectie
         # herkenbaar is, eindigt het laatste CV-fragment op de pagina ervoor.
-        cv_content_end_page = pdf.page_count - 1
-        if document_type == "correctievoorschrift":
-            for page_index, page in enumerate(pdf):
-                page_text = page.get_text("text").casefold()
-                if re.search(r"(?m)^\s*5\s+aanleveren scores\b", page_text):
-                    cv_content_end_page = max(0, page_index - 1)
-                    break
+        # Gebruik exact dezelfde herkenning als de API voor de vraagstarts.
+        # Zo kan stap 8 geen andere paginagrens hanteren dan stap 7 en wordt
+        # een verwijzing in de inhoudsopgave niet aangezien voor de echte
+        # administratieve slotsectie.
+        cv_last_content_page = (
+            cv_content_end_page(pdf)
+            if document_type == "correctievoorschrift"
+            else pdf.page_count - 1
+        )
         # Verwijder alleen oude gegenereerde PNG's in deze eigen werkmap.
         # Bronbestanden staan elders en worden nooit gewijzigd of verwijderd.
         for old_file in destination.glob("question-*.png"):
@@ -975,7 +1020,7 @@ def generate_question_fragments(
             next_start = starts[index + 1] if index + 1 < len(starts) else None
             first_page = int(start["page_index"])
             last_page = int(next_start["page_index"]) if next_start else (
-                cv_content_end_page if document_type == "correctievoorschrift" else pdf.page_count - 1
+                cv_last_content_page
             )
             segments = []
             extracted_text_parts: list[str] = []
