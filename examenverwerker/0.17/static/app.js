@@ -1055,7 +1055,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const tokens = value.split(/[;,]/).map(token => token.trim()).filter(Boolean);
       if (!tokens.length) return null;
       for (const token of tokens) {
-        const range = token.match(/^(\\d{1,2})\\s*[-–]\\s*(\\d{1,2})$/);
+        const range = token.match(/^(\d{1,2})\s*[-–]\s*(\d{1,2})$/);
         if (range) {
           let first = Number(range[1]);
           let last = Number(range[2]);
@@ -1064,7 +1064,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           for (let number = first; number <= last; number += 1) numbers.add(number);
           continue;
         }
-        if (!/^\\d{1,2}$/.test(token)) return null;
+        if (!/^\d{1,2}$/.test(token)) return null;
         const number = Number(token);
         if (number < 1 || number > 60) return null;
         numbers.add(number);
