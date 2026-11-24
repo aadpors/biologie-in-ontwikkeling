@@ -93,6 +93,89 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertIn(1, [item["question_number"] for item in result.json()["candidates"]])
         self.assertIn(2, [item["question_number"] for item in result.json()["candidates"]])
 
+    def test_cv_detector_recognises_open_questions_with_score_in_separate_column(self):
+        # Het CV kan de vraagkolom en de scorekolom als afzonderlijke
+        # tekstblokken opslaan. De PDF-tekstvolgorde is dan niet betrouwbaar:
+        # "maximumscore" kan vóór het vraagnummer worden uitgelezen.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Beoordelingsmodel", fontsize=12)
+
+        # Open vraag 1: scorekolom bewust vóór de vraagnummerkolom invoegen.
+        page.insert_text((350, 130), "maximumscore 3", fontsize=10)
+        page.insert_text((60, 130), "1", fontsize=11)
+        page.insert_text((90, 155), "Uit het antwoord moet blijken dat ...", fontsize=10)
+
+        # Open vraag 2: zelfde tabelvorm, maar met een andere regelafstand.
+        page.insert_text((350, 220), "maximumscore 2", fontsize=10)
+        page.insert_text((60, 220), "2", fontsize=11)
+        page.insert_text((90, 245), "De kandidaat noemt twee kenmerken.", fontsize=10)
+
+        # Meerkeuzevraag 3 blijft eveneens herkenbaar wanneer letter en score
+        # in losse tekstkolommen naast het vraagnummer staan.
+        page.insert_text((60, 310), "3", fontsize=11)
+        page.insert_text((350, 310), "B", fontsize=10)
+        page.insert_text((405, 310), "1", fontsize=10)
+
+        path = self.root / "cv-open-en-mc.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [item["question_number"] for item in result.json()["candidates"]],
+            [1, 2, 3],
+        )
+
+    def test_cv_heading_ignores_mentions_in_introductory_text(self):
+        # Een juridische toelichting kan het woord "beoordelingsmodel"
+        # noemen vóór de zelfstandige hoofdstukkop. Alleen die echte kop
+        # mag bepalen waar de vraagstartdetectie begint.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Het beoordelingsmodel wordt hieronder toegelicht.")
+        page.insert_text((60, 120), "1")
+        page.insert_text((60, 145), "Regels voor de beoordeling")
+        page.insert_text((60, 190), "4 Beoordelingsmodel")
+        page.insert_text((60, 230), "1")
+        page.insert_text((60, 255), "maximumscore 2")
+        path = self.root / "cv-heading.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [item["question_number"] for item in result.json()["candidates"]],
+            [1],
+        )
+
     def test_detector_uses_only_standalone_main_question_lines(self):
         path = self.root / "sample.pdf"
         path.write_bytes(self.make_pdf())
