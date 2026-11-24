@@ -80,12 +80,15 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
         bbox = mask.getbbox()
         if not bbox:
             return
-        left, top, right, bottom = bbox
-        left = max(0, left - padding)
+        # Fragmenten blijven altijd paginabreed. Alleen de verticale
+        # witruimte binnen de al bepaalde fragmentclip wordt verkleind.
+        # Horizontaal bijsnijden kan anders kolommen, figuren, bijschriften of
+        # uitwerkingen aan de linker- of rechterzijde onzichtbaar maken.
         top = max(0, top - padding)
-        right = min(image.width, right + padding)
         bottom = min(image.height, bottom + padding)
-        image.crop((left, top, right, bottom)).save(image_path, format="PNG", optimize=True)
+        image.crop((0, top, image.width, bottom)).save(
+            image_path, format="PNG", optimize=True
+        )
 
 
 
@@ -249,10 +252,14 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                     mask = Image.eval(image.convert("L"), lambda value: 255 if value < 246 else 0)
                     bbox = mask.getbbox()
                     if bbox:
-                        left, top, right, bottom = bbox
+                        # Behoud de volledige paginabreedte. Alleen de
+                        # verticale lege boven- en ondermarges worden beperkt.
+                        # Zo blijven zijstroken, kolommen en brede figuren
+                        # zichtbaar in ieder fragment, ongeacht de stap.
+                        _, top, _, bottom = bbox
                         pad = max(12, int(render_scale * 8))
-                        bbox = (max(0, left-pad), max(0, top-pad),
-                                min(image.width, right+pad), min(image.height, bottom+pad))
+                        bbox = (0, max(0, top-pad), image.width,
+                                min(image.height, bottom+pad))
                         image = image.crop(bbox)
                     page_images.append(image.copy())
                     page_meta.append({
