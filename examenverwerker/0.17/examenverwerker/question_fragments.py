@@ -277,13 +277,13 @@ def _looks_like_context_region(
     inhoud bij de vraag en kan de docent haar handmatig als context markeren.
     """
     cues = re.compile(
-        r"\\b(?:gebruik de informatie|gebruik onderstaande|gebruik de tekst|"
+        r"\b(?:gebruik de informatie|gebruik onderstaande|gebruik de tekst|"
         r"lees de tekst|bekijk de afbeelding|onderstaande afbeelding|"
         r"de volgende informatie|de volgende tekst|in de tekst hieronder|"
         r"bij de volgende vragen|voor de volgende vragen|"
         r"een onderzoek naar|bij dit onderzoek|de onderzoekers|"
         r"een experiment|de proefpersonen|in deze situatie|"
-        r"de afbeelding hieronder|de tabel hieronder|context)\\b",
+        r"de afbeelding hieronder|de tabel hieronder|context)\b",
         re.IGNORECASE,
     )
     for info in page_metadata:
@@ -310,11 +310,11 @@ def _looks_like_context_region(
             continue
         clip = fitz.Rect(0, pdf_top, page.rect.width, pdf_bottom)
         text = page.get_text("text", clip=clip).strip()
-        words = re.findall(r"\\w+", text, flags=re.UNICODE)
+        words = re.findall(r"\w+", text, flags=re.UNICODE)
         lines = [line.strip() for line in text.splitlines() if line.strip()]
         if len(words) >= 6 and cues.search(text):
             return True
-        sentence_count = len(re.findall(r"[.!?](?:\\s|$)", text))
+        sentence_count = len(re.findall(r"[.!?](?:\s|$)", text))
         if len(words) >= 28 and len(lines) >= 3 and sentence_count >= 2:
             return True
         # Een figuur kan zelfstandig context zijn; een klein icoon of
