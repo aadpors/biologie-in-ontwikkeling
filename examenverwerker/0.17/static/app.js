@@ -535,7 +535,7 @@ async function renderRelationsStage() {
       ${result.extra_cv.length ? `
         <section class="analysis-card">
           <h3>CV-vragen zonder opgave</h3>
-          <p>Deze nummers komen wel in het CV voor, maar niet in de opgaven: ${result.extra_cv.join(', ')}. Controleer of het om een afwijkende nummering of een onbedoeld extra fragment gaat.</p>
+          <p>Deze nummers komen wel in het CV voor, maar niet in de opgaven: ${result.extra_cv.join(', ')}. Controleer of het om een afwijkende nummering of een onbedoeld extra fragment gaat.</p><button class="quiet" type="button" id="repairExtraCv">CV-vraagstarts herstellen</button>
         </section>` : ''}
       ${mismatches.length ? `
         <h3>Afwijkende maximumscores</h3>
@@ -553,7 +553,7 @@ async function renderRelationsStage() {
       </details>
       <div class="review-actions">
         <button class="primary" id="saveRelations" type="button">Toelichtingen opslaan</button>
-        <button class="primary" id="completeRelations" type="button" ${result.missing_cv.length||mismatches.some(item=>!(previousNotes[item.question_number]||'').trim())?'disabled':''}>Controles afronden en doorgaan</button>
+        <button class="primary" id="completeRelations" type="button" ${result.missing_cv.length||result.extra_cv.length||mismatches.some(item=>!(previousNotes[item.question_number]||'').trim())?'disabled':''}>Controles afronden en doorgaan</button>
       </div>
       <p id="relationsMessage" class="form-error" role="status"></p>`;
     const cards=[...document.querySelectorAll('[data-relation-issue]')];
@@ -568,7 +568,7 @@ async function renderRelationsStage() {
     bindStageAutoSave(panel,save,'#relationsMessage');
     const refresh=()=>{
       const unresolved=cards.some(card=>!card.querySelector('textarea').value.trim());
-      $('#completeRelations').disabled=result.missing_cv.length>0||unresolved;
+      $('#completeRelations').disabled=result.missing_cv.length>0||result.extra_cv.length>0||unresolved;
     };
     cards.forEach(card=>card.querySelector('textarea').addEventListener('input',refresh));
     $('#saveRelations').addEventListener('click',async()=>{
@@ -597,6 +597,12 @@ async function renderRelationsStage() {
     $('#repairMissingCv')?.addEventListener('click',async()=>{
       try {
         await api(`/api/exams/${state.examId}/steps/cv_fragments/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    $('#repairExtraCv')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/cv_starts/reopen`,{method:'POST'});
         await openWorkspace(state.examId);
       } catch(error) { $('#relationsMessage').textContent=error.message; }
     });
