@@ -222,14 +222,14 @@ if CV_SOURCE.is_file():
                 "accepted_by_filter": False,
                 "reason": "geen passend vraagstartpatroon",
             }
-            direct = re.match(r"^\\d{1,2}\\.?\\s+maximumscore\\b", candidate_text, re.IGNORECASE)
-            direct_mc = re.match(r"^\\d{1,2}\\.?\\s+[A-E]\\s+\\d{1,2}\\s*$", candidate_text, re.IGNORECASE)
+            direct = re.match(r"^\d{1,2}\.?\s+maximumscore\b", candidate_text, re.IGNORECASE)
+            direct_mc = re.match(r"^\d{1,2}\.?\s+[A-E]\s+\d{1,2}\s*$", candidate_text, re.IGNORECASE)
             if direct or direct_mc:
                 debug_item["accepted_by_filter"] = True
                 debug_item["reason"] = "directe CV-regel"
                 cv_filter_debug.append(debug_item)
                 continue
-            if re.fullmatch(r"\d{1,2}\\.?", candidate_text):
+            if re.fullmatch(r"\d{1,2}\.?", candidate_text):
                 positioned_lines = []
                 for block in cv_pdf[page_index].get_text("dict").get("blocks", []):
                     if block.get("type") != 0:
@@ -273,11 +273,11 @@ if CV_SOURCE.is_file():
                     )
                 ]
                 has_maximumscore = any(
-                    re.search(r"\bmaximumscore\\s+\\d+", item["text"], re.IGNORECASE)
+                    re.search(r"\bmaximumscore\s+\d+", item["text"], re.IGNORECASE)
                     for item in nearby
                 )
                 has_inline_mc_answer = any(
-                    re.fullmatch(r"[A-E][.)]?\\s+[012]", item["text"], re.IGNORECASE)
+                    re.fullmatch(r"[A-E][.)]?\s+[012]", item["text"], re.IGNORECASE)
                     for item in nearby
                 )
                 has_split_mc_answer = any(
