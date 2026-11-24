@@ -12,9 +12,9 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
-# Alleen opties aan het begin van een tekstregel tellen mee. Een letter A-E
+# Alleen opties aan het begin van een tekstregel tellen mee. Een letter A-F
 # midden in lopende tekst mag niet als antwoordoptie worden geïnterpreteerd.
-OPTION_LINE = re.compile(r"^\s*([A-E])\s*[.)]\s+(.+?)\s*$", re.IGNORECASE)
+OPTION_LINE = re.compile(r"^\s*([A-F])\s*[.)]\s+(.+?)\s*$", re.IGNORECASE)
 # Puntennotaties verschillen tussen examens. De regex vangt expliciete
 # vermeldingen, maar gokt niet wanneer het examen geen puntenaantal toont.
 POINT_PATTERNS = (
@@ -34,7 +34,7 @@ def detect_options(text: str) -> list[dict[str, str]]:
     PDF-extractie is niet layoutvast: letters kunnen op een eigen regel
     staan, opties kunnen achter elkaar op één regel staan of letters kunnen
     tussen haakjes of met een dubbele punt zijn vormgegeven. Daarom combineren
-    we expliciete A-E-markeringen met een regelgerichte terugvaloptie. Een
+    we expliciete A-F-markeringen met een regelgerichte terugvaloptie. Een
     voorstel wordt alleen geaccepteerd bij minimaal twee opeenvolgende opties
     vanaf A.
     """
@@ -47,7 +47,7 @@ def detect_options(text: str) -> list[dict[str, str]]:
     # blijven opties herkenbaar wanneer de PDF ze op één regel of in kolommen
     # achter elkaar uitleest.
     marker_pattern = re.compile(
-        r"(?<![A-Za-z0-9])(?:\(([A-E])\)|([A-E])\s*[.):])\s*",
+        r"(?<![A-Za-z0-9])(?:\(([A-F])\)|([A-F])\s*[.):])\s*",
         re.IGNORECASE,
     )
     matches = list(marker_pattern.finditer(normalised_text))
@@ -58,7 +58,7 @@ def detect_options(text: str) -> list[dict[str, str]]:
         content_start = match.end()
         content_end = matches[index + 1].start() if index + 1 < len(matches) else len(normalised_text)
         option_text = normalised_text[content_start:content_end].strip(" \t\r\n;|")
-        if len(option_text) >= 2:
+        if len(option_text) >= 1:
             found[letter] = option_text
 
     # Regelgerichte fallback voor PDF's die alleen een letter op een regel
@@ -68,20 +68,20 @@ def detect_options(text: str) -> list[dict[str, str]]:
     index = 0
     while index < len(lines):
         line = lines[index]
-        compact = re.match(r"^\s*([A-E])[.)]?\s+(.+?)\s*$", line, re.IGNORECASE)
+        compact = re.match(r"^\s*([A-F])[.)]?\s+(.+?)\s*$", line, re.IGNORECASE)
         if compact:
             letter, option_text = compact.group(1).upper(), compact.group(2).strip()
-            if len(option_text) >= 2:
+            if len(option_text) >= 1:
                 found.setdefault(letter, option_text)
             index += 1
             continue
 
-        standalone = re.fullmatch(r"\s*([A-E])[.)]?\s*", line, re.IGNORECASE)
+        standalone = re.fullmatch(r"\s*([A-F])[.)]?\s*", line, re.IGNORECASE)
         if standalone and index + 1 < len(lines):
             next_line = lines[index + 1]
             next_is_option = bool(
-                re.match(r"^\s*[A-E](?:[.)]|:)\s*", next_line, re.IGNORECASE)
-                or re.fullmatch(r"\s*\(?[A-E]\)?[.)]?\s*", next_line, re.IGNORECASE)
+                re.match(r"^\s*[A-F](?:[.)]|:)\s*", next_line, re.IGNORECASE)
+                or re.fullmatch(r"\s*\(?[A-F]\)?[.)]?\s*", next_line, re.IGNORECASE)
             )
             if not next_is_option and len(next_line.strip()) >= 2:
                 found.setdefault(standalone.group(1).upper(), next_line.strip())
@@ -91,8 +91,8 @@ def detect_options(text: str) -> list[dict[str, str]]:
 
     # Een losse C of D in lopende tekst is geen meerkeuzereeks. Alleen een
     # aaneengesloten prefix vanaf A wordt als betrouwbaar voorstel getoond.
-    ordered = [letter for letter in "ABCDE" if letter in found]
-    if len(ordered) < 2 or ordered != list("ABCDE")[:len(ordered)]:
+    ordered = [letter for letter in "ABCDEF" if letter in found]
+    if len(ordered) < 2 or ordered != list("ABCDEF")[:len(ordered)]:
         return []
     return [{"letter": letter, "text": found[letter]} for letter in ordered]
 
@@ -302,6 +302,40 @@ def detect_max_points(text: str) -> tuple[int | None, str]:
     return None, "Geen eenduidige puntenvermelding in het vraagfragment gevonden."
 
 
+def _should_run_option_ocr(text: str, options: list[dict[str, str]]) -> bool:
+    """Bepaal of OCR waarschijnlijk extra antwoordopties kan opleveren.
+
+    Een herkende reeks van minimaal twee opeenvolgende opties hoeft niet
+    opnieuw door OCR. Bij een onvolledige PDF-tekstlaag is OCR wel zinvol
+    wanneer er antwoordlabels of een expliciete meerkeuzeformulering staan.
+    Een volledig lege tekstlaag kan wijzen op een gescand fragment en krijgt
+    daarom eveneens een OCR-poging.
+    """
+    if len(options) >= 2:
+        return False
+    if not text.strip():
+        return True
+
+    # Labels zonder leesteken komen voor in officiële examens (bijvoorbeeld
+    # "A 9" en "B 19"). Ook een los label op een eigen regel is een aanwijzing.
+    has_option_label = bool(
+        re.search(r"(?m)^\s*[A-F](?:[.) :]\s*|\s+\S)", text, re.IGNORECASE)
+    )
+    has_multiple_choice_wording = any(
+        phrase in text.casefold()
+        for phrase in (
+            "kies het juiste antwoord", "kies de juiste optie",
+            "welke van de volgende", "welke van onderstaande",
+            "welke uitspraak is juist", "welke uitspraak is onjuist",
+            "welke bewering is juist", "welke bewering is onjuist",
+            "welke combinatie is juist", "welke combinatie is correct",
+            "wat is het juiste antwoord", "welk antwoord is juist",
+            "welke optie is juist",
+        )
+    )
+    return has_option_label or has_multiple_choice_wording
+
+
 def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
     """Maak per vraag een bewerkbaar voorstel, gekoppeld aan de afbeelding."""
     questions = []
@@ -310,15 +344,15 @@ def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
         options = detect_options(text)
         ocr_text = ""
 
-        # De PDF-tekstlaag blijft de eerste bron, omdat die doorgaans het
-        # nauwkeurigst is voor puntenaantallen en gewone vraagtekst. Wanneer
-        # daarin geen volledige antwoordopties staan, lezen we aanvullend de
-        # gekoppelde vraagafbeelding. Daarmee worden ook gescande opties en
-        # afwijkende kolomindelingen meegenomen. Vier opties (A-D) vormen de
-        # gebruikelijke complete set; bij minder opties controleren we de
-        # afbeelding alsnog, zodat een gedeeltelijke tekstextractie niet als
-        # een volledige antwoordset wordt aangezien.
-        if len(options) < 4 and question.get("image_paths"):
+        # De PDF-tekstlaag is de snelste en doorgaans nauwkeurigste bron.
+        # OCR op ieder vraagfragment maakte stap 4 onnodig traag: ook gewone
+        # open vragen werden telkens door het OCR-model gehaald. We starten
+        # OCR daarom alleen als de tekstlaag geen bruikbare optie oplevert én
+        # er een concrete aanwijzing is voor meerkeuze (een antwoordlabel of
+        # bekende meerkeuzeformulering), of wanneer de tekstlaag leeg is.
+        # Een herkende reeks met twee of meer opties hoeft niet opnieuw door
+        # OCR; het aantal opties alleen is geen reden voor een tweede bron.
+        if _should_run_option_ocr(text, options) and question.get("image_paths"):
             ocr_text = _ocr_image_text(question["image_paths"])
             ocr_options = detect_options(ocr_text)
             if len(ocr_options) > len(options):
@@ -374,8 +408,8 @@ def validate_question_analysis(payload: dict[str, Any], expected_numbers: set[in
         if points is not None and (not isinstance(points, int) or not 0 <= points <= 20):
             raise ValueError(f"Ongeldig maximumaantal punten bij vraag {number}.")
         options = item.get("options", [])
-        if (not isinstance(options, list) or len(options) > 5 or
-                any(not isinstance(option, dict) or option.get("letter") not in list("ABCDE")
+        if (not isinstance(options, list) or len(options) > 6 or
+                any(not isinstance(option, dict) or option.get("letter") not in list("ABCDEF")
                     or not isinstance(option.get("text"), str) or not option.get("text", "").strip()
                     for option in options) or
                 len({option["letter"] for option in options if isinstance(option, dict) and "letter" in option}) != len(options)):

@@ -370,7 +370,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                             continue
                         candidate_text = candidate["text"].strip()
                         direct = re.match(r"^\d{1,2}\.?\s+maximumscore\b", candidate_text, re.IGNORECASE)
-                        direct_mc = re.match(r"^\d{1,2}\.?\s+[A-E]\s+\d{1,2}\s*$", candidate_text, re.IGNORECASE)
+                        direct_mc = re.match(r"^\d{1,2}\.?\s+[A-F]\s+\d{1,2}\s*$", candidate_text, re.IGNORECASE)
                         if direct or direct_mc:
                             cv_valid_candidates.append(candidate)
                             continue
@@ -444,7 +444,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                                 for line in nearby_lines
                             )
                             has_inline_mc_answer = any(
-                                re.fullmatch(r"[A-E][.)]?\s+[012]", line, re.IGNORECASE)
+                                re.fullmatch(r"[A-F][.)]?\s+[012]", line, re.IGNORECASE)
                                 for line in nearby_lines
                             )
                             # In sommige tabellen zijn antwoordletter en score
@@ -461,7 +461,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                                 )
                             ]
                             has_split_mc_answer = any(
-                                re.fullmatch(r"[A-E][.)]?", item["text"], re.IGNORECASE)
+                                re.fullmatch(r"[A-F][.)]?", item["text"], re.IGNORECASE)
                                 and any(
                                     re.fullmatch(r"[012]", other["text"])
                                     and abs(other["top"] - item["top"]) <= 24
@@ -1504,7 +1504,7 @@ def _merge_saved_question_analysis(question: dict[str, Any], saved: dict[str, An
     if saved_options or current_options:
         question["options"] = [
             saved_options.get(letter) or current_options[letter]
-            for letter in "ABCDE"
+            for letter in "ABCDEF
             if letter in saved_options or letter in current_options
         ]
 

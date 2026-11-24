@@ -2446,9 +2446,9 @@ async function renderQuestionAnalysisStage() {
       const rawPoints = card.querySelector(`[data-analysis-points="${number}"]`).value.trim();
       const optionsText = card.querySelector(`[data-analysis-options="${number}"]`).value;
       const options = optionsText.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map((line, index) => {
-        const match = line.match(/^([A-E])[.)]\s*(.*)$/i);
+        const match = line.match(/^([A-F])[.)]\s*(.*)$/i);
         return match ? {letter:match[1].toUpperCase(), text:match[2].trim()}
-          : {letter:'ABCDE'[index] || 'E', text:line};
+          : {letter:'ABCDEF'[index] || 'F', text:line};
       });
       return {
         question_number:number,

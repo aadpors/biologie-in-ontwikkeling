@@ -56,6 +56,54 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertIn("Het membraan bevat cellulose", options[1]["text"])
         self.assertIn("Ribosomen maken eiwitten", options[2]["text"])
 
+    def test_multiple_choice_numeric_single_character_options_are_kept(self):
+        # In VWO 2026-II vragen 2 en 25 zijn antwoordopties getallen.
+        # Een antwoord als "A 9" of "A 0" mag niet verdwijnen omdat de
+        # antwoordtekst maar één teken bevat.
+        question_two = "A 9\nB 19\nC 24\nD 26"
+        question_twenty_five = "A 0\nB 504\nC 1008\nD 95.247\nE 190.494"
+        self.assertEqual(
+            [(item["letter"], item["text"]) for item in detect_options(question_two)],
+            [("A", "9"), ("B", "19"), ("C", "24"), ("D", "26")],
+        )
+        self.assertEqual(
+            [(item["letter"], item["text"]) for item in detect_options(question_twenty_five)],
+            [("A", "0"), ("B", "504"), ("C", "1008"), ("D", "95.247"), ("E", "190.494")],
+        )
+
+    def test_multiple_choice_supports_six_options_through_f(self):
+        # VWO 2026-II vraag 28 bevat zes antwoordopties, A tot en met F.
+        options_text = "\n".join(
+            f"{letter} 5’- SEQUENTIE {letter} - 3’"
+            for letter in "ABCDEF"
+        )
+        self.assertEqual(
+            [item["letter"] for item in detect_options(options_text)],
+            list("ABCDEF"),
+        )
+        payload = {
+            "questions": [{
+                "question_number": 28,
+                "question_type": "meerkeuze",
+                "max_points": 2,
+                "options": detect_options(options_text),
+                "reviewed": True,
+            }]
+        }
+        validated = validate_question_analysis(payload, {28})
+        self.assertEqual(len(validated["questions"][0]["options"]), 6)
+
+    def test_option_ocr_is_skipped_for_recognised_sets_and_open_questions(self):
+        # Vermijd OCR als de PDF-tekst al opties bevat of als een vraag
+        # duidelijk open is en geen aanwijzingen voor meerkeuze bevat.
+        from examenverwerker.question_analysis import _should_run_option_ocr
+        self.assertFalse(_should_run_option_ocr("A 9\nB 19\nC 24", [
+            {"letter": "A", "text": "9"}, {"letter": "B", "text": "19"}
+        ]))
+        self.assertFalse(_should_run_option_ocr("Leg uit waarom dit gebeurt.", []))
+        self.assertTrue(_should_run_option_ocr("A 9\nB 19", []))
+        self.assertTrue(_should_run_option_ocr("", []))
+
     def test_multiple_choice_options_reject_nonconsecutive_letter_noise(self):
         # Een losse letter in lopende tekst mag niet als complete antwoordset
         # worden geïnterpreteerd.
