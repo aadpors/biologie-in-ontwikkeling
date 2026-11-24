@@ -1950,6 +1950,18 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
         raise HTTPException(409, "Gebruik de afzonderlijke publicatieactie nadat de eindcontrole is afgerond.")
     completed = [key for key, value in exam["steps"].items() if value["status"] == "complete"]
     missing = unmet_requirements(step_key, completed)
+    if step_key == "relaties":
+        # Een document dat niet is geïmporteerd, kan geen openstaande
+        # verwerkingsstap opleveren. Dit blijft ook gelden voor oudere examens
+        # die vóór de automatische 'niet van toepassing'-afhandeling zijn
+        # aangemaakt.
+        document_types = exam["metadata"].get("document_types", {})
+        has_workbook = any(value == "uitwerkbijlage" for value in document_types.values())
+        has_supplement = any(value == "aanvulling_correctievoorschrift" for value in document_types.values())
+        if not has_workbook:
+            missing = [key for key in missing if key != "uitwerk_fragments"]
+        if not has_supplement:
+            missing = [key for key in missing if key != "cv_aanvulling"]
     if missing:
         raise HTTPException(409, {"message": "Eerdere stappen zijn nog niet afgerond.", "missing": missing})
     if not payload or not payload.get("reviewed"):
