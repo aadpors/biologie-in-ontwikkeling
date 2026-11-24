@@ -977,16 +977,18 @@ async function renderFinalReviewStage() {
           </section>
         ` : ''}
 
-        <h4>Herstelmogelijkheden</h4>
-        <div class="review-actions">
-          <button class="quiet" type="button" data-repair="opgaven_fragments">Opgavefragment herstellen</button>
-          <button class="quiet" type="button" data-repair="opgaven_analyse">Vraagtype / punten / opties</button>
-          ${examHasDocumentType('uitwerkbijlage') ? '<button class="quiet" type="button" data-repair="uitwerk_fragments">Uitwerkfragment herstellen</button>' : ''}
-          <button class="quiet" type="button" data-repair="cv_fragments">CV-fragment herstellen</button>
-          <button class="quiet" type="button" data-repair="cv_aanvulling">CV-aanvulling aanpassen</button>
-          <button class="quiet" type="button" data-repair="antwoorden">Antwoord aanpassen</button>
-          <button class="quiet" type="button" data-repair="relaties">Koppeling herstellen</button>
-        </div>
+        <details>
+          <summary>Herstelmogelijkheden voor deze vraag</summary>
+          <div class="review-actions">
+            <button class="quiet" type="button" data-repair="opgaven_fragments">Opgavefragment herstellen</button>
+            <button class="quiet" type="button" data-repair="opgaven_analyse">Vraagtype / punten / opties</button>
+            ${examHasDocumentType('uitwerkbijlage') ? '<button class="quiet" type="button" data-repair="uitwerk_fragments">Uitwerkfragment herstellen</button>' : ''}
+            <button class="quiet" type="button" data-repair="cv_fragments">CV-fragment herstellen</button>
+            <button class="quiet" type="button" data-repair="cv_aanvulling">CV-aanvulling aanpassen</button>
+            <button class="quiet" type="button" data-repair="antwoorden">Antwoord aanpassen</button>
+            <button class="quiet" type="button" data-repair="relaties">Koppeling herstellen</button>
+          </div>
+        </details>
       </article>`;
 
     const overviewHtml = () => result.questions.map((question, index) => {
