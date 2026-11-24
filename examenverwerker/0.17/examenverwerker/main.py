@@ -41,7 +41,7 @@ STORE = Store(DATA)
 app = FastAPI(title="Examenverwerker", version="0.17.0")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
-def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sha256: str) -> dict[str, Any]:
+def _load_or_build_stitched_exam(source_path: Path, output_path: Path, source_sha256: str, *, start_page: int = 1) -> dict[str, Any]:
     """Herbruik de bestaande lange examenafbeelding zolang de bron gelijk is.
 
     Teruggaan van stap 4 naar stap 3 is een normale navigatiehandeling en mag
@@ -1065,7 +1065,7 @@ def get_stitched_document(exam_id: str, document_type: str):
     output_dir.mkdir(parents=True, exist_ok=True)
     target = output_dir / "exam-long.png"
     try:
-        metadata = _load_or_build_stitched_exam(source, target, document["sha256"])
+        metadata = _load_or_build_stitched_exam(\n            source, target, document["sha256"], start_page=0\n        )
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, str(exc)) from exc
 
