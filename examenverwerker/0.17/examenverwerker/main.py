@@ -930,6 +930,150 @@ def get_stitched_opgaven(exam_id: str):
     return metadata
 
 
+@app.get("/api/exams/{exam_id}/stitched-document/{document_type}")
+def get_stitched_document(exam_id: str, document_type: str):
+    """Lever een doorlopende afbeelding voor de fragmentreview van een document.
+
+    De route wordt gebruikt voor de uitwerkbijlage (workflowstap 6). Dezelfde
+    render- en selectietechniek als bij de opgaven wordt hergebruikt, maar
+    uitwerkfragmenten zijn uitsluitend vraagfragmenten: er worden geen
+    contextfragmenten voorgesteld of opgeslagen.
+    """
+    if document_type != "uitwerkbijlage":
+        raise HTTPException(404, "Deze doorlopende fragmentreview is niet beschikbaar voor dit documenttype.")
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    document = _document_for_type(exam, document_type)
+    source = DATA / document["relative_path"]
+    if STORE.sha256(source) != document["sha256"]:
+        raise HTTPException(409, "Het bronbestand is gewijzigd sinds import.")
+
+    output_dir = DATA / "exams" / exam_id / "derived" / f"{document_type}_stitched"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    target = output_dir / "exam-long.png"
+    try:
+        metadata = _load_or_build_stitched_exam(source, target, document["sha256"])
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+    previous = exam["steps"].get("uitwerk_fragments", {}).get("evidence", {})
+    saved = previous.get("stitched_selections", [])
+    starts = exam["steps"].get("uitwerk_starts", {}).get("evidence", {})
+    accepted = [
+        item for item in starts.get("candidates", [])
+        if item.get("accepted") and not item.get("removed")
+    ]
+    proposed = []
+    if not saved:
+        proposed = propose_stitched_question_selections(
+            metadata.get("pages", []), accepted,
+            render_scale=1.25, image_height=int(metadata["height"]),
+            pdf_path=source,
+        )
+        # De uitwerkbijlage kent alleen vraagfragmenten. Verwijder eventuele
+        # contextvoorstellen en houd de automatische vraaggrenzen intact.
+        proposed = [item for item in proposed if item.get("type") == "vraag"]
+
+    white_rows = metadata.get("white_row_ranges") or _white_row_ranges(target)
+    metadata.update({
+        "image_url": f"/api/stitched-document-images/{exam_id}/{document_type}/exam-long.png",
+        "document_sha256": document["sha256"],
+        "selections": saved,
+        "proposed_selections": proposed,
+        "white_row_ranges": white_rows,
+        "segmentation_mode": "saved" if saved else "automatic_proposal",
+    })
+    return metadata
+
+
+@app.get("/api/stitched-document-images/{exam_id}/{document_type}/{filename}")
+def stitched_document_image(exam_id: str, document_type: str, filename: str):
+    """Serveer de afgeleide lange afbeelding voor de geselecteerde documentsoort."""
+    if document_type != "uitwerkbijlage" or filename != "exam-long.png":
+        raise HTTPException(404, "Afbeelding niet gevonden.")
+    if not re.fullmatch(r"[a-f0-9]{12}", exam_id) or not STORE.get_exam(exam_id):
+        raise HTTPException(404, "Examen niet gevonden.")
+    path = DATA / "exams" / exam_id / "derived" / f"{document_type}_stitched" / filename
+    if not path.is_file():
+        raise HTTPException(404, "Afbeelding niet gevonden.")
+    return FileResponse(path, media_type="image/png", headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/exams/{exam_id}/stitched-document/{document_type}/review")
+def save_stitched_document_review(exam_id: str, document_type: str, payload: dict):
+    """Bewaar uitsluitend vraagfragmenten van de doorlopende uitwerkbijlage."""
+    if document_type != "uitwerkbijlage":
+        raise HTTPException(404, "Deze fragmentreview is niet beschikbaar voor dit documenttype.")
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    starts = exam["steps"].get("uitwerk_starts", {})
+    if starts.get("status") != "complete":
+        raise HTTPException(409, "Rond eerst de vraagstartcontrole van de uitwerkbijlage af.")
+    selections = payload.get("selections")
+    if not isinstance(selections, list):
+        raise HTTPException(422, "De fragmentselecties ontbreken.")
+
+    stitched_path = DATA / "exams" / exam_id / "derived" / "uitwerkbijlage_stitched" / "exam-long.png"
+    if not stitched_path.is_file():
+        document = _document_for_type(exam, document_type)
+        _load_or_build_stitched_exam(
+            DATA / document["relative_path"], stitched_path, document["sha256"]
+        )
+    with Image.open(stitched_path) as image:
+        stitched_height = image.height
+    white_rows = _white_row_ranges(stitched_path)
+
+    clean = []
+    for index, item in enumerate(selections):
+        if not isinstance(item, dict):
+            raise HTTPException(422, "Een fragmentselectie heeft een ongeldig formaat.")
+        top, bottom = item.get("top"), item.get("bottom")
+        numbers = item.get("question_numbers")
+        if (item.get("type") != "vraag"
+                or not isinstance(top, (int, float)) or not isinstance(bottom, (int, float))
+                or not float(top).is_integer() or not float(bottom).is_integer()
+                or top < 0 or bottom <= top or bottom >= stitched_height):
+            raise HTTPException(422, "Een uitwerkfragment moet een geldig vraagfragment met gehele pixelgrenzen zijn.")
+        if not _is_white_boundary(top, white_rows) or not _is_white_boundary(bottom, white_rows):
+            raise HTTPException(422, "Plaats beide fragmentgrenzen op een volledig witte horizontale regel.")
+        if (not isinstance(numbers, list) or not numbers
+                or any(not isinstance(number, int) or not 1 <= number <= 60 for number in numbers)):
+            raise HTTPException(422, "Koppel ieder uitwerkfragment aan minimaal één geldig vraagnummer.")
+        clean.append({
+            "id": str(item.get("id") or f"fragment-{index + 1}"),
+            "type": "vraag", "top": int(top), "bottom": int(bottom),
+            "question_numbers": sorted(set(numbers)),
+            "label": str(item.get("label") or "")[:160],
+        })
+
+    if payload.get("reviewed"):
+        expected = {
+            item["question_number"] for item in starts["evidence"].get("candidates", [])
+            if item.get("accepted") and not item.get("removed")
+        }
+        covered = {number for item in clean for number in item["question_numbers"]}
+        missing = sorted(expected - covered)
+        if missing:
+            raise HTTPException(422, "Selecteer nog uitwerkfragmenten voor vraag: " +
+                                ", ".join(map(str, missing)))
+
+    evidence = {
+        **exam["steps"].get("uitwerk_fragments", {}).get("evidence", {}),
+        "stitched_selections": clean,
+        "stitched_reviewed": bool(payload.get("reviewed")),
+        "document_sha256": starts.get("evidence", {}).get("document_sha256"),
+    }
+    saved_as_draft = STORE.save_step_draft_preserving_identical_complete(
+        exam_id, "uitwerk_fragments", evidence,
+        identity_fields=("stitched_selections", "document_sha256"),
+    )
+    return {"ok": True, "selection_count": len(clean),
+            "reviewed": evidence["stitched_reviewed"],
+            "complete": not saved_as_draft}
+
+
 @app.get("/api/stitched-opgaven-images/{exam_id}/{filename}")
 def stitched_opgaven_image(exam_id: str, filename: str):
     """Serveer uitsluitend de gegenereerde lange afbeelding van dit examen."""
