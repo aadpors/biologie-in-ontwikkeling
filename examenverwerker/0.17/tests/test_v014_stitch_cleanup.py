@@ -7,7 +7,7 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
-from examenverwerker.question_fragments import build_stitched_exam, propose_stitched_question_selections
+from examenverwerker.question_fragments import build_stitched_exam, propose_stitched_question_selections, cv_model_start, normalise_stitched_selections
 from examenverwerker.context_detection import generate_context_candidates
 
 
@@ -39,6 +39,58 @@ class StitchedPageCleanupTests(unittest.TestCase):
             self.assertTrue(output.is_file())
             with Image.open(output) as stitched:
                 self.assertEqual(stitched.height, metadata["height"])
+
+    def test_cv_stitch_starts_at_real_assessment_model_heading(self):
+        """Pagina's vóór hoofdstuk 4 en de ruimte boven de kop vallen buiten stap 8."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "cv.pdf"
+            output = root / "cv-long.png"
+
+            pdf = fitz.open()
+            toc = pdf.new_page(width=600, height=800)
+            toc.insert_text((50, 90), "4 Beoordelingsmodel", fontsize=9)
+            preamble = pdf.new_page(width=600, height=800)
+            preamble.insert_text((50, 110), "Algemene toelichting op het correctievoorschrift.", fontsize=12)
+            model = pdf.new_page(width=600, height=800)
+            model.insert_text((50, 90), "4 Beoordelingsmodel", fontsize=18)
+            model.insert_text((50, 150), "1 maximumscore 2", fontsize=12)
+            model.insert_text((50, 180), "Het antwoord moet blijken uit de gegevens.", fontsize=12)
+            pdf.save(source)
+            pdf.close()
+
+            with fitz.open(source) as source_pdf:
+                start_page, start_y = cv_model_start(source_pdf)
+            self.assertEqual(start_page, 2)
+            self.assertGreater(start_y, 0)
+
+            metadata = build_stitched_exam(
+                source, output, start_page=start_page, start_y=start_y,
+                end_page=2, render_scale=1.0,
+            )
+            self.assertEqual([item["page_number"] for item in metadata["pages"]], [3])
+            self.assertGreaterEqual(metadata["pages"][0]["crop_pixels"][1], round(start_y))
+
+    def test_last_question_fragment_stops_after_last_visible_content_row(self):
+        """Een leeg stuk onder het antwoord wordt niet in het vraagfragment opgenomen."""
+        with tempfile.TemporaryDirectory() as folder:
+            image_path = Path(folder) / "stitched.png"
+            image = Image.new("RGB", (100, 180), "white")
+            draw = ImageDraw.Draw(image)
+            draw.rectangle((10, 55, 90, 82), fill="black")
+            image.save(image_path)
+            image.close()
+
+            result = normalise_stitched_selections(
+                [{"id":"q1","type":"vraag","top":50,"bottom":160,
+                  "question_numbers":[1],"label":"Vraag 1"}],
+                [[0, 4], [45, 49], [83, 87], [120, 124], [150, 154]],
+                image_path,
+                image_height=180,
+                leading_top=0,
+            )
+            question = next(item for item in result if item["type"] == "vraag")
+            self.assertEqual(question["bottom"], 83)
 
     def test_page_crops_are_stitched_with_clear_white_separator(self):
         """De totale hoogte is de som van de crops plus een duidelijk zichtbare witte scheidingsstrook."""
