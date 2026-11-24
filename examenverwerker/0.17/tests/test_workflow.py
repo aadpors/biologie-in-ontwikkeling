@@ -459,6 +459,70 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(exam["steps"]["metadata_draft"]["evidence"], metadata)
         self.assertNotIn("metadata", exam["steps"])
 
+    def test_relation_audit_does_not_require_per_question_checkboxes(self):
+        """Normale koppelingen worden automatisch gecontroleerd; één afrondactie volstaat."""
+        exam_id = self.import_sample()["exam_id"]
+        main.STORE.save_step_draft(exam_id, "opgaven_starts", {
+            "candidates":[{"question_number":1,"accepted":True,"removed":False}]
+        })
+        main.STORE.save_step_draft(exam_id, "cv_starts", {
+            "candidates":[{"question_number":1,"accepted":True,"removed":False}]
+        })
+        main.STORE.save_step_draft(exam_id, "uitwerk_starts", {"not_applicable":True})
+        main.STORE.save_step_draft(exam_id, "opgaven_analyse", {
+            "questions":[{"question_number":1,"max_points":2}]
+        })
+        main.STORE.save_step_draft(exam_id, "antwoorden", {
+            "questions":[{"question_number":1,"cv_max_points":2}]
+        })
+
+        # De browser hoeft geen lijst met aangevinkte vragen meer te versturen.
+        saved = self.client.post(f"/api/exams/{exam_id}/relations/review", json={})
+        self.assertEqual(saved.status_code, 200, saved.text)
+        evidence = saved.json()
+        self.assertTrue(evidence["complete"])
+        self.assertTrue(evidence["reviewed_all_questions"])
+        self.assertEqual(evidence["reviewed_count"], 1)
+        self.assertTrue(evidence["questions"][0]["reviewed"])
+
+        # Alleen de echte voorgangers van stap 11 hoeven voor deze API-test
+        # als afgerond te zijn vastgelegd.
+        for key in ("uitwerk_fragments", "cv_aanvulling", "antwoorden"):
+            main.STORE.complete_step(exam_id, key, {})
+        completed = self.client.post(
+            f"/api/exams/{exam_id}/steps/relaties/complete",
+            json={"reviewed":True,"reviewed_all_questions":True},
+        )
+        self.assertEqual(completed.status_code, 200, completed.text)
+
+    def test_relation_audit_requires_explanation_only_for_score_mismatches(self):
+        """Een afwijkende maximumscore vraagt een toelichting, geen afvinklijst."""
+        exam_id = self.import_sample()["exam_id"]
+        main.STORE.save_step_draft(exam_id, "opgaven_starts", {
+            "candidates":[{"question_number":1,"accepted":True,"removed":False}]
+        })
+        main.STORE.save_step_draft(exam_id, "cv_starts", {
+            "candidates":[{"question_number":1,"accepted":True,"removed":False}]
+        })
+        main.STORE.save_step_draft(exam_id, "uitwerk_starts", {"not_applicable":True})
+        main.STORE.save_step_draft(exam_id, "opgaven_analyse", {
+            "questions":[{"question_number":1,"max_points":2}]
+        })
+        main.STORE.save_step_draft(exam_id, "antwoorden", {
+            "questions":[{"question_number":1,"cv_max_points":3}]
+        })
+        self.assertEqual(self.client.get(f"/api/exams/{exam_id}/relations").json()["score_mismatches"][0]["question_number"], 1)
+
+        # Zonder toelichting blijft alleen deze concrete afwijking openstaan.
+        saved = self.client.post(f"/api/exams/{exam_id}/relations/review", json={})
+        self.assertFalse(saved.json()["complete"])
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/relations/review",
+            json={"questions":[{"question_number":1,"note":"Het CV kent hier bewust een extra beoordelingspunt toe."}]},
+        )
+        self.assertTrue(saved.json()["complete"])
+        self.assertEqual(saved.json()["unresolved_score_mismatches"], [])
+
     def test_non_pdf_upload_is_rejected(self):
         response = self.client.post("/api/exams/import", files=[("files", ("not-a-pdf.txt", b"hello", "text/plain"))])
         self.assertEqual(response.status_code, 400)
