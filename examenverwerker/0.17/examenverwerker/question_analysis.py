@@ -27,23 +27,72 @@ def _normalise_lines(text: str) -> list[str]:
 
 
 def detect_options(text: str) -> list[dict[str, str]]:
-    """Herken mogelijke A-E-opties en vereis een aaneengesloten reeks."""
+    """Herken antwoordopties in zowel compacte als regel-voor-regel-PDF-tekst.
+
+    PDF-tekstextractie zet de letter en de antwoordtekst niet altijd op
+    dezelfde regel. Soms staat er bijvoorbeeld eerst alleen "A." en pas op
+    de volgende regel de antwoordtekst. Ook kan een optie met een haakje in
+    plaats van een punt beginnen. Deze parser herkent die varianten, maar
+    accepteert alleen een aaneengesloten reeks vanaf A om toevallige letters
+    in gewone zinnen niet als antwoordopties te behandelen.
+    """
+    lines = _normalise_lines(text)
     found: dict[str, str] = {}
-    for line in _normalise_lines(text):
-        match = OPTION_LINE.match(line)
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        # Gebruik eerst de gebruikelijke notatie: "A. antwoord" of "A) antwoord".
+        match = re.match(r"^\s*([A-E])[.)]?\s+(.+?)\s*$", line, re.IGNORECASE)
         if match:
-            letter = match.group(1).upper()
-            # Dubbele letters kunnen voorkomen door herhaalde koppen of een
-            # tweekolomsopmaak; de eerste tekstregel blijft het voorstel.
-            found.setdefault(letter, match.group(2).strip())
+            letter, option_text = match.group(1).upper(), match.group(2).strip()
+            if len(option_text) >= 2:
+                found.setdefault(letter, option_text)
+            index += 1
+            continue
+
+        # In sommige PDF's staat de letter als afzonderlijke tekstregel.
+        # Neem dan de eerstvolgende regel als antwoordtekst, tenzij die zelf
+        # al een volgende optieletter is.
+        standalone = re.fullmatch(r"\s*([A-E])[.)]?\s*", line, re.IGNORECASE)
+        if standalone and index + 1 < len(lines):
+            next_line = lines[index + 1]
+            next_is_option = bool(re.match(r"^\s*[A-E][.)]?\s+", next_line, re.IGNORECASE)
+                                   or re.fullmatch(r"\s*[A-E][.)]?\s*", next_line, re.IGNORECASE))
+            if not next_is_option and len(next_line.strip()) >= 2:
+                found.setdefault(standalone.group(1).upper(), next_line.strip())
+                index += 2
+                continue
+        index += 1
+
     ordered = [letter for letter in "ABCDE" if letter in found]
-    if len(ordered) < 2:
-        return []
-    # Een losse A en C is geen betrouwbare set. Accepteer alleen prefixen
-    # van A, B, C, D, E; ontbrekende latere opties zijn wel toegestaan.
-    if ordered != list("ABCDE")[:len(ordered)]:
+    if len(ordered) < 2 or ordered != list("ABCDE")[:len(ordered)]:
         return []
     return [{"letter": letter, "text": found[letter]} for letter in ordered]
+
+
+def detect_closed_answer_form(text: str) -> str | None:
+    """Benoem de concrete gesloten antwoordvorm die in de vraag wordt genoemd.
+
+    Dit is aanvullende informatie naast het algemene vraagtype 'gesloten'.
+    De functie doet geen uitspraak over welk antwoord inhoudelijk juist is;
+    zij benoemt uitsluitend de antwoordcategorieën die de vraag zelf noemt.
+    """
+    lowered = re.sub(r"\s+", " ", text.casefold())
+    forms = (
+        (r"juist\s*(?:/|of)\s*onjuist|waar\s*(?:/|of)\s*niet waar", "juist / onjuist"),
+        (r"wel\s*(?:/|of)\s*niet", "wel / niet"),
+        (r"wel\s*(?:/|of)\s*geen", "wel / geen"),
+        (r"hoger\s*(?:,|/|of en)\s*gelijk\s*(?:,|/|of en)\s*lager|hoger,? gelijk(?: aan)?,? of lager", "hoger / gelijk / lager"),
+        (r"lager\s*(?:,|/|of en)\s*gelijk\s*(?:,|/|of en)\s*hoger", "lager / gelijk / hoger"),
+        (r"meer\s*(?:,|/|of en)\s*evenveel\s*(?:,|/|of en)\s*minder", "meer / gelijk / minder"),
+        (r"meer\s*(?:/|of)\s*minder", "meer / minder"),
+        (r"ja\s*(?:/|of)\s*nee", "ja / nee"),
+        (r"juist\s*(?:/|of)\s*onjuist", "juist / onjuist"),
+    )
+    for pattern, label in forms:
+        if re.search(pattern, lowered):
+            return label
+    return None
 
 
 def detect_question_type(text: str, options: list[dict[str, str]]) -> tuple[str, str]:
@@ -73,9 +122,9 @@ def detect_question_type(text: str, options: list[dict[str, str]]) -> tuple[str,
         "welke uitspraak is juist", "welke bewering is juist",
         "wat is het juiste antwoord", "welk antwoord is juist",
     )
-    if len(options) >= 3 or any(signal in lowered for signal in multiple_choice_signals):
-        reason = ("Er is een aaneengesloten reeks van minimaal drie antwoordopties gevonden."
-                  if len(options) >= 3 else
+    if len(options) >= 2 or any(signal in lowered for signal in multiple_choice_signals):
+        reason = ("Er is een aaneengesloten reeks van minimaal twee antwoordopties gevonden."
+                  if len(options) >= 2 else
                   "De vraagformulering wijst op een meerkeuzevraag; opties hoeven niet herkend te zijn.")
         return "meerkeuze", reason
     if options:
@@ -104,10 +153,12 @@ def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
         text = question.get("extracted_text", "")
         options = detect_options(text)
         question_type, type_reason = detect_question_type(text, options)
+        closed_answer_form = detect_closed_answer_form(text) if question_type == "gesloten" else None
         max_points, points_reason = detect_max_points(text)
         questions.append({
             "question_number": question["question_number"],
             "question_type": question_type,
+            "closed_answer_form": closed_answer_form,
             "max_points": max_points,
             "options": options,
             "type_reason": type_reason,
