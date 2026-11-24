@@ -149,7 +149,7 @@ class WorkflowApplicationTests(unittest.TestCase):
         )
         self.assertEqual(stitched.status_code, 200, stitched.text)
         self.assertEqual(len(stitched.json()["pages"]), 1)
-        self.assertEqual(stitched.json()["pages"][0]["page_index"], 0)
+        self.assertEqual(stitched.json()["pages"][0]["page_number"], 1)
 
     def test_step_six_uses_stitched_workbook_selections_for_final_fragments(self):
         """Stap 6 gebruikt dezelfde doorlopende selectiewerkruimte als stap 3."""
