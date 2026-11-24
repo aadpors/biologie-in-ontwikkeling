@@ -21,8 +21,8 @@ class AnswerAndSupplementTests(unittest.TestCase):
 
     def test_cv_maximum_score_is_recognised_when_label_and_value_are_split(self):
         self.assertEqual(detect_cv_max_points("Maximumscore 2", 1), 2)
-        self.assertEqual(detect_cv_max_points("Maximumscore\\n2", 1), 2)
-        self.assertEqual(detect_cv_max_points("Maximum\\nscore\\n3", 1), 3)
+        self.assertEqual(detect_cv_max_points("Maximumscore\n2", 1), 2)
+        self.assertEqual(detect_cv_max_points("Maximum\nscore\n3", 1), 3)
         self.assertEqual(detect_cv_max_points("maximum score: 4", 1), 4)
 
     def test_closed_answer_list_is_recognised_in_order(self):
