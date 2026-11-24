@@ -19,9 +19,18 @@ async function api(url, options = {}) {
   }
   if (!response.ok) {
     const detail = body.detail;
-    const message = typeof detail === 'string'
+    let message = typeof detail === 'string'
       ? detail
       : (detail?.message || JSON.stringify(detail) || `HTTP ${response.status} ${response.statusText}`);
+    // Bij een blokkade door ontbrekende voorgangers tonen we voortaan de
+    // concrete stapnamen. Alleen de algemene servermelding is onvoldoende
+    // om te begrijpen welke workflowstatus nog ontbreekt.
+    if (Array.isArray(detail?.missing) && detail.missing.length) {
+      const titles = detail.missing.map(key =>
+        state.workflow.find(step => step.key === key)?.title || key
+      );
+      message += ' Nog niet afgerond: ' + titles.join(', ') + '.';
+    }
     const error = new Error(message);
     error.detail = detail;
     error.status = response.status;
@@ -439,24 +448,104 @@ async function renderAnswersStage() {
    voorkomen. De uitwerkbijlage hoeft niet alle examenvragen te bevatten. */
 async function renderRelationsStage() {
   const panel=$('#stagePanel');
-  panel.innerHTML='<p class="muted">Document- en vraagkoppelingen controleren…</p>';
+  panel.innerHTML='<p class="muted">Automatische controles op document- en vraagkoppelingen uitvoeren…</p>';
   try {
     const result=await api(`/api/exams/${state.examId}/relations`);
-    panel.innerHTML=`<p class="eyebrow">FASE 7 · DOCUMENTKOPPELINGEN</p><h2>Vragen tussen documenten koppelen</h2><p class="lead">Controleer of elke opgave bij het juiste correctievoorschrift hoort. De uitwerkbijlage bevat soms slechts enkele invulvragen; afwezigheid daar is dus niet automatisch een fout.</p><div class="notice">${result.question_count} opgaven · ${result.questions.filter(q=>q.has_cv).length} CV-koppelingen · ${result.uitwerk_questions.length} vragen in de uitwerkbijlage</div>${result.missing_cv.length?`<p class="form-error">Geen CV-fragment gevonden bij: ${result.missing_cv.join(', ')}</p>`:''}${result.extra_cv.length?`<p class="notice">CV-vragen zonder corresponderende opgave: ${result.extra_cv.join(', ')}</p>`:''}
-      ${result.questions.map(q=>`<article class="analysis-card" data-relation-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${q.has_cv?'CV gekoppeld':'CV ontbreekt'}</span></div><div class="relation-grid"><span>Opgaven: aanwezig</span><span>CV: ${q.has_cv?'aanwezig':'ontbreekt'}</span><span>Uitwerkbijlage: ${q.has_uitwerkbijlage?'aanwezig':'niet van toepassing'}</span><span>Maximumscore opgave: ${q.max_points??'nog niet bepaald'}</span><span>Maximumscore CV: ${q.cv_max_points??'nog niet bepaald'}</span><span>Scorecontrole: ${q.points_match===true?'gelijk':q.points_match===false?'verschil':'nog niet vergelijkbaar'}</span></div><label>Opmerking / correctie<textarea rows="2" data-relation-note="${q.question_number}"></textarea></label><label class="review-warning"><input type="checkbox" data-relation-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb de koppeling van vraag ${q.question_number} gecontroleerd.</label></article>`).join('')}
-      <div class="review-actions"><button class="primary" id="saveRelations" type="button">Koppelingen opslaan</button><button class="primary" id="completeRelations" type="button" disabled>Koppelingen goedkeuren en doorgaan</button></div><p id="relationsMessage" class="form-error" role="status"></p>`;
-    const cards=[...document.querySelectorAll('[data-relation-card]')];
-    const checks=()=>[...document.querySelectorAll('[data-relation-reviewed]')];
-    const refresh=()=>{$('#completeRelations').disabled=checks().some(input=>!input.checked)||result.missing_cv.length>0;};
-    checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
-    const collect=()=>cards.map(card=>{const n=Number(card.dataset.relationCard);return {question_number:n,reviewed:card.querySelector(`[data-relation-reviewed="${n}"]`).checked,note:card.querySelector(`[data-relation-note="${n}"]`).value};});
-    const save=()=>api(`/api/exams/${state.examId}/relations/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
-    bindStageAutoSave(panel, save, '#relationsMessage');
-    $('#saveRelations').addEventListener('click',async()=>{try{const r=await save();$('#relationsMessage').textContent=`${r.reviewed_count} van ${result.question_count} koppelingen gecontroleerd.`;}catch(error){$('#relationsMessage').textContent=error.message;}});
-    $('#completeRelations').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle koppelingen.');await api(`/api/exams/${state.examId}/steps/relaties/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#relationsMessage').textContent=error.message;}});
-  } catch(error) { panel.innerHTML=`<h2>Documentkoppelingen</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+    const previous = state.exam.steps.relaties?.evidence?.questions || [];
+    const previousNotes = Object.fromEntries(previous.map(item=>[item.question_number,item.note||'']));
+    const mismatches = result.score_mismatches || [];
+    const mismatchNumbers = new Set(mismatches.map(item=>item.question_number));
+    const normalQuestions = result.questions.filter(q=>!mismatchNumbers.has(q.question_number));
+    const issueCount = result.missing_cv.length + mismatches.length + result.extra_cv.length;
+    panel.innerHTML=`
+      <p class="eyebrow">FASE 7 · AANVULLENDE CONTROLES</p>
+      <h2>Automatische integriteitscontrole</h2>
+      <p class="lead">De applicatie vergelijkt de vraagnummering en documentkoppelingen automatisch. Je hoeft normale koppelingen niet stuk voor stuk af te vinken. Alleen afwijkingen vragen om een beslissing of toelichting.</p>
+      <div class="notice">${result.question_count} opgaven gecontroleerd · ${result.questions.filter(q=>q.has_cv).length} CV-koppelingen · ${result.uitwerk_questions.length} uitwerkbijlagevragen</div>
+      <div class="relation-grid">
+        <span>${result.missing_cv.length ? 'CV-fragmenten ontbreken: '+result.missing_cv.join(', ') : 'Alle opgaven hebben een CV-koppeling'}</span>
+        <span>${result.extra_cv.length ? 'CV-vragen zonder opgave: '+result.extra_cv.join(', ') : 'Geen extra CV-vragen'}</span>
+        <span>${mismatches.length ? mismatches.length+' afwijkende maximumscores' : 'Maximumscores komen overeen waar vergelijkbaar'}</span>
+        <span>${result.uitwerk_questions.length} vragen in de uitwerkbijlage · gedeeltelijke dekking is toegestaan</span>
+      </div>
+      ${result.missing_cv.length ? `
+        <section class="analysis-card">
+          <h3>Ontbrekende CV-fragmenten</h3>
+          <p class="form-error">Voor vraag ${result.missing_cv.join(', ')} is geen correctievoorschriftfragment gevonden. Herstel dit in stap 8 voordat je verdergaat.</p>
+          <button class="quiet" type="button" id="repairMissingCv">CV-fragmenten herstellen</button>
+        </section>` : ''}
+      ${result.extra_cv.length ? `
+        <section class="analysis-card">
+          <h3>CV-vragen zonder opgave</h3>
+          <p>Deze nummers komen wel in het CV voor, maar niet in de opgaven: ${result.extra_cv.join(', ')}. Controleer of het om een afwijkende nummering of een onbedoeld extra fragment gaat.</p>
+        </section>` : ''}
+      ${mismatches.length ? `
+        <h3>Afwijkende maximumscores</h3>
+        <p class="lead">Leg alleen bij deze vragen vast waarom de scores verschillen, of herstel de brongegevens in de eerdere stap.</p>
+        ${mismatches.map(item=>`<article class="analysis-card" data-relation-issue="${item.question_number}">
+          <h3>Vraag ${item.question_number}</h3>
+          <div class="relation-grid"><span>Opgave: ${item.opgaven_max_points} punten</span><span>CV: ${item.cv_max_points} punten</span></div>
+          <label>Toelichting bij de afwijking<textarea rows="2" data-relation-note="${item.question_number}">${escapeHtml(previousNotes[item.question_number]||'')}</textarea></label>
+        </article>`).join('')}` : ''}
+      <details class="analysis-text">
+        <summary>Alle ${result.question_count} automatische vraagkoppelingen bekijken</summary>
+        <div class="relation-audit-list">
+          ${result.questions.map(q=>`<div class="relation-audit-row"><strong>Vraag ${q.question_number}</strong><span>CV: ${q.has_cv?'gekoppeld':'ontbreekt'}</span><span>Uitwerkbijlage: ${q.has_uitwerkbijlage?'aanwezig':'niet van toepassing'}</span><span>Scores: ${q.points_match===true?'gelijk':q.points_match===false?'afwijkend':'niet vergelijkbaar'}</span></div>`).join('')}
+        </div>
+      </details>
+      <div class="review-actions">
+        <button class="primary" id="saveRelations" type="button">Toelichtingen opslaan</button>
+        <button class="primary" id="completeRelations" type="button" ${result.missing_cv.length||mismatches.some(item=>!(previousNotes[item.question_number]||'').trim())?'disabled':''}>Controles afronden en doorgaan</button>
+      </div>
+      <p id="relationsMessage" class="form-error" role="status"></p>`;
+    const cards=[...document.querySelectorAll('[data-relation-issue]')];
+    const collect=()=>cards.map(card=>({
+      question_number:Number(card.dataset.relationIssue),
+      note:card.querySelector(`[data-relation-note="${card.dataset.relationIssue}"]`).value
+    }));
+    const save=()=>api(`/api/exams/${state.examId}/relations/review`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({questions:collect()})
+    });
+    bindStageAutoSave(panel,save,'#relationsMessage');
+    const refresh=()=>{
+      const unresolved=cards.some(card=>!card.querySelector('textarea').value.trim());
+      $('#completeRelations').disabled=result.missing_cv.length>0||unresolved;
+    };
+    cards.forEach(card=>card.querySelector('textarea').addEventListener('input',refresh));
+    $('#saveRelations').addEventListener('click',async()=>{
+      try {
+        const saved=await save();
+        $('#relationsMessage').textContent='Toelichtingen opgeslagen. '+saved.reviewed_count+' koppelingen zijn automatisch gecontroleerd.';
+        refresh();
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    $('#completeRelations').addEventListener('click',async()=>{
+      const button=$('#completeRelations');
+      button.disabled=true;
+      try {
+        const saved=await save();
+        if(!saved.complete) throw new Error('Los eerst de getoonde afwijkingen op.');
+        await api(`/api/exams/${state.examId}/steps/relaties/complete`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true,reviewed_all_questions:true})
+        });
+        await openWorkspace(state.examId);
+      } catch(error) {
+        $('#relationsMessage').textContent=error.message;
+        refresh();
+      }
+    });
+    $('#repairMissingCv')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/cv_fragments/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+  } catch(error) {
+    panel.innerHTML=`<h2>Integriteitscontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+  }
 }
-
 
 /* De snippetfase maakt contextkandidaten los van de vraagfragmenten. Een
    contextbereik wordt alleen als voorstel ingevuld; de docent controleert en
