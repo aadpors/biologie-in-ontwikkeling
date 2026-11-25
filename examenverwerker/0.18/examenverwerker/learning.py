@@ -234,3 +234,46 @@ def apply_context_range_learning(
         }
         adjusted.append(item)
     return adjusted
+
+
+
+def learned_boundary_overrides(
+    accepted_starts: list[dict[str, Any]],
+    page_heights: list[float],
+    profile: dict[str, Any],
+    *,
+    margin_points: float = 10.0,
+) -> dict[int, dict[str, float]]:
+    """Maak voorlopige fragmentgrenzen uit geleerde offsets.
+
+    Deze helper levert alleen voorstellen. De caller moet reeds opgeslagen
+    docentoverrides erna samenvoegen, zodat expliciete correcties altijd winnen.
+    """
+    if not profile.get("active") or not accepted_starts or not page_heights:
+        return {}
+    ordered = sorted(
+        accepted_starts,
+        key=lambda item: (int(item["page_index"]), float(item["pdf_bbox"][1])),
+    )
+    result: dict[int, dict[str, float]] = {}
+    start_offset = float(profile.get("median_start_offset") or 0)
+    end_offset = float(profile.get("median_end_offset") or 0)
+    for index, start in enumerate(ordered):
+        next_start = ordered[index + 1] if index + 1 < len(ordered) else None
+        first_page = int(start["page_index"])
+        last_page = int(next_start["page_index"]) if next_start else len(page_heights) - 1
+        if not 0 <= first_page < len(page_heights) or not 0 <= last_page < len(page_heights):
+            continue
+        default_end = (
+            float(next_start["pdf_bbox"][1])
+            if next_start and int(next_start["page_index"]) == last_page
+            else float(page_heights[last_page])
+        )
+        end_y = default_end + end_offset
+        if next_start and int(next_start["page_index"]) == last_page:
+            end_y -= margin_points
+        result[int(start["question_number"])] = {
+            "start_y": float(start["pdf_bbox"][1]) + start_offset,
+            "end_y": end_y,
+        }
+    return result
