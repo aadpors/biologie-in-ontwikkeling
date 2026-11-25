@@ -8,6 +8,8 @@ from examenverwerker.learning import (
     build_learning_profile,
     learned_adjustment,
     question_start_features,
+    build_boundary_learning_profile,
+    build_context_learning_profile,
 )
 from examenverwerker.storage import Store
 
@@ -58,6 +60,35 @@ class LearningTests(unittest.TestCase):
         self.assertGreaterEqual(adjustment["score_adjustment"], -0.15)
         self.assertLessEqual(adjustment["score_adjustment"], 0.15)
         self.assertNotIn("accepted", adjustment)
+
+    def test_boundary_profile_learns_median_manual_offsets_per_document_type(self):
+        records = [{
+            "stage": "fragment_boundaries:opgaven",
+            "accepted": {"examples": [
+                {"start_offset": -2, "end_offset": 4},
+                {"start_offset": -4, "end_offset": 6},
+                {"start_offset": -3, "end_offset": 5},
+                {"start_offset": -3, "end_offset": 5},
+                {"start_offset": -5, "end_offset": 7},
+            ]},
+        }]
+        profile = build_boundary_learning_profile(records)
+        self.assertTrue(profile["opgaven"]["active"])
+        self.assertEqual(profile["opgaven"]["median_start_offset"], -3)
+        self.assertEqual(profile["opgaven"]["median_end_offset"], 5)
+
+    def test_context_profile_learns_corrected_question_ranges(self):
+        records = [{
+            "stage": "fragment_review",
+            "summary": {"context_range_changes": [
+                {"suggested_from": 2, "suggested_to": 4, "accepted_from": 1, "accepted_to": 5}
+                for _ in range(5)
+            ]},
+        }]
+        profile = build_context_learning_profile(records)
+        self.assertTrue(profile["active"])
+        self.assertEqual(profile["median_start_shift"], -1)
+        self.assertEqual(profile["median_end_shift"], 1)
 
     def test_feedback_is_append_only_and_can_be_reloaded(self):
         with tempfile.TemporaryDirectory() as folder:
