@@ -795,7 +795,7 @@ async function renderSnippetsStage() {
       <article class="analysis-card" data-context-card="${escapeHtml(context.id)}">
         <div class="card-heading">
           <h3>Context · pagina ${context.page_number}</h3>
-          <span class="muted">Voorstel: vraag ${context.suggested_from_question}–${context.to_question}</span>
+          <span class="muted">Voorstel: vraag ${context.suggested_from_question}–${context.to_question}${context.learning_adjusted ? ` · leerfunctie aangepast (${context.learning_correction.examples} eerdere correcties)` : ""}</span>
         </div>
         <img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Contextfragment op pagina ${context.page_number}">
         <p class="analysis-reason">${escapeHtml(context.label)}</p>
