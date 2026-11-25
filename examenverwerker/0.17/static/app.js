@@ -2114,10 +2114,18 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         // Het eerste fragment bepaalt daarom de titel van de hele groep.
         const title = group.parts[0]?.item.context_title || "Titel niet beschikbaar in de PDF-tekstlaag";
         return `<section class="context-group-card">
-          <div class="context-group-heading"><strong>${escapeHtml(title)}</strong><span>${group.parts.length} contextdeel${group.parts.length === 1 ? "" : "en"}</span></div>
-          <p><strong>Bijbehorende opgaven: ${escapeHtml(formatNumbers(numbers))}</strong></p>
-          <div class="context-question-chips">${linked || '<span class="context-question-chip missing">Nog geen vragen gekoppeld</span>'}</div>
-          <small>${group.parts.map(entry => escapeHtml(questionLabel(entry.item))).join(" · ")}</small>
+          <div class="context-group-heading">
+            <strong>${escapeHtml(title)}</strong>
+            <span class="context-group-count">${group.parts.length} deel${group.parts.length === 1 ? "" : "delen"}</span>
+          </div>
+          <div class="context-group-questions">
+            <span class="context-group-label">Gekoppelde vragen</span>
+            <div class="context-question-chips">${linked || '<span class="context-question-chip missing">Nog geen vragen gekoppeld</span>'}</div>
+          </div>
+          <details class="context-group-details">
+            <summary>Bekijk de ${group.parts.length} contextfragmenten</summary>
+            <ul>${group.parts.map(entry => `<li>${escapeHtml(questionLabel(entry.item))}</li>`).join("")}</ul>
+          </details>
         </section>`;
       }).join("") : '<p class="muted">Selecteer op de examenstrook een fragment van het type Context en koppel het aan de bijbehorende vraagnummers. Contextdelen met overlappende vraagnummers vormen automatisch één groep.</p>';
 
