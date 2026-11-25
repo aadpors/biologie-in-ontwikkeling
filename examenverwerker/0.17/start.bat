@@ -98,6 +98,29 @@ REM Installeer of actualiseer de afhankelijkheden in de lokale omgeving.
 REM Door de interpreter hierboven vast te leggen, kan pip een passende
 REM ONNX Runtime-wheel voor Windows installeren.
 echo Benodigde onderdelen controleren en installeren...
+REM Eerst pip herstellen vanuit de standaard Python-bootstrapper. Sommige Windows-
+REM installaties leveren een onvolledige pip-package in de venv, waardoor
+REM "python -m pip" niet start (pip.__main__ ontbreekt).
+"%PYTHON_EXE%" -m ensurepip --upgrade
+if errorlevel 1 (
+    echo.
+    echo FOUT: pip kon vanuit Python niet worden hersteld.
+    echo De lokale omgeving wordt verwijderd zodat deze opnieuw kan worden aangemaakt.
+    rmdir /s /q .venv
+    py -3.12 -m venv .venv
+    if errorlevel 1 (
+        echo FOUT: Python-omgeving opnieuw aanmaken is mislukt.
+        pause
+        exit /b 1
+    )
+    set "PYTHON_EXE=.venv\Scripts\python.exe"
+    "%PYTHON_EXE%" -m ensurepip --upgrade
+    if errorlevel 1 (
+        echo FOUT: pip kon ook na opnieuw aanmaken niet worden hersteld.
+        pause
+        exit /b 1
+    )
+)
 "%PYTHON_EXE%" -m pip install --upgrade pip
 if errorlevel 1 (
     echo.

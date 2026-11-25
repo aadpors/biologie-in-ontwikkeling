@@ -55,6 +55,18 @@ if (-not (Test-Path $Python)) {
 # Werk pip bij en installeer alle applicatieafhankelijkheden in de
 # gecontroleerde Python 3.12-omgeving.
 Write-Host 'Benodigde Python-pakketten controleren…'
+# Herstel pip eerst vanuit ensurepip: een venv kan een pip-package bevatten
+# zonder pip.__main__, waardoor de normale pip-opdracht niet uitvoerbaar is.
+& $Python -m ensurepip --upgrade
+if ($LASTEXITCODE -ne 0) {
+    Write-Host 'pip-bootstrap mislukt; de lokale .venv wordt opnieuw aangemaakt…'
+    Remove-Item -Recurse -Force (Join-Path $PSScriptRoot '.venv')
+    & py -3.12 -m venv .venv
+    if ($LASTEXITCODE -ne 0) { throw 'Python-omgeving opnieuw aanmaken is mislukt.' }
+    $Python = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+    & $Python -m ensurepip --upgrade
+    if ($LASTEXITCODE -ne 0) { throw 'pip kon ook na opnieuw aanmaken niet worden hersteld.' }
+}
 & $Python -m pip install --upgrade pip
 if ($LASTEXITCODE -ne 0) {
     throw 'pip kon niet worden bijgewerkt.'
