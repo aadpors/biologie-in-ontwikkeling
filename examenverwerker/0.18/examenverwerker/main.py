@@ -33,7 +33,7 @@ from .context_detection import generate_context_candidates, validate_context_rev
 from .storage import Store, resolve_shared_data_root
 from .learning import (question_start_features, build_learning_profile, learned_adjustment,
                        build_boundary_learning_profile, build_context_learning_profile,
-                       apply_context_range_learning)
+                       apply_context_range_learning, learned_boundary_overrides)
 
 ROOT = Path(__file__).resolve().parent.parent
 # De opslag staat buiten de versie-map. Bij de eerste start van 0.17 wordt
@@ -840,10 +840,9 @@ def _load_document_fragments(exam_id: str, document_type: str):
     previous = exam["steps"].get(fragments_step_key, {}).get("evidence", {})
     boundary_overrides = {int(item["question_number"]): item
                           for item in previous.get("boundary_overrides", [])}
-    # Als voor dit documenttype voldoende gecontroleerde grenscorrecties
-    # bestaan, gebruik dan de mediane offsets als voorlopig voorstel voor
-    # vragen zonder eigen handmatige override. Een expliciete docentcorrectie
-    # heeft altijd voorrang en blijft dus exact behouden.
+    # Geleerde grensoffsets worden alleen als voorlopig voorstel gebruikt.
+    # Een handmatig opgeslagen override wordt daarna samengevoegd en wint dus
+    # altijd van het leerprofiel.
     if accepted:
         boundary_profile = build_boundary_learning_profile(
             STORE.list_fragment_feedback()
@@ -851,34 +850,11 @@ def _load_document_fragments(exam_id: str, document_type: str):
         if boundary_profile.get("active"):
             with fitz.open(source_path) as learning_pdf:
                 page_heights = [float(page.rect.height) for page in learning_pdf]
-            ordered_starts = sorted(
-                accepted,
-                key=lambda item: (item["page_index"], item["pdf_bbox"][1]),
+            learned = learned_boundary_overrides(
+                accepted, page_heights, boundary_profile
             )
-            for index, start in enumerate(ordered_starts):
-                number = int(start["question_number"])
-                if number in boundary_overrides:
-                    continue
-                next_start = ordered_starts[index + 1] if index + 1 < len(ordered_starts) else None
-                first_page = int(start["page_index"])
-                last_page = int(next_start["page_index"]) if next_start else len(page_heights) - 1
-                default_end = (
-                    float(next_start["pdf_bbox"][1])
-                    if next_start and next_start["page_index"] == last_page
-                    else page_heights[last_page]
-                )
-                # De detector gebruikt bij een volgende vraag standaard een
-                # kleine marge van 10 PDF-punten. De geleerde end-offset is
-                # ten opzichte van de ruwe vraagstart, dus pas dezelfde marge
-                # hier opnieuw toe om dubbele verschuiving te voorkomen.
-                end_y = default_end + float(boundary_profile["median_end_offset"] or 0)
-                if next_start and next_start["page_index"] == last_page:
-                    end_y -= 10.0
-                boundary_overrides[number] = {
-                    "start_y": float(start["pdf_bbox"][1])
-                    + float(boundary_profile["median_start_offset"] or 0),
-                    "end_y": end_y,
-                }
+            for number, override in learned.items():
+                boundary_overrides.setdefault(number, override)
     try:
         proposals = generate_question_fragments(source_path, accepted, output_dir,
                                                 document_type=document_type,
