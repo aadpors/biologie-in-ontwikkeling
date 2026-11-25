@@ -732,6 +732,30 @@ def _extract_stitched_selection_text(
     return "\n".join(text_parts)
 
 
+def _first_nonempty_text_line(text: str) -> str:
+    """Geef de eerste zichtbare tekstregel terug voor de titel van een contextgroep.
+
+    De volgorde uit de PDF-tekstextractie blijft leidend. Lege regels en regels
+    met uitsluitend witruimte worden overgeslagen; de inhoud wordt niet
+    herschreven of inhoudelijk samengevat.
+    """
+    return next((line.strip() for line in str(text or "").splitlines() if line.strip()), "")
+
+
+def _context_title_for_selection(
+    pdf_path: str | Path,
+    page_metadata: list[dict[str, Any]],
+    selection: dict[str, Any],
+) -> str:
+    """Leid de contexttitel af uit de eerste tekstregel binnen het fragment."""
+    extracted = _extract_stitched_selection_text(
+        pdf_path, page_metadata,
+        float(selection.get("top", 0)),
+        float(selection.get("bottom", 0)),
+    )
+    return _first_nonempty_text_line(extracted)
+
+
 def _nearest_white_row(y: float, ranges: list[list[int]]) -> int:
     """Rond een voorgestelde grens af op de dichtstbijzijnde volledig witte rij."""
     if not ranges:
@@ -1151,9 +1175,18 @@ def get_stitched_opgaven(exam_id: str):
             context_candidates_only=True,
         )
 
+    # De titel van ieder contextdeel wordt uit de oorspronkelijke PDF gelezen.
+    # De afbeelding blijft leidend voor de grenzen; de tekstlaag levert alleen
+    # de eerste tekstregel die als titel in de contextgroep wordt getoond.
+    for selection in [*saved_selections, *proposed]:
+        if selection.get("type") == "context":
+            selection["context_title"] = _context_title_for_selection(
+                source, metadata.get("pages", []), selection
+            )
+
     # De voorstelgenerator levert nu zowel vraagfragmenten als contexten.
-    # Contexten zijn exact de tussenruimtes tussen opeenvolgende vraagfragmenten;
-    # er wordt dus niet meer alleen bovenaan pagina's naar context gezocht.
+    # Contexten zijn exacte uitsneden tussen vraagfragmenten; de docent kan
+    # hun onderlinge samenhang daarna expliciet leggen via overlappende vragen.
 
     metadata.update({
         "image_url": f"/api/stitched-opgaven-images/{exam_id}/exam-long.png",
@@ -1347,9 +1380,19 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
         exam_id, fragments_step_key, evidence,
         identity_fields=("stitched_selections", "document_sha256", "stitched_image_sha256"),
     )
+    # Geef de titels terug bij iedere opslag. Wanneer de docent een
+    # fragmentgrens verplaatst, wordt de titel dus opnieuw bepaald op basis
+    # van de tekst die nu werkelijk binnen de uitsnede valt.
+    context_titles = {
+        item["id"]: _context_title_for_selection(
+            source_path, stitched_metadata.get("pages", []), item
+        )
+        for item in clean if item["type"] == "context"
+    }
     return {"ok": True, "selection_count": len(clean),
             "reviewed": evidence["stitched_reviewed"],
-            "complete": not saved_as_draft}
+            "complete": not saved_as_draft,
+            "context_titles": context_titles}
 
 
 @app.get("/api/stitched-opgaven-images/{exam_id}/{filename}")
@@ -1380,11 +1423,14 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
     # Valideer de grenzen tegen de werkelijk gegenereerde afbeelding; zo kan
     # een foutieve of verouderde browsercoördinaat nooit buiten de bron vallen.
     stitched_path = DATA / "exams" / exam_id / "derived" / "opgaven_stitched" / "exam-long.png"
-    if not stitched_path.is_file():
-        document = _document_for_type(exam, "opgaven")
-        _load_or_build_stitched_exam(
-            DATA / document["relative_path"], stitched_path, document["sha256"]
-        )
+    document = _document_for_type(exam, "opgaven")
+    source_path = DATA / document["relative_path"]
+    # Laad ook de stitchmetadata wanneer de PNG al bestaat. De metadata bevat
+    # de omzetting van pixelgrenzen naar PDF-gebieden die nodig is om de
+    # actuele contexttitel betrouwbaar uit de bron te kunnen uitlezen.
+    stitched_metadata = _load_or_build_stitched_exam(
+        source_path, stitched_path, document["sha256"]
+    )
     with Image.open(stitched_path) as stitched_image:
         stitched_height = stitched_image.height
     # De server herhaalt de pixelcontrole. Zo kunnen verouderde browsers of
