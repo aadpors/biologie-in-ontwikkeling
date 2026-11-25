@@ -850,6 +850,10 @@ def _load_document_fragments(exam_id: str, document_type: str):
         if boundary_profile.get("active"):
             with fitz.open(source_path) as learning_pdf:
                 page_heights = [float(page.rect.height) for page in learning_pdf]
+                if document_type == "correctievoorschrift":
+                    # Gebruik dezelfde inhoudsgrens als de fragmentgenerator:
+                    # de administratieve slotpagina mag geen leergrens worden.
+                    page_heights = page_heights[:cv_content_end_page(learning_pdf) + 1]
             learned = learned_boundary_overrides(
                 accepted, page_heights, boundary_profile
             )
