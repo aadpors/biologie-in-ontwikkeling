@@ -122,6 +122,34 @@ class StitchedPageCleanupTests(unittest.TestCase):
                     0,
                 )
 
+    def test_question_number_in_separate_span_survives_footer_cleanup(self):
+        """Een apart PDF-span met vraagnummer blijft staan naast losse footer-spans."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "separate-footer-spans.pdf"
+            output = root / "separate-footer-spans-long.png"
+
+            pdf = fitz.open()
+            page = pdf.new_page(width=600, height=800)
+            page.insert_text((55, 150), "Inhoudelijke tekst blijft behouden.", fontsize=12)
+            # De PDF bewaart de vraag en de footer als afzonderlijke spans op
+            # dezelfde regel. Het vraagnummer mag niet als paginanummer gelden.
+            page.insert_text((45, 780), "Vraag 30", fontsize=9)
+            page.insert_text((115, 780), "2 / 19", fontsize=9)
+            page.insert_text((165, 780), "lees verder", fontsize=9)
+            pdf.save(source)
+            pdf.close()
+
+            metadata = build_stitched_exam(source, output, start_page=0, render_scale=1.0)
+            with Image.open(output) as stitched:
+                crop_top = metadata["pages"][0]["crop_pixels"][1]
+                question_y = 780 - crop_top
+                question_area = stitched.crop((35, max(0, question_y - 18), 110, question_y + 5))
+                dark_pixels = sum(
+                    1 for pixel in question_area.convert("L").getdata() if pixel < 180
+                )
+                self.assertGreater(dark_pixels, 0, "Vraag 30 is ten onrechte uit de examenstrook verwijderd.")
+
     def test_standalone_exam_code_in_footer_is_removed(self):
         """Ook een losse Cito-documentcode in de onderste marge wordt gemaskeerd."""
         with tempfile.TemporaryDirectory() as folder:
