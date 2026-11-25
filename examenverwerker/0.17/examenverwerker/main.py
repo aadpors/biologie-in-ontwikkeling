@@ -2383,6 +2383,38 @@ def publish_exam(exam_id: str):
     return {"ok": True, "published": True}
 
 
+
+
+@app.get("/api/exams/{exam_id}/publication-versions")
+def get_publication_versions(exam_id: str):
+    """Toon de bewaarde publicatieversies als read-only historie."""
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    versions = STORE.publication_versions(exam_id)
+    return [{"version": item["version"], "published_at": item["published_at"]}
+            for item in versions]
+
+
+@app.post("/api/exams/{exam_id}/reopen-published")
+def reopen_published_exam(exam_id: str):
+    """Open een gepubliceerd examen opnieuw als gecontroleerde bewerkingsversie.
+
+    De laatst gepubliceerde snapshot blijft in publication_versions staan.
+    De inhoudelijke workflow-evidence wordt behouden, maar snippets, eindcontrole
+    en publicatie worden opnieuw gecontroleerd. De docent kan daarna via de
+    bestaande werkruimte de gewenste upstream stap opnieuw openen.
+    """
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    if not exam.get("published"):
+        raise HTTPException(409, "Dit examen is niet momenteel gepubliceerd.")
+    STORE.invalidate_steps(exam_id, ["snippets", "eindcontrole", "publicatie"])
+    return {"ok": True, "reopened": True,
+            "message": "Examen opnieuw geopend. De eerdere publicatie blijft bewaard."}
+
+
 @app.get("/api/workflow")
 def workflow():
     return [{"key": s.key, "title": s.title, "description": s.description, "requires": list(s.requires)} for s in WORKFLOW]
