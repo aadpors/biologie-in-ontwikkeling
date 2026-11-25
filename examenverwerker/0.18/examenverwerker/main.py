@@ -2212,9 +2212,31 @@ def fragment_learning_status(exam_id: str):
     """Expose counts of approved examples, not raw learner data."""
     if not STORE.get_exam(exam_id):
         raise HTTPException(404, "Examen niet gevonden.")
-    return {"examples": STORE.fragment_feedback_count("fragment_review"),
-            "scope": "fragment_review", "automatic_training": False,
-            "message": "Correcties worden opgeslagen als gecontroleerde voorbeelden; automatische regelwijziging gebeurt niet zonder tests."}
+    records = STORE.list_fragment_feedback()
+    question_examples = sum(
+        len(record["accepted"].get("examples", []))
+        for record in records if record["stage"].startswith("question_starts:")
+    )
+    boundary_examples = sum(
+        len(record["accepted"].get("examples", []))
+        for record in records if record["stage"].startswith("fragment_boundaries:")
+    )
+    context_examples = sum(
+        len(record["summary"].get("context_range_changes", []))
+        for record in records if record["stage"] == "fragment_review"
+    )
+    return {
+        "examples": question_examples + boundary_examples + context_examples,
+        "question_start_examples": question_examples,
+        "fragment_boundary_examples": boundary_examples,
+        "context_group_examples": context_examples,
+        "learning_active": bool(question_examples or boundary_examples or context_examples),
+        "automatic_approval": False,
+        "message": (
+            "Gecontroleerde correcties worden gebruikt om nieuwe detectievoorstellen "
+            "te verbeteren. Een detectie wordt nooit automatisch goedgekeurd."
+        ),
+    }
 
 @app.get("/api/exams/{exam_id}/final-review")
 def get_final_review(exam_id: str):
