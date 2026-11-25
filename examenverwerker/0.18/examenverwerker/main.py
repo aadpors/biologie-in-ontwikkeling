@@ -948,6 +948,14 @@ def _load_document_fragments(exam_id: str, document_type: str):
     reviewed_numbers = set(raw_reviewed_numbers) if isinstance(raw_reviewed_numbers, list) else set()
     for question in proposals["questions"]:
         question["reviewed"] = question["question_number"] in reviewed_numbers
+    # Geef het fragmentenscherm de historische grenscorrecties mee. Deze
+    # worden nog niet automatisch op een bestaande selectie toegepast; ze
+    # zijn een uitlegbare referentie voor de volgende voorstelgeneratie.
+    boundary_profiles = build_boundary_learning_profile(STORE.list_fragment_feedback())
+    proposals["learning_boundary_profile"] = boundary_profiles.get(document_type, {
+        "examples": 0, "active": False,
+        "median_start_offset": None, "median_end_offset": None,
+    })
     return proposals
 
 
