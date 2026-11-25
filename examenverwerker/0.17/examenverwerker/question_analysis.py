@@ -333,7 +333,16 @@ def _should_run_option_ocr(text: str, options: list[dict[str, str]]) -> bool:
             "welke optie is juist",
         )
     )
-    return has_option_label or has_multiple_choice_wording
+    # De formulering kan een tussenzin bevatten, zoals "Welke uitspraak
+    # over fotosynthese is juist?". Herken daarom ook de combinatie van
+    # vraagwoord + onderwerp + beoordelingswoord; een exacte vaste frase
+    # zou deze veelvoorkomende meerkeuzevraag missen.
+    has_flexible_statement_wording = bool(re.search(
+        r"\\bwelke\\s+uitspraak\\b.*\\b(?:is\\s+)?(?:juist|onjuist|correct)\\b",
+        text,
+        re.IGNORECASE | re.DOTALL,
+    ))
+    return has_option_label or has_multiple_choice_wording or has_flexible_statement_wording
 
 
 def analyse_questions(fragment_result: dict[str, Any]) -> dict[str, Any]:
