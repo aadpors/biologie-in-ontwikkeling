@@ -270,7 +270,7 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                 footer_patterns = [
                     re.compile(r"\b\d{1,3}\s*/\s*\d{1,3}\b"),
                     re.compile(r"(?i)\blees\s+verder\b"),
-                    re.compile(r"►{1,3}"),
+                    re.compile(r"(?:►|·){1,3}"),  # PyMuPDF kan de pijl als middot extraheren.
                     re.compile(r"(?i)\b(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*\b"),
                 ]
                 raw_page = page.get_text("rawdict")
