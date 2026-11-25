@@ -193,6 +193,58 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(len(stitched.json()["pages"]), 1)
         self.assertEqual(stitched.json()["pages"][0]["page_number"], 1)
 
+    def test_cv_fragment_with_unapproved_question_number_is_reported_explicitly(self):
+        """Een CV-selectie zonder goedgekeurde vraagstart mag niet stil verdwijnen."""
+        cv = fitz.open()
+        page = cv.new_page(width=600, height=800)
+        page.insert_text((70, 80), "4 Beoordelingsmodel")
+        page.insert_text((70, 130), "1 maximumscore 2")
+        page.insert_text((90, 165), "Antwoord en beoordelingsregel.")
+        cv_bytes = cv.tobytes()
+        cv.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", cv_bytes, "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        # Simuleer de eerder goedgekeurde CV-vraagstarts: alleen vraag 1 bestaat.
+        main.STORE.complete_step(exam_id, "cv_starts", {
+            "candidates":[{
+                "id":"cv-q1", "question_number":1, "page_index":0,
+                "pdf_bbox":[70.0, 130.0, 85.0, 145.0],
+                "text":"1 maximumscore 2", "accepted":True, "removed":False,
+            }],
+            "document_sha256": imported.json()["documents"][0]["sha256"],
+        })
+        stitched = self.client.get(f"/api/exams/{exam_id}/stitched-document/correctievoorschrift")
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        white_ranges = stitched.json()["white_row_ranges"]
+        self.assertTrue(white_ranges)
+        top, bottom = white_ranges[0][0], white_ranges[-1][1]
+
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/stitched-document/correctievoorschrift/review",
+            json={"selections":[{
+                "id":"cv-q28", "type":"vraag", "top":top, "bottom":bottom,
+                "question_numbers":[28], "label":"Vraag 28",
+            }], "reviewed":False},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        fragments = self.client.get(
+            f"/api/exams/{exam_id}/document-question-fragments/correctievoorschrift"
+        )
+        self.assertEqual(fragments.status_code, 409)
+        self.assertIn("vraag 28", fragments.json()["detail"])
+        self.assertIn("stap 7", fragments.json()["detail"])
+
     def test_step_six_uses_stitched_workbook_selections_for_final_fragments(self):
         """Stap 6 gebruikt dezelfde doorlopende selectiewerkruimte als stap 3."""
         opgaven = fitz.open()
