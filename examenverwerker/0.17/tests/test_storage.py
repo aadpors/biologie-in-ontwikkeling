@@ -71,6 +71,57 @@ class StorageTests(unittest.TestCase):
             self.assertIsNotNone(exam["published_at"])
             self.assertEqual(exam["steps"]["publicatie"]["status"], "complete")
 
+    def test_reopened_step_invalidates_dependents_only_after_a_real_change(self):
+        """Ongewijzigd opnieuw afronden behoudt downstream-goedkeuringen."""
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(Path(tmp))
+            store.create_exam("012345abcdef", "Biologie vwo 2026 tv2", [])
+            approved = {"candidates":[{"question_number":1,"accepted":True}]}
+            downstream = {"selections":[{"question_number":1,"top":100,"bottom":300}]}
+            store.complete_step("012345abcdef", "opgaven_starts", approved)
+            store.complete_step("012345abcdef", "opgaven_fragments", downstream)
+
+            store.reopen_step("012345abcdef", "opgaven_starts", approved)
+            exam = store.get_exam("012345abcdef")
+            self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
+            self.assertEqual(exam["steps"]["opgaven_fragments"]["status"], "complete")
+
+            # Een identieke herbevestiging laat de downstream-status ongemoeid.
+            changed = store.complete_step("012345abcdef", "opgaven_starts", approved)
+            self.assertFalse(changed)
+            self.assertEqual(
+                store.get_exam("012345abcdef")["steps"]["opgaven_fragments"]["status"],
+                "complete",
+            )
+
+            # Een inhoudelijke wijziging levert een expliciet signaal voor de API.
+            store.reopen_step("012345abcdef", "opgaven_starts", approved)
+            revised = {"candidates":[{"question_number":1,"accepted":True},
+                                     {"question_number":2,"accepted":True}]}
+            changed = store.complete_step("012345abcdef", "opgaven_starts", revised)
+            self.assertTrue(changed)
+            store.invalidate_steps("012345abcdef", ["opgaven_fragments"])
+            exam = store.get_exam("012345abcdef")
+            self.assertEqual(exam["steps"]["opgaven_fragments"]["status"], "pending")
+            self.assertEqual(exam["steps"]["opgaven_fragments"]["evidence"], downstream)
+
+    def test_reopened_metadata_compares_against_approved_values(self):
+        """Metadata wordt alleen als gewijzigd gezien als de bevestigde waarden afwijken."""
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(Path(tmp))
+            store.create_exam("012345abcdef", "Biologie vwo 2026 tv2", [])
+            original = {
+                "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+                "document_types":{"exam.pdf":"correctievoorschrift"},
+            }
+            store.confirm_metadata("012345abcdef", original)
+            store.reopen_metadata("012345abcdef", original)
+            self.assertFalse(store.confirm_metadata("012345abcdef", original))
+
+            store.reopen_metadata("012345abcdef", original)
+            revised = {**original, "period":1}
+            self.assertTrue(store.confirm_metadata("012345abcdef", revised))
+
     def test_invalidation_preserves_review_evidence_and_clears_publication(self):
         """Ongeldig bewijs blijft als concept beschikbaar voor gerichte hercontrole."""
         with tempfile.TemporaryDirectory() as tmp:
