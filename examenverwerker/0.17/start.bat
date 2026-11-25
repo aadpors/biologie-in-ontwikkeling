@@ -121,6 +121,32 @@ if errorlevel 1 (
         exit /b 1
     )
 )
+REM Controleer eerst of pip als module echt uitvoerbaar is. Een venv kan
+REM pip-metadata bevatten terwijl pip.__main__ ontbreekt of beschadigd is.
+"%PYTHON_EXE%" -m pip --version >nul 2>nul
+if errorlevel 1 (
+    echo pip in de lokale omgeving is beschadigd. Omgeving opnieuw aanmaken...
+    rmdir /s /q .venv
+    py -3.12 -m venv .venv
+    if errorlevel 1 (
+        echo FOUT: Python-omgeving opnieuw aanmaken is mislukt.
+        pause
+        exit /b 1
+    )
+    set "PYTHON_EXE=.venv\Scripts\python.exe"
+    "%PYTHON_EXE%" -m ensurepip --upgrade
+    if errorlevel 1 (
+        echo FOUT: pip kon na opnieuw aanmaken niet worden geinitialiseerd.
+        pause
+        exit /b 1
+    )
+    "%PYTHON_EXE%" -m pip --version >nul 2>nul
+    if errorlevel 1 (
+        echo FOUT: pip werkt ook in de nieuwe omgeving niet.
+        pause
+        exit /b 1
+    )
+)
 "%PYTHON_EXE%" -m pip install --upgrade pip
 if errorlevel 1 (
     echo.

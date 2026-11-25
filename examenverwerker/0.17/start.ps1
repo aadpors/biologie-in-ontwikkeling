@@ -67,6 +67,19 @@ if ($LASTEXITCODE -ne 0) {
     & $Python -m ensurepip --upgrade
     if ($LASTEXITCODE -ne 0) { throw 'pip kon ook na opnieuw aanmaken niet worden hersteld.' }
 }
+# Test of pip daadwerkelijk uitvoerbaar is, niet alleen als pakket geregistreerd.
+& $Python -m pip --version
+if ($LASTEXITCODE -ne 0) {
+    Write-Host 'pip is beschadigd; de lokale .venv wordt opnieuw aangemaakt…'
+    Remove-Item -Recurse -Force (Join-Path $PSScriptRoot '.venv')
+    & py -3.12 -m venv .venv
+    if ($LASTEXITCODE -ne 0) { throw 'Python-omgeving opnieuw aanmaken is mislukt.' }
+    $Python = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+    & $Python -m ensurepip --upgrade
+    if ($LASTEXITCODE -ne 0) { throw 'pip kon na opnieuw aanmaken niet worden geinitialiseerd.' }
+    & $Python -m pip --version
+    if ($LASTEXITCODE -ne 0) { throw 'pip werkt ook in de nieuwe omgeving niet.' }
+}
 & $Python -m pip install --upgrade pip
 if ($LASTEXITCODE -ne 0) {
     throw 'pip kon niet worden bijgewerkt.'
