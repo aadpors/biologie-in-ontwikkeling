@@ -1735,7 +1735,13 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
           <div class="stitched-image-scroll" id="stitchedImageScroll"><div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div></div>
         </section>
-        <aside class="stitched-inspector"><h3>Fragmenten</h3><div id="stitchedSelectionList"></div></aside>
+        <aside class="stitched-inspector">
+            <h3>Contextgroepen en gekoppelde vragen</h3>
+            <p class="field-help">Contextfragmenten die aan dezelfde vragen zijn gekoppeld, worden hier als één contextgroep getoond. Zo blijft zichtbaar welke tekst- en afbeeldingsdelen samen bij welke opgaven horen.</p>
+            <div id="contextGroupSummary" class="context-group-summary"></div>
+            <h3>Afzonderlijke fragmenten</h3>
+            <div id="stitchedSelectionList"></div>
+          </aside>
       </div>
       <div class="review-actions"><button class="primary" id="saveStitched">Nu opslaan</button><button class="primary" id="completeStitched">Fragmentcontrole goedkeuren en doorgaan</button></div><p id="stitchedMessage" class="form-error" role="status"></p>`;
 
@@ -2028,6 +2034,69 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const activeId = selections[activeIndex]?.id;
       selections.sort((a, b) => Number(a.top) - Number(b.top) || Number(a.bottom) - Number(b.bottom));
       activeIndex = activeId ? selections.findIndex(item => item.id === activeId) : -1;
+
+      /*
+       * Contextstructuur voor de docent zichtbaar maken.
+       *
+       * Meerdere fysieke contextfragmenten kunnen samen één inhoudelijke
+       * context vormen. De expliciete koppeling staat in question_numbers.
+       * Fragmenten met overlappende vraagnummers worden daarom als één
+       * contextgroep gepresenteerd. De onderliggende losse fragmenten en
+       * hun coördinaten blijven afzonderlijk opgeslagen en bewerkbaar.
+       */
+      const contextSelections = selections
+        .map((item, index) => ({item, index}))
+        .filter(entry => entry.item.type === "context");
+      const parent = contextSelections.map((_, index) => index);
+      const findRoot = index => {
+        while (parent[index] !== index) {
+          parent[index] = parent[parent[index]];
+          index = parent[index];
+        }
+        return index;
+      };
+      const joinGroups = (left, right) => {
+        const a = findRoot(left), b = findRoot(right);
+        if (a !== b) parent[b] = a;
+      };
+      const overlapsQuestions = (left, right) => {
+        const rightNumbers = new Set((right.question_numbers || []).map(Number));
+        return (left.question_numbers || []).some(number => rightNumbers.has(Number(number)));
+      };
+      for (let left = 0; left < contextSelections.length; left++) {
+        for (let right = left + 1; right < contextSelections.length; right++) {
+          if (overlapsQuestions(contextSelections[left].item, contextSelections[right].item)) {
+            joinGroups(left, right);
+          }
+        }
+      }
+      const contextGroups = new Map();
+      contextSelections.forEach((entry, index) => {
+        const root = findRoot(index);
+        if (!contextGroups.has(root)) contextGroups.set(root, {parts: [], questionNumbers: new Set()});
+        const group = contextGroups.get(root);
+        group.parts.push(entry);
+        (entry.item.question_numbers || []).forEach(number => group.questionNumbers.add(Number(number)));
+      });
+      const questionSelections = selections.filter(item => item.type === "vraag");
+      const formatNumbers = numbers => {
+        const sorted = [...numbers].sort((a, b) => a - b);
+        return sorted.length ? formatQuestionRanges(sorted) : "nog niet gekoppeld";
+      };
+      const summary = $("#contextGroupSummary");
+      summary.innerHTML = contextGroups.size ? [...contextGroups.values()].map((group, groupIndex) => {
+        const numbers = [...group.questionNumbers].sort((a, b) => a - b);
+        const linked = numbers.map(number => {
+          const hasQuestion = questionSelections.some(item => (item.question_numbers || []).map(Number).includes(number));
+          return `<span class="context-question-chip ${hasQuestion ? "linked" : "missing"}">Vraag ${number}${hasQuestion ? "" : " · fragment ontbreekt"}</span>`;
+        }).join("");
+        return `<section class="context-group-card">
+          <div class="context-group-heading"><strong>Contextgroep ${groupIndex + 1}</strong><span>${group.parts.length} contextdeel${group.parts.length === 1 ? "" : "en"}</span></div>
+          <p><strong>Bijbehorende opgaven: ${escapeHtml(formatNumbers(numbers))}</strong></p>
+          <div class="context-question-chips">${linked || '<span class="context-question-chip missing">Nog geen vragen gekoppeld</span>'}</div>
+          <small>${group.parts.map(entry => escapeHtml(questionLabel(entry.item))).join(" · ")}</small>
+        </section>`;
+      }).join("") : '<p class="muted">Selecteer op de examenstrook een fragment van het type Context en koppel het aan de bijbehorende vraagnummers. Meerdere contextdelen met dezelfde vragen vormen automatisch één groep.</p>';
 
       // De inhoudelijke naam is voldoende; een los fragmentnummer voegt
       // voor de docent niets toe en verandert bovendien bij hersorteren.
