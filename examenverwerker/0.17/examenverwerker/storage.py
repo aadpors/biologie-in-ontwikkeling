@@ -280,5 +280,29 @@ class Store:
             )
 
     def invalidate_steps(self, exam_id: str, keys: list[str]):
+        """Markeer afhankelijke stappen als opnieuw te controleren, maar bewaar hun werk.
+
+        Een wijziging in een eerdere workflowstap maakt latere goedkeuringen
+        ongeldig, maar maakt de opgeslagen correcties en selecties niet
+        waardeloos. Bewaar daarom evidence_json als concept en wijzig alleen
+        de status. De volgende stap kan de bestaande invoer opnieuw tonen,
+        zodat de gebruiker alleen hoeft aan te passen wat werkelijk veranderd is.
+
+        Publicatiestatus wordt teruggezet wanneer de publicatiestap zelf in de
+        invalidatieset zit. Een eerder gepubliceerde versie mag na een wijziging
+        nooit als actueel gepubliceerd blijven gelden.
+        """
+        unique_keys = list(dict.fromkeys(keys))
+        if not unique_keys:
+            return
         with self.connection() as db:
-            db.executemany("DELETE FROM steps WHERE exam_id=? AND step_key=?", [(exam_id, key) for key in keys])
+            db.executemany(
+                "UPDATE steps SET status='pending', updated_at=CURRENT_TIMESTAMP "
+                "WHERE exam_id=? AND step_key=?",
+                [(exam_id, key) for key in unique_keys],
+            )
+            if "publicatie" in unique_keys:
+                db.execute(
+                    "UPDATE exams SET published=0, published_at=NULL WHERE id=?",
+                    (exam_id,),
+                )
