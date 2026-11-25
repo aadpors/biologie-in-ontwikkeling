@@ -1,3 +1,6 @@
+- Behoud van eerder opgeslagen handmatige fragmentgrenzen wanneer uitsluitend de voettekstmaskering van de lange afbeelding wijzigt. De grenzen worden niet meer stilzwijgend vervangen door nieuwe voorstellen; de docent krijgt een waarschuwing en moet de behouden grenzen visueel opnieuw opslaan.
+- Aangescherpte herkenning van losse paginanummers: een zelfstandig getal in de boven- of ondermarge wordt alleen verwijderd wanneer het op meerdere pagina's op dezelfde relatieve positie terugkeert. Losse vraagnummers, waaronder 28 en 30, blijven daardoor behouden.
+- Regressietests toegevoegd voor zelfstandige vraagnummers 28 en 30 in de onderste marge en voor het blijven verwijderen van herhaalde paginanummers.
 ## Contextgroepen in stap 3 — context en opgaven expliciet verbinden
 
 - De werkruimte voor het opgavendocument toont nu boven de losse fragmentlijst een overzicht van contextgroepen en de bijbehorende vraagnummers.
