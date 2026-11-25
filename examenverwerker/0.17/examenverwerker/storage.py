@@ -91,6 +91,17 @@ class Store:
                     snapshot_json TEXT NOT NULL,
                     PRIMARY KEY (exam_id, version)
                 );
+                -- Append-only feedback: reviewed fragment outcomes are retained.
+                CREATE TABLE IF NOT EXISTS fragment_learning_feedback (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                    stage TEXT NOT NULL,
+                    source_hash TEXT,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    automatic_json TEXT NOT NULL,
+                    accepted_json TEXT NOT NULL,
+                    correction_summary_json TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS steps (
                     exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
                     step_key TEXT NOT NULL,
@@ -351,6 +362,24 @@ class Store:
                 (exam_id, step_key, "pending", serialised),
             )
             return True
+
+
+    def record_fragment_feedback(self, exam_id: str, stage: str, source_hash: str,
+                                 automatic: dict[str, Any], accepted: dict[str, Any],
+                                 summary: dict[str, Any]):
+        """Append a reviewed example; never update or erase earlier feedback."""
+        with self.connection() as db:
+            db.execute(
+                "INSERT INTO fragment_learning_feedback(exam_id,stage,source_hash,automatic_json,accepted_json,correction_summary_json) VALUES (?,?,?,?,?,?)",
+                (exam_id, stage, source_hash, json.dumps(automatic, ensure_ascii=False),
+                 json.dumps(accepted, ensure_ascii=False), json.dumps(summary, ensure_ascii=False)),
+            )
+
+    def fragment_feedback_count(self, stage: str | None = None):
+        """Return aggregate count of validated feedback examples."""
+        with self.connection() as db:
+            row = db.execute("SELECT COUNT(*) AS n FROM fragment_learning_feedback" + (" WHERE stage=?" if stage else ""), (stage,) if stage else ()).fetchone()
+        return int(row["n"])
 
     def publish_exam(self, exam_id: str):
         """Maak een onveranderbare publicatieversie en markeer deze actueel.
