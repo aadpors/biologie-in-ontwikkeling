@@ -134,9 +134,21 @@ async function loadLibrary() {
   const exams = await api('/api/exams');
   $('#examCount').textContent = `${exams.length} ${exams.length === 1 ? 'examen' : 'examens'}`;
   $('#examList').innerHTML = exams.length ? exams.map(exam => `
-    <article class="exam-row"><div class="doc-icon">PDF</div><div><strong>${escapeHtml(exam.title)}</strong><p>${exam.published ? 'Gepubliceerd in examenbibliotheek' : (exam.confirmed ? 'Metadata bevestigd · nog niet gepubliceerd' : 'Metadata nog te bevestigen')} · geïmporteerd ${new Date(exam.created_at + 'Z').toLocaleDateString('nl-NL')}</p></div><button class="quiet" data-open="${exam.id}">Open werkruimte →</button></article>
+    <article class="exam-row"><div class="doc-icon">PDF</div><div><strong>${escapeHtml(exam.title)}</strong><p>${exam.published ? 'Gepubliceerd in examenbibliotheek' : (exam.confirmed ? 'Metadata bevestigd · nog niet gepubliceerd' : 'Metadata nog te bevestigen')} · geïmporteerd ${new Date(exam.created_at + 'Z').toLocaleDateString('nl-NL')}</p></div><button class="quiet" data-open="${exam.id}">Open werkruimte →</button>${exam.published ? `<button class="quiet" data-reopen-published="${exam.id}">Publicatie bewerken</button>` : ''}</article>
   `).join('') : '<p class="muted">Er zijn nog geen examens geïmporteerd.</p>';
   document.querySelectorAll('[data-open]').forEach(button => button.addEventListener('click', () => openWorkspace(button.dataset.open)));
+  // Een gepubliceerd examen kan via een expliciete actie worden heropend.
+  // De server houdt de vorige publicatie als immutable snapshot beschikbaar.
+  document.querySelectorAll('[data-reopen-published]').forEach(button => button.addEventListener('click', async () => {
+    button.disabled = true;
+    try {
+      await api(`/api/exams/${button.dataset.reopenPublished}/reopen-published`, {method:'POST'});
+      await openWorkspace(button.dataset.reopenPublished);
+    } catch (error) {
+      button.disabled = false;
+      alert(error.message);
+    }
+  }));
 }
 
 function escapeHtml(value) {
