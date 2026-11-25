@@ -31,7 +31,8 @@ from .answer_detection import analyse_answers, detect_cv_max_points, validate_an
 from .cv_supplement import analyse_supplement, validate_supplement_review
 from .context_detection import generate_context_candidates, validate_context_review
 from .storage import Store, resolve_shared_data_root
-from .learning import question_start_features, build_learning_profile, learned_adjustment
+from .learning import (question_start_features, build_learning_profile, learned_adjustment,
+                       build_boundary_learning_profile, build_context_learning_profile)
 
 ROOT = Path(__file__).resolve().parent.parent
 # De opslag staat buiten de versie-map. Bij de eerste start van 0.17 wordt
@@ -2150,8 +2151,13 @@ def get_learning_profile(exam_id: str):
             continue
         examples.extend(record["accepted"].get("examples", []))
     profile = build_learning_profile(examples)
+    all_feedback = STORE.list_fragment_feedback()
+    boundary_profile = build_boundary_learning_profile(all_feedback)
+    context_profile = build_context_learning_profile(all_feedback)
     return {
         **profile,
+        "fragment_boundaries": boundary_profile,
+        "context_groups": context_profile,
         "learning_policy": {
             "automatic_approval": False,
             "minimum_examples_per_feature": profile["minimum_examples"],
@@ -2481,6 +2487,61 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             STORE.record_detection_examples(
                 exam_id, f"question_starts:{document_type}",
                 document["sha256"], examples,
+            )
+
+    # Bewaar ook handmatig gecorrigeerde fragmentgrenzen als numerieke
+    # leervoorbeelden. De offset wordt berekend ten opzichte van de
+    # oorspronkelijke vraagstart en de volgende vraag/pagina-eindgrens.
+    # Alleen een expliciet afgeronde fragmentreview telt mee.
+    if step_key in {"opgaven_fragments", "uitwerk_fragments", "cv_fragments"}:
+        prior_status = exam["steps"].get(step_key, {}).get("status")
+        fragment_evidence = {**previous, **payload}
+        overrides = fragment_evidence.get("boundary_overrides", [])
+        if prior_status != "complete" and fragment_evidence.get("reviewed_all_questions") and overrides:
+            document_type = {
+                "opgaven_fragments": "opgaven",
+                "uitwerk_fragments": "uitwerkbijlage",
+                "cv_fragments": "correctievoorschrift",
+            }[step_key]
+            document = _document_for_type(exam, document_type)
+            starts_key = {
+                "opgaven": "opgaven_starts",
+                "uitwerkbijlage": "uitwerk_starts",
+                "correctievoorschrift": "cv_starts",
+            }[document_type]
+            starts_evidence = exam["steps"].get(starts_key, {}).get("evidence", {})
+            starts = sorted(
+                [item for item in starts_evidence.get("candidates", [])
+                 if item.get("accepted") and not item.get("removed")],
+                key=lambda item: (item["page_index"], item["pdf_bbox"][1]),
+            )
+            start_by_number = {int(item["question_number"]): item for item in starts}
+            source_path = DATA / document["relative_path"]
+            with fitz.open(source_path) as boundary_pdf:
+                page_heights = [float(page.rect.height) for page in boundary_pdf]
+            boundary_examples = []
+            for override in overrides:
+                start = start_by_number.get(int(override["question_number"]))
+                if not start:
+                    continue
+                start_index = starts.index(start)
+                next_start = starts[start_index + 1] if start_index + 1 < len(starts) else None
+                last_page = next_start["page_index"] if next_start else len(page_heights) - 1
+                default_end = (
+                    float(next_start["pdf_bbox"][1])
+                    if next_start and next_start["page_index"] == last_page
+                    else page_heights[last_page]
+                )
+                boundary_examples.append({
+                    "question_number": int(override["question_number"]),
+                    "start_offset": round(float(override["start_y"]) - float(start["pdf_bbox"][1]), 2),
+                    "end_offset": round(float(override["end_y"]) - default_end, 2),
+                })
+            STORE.record_fragment_feedback(
+                exam_id, f"fragment_boundaries:{document_type}", document["sha256"],
+                {"automatic_boundary_reference": "question_start_and_next_question"},
+                {"examples": boundary_examples},
+                {"reviewed_boundary_count": len(boundary_examples), "reviewed_by_user": True},
             )
 
     changed = STORE.complete_step(exam_id, step_key, {**previous, **payload})
