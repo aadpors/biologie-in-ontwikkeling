@@ -144,8 +144,9 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
 
     Een los getal in de boven- of ondermarge is niet automatisch een
     paginanummer: examen-PDF's kunnen daar ook een vraagnummer plaatsen.
-    Daarom verwijderen we numerieke spans alleen als ze op meerdere pagina's
-    op vrijwel exact dezelfde relatieve positie terugkeren. Niet-numerieke
+    Daarom verwijderen we numerieke spans alleen als ze op vrijwel exact
+    dezelfde relatieve positie én in een doorlopende paginanummerreeks staan.
+    Een afwijkend vraagnummer op die positie blijft behouden. Niet-numerieke
     korte kop- en voetteksten worden alleen verwijderd als dezelfde tekst op
     ten minste twee pagina's voorkomt.
     """
