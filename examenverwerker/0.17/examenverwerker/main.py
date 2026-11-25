@@ -2026,11 +2026,52 @@ def save_snippets_review(exam_id: str, payload: dict):
     STORE.save_step_draft_preserving_identical_complete(
         exam_id, "snippets", evidence, identity_fields=tuple(evidence.keys())
     )
+    # Leg een leervoorbeeld vast wanneer alle fragmenttypen expliciet zijn
+    # gecontroleerd. De automatische voorstellen en de geaccepteerde review
+    # blijven naast elkaar bewaard, zodat latere regelverbeteringen toetsbaar zijn.
+    if (not payload.get("draft") and evidence["reviewed_all_questions"]
+            and evidence["reviewed_all_contexts"] and evidence["reviewed_all_uitwerk"]
+            and evidence["reviewed_all_cv"]):
+        automatic = {
+            "context_candidates": result["contexts"],
+            "question_fragment_candidates": result["opgaven"]["questions"],
+            "worksheet_candidates": result["uitwerkbijlage"]["questions"],
+            "cv_candidates": result["correctievoorschrift"]["questions"],
+        }
+        accepted = {
+            "reviewed_context_ranges": evidence["contexts"],
+            "reviewed_question_numbers": evidence["reviewed_question_numbers"],
+            "reviewed_worksheet_numbers": evidence["reviewed_uitwerk_numbers"],
+            "reviewed_cv_numbers": evidence["reviewed_cv_numbers"],
+        }
+        summary = {
+            "context_range_changes": [
+                {"id": item["id"], "suggested_from": next((candidate.get("from_question")
+                    for candidate in result["contexts"] if candidate["id"] == item["id"]), None),
+                 "suggested_to": next((candidate.get("to_question")
+                    for candidate in result["contexts"] if candidate["id"] == item["id"]), None),
+                 "accepted_from": item["from_question"], "accepted_to": item["to_question"]}
+                for item in evidence["contexts"]],
+            "manual_review_confirmed": True,
+        }
+        STORE.record_fragment_feedback(exam_id, "fragment_review", evidence["document_sha256"],
+                                      automatic, accepted, summary)
     return {"ok": True, **evidence,
             "complete": (evidence["reviewed_all_questions"] and evidence["reviewed_all_contexts"]
                          and evidence["reviewed_all_uitwerk"] and evidence["reviewed_all_cv"]
                          and (bool(result["contexts"]) or evidence["confirmed_no_contexts"]))}
 
+
+
+
+@app.get("/api/exams/{exam_id}/fragment-learning-status")
+def fragment_learning_status(exam_id: str):
+    """Expose counts of approved examples, not raw learner data."""
+    if not STORE.get_exam(exam_id):
+        raise HTTPException(404, "Examen niet gevonden.")
+    return {"examples": STORE.fragment_feedback_count("fragment_review"),
+            "scope": "fragment_review", "automatic_training": False,
+            "message": "Correcties worden opgeslagen als gecontroleerde voorbeelden; automatische regelwijziging gebeurt niet zonder tests."}
 
 @app.get("/api/exams/{exam_id}/final-review")
 def get_final_review(exam_id: str):
