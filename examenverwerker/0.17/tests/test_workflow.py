@@ -444,6 +444,69 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
         self.assertEqual(exam["steps"]["opgaven_starts"]["evidence"], evidence)
 
+    def test_reopening_metadata_preserves_dependents_until_values_change(self):
+        """Alleen een gewijzigde metadata-bevestiging maakt vervolgstappen ongeldig."""
+        exam_id = self.import_sample()["exam_id"]
+        original = {
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{
+                "biologie-vwo-2026-tv2-o.pdf":"opgaven",
+                "biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift",
+            },
+        }
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json=original)
+        evidence = {"candidates":[{"question_number":1,"accepted":True}]}
+        main.STORE.complete_step(exam_id, "opgaven_starts", evidence)
+
+        reopened = self.client.post(f"/api/exams/{exam_id}/steps/metadata/reopen")
+        self.assertEqual(reopened.status_code, 200, reopened.text)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "complete")
+
+        unchanged = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json=original)
+        self.assertEqual(unchanged.status_code, 200, unchanged.text)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "complete")
+
+        self.client.post(f"/api/exams/{exam_id}/steps/metadata/reopen")
+        revised = {**original, "period":1}
+        changed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json=revised)
+        self.assertEqual(changed.status_code, 200, changed.text)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
+        self.assertEqual(exam["steps"]["opgaven_starts"]["evidence"], evidence)
+
+    def test_reopening_a_step_does_not_invalidate_downstream_when_unchanged(self):
+        """Een identieke herbevestiging behoudt downstream-goedkeuringen."""
+        exam_id = self.import_sample()["exam_id"]
+        metadata = {
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{
+                "biologie-vwo-2026-tv2-o.pdf":"opgaven",
+                "biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift",
+            },
+        }
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json=metadata)
+        main.STORE.complete_step(exam_id, "cv_fragments", {"reviewed":True})
+        approved = {"reviewed":True, "not_required":True}
+        main.STORE.complete_step(exam_id, "cv_aanvulling", approved)
+        downstream = {"questions":[{"question_number":1,"answer_text":"juist"}]}
+        main.STORE.complete_step(exam_id, "antwoorden", downstream)
+
+        reopened = self.client.post(f"/api/exams/{exam_id}/steps/cv_aanvulling/reopen")
+        self.assertEqual(reopened.status_code, 200, reopened.text)
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["antwoorden"]["status"], "complete")
+
+        completed = self.client.post(
+            f"/api/exams/{exam_id}/steps/cv_aanvulling/complete",
+            json=approved,
+        )
+        self.assertEqual(completed.status_code, 200, completed.text)
+        self.assertFalse(completed.json()["changed"])
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["antwoorden"]["status"], "complete")
+
     def test_reopening_metadata_invalidates_all_later_steps(self):
         self.assertIn("publicatie", invalidate_dependents("metadata"))
         self.assertIn("eindcontrole", invalidate_dependents("metadata"))
