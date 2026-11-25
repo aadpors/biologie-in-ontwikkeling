@@ -177,7 +177,10 @@ class IntegratedReviewTests(unittest.TestCase):
 
     def test_stitched_opgaven_preserves_saved_boundaries_when_image_fingerprint_is_stale(self):
         """Een nieuwe stitchversie mag eerder handmatig werk niet vervangen."""
-        exam_id = self.create_exam()
+        exam_id = self.create_exam(opgaven_pages=[
+            ["Voorblad van het examen."],
+            ["1p 1 Kies het juiste antwoord.", "A. optie een", "B. optie twee"],
+        ])
         starts = self.client.get(
             f"/api/exams/{exam_id}/document-question-starts/opgaven"
         )
