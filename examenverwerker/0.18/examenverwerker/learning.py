@@ -130,3 +130,63 @@ def learned_adjustment(features: dict[str, str], profile: dict[str, Any]) -> dic
         "evidence": evidence,
         "learning_active": True,
     }
+
+
+
+def _median(values: list[float]) -> float | None:
+    """Bereken een mediaan zonder externe numerieke afhankelijkheid."""
+    if not values:
+        return None
+    ordered = sorted(float(value) for value in values)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return round(ordered[middle], 2)
+    return round((ordered[middle - 1] + ordered[middle]) / 2, 2)
+
+
+def build_boundary_learning_profile(records: list[dict[str, Any]]) -> dict[str, Any]:
+    """Leer typische handmatige grenscorrecties per documenttype.
+
+    De offsets zijn uitgedrukt in PDF-punten ten opzichte van het automatische
+    voorstel. Een mediaan is robuuster dan een gemiddelde wanneer één
+    uitzonderlijk grote correctie wordt aangebracht.
+    """
+    by_type: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for record in records:
+        if not record.get("stage", "").startswith("fragment_boundaries:"):
+            continue
+        document_type = record["stage"].split(":", 1)[1]
+        by_type[document_type].extend(record.get("accepted", {}).get("examples", []))
+    result = {}
+    for document_type, examples in by_type.items():
+        starts = [float(item["start_offset"]) for item in examples if isinstance(item.get("start_offset"), (int, float))]
+        ends = [float(item["end_offset"]) for item in examples if isinstance(item.get("end_offset"), (int, float))]
+        result[document_type] = {
+            "examples": len(examples),
+            "active": len(examples) >= MIN_EXAMPLES_PER_FEATURE,
+            "median_start_offset": _median(starts),
+            "median_end_offset": _median(ends),
+        }
+    return result
+
+
+def build_context_learning_profile(records: list[dict[str, Any]]) -> dict[str, Any]:
+    """Leer terugkerende correcties in de vraagbereiken van contextgroepen."""
+    changes = []
+    for record in records:
+        if record.get("stage") != "fragment_review":
+            continue
+        for item in record.get("summary", {}).get("context_range_changes", []):
+            if all(isinstance(item.get(key), int) for key in (
+                "suggested_from", "suggested_to", "accepted_from", "accepted_to"
+            )):
+                changes.append({
+                    "start_shift": item["accepted_from"] - item["suggested_from"],
+                    "end_shift": item["accepted_to"] - item["suggested_to"],
+                })
+    return {
+        "examples": len(changes),
+        "active": len(changes) >= MIN_EXAMPLES_PER_FEATURE,
+        "median_start_shift": _median([item["start_shift"] for item in changes]),
+        "median_end_shift": _median([item["end_shift"] for item in changes]),
+    }
