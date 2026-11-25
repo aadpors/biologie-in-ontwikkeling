@@ -1136,15 +1136,18 @@ def get_stitched_opgaven(exam_id: str):
     current_image_fingerprint = _stitched_image_fingerprint(target)
     selection_warning = None
     if saved_selections and not _stitched_selection_matches_image(previous, target):
-        # Legacy selections have no reliable record of the image version they
-        # were drawn on. Do not reuse their old pixel positions: generate fresh
-        # proposals and ask for a new visual approval instead.
-        saved_selections = []
+        # BELANGRIJK: bewaar bestaande docentgrenzen ook wanneer alleen de
+        # pixels van de lange afbeelding zijn opgeschoond. De recente cache-
+        # update wijzigt uitsluitend maskering van voettekst; pagina-indeling,
+        # renderfactor, uitsnedes en verticale stitchposities blijven gelijk.
+        # De oude coördinaten blijven daardoor op dezelfde inhoud wijzen.
+        # We tonen een waarschuwing en blokkeren definitieve verwerking totdat
+        # de docent de zichtbare grenzen opnieuw heeft opgeslagen. Zo raakt
+        # handmatig werk nooit meer stilzwijgend kwijt.
         selection_warning = (
-            "De eerder opgeslagen fragmentgrenzen zijn gemaakt op een andere "
-            "versie van de lange afbeelding. Daarom worden nieuwe voorstellen "
-            "getoond. Controleer en sla de fragmenten opnieuw op; opnieuw "
-            "importeren is niet nodig."
+            "De afbeelding is opgeschoond. Je eerder opgeslagen fragmentgrenzen "
+            "zijn behouden. Controleer ze visueel en sla ze opnieuw op voordat "
+            "je verdergaat."
         )
     starts_evidence = exam["steps"].get("opgaven_starts", {}).get("evidence", {})
     accepted_starts = [
@@ -1240,11 +1243,14 @@ def get_stitched_document(exam_id: str, document_type: str):
     current_image_fingerprint = _stitched_image_fingerprint(target)
     selection_warning = None
     if saved and not _stitched_selection_matches_image(previous, target):
-        saved = []
+        # Bewaar ook hier de bestaande coördinaten. De nieuwe cacheversie
+        # maskeert alleen voettekst en verandert de geometrie van de afbeelding
+        # niet. De waarschuwing voorkomt dat oude selecties ongemerkt worden
+        # gebruikt: na visuele controle slaat de docent ze opnieuw op.
         selection_warning = (
-            "De eerder opgeslagen fragmentgrenzen horen bij een oudere versie "
-            "van deze afbeelding. Nieuwe voorstellen worden getoond; controleer "
-            "en sla ze opnieuw op."
+            "De afbeelding is opgeschoond. Je eerder opgeslagen fragmentgrenzen "
+            "zijn behouden. Controleer ze visueel en sla ze opnieuw op voordat "
+            "je verdergaat."
         )
     starts = exam["steps"].get(starts_step_key, {}).get("evidence", {})
     accepted = [
