@@ -140,15 +140,14 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
 
 
 def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
-    """Vind herhaalde kop-/voettekstregels in de buitenste paginamarges.
+    """Vind herhaalde kop-/voettekst *span-elementen* in de paginamarges.
 
-    Alleen regels die in de bovenste 6% of onderste 12% van een pagina staan
-    worden onderzocht. Een identieke regel moet op ten minste twee pagina's
-    voorkomen voordat deze als niet-inhoudelijke herhaling wordt gemaskeerd.
-    Losse paginanummers in de marge worden eveneens herkend.
+    Maskeer nooit een volledige tekstregel: daarin kan ook een vraagnummer of
+    inhoudelijke tekst staan. Daarom wordt ieder afzonderlijk PDF-tekstspan
+    beoordeeld en uitsluitend het herhaalde span zelf als maskervak teruggegeven.
     """
     occurrences: dict[str, set[int]] = {}
-    boxes_by_page: list[list[tuple[str, list[float]]]] = [[] for _ in pdf]
+    spans_by_page: list[list[tuple[str, list[float]]]] = [[] for _ in pdf]
     page_number_pattern = re.compile(r"^\d{1,3}$")
     for page_index, page in enumerate(pdf):
         height = page.rect.height
@@ -156,24 +155,25 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
             if block.get("type") != 0:
                 continue
             for line in block.get("lines", []):
-                text = "".join(span.get("text", "") for span in line.get("spans", [])).strip()
-                if not text:
-                    continue
-                bbox = [float(value) for value in line.get("bbox", [])]
-                if len(bbox) != 4:
-                    continue
-                in_margin = bbox[1] <= height * 0.06 or bbox[3] >= height * 0.88
-                if not in_margin:
-                    continue
-                key = " ".join(text.casefold().split())
-                boxes_by_page[page_index].append((key, bbox))
-                if not page_number_pattern.fullmatch(text):
-                    occurrences.setdefault(key, set()).add(page_index)
+                for span in line.get("spans", []):
+                    text = str(span.get("text", "")).strip()
+                    bbox = span.get("bbox", [])
+                    if not text or len(bbox) != 4:
+                        continue
+                    coordinates = [float(value) for value in bbox]
+                    in_margin = coordinates[1] <= height * 0.06 or coordinates[3] >= height * 0.88
+                    if not in_margin:
+                        continue
+                    key = " ".join(text.casefold().split())
+                    spans_by_page[page_index].append((key, coordinates))
+                    if not page_number_pattern.fullmatch(key):
+                        occurrences.setdefault(key, set()).add(page_index)
     repeated = {key for key, pages in occurrences.items() if len(pages) >= 2}
-    result: list[list[list[float]]] = []
-    for page_lines in boxes_by_page:
-        result.append([bbox for key, bbox in page_lines if key in repeated or page_number_pattern.fullmatch(key)])
-    return result
+    return [
+        [bbox for key, bbox in page_spans
+         if key in repeated or page_number_pattern.fullmatch(key)]
+        for page_spans in spans_by_page
+    ]
 
 
 def _mask_marginal_boxes(image_path: Path, boxes: list[list[float]], clip: fitz.Rect,
@@ -256,50 +256,62 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                 clip = fitz.Rect(0, 0, page.rect.width, page.rect.height)
                 _mask_marginal_boxes(page_path, marginal_boxes[page_index], clip,
                                      pix.width / clip.width, pix.height / clip.height)
-                # Paginanummers zijn losse tekstelementen in de onderste
-                # paginamarge. Maskeer alleen een geïsoleerde numerieke regel
-                # onderaan; getallen in de inhoud blijven daardoor behouden.
-                footer_numbers = []
+                # Beoordeel voettekst per afzonderlijk PDF-tekstspan, niet per
+                # complete regel. Een regel kan bijvoorbeeld zowel een
+                # vraagnummer als "2 / 19" of "lees verder" bevatten. Alleen
+                # het herkenbare footer-element mag dan worden afgedekt.
+                footer_spans: list[list[float]] = []
                 for block in page.get_text("dict").get("blocks", []):
                     if block.get("type") != 0:
                         continue
                     for line in block.get("lines", []):
+                        line_spans = line.get("spans", [])
                         line_text = " ".join(
-                            span.get("text", "") for span in line.get("spans", [])
+                            str(span.get("text", "")).strip() for span in line_spans
                         ).strip()
-                        line_bbox = line.get("bbox")
-                        if not line_bbox:
+                        line_bbox = line.get("bbox", [])
+                        if len(line_bbox) != 4:
                             continue
-                        lower_text = line_text.casefold()
-                        # Veel examen-PDF's combineren de documentcode,
-                        # paginering ("2 / 19") en "lees verder" in één regel.
-                        # Dat is geen geïsoleerd getal, maar wel een footer.
-                        is_page_counter = bool(re.search(r"\b\d{1,3}\s*/\s*\d{1,3}\b", line_text))
-                        is_read_on_footer = "lees verder" in lower_text or "►" in line_text
-                        is_isolated_number = bool(re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", line_text))
-                        # Cito-documentcodes staan soms als enige tekstregel
-                        # in de voettekst, zonder paginateller of 'lees verder'.
-                        # Herken die daarom apart in de onderste paginamarge.
-                        is_exam_document_code = bool(re.search(
-                            r"\b(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}", line_text, re.IGNORECASE
-                        ))
-                        if (float(line_bbox[1]) >= page.rect.height * 0.85
-                                and (is_page_counter or is_read_on_footer or is_exam_document_code or
-                                     (is_isolated_number and float(line_bbox[1]) >= page.rect.height * 0.93))):
-                            footer_numbers.append(line_bbox)
-                if footer_numbers:
+                        line_is_low = float(line_bbox[1]) >= page.rect.height * 0.85
+                        if not line_is_low:
+                            continue
+                        for span in line_spans:
+                            span_text = str(span.get("text", "")).strip()
+                            span_bbox = span.get("bbox", [])
+                            if not span_text or len(span_bbox) != 4:
+                                continue
+                            lower_span = span_text.casefold()
+                            is_page_counter = bool(re.fullmatch(
+                                r"\d{1,3}\s*/\s*\d{1,3}", span_text
+                            ))
+                            is_read_on_footer = (
+                                lower_span in {"lees verder", "►", "►►", "►►►"}
+                            )
+                            is_isolated_number = (
+                                len(line_spans) == 1
+                                and bool(re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", span_text))
+                                and float(span_bbox[1]) >= page.rect.height * 0.93
+                            )
+                            is_exam_document_code = bool(re.fullmatch(
+                                r"(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*",
+                                span_text, re.IGNORECASE
+                            ))
+                            if (is_page_counter or is_read_on_footer
+                                    or is_exam_document_code or is_isolated_number):
+                                footer_spans.append([float(value) for value in span_bbox])
+                if footer_spans:
                     with Image.open(page_path) as rendered:
                         cleaned = rendered.convert("RGB")
                         draw = ImageDraw.Draw(cleaned)
                         scale_x = cleaned.width / page.rect.width
                         scale_y = cleaned.height / page.rect.height
-                        for x0, y0, x1, y1 in footer_numbers:
-                            # Extra witruimte voorkomt restpixels door antialiasing.
+                        for x0, y0, x1, y1 in footer_spans:
+                            # Extra witruimte geldt nu alleen voor het footer-span.
                             draw.rectangle((
-                                max(0, int(x0 * scale_x) - 5),
-                                max(0, int(y0 * scale_y) - 5),
-                                min(cleaned.width, int(x1 * scale_x) + 5),
-                                min(cleaned.height, int(y1 * scale_y) + 5),
+                                max(0, int(x0 * scale_x) - 3),
+                                max(0, int(y0 * scale_y) - 3),
+                                min(cleaned.width, int(x1 * scale_x) + 3),
+                                min(cleaned.height, int(y1 * scale_y) + 3),
                             ), fill="white")
                         cleaned.save(page_path, format="PNG", optimize=True)
                 with Image.open(page_path) as source:
