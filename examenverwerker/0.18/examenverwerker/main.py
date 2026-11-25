@@ -31,6 +31,7 @@ from .answer_detection import analyse_answers, detect_cv_max_points, validate_an
 from .cv_supplement import analyse_supplement, validate_supplement_review
 from .context_detection import generate_context_candidates, validate_context_review
 from .storage import Store, resolve_shared_data_root
+from .learning import question_start_features, build_learning_profile
 
 ROOT = Path(__file__).resolve().parent.parent
 # De opslag staat buiten de versie-map. Bij de eerste start van 0.17 wordt
@@ -39,7 +40,7 @@ ROOT = Path(__file__).resolve().parent.parent
 _data_override = __import__("os").environ.get("EXAMENVERWERKER_DATA")
 DATA = Path(_data_override).resolve() if _data_override else resolve_shared_data_root(ROOT)
 STORE = Store(DATA)
-app = FastAPI(title="Examenverwerker", version="0.17.0")
+app = FastAPI(title="Examenverwerker", version="0.18.0")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 def _load_or_build_stitched_exam(
@@ -2116,6 +2117,31 @@ def save_snippets_review(exam_id: str, payload: dict):
 
 
 
+@app.get("/api/exams/{exam_id}/learning-profile")
+def get_learning_profile(exam_id: str):
+    """Toon transparant wat de detectie uit eerdere reviews heeft geleerd."""
+    if not STORE.get_exam(exam_id):
+        raise HTTPException(404, "Examen niet gevonden.")
+    examples = []
+    for record in STORE.list_fragment_feedback():
+        if not record["stage"].startswith("question_starts:"):
+            continue
+        examples.extend(record["accepted"].get("examples", []))
+    profile = build_learning_profile(examples)
+    return {
+        **profile,
+        "learning_policy": {
+            "automatic_approval": False,
+            "minimum_examples_per_feature": profile["minimum_examples"],
+            "description": (
+                "Feedback beïnvloedt alleen de rangschikking van detectievoorstellen. "
+                "Er worden geen vraagstarts automatisch goedgekeurd en bestaande "
+                "docentbeslissingen worden nooit overschreven."
+            ),
+        },
+    }
+
+
 @app.get("/api/exams/{exam_id}/fragment-learning-status")
 def fragment_learning_status(exam_id: str):
     """Expose counts of approved examples, not raw learner data."""
@@ -2400,6 +2426,41 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
     # Vergelijk de definitieve review met de goedgekeurde nulmeting die
     # bij het heropenen is opgeslagen. Alleen een echte inhoudelijke wijziging
     # maakt afhankelijke stappen opnieuw controleplichtig.
+    # Vraagstartreviews worden pas als leervoorbeeld vastgelegd wanneer de
+    # docent de volledige detectiestap expliciet afrondt. Autosaves leveren
+    # dus geen dubbele of onvolledige trainingsvoorbeelden op.
+    if step_key in {"opgaven_starts", "uitwerk_starts", "cv_starts"}:
+        prior_status = exam["steps"].get(step_key, {}).get("status")
+        reviewed_evidence = {**previous, **payload}
+        if prior_status != "complete" and reviewed_evidence.get("reviewed"):
+            document_type = {
+                "opgaven_starts": "opgaven",
+                "uitwerk_starts": "uitwerkbijlage",
+                "cv_starts": "correctievoorschrift",
+            }[step_key]
+            document = _document_for_type(exam, document_type)
+            source_path = DATA / document["relative_path"]
+            with fitz.open(source_path) as reviewed_pdf:
+                page_sizes = [
+                    {"width": page.rect.width, "height": page.rect.height}
+                    for page in reviewed_pdf
+                ]
+            examples = []
+            for candidate in reviewed_evidence.get("candidates", []):
+                page_index = int(candidate.get("page_index", -1))
+                if not 0 <= page_index < len(page_sizes):
+                    continue
+                examples.append({
+                    "accepted": bool(candidate.get("accepted")),
+                    "features": question_start_features(candidate, page_sizes[page_index]),
+                    "question_number": candidate.get("question_number"),
+                    "source": candidate.get("source", "automatic"),
+                })
+            STORE.record_detection_examples(
+                exam_id, f"question_starts:{document_type}",
+                document["sha256"], examples,
+            )
+
     changed = STORE.complete_step(exam_id, step_key, {**previous, **payload})
     if changed:
         STORE.invalidate_steps(exam_id, invalidate_dependents(step_key))
