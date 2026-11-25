@@ -375,19 +375,22 @@ class WorkflowApplicationTests(unittest.TestCase):
         missing_evidence = self.client.post(f"/api/exams/{exam_id}/steps/opgaven_starts/complete", json={})
         self.assertEqual(missing_evidence.status_code, 422)
 
-    def test_reopening_metadata_removes_dependent_approvals_from_database(self):
+    def test_reopening_metadata_marks_dependent_approvals_pending_and_preserves_evidence(self):
+        """Metadatawijzigingen bewaren eerder werk, maar trekken goedkeuringen in."""
         result = self.import_sample()
         exam_id = result["exam_id"]
         self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
             "subject":"biologie", "level":"vwo", "year":2026, "period":2,
             "document_types":{"biologie-vwo-2026-tv2-o.pdf":"opgaven", "biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"}
         })
-        self.client.post(f"/api/exams/{exam_id}/steps/opgaven_starts/complete", json={"reviewed":True,"candidate_count":39})
+        evidence = {"reviewed":True, "candidate_count":39, "custom_note":"behouden"}
+        main.STORE.complete_step(exam_id, "opgaven_starts", evidence)
         response = self.client.post(f"/api/exams/{exam_id}/steps/metadata/invalidate")
         self.assertEqual(response.status_code, 200)
         exam = self.client.get(f"/api/exams/{exam_id}").json()
         self.assertNotIn("metadata", exam["steps"])
-        self.assertNotIn("opgaven_starts", exam["steps"])
+        self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
+        self.assertEqual(exam["steps"]["opgaven_starts"]["evidence"], evidence)
 
     def test_reopening_metadata_invalidates_all_later_steps(self):
         self.assertIn("publicatie", invalidate_dependents("metadata"))
