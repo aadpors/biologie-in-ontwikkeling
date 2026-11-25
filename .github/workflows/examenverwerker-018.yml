@@ -27,6 +27,8 @@ jobs:
         run: python -m compileall -q examenverwerker tests
       - name: Voer tests uit
         run: python -m unittest discover -s tests -v
+      - name: Controleer Python-syntaxis opnieuw
+        run: python -m compileall -q examenverwerker tests
       - name: Controleer JavaScript
         run: node --check static/app.js
       - name: Analyseer echt vwo-examen voor fragmentdiagnose
