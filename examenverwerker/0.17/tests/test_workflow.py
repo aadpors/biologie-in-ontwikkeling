@@ -388,7 +388,7 @@ class WorkflowApplicationTests(unittest.TestCase):
         response = self.client.post(f"/api/exams/{exam_id}/steps/metadata/invalidate")
         self.assertEqual(response.status_code, 200)
         exam = self.client.get(f"/api/exams/{exam_id}").json()
-        self.assertNotIn("metadata", exam["steps"])
+        self.assertEqual(exam["steps"]["metadata"]["status"], "pending")
         self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
         self.assertEqual(exam["steps"]["opgaven_starts"]["evidence"], evidence)
 
