@@ -2102,13 +2102,22 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         group.parts.push(entry);
         (entry.item.question_numbers || []).forEach(number => group.questionNumbers.add(Number(number)));
       });
+      // Sorteer de fysieke contextdelen altijd op hun positie in de
+      // doorlopende examenstrook. De bovenste context bepaalt de titel,
+      // ongeacht de volgorde waarin de docent de fragmenten heeft geselecteerd.
+      for (const group of contextGroups.values()) {
+        group.parts.sort((left, right) => Number(left.item.top) - Number(right.item.top));
+      }
+      const orderedContextGroups = [...contextGroups.values()].sort((left, right) =>
+        Number(left.parts[0]?.item.top || 0) - Number(right.parts[0]?.item.top || 0)
+      );
       const questionSelections = selections.filter(item => item.type === "vraag");
       const formatNumbers = numbers => {
         const sorted = [...numbers].sort((a, b) => a - b);
         return sorted.length ? formatQuestionRanges(sorted) : "nog niet gekoppeld";
       };
       const summary = $("#contextGroupSummary");
-      summary.innerHTML = contextGroups.size ? [...contextGroups.values()].map((group, groupIndex) => {
+      summary.innerHTML = contextGroups.size ? orderedContextGroups.map((group, groupIndex) => {
         const numbers = [...group.questionNumbers].sort((a, b) => a - b);
         const missingNumbers = numbers.filter(number =>
           !questionSelections.some(item => (item.question_numbers || []).map(Number).includes(number))
