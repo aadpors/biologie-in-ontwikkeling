@@ -150,10 +150,15 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
     ten minste twee pagina's voorkomt.
     """
     text_occurrences: dict[str, set[int]] = {}
-    numeric_positions: dict[tuple[float, float], list[tuple[int, list[float]]]] = {}
-    spans_by_page: list[list[tuple[str, list[float], tuple[float, float] | None]]] = [
-        [] for _ in pdf
-    ]
+    # Bewaar bij losse getallen óók de waarde en de bronpaginapositie.
+    # Alleen dezelfde plaats op meerdere pagina's is onvoldoende bewijs:
+    # een vraagnummer kan toevallig op de plaats van een paginanummer staan.
+    numeric_positions: dict[
+        tuple[float, float], list[tuple[int, int, list[float]]]
+    ] = {}
+    spans_by_page: list[
+        list[tuple[str, list[float], tuple[float, float] | None]]
+    ] = [[] for _ in pdf]
     page_number_pattern = re.compile(r"^\d{1,3}$")
 
     for page_index, page in enumerate(pdf):
@@ -181,15 +186,17 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                         continue
 
                     if page_number_pattern.fullmatch(text):
-                        # Rond relatieve positie ruim genoeg af om kleine
-                        # verschillen in fontmetrics en paginagrootte op te
-                        # vangen. Een vraagnummer op een eenmalige positie
-                        # wordt hierdoor nooit als paginanummer verwijderd.
+                        # De relatieve positie vangt kleine verschillen in
+                        # fontmetrics en paginagrootte op. De waarde blijft
+                        # apart bewaard om een echte paginatellerrij te kunnen
+                        # onderscheiden van een vraagnummer op diezelfde plek.
                         center_x = ((coordinates[0] + coordinates[2]) / 2) / page_width
                         center_y = ((coordinates[1] + coordinates[3]) / 2) / page_height
                         position = (round(center_x, 1), round(center_y, 2))
                         spans_by_page[page_index].append((text, coordinates, position))
-                        numeric_positions.setdefault(position, []).append((page_index, coordinates))
+                        numeric_positions.setdefault(position, []).append(
+                            (page_index, int(text), coordinates)
+                        )
                         continue
 
                     key = text.casefold()
@@ -205,20 +212,34 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
     repeated_text = {
         key for key, pages in text_occurrences.items() if len(pages) >= 2
     }
-    repeated_numeric_positions = {
-        position
-        for position, occurrences in numeric_positions.items()
-        if len({page_index for page_index, _ in occurrences}) >= 2
-    }
+
+    # Een echt paginanummer loopt mee met de bronpaginavolgorde: het verschil
+    # tussen het afgedrukte nummer en de nulgebaseerde PDF-pagina-index blijft
+    # gelijk (bijvoorbeeld PDF-pagina 1 -> nummer 1, pagina 2 -> nummer 2).
+    # We markeren alleen de concrete getallen die zo'n reeks ondersteunen.
+    # Een afwijkend getal op dezelfde plek, zoals een vraagnummer 28, blijft
+    # daardoor staan en bepaalt ook de ondergrens van de paginacrop.
+    repeated_numeric_entries: set[tuple[int, tuple[float, float], int]] = set()
+    for position, occurrences in numeric_positions.items():
+        offsets: dict[int, set[int]] = {}
+        for page_index, number, _coordinates in occurrences:
+            offsets.setdefault(number - page_index, set()).add(page_index)
+        valid_offsets = {
+            offset for offset, pages in offsets.items() if len(pages) >= 2
+        }
+        for page_index, number, _coordinates in occurrences:
+            if number - page_index in valid_offsets:
+                repeated_numeric_entries.add((page_index, position, number))
 
     result: list[list[list[float]]] = []
-    for page_spans in spans_by_page:
+    for page_index, page_spans in enumerate(spans_by_page):
         page_boxes = []
         for key, coordinates, position in page_spans:
-            if (
-                (position is not None and position in repeated_numeric_positions)
-                or (position is None and key in repeated_text)
-            ):
+            is_repeated_page_number = (
+                position is not None
+                and (page_index, position, int(key)) in repeated_numeric_entries
+            )
+            if is_repeated_page_number or (position is None and key in repeated_text):
                 page_boxes.append(coordinates)
         result.append(page_boxes)
     return result
