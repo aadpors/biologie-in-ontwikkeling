@@ -800,6 +800,9 @@ async function renderSnippetsStage() {
         <img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Contextfragment op pagina ${context.page_number}">
         <p class="analysis-reason">${escapeHtml(context.label)}</p>
         <div class="analysis-fields">
+          <label>Contexttitel
+            <input type="text" maxlength="200" data-context-title="${escapeHtml(context.id)}" value="${escapeHtml(context.title || context.label || '')}" placeholder="Titel van deze context">
+          </label>
           <label>Vanaf vraag
             <input type="number" min="1" max="60" data-context-from="${escapeHtml(context.id)}" value="${context.from_question}">
           </label>
@@ -903,6 +906,7 @@ async function renderSnippetsStage() {
     const collect = () => ({
       contexts: result.contexts.map(context => ({
         id: context.id,
+        title: panel.querySelector(`[data-context-title="${CSS.escape(context.id)}"]`)?.value?.trim() || context.label || '',
         from_question: Number(panel.querySelector(`[data-context-from="${CSS.escape(context.id)}"]`)?.value),
         to_question: Number(panel.querySelector(`[data-context-to="${CSS.escape(context.id)}"]`)?.value),
         reviewed: true
