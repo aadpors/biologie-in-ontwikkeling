@@ -190,3 +190,47 @@ def build_context_learning_profile(records: list[dict[str, Any]]) -> dict[str, A
         "median_start_shift": _median([item["start_shift"] for item in changes]),
         "median_end_shift": _median([item["end_shift"] for item in changes]),
     }
+
+
+
+def apply_context_range_learning(
+    contexts: list[dict[str, Any]],
+    profile: dict[str, Any],
+    question_numbers: set[int],
+) -> list[dict[str, Any]]:
+    """Pas voldoende onderbouwde contextbereikcorrecties toe op nieuwe voorstellen.
+
+    Alleen nog niet handmatig gecontroleerde voorstellen worden aangepast.
+    De aanpassing blijft zichtbaar als metadata en de docent houdt de normale
+    visuele review. Een opgeslagen contextbeslissing wordt later door de
+    workflowlaag over dit voorstel heen gezet.
+    """
+    adjusted = []
+    numbers = sorted(question_numbers)
+    if not profile.get("active"):
+        return [dict(item) for item in contexts]
+    for original in contexts:
+        item = dict(original)
+        if item.get("reviewed"):
+            adjusted.append(item)
+            continue
+        start = int(item.get("from_question", 0))
+        end = int(item.get("to_question", start))
+        proposed_start = start + int(profile.get("median_start_shift") or 0)
+        proposed_end = end + int(profile.get("median_end_shift") or 0)
+        # Beperk de grenzen tot bestaande vragen en voorkom een omgekeerd
+        # bereik wanneer historische correcties op een klein examen landen.
+        proposed_start = min(numbers, key=lambda number: abs(number - proposed_start)) if numbers else start
+        proposed_end = min(numbers, key=lambda number: abs(number - proposed_end)) if numbers else end
+        if proposed_start > proposed_end:
+            proposed_start, proposed_end = start, end
+        item["from_question"] = proposed_start
+        item["to_question"] = proposed_end
+        item["learning_adjusted"] = (proposed_start != start or proposed_end != end)
+        item["learning_correction"] = {
+            "start_shift": int(profile.get("median_start_shift") or 0),
+            "end_shift": int(profile.get("median_end_shift") or 0),
+            "examples": profile.get("examples", 0),
+        }
+        adjusted.append(item)
+    return adjusted
