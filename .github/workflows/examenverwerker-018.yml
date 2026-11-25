@@ -31,6 +31,8 @@ jobs:
         run: python -m compileall -q examenverwerker tests
       - name: Controleer JavaScript
         run: node --check static/app.js
+      - name: Controleer JavaScript-syntaxis opnieuw
+        run: node --check static/app.js
       - name: Analyseer echt vwo-examen voor fragmentdiagnose
         run: python tools/diagnose_real_exam.py
         env:
