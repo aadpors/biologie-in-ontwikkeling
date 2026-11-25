@@ -109,3 +109,11 @@ op, zonder overlappende vraagfragmenten.
 - Kop- en voettekstopschoning werkt nu per afzonderlijk PDF-tekstspan in plaats van per volledige tekstregel. Een vraagnummer of inhoudelijke tekst op dezelfde regel als een paginateller of footerlabel wordt daardoor niet meer integraal afgedekt.
 - De herkenning van herhaalde marginaaltekst maskeert eveneens alleen het herhaalde span-element, niet de volledige regel.
 - Een regressietest controleert dat een vraagnummer behouden blijft wanneer het op dezelfde regel staat als een paginateller en 'lees verder'.
+
+
+## Contextoverzicht in stap 3
+
+- Het rechterpaneel presenteert contextgroepen nu als primaire, afzonderlijke kaarten met de contexttitel, gekoppelde vraagnummers en een subtiele telling van de fysieke fragmenten.
+- De lijst met afzonderlijke fragmenten is ondergebracht in een inklapbaar onderdeel. Zodra een fragment wordt geselecteerd, opent het onderdeel automatisch zodat de bewerkingsvelden direct beschikbaar zijn.
+- Contextgroepen en hun onderliggende fragmenten worden op documentpositie gesorteerd. De titel is daarmee altijd afkomstig van het bovenste contextfragment, onafhankelijk van de selectievolgorde.
+- De breedte en typografische hiërarchie van de inspector zijn aangepast om de contextstructuur sneller scanbaar te maken.
