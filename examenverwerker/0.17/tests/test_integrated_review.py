@@ -57,10 +57,10 @@ class IntegratedReviewTests(unittest.TestCase):
     def test_context_group_title_uses_first_nonempty_pdf_text_line(self):
         """Een contextgroeptitel is letterlijk de eerste niet-lege tekstregel."""
         self.assertEqual(
-            main._first_nonempty_text_line("\\n  Opwinding door kattenkruid  \\n\\nDe volgende regel hoort bij de context."),
+            main._first_nonempty_text_line("\n  Opwinding door kattenkruid  \n\nDe volgende regel hoort bij de context."),
             "Opwinding door kattenkruid",
         )
-        self.assertEqual(main._first_nonempty_text_line("\\n \\n"), "")
+        self.assertEqual(main._first_nonempty_text_line("\n \n"), "")
 
     def test_cv_detection_ignores_numbered_preamble_before_marking_model(self):
         exam_id = self.create_exam()
