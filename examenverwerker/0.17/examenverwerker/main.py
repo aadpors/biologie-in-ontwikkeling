@@ -1504,7 +1504,7 @@ def _merge_saved_question_analysis(question: dict[str, Any], saved: dict[str, An
     if saved_options or current_options:
         question["options"] = [
             saved_options.get(letter) or current_options[letter]
-            for letter in "ABCDEF
+            for letter in "ABCDEF"
             if letter in saved_options or letter in current_options
         ]
 
