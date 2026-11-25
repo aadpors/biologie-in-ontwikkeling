@@ -290,3 +290,51 @@
   .stitched-image-wrap { max-width: 1200px; }
   .fragment-images { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* Visuele groepering van contextdelen en de opgaven die erop steunen.
+   De groepen zijn een samenvatting van de expliciete vraagnummervelden;
+   de losse fragmenten blijven afzonderlijk selecteerbaar op de examenstrook. */
+.context-group-summary {
+  display: grid;
+  gap: .75rem;
+  margin: .75rem 0 1.25rem;
+}
+.context-group-card {
+  border: 1px solid var(--line, #d9dee7);
+  border-left: 4px solid var(--accent, #4b78a8);
+  border-radius: .65rem;
+  padding: .8rem;
+  background: var(--surface, #fff);
+}
+.context-group-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .5rem;
+  margin-bottom: .45rem;
+}
+.context-group-heading span,
+.context-group-card small {
+  color: var(--muted, #667085);
+  font-size: .8rem;
+}
+.context-group-card p { margin: .35rem 0 .55rem; }
+.context-question-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin-bottom: .55rem;
+}
+.context-question-chip {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: .2rem .55rem;
+  font-size: .78rem;
+  background: #e8f1eb;
+  color: #245b37;
+}
+.context-question-chip.missing {
+  background: #fff0e8;
+  color: #9a3e16;
+}
