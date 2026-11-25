@@ -1728,7 +1728,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
       <p class="lead">${isStitchedDocument
         ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
-        : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Contexten en vragen staan in dezelfde strook. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.'}</p>
+        : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Selecteer elk afzonderlijk contextdeel als fragment van het type Context en koppel alle delen van dezelfde context aan exact dezelfde vraagnummers. Die delen verschijnen rechts automatisch als één contextgroep. Selecteer daarnaast iedere opgave als fragment van het type Vraag en koppel die aan het eigen vraagnummer.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
       ${result.selection_warning ? `<p class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
       <div class="stitched-workspace">
