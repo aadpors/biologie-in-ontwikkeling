@@ -154,7 +154,7 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
     spans_by_page: list[list[tuple[str, list[float], tuple[float, float] | None]]] = [
         [] for _ in pdf
     ]
-    page_number_pattern = re.compile(r"^\\d{1,3}$")
+    page_number_pattern = re.compile(r"^\d{1,3}$")
 
     for page_index, page in enumerate(pdf):
         page_width = float(page.rect.width) or 1.0
@@ -197,7 +197,7 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                     # inhoudelijke tekst en mag nooit als geheel verdwijnen.
                     if (
                         len(key) <= 48
-                        and not re.search(r"\\b(?:vraag|opgave|antwoord)\\s*\\d+", key)
+                        and not re.search(r"\b(?:vraag|opgave|antwoord)\s*\d+", key)
                     ):
                         spans_by_page[page_index].append((key, coordinates, None))
                         text_occurrences.setdefault(key, set()).add(page_index)
@@ -350,7 +350,7 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         # '2 / 19' worden hierboven teken voor teken verwijderd.
                         stripped = line_text.strip()
                         if re.fullmatch(
-                            r"(?:VW|VMBO|HAVO|VWO)[- ]?\\d{3,}(?:[- ][\\w-]+)*",
+                            r"(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*",
                             stripped,
                             re.IGNORECASE,
                         ):
