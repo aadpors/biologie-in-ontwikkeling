@@ -618,7 +618,7 @@ def _save_document_question_start_review(exam_id: str, document_type: str, paylo
     except (ValueError, TypeError) as exc:
         raise HTTPException(422, str(exc)) from exc
     review["document_sha256"] = document["sha256"]
-    review["detector_version"] = "0.5"
+    review["detector_version"] = "0.18"
     step_key = {"opgaven":"opgaven_starts", "uitwerkbijlage":"uitwerk_starts",
                 "correctievoorschrift":"cv_starts"}[document_type]
 
