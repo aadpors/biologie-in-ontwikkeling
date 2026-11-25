@@ -70,3 +70,21 @@ class StorageTests(unittest.TestCase):
             self.assertEqual(exam["published"], 1)
             self.assertIsNotNone(exam["published_at"])
             self.assertEqual(exam["steps"]["publicatie"]["status"], "complete")
+
+    def test_invalidation_preserves_review_evidence_and_clears_publication(self):
+        """Ongeldig bewijs blijft als concept beschikbaar voor gerichte hercontrole."""
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(Path(tmp))
+            store.create_exam("012345abcdef", "Biologie vwo 2026 tv2", [])
+            evidence = {"selections":[{"question_number":28,"top":100,"bottom":300}]}
+            store.complete_step("012345abcdef", "cv_fragments", evidence)
+            store.publish_exam("012345abcdef")
+
+            store.invalidate_steps("012345abcdef", ["cv_fragments", "antwoorden", "publicatie"])
+            exam = store.get_exam("012345abcdef")
+
+            self.assertEqual(exam["steps"]["cv_fragments"]["status"], "pending")
+            self.assertEqual(exam["steps"]["cv_fragments"]["evidence"], evidence)
+            self.assertEqual(exam["steps"]["publicatie"]["status"], "pending")
+            self.assertEqual(exam["published"], 0)
+            self.assertIsNone(exam["published_at"])
