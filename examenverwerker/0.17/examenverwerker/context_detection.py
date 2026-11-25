@@ -115,7 +115,12 @@ def validate_context_review(payload: dict[str, Any], expected_ids: set[str], que
         if not set(range(start, end + 1)).issubset(question_numbers):
             raise ValueError(f"Context {context_id} verwijst naar een niet-bestaand vraagnummer.")
         seen.add(context_id)
-        cleaned.append({"id": context_id, "from_question": start, "to_question": end,
+        # Contexttitel is een zelfstandige, bewerkbare metadata-eigenschap.
+        # Gebruik de voorgestelde titel als fallback, maar accepteer nooit
+        # automatisch een titel als inhoudelijke waarheid zonder visuele review.
+        title = str(item.get("title", "")).strip()
+        cleaned.append({"id": context_id, "title": title,
+                        "from_question": start, "to_question": end,
                         "reviewed": bool(item.get("reviewed"))})
     if seen != expected_ids:
         raise ValueError("Controleer alle voorgestelde contexten.")
