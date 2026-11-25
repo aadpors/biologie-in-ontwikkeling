@@ -54,7 +54,6 @@ jobs:
               - 'exam-contexts.json'
               - 'exam-snippets/**'
               - 'examens/**'
-              - 'examenverwerker/**'
               - 'scripts/extract-binary-cv-text.py'
               - 'scripts/extract-mcq-questions.py'
               - 'scripts/fix-ha25t1-q34.py'
