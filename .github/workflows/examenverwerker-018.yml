@@ -37,6 +37,8 @@ jobs:
         run: node --check static/app.js
       - name: Voer alle nieuwe leerlaagtests uit
         run: python -m unittest tests.test_learning -v
+      - name: Test leerstatus voor alle detectietypen
+        run: python -m unittest tests.test_learning -v
       - name: Analyseer echt vwo-examen voor fragmentdiagnose
         run: python tools/diagnose_real_exam.py
         env:
