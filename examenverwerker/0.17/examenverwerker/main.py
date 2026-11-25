@@ -2315,12 +2315,13 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
 
 @app.post("/api/exams/{exam_id}/steps/{step_key}/reopen")
 def reopen_step(exam_id: str, step_key: str):
-    """Heropen een stap met behoud van de laatst opgeslagen reviewbeslissingen.
+    """Heropen een stap en vergelijk pas na afronding met de oude goedkeuring.
 
-    Dit is de herstelroute wanneer een docent bij de fragmentcontrole ziet
-    dat een vraagstart moet worden verplaatst. De huidige stap wordt concept,
-    afhankelijke stappen worden verwijderd en de docent kan verdergaan met
-    de eerder gemaakte correcties in plaats van opnieuw te beginnen.
+    Dit is de herstelroute wanneer een docent bijvoorbeeld een vraagstart wil
+    verplaatsen. De huidige stap wordt een bewerkbaar concept; de bestaande
+    vervolggoedkeuringen blijven voorlopig staan. Bij de nieuwe afronding
+    vergelijkt de opslag de inhoud met de goedgekeurde nulmeting. Alleen bij
+    een echte wijziging worden afhankelijke stappen opnieuw controleplichtig.
     """
     exam = STORE.get_exam(exam_id)
     if not exam:
@@ -2350,7 +2351,11 @@ def reopen_step(exam_id: str, step_key: str):
 
 @app.post("/api/exams/{exam_id}/steps/{step_key}/invalidate")
 def invalidate_step(exam_id: str, step_key: str):
-    """Heropen een stap en verwijder alle afhankelijke goedkeuringen."""
+    """Maak een stap en haar afhankelijkheden expliciet opnieuw controleplichtig.
+
+    In tegenstelling tot de normale heropenroute is dit een directe
+    invalidatieactie. Eerder reviewbewijs blijft wel bewaard als concept.
+    """
     exam = STORE.get_exam(exam_id)
     if not exam:
         raise HTTPException(404, "Examen niet gevonden.")
