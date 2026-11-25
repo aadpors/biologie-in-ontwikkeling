@@ -3,3 +3,6 @@ uvicorn[standard]>=0.30,<1
 python-multipart>=0.0.9
 PyMuPDF>=1.24
 Pillow>=10
+# Lokale OCR voor antwoordopties die alleen visueel in het vraagfragment staan.
+rapidocr>=3.10,<4
+onnxruntime>=1.18

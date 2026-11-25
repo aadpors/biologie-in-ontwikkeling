@@ -10,9 +10,15 @@ from __future__ import annotations
 import re
 from typing import Any
 
-# Alleen opties aan het begin van een tekstregel tellen mee. Een letter A-E
-# midden in lopende tekst mag niet als antwoordoptie worden geïnterpreteerd.
-OPTION_LINE = re.compile(r"^\s*([A-E])\s*[.)]\s+(.+?)\s*$", re.IGNORECASE)
+# Een optieletter kan in examen-PDF's op verschillende manieren zijn gezet:
+# "A. tekst", "(A) tekst", "A) tekst", maar ook alleen "A" op een regel met
+# de antwoordtekst op de volgende regel. Na de letter moet witruimte,
+# leesteken of regeleinde volgen, zodat woorden als "Als" niet meetellen.
+OPTION_LINE = re.compile(
+    r"^\s*(?:\(([A-E])\)|\[([A-E])\]|([A-E])(?=\s|[.):]|$))"
+    r"\s*[.):]?\s*(.*?)\s*$",
+    re.IGNORECASE,
+)
 # Puntennotaties verschillen tussen examens. De regex vangt expliciete
 # vermeldingen, maar gokt niet wanneer het examen geen puntenaantal toont.
 POINT_PATTERNS = (
@@ -27,22 +33,44 @@ def _normalise_lines(text: str) -> list[str]:
 
 
 def detect_options(text: str) -> list[dict[str, str]]:
-    """Herken mogelijke A-E-opties en vereis een aaneengesloten reeks."""
+    """Herken antwoordopties met zowel inline als losse PDF-optielabels.
+
+    PDF-tekstextractie zet een antwoordletter en de bijbehorende tekst niet
+    altijd op dezelfde regel. Daarom bewaren we een gevonden label als
+    actieve optie en voegen we een volgende tekstregel toe zolang er geen
+    nieuw A-E-label begint. De afbeelding blijft leidend; dit is uitsluitend
+    een voorstel voor de bewerkbare antwoordopties.
+    """
     found: dict[str, str] = {}
+    current_letter: str | None = None
+
     for line in _normalise_lines(text):
         match = OPTION_LINE.match(line)
         if match:
-            letter = match.group(1).upper()
-            # Dubbele letters kunnen voorkomen door herhaalde koppen of een
-            # tweekolomsopmaak; de eerste tekstregel blijft het voorstel.
-            found.setdefault(letter, match.group(2).strip())
+            # De letter staat in precies één alternatieve groep: haakjes,
+            # blokhaken of een losse letter met optionele interpunctie.
+            letter = next(group for group in match.groups()[:3] if group).upper()
+            option_text = match.group(4).strip()
+
+            # Houd de eerste instantie van een label. Herhaalde labels kunnen
+            # door kopteksten of een afwijkende PDF-leesvolgorde ontstaan.
+            found.setdefault(letter, option_text)
+            current_letter = letter
+            continue
+
+        # Bij een losse optiekolom staat de antwoordtekst soms pas op de
+        # volgende regel. Koppel die regel aan het laatst gevonden label.
+        if current_letter and line:
+            found[current_letter] = f"{found[current_letter]} {line}".strip()
+
     ordered = [letter for letter in "ABCDE" if letter in found]
     if len(ordered) < 2:
         return []
-    # Een losse A en C is geen betrouwbare set. Accepteer alleen prefixen
-    # van A, B, C, D, E; ontbrekende latere opties zijn wel toegestaan.
-    if ordered != list("ABCDE")[:len(ordered)]:
-        return []
+
+    # De PDF-tekstlaag kan kolommen in een andere volgorde uitlezen. Sorteer
+    # op het zichtbare antwoordlabel en eis geen ononderbroken A-B-C-reeks.
+    # Twee labels blijven zichtbaar als voorstel, maar zijn niet genoeg om
+    # zonder aanvullende aanwijzing de vraag automatisch als MC te classificeren.
     return [{"letter": letter, "text": found[letter]} for letter in ordered]
 
 
@@ -68,15 +96,26 @@ def detect_question_type(text: str, options: list[dict[str, str]]) -> tuple[str,
     # Een vraag kan expliciet meerkeuze zijn zonder dat de antwoordopties als
     # losse tekstregels zijn geëxtraheerd. De vraagformulering is dan genoeg
     # voor een voorstel; het ontbreken van opties verhindert de classificatie niet.
+    # Herken verschillende gebruikelijke vraagstammen en instructies. De
+    # formulering kan op meerkeuze wijzen, ook als de PDF-tekstlaag de opties
+    # zelf niet goed heeft geëxtraheerd.
     multiple_choice_signals = (
-        "kies het juiste antwoord", "welke van de volgende",
+        "kies het juiste antwoord", "kruis het juiste antwoord aan",
+        "omcirkel het juiste antwoord", "selecteer het juiste antwoord",
+        "welke van de volgende", "welke van onderstaande",
+        "welk van de volgende", "welk van onderstaande",
         "welke uitspraak is juist", "welke bewering is juist",
-        "wat is het juiste antwoord", "welk antwoord is juist",
+        "welke stelling is juist", "welke combinatie is juist",
+        "wat is het juiste antwoord", "wat is juist",
+        "welk antwoord is juist", "welke optie is juist",
     )
-    if len(options) >= 3 or any(signal in lowered for signal in multiple_choice_signals):
-        reason = ("Er is een aaneengesloten reeks van minimaal drie antwoordopties gevonden."
+    normalised = re.sub(r"\s+", " ", lowered)
+    prompt_detected = any(signal in normalised for signal in multiple_choice_signals)
+    if len(options) >= 2 or prompt_detected:
+        reason = ("Er zijn twee of meer verschillende antwoordlabels herkend."
                   if len(options) >= 3 else
-                  "De vraagformulering wijst op een meerkeuzevraag; opties hoeven niet herkend te zijn.")
+                  "De vraagformulering bevat een herkenbare meerkeuze-instructie; "
+                  "de opties worden zo nodig handmatig gecontroleerd.")
         return "meerkeuze", reason
     if options:
         return "onbekend", "Er zijn enkele optieachtige regels gevonden, maar geen volledige herkenbare set."

@@ -54,6 +54,14 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertEqual(confirmed.status_code, 200, confirmed.text)
         return exam_id
 
+    def test_context_group_title_uses_first_nonempty_pdf_text_line(self):
+        """Een contextgroeptitel is letterlijk de eerste niet-lege tekstregel."""
+        self.assertEqual(
+            main._first_nonempty_text_line("\n  Opwinding door kattenkruid  \n\nDe volgende regel hoort bij de context."),
+            "Opwinding door kattenkruid",
+        )
+        self.assertEqual(main._first_nonempty_text_line("\n \n"), "")
+
     def test_cv_detection_ignores_numbered_preamble_before_marking_model(self):
         exam_id = self.create_exam()
         result = self.client.get(f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift")
@@ -166,6 +174,62 @@ class IntegratedReviewTests(unittest.TestCase):
                   "reviewed": False},
         )
         self.assertEqual(invalid.status_code, 422)
+
+    def test_stitched_opgaven_preserves_saved_boundaries_when_image_fingerprint_is_stale(self):
+        """Een nieuwe stitchversie mag eerder handmatig werk niet vervangen."""
+        exam_id = self.create_exam(opgaven_pages=[
+            ["Voorblad van het examen."],
+            ["1p 1 Kies het juiste antwoord.", "A. optie een", "B. optie twee"],
+        ])
+        starts = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/opgaven"
+        )
+        self.assertEqual(starts.status_code, 200, starts.text)
+        main.STORE.complete_step(exam_id, "opgaven_starts", {
+            "candidates": starts.json()["candidates"],
+            "reviewed_all_pages": True,
+            "document_sha256": starts.json()["document"]["sha256"],
+        })
+
+        first_open = self.client.get(f"/api/exams/{exam_id}/stitched-opgaven")
+        self.assertEqual(first_open.status_code, 200, first_open.text)
+        rows = first_open.json()["white_row_ranges"]
+        first_top = rows[0][0]
+        first_bottom = next(
+            start for start, end in rows if start > first_top
+        )
+        original_selection = {
+            "id": "manual-q1",
+            "type": "vraag",
+            "top": first_top,
+            "bottom": first_bottom,
+            "question_numbers": [1],
+            "label": "Handmatig gecontroleerde vraag 1",
+        }
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/stitched-opgaven/review",
+            json={"selections": [original_selection], "reviewed": False},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        # Simuleer een cachevernieuwing: de PDF is hetzelfde, maar de hash van
+        # de afgeleide afbeelding verschilt. De fragmentdata zelf blijft staan.
+        exam = main.STORE.get_exam(exam_id)
+        evidence = exam["steps"]["opgaven_fragments"]["evidence"]
+        evidence["stitched_image_sha256"] = "oude-afbeelding-hash"
+        main.STORE.save_step_draft(exam_id, "opgaven_fragments", evidence)
+
+        reopened = self.client.get(f"/api/exams/{exam_id}/stitched-opgaven")
+        self.assertEqual(reopened.status_code, 200, reopened.text)
+        self.assertIn("herstelvoorstel", reopened.json()["selection_warning"].lower())
+        self.assertEqual(reopened.json()["segmentation_mode"], "saved")
+        self.assertEqual(reopened.json()["selections"], [original_selection])
+
+        # Ook na het openen mag de server de oude grenzen niet stilzwijgend
+        # vervangen door automatisch gegenereerde voorstellen.
+        persisted = main.STORE.get_exam(exam_id)["steps"]["opgaven_fragments"]["evidence"]
+        self.assertEqual(persisted["stitched_selections"], [original_selection])
+        self.assertEqual(persisted["stitched_image_sha256"], "oude-afbeelding-hash")
 
     def test_no_supplement_requires_explicit_confirmation(self):
         exam_id = self.create_exam()
@@ -296,6 +360,70 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertIn("Vraag 1", question["answer_text"])
         self.assertEqual(question["cv_max_points"], 2)
         self.assertEqual(question["supplement_pages"][0]["action"], "vervangen")
+
+    def test_cv_fragment_review_uses_the_same_stitched_pagewide_workspace(self):
+        """Stap 8 gebruikt dezelfde lange, paginabrede selectie als stap 3 en 6."""
+        exam_id = self.create_exam()
+
+        starts = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(starts.status_code, 200, starts.text)
+        self.assertEqual([item["question_number"] for item in starts.json()["candidates"]], [1])
+        saved_starts = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift/review",
+            json={"candidates": starts.json()["candidates"]},
+        )
+        self.assertEqual(saved_starts.status_code, 200, saved_starts.text)
+        main.STORE.complete_step(exam_id, "cv_starts", {
+            "candidates": starts.json()["candidates"],
+            "reviewed_all_pages": True,
+            "document_sha256": starts.json()["document"]["sha256"],
+        })
+
+        # Een eerder concept kan nog oude PDF-puntgrenzen bevatten.
+        # De nieuwe doorlopende review moet die verouderde coördinaten wissen.
+        main.STORE.save_step_draft(exam_id, "cv_fragments", {
+            "boundary_overrides": [{"question_number": 1, "start_y": 900.0, "end_y": 950.0}]
+        })
+
+        stitched = self.client.get(
+            f"/api/exams/{exam_id}/stitched-document/correctievoorschrift"
+        )
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        self.assertGreater(stitched.json()["width"], 0)
+        self.assertGreater(stitched.json()["height"], 0)
+        self.assertIn("/correctievoorschrift/exam-long.png", stitched.json()["image_url"])
+        proposals = stitched.json()["proposed_selections"]
+        self.assertTrue(proposals, "Voor de goedgekeurde CV-vraagstart moet een fragmentvoorstel bestaan.")
+
+        selection = dict(proposals[0])
+        selection.update({
+            "type": "vraag",
+            "question_numbers": [1],
+            "label": "Vraag 1",
+        })
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/stitched-document/correctievoorschrift/review",
+            json={"selections": [selection], "reviewed": False},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        self.assertEqual(saved.json()["selection_count"], 1)
+        saved_evidence = self.client.get(f"/api/exams/{exam_id}").json()["steps"]["cv_fragments"]["evidence"]
+        self.assertEqual(saved_evidence["boundary_overrides"], [])
+
+        fragments = self.client.get(
+            f"/api/exams/{exam_id}/document-question-fragments/correctievoorschrift"
+        )
+        self.assertEqual(fragments.status_code, 200, fragments.text)
+        self.assertEqual(fragments.json()["question_count"], 1)
+        question = fragments.json()["questions"][0]
+        self.assertTrue(question["stitched"])
+        # De eerste PDF-pagina bevat alleen algemene regels. Stap 8 begint
+        # bewust pas op de pagina met de echte kop Beoordelingsmodel.
+        self.assertEqual(question["first_page"], 2)
+        self.assertEqual(question["last_page"], 2)
+        self.assertIn("correctievoorschrift", question["segments"][0]["url"])
 
     def test_cv_detector_excludes_numbered_closed_answer_items(self):
         opgaven = self.pdf([["1p 1 Geef een verklaring."]])

@@ -84,12 +84,40 @@ class Store:
                     metadata_json TEXT NOT NULL,
                     page_count INTEGER NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS publication_versions (
+                    exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                    version INTEGER NOT NULL,
+                    published_at TEXT NOT NULL,
+                    snapshot_json TEXT NOT NULL,
+                    PRIMARY KEY (exam_id, version)
+                );
+                -- Append-only feedback: reviewed fragment outcomes are retained.
+                CREATE TABLE IF NOT EXISTS fragment_learning_feedback (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                    stage TEXT NOT NULL,
+                    source_hash TEXT,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    automatic_json TEXT NOT NULL,
+                    accepted_json TEXT NOT NULL,
+                    correction_summary_json TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS steps (
                     exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
                     step_key TEXT NOT NULL,
                     status TEXT NOT NULL DEFAULT 'pending',
                     evidence_json TEXT NOT NULL DEFAULT '{}',
                     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (exam_id, step_key)
+                );
+                -- Bewaar de laatst goedgekeurde momentopname wanneer een stap
+                -- opnieuw wordt geopend. Pas bij de nieuwe afronding vergelijken
+                -- we de definitieve inhoud en bepalen we of vervolgstappen echt
+                -- opnieuw gecontroleerd moeten worden.
+                CREATE TABLE IF NOT EXISTS step_reopen_baselines (
+                    exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                    step_key TEXT NOT NULL,
+                    evidence_json TEXT NOT NULL,
                     PRIMARY KEY (exam_id, step_key)
                 );
             """)
@@ -152,8 +180,18 @@ class Store:
             db.execute("DELETE FROM exams WHERE id=?", (exam_id,))
 
     def reopen_metadata(self, exam_id: str, metadata: dict[str, Any]):
-        """Zet metadata opnieuw open en bewaar de bestaande waarden als concept."""
+        """Open metadata als concept en bewaar de goedgekeurde nulmeting.
+
+        Afhankelijke stappen worden nog niet ongeldig verklaard. Dat gebeurt
+        pas wanneer de docent de gewijzigde metadata daadwerkelijk bevestigt.
+        Bij een identieke bevestiging blijft alle vervolggoedkeuring behouden.
+        """
         with self.connection() as db:
+            db.execute(
+                "INSERT OR REPLACE INTO step_reopen_baselines(exam_id,step_key,evidence_json) "
+                "VALUES (?,?,?)",
+                (exam_id, "metadata", json.dumps(metadata, ensure_ascii=False)),
+            )
             db.execute("UPDATE exams SET confirmed=0 WHERE id=?", (exam_id,))
             db.execute("DELETE FROM steps WHERE exam_id=? AND step_key='metadata'", (exam_id,))
             db.execute(
@@ -162,6 +200,28 @@ class Store:
                 "ON CONFLICT(exam_id,step_key) DO UPDATE SET status='pending', "
                 "evidence_json=excluded.evidence_json, updated_at=CURRENT_TIMESTAMP",
                 (exam_id, "metadata_draft", "pending", json.dumps(metadata, ensure_ascii=False)),
+            )
+
+    def reopen_step(self, exam_id: str, step_key: str, evidence: dict[str, Any]):
+        """Open een stap zonder vervolggoedkeuringen voortijdig te verliezen.
+
+        De bestaande evidence wordt zowel als bewerkbaar concept als in een
+        aparte baseline opgeslagen. Bij de nieuwe afronding kan zo exact
+        worden vastgesteld of de inhoud werkelijk veranderd is.
+        """
+        serialised = json.dumps(evidence, ensure_ascii=False)
+        with self.connection() as db:
+            db.execute(
+                "INSERT OR REPLACE INTO step_reopen_baselines(exam_id,step_key,evidence_json) "
+                "VALUES (?,?,?)",
+                (exam_id, step_key, serialised),
+            )
+            db.execute(
+                "INSERT INTO steps(exam_id,step_key,status,evidence_json,updated_at) "
+                "VALUES (?,?,?,?,CURRENT_TIMESTAMP) "
+                "ON CONFLICT(exam_id,step_key) DO UPDATE SET "
+                "status='pending', evidence_json=excluded.evidence_json, updated_at=CURRENT_TIMESTAMP",
+                (exam_id, step_key, "pending", serialised),
             )
 
     def get_exam(self, exam_id: str):
@@ -183,17 +243,57 @@ class Store:
             rows = db.execute("SELECT id,title,confirmed,published,published_at,created_at FROM exams ORDER BY created_at DESC").fetchall()
         return [dict(row) for row in rows]
 
-    def confirm_metadata(self, exam_id: str, metadata: dict):
+    def confirm_metadata(self, exam_id: str, metadata: dict) -> bool:
+        """Bevestig metadata en geef terug of de goedgekeurde inhoud veranderde."""
+        serialised = json.dumps(metadata, ensure_ascii=False)
         with self.connection() as db:
+            baseline_row = db.execute(
+                "SELECT evidence_json FROM step_reopen_baselines "
+                "WHERE exam_id=? AND step_key='metadata'",
+                (exam_id,),
+            ).fetchone()
+            changed = bool(
+                baseline_row
+                and json.loads(baseline_row["evidence_json"]) != metadata
+            )
             db.execute("UPDATE exams SET metadata_json=?, confirmed=1 WHERE id=?",
-                       (json.dumps(metadata, ensure_ascii=False), exam_id))
+                       (serialised, exam_id))
             db.execute("INSERT OR REPLACE INTO steps(exam_id,step_key,status,evidence_json,updated_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
                        (exam_id, "metadata", "complete", json.dumps({"confirmed": True})))
+            db.execute(
+                "DELETE FROM step_reopen_baselines WHERE exam_id=? AND step_key='metadata'",
+                (exam_id,),
+            )
+            return changed
 
-    def complete_step(self, exam_id: str, step_key: str, evidence: dict):
+    def complete_step(self, exam_id: str, step_key: str, evidence: dict) -> bool:
+        """Rond een stap af en vergelijk met de laatst goedgekeurde momentopname.
+
+        De retourwaarde is True als de inhoud sinds het heropenen veranderde.
+        De API-laag gebruikt dat signaal om uitsluitend dan afhankelijke
+        goedkeuringen ongeldig te verklaren.
+        """
+        serialised = json.dumps(evidence, ensure_ascii=False)
         with self.connection() as db:
-            db.execute("INSERT OR REPLACE INTO steps(exam_id,step_key,status,evidence_json,updated_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-                       (exam_id, step_key, "complete", json.dumps(evidence, ensure_ascii=False)))
+            baseline_row = db.execute(
+                "SELECT evidence_json FROM step_reopen_baselines "
+                "WHERE exam_id=? AND step_key=?",
+                (exam_id, step_key),
+            ).fetchone()
+            changed = bool(
+                baseline_row
+                and json.loads(baseline_row["evidence_json"]) != evidence
+            )
+            db.execute(
+                "INSERT OR REPLACE INTO steps(exam_id,step_key,status,evidence_json,updated_at) "
+                "VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
+                (exam_id, step_key, "complete", serialised),
+            )
+            db.execute(
+                "DELETE FROM step_reopen_baselines WHERE exam_id=? AND step_key=?",
+                (exam_id, step_key),
+            )
+            return changed
 
 
     def save_step_draft(self, exam_id: str, step_key: str, evidence: dict[str, Any]):
@@ -214,22 +314,149 @@ class Store:
                 (exam_id, step_key, "pending", json.dumps(evidence, ensure_ascii=False)),
             )
 
-    def publish_exam(self, exam_id: str):
-        """Publicatiestatus en workflowbewijs in één transactie vastleggen.
+    def save_step_draft_preserving_identical_complete(
+        self,
+        exam_id: str,
+        step_key: str,
+        evidence: dict[str, Any],
+        *,
+        identity_fields: tuple[str, ...],
+    ) -> bool:
+        """Bewaar een conceptreview zonder een identieke goedkeuring terug te draaien.
 
-        De API controleert vóór deze methode of de integrale eindcontrole is
-        afgerond. Door beide wijzigingen in dezelfde SQLite-transactie uit te
-        voeren kan een examen niet wel gepubliceerd zijn maar nog als
-        ongepubliceerd in de workflow staan (of andersom).
+        Een browser kan vlak vóór het afronden nog een autosave starten. Die
+        HTTP-aanvraag kan pas ná de expliciete afrondactie in de database
+        aankomen. Een controle buiten de transactie is dan onvoldoende: de
+        autosave kan eerst 'pending' lezen en daarna alsnog de status
+        'complete' overschrijven.
+
+        BEGIN IMMEDIATE vergrendelt de SQLite-schrijfrij vóórdat de bestaande
+        status wordt gelezen. Daardoor geldt een vaste volgorde:
+        - komt de autosave eerst, dan kan de afrondactie daarna 'complete' zetten;
+        - komt de afrondactie eerst, dan ziet de autosave de complete rij en
+          behoudt zij die goedkeuring wanneer de inhoudelijke velden identiek zijn.
+
+        De methode retourneert True wanneer een concept is opgeslagen en False
+        wanneer een identieke, reeds goedgekeurde versie ongewijzigd bleef.
+        """
+        serialised = json.dumps(evidence, ensure_ascii=False)
+        with self.connection() as db:
+            # Neem vóór de SELECT de schrijflock; anders kunnen twee requests
+            # allebei een oude status lezen en elkaar alsnog overschrijven.
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute(
+                "SELECT status, evidence_json FROM steps WHERE exam_id=? AND step_key=?",
+                (exam_id, step_key),
+            ).fetchone()
+
+            if row and row["status"] == "complete":
+                approved = json.loads(row["evidence_json"])
+                if all(approved.get(field) == evidence.get(field) for field in identity_fields):
+                    return False
+
+            db.execute(
+                "INSERT INTO steps(exam_id,step_key,status,evidence_json,updated_at) "
+                "VALUES (?,?,?,?,CURRENT_TIMESTAMP) "
+                "ON CONFLICT(exam_id,step_key) DO UPDATE SET "
+                "status='pending', evidence_json=excluded.evidence_json, updated_at=CURRENT_TIMESTAMP",
+                (exam_id, step_key, "pending", serialised),
+            )
+            return True
+
+
+    def record_fragment_feedback(self, exam_id: str, stage: str, source_hash: str,
+                                 automatic: dict[str, Any], accepted: dict[str, Any],
+                                 summary: dict[str, Any]):
+        """Append a reviewed example; never update or erase earlier feedback."""
+        with self.connection() as db:
+            db.execute(
+                "INSERT INTO fragment_learning_feedback(exam_id,stage,source_hash,automatic_json,accepted_json,correction_summary_json) VALUES (?,?,?,?,?,?)",
+                (exam_id, stage, source_hash, json.dumps(automatic, ensure_ascii=False),
+                 json.dumps(accepted, ensure_ascii=False), json.dumps(summary, ensure_ascii=False)),
+            )
+
+    def fragment_feedback_count(self, stage: str | None = None):
+        """Return aggregate count of validated feedback examples."""
+        with self.connection() as db:
+            row = db.execute("SELECT COUNT(*) AS n FROM fragment_learning_feedback" + (" WHERE stage=?" if stage else ""), (stage,) if stage else ()).fetchone()
+        return int(row["n"])
+
+    def publish_exam(self, exam_id: str):
+        """Maak een onveranderbare publicatieversie en markeer deze actueel.
+
+        Elke publicatie krijgt een oplopend versienummer en een volledige
+        momentopname van metadata, bronbestanden (hashes) en workflowbewijs.
+        De vorige publicatie wordt nooit overschreven. Dit vormt later ook
+        een betrouwbare set referentievoorbeelden voor het leermechanisme.
         """
         with self.connection() as db:
+            exam = db.execute("SELECT * FROM exams WHERE id=?", (exam_id,)).fetchone()
+            if not exam:
+                raise ValueError("Examen niet gevonden.")
+            documents = [dict(row) for row in db.execute(
+                "SELECT * FROM documents WHERE exam_id=? ORDER BY id", (exam_id,)
+            ).fetchall()]
+            steps = [dict(row) for row in db.execute(
+                "SELECT * FROM steps WHERE exam_id=? ORDER BY step_key", (exam_id,)
+            ).fetchall()]
+            versions = db.execute(
+                "SELECT COALESCE(MAX(version),0) AS latest FROM publication_versions WHERE exam_id=?",
+                (exam_id,)
+            ).fetchone()
+            version = int(versions["latest"]) + 1
+            snapshot = {
+                "exam": dict(exam),
+                "documents": documents,
+                "steps": [{**step, "evidence": json.loads(step["evidence_json"])}
+                          for step in steps],
+                "version": version,
+            }
+            db.execute(
+                "INSERT INTO publication_versions(exam_id,version,published_at,snapshot_json) "
+                "VALUES (?,?,CURRENT_TIMESTAMP,?)",
+                (exam_id, version, json.dumps(snapshot, ensure_ascii=False)),
+            )
             db.execute("UPDATE exams SET published=1, published_at=CURRENT_TIMESTAMP WHERE id=?", (exam_id,))
             db.execute(
                 "INSERT OR REPLACE INTO steps(exam_id,step_key,status,evidence_json,updated_at) "
                 "VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-                (exam_id, "publicatie", "complete", json.dumps({"published": True})),
+                (exam_id, "publicatie", "complete", json.dumps({"published": True, "version": version})),
             )
 
-    def invalidate_steps(self, exam_id: str, keys: list[str]):
+    def publication_versions(self, exam_id: str):
+        """Geef de metadata van eerdere publicaties terug, zonder de snapshots te wijzigen."""
         with self.connection() as db:
-            db.executemany("DELETE FROM steps WHERE exam_id=? AND step_key=?", [(exam_id, key) for key in keys])
+            rows = db.execute(
+                "SELECT version,published_at,snapshot_json FROM publication_versions "
+                "WHERE exam_id=? ORDER BY version DESC", (exam_id,)
+            ).fetchall()
+        return [{"version": row["version"], "published_at": row["published_at"],
+                 "snapshot": json.loads(row["snapshot_json"])} for row in rows]
+
+    def invalidate_steps(self, exam_id: str, keys: list[str]):
+        """Markeer afhankelijke stappen als opnieuw te controleren, maar bewaar hun werk.
+
+        Een wijziging in een eerdere workflowstap maakt latere goedkeuringen
+        ongeldig, maar maakt de opgeslagen correcties en selecties niet
+        waardeloos. Bewaar daarom evidence_json als concept en wijzig alleen
+        de status. De volgende stap kan de bestaande invoer opnieuw tonen,
+        zodat de gebruiker alleen hoeft aan te passen wat werkelijk veranderd is.
+
+        Publicatiestatus wordt teruggezet wanneer de publicatiestap zelf in de
+        invalidatieset zit. Een eerder gepubliceerde versie mag na een wijziging
+        nooit als actueel gepubliceerd blijven gelden.
+        """
+        unique_keys = list(dict.fromkeys(keys))
+        if not unique_keys:
+            return
+        with self.connection() as db:
+            db.executemany(
+                "UPDATE steps SET status='pending', updated_at=CURRENT_TIMESTAMP "
+                "WHERE exam_id=? AND step_key=?",
+                [(exam_id, key) for key in unique_keys],
+            )
+            if "publicatie" in unique_keys:
+                db.execute(
+                    "UPDATE exams SET published=0, published_at=NULL WHERE id=?",
+                    (exam_id,),
+                )

@@ -2,15 +2,17 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import fitz
+from PIL import Image
 from fastapi.testclient import TestClient
 
 from examenverwerker import main
 from examenverwerker.storage import Store
 from examenverwerker.question_detection import detect_question_starts, validate_review
-from examenverwerker.question_fragments import generate_question_fragments, build_stitched_exam
-from examenverwerker.question_analysis import analyse_questions, detect_options, detect_question_type, detect_max_points, validate_question_analysis
+from examenverwerker.question_fragments import generate_question_fragments, build_stitched_exam, normalise_stitched_selections
+from examenverwerker.question_analysis import analyse_questions, detect_options, detect_question_type, detect_max_points, detect_closed_answer_form, validate_question_analysis
 
 
 class QuestionDetectionTests(unittest.TestCase):
@@ -35,6 +37,444 @@ class QuestionDetectionTests(unittest.TestCase):
         data = doc.tobytes()
         doc.close()
         return data
+
+    def test_multiple_choice_options_support_separate_letter_lines_and_two_options(self):
+        # PDF-tekstextractie kan de antwoordletter en antwoordtekst splitsen.
+        extracted = "Kies het juiste antwoord.\nA.\nDe celkern bevat DNA.\nB.\nHet celmembraan bevat cellulose."
+        options = detect_options(extracted)
+        self.assertEqual([item["letter"] for item in options], ["A", "B"])
+        self.assertEqual(options[0]["text"], "De celkern bevat DNA.")
+        self.assertEqual(detect_question_type(extracted, options)[0], "meerkeuze")
+
+    def test_multiple_choice_options_support_inline_and_parenthesised_markers(self):
+        # Sommige PDF-tekstlagen zetten meerdere antwoordopties achter elkaar
+        # op één regel; andere gebruiken haakjes of een dubbele punt.
+        inline = "Kies het juiste antwoord. A. De celkern bevat DNA. B) Het membraan bevat cellulose. C: Ribosomen maken eiwitten."
+        options = detect_options(inline)
+        self.assertEqual([item["letter"] for item in options], ["A", "B", "C"])
+        self.assertIn("De celkern bevat DNA", options[0]["text"])
+        self.assertIn("Het membraan bevat cellulose", options[1]["text"])
+        self.assertIn("Ribosomen maken eiwitten", options[2]["text"])
+
+    def test_multiple_choice_numeric_single_character_options_are_kept(self):
+        # In VWO 2026-II vragen 2 en 25 zijn antwoordopties getallen.
+        # Een antwoord als "A 9" of "A 0" mag niet verdwijnen omdat de
+        # antwoordtekst maar één teken bevat.
+        question_two = "A 9\nB 19\nC 24\nD 26"
+        question_twenty_five = "A 0\nB 504\nC 1008\nD 95.247\nE 190.494"
+        self.assertEqual(
+            [(item["letter"], item["text"]) for item in detect_options(question_two)],
+            [("A", "9"), ("B", "19"), ("C", "24"), ("D", "26")],
+        )
+        self.assertEqual(
+            [(item["letter"], item["text"]) for item in detect_options(question_twenty_five)],
+            [("A", "0"), ("B", "504"), ("C", "1008"), ("D", "95.247"), ("E", "190.494")],
+        )
+
+    def test_multiple_choice_supports_six_options_through_f(self):
+        # VWO 2026-II vraag 28 bevat zes antwoordopties, A tot en met F.
+        options_text = "\n".join(
+            f"{letter} 5’- SEQUENTIE {letter} - 3’"
+            for letter in "ABCDEF"
+        )
+        self.assertEqual(
+            [item["letter"] for item in detect_options(options_text)],
+            list("ABCDEF"),
+        )
+        payload = {
+            "questions": [{
+                "question_number": 28,
+                "question_type": "meerkeuze",
+                "max_points": 2,
+                "options": detect_options(options_text),
+                "reviewed": True,
+            }]
+        }
+        validated = validate_question_analysis(payload, {28})
+        self.assertEqual(len(validated["questions"][0]["options"]), 6)
+
+    def test_option_ocr_is_skipped_for_recognised_sets_and_open_questions(self):
+        # Vermijd OCR als de PDF-tekst al opties bevat of als een vraag
+        # duidelijk open is en geen aanwijzingen voor meerkeuze bevat.
+        from examenverwerker.question_analysis import _should_run_option_ocr
+        self.assertFalse(_should_run_option_ocr("A 9\nB 19\nC 24", [
+            {"letter": "A", "text": "9"}, {"letter": "B", "text": "19"}
+        ]))
+        self.assertFalse(_should_run_option_ocr("Leg uit waarom dit gebeurt.", []))
+        self.assertTrue(_should_run_option_ocr("A 9\nB 19", []))
+        self.assertTrue(_should_run_option_ocr("", []))
+
+    def test_multiple_choice_options_reject_nonconsecutive_letter_noise(self):
+        # Een losse letter in lopende tekst mag niet als complete antwoordset
+        # worden geïnterpreteerd.
+        self.assertEqual(detect_options("A. Dit is een gewone zin. Daarna volgt optie C in de uitleg."), [])
+
+    def test_visual_ocr_rebuilds_lines_from_separate_option_labels_and_text(self):
+        # RapidOCR levert tekstregels met bounding boxes. Deze test bootst
+        # antwoordletters en antwoordteksten na die visueel op dezelfde regel
+        # staan, maar als losse OCR-detecties worden teruggegeven.
+        image_path = self.root / "visual-options.png"
+        Image.new("RGB", (120, 50), "white").save(image_path)
+
+        class FakeOCRResult:
+            boxes = [
+                [[0, 0], [12, 0], [12, 10], [0, 10]],
+                [[18, 0], [110, 0], [110, 10], [18, 10]],
+                [[0, 20], [12, 20], [12, 30], [0, 30]],
+                [[18, 20], [110, 20], [110, 30], [18, 30]],
+            ]
+            txts = ["A.", "De celkern bevat DNA.", "B.", "Het celmembraan bevat cellulose."]
+
+        class FakeEngine:
+            def __call__(self, _path):
+                return FakeOCRResult()
+
+        # Gebruik de modulefunctie rechtstreeks; de expliciete import houdt
+        # de test onafhankelijk van interne attributen van main.py.
+        from examenverwerker.question_analysis import _ocr_image_text
+        with patch("examenverwerker.question_analysis._get_ocr_engine", return_value=FakeEngine()):
+            recognised = _ocr_image_text([image_path])
+
+        self.assertEqual(
+            recognised.splitlines(),
+            ["A. De celkern bevat DNA.", "B. Het celmembraan bevat cellulose."],
+        )
+
+    def test_new_ocr_proposals_update_old_unreviewed_analysis_drafts(self):
+        # Oude concepten konden een eerder onjuist voorstel 'open' met lege
+        # opties blijven terugzetten. Een nieuwe OCR-herkenning moet die lege
+        # velden aanvullen, zonder bestaande handmatige antwoordteksten kwijt
+        # te raken.
+        question = {
+            "question_number": 4,
+            "question_type": "meerkeuze",
+            "max_points": 2,
+            "options": [
+                {"letter": "A", "text": "Nieuwe optie A"},
+                {"letter": "B", "text": "Nieuwe optie B"},
+            ],
+            "reviewed": False,
+        }
+        old_draft = {
+            "question_type": "open",
+            "max_points": None,
+            "options": [],
+            "reviewed": False,
+        }
+        main._merge_saved_question_analysis(question, old_draft)
+        self.assertEqual(question["question_type"], "meerkeuze")
+        self.assertEqual([item["letter"] for item in question["options"]], ["A", "B"])
+
+        # Een bestaande handmatige tekst blijft behouden, terwijl een optie
+        # die pas door de nieuwe OCR is gevonden alsnog wordt toegevoegd.
+        question["options"] = [
+            {"letter": "A", "text": "Nieuwe optie A"},
+            {"letter": "B", "text": "Nieuwe optie B"},
+        ]
+        manual_draft = {
+            "question_type": "open",
+            "max_points": None,
+            "options": [{"letter": "A", "text": "Handmatig gecorrigeerde optie A"}],
+            "reviewed": False,
+        }
+        main._merge_saved_question_analysis(question, manual_draft)
+        self.assertEqual(question["question_type"], "meerkeuze")
+        self.assertEqual(
+            question["options"],
+            [
+                {"letter": "A", "text": "Handmatig gecorrigeerde optie A"},
+                {"letter": "B", "text": "Nieuwe optie B"},
+            ],
+        )
+
+    def test_reviewed_question_analysis_is_never_overwritten_by_new_detection(self):
+        # Een expliciet door de docent gecontroleerde keuze blijft leidend,
+        # ook wanneer de automatische analyse later andere signalen vindt.
+        question = {
+            "question_number": 5,
+            "question_type": "meerkeuze",
+            "max_points": 2,
+            "options": [{"letter": "A", "text": "OCR-voorstel"}],
+            "reviewed": False,
+        }
+        reviewed = {
+            "question_type": "open",
+            "max_points": 4,
+            "options": [],
+            "reviewed": True,
+        }
+        main._merge_saved_question_analysis(question, reviewed)
+        self.assertEqual(question["question_type"], "open")
+        self.assertEqual(question["max_points"], 4)
+        self.assertEqual(question["options"], [])
+        self.assertTrue(question["reviewed"])
+
+    def test_question_analysis_uses_visual_ocr_when_pdf_text_has_no_options(self):
+        # De PDF-tekstlaag kan een meerkeuzevraag wel herkennen als tekst,
+        # maar de antwoordopties missen doordat ze als afbeelding of in aparte
+        # kolommen zijn opgeslagen. De zichtbare vraagafbeelding is dan de
+        # aanvullende bron voor de opties.
+        question = {
+            "question_number": 7,
+            "extracted_text": "Welke uitspraak over fotosynthese is juist?",
+            "segments": [],
+            "image_paths": ["vraag-7.png"],
+        }
+        visual_text = (
+            "A De lichtreactie vindt plaats in de mitochondriën.\n"
+            "B De donkerreactie vindt plaats in de stroma.\n"
+            "C Bij fotosynthese ontstaat zuurstof uit koolstofdioxide."
+        )
+        with patch("examenverwerker.question_analysis._ocr_image_text", return_value=visual_text) as ocr:
+            result = analyse_questions({"questions": [question]})
+
+        ocr.assert_called_once_with(["vraag-7.png"])
+        detected = result["questions"][0]
+        self.assertEqual(detected["question_type"], "meerkeuze")
+        self.assertEqual([option["letter"] for option in detected["options"]], ["A", "B", "C"])
+        self.assertIn("vraagafbeelding", detected["type_reason"])
+
+    def test_question_type_recognises_common_dutch_multiple_choice_formulations(self):
+        # Niet ieder examen gebruikt letterlijk de instructie 'kies het juiste
+        # antwoord'. Deze formuleringen zijn ook sterke aanwijzingen voor een
+        # meerkeuzevraag wanneer de antwoordopties visueel nog gecontroleerd
+        # moeten worden.
+        examples = (
+            "Welke uitspraak is onjuist?",
+            "Welke combinatie is correct?",
+            "Wat is de juiste volgorde van deze processen?",
+            "Welke letter hoort bij de juiste afbeelding?",
+        )
+        for text in examples:
+            with self.subTest(text=text):
+                self.assertEqual(detect_question_type(text, [])[0], "meerkeuze")
+
+    def test_closed_answer_form_is_reported_explicitly(self):
+        self.assertEqual(
+            detect_closed_answer_form("Is de concentratie hoger, gelijk of lager?"),
+            "hoger / gelijk / lager",
+        )
+        self.assertEqual(
+            detect_closed_answer_form("Is de stof wel of niet aanwezig?"),
+            "wel / niet",
+        )
+        self.assertEqual(
+            detect_closed_answer_form("Is de uitspraak juist of onjuist?"),
+            "juist / onjuist",
+        )
+
+    def test_cv_detector_recognises_multiple_choice_answer_split_over_three_lines(self):
+        # In een CV kan de MC-regel door de tabelopmaak in drie regels worden
+        # geëxtraheerd: eerst het vraagnnummer, dan de antwoordletter en dan
+        # de score. De CV-vraagstart moet ondanks die splitsing behouden blijven.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Beoordelingsmodel", fontsize=12)
+        page.insert_text((60, 130), "1", fontsize=11)
+        page.insert_text((100, 130), "B", fontsize=11)
+        page.insert_text((160, 130), "1", fontsize=11)
+        page.insert_text((60, 190), "2", fontsize=11)
+        page.insert_text((60, 215), "maximumscore 2", fontsize=10)
+        path = self.root / "cv-split-mc.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertIn(1, [item["question_number"] for item in result.json()["candidates"]])
+        self.assertIn(2, [item["question_number"] for item in result.json()["candidates"]])
+
+    def test_cv_detector_recognises_open_questions_with_score_in_separate_column(self):
+        # Het CV kan de vraagkolom en de scorekolom als afzonderlijke
+        # tekstblokken opslaan. De PDF-tekstvolgorde is dan niet betrouwbaar:
+        # "maximumscore" kan vóór het vraagnummer worden uitgelezen.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Beoordelingsmodel", fontsize=12)
+
+        # Open vraag 1: scorekolom bewust vóór de vraagnummerkolom invoegen.
+        page.insert_text((350, 130), "maximumscore 3", fontsize=10)
+        page.insert_text((60, 130), "1", fontsize=11)
+        page.insert_text((90, 155), "Uit het antwoord moet blijken dat ...", fontsize=10)
+
+        # Open vraag 2: zelfde tabelvorm, maar met een andere regelafstand.
+        page.insert_text((350, 220), "maximumscore 2", fontsize=10)
+        page.insert_text((60, 220), "2", fontsize=11)
+        page.insert_text((90, 245), "De kandidaat noemt twee kenmerken.", fontsize=10)
+
+        # Meerkeuzevraag 3 blijft eveneens herkenbaar wanneer letter en score
+        # in losse tekstkolommen naast het vraagnummer staan.
+        page.insert_text((60, 310), "3", fontsize=11)
+        page.insert_text((350, 310), "B", fontsize=10)
+        page.insert_text((405, 310), "1", fontsize=10)
+
+        path = self.root / "cv-open-en-mc.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [item["question_number"] for item in result.json()["candidates"]],
+            [1, 2, 3],
+        )
+
+    def test_cv_open_question_can_have_a_long_scoring_block(self):
+        # Een open vraag kan veel beoordelingsregels bevatten voordat
+        # maximumscore wordt vermeld. De vraagstart moet daarom niet worden
+        # afgewezen omdat de score meer dan 48 PDF-punten lager staat.
+        document = fitz.open()
+        page = document.new_page()
+        page.insert_text((60, 80), "Beoordelingsmodel", fontsize=12)
+
+        # Vraag 1 begint in de vaste vraagnummerkolom. Een ingesprongen
+        # los nummer in de antwoordcriteria is een subonderdeel en mag de
+        # zoekruimte naar de maximumscore niet voortijdig afkappen.
+        page.insert_text((60, 130), "1.", fontsize=11)
+        page.insert_text((95, 160), "1", fontsize=10)
+        page.insert_text((95, 185), "De kandidaat noemt het eerste criterium.", fontsize=10)
+        page.insert_text((95, 210), "De kandidaat licht dit verder toe.", fontsize=10)
+        page.insert_text((350, 255), "maximumscore 3", fontsize=10)
+
+        # Een volgende hoofdvraag op dezelfde vraagnummerkolom vormt wel
+        # de bovengrens van het beoordelingsblok van vraag 1.
+        page.insert_text((60, 320), "2.", fontsize=11)
+        page.insert_text((350, 345), "maximumscore 2", fontsize=10)
+
+        path = self.root / "cv-long-open-question.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [item["question_number"] for item in result.json()["candidates"]],
+            [1, 2],
+        )
+
+    def test_cv_end_section_ignores_table_of_contents_entry(self):
+        # De inhoudsopgave kan de kop "5 Aanleveren scores" noemen. Die
+        # vermelding mag het beoordelingsmodel niet afkappen: alleen de echte
+        # zelfstandige kop bovenaan de administratieve slotpagina telt.
+        document = fitz.open()
+        contents_page = document.new_page()
+        contents_page.insert_text((60, 80), "Inhoud", fontsize=12)
+        contents_page.insert_text((60, 400), "5 Aanleveren scores", fontsize=10)
+
+        model_page = document.new_page()
+        model_page.insert_text((60, 80), "4 Beoordelingsmodel", fontsize=12)
+        model_page.insert_text((60, 130), "1", fontsize=11)
+        model_page.insert_text((60, 155), "maximumscore 2", fontsize=10)
+        model_page.insert_text((90, 180), "De kandidaat noemt twee juiste kenmerken.", fontsize=10)
+
+        final_page = document.new_page()
+        final_page.insert_text((60, 80), "5 Aanleveren scores", fontsize=12)
+        final_page.insert_text((60, 120), "Verwerk de scores in de applicatie Wolf.", fontsize=10)
+
+        path = self.root / "cv-end-section-contents.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [(item["question_number"], item["page_index"])
+             for item in result.json()["candidates"]],
+            [(1, 1)],
+        )
+
+    def test_cv_heading_ignores_mentions_in_introductory_text(self):
+        # Een juridische toelichting kan het woord "beoordelingsmodel"
+        # noemen vóór de zelfstandige hoofdstukkop. Alleen die echte kop
+        # mag bepalen waar de vraagstartdetectie begint.
+        document = fitz.open()
+        intro_page = document.new_page()
+        intro_page.insert_text((60, 80), "Het beoordelingsmodel wordt hieronder toegelicht.")
+        intro_page.insert_text((60, 120), "1")
+        intro_page.insert_text((60, 145), "Regels voor de beoordeling")
+        # Een inhoudsopgave kan de zelfstandige kop letterlijk herhalen,
+        # maar staat niet bovenaan de pagina en mag de modelgrens niet bepalen.
+        intro_page.insert_text((60, 400), "Beoordelingsmodel")
+
+        model_page = document.new_page()
+        model_page.insert_text((60, 80), "4 Beoordelingsmodel")
+        model_page.insert_text((60, 130), "1")
+        model_page.insert_text((60, 155), "maximumscore 2")
+        path = self.root / "cv-heading.pdf"
+        document.save(path)
+        document.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", path.read_bytes(), "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+        result = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/correctievoorschrift"
+        )
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(
+            [(item["question_number"], item["page_index"])
+             for item in result.json()["candidates"]],
+            [(1, 1)],
+        )
 
     def test_detector_uses_only_standalone_main_question_lines(self):
         path = self.root / "sample.pdf"
@@ -108,6 +548,41 @@ class QuestionDetectionTests(unittest.TestCase):
         exam = self.client.get(f"/api/exams/{exam_id}").json()
         self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "pending")
         self.assertEqual(exam["steps"]["opgaven_starts"]["evidence"]["accepted_count"], 1)
+
+    def test_late_identical_question_start_autosave_preserves_completed_step(self):
+        """Een late autosave mag een al goedgekeurde vraagstartreview niet heropenen."""
+        response = self.client.post(
+            "/api/exams/import",
+            files=[("files", ("biologie-vwo-2026-tv2-o.pdf", self.make_pdf(), "application/pdf"))],
+        )
+        exam_id = response.json()["exam_id"]
+        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-o.pdf":"opgaven"}
+        })
+        detected = self.client.get(f"/api/exams/{exam_id}/document-question-starts/opgaven").json()
+        candidates = detected["candidates"]
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/opgaven/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        completed = self.client.post(
+            f"/api/exams/{exam_id}/steps/opgaven_starts/complete",
+            json={"reviewed":True, "reviewed_all_pages":True},
+        )
+        self.assertEqual(completed.status_code, 200, completed.text)
+
+        # Simuleer de vertraagde identieke autosave die bij het verlaten van
+        # het vraagstartscherm nog onderweg kan zijn.
+        late_save = self.client.post(
+            f"/api/exams/{exam_id}/document-question-starts/opgaven/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(late_save.status_code, 200, late_save.text)
+        self.assertTrue(late_save.json()["complete"])
+        exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(exam["steps"]["opgaven_starts"]["status"], "complete")
 
     def test_review_validation_rejects_coordinates_outside_page(self):
         review = {"candidates":[{"id":"manual-1","question_number":1,"page_index":0,
@@ -184,6 +659,95 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual([segment["page_number"] for segment in result["questions"][0]["segments"]], [1,2])
         self.assertTrue((self.root / "derived" / result["questions"][0]["segments"][0]["filename"]).is_file())
         self.assertLess(result["questions"][0]["segments"][1]["pdf_clip"][3], 842)
+
+    def test_stitched_fragment_review_can_continue_into_question_analysis(self):
+        # Dit is de volledige API-route die de browser in stap 3 en stap 4
+        # doorloopt. De vraagafbeeldingen, tekstextractie en stapvalidatie
+        # moeten dezelfde goedgekeurde fragmentgrenzen blijven gebruiken.
+        document = fitz.open()
+        cover = document.new_page()
+        cover.insert_text((70, 100), "Biologie examen vwo 2026")
+        questions = document.new_page()
+        questions.insert_text((70, 100), "1. Beschrijf de functie van het celmembraan.", fontsize=11)
+        questions.insert_text((70, 250), "2. Leg uit waarom transport energie kost.", fontsize=11)
+        pdf_bytes = document.tobytes()
+        document.close()
+
+        imported = self.client.post(
+            "/api/exams/import",
+            files=[("files", ("biologie-vwo-2026-tv2-o.pdf", pdf_bytes, "application/pdf"))],
+        )
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
+            "document_types":{"biologie-vwo-2026-tv2-o.pdf":"opgaven"},
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+
+        starts = self.client.get(f"/api/exams/{exam_id}/question-starts")
+        self.assertEqual(starts.status_code, 200, starts.text)
+        candidates = starts.json()["candidates"]
+        self.assertEqual([item["question_number"] for item in candidates], [1, 2])
+        saved_starts = self.client.post(
+            f"/api/exams/{exam_id}/question-starts/review",
+            json={"candidates":candidates},
+        )
+        self.assertEqual(saved_starts.status_code, 200, saved_starts.text)
+        completed_starts = self.client.post(
+            f"/api/exams/{exam_id}/steps/opgaven_starts/complete",
+            json={"reviewed":True, "reviewed_all_pages":True},
+        )
+        self.assertEqual(completed_starts.status_code, 200, completed_starts.text)
+
+        stitched = self.client.get(f"/api/exams/{exam_id}/stitched-opgaven")
+        self.assertEqual(stitched.status_code, 200, stitched.text)
+        proposed = stitched.json()["proposed_selections"]
+        question_selections = [item for item in proposed if item["type"] == "vraag"]
+        self.assertEqual(len(question_selections), 2)
+        self.assertTrue(stitched.json()["white_row_ranges"])
+
+        reviewed_selections = [
+            {**item, "question_numbers":list(item["question_numbers"])}
+            for item in proposed
+        ]
+        saved_stitched = self.client.post(
+            f"/api/exams/{exam_id}/stitched-opgaven/review",
+            json={"selections":reviewed_selections, "reviewed":True},
+        )
+        self.assertEqual(saved_stitched.status_code, 200, saved_stitched.text)
+
+        saved_fragment_review = self.client.post(
+            f"/api/exams/{exam_id}/document-question-fragments/opgaven/review",
+            json={"reviewed_question_numbers":[1, 2],
+                  "reviewed_all_questions":True, "boundary_overrides":[]},
+        )
+        self.assertEqual(saved_fragment_review.status_code, 200, saved_fragment_review.text)
+        completed_fragments = self.client.post(
+            f"/api/exams/{exam_id}/steps/opgaven_fragments/complete",
+            json={"reviewed":True, "reviewed_all_questions":True,
+                  "reviewed_question_numbers":[1, 2]},
+        )
+        self.assertEqual(completed_fragments.status_code, 200, completed_fragments.text)
+
+        # Een vertraagde pagehide/visibilitychange-autosave met exact dezelfde
+        # selectie mag de zojuist afgeronde fragmentcontrole niet terugzetten.
+        late_autosave = self.client.post(
+            f"/api/exams/{exam_id}/stitched-opgaven/review",
+            json={"selections":reviewed_selections, "reviewed":False},
+        )
+        self.assertEqual(late_autosave.status_code, 200, late_autosave.text)
+        self.assertTrue(late_autosave.json()["complete"])
+        current_exam = self.client.get(f"/api/exams/{exam_id}").json()
+        self.assertEqual(current_exam["steps"]["opgaven_fragments"]["status"], "complete")
+
+        analysis = self.client.get(f"/api/exams/{exam_id}/question-analysis")
+        self.assertEqual(analysis.status_code, 200, analysis.text)
+        questions_result = analysis.json()["questions"]
+        self.assertEqual([item["question_number"] for item in questions_result], [1, 2])
+        self.assertIn("celmembraan", questions_result[0]["extracted_text"].casefold())
+        self.assertIn("energie kost", questions_result[1]["extracted_text"].casefold())
+        self.assertTrue(all(item["segments"] for item in questions_result))
 
     def test_fragment_step_cannot_complete_without_full_review(self):
         response = self.client.post("/api/exams/import", files=[("files", ("biologie-vwo-2026-tv2-o.pdf", self.make_pdf(), "application/pdf"))])
@@ -388,6 +952,42 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertEqual(clip[1], 150)
         self.assertEqual(clip[3], 260)
 
+    def test_cv_fragment_generator_uses_real_slot_section_not_contents_reference(self):
+        # Stap 7 en stap 8 moeten dezelfde grens hanteren. Een vermelding van
+        # "5 Aanleveren scores" in de inhoudsopgave mag een laatste examenvraag
+        # op een latere pagina van het beoordelingsmodel niet uitsluiten.
+        document = fitz.open()
+        contents_page = document.new_page()
+        contents_page.insert_text((60, 80), "Inhoud", fontsize=12)
+        contents_page.insert_text((60, 400), "5 Aanleveren scores", fontsize=10)
+
+        model_page = document.new_page()
+        model_page.insert_text((60, 80), "4 Beoordelingsmodel", fontsize=12)
+        model_page.insert_text((60, 130), "39", fontsize=11)
+        model_page.insert_text((60, 155), "maximumscore 2", fontsize=10)
+        model_page.insert_text((90, 180), "De kandidaat noemt twee juiste kenmerken.", fontsize=10)
+
+        final_page = document.new_page()
+        final_page.insert_text((60, 80), "5 Aanleveren scores", fontsize=12)
+        final_page.insert_text((60, 120), "Verwerk de scores in de applicatie Wolf.", fontsize=10)
+
+        pdf_path = self.root / "cv-fragment-end-section-contents.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        result = generate_question_fragments(
+            pdf_path,
+            [{"id":"cv-q39", "question_number":39, "page_index":1,
+              "pdf_bbox":[60,120,80,135]}],
+            self.root / "cv-fragment-end-section",
+            document_type="correctievoorschrift",
+        )
+
+        self.assertEqual(result["question_count"], 1)
+        self.assertEqual(result["questions"][0]["first_page"], 2)
+        self.assertEqual(result["questions"][0]["last_page"], 2)
+        self.assertIn("maximumscore 2", result["questions"][0]["extracted_text"])
+
     def test_last_cv_question_stops_before_administrative_pages(self):
         document = fitz.open()
         first = document.new_page()
@@ -440,6 +1040,143 @@ class QuestionDetectionTests(unittest.TestCase):
         regenerated = self.client.get(f"/api/exams/{exam_id}/document-question-fragments/opgaven").json()
         self.assertEqual(regenerated["questions"][0]["segments"][0]["pdf_clip"][1], 150)
         self.assertEqual(regenerated["questions"][0]["segments"][0]["pdf_clip"][3], 300)
+
+
+    def test_fragment_boundaries_require_pure_white_rgb_rows(self):
+        # Een bijna-witte pixel is nog steeds inhoud. Alleen de rijen die
+        # volledig uit RGB(255, 255, 255) bestaan, mogen als grens dienen.
+        image_path = self.root / "white-rows.png"
+        image = Image.new("RGB", (4, 4), (255, 255, 255))
+        image.putpixel((2, 1), (254, 255, 255))
+        image.save(image_path)
+        image.close()
+
+        ranges = main._white_row_ranges(image_path)
+        self.assertEqual(ranges, [[0, 0], [2, 3]])
+        self.assertTrue(main._is_white_boundary(0, ranges))
+        # Een decimale coördinaat mag niet door afronden alsnog op rij 0
+        # worden goedgekeurd; de opgeslagen grens moet exact een pixelrij zijn.
+        self.assertFalse(main._is_white_boundary(0.4, ranges))
+
+    def test_stitched_normalisation_does_not_cut_a_question_at_an_early_blank_row(self):
+        # De detector kan een interne witregel in een vraag ten onrechte als
+        # ondergrens voorstellen. De normalisatie moet de vraag dan laten
+        # doorlopen tot de witte rij vóór de volgende goedgekeurde vraagstart.
+        image_path = self.root / "question-boundaries.png"
+        image = Image.new("RGB", (20, 200), (255, 255, 255))
+        for y in range(30, 66):
+            for x in range(3, 17):
+                image.putpixel((x, y), (0, 0, 0))
+        # Dit zichtbare tekstblok ligt ná vraag 1 en vóór vraag 2.
+        # Het is context bij de voorafgaande vraag en mag niet in vraag 2
+        # worden opgenomen.
+        for y in range(76, 94):
+            for x in range(3, 17):
+                image.putpixel((x, y), (30, 30, 30))
+        for y in range(112, 141):
+            for x in range(3, 17):
+                image.putpixel((x, y), (0, 0, 0))
+        # Vraag 3 volgt op vraag 2 zonder een nieuw contextblok. Het context-
+        # fragment tussen vraag 1 en 2 moet daarom bij beide vervolgvragen horen.
+        for y in range(160, 181):
+            for x in range(3, 17):
+                image.putpixel((x, y), (0, 0, 0))
+        image.save(image_path)
+        image.close()
+
+        white_rows = main._white_row_ranges(image_path)
+        selections = [
+            {"id":"q1", "type":"vraag", "top":28, "bottom":70,
+             "question_numbers":[1], "label":"Vraag 1"},
+            {"id":"q2", "type":"vraag", "top":112, "bottom":150,
+             "question_numbers":[2], "label":"Vraag 2"},
+            {"id":"q3", "type":"vraag", "top":160, "bottom":190,
+             "question_numbers":[3], "label":"Vraag 3"},
+        ]
+        normalised = normalise_stitched_selections(
+            selections, white_rows, image_path, image_height=200
+        )
+        questions = [item for item in normalised if item["type"] == "vraag"]
+
+        self.assertEqual(len(questions), 3)
+        # De ondergrens van vraag 1 ligt op de bovenste witte rij direct
+        # onder de laatste inhoudsregel; de bovengrens van vraag 2 ligt op
+        # de onderste witte rij direct boven de eerste inhoudsregel.
+        self.assertEqual(questions[0]["bottom"], 66)
+        self.assertEqual(questions[1]["top"], 111)
+        self.assertEqual(questions[1]["bottom"], 141)
+        self.assertEqual(questions[2]["top"], 159)
+        self.assertEqual(questions[2]["bottom"], 181)
+        self.assertLess(questions[0]["bottom"], questions[1]["top"])
+        contexts = [item for item in normalised if item["type"] == "context"]
+        self.assertEqual(len(contexts), 1)
+        # De context staat vóór vraag 2 en 3 en wordt aan beide gekoppeld,
+        # maar blijft een afzonderlijk fragment buiten de vraagafbeeldingen.
+        self.assertEqual(contexts[0]["question_numbers"], [2, 3])
+        self.assertEqual(contexts[0]["top"], questions[0]["bottom"])
+        self.assertEqual(contexts[0]["bottom"], questions[1]["top"])
+
+    def test_stitched_normalisation_keeps_non_context_gap_inside_previous_question(self):
+        # Niet iedere zichtbare ruimte tussen vragen is een context. Zonder
+        # inhoudelijke contextkandidaat moet de tekst behouden blijven bij de
+        # voorafgaande vraag en mag geen contextfragment ontstaan.
+        image_path = self.root / "question-gap.png"
+        image = Image.new("RGB", (20, 120), (255, 255, 255))
+        for y in range(10, 25):
+            for x in range(2, 18):
+                image.putpixel((x, y), (0, 0, 0))
+        for y in range(45, 62):
+            for x in range(2, 18):
+                image.putpixel((x, y), (20, 20, 20))
+        for y in range(82, 100):
+            for x in range(2, 18):
+                image.putpixel((x, y), (0, 0, 0))
+        image.save(image_path)
+        image.close()
+        white_rows = main._white_row_ranges(image_path)
+        selections = [
+            {"id":"q1", "type":"vraag", "top":8, "bottom":28,
+             "question_numbers":[1], "label":"Vraag 1"},
+            {"id":"q2", "type":"vraag", "top":80, "bottom":102,
+             "question_numbers":[2], "label":"Vraag 2"},
+        ]
+        normalised = normalise_stitched_selections(
+            selections, white_rows, image_path, image_height=120,
+            context_candidates_only=True,
+        )
+        self.assertFalse(any(item["type"] == "context" for item in normalised))
+        questions = [item for item in normalised if item["type"] == "vraag"]
+        self.assertEqual(questions[0]["bottom"], questions[1]["top"])
+
+    def test_selected_stitched_text_is_read_from_the_matching_source_page(self):
+        # Pagina 1 is de omslag en wordt niet in het stitchwerkvlak opgenomen.
+        # De tekstextractie moet de geselecteerde pixelstrook terugrekenen naar
+        # de juiste bronpagina, zonder tekst van een andere pagina toe te voegen.
+        document = fitz.open()
+        cover = document.new_page()
+        cover.insert_text((60, 100), "OMSLAGTEKST")
+        content = document.new_page()
+        content.insert_text((60, 100), "Vraag 1 unieke geselecteerde tekst")
+        content.insert_text((60, 300), "Vraag 2 staat lager op dezelfde pagina")
+        later = document.new_page()
+        later.insert_text((60, 100), "Tekst van een latere pagina")
+        pdf_path = self.root / "selected-text.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        metadata = build_stitched_exam(pdf_path, self.root / "selected-text.png")
+        first_content_page = metadata["pages"][0]
+        extracted = main._extract_stitched_selection_text(
+            pdf_path,
+            metadata["pages"],
+            first_content_page["top"],
+            first_content_page["bottom"],
+        )
+
+        self.assertIn("Vraag 1 unieke geselecteerde tekst", extracted)
+        self.assertIn("Vraag 2 staat lager op dezelfde pagina", extracted)
+        self.assertNotIn("OMSLAGTEKST", extracted)
+        self.assertNotIn("Tekst van een latere pagina", extracted)
 
 
 if __name__ == "__main__":

@@ -37,7 +37,7 @@ WORKFLOW: tuple[WorkflowStep, ...] = (
     WorkflowStep("cv_fragments", "Correctievoorschrift verwerken", "Opschonen, uitsnijden en pagina's verticaal samenvoegen.", ("cv_starts",)),
     WorkflowStep("cv_aanvulling", "Aanvulling samenvoegen", "Per beoordelingsonderdeel aanvullen, vervangen of laten beoordelen.", ("cv_fragments",)),
     WorkflowStep("antwoorden", "Antwoorden herkennen", "Gesloten antwoordvormen en juiste antwoorden koppelen.", ("opgaven_analyse", "cv_fragments", "cv_aanvulling")),
-    WorkflowStep("relaties", "Document- en vraagkoppelingen", "Contexten, uitwerkbijlage, cv en vragen op samenhang controleren.", ("uitwerk_fragments", "cv_aanvulling", "antwoorden")),
+    WorkflowStep("relaties", "Aanvullende controles", "Nummering, documentkoppelingen, maximumscores en volledigheid automatisch controleren; alleen afwijkingen vragen aandacht.", ("uitwerk_fragments", "cv_aanvulling", "antwoorden")),
     WorkflowStep("snippets", "Definitieve snippets genereren", "Pas na de controles alle definitieve afbeeldingen uitsnijden.", ("relaties",)),
     WorkflowStep("eindcontrole", "Integrale eindcontrole", "Per vraag alle bronnen en antwoorden in samenhang controleren.", ("snippets",)),
     WorkflowStep("publicatie", "Publiceren in examenbibliotheek", "Alleen een volledig en gecontroleerd examen publiceren.", ("eindcontrole",)),

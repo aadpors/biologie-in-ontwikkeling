@@ -19,9 +19,18 @@ async function api(url, options = {}) {
   }
   if (!response.ok) {
     const detail = body.detail;
-    const message = typeof detail === 'string'
+    let message = typeof detail === 'string'
       ? detail
       : (detail?.message || JSON.stringify(detail) || `HTTP ${response.status} ${response.statusText}`);
+    // Bij een blokkade door ontbrekende voorgangers tonen we voortaan de
+    // concrete stapnamen. Alleen de algemene servermelding is onvoldoende
+    // om te begrijpen welke workflowstatus nog ontbreekt.
+    if (Array.isArray(detail?.missing) && detail.missing.length) {
+      const titles = detail.missing.map(key =>
+        state.workflow.find(step => step.key === key)?.title || key
+      );
+      message += ' Nog niet afgerond: ' + titles.join(', ') + '.';
+    }
     const error = new Error(message);
     error.detail = detail;
     error.status = response.status;
@@ -75,13 +84,41 @@ function bindStageAutoSave(panel, save, statusSelector) {
   document.addEventListener('visibilitychange', onVisibilityChange);
   window.addEventListener('pagehide', flushOnHide);
 
+  panel._stageAutoSaveFlush = saveNow;
   panel._stageAutoSaveCleanup = () => {
     clearTimeout(timer);
+    panel._stageAutoSaveFlush = null;
     panel.removeEventListener('change', schedule);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('pagehide', flushOnHide);
     panel._stageAutoSaveCleanup = null;
   };
+}
+
+/* De afrondknop is de expliciete bevestiging voor een complete stap.
+   Losse vinkjes per vraag, pagina of fragment voegen geen extra controle toe.
+   Houd de bestaande reviewed-velden intern op true voor compatibiliteit met
+   opgeslagen bewijs, maar verberg de repetitieve bediening voor de gebruiker.
+   Vraagstart-selectievakjes blijven zichtbaar: die bepalen de inhoudelijke
+   structuur en zijn dus geen administratieve controlevinkjes. */
+function prepareStageApproval(panel) {
+  const reviewLabels = [...panel.querySelectorAll('.review-warning')];
+  if (!reviewLabels.length) return;
+  reviewLabels.forEach(label => {
+    const checkbox = label.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+      checkbox.checked = true;
+      checkbox.disabled = true;
+    }
+    label.hidden = true;
+  });
+  // Sommige bestaande schermen schakelden de afrondknop uitsluitend uit
+  // zolang deze vinkjes niet waren gezet. Die blokkade vervalt nu; eventuele
+  // inhoudelijke blokkades worden direct daarna door de eigen refresh-functie
+  // van de stap opnieuw toegepast.
+  panel.querySelectorAll('button[id^="complete"]').forEach(button => {
+    button.disabled = false;
+  });
 }
 
 function showLibrary() {
@@ -97,13 +134,60 @@ async function loadLibrary() {
   const exams = await api('/api/exams');
   $('#examCount').textContent = `${exams.length} ${exams.length === 1 ? 'examen' : 'examens'}`;
   $('#examList').innerHTML = exams.length ? exams.map(exam => `
-    <article class="exam-row"><div class="doc-icon">PDF</div><div><strong>${escapeHtml(exam.title)}</strong><p>${exam.published ? 'Gepubliceerd in examenbibliotheek' : (exam.confirmed ? 'Metadata bevestigd · nog niet gepubliceerd' : 'Metadata nog te bevestigen')} · geïmporteerd ${new Date(exam.created_at + 'Z').toLocaleDateString('nl-NL')}</p></div><button class="quiet" data-open="${exam.id}">Open werkruimte →</button></article>
+    <article class="exam-row"><div class="doc-icon">PDF</div><div><strong>${escapeHtml(exam.title)}</strong><p>${exam.published ? 'Gepubliceerd in examenbibliotheek' : (exam.confirmed ? 'Metadata bevestigd · nog niet gepubliceerd' : 'Metadata nog te bevestigen')} · geïmporteerd ${new Date(exam.created_at + 'Z').toLocaleDateString('nl-NL')}</p></div><button class="quiet" data-open="${exam.id}">Open werkruimte →</button>${exam.published ? `<button class="quiet" data-reopen-published="${exam.id}">Publicatie bewerken</button>` : ''}</article>
   `).join('') : '<p class="muted">Er zijn nog geen examens geïmporteerd.</p>';
   document.querySelectorAll('[data-open]').forEach(button => button.addEventListener('click', () => openWorkspace(button.dataset.open)));
+  // Een gepubliceerd examen kan via een expliciete actie worden heropend.
+  // De server houdt de vorige publicatie als immutable snapshot beschikbaar.
+  document.querySelectorAll('[data-reopen-published]').forEach(button => button.addEventListener('click', async () => {
+    button.disabled = true;
+    try {
+      await api(`/api/exams/${button.dataset.reopenPublished}/reopen-published`, {method:'POST'});
+      await openWorkspace(button.dataset.reopenPublished);
+    } catch (error) {
+      button.disabled = false;
+      alert(error.message);
+    }
+  }));
 }
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* Toon een eigen, toegankelijke dialoog voor beslissingen rond importeren.
+   De Promise geeft uitsluitend de expliciete waarde van de gekozen knop terug.
+   Escape en sluiten leveren een lege waarde op en voeren dus nooit een
+   destructieve actie uit. */
+function showImportDialog({title, message, actions}) {
+  const dialog = $('#importDecisionDialog');
+  dialog.innerHTML = `
+    <div class="import-dialog-content">
+      <p class="eyebrow">EXAMEN IMPORTEREN</p>
+      <h2 id="importDialogTitle">${escapeHtml(title)}</h2>
+      <p>${escapeHtml(message)}</p>
+      <div class="import-dialog-actions">
+        ${actions.map(action => `
+          <button type="button"
+            class="${action.danger ? 'danger' : action.primary ? 'primary' : 'quiet'}"
+            data-dialog-value="${escapeHtml(action.value)}">${escapeHtml(action.label)}</button>
+        `).join('')}
+      </div>
+    </div>`;
+  return new Promise(resolve => {
+    // Een dialoog die al openstaat wijst op een programmeerfout; voorkom dat
+    // een tweede beslissing stilzwijgend de eerste dialoog overschrijft.
+    if (dialog.open) {
+      resolve('');
+      return;
+    }
+    const finish = () => resolve(dialog.returnValue || '');
+    dialog.addEventListener('close', finish, {once:true});
+    dialog.querySelectorAll('[data-dialog-value]').forEach(button => {
+      button.addEventListener('click', () => dialog.close(button.dataset.dialogValue));
+    });
+    dialog.showModal();
+  });
 }
 
 $('#importForm').addEventListener('submit', async event => {
@@ -125,19 +209,54 @@ $('#importForm').addEventListener('submit', async event => {
     try {
       result = await api('/api/exams/import', { method: 'POST', body: form });
     } catch (error) {
-      let detail = null;
-      try { detail = JSON.parse(error.message); } catch (_) {}
+      // api() bewaart de oorspronkelijke FastAPI-detailpayload op
+      // error.detail. Gebruik die gestructureerde payload rechtstreeks:
+      // error.message bevat alleen de leesbare melding en kan dus niet als
+      // JSON worden geparseerd. De fallback ondersteunt oudere API-fouten.
+      let detail = error.detail || null;
+      if (!detail) {
+        try { detail = JSON.parse(error.message); } catch (_) {}
+      }
       if (detail?.code !== 'duplicate_exam') throw error;
 
-      const confirmed = window.confirm(
-        `Dit examen is al geïmporteerd: "${detail.title}".\n\n` +
-        'Wil je de bestaande import en alle bijbehorende verwerking verwijderen ' +
-        'en vervangen door deze nieuwe import? Deze actie kan niet ongedaan worden gemaakt.'
-      );
-      if (!confirmed) {
-        $('#importError').textContent = 'Import geannuleerd. De bestaande verwerking is behouden.';
+      // Gebruik een eigen dialoog met benoemde acties. Een browservenster met
+      // alleen 'OK' en 'Annuleren' maakt niet duidelijk welke handeling achter
+      // Annuleren zit en past niet bij de vormgeving van de werkruimte.
+      const duplicateAction = await showImportDialog({
+        title: 'Dit examen is al geïmporteerd',
+        message: `"${detail.title}" staat al in de examenbibliotheek. Je kunt de bestaande verwerking openen en verdergaan waar je gebleven was, of een volledig nieuwe verwerking starten.`,
+        actions: [
+          {value: 'continue', label: 'Verdergaan met bestaande import', primary: true},
+          {value: 'restart', label: 'Opnieuw importeren'},
+          {value: 'cancel', label: 'Annuleren'}
+        ]
+      });
+      if (duplicateAction === 'continue') {
+        $('#pdfFiles').value = '';
+        button.textContent = 'Bestaande verwerking openen…';
+        await openWorkspace(detail.exam_id);
         return;
       }
+      if (duplicateAction !== 'restart') {
+        $('#importError').textContent = 'Importeren geannuleerd. De bestaande verwerking is behouden.';
+        return;
+      }
+
+      // De tweede dialoog benoemt expliciet wat verloren gaat. Alleen de
+      // nadrukkelijke knop 'Import opnieuw starten' voert de vervanging uit.
+      const replaceExisting = await showImportDialog({
+        title: 'Bestaande verwerking vervangen?',
+        message: 'Opnieuw importeren verwijdert de bestaande import en alle bijbehorende verwerking definitief. De geselecteerde PDF-bestanden worden daarna opnieuw geïmporteerd. Deze handeling kan niet ongedaan worden gemaakt.',
+        actions: [
+          {value: 'replace', label: 'Import opnieuw starten', danger: true},
+          {value: 'back', label: 'Terug'}
+        ]
+      });
+      if (replaceExisting !== 'replace') {
+        $('#importError').textContent = 'Opnieuw importeren geannuleerd. De bestaande verwerking is behouden.';
+        return;
+      }
+
       form.append('replace_exam_id', detail.exam_id);
       button.textContent = 'Bestaande import vervangen…';
       result = await api('/api/exams/import', { method: 'POST', body: form });
@@ -158,6 +277,27 @@ async function openWorkspace(examId) {
   state.examId = examId;
   state.exam = await api(`/api/exams/${examId}`);
   state.workflow = await api('/api/workflow');
+
+  // Documenttypen die ontbreken zijn geen inhoudelijke reviewtaak. Rond
+  // optionele fasen daarom automatisch als 'niet van toepassing' af; anders
+  // moet de gebruiker later een overbodige bevestigingsknop indrukken en kan
+  // een vervolgstap onterecht melden dat een voorganger nog openstaat.
+  if (state.exam.confirmed) {
+    let next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
+    if (['uitwerk_starts', 'uitwerk_fragments'].includes(next?.key) && !examHasDocumentType('uitwerkbijlage')) {
+      await api(`/api/exams/${examId}/skip-optional-workbook`, {method:'POST'});
+      state.exam = await api(`/api/exams/${examId}`);
+      next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
+    }
+    if (next?.key === 'cv_aanvulling' && !examHasDocumentType('aanvulling_correctievoorschrift')) {
+      await api(`/api/exams/${examId}/steps/cv_aanvulling/complete`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({reviewed:true, not_required:true})
+      });
+      state.exam = await api(`/api/exams/${examId}`);
+    }
+  }
+
   $('#libraryView').hidden = true;
   $('#workspaceView').hidden = false;
   $('#backLibrary').hidden = false;
@@ -196,8 +336,8 @@ function renderWorkspace() {
       const step = state.workflow.find(item => item.key === key);
       const confirmed = window.confirm(
         `Wil je "${step?.title || key}" opnieuw openen?\n\n` +
-        'De opgeslagen correcties blijven behouden. Goedgekeurde vervolgstappen ' +
-        'worden opnieuw ter controle aangeboden.'
+        'De opgeslagen correcties blijven behouden. Vervolgstappen worden alleen ' +
+        'opnieuw ter controle aangeboden als je de inhoud daadwerkelijk wijzigt.'
       );
       if (!confirmed) return;
       try {
@@ -214,9 +354,9 @@ function renderWorkspace() {
   else if (next?.key === 'opgaven_analyse') renderQuestionAnalysisStage();
   else if (next?.key === 'uitwerk_starts' && !examHasDocumentType('uitwerkbijlage')) renderSkipWorkbookStage();
   else if (next?.key === 'uitwerk_starts') renderQuestionStartsStage('uitwerk_starts', 'uitwerkbijlage', 'FASE 3 · UITWERKBIJLAGE', 'Vraagstarts uitwerkbijlage');
-  else if (next?.key === 'uitwerk_fragments') renderQuestionFragmentsStage('uitwerk_fragments', 'uitwerkbijlage', 'uitwerk_starts', 'FASE 3 · UITWERKBIJLAGE', 'Fragmenten uitwerkbijlage');
+  else if (next?.key === 'uitwerk_fragments') renderStitchedOpgavenStage('uitwerk_fragments', 'uitwerk_starts', 'FASE 3 · UITWERKBIJLAGE', 'Fragmenten uitwerkbijlage', 'uitwerkbijlage');
   else if (next?.key === 'cv_starts') renderQuestionStartsStage('cv_starts', 'correctievoorschrift', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Vraagstarts correctievoorschrift');
-  else if (next?.key === 'cv_fragments') renderQuestionFragmentsStage('cv_fragments', 'correctievoorschrift', 'cv_starts', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Correctievoorschriftfragmenten');
+  else if (next?.key === 'cv_fragments') renderStitchedOpgavenStage('cv_fragments', 'cv_starts', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Fragmenten correctievoorschrift', 'correctievoorschrift');
   else if (next?.key === 'cv_aanvulling') renderCvSupplementStage();
   else if (next?.key === 'antwoorden') renderAnswersStage();
   else if (next?.key === 'relaties') renderRelationsStage();
@@ -224,9 +364,19 @@ function renderWorkspace() {
   else if (next?.key === 'eindcontrole') renderFinalReviewStage();
   else if (next?.key === 'publicatie') renderPublicationStage();
   else renderStageOverview(next, completed);
+
+  // Iedere nieuwe workflowstap begint bovenaan het scherm. Dit gebeurt
+  // centraal na het renderen, zodat alle routes (afronden, heropenen en
+  // opnieuw laden) hetzelfde navigatiegedrag gebruiken.
+  window.scrollTo(0, 0);
 }
 
 function renderMetadataStage() {
+  // Bewaar de verwijzing naar het paneel lokaal. De opruimfunctie voor
+  // autosave-listeners gebruikt dit element wanneer de gebruiker naar een
+  // volgende stap gaat; zonder deze declaratie stopt het renderen hier met
+  // een ReferenceError en wordt de submit-handler nooit gekoppeld.
+  const panel = $('#stagePanel');
   const exam = state.exam;
   const first = exam.documents[0].metadata;
   // Onbevestigde metadata wordt als concept uit SQLite teruggelezen, zodat
@@ -318,7 +468,13 @@ async function confirmMetadata(event) {
    niet ongemerkt een bestaande beoordelingsregel kan overschrijven. */
 
 function examHasDocumentType(documentType) {
-  return state.exam.documents.some(doc => state.exam.metadata.document_types?.[doc.filename] === documentType);
+  // Gebruik de bevestigde exammetadata als primaire bron. Oudere examens
+  // kunnen het documenttype alleen nog in de metadata van het bronbestand
+  // hebben opgeslagen; die informatie blijft een geldige terugval.
+  return state.exam.documents.some(doc =>
+    state.exam.metadata.document_types?.[doc.filename] === documentType ||
+    doc.metadata?.document_type === documentType
+  );
 }
 
 async function renderSkipWorkbookStage() {
@@ -350,6 +506,7 @@ async function renderCvSupplementStage() {
       ${result.items.map(item => `<article class="analysis-card" data-supplement-page="${item.page_number}"><h3>Pagina ${item.page_number}${item.question_numbers.length ? ` · vraag ${item.question_numbers.join(', ')}` : ''}</h3><img class="fragment-image" loading="lazy" alt="Pagina ${item.page_number} van de CV-aanvulling" src="/api/exams/${state.examId}/documents/${doc.id}/preview/${item.page_index}"><p class="analysis-reason">${escapeHtml(item.reason)}</p><label>Verwerking<select data-supplement-action="${item.page_number}"><option value="toevoegen" ${item.action==='toevoegen'?'selected':''}>Toevoegen</option><option value="vervangen" ${item.action==='vervangen'?'selected':''}>Vervangen</option><option value="handmatig" ${item.action==='handmatig'?'selected':''}>Handmatig beoordelen</option><option value="negeren" ${item.action==='negeren'?'selected':''}>Geen inhoudelijke wijziging</option></select></label><label>Betrokken vraagnummers (komma's scheiden)<input type="text" data-supplement-questions="${item.page_number}" value="${item.question_numbers.join(', ')}" placeholder="bijvoorbeeld 12, 22"></label><details class="analysis-text"><summary>Tekst uit deze pagina</summary><pre>${escapeHtml(item.text || 'Geen selecteerbare tekstlaag; beoordeel de pagina-afbeelding.')}</pre></details><label class="review-warning"><input type="checkbox" data-supplement-reviewed="${item.page_number}" ${item.reviewed?'checked':''}> Ik heb deze pagina en de voorgestelde verwerking gecontroleerd.</label></article>`).join('')}
       <div class="review-actions"><button class="primary" id="saveSupplement" type="button">Controle opslaan</button><button class="primary" id="completeSupplement" type="button" disabled>Aanvulling beoordelen en doorgaan</button></div><p id="supplementMessage" class="form-error" role="status"></p>`;
     const cards = [...document.querySelectorAll('[data-supplement-page]')];
+      prepareStageApproval(panel);
     const checks = () => [...document.querySelectorAll('[data-supplement-reviewed]')];
     const refresh = () => { $('#completeSupplement').disabled = checks().some(input => !input.checked); };
     checks().forEach(input => input.addEventListener('change', refresh)); refresh();
@@ -364,22 +521,55 @@ async function renderCvSupplementStage() {
     const save = () => api(`/api/exams/${state.examId}/cv-supplement/review`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:collect()})});
     bindStageAutoSave(panel, save, '#supplementMessage');
     $('#saveSupplement').addEventListener('click', async () => { try { const r=await save(); $('#supplementMessage').textContent=`${r.reviewed_count} van ${r.page_count} pagina's gecontroleerd. Concept opgeslagen.`; } catch(error) { $('#supplementMessage').textContent=error.message; } });
-    $('#completeSupplement').addEventListener('click', async () => { try { const r=await save(); if(!r.complete) throw new Error('Controleer eerst alle pagina’s.'); await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_pages:true})}); await openWorkspace(state.examId); } catch(error) { $('#supplementMessage').textContent=error.message; } });
+    let completingSupplement=false;
+    $('#completeSupplement').addEventListener('click', async () => {
+      const button=$('#completeSupplement');
+      if(completingSupplement) return;
+      completingSupplement=true;
+      button.disabled=true;
+      try {
+        // Wacht op de laatste paginakeuze voordat de stapstatus definitief wordt.
+        const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
+        if(!saved.complete) throw new Error('Controleer eerst alle pagina’s.');
+        await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true,reviewed_all_pages:true})
+        });
+        await openWorkspace(state.examId);
+      } catch(error) {
+        completingSupplement=false;
+        refresh();
+        $('#supplementMessage').textContent=error.message;
+      }
+    });
   } catch (error) { panel.innerHTML = `<h2>Aanvulling correctievoorschrift</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
 
 /* Antwoordvoorstellen komen uit de bijbehorende CV-fragmenten. De gebruiker
-   ziet altijd de bronafbeelding, kan de tekst corrigeren en moet elk antwoord
-   afzonderlijk afvinken. De tekstherkenning is dus nooit een eindbeslissing. */
+   ziet altijd de bronafbeelding en kan de tekst corrigeren. De expliciete
+   afrondactie bevestigt de complete set; losse vinkjes per antwoord zijn niet
+   nodig. De tekstherkenning is dus nooit een eindbeslissing. */
 async function renderAnswersStage() {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Antwoorden uit het correctievoorschrift analyseren…</p>';
   try {
     const result = await api(`/api/exams/${state.examId}/answers`);
     panel.innerHTML = `<p class="eyebrow">FASE 6 · ANTWOORDEN HERKENNEN</p><h2>Antwoorden controleren</h2><p class="lead">Per vraag staat het bijbehorende fragment uit het correctievoorschrift. Herkende meerkeuzeletters en gesloten antwoorden zijn voorstellen. Controleer de bronafbeelding en corrigeer de antwoordtekst waar nodig.</p><div class="notice">${result.question_count} CV-fragmenten · lage zekerheid betekent dat de tekst handmatig moet worden nagekeken.</div>
-      ${result.questions.map(q => `<article class="analysis-card" data-answer-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${escapeHtml(q.confidence)} zekerheid</span></div><p class="analysis-reason">${escapeHtml(q.reason)} · Maximumscore CV: ${q.cv_max_points ?? 'onbekend'} · Opgaven: ${q.opgaven_max_points ?? 'onbekend'}${q.points_match===false?' · SCORES VERSCHILLEN':''}</p>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" alt="Correctievoorschrift vraag ${q.question_number}" src="${escapeHtml(seg.url)}">`).join('')}${(q.supplement_pages||[]).map(page=>`<div class="notice">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}</div><img class="fragment-image" loading="lazy" alt="CV-aanvulling bij vraag ${q.question_number}" src="${escapeHtml(page.url)}">`).join('')}<div class="analysis-fields"><label>Antwoordvorm<select data-answer-kind="${q.question_number}"><option value="meerkeuze" ${q.answer_kind==='meerkeuze'?'selected':''}>Meerkeuze</option><option value="gesloten" ${q.answer_kind==='gesloten'?'selected':''}>Gesloten antwoord</option><option value="open" ${q.answer_kind==='open'?'selected':''}>Open antwoord / beoordelingscriteria</option><option value="handmatig" ${q.answer_kind==='handmatig'?'selected':''}>Handmatig bepalen</option></select></label></div><label>Antwoord of beoordelingscriteria<textarea rows="4" data-answer-text="${q.question_number}">${escapeHtml(q.answer_text)}</textarea></label><label class="review-warning"><input type="checkbox" data-answer-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het antwoord van vraag ${q.question_number} aan de hand van het CV-fragment gecontroleerd.</label></article>`).join('')}
+      ${result.questions.map(q => `<article class="analysis-card" data-answer-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${escapeHtml(q.confidence)} zekerheid</span></div><p class="analysis-reason">${escapeHtml(q.reason)} · Maximumscore CV: ${q.cv_max_points ?? 'onbekend'} · Opgaven: ${q.opgaven_max_points ?? 'onbekend'}${q.points_match===false?' · SCORES VERSCHILLEN':''}</p>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" alt="Correctievoorschrift vraag ${q.question_number}" src="${escapeHtml(seg.url)}">`).join('')}${(q.supplement_pages||[]).map(page=>`<div class="notice">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}</div><img class="fragment-image" loading="lazy" alt="CV-aanvulling bij vraag ${q.question_number}" src="${escapeHtml(page.url)}">`).join('')}<div class="analysis-fields"><label>Antwoordvorm<select data-answer-kind="${q.question_number}"><option value="meerkeuze" ${q.answer_kind==='meerkeuze'?'selected':''}>Meerkeuze</option><option value="gesloten" ${q.answer_kind==='gesloten'?'selected':''}>Gesloten antwoord</option><option value="open" ${q.answer_kind==='open'?'selected':''}>Open antwoord / beoordelingscriteria</option><option value="handmatig" ${q.answer_kind==='handmatig'?'selected':''}>Handmatig bepalen</option></select></label></div><label class="answer-text-field">Antwoord of beoordelingscriteria<textarea class="answer-textarea" rows="2" data-answer-text="${q.question_number}">${escapeHtml(q.answer_text)}</textarea></label><label class="review-warning"><input type="checkbox" data-answer-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het antwoord van vraag ${q.question_number} aan de hand van het CV-fragment gecontroleerd.</label></article>`).join('')}
       <div class="review-actions"><button class="primary" id="saveAnswers" type="button">Controle opslaan</button><button class="primary" id="completeAnswers" type="button" disabled>Antwoorden goedkeuren en doorgaan</button></div><p id="answersMessage" class="form-error" role="status"></p>`;
     const cards=[...document.querySelectorAll('[data-answer-card]')];
+      prepareStageApproval(panel);
+    // Het antwoordveld gebruikt de volledige breedte en groeit mee met de
+    // ingevoerde antwoordtekst of beoordelingscriteria.
+    const answerFields = [...document.querySelectorAll('[data-answer-text]')];
+    const resizeAnswerField = field => {
+      field.style.height = 'auto';
+      field.style.height = `${Math.max(field.scrollHeight, 72)}px`;
+    };
+    answerFields.forEach(field => {
+      resizeAnswerField(field);
+      field.addEventListener('input', () => resizeAnswerField(field));
+    });
     const checks=()=>[...document.querySelectorAll('[data-answer-reviewed]')];
     const refresh=()=>{$('#completeAnswers').disabled=checks().some(input=>!input.checked);};
     checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
@@ -387,7 +577,32 @@ async function renderAnswersStage() {
     const save=()=>api(`/api/exams/${state.examId}/answers/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
     bindStageAutoSave(panel, save, '#answersMessage');
     $('#saveAnswers').addEventListener('click',async()=>{try{const r=await save();$('#answersMessage').textContent=`${r.reviewed_count} van ${result.question_count} antwoorden gecontroleerd. Concept opgeslagen.`;}catch(error){$('#answersMessage').textContent=error.message;}});
-    $('#completeAnswers').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle antwoorden.');await api(`/api/exams/${state.examId}/steps/antwoorden/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#answersMessage').textContent=error.message;}});
+    let completingAnswers = false;
+    $('#completeAnswers').addEventListener('click',async()=>{
+      const button = $('#completeAnswers');
+      if (completingAnswers) return;
+      completingAnswers = true;
+      button.disabled = true;
+      button.textContent = 'Controleren en afronden…';
+      try {
+        // Wacht op de gedeelde autosaveketen zodat een recente wijziging
+        // niet gelijktijdig met de definitieve goedkeuring wordt opgeslagen.
+        const r = panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save();
+        if(!r.complete) throw new Error('Controleer eerst alle antwoorden.');
+        await api(`/api/exams/${state.examId}/steps/antwoorden/complete`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true,reviewed_all_questions:true})
+        });
+        await openWorkspace(state.examId);
+      } catch(error) {
+        completingAnswers = false;
+        button.disabled = false;
+        button.textContent = 'Antwoorden goedkeuren en doorgaan';
+        $('#answersMessage').textContent=error.message;
+      }
+    });
   } catch(error) { panel.innerHTML=`<h2>Antwoorden herkennen</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
 
@@ -396,77 +611,750 @@ async function renderAnswersStage() {
    voorkomen. De uitwerkbijlage hoeft niet alle examenvragen te bevatten. */
 async function renderRelationsStage() {
   const panel=$('#stagePanel');
-  panel.innerHTML='<p class="muted">Document- en vraagkoppelingen controleren…</p>';
+  panel.innerHTML='<p class="muted">Automatische controles op document- en vraagkoppelingen uitvoeren…</p>';
   try {
     const result=await api(`/api/exams/${state.examId}/relations`);
-    panel.innerHTML=`<p class="eyebrow">FASE 7 · DOCUMENTKOPPELINGEN</p><h2>Vragen tussen documenten koppelen</h2><p class="lead">Controleer of elke opgave bij het juiste correctievoorschrift hoort. De uitwerkbijlage bevat soms slechts enkele invulvragen; afwezigheid daar is dus niet automatisch een fout.</p><div class="notice">${result.question_count} opgaven · ${result.questions.filter(q=>q.has_cv).length} CV-koppelingen · ${result.uitwerk_questions.length} vragen in de uitwerkbijlage</div>${result.missing_cv.length?`<p class="form-error">Geen CV-fragment gevonden bij: ${result.missing_cv.join(', ')}</p>`:''}${result.extra_cv.length?`<p class="notice">CV-vragen zonder corresponderende opgave: ${result.extra_cv.join(', ')}</p>`:''}
-      ${result.questions.map(q=>`<article class="analysis-card" data-relation-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${q.has_cv?'CV gekoppeld':'CV ontbreekt'}</span></div><div class="relation-grid"><span>Opgaven: aanwezig</span><span>CV: ${q.has_cv?'aanwezig':'ontbreekt'}</span><span>Uitwerkbijlage: ${q.has_uitwerkbijlage?'aanwezig':'niet van toepassing'}</span><span>Maximumscore opgave: ${q.max_points??'nog niet bepaald'}</span><span>Maximumscore CV: ${q.cv_max_points??'nog niet bepaald'}</span><span>Scorecontrole: ${q.points_match===true?'gelijk':q.points_match===false?'verschil':'nog niet vergelijkbaar'}</span></div><label>Opmerking / correctie<textarea rows="2" data-relation-note="${q.question_number}"></textarea></label><label class="review-warning"><input type="checkbox" data-relation-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb de koppeling van vraag ${q.question_number} gecontroleerd.</label></article>`).join('')}
-      <div class="review-actions"><button class="primary" id="saveRelations" type="button">Koppelingen opslaan</button><button class="primary" id="completeRelations" type="button" disabled>Koppelingen goedkeuren en doorgaan</button></div><p id="relationsMessage" class="form-error" role="status"></p>`;
-    const cards=[...document.querySelectorAll('[data-relation-card]')];
-    const checks=()=>[...document.querySelectorAll('[data-relation-reviewed]')];
-    const refresh=()=>{$('#completeRelations').disabled=checks().some(input=>!input.checked)||result.missing_cv.length>0;};
-    checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
-    const collect=()=>cards.map(card=>{const n=Number(card.dataset.relationCard);return {question_number:n,reviewed:card.querySelector(`[data-relation-reviewed="${n}"]`).checked,note:card.querySelector(`[data-relation-note="${n}"]`).value};});
-    const save=()=>api(`/api/exams/${state.examId}/relations/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
-    bindStageAutoSave(panel, save, '#relationsMessage');
-    $('#saveRelations').addEventListener('click',async()=>{try{const r=await save();$('#relationsMessage').textContent=`${r.reviewed_count} van ${result.question_count} koppelingen gecontroleerd.`;}catch(error){$('#relationsMessage').textContent=error.message;}});
-    $('#completeRelations').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle koppelingen.');await api(`/api/exams/${state.examId}/steps/relaties/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#relationsMessage').textContent=error.message;}});
-  } catch(error) { panel.innerHTML=`<h2>Documentkoppelingen</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+    const previous = state.exam.steps.relaties?.evidence?.questions || [];
+    const previousNotes = Object.fromEntries(previous.map(item=>[item.question_number,item.note||'']));
+    const mismatches = result.score_mismatches || [];
+    panel.innerHTML=`
+      <p class="eyebrow">FASE 7 · AANVULLENDE CONTROLES</p>
+      <h2>Automatische integriteitscontrole</h2>
+      <p class="lead">De applicatie vergelijkt de vraagnummering en documentkoppelingen automatisch. Je hoeft normale koppelingen niet stuk voor stuk af te vinken. Alleen afwijkingen vragen om een beslissing of toelichting.</p>
+      <div class="notice">${result.question_count} opgaven gecontroleerd · ${result.questions.filter(q=>q.has_cv).length} CV-koppelingen · ${result.uitwerk_questions.length} uitwerkbijlagevragen</div>
+      <div class="relation-grid">
+        <span>${result.missing_cv.length ? 'CV-fragmenten ontbreken: '+result.missing_cv.join(', ') : 'Alle opgaven hebben een CV-koppeling'}</span>
+        <span>${result.extra_cv.length ? 'CV-vragen zonder opgave: '+result.extra_cv.join(', ') : 'Geen extra CV-vragen'}</span>
+        <span>${result.missing_answers.length ? 'Antwoorden ontbreken: '+result.missing_answers.join(', ') : 'Antwoordrecords volledig gekoppeld'}</span>
+        <span>${result.extra_answers.length ? 'Antwoorden zonder opgave: '+result.extra_answers.join(', ') : 'Geen extra antwoordrecords'}</span>
+        <span>${result.uncertain_analysis.length ? 'Onzekere vraaganalyse: '+result.uncertain_analysis.join(', ') : 'Vraagtypen en scores zijn bepaald'}</span>
+        <span>${result.uncertain_answers.length ? 'Handmatige/onzekere antwoorden: '+result.uncertain_answers.join(', ') : 'Antwoorden zijn ingevuld'}</span>
+        <span>${mismatches.length ? mismatches.length+' afwijkende maximumscores' : 'Maximumscores komen overeen waar vergelijkbaar'}</span>
+        <span>${result.uitwerk_questions.length} vragen in de uitwerkbijlage · gedeeltelijke dekking is toegestaan</span>
+      </div>
+      ${result.missing_cv.length ? `
+        <section class="analysis-card">
+          <h3>Ontbrekende CV-fragmenten</h3>
+          <p class="form-error">Voor vraag ${result.missing_cv.join(', ')} is geen correctievoorschriftfragment gevonden. Herstel dit in stap 8 voordat je verdergaat.</p>
+          <button class="quiet" type="button" id="repairMissingCv">CV-fragmenten herstellen</button>
+        </section>` : ''}
+      ${result.extra_cv.length ? `
+        <section class="analysis-card">
+          <h3>CV-vragen zonder opgave</h3>
+          <p>Deze nummers komen wel in het CV voor, maar niet in de opgaven: ${result.extra_cv.join(', ')}. Controleer of het om een afwijkende nummering of een onbedoeld extra fragment gaat.</p><button class="quiet" type="button" id="repairExtraCv">CV-vraagstarts herstellen</button>
+        </section>` : ''}
+      ${result.missing_answers.length ? `
+        <section class="analysis-card">
+          <h3>Antwoorden ontbreken</h3>
+          <p class="form-error">Er is geen antwoordrecord gekoppeld aan vraag ${result.missing_answers.join(', ')}. Controleer de antwoordherkenning in stap 10.</p>
+          <button class="quiet" type="button" id="repairMissingAnswers">Antwoorden herstellen</button>
+        </section>` : ''}
+      ${result.extra_answers.length ? `
+        <section class="analysis-card">
+          <h3>Antwoorden zonder opgave</h3>
+          <p class="form-error">Er zijn antwoordrecords voor vraag ${result.extra_answers.join(', ')}, maar deze nummers komen niet voor in de opgaven.</p>
+          <button class="quiet" type="button" id="repairExtraAnswers">Antwoorden herstellen</button>
+        </section>` : ''}
+      ${result.uncertain_analysis.length ? `
+        <section class="analysis-card">
+          <h3>Onzekere vraaganalyse</h3>
+          <p>Bij vraag ${result.uncertain_analysis.join(', ')} is het vraagtype nog onbekend of ontbreekt een maximumscore. Dit is niet automatisch een fout, maar verdient aandacht in stap 4.</p>
+          <button class="quiet" type="button" id="repairQuestionAnalysis">Vraaganalyse bekijken</button>
+        </section>` : ''}
+      ${result.uncertain_answers.length ? `
+        <section class="analysis-card">
+          <h3>Onzekere of handmatige antwoorden</h3>
+          <p>Bij vraag ${result.uncertain_answers.join(', ')} is de antwoordvorm handmatig bepaald of staat nog geen antwoordtekst. Controleer of dit bewust zo is.</p>
+          <button class="quiet" type="button" id="repairUncertainAnswers">Antwoorden bekijken</button>
+        </section>` : ''}
+      ${mismatches.length ? `
+        <h3>Afwijkende maximumscores</h3>
+        <p class="lead">Leg alleen bij deze vragen vast waarom de scores verschillen, of herstel de brongegevens in de eerdere stap.</p>
+        ${mismatches.map(item=>`<article class="analysis-card" data-relation-issue="${item.question_number}">
+          <h3>Vraag ${item.question_number}</h3>
+          <div class="relation-grid"><span>Opgave: ${item.opgaven_max_points} punten</span><span>CV: ${item.cv_max_points} punten</span></div>
+          <label>Toelichting bij de afwijking<textarea rows="2" data-relation-note="${item.question_number}">${escapeHtml(previousNotes[item.question_number]||'')}</textarea></label>
+        </article>`).join('')}` : ''}
+      <details class="analysis-text">
+        <summary>Alle ${result.question_count} automatische vraagkoppelingen bekijken</summary>
+        <div class="relation-audit-list">
+          ${result.questions.map(q=>`<div class="relation-audit-row"><strong>Vraag ${q.question_number}</strong><span>CV: ${q.has_cv?'gekoppeld':'ontbreekt'}</span><span>Uitwerkbijlage: ${q.has_uitwerkbijlage?'aanwezig':'niet van toepassing'}</span><span>Scores: ${q.points_match===true?'gelijk':q.points_match===false?'afwijkend':'niet vergelijkbaar'}</span></div>`).join('')}
+        </div>
+      </details>
+      <div class="review-actions">
+        <button class="primary" id="saveRelations" type="button">Toelichtingen opslaan</button>
+        <button class="primary" id="completeRelations" type="button" ${result.missing_cv.length||result.extra_cv.length||result.missing_answers.length||result.extra_answers.length||mismatches.some(item=>!(previousNotes[item.question_number]||'').trim())?'disabled':''}>Controles afronden en doorgaan</button>
+      </div>
+      <p id="relationsMessage" class="form-error" role="status"></p>`;
+    const cards=[...document.querySelectorAll('[data-relation-issue]')];
+    const collect=()=>cards.map(card=>({
+      question_number:Number(card.dataset.relationIssue),
+      note:card.querySelector(`[data-relation-note="${card.dataset.relationIssue}"]`).value
+    }));
+    const save=()=>api(`/api/exams/${state.examId}/relations/review`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({questions:collect()})
+    });
+    bindStageAutoSave(panel,save,'#relationsMessage');
+    const refresh=()=>{
+      const unresolved=cards.some(card=>!card.querySelector('textarea').value.trim());
+      $('#completeRelations').disabled=result.missing_cv.length>0||result.extra_cv.length>0||result.missing_answers.length>0||result.extra_answers.length>0||unresolved;
+    };
+    cards.forEach(card=>card.querySelector('textarea').addEventListener('input',refresh));
+    $('#saveRelations').addEventListener('click',async()=>{
+      try {
+        const saved=await save();
+        $('#relationsMessage').textContent='Toelichtingen opgeslagen. '+saved.reviewed_count+' koppelingen zijn automatisch gecontroleerd.';
+        refresh();
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    let completingRelations=false;
+    $('#completeRelations').addEventListener('click',async()=>{
+      const button=$('#completeRelations');
+      if(completingRelations) return;
+      completingRelations=true;
+      button.disabled=true;
+      button.textContent='Controleren en afronden…';
+      try {
+        // Wacht eerst op een eventuele autosave van de laatste toelichting.
+        // Zo kan een vertraagde conceptopslag de afgeronde stap niet terugzetten.
+        const saved=panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save();
+        if(!saved.complete) throw new Error('Los eerst de getoonde afwijkingen op.');
+        await api(`/api/exams/${state.examId}/steps/relaties/complete`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true,reviewed_all_questions:true})
+        });
+        await openWorkspace(state.examId);
+      } catch(error) {
+        completingRelations=false;
+        button.textContent='Controles afronden en doorgaan';
+        $('#relationsMessage').textContent=error.message;
+        refresh();
+      }
+    });
+    $('#repairMissingCv')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/cv_fragments/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    $('#repairExtraCv')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/cv_starts/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    document.querySelectorAll('#repairMissingAnswers, #repairExtraAnswers').forEach(button=>{
+      button.addEventListener('click',async()=>{
+        try {
+          await api(`/api/exams/${state.examId}/steps/antwoorden/reopen`,{method:'POST'});
+          await openWorkspace(state.examId);
+        } catch(error) { $('#relationsMessage').textContent=error.message; }
+      });
+    });
+    $('#repairUncertainAnswers')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/antwoorden/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+    $('#repairQuestionAnalysis')?.addEventListener('click',async()=>{
+      try {
+        await api(`/api/exams/${state.examId}/steps/opgaven_analyse/reopen`,{method:'POST'});
+        await openWorkspace(state.examId);
+      } catch(error) { $('#relationsMessage').textContent=error.message; }
+    });
+  } catch(error) {
+    panel.innerHTML=`<h2>Integriteitscontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+  }
 }
-
 
 /* De snippetfase maakt contextkandidaten los van de vraagfragmenten. Een
    contextbereik wordt alleen als voorstel ingevuld; de docent controleert en
    corrigeert de reeks vragen waarop de context van toepassing is. */
 async function renderSnippetsStage() {
-  const panel=$('#stagePanel');
-  panel.innerHTML='<p class="muted">Contexten en definitieve snippets voorbereiden…</p>';
+  const panel = $('#stagePanel');
+  panel.innerHTML = '<p class="muted">Contexten en definitieve snippets voorbereiden…</p>';
+
   try {
-    const result=await api(`/api/exams/${state.examId}/snippets`);
-    const contextCards=result.contexts.map(context=>`<article class="analysis-card" data-context-card="${escapeHtml(context.id)}"><div class="card-heading"><h3>Context · pagina ${context.page_number}</h3><span class="muted">Voorstel: vraag ${context.suggested_from_question}–${context.to_question}</span></div><img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Contextfragment op pagina ${context.page_number}"><p class="analysis-reason">${escapeHtml(context.label)}</p><div class="analysis-fields"><label>Vanaf vraag<input type="number" min="1" max="60" data-context-from="${escapeHtml(context.id)}" value="${context.from_question}"></label><label>Tot en met vraag<input type="number" min="1" max="60" data-context-to="${escapeHtml(context.id)}" value="${context.to_question}"></label></div><details class="analysis-text"><summary>Tekstlaag (hulpmiddel)</summary><pre>${escapeHtml(context.extracted_text)}</pre></details><label class="review-warning"><input type="checkbox" data-context-reviewed="${escapeHtml(context.id)}" ${context.reviewed?'checked':''}> Ik heb deze context en het vraagbereik gecontroleerd.</label></article>`).join('');
-    const questionCards=result.opgaven.questions.map(q=>`<article class="analysis-card" data-snippet-question="${q.question_number}"><h3>Vraag ${q.question_number}</h3><div class="fragment-images">${q.segments.map(seg=>`<figure><figcaption>Pagina ${seg.page_number}</figcaption><img loading="lazy" src="${escapeHtml(seg.url)}" alt="Definitief vraagfragment ${q.question_number}"></figure>`).join('')}</div><label class="review-warning"><input type="checkbox" data-snippet-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het definitieve vraagfragment gecontroleerd.</label></article>`).join('');
-    const workbookCards=result.uitwerkbijlage.questions.map(q=>`<article class="analysis-card"><h3>Uitwerkbijlage · vraag ${q.question_number}</h3>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Uitwerkbijlagevraag ${q.question_number}">`).join('')}<label class="review-warning"><input type="checkbox" data-snippet-uitwerk="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb dit fragment gecontroleerd.</label></article>`).join('');
-    const cvCards=result.correctievoorschrift.questions.map(q=>`<article class="analysis-card"><h3>Correctievoorschrift · vraag ${q.question_number}</h3>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="CV-fragment ${q.question_number}">`).join('')}<label class="review-warning"><input type="checkbox" data-snippet-cv="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb dit CV-fragment gecontroleerd.</label></article>`).join('');
-    panel.innerHTML=`<p class="eyebrow">FASE 8 · DEFINITIEVE SNIPPETS</p><h2>Contexten en snippets controleren</h2><p class="lead">De vraag-, uitwerkbijlage- en CV-fragmenten zijn uit de oorspronkelijke PDF's opgebouwd. Contexten worden afzonderlijk voorgesteld, zodat één context aan een reeks vragen gekoppeld kan worden.</p><div class="notice">${result.question_count} vragen · ${result.context_count} contextvoorstellen · ${result.uitwerkbijlage.question_count} uitwerkbijlagefragmenten · ${result.correctievoorschrift.question_count} CV-fragmenten.</div><h3>Contexten</h3>${contextCards||'<p class="muted">Geen contextvoorstellen op basis van de tekstlaag. Controleer de oorspronkelijke opgaven visueel en bevestig hieronder of er geen afzonderlijke contexten zijn.</p><label class="review-warning"><input type="checkbox" id="confirmNoContexts"> Ik heb gecontroleerd dat er geen afzonderlijke contextfragmenten gekoppeld hoeven te worden.</label>'}<h3>Vraagfragmenten</h3>${questionCards}<h3>Uitwerkbijlagefragmenten</h3>${workbookCards||'<p class="muted">Geen uitwerkbijlagefragmenten van toepassing.</p>'}<h3>Correctievoorschriftfragmenten</h3>${cvCards}<div class="review-actions"><button class="primary" id="saveSnippets">Snippetcontrole opslaan</button><button class="primary" id="completeSnippets" disabled>Snippets goedkeuren en doorgaan</button></div><p id="snippetsMessage" class="form-error" role="status"></p>`;
-    const contextChecks=()=>[...document.querySelectorAll('[data-context-reviewed]')];
-    const questionChecks=()=>[...document.querySelectorAll('[data-snippet-reviewed]')];
-    const workbookChecks=()=>[...document.querySelectorAll('[data-snippet-uitwerk]')];
-    const cvChecks=()=>[...document.querySelectorAll('[data-snippet-cv]')];
-    const noContextConfirmed=()=>!result.contexts.length && $('#confirmNoContexts')?.checked;
-    const refresh=()=>{$('#completeSnippets').disabled=contextChecks().some(x=>!x.checked)||questionChecks().some(x=>!x.checked)||workbookChecks().some(x=>!x.checked)||cvChecks().some(x=>!x.checked)||(!result.contexts.length&&!noContextConfirmed());};
-    [...contextChecks(),...questionChecks(),...workbookChecks(),...cvChecks()].forEach(x=>x.addEventListener('change',refresh));
-    $('#confirmNoContexts')?.addEventListener('change',refresh); refresh();
-    const collect=()=>({contexts:result.contexts.map(c=>({id:c.id,from_question:Number(document.querySelector(`[data-context-from="${c.id}"]`).value),to_question:Number(document.querySelector(`[data-context-to="${c.id}"]`).value),reviewed:document.querySelector(`[data-context-reviewed="${c.id}"]`).checked})),reviewed_question_numbers:questionChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetReviewed)),reviewed_uitwerk_numbers:workbookChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetUitwerk)),reviewed_cv_numbers:cvChecks().filter(x=>x.checked).map(x=>Number(x.dataset.snippetCv)),confirmed_no_contexts:noContextConfirmed()});
-    const save=(options={})=>api(`/api/exams/${state.examId}/snippets/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...collect(),...options})});
+    const result = await api(`/api/exams/${state.examId}/snippets`);
+
+    // De fragmenten zijn inhoudelijk al afgebakend in de eerdere stappen.
+    // Hier worden alleen contextbereiken gecontroleerd en de volledige set
+    // visueel beoordeeld. Er zijn daarom geen losse controlevinkjes nodig.
+    // Maak van contexten en vragen één chronologische lijst.
+    // Contexten worden vóór de eerste vraag geplaatst waarvoor ze gelden.
+    // Bij meerdere contexten die bij dezelfde vraag beginnen, tonen we eerst
+    // de breedste context (bijvoorbeeld 1–6), daarna de specifiekere (1–2).
+    // Vervolgens komt de vraag zelf; op de volgende vraagpositie kunnen weer
+    // nieuwe contextblokken volgen. Dit voorkomt dat contexten los bovenaan
+    // worden verzameld of telkens binnen iedere vraag worden herhaald.
+    const contextHtml = context => `
+      <article class="analysis-card" data-context-card="${escapeHtml(context.id)}">
+        <div class="card-heading">
+          <h3>Context · pagina ${context.page_number}</h3>
+          <span class="muted">Voorstel: vraag ${context.suggested_from_question}–${context.to_question}</span>
+        </div>
+        <img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Contextfragment op pagina ${context.page_number}">
+        <p class="analysis-reason">${escapeHtml(context.label)}</p>
+        <div class="analysis-fields">
+          <label>Contexttitel
+            <input type="text" maxlength="200" data-context-title="${escapeHtml(context.id)}" value="${escapeHtml(context.title || context.label || '')}" placeholder="Titel van deze context">
+          </label>
+          <label>Vanaf vraag
+            <input type="number" min="1" max="60" data-context-from="${escapeHtml(context.id)}" value="${context.from_question}">
+          </label>
+          <label>Tot en met vraag
+            <input type="number" min="1" max="60" data-context-to="${escapeHtml(context.id)}" value="${context.to_question}">
+          </label>
+        </div>
+        <details class="analysis-text">
+          <summary>Tekstlaag (hulpmiddel)</summary>
+          <pre>${escapeHtml(context.extracted_text || context.text || '')}</pre>
+        </details>
+      </article>`;
+
+    const renderQuestionCard = question => `
+      <article class="analysis-card">
+        <h3>Opgave · vraag ${question.question_number}</h3>
+        <div class="fragment-images">
+          ${question.segments.map(segment => `
+            <figure>
+              <figcaption>Pagina ${segment.page_number}</figcaption>
+              <img loading="lazy" src="${escapeHtml(segment.url)}" alt="Definitief vraagfragment ${question.question_number}">
+            </figure>`).join('')}
+        </div>
+      </article>`;
+
+    // Gebruik de daadwerkelijke, door de docent bevestigde contextbereiken.
+    // Als twee contexten dezelfde startvraag hebben, sorteer dan op eindvraag
+    // aflopend zodat de grotere gedeelde context eerst zichtbaar wordt.
+    const orderedItems = [
+      ...result.contexts.map(context => ({
+        kind: 'context',
+        start: Number(context.from_question ?? context.suggested_from_question),
+        end: Number(context.to_question),
+        context
+      })),
+      ...result.opgaven.questions.map(question => ({
+        kind: 'question',
+        start: Number(question.question_number),
+        end: Number(question.question_number),
+        question
+      }))
+    ].sort((a, b) =>
+      a.start - b.start ||
+      (a.kind === 'context' && b.kind === 'question' ? -1 :
+       a.kind === 'question' && b.kind === 'context' ? 1 : 0) ||
+      (a.kind === 'context' && b.kind === 'context' ? b.end - a.end : 0)
+    );
+
+    const orderedReviewCards = orderedItems.map(item =>
+      item.kind === 'context' ? contextHtml(item.context) : renderQuestionCard(item.question)
+    ).join('');
+    const renderFragmentCards = (questions, heading, altPrefix) => questions.map(question => `
+      <article class="analysis-card">
+        <h3>${heading} · vraag ${question.question_number}</h3>
+        <div class="fragment-images">
+          ${question.segments.map(segment => `
+            <figure>
+              ${segment.page_number ? `<figcaption>Pagina ${segment.page_number}</figcaption>` : ''}
+              <img class="fragment-image" loading="lazy" src="${escapeHtml(segment.url)}" alt="${altPrefix} vraag ${question.question_number}">
+            </figure>`).join('')}
+        </div>
+      </article>`).join('');
+
+    const questionCards = result.opgaven.questions.map(question => `
+      <article class="analysis-card">
+        <h3>Opgave · vraag ${question.question_number}</h3>
+        <div class="fragment-images">
+          ${question.segments.map(segment => `
+            <figure>
+              <figcaption>Pagina ${segment.page_number}</figcaption>
+              <img loading="lazy" src="${escapeHtml(segment.url)}" alt="Definitief vraagfragment ${question.question_number}">
+            </figure>`).join('')}
+        </div>
+      </article>`).join('');
+
+    panel.innerHTML = `
+      <p class="eyebrow">FASE 8 · DEFINITIEVE SNIPPETS</p>
+      <h2>Contexten en snippets controleren</h2>
+      <p class="lead">Bekijk de definitieve uitsneden en controleer of context, vraag, uitwerkbijlage en correctievoorschrift volledig en correct zijn weergegeven. Pas alleen een contextbereik aan als de koppeling met de vragen niet klopt.</p>
+      <div class="notice">
+        ${result.question_count} vragen · ${result.context_count} contextvoorstellen ·
+        ${result.uitwerkbijlage.question_count} uitwerkbijlagefragmenten ·
+        ${result.correctievoorschrift.question_count} CV-fragmenten.
+      </div>
+      <h3>Contexten en vraagfragmenten in documentvolgorde</h3>
+      ${orderedReviewCards || '<p class="muted">Er zijn geen context- of vraagfragmenten beschikbaar.</p>'}
+      <h3>Uitwerkbijlagefragmenten</h3>
+      ${renderFragmentCards(result.uitwerkbijlage.questions, 'Uitwerkbijlage', 'Uitwerkbijlage')}
+      ${result.uitwerkbijlage.questions.length ? '' : '<p class="muted">Geen uitwerkbijlagefragmenten van toepassing.</p>'}
+      <h3>Correctievoorschriftfragmenten</h3>
+      ${renderFragmentCards(result.correctievoorschrift.questions, 'Correctievoorschrift', 'Correctievoorschrift')}
+      <div class="review-actions">
+        <button class="primary" id="saveSnippets" type="button">Controle opslaan</button>
+        <button class="primary" id="completeSnippets" type="button">Snippets goedkeuren en doorgaan</button>
+      </div>
+      <p id="snippetsMessage" class="form-error" role="status"></p>`;
+
+    // De server bewaart voor compatibiliteit nog steeds expliciete
+    // reviewed-markeringen. Die worden nu in één keer gezet door de
+    // afrondactie, niet door een reeks vinkjes naast afzonderlijke plaatjes.
+    const collect = () => ({
+      contexts: result.contexts.map(context => ({
+        id: context.id,
+        title: panel.querySelector(`[data-context-title="${CSS.escape(context.id)}"]`)?.value?.trim() || context.label || '',
+        from_question: Number(panel.querySelector(`[data-context-from="${CSS.escape(context.id)}"]`)?.value),
+        to_question: Number(panel.querySelector(`[data-context-to="${CSS.escape(context.id)}"]`)?.value),
+        reviewed: true
+      })),
+      reviewed_question_numbers: result.opgaven.questions.map(item => Number(item.question_number)),
+      reviewed_uitwerk_numbers: result.uitwerkbijlage.questions.map(item => Number(item.question_number)),
+      reviewed_cv_numbers: result.correctievoorschrift.questions.map(item => Number(item.question_number)),
+      confirmed_no_contexts: result.contexts.length === 0
+    });
+
+    const validate = () => {
+      for (const context of collect().contexts) {
+        if (!Number.isInteger(context.from_question) || !Number.isInteger(context.to_question)
+            || context.from_question < 1 || context.to_question < context.from_question
+            || context.to_question > 60) {
+          return 'Controleer het vraagbereik van iedere context.';
+        }
+      }
+      return null;
+    };
+
+    const save = (options = {}) => {
+      const problem = validate();
+      if (problem) throw new Error(problem);
+      return api(`/api/exams/${state.examId}/snippets/review`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({...collect(), ...options})
+      });
+    };
+
     bindStageAutoSave(panel, save, '#snippetsMessage');
-    $('#saveSnippets').addEventListener('click',async()=>{try{const r=await save();$('#snippetsMessage').textContent=`${r.reviewed_count} vragen en ${r.reviewed_all_contexts?result.context_count:contextChecks().filter(x=>x.checked).length} contexten gecontroleerd.`;}catch(error){$('#snippetsMessage').textContent=error.message;}});
-    $('#completeSnippets').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle contexten en vraagfragmenten.');await api(`/api/exams/${state.examId}/steps/snippets/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_all_contexts:true})});await openWorkspace(state.examId);}catch(error){$('#snippetsMessage').textContent=error.message;}});
-  } catch(error) { panel.innerHTML=`<h2>Definitieve snippets</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+
+    $('#saveSnippets').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Opslaan…';
+      try {
+        const saved = await save({draft: true});
+        $('#snippetsMessage').textContent =
+          `${saved.reviewed_question_numbers.length} vraagfragmenten en ${result.context_count} contexten opgeslagen.`;
+      } catch (error) {
+        $('#snippetsMessage').textContent = error.message;
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      }
+    });
+
+    let completingSnippets = false;
+    $('#completeSnippets').addEventListener('click', async event => {
+      const button = event.currentTarget;
+      if (completingSnippets) return;
+      completingSnippets = true;
+      button.disabled = true;
+      button.textContent = 'Controleren en afronden…';
+      try {
+        // Flush de laatste contextwijziging vóór het expliciet afronden.
+        const saved = panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save({draft: true});
+        if (!saved.complete) throw new Error('De snippetcontrole is nog niet volledig opgeslagen.');
+
+        await api(`/api/exams/${state.examId}/steps/snippets/complete`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({reviewed: true, reviewed_all_questions: true, reviewed_all_contexts: true})
+        });
+        button.textContent = 'Volgende stap openen…';
+        await openWorkspace(state.examId);
+      } catch (error) {
+        completingSnippets = false;
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = 'Snippets goedkeuren en doorgaan';
+        }
+        $('#snippetsMessage').textContent = error.message;
+        if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+          $('#snippetsMessage').insertAdjacentHTML('afterend',
+            '<button class="quiet" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
+          $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+            await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+            await openWorkspace(state.examId);
+          });
+        }
+      }
+    });
+  } catch (error) {
+    panel.innerHTML = `<h2>Definitieve snippets</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+    if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+      panel.insertAdjacentHTML('beforeend',
+        '<button class="primary" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
+      $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+        try {
+          await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+          await openWorkspace(state.examId);
+        } catch (reopenError) {
+          panel.insertAdjacentHTML('beforeend', `<p class="form-error">${escapeHtml(reopenError.message)}</p>`);
+        }
+      });
+    }
+  }
 }
 
 /* De integrale eindcontrole toont alle bronnen in één vraagkaart. Problemen
    worden niet verborgen: ontbrekende koppelingen en afwijkende scores blijven
-   zichtbaar en vragen een toelichting voordat het examen kan worden afgerond. */
+   zichtbaar en vragen een toelichting voordat het examen kan worden afgerond.
+   De afrondknop is de bevestiging; per vraag afvinken is overbodig. */
 async function renderFinalReviewStage() {
-  const panel=$('#stagePanel');
-  panel.innerHTML='<p class="muted">Integrale eindcontrole samenstellen…</p>';
+  const panel = $('#stagePanel');
+  panel.innerHTML = '<p class="muted">Integrale eindcontrole samenstellen…</p>';
+
   try {
-    const result=await api(`/api/exams/${state.examId}/final-review`);
-    panel.innerHTML=`<p class="eyebrow">FASE 9 · INTEGRALE EINDCONTROLE</p><h2>Iedere vraag in samenhang controleren</h2><p class="lead">Controleer per vraag de context, opgave, eventuele uitwerkbijlage, correctievoorschrift, antwoord en punten. Bij een verschil tussen de maximumscore in opgave en CV moet de oplossing worden toegelicht.</p><div class="notice">${result.question_count} vragen · controleer de volledige visuele samenhang vóór publicatie.</div>
-      ${result.questions.map(q=>`<article class="analysis-card final-review-card" data-final-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${q.points_match===false?'Scoreverschil':q.correctievoorschrift.length?'CV gekoppeld':'CV ontbreekt'}</span></div><h4>Gekoppelde context</h4>${q.context.length?q.context.map(c=>`<figure><figcaption>Context · pagina ${c.page_number} · vragen ${c.from_question}–${c.to_question}</figcaption><img class="fragment-image" loading="lazy" src="${escapeHtml(c.url)}" alt="Context bij vraag ${q.question_number}"></figure>`).join(''):'<p class="muted">Geen context gekoppeld.</p>'}<h4>Opgave</h4>${q.opgaven.map(seg=>`<figure><figcaption>Pagina ${seg.page_number}</figcaption><img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Opgave ${q.question_number}"></figure>`).join('')}<h4>Uitwerkbijlage</h4>${q.uitwerkbijlage.length?q.uitwerkbijlage.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Uitwerkbijlage ${q.question_number}">`).join(''):'<p class="muted">Geen bijbehorend onderdeel in de uitwerkbijlage.</p>'}<h4>Correctievoorschrift</h4>${q.correctievoorschrift.length?q.correctievoorschrift.map(seg=>`<img class="fragment-image" loading="lazy" src="${escapeHtml(seg.url)}" alt="Correctievoorschrift ${q.question_number}">`).join(''):'<p class="form-error">Geen CV-fragment gekoppeld.</p>'}${(q.supplement_pages||[]).map(page=>`<p class="analysis-reason">Aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}${page.action==='vervangen'?' (vervangt het oorspronkelijke antwoordvoorstel)':''}</p><img class="fragment-image" loading="lazy" src="${escapeHtml(page.url)}" alt="Aanvulling correctievoorschrift bij vraag ${q.question_number}">`).join('')}${q.options?.length?`<h4>Herkende antwoordopties</h4><ul>${q.options.map(option=>`<li><strong>${escapeHtml(option.letter)}.</strong> ${escapeHtml(option.text)}</li>`).join('')}</ul>`:''}<div class="relation-grid"><span>Vraagtype: ${escapeHtml(q.question_type)}</span><span>Maximumscore opgave: ${q.max_points??'onbekend'}</span><span>Maximumscore CV: ${q.cv_max_points??'onbekend'}</span><span>Antwoordvorm: ${escapeHtml(q.answer_kind)}</span></div><details><summary>Antwoord / beoordelingscriteria</summary><pre>${escapeHtml(q.answer_text)}</pre></details>${q.points_match===false?'<p class="form-error">De maximumscores komen niet overeen. Leg vast hoe dit verschil is gecontroleerd.</p>':''}<label>Toelichting bij afwijking / herstel<textarea rows="2" data-final-note="${q.question_number}">${escapeHtml(q.resolution_note)}</textarea></label><label class="review-warning"><input type="checkbox" data-final-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb vraag ${q.question_number} in samenhang gecontroleerd.</label><div class="review-actions"><button class="quiet" type="button" data-repair="opgaven_fragments">Opgavefragment herstellen</button><button class="quiet" type="button" data-repair="opgaven_analyse">Vraagtype / punten / opties</button>${examHasDocumentType('uitwerkbijlage')?'<button class="quiet" type="button" data-repair="uitwerk_fragments">Uitwerkfragment herstellen</button>':''}<button class="quiet" type="button" data-repair="cv_fragments">CV-fragment herstellen</button><button class="quiet" type="button" data-repair="cv_aanvulling">CV-aanvulling aanpassen</button><button class="quiet" type="button" data-repair="antwoorden">Antwoord aanpassen</button><button class="quiet" type="button" data-repair="relaties">Koppeling herstellen</button></div></article>`).join('')}
-      <div class="review-actions"><button class="primary" id="saveFinalReview">Eindcontrole opslaan</button><button class="primary" id="completeFinalReview" disabled>Eindcontrole afronden</button></div><p id="finalReviewMessage" class="form-error" role="status"></p>`;
-    const cards=[...document.querySelectorAll('[data-final-card]')];
-    const checks=()=>[...document.querySelectorAll('[data-final-reviewed]')];
-    const refresh=()=>{$('#completeFinalReview').disabled=checks().some(x=>!x.checked)||result.questions.some(q=>q.points_match===false&&!document.querySelector(`[data-final-note="${q.question_number}"]`).value.trim());};
-    checks().forEach(x=>x.addEventListener('change',refresh));
-    document.querySelectorAll('[data-final-note]').forEach(x=>x.addEventListener('input',refresh)); refresh();
-    const collect=()=>cards.map(card=>{const n=Number(card.dataset.finalCard);return {question_number:n,reviewed:card.querySelector(`[data-final-reviewed="${n}"]`).checked,resolution_note:card.querySelector(`[data-final-note="${n}"]`).value};});
-    const save=(options={})=>api(`/api/exams/${state.examId}/final-review/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect(),...options})});
-    bindStageAutoSave(panel, save, '#finalReviewMessage');
-    $('#saveFinalReview').addEventListener('click',async()=>{try{const r=await save();$('#finalReviewMessage').textContent=`${r.reviewed_count} van ${result.question_count} vragen gecontroleerd.`;}catch(error){$('#finalReviewMessage').textContent=error.message;}});
-    $('#completeFinalReview').addEventListener('click',async()=>{try{const r=await save();if(!r.complete)throw new Error('Controleer eerst alle vragen.');await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true})});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}});
-    document.querySelectorAll('[data-repair]').forEach(button=>button.addEventListener('click',async()=>{try{await api(`/api/exams/${state.examId}/steps/${button.dataset.repair}/reopen`,{method:'POST'});await openWorkspace(state.examId);}catch(error){$('#finalReviewMessage').textContent=error.message;}}));
-  } catch(error) { panel.innerHTML=`<h2>Integrale eindcontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+    const result = await api(`/api/exams/${state.examId}/final-review`);
+    if (!result.questions?.length) {
+      throw new Error('Er zijn geen vraagrecords beschikbaar voor de integrale eindcontrole.');
+    }
+
+    let currentIndex = 0;
+    const visited = new Set(
+      result.questions.filter(question => question.reviewed).map(question => question.question_number)
+    );
+    const notes = Object.fromEntries(
+      result.questions.map(question => [question.question_number, question.resolution_note || ''])
+    );
+    let saveTimer = null;
+    let saveChain = Promise.resolve();
+    let completing = false;
+
+    const currentQuestion = () => result.questions[currentIndex];
+    const allVisited = () => visited.size === result.questions.length;
+    const unresolvedMismatches = () => result.questions.filter(question =>
+      question.points_match === false && !String(notes[question.question_number] || '').trim()
+    );
+
+    const contextHtml = question => question.context.length
+      ? question.context.map(context => `
+          <figure>
+            <figcaption>Context · pagina ${context.page_number} · vragen ${context.from_question}–${context.to_question}</figcaption>
+            <img class="fragment-image" loading="lazy" src="${escapeHtml(context.url)}" alt="Context bij vraag ${question.question_number}">
+          </figure>`).join('')
+      : '<p class="muted">Geen afzonderlijke context gekoppeld.</p>';
+
+    const segmentHtml = (segments, alt, emptyMessage) => segments.length
+      ? segments.map(segment => `
+          <figure>
+            ${segment.page_number ? `<figcaption>Pagina ${segment.page_number}</figcaption>` : ''}
+            <img class="fragment-image" loading="lazy" src="${escapeHtml(segment.url)}" alt="${alt}">
+          </figure>`).join('')
+      : `<p class="muted">${emptyMessage}</p>`;
+
+    const questionCardHtml = question => `
+      <article class="analysis-card final-review-card" data-final-card="${question.question_number}">
+        <div class="card-heading">
+          <h3>Vraag ${question.question_number}</h3>
+          <span class="status-pill">${question.points_match === false ? 'Scoreverschil' : question.correctievoorschrift.length ? 'CV gekoppeld' : 'CV ontbreekt'}</span>
+        </div>
+
+        <h4>Gekoppelde context</h4>
+        ${contextHtml(question)}
+
+        <h4>Opgave</h4>
+        ${segmentHtml(question.opgaven, `Opgave ${question.question_number}`, 'Geen opgavefragment gevonden.')}
+
+        <h4>Uitwerkbijlage</h4>
+        ${segmentHtml(question.uitwerkbijlage, `Uitwerkbijlage vraag ${question.question_number}`, 'Geen bijbehorend onderdeel in de uitwerkbijlage.')}
+
+        <h4>Correctievoorschrift</h4>
+        ${segmentHtml(question.correctievoorschrift, `Correctievoorschrift vraag ${question.question_number}`, 'Geen CV-fragment gekoppeld.')}
+
+        ${(question.supplement_pages || []).map(page => `
+          <p class="analysis-reason">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}${page.action === 'vervangen' ? ' (vervangt het oorspronkelijke antwoordvoorstel)' : ''}</p>
+          <img class="fragment-image" loading="lazy" src="${escapeHtml(page.url)}" alt="CV-aanvulling bij vraag ${question.question_number}">
+        `).join('')}
+
+        ${question.options?.length ? `
+          <h4>Herkende antwoordopties</h4>
+          <ul>${question.options.map(option => `<li><strong>${escapeHtml(option.letter)}.</strong> ${escapeHtml(option.text)}</li>`).join('')}</ul>
+        ` : ''}
+
+        <div class="relation-grid">
+          <span>Vraagtype: ${escapeHtml(question.question_type)}</span>
+          <span>Maximumscore opgave: ${question.max_points ?? 'onbekend'}</span>
+          <span>Maximumscore CV: ${question.cv_max_points ?? 'onbekend'}</span>
+          <span>Antwoordvorm: ${escapeHtml(question.answer_kind)}</span>
+        </div>
+
+        <details>
+          <summary>Antwoord / beoordelingscriteria</summary>
+          <pre>${escapeHtml(question.answer_text || 'Geen antwoordtekst opgeslagen.')}</pre>
+        </details>
+
+        ${question.points_match === false ? `
+          <section class="analysis-card">
+            <p class="form-error">De maximumscores komen niet overeen. Leg kort vast waarom dit verschil klopt of hoe het is hersteld.</p>
+            <label>Toelichting scoreverschil
+              <textarea rows="3" data-final-note="${question.question_number}">${escapeHtml(notes[question.question_number])}</textarea>
+            </label>
+          </section>
+        ` : ''}
+
+        <details>
+          <summary>Herstelmogelijkheden voor deze vraag</summary>
+          <div class="review-actions">
+            <button class="quiet" type="button" data-repair="opgaven_fragments">Opgavefragment herstellen</button>
+            <button class="quiet" type="button" data-repair="opgaven_analyse">Vraagtype / punten / opties</button>
+            ${examHasDocumentType('uitwerkbijlage') ? '<button class="quiet" type="button" data-repair="uitwerk_fragments">Uitwerkfragment herstellen</button>' : ''}
+            <button class="quiet" type="button" data-repair="cv_fragments">CV-fragment herstellen</button>
+            <button class="quiet" type="button" data-repair="cv_aanvulling">CV-aanvulling aanpassen</button>
+            <button class="quiet" type="button" data-repair="antwoorden">Antwoord aanpassen</button>
+            <button class="quiet" type="button" data-repair="relaties">Koppeling herstellen</button>
+          </div>
+        </details>
+      </article>`;
+
+    const overviewHtml = () => result.questions.map((question, index) => {
+      const number = question.question_number;
+      const isVisited = visited.has(number);
+      const hasIssue = question.points_match === false;
+      const label = hasIssue ? `${number} · !` : isVisited ? `${number} · ✓` : String(number);
+      return `<button class="quiet small" type="button" data-final-jump="${index}" aria-label="Ga naar vraag ${number}" title="${hasIssue ? 'Scoreverschil toelichten' : isVisited ? 'Bekeken' : 'Nog niet bekeken'}">${label}</button>`;
+    }).join('');
+
+    const collect = (markAllReviewed = false) => result.questions.map(question => ({
+      question_number: question.question_number,
+      reviewed: markAllReviewed || visited.has(question.question_number),
+      resolution_note: String(notes[question.question_number] || '')
+    }));
+
+    const save = (options = {}) => {
+      const questions = collect(Boolean(options.mark_all_reviewed));
+      const payload = {...options, questions};
+      delete payload.mark_all_reviewed;
+      return api(`/api/exams/${state.examId}/final-review/review`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+    };
+
+    const saveDraft = () => {
+      clearTimeout(saveTimer);
+      // Serialiseer autosaves. Een oudere, tragere request mag een nieuwere
+      // vraagnotitie of bekeken-status nooit terugschrijven.
+      saveChain = saveChain.catch(() => {}).then(() => save({draft: true}));
+      return saveChain;
+    };
+
+    const scheduleSave = () => {
+      clearTimeout(saveTimer);
+      const status = $('#finalReviewSaveStatus');
+      if (status) status.textContent = 'Wijziging wordt opgeslagen…';
+      saveTimer = setTimeout(() => {
+        saveDraft().then(() => {
+          const currentStatus = $('#finalReviewSaveStatus');
+          if (currentStatus) currentStatus.textContent = 'Opgeslagen';
+        }).catch(error => {
+          const currentStatus = $('#finalReviewSaveStatus');
+          if (currentStatus) currentStatus.textContent = error.message;
+        });
+      }, 450);
+    };
+
+    const refreshControls = () => {
+      const previousButtons = [$('#previousFinalQuestion'), $('#previousFinalQuestionBottom')].filter(Boolean);
+      const nextButtons = [$('#nextFinalQuestion'), $('#nextFinalQuestionBottom')].filter(Boolean);
+      const complete = $('#completeFinalReview');
+      const progress = $('#finalReviewProgress');
+      previousButtons.forEach(button => button.disabled = currentIndex === 0);
+      nextButtons.forEach(button => button.disabled = currentIndex === result.questions.length - 1);
+      if (progress) {
+        const remaining = result.questions.length - visited.size;
+        progress.textContent = `Vraag ${currentIndex + 1} van ${result.questions.length} · ${remaining} nog te bekijken`;
+      }
+      if (complete) {
+        complete.disabled = !allVisited() || unresolvedMismatches().length > 0 || completing;
+        complete.textContent = completing ? 'Eindcontrole afronden…' : 'Eindcontrole afronden';
+      }
+      panel.querySelectorAll('[data-final-jump]').forEach(button => {
+        const index = Number(button.dataset.finalJump);
+        button.classList.toggle('active', index === currentIndex);
+        const question = result.questions[index];
+        button.classList.toggle('candidate-suspect',
+          question.points_match === false && !String(notes[question.question_number] || '').trim());
+      });
+    };
+
+    const renderQuestion = () => {
+      const question = currentQuestion();
+      visited.add(question.question_number);
+      panel.innerHTML = `
+        <p class="eyebrow">FASE 9 · INTEGRALE EINDCONTROLE</p>
+        <h2>Vraag voor vraag controleren</h2>
+        <p class="lead">Bekijk per vraag de context, opgave, eventuele uitwerkbijlage, correctievoorschrift en antwoord. Met Vorige en Volgende doorloop je het examen. Een toelichting is alleen nodig bij een afwijkende maximumscore.</p>
+        <div class="notice" id="finalReviewProgress"></div>
+        <div class="final-review-overview" style="display:flex;flex-wrap:wrap;gap:0.35rem;margin:0.75rem 0 1rem">
+          ${overviewHtml()}
+        </div>
+        <div class="review-actions" style="justify-content:space-between">
+          <button class="quiet" id="previousFinalQuestion" type="button">← Vorige vraag</button>
+          <button class="quiet" id="nextFinalQuestion" type="button">Volgende vraag →</button>
+        </div>
+        ${questionCardHtml(question)}
+        <!-- Tweede navigatiepaar onder de vraagkaart: lange vragen kunnen scrollen. -->
+        <div class="review-actions" style="justify-content:space-between">
+          <button class="quiet" id="previousFinalQuestionBottom" type="button">← Vorige vraag</button>
+          <button class="quiet" id="nextFinalQuestionBottom" type="button">Volgende vraag →</button>
+        </div>
+        <div class="review-actions">
+          <button class="primary" id="saveFinalReview" type="button">Voortgang opslaan</button>
+          <button class="primary" id="completeFinalReview" type="button">Eindcontrole afronden</button>
+        </div>
+        <p id="finalReviewSaveStatus" class="muted" role="status"></p>
+        <p id="finalReviewMessage" class="form-error" role="status"></p>`;
+
+      const noteField = panel.querySelector('[data-final-note]');
+      if (noteField) {
+        noteField.addEventListener('input', () => {
+          notes[question.question_number] = noteField.value;
+          refreshControls();
+          scheduleSave();
+        });
+      }
+
+      // Beide navigatieparen bedienen dezelfde index en dezelfde save-route.
+      ['previousFinalQuestion', 'previousFinalQuestionBottom'].forEach(id => {
+        panel.querySelector('#' + id)?.addEventListener('click', () => navigateTo(currentIndex - 1));
+      });
+      ['nextFinalQuestion', 'nextFinalQuestionBottom'].forEach(id => {
+        panel.querySelector('#' + id)?.addEventListener('click', () => navigateTo(currentIndex + 1));
+      });
+      panel.querySelectorAll('[data-final-jump]').forEach(button => {
+        button.addEventListener('click', () => navigateTo(Number(button.dataset.finalJump)));
+      });
+
+      $('#saveFinalReview').addEventListener('click', async event => {
+        const button = event.currentTarget;
+        const original = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Opslaan…';
+        try {
+          await saveDraft();
+          $('#finalReviewSaveStatus').textContent = 'Voortgang opgeslagen.';
+        } catch (error) {
+          $('#finalReviewMessage').textContent = error.message;
+        } finally {
+          if (button.isConnected) button.textContent = original;
+          refreshControls();
+        }
+      });
+
+      $('#completeFinalReview').addEventListener('click', async () => {
+        if (completing || !allVisited() || unresolvedMismatches().length) return;
+        completing = true;
+        refreshControls();
+        try {
+          clearTimeout(saveTimer);
+          // De expliciete afrondactie bevestigt de volledige reeks. De server
+          // krijgt alle vragen als gecontroleerd, zonder verborgen vinkjes.
+          const saved = await save({draft: false, mark_all_reviewed: true});
+          if (!saved.complete) throw new Error('De integrale eindcontrole is nog niet volledig opgeslagen.');
+          await api(`/api/exams/${state.examId}/steps/eindcontrole/complete`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({reviewed: true, reviewed_all_questions: true})
+          });
+          await openWorkspace(state.examId);
+        } catch (error) {
+          completing = false;
+          const message = $('#finalReviewMessage');
+          if (message) message.textContent = error.message;
+          refreshControls();
+        }
+      });
+
+      panel.querySelectorAll('[data-repair]').forEach(button => {
+        button.addEventListener('click', async () => {
+          const original = button.textContent;
+          button.disabled = true;
+          button.textContent = 'Stap heropenen…';
+          try {
+            await saveDraft();
+            await api(`/api/exams/${state.examId}/steps/${button.dataset.repair}/reopen`, {method: 'POST'});
+            await openWorkspace(state.examId);
+          } catch (error) {
+            button.disabled = false;
+            button.textContent = original;
+            const message = $('#finalReviewMessage');
+            if (message) message.textContent = error.message;
+          }
+        });
+      });
+
+      refreshControls();
+    };
+
+    const navigateTo = nextIndex => {
+      if (nextIndex < 0 || nextIndex >= result.questions.length || nextIndex === currentIndex) return;
+
+      /*
+       * Navigeren hoeft niet op de serverroundtrip te wachten: de bekeken-status
+       * en eventuele toelichting staan al in de lokale arrays (visited/notes).
+       * De debounced, seriële autosave schrijft die momentopname weg. Daardoor
+       * wordt het scherm direct opgebouwd, terwijl opslag op de achtergrond
+       * doorgaat. saveChain voorkomt dat overlappende saves elkaar overschrijven.
+       */
+      currentIndex = nextIndex;
+      renderQuestion();
+      scheduleSave();
+    };
+
+    // Expose one flush hook so any workflow navigation waits for the final
+    // pending autosave before replacing this panel.
+    const saveWhenHidden = () => {
+      if (document.visibilityState === 'hidden') saveDraft().catch(() => {});
+    };
+    const saveOnPageHide = () => saveDraft().catch(() => {});
+    document.addEventListener('visibilitychange', saveWhenHidden);
+    window.addEventListener('pagehide', saveOnPageHide);
+
+    panel._stageAutoSaveFlush = saveDraft;
+    panel._stageAutoSaveCleanup = () => {
+      clearTimeout(saveTimer);
+      document.removeEventListener('visibilitychange', saveWhenHidden);
+      window.removeEventListener('pagehide', saveOnPageHide);
+      panel._stageAutoSaveFlush = null;
+      panel._stageAutoSaveCleanup = null;
+    };
+
+    renderQuestion();
+  } catch (error) {
+    panel.innerHTML = `<h2>Integrale eindcontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+    if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+      panel.insertAdjacentHTML('beforeend',
+        '<button class="primary" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
+      $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+        try {
+          await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+          await openWorkspace(state.examId);
+        } catch (reopenError) {
+          panel.insertAdjacentHTML('beforeend', `<p class="form-error">${escapeHtml(reopenError.message)}</p>`);
+        }
+      });
+    }
+  }
 }
 
 async function renderPublicationStage() {
@@ -548,6 +1436,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         <label class="review-warning"><input type="checkbox" id="allPagesReviewed"> Ik heb alle pagina's van dit document visueel gecontroleerd, ook de pagina's zonder voorstellen.</label>
         <div class="review-actions"><button class="primary" id="saveStartReview" type="button">Review opslaan</button><button class="primary" id="completeStartReview" type="button" disabled>Vraagstarts goedkeuren en doorgaan</button></div>
         <p id="startReviewMessage" class="form-error" role="status"></p>`;
+      prepareStageApproval(panel);
 
       const candidateById = new Map(result.candidates.map(item => [item.id, item]));
       const syncControls = () => {
@@ -573,10 +1462,17 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
       // automatisch als concept opgeslagen. De expliciete knop blijft bestaan
       // als handmatige bevestiging dat de docent de opslag heeft uitgevoerd.
       let autosaveTimer = null;
+      let startSaveChain = Promise.resolve();
+      const queueStartSave = () => {
+        // Seriële opslag voorkomt dat twee snel opeenvolgende wijzigingen
+        // elkaar in SQLite in een andere volgorde overschrijven.
+        startSaveChain = startSaveChain.catch(() => {}).then(() => saveReview());
+        return startSaveChain;
+      };
       const scheduleStartAutosave = () => {
         clearTimeout(autosaveTimer);
         autosaveTimer = setTimeout(() => {
-          saveReview().then(saved => {
+          queueStartSave().then(saved => {
             const status = $('#startReviewMessage');
             if (status) status.textContent = 'Wijziging automatisch opgeslagen.';
           }).catch(error => {
@@ -585,7 +1481,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
           });
         }, 250);
       };
-      panel.onchange = event => {
+            panel.onchange = event => {
         if (event.target.matches('[data-candidate], [data-number], [data-move]')) {
           scheduleStartAutosave();
         }
@@ -597,22 +1493,24 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
       };
       const flushStartAutosave = () => {
         clearTimeout(autosaveTimer);
-        saveReview().catch(error => {
+        return queueStartSave().catch(error => {
           const status = $('#startReviewMessage');
           if (status) status.textContent = 'Automatisch opslaan mislukt: ' + error.message;
+          throw error;
         });
       };
       const startVisibilityChange = () => {
-        if (document.visibilityState === 'hidden') flushStartAutosave();
+        if (document.visibilityState === 'hidden') flushStartAutosave().catch(() => {});
       };
+      const flushStartOnPageHide = () => flushStartAutosave().catch(() => {});
       document.addEventListener('visibilitychange', startVisibilityChange);
-      window.addEventListener('pagehide', flushStartAutosave);
+      window.addEventListener('pagehide', flushStartOnPageHide);
       panel._stageAutoSaveCleanup = () => {
         clearTimeout(autosaveTimer);
         panel.onchange = null;
         panel.onclick = null;
         document.removeEventListener('visibilitychange', startVisibilityChange);
-        window.removeEventListener('pagehide', flushStartAutosave);
+        window.removeEventListener('pagehide', flushStartOnPageHide);
         panel._stageAutoSaveCleanup = null;
       };
 
@@ -684,7 +1582,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
           page.candidates.push(candidate);
           page.candidate_count = page.candidates.length;
           renderAll();
-          saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+          queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
         };
         canvas.addEventListener('click', place, {once:true});
       }));
@@ -716,7 +1614,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         oldPage.candidate_count = oldPage.candidates.length;
         newPage.candidate_count = newPage.candidates.length;
         renderAll();
-        saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+        queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
       }));
 
       // Een bestaande vraagstart kan ook exact opnieuw worden geplaatst.
@@ -746,7 +1644,7 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
             Number((item.pdf_bbox[2] * page.scale_x).toFixed(2)),
             Number((item.pdf_bbox[3] * page.scale_y).toFixed(2))];
           renderAll();
-          saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+          queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
         }, {once:true});
       }));
 
@@ -764,18 +1662,18 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
         page.candidates = page.candidates.filter(candidate => candidate.id !== item.id);
         page.candidate_count = page.candidates.length;
         renderAll();
-        saveReview().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
+        queueStartSave().catch(error => { $('#startReviewMessage').textContent = 'Automatisch opslaan mislukt: ' + error.message; });
       }));
 
       $('#saveStartReview').addEventListener('click', async () => {
         try {
-          const saved = await saveReview();
+          const saved = await flushStartAutosave();
           $('#startReviewMessage').textContent = `${saved.review.accepted_count} vraagstarts geaccepteerd; ${saved.review.rejected_count} afgewezen. Conceptreview opgeslagen.`;
         } catch (error) { $('#startReviewMessage').textContent = error.message; }
       });
       $('#completeStartReview').addEventListener('click', async () => {
         try {
-          const saved = await saveReview();
+          const saved = await flushStartAutosave();
           if (!saved.review.accepted_count) throw new Error('Er is geen enkele vraagstart geaccepteerd. Controleer eerst de detectie.');
           await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`, {
             method:'POST', headers:{'Content-Type':'application/json'},
@@ -797,11 +1695,24 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
    selecteert daarop rechthoekige verticale bereiken en classificeert elk bereik
    als context of vraag. De rechter inspector beheert de koppeling met één of
    meer vraagnummers; de selectiecoördinaten blijven in pixels van de stitchbron. */
-async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, stageTitle) {
+async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, stageTitle, documentType = 'opgaven') {
   const panel = $('#stagePanel');
-  panel.innerHTML = '<p class="muted">Het examen wordt samengevoegd tot één lange afbeelding…</p>';
+  panel.innerHTML = '<p class="muted">Het document wordt samengevoegd tot één lange afbeelding…</p>';
+  // Dezelfde werkruimte wordt gebruikt voor opgaven en uitwerkbijlage.
+  // Alleen de API-route en toegestane fragmentsoort verschillen.
+  const isWorkbook = documentType === 'uitwerkbijlage';
+  const isCv = documentType === 'correctievoorschrift';
+  const isStitchedDocument = isWorkbook || isCv;
+  const documentLabel = isWorkbook ? 'uitwerkbijlage' : isCv ? 'correctievoorschrift' : 'opgavenboekje';
+  const stitchedReviewUrl = isStitchedDocument
+    ? `/api/exams/${state.examId}/stitched-document/${documentType}/review`
+    : `/api/exams/${state.examId}/stitched-opgaven/review`;
+  const startsUrl = `/api/exams/${state.examId}/document-question-starts/${documentType}`;
+  const fragmentsReviewUrl = `/api/exams/${state.examId}/document-question-fragments/${documentType}/review`;
   try {
-    const result = await api(`/api/exams/${state.examId}/stitched-opgaven`);
+    const result = await api(isStitchedDocument
+      ? `/api/exams/${state.examId}/stitched-document/${documentType}`
+      : `/api/exams/${state.examId}/stitched-opgaven`);
     // Herstel altijd de serverversie van eerder opgeslagen werk. Automatische
     // voorstellen worden alleen gebruikt als er nog geen concept bestaat.
     let selections = (result.selections?.length ? result.selections : (result.proposed_selections || []))
@@ -811,43 +1722,86 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     let pointerStart = null;
     let saveTimer = null;
     let saveChain = Promise.resolve();
+    let completingStep = false;
+    // Bij een oude afbeelding zijn de behouden grenzen slechts een
+    // herstelvoorstel. Automatische saves en pagehide mogen de waarschuwing
+    // niet stilzwijgend wissen; alleen de expliciete knop 'Nu opslaan' geldt
+    // als bevestiging dat de docent de grenzen op de nieuwe afbeelding heeft
+    // gecontroleerd.
+    let recoveryNeedsExplicitSave = Boolean(result.selection_warning);
 
     panel.innerHTML = `
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
-      <p class="lead">De pagina's zijn eerst afzonderlijk bijgesneden en daarna samengevoegd. Contexten en vragen staan in één doorlopende afbeelding. Controleer de voorgestelde afwisseling, verplaats grenzen en koppel elk fragment aan de juiste vragen.</p>
+      <p class="lead">${isStitchedDocument
+        ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
+        : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Selecteer elk afzonderlijk contextdeel als fragment van het type Context en koppel het aan de vragen waarop het betrekking heeft. Contextdelen met overlappende vraagnummers worden automatisch samengevoegd tot één contextgroep. De titel wordt afgeleid van de eerste tekstregel van het eerste contextdeel. Selecteer daarnaast iedere opgave als fragment van het type Vraag en koppel die aan het eigen vraagnummer.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
+      ${result.selection_warning ? `<p id="selectionRecoveryWarning" class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
-          <div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div>
+          <div class="stitched-image-scroll" id="stitchedImageScroll"><div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div></div>
         </section>
-        <aside class="stitched-inspector"><h3>Fragmenten</h3><div id="stitchedSelectionList"></div></aside>
+        <aside class="stitched-inspector">
+            <div class="stitched-inspector-heading">
+              <h3>Contextoverzicht</h3>
+              <p class="field-help">Contextdelen worden op basis van overlappende vraagnummers gegroepeerd. De titel komt uit de eerste tekstregel van het eerste contextdeel.</p>
+            </div>
+            <div id="contextGroupSummary" class="context-group-summary"></div>
+            <details class="stitched-fragments-panel" ${activeIndex >= 0 ? "open" : ""}>
+              <summary>Fragmenten bewerken <span>${selections.length}</span></summary>
+              <div id="stitchedSelectionList"></div>
+            </details>
+          </aside>
       </div>
       <div class="review-actions"><button class="primary" id="saveStitched">Nu opslaan</button><button class="primary" id="completeStitched">Fragmentcontrole goedkeuren en doorgaan</button></div><p id="stitchedMessage" class="form-error" role="status"></p>`;
 
     const img = $('#stitchedImage');
     const wrap = $('#stitchedImageWrap');
+    const imageScroll = $('#stitchedImageScroll');
     const overlay = $('#stitchedOverlay');
     const hint = $('#selectionHint');
     const list = $('#stitchedSelectionList');
     const saveStatus = $('#stitchedSaveStatus');
     const whiteRowRanges = result.white_row_ranges || [];
+    if (!whiteRowRanges.length) {
+      // Geen geldige grensrij betekent dat de selectie niet veilig kan worden
+      // bewerkt. Toon een duidelijke fout in plaats van de grens op een
+      // willekeurige (mogelijk bedrukte) beeldrij te laten vallen.
+      throw new Error('In de examenafbeelding is geen volledig zuiver witte horizontale rij gevonden. Fragmentgrenzen kunnen niet veilig worden geplaatst.');
+    }
 
-    // Een grens mag uitsluitend op een rij liggen waarvan ieder pixel wit is.
-    // De API levert compacte intervallen met zulke rijen; deze functie kiest
-    // steeds de dichtstbijzijnde geldige rij, ook bij slepen en handmatige invoer.
-    const snapBoundary = (value, minimum = 0, maximum = result.height - 1) => {
+    // Een grens mag uitsluitend op een rij liggen waarvan iedere RGB-pixel
+    // exact wit is. De server levert alleen zulke rijen aan; de browser kiest
+    // daaruit steeds de dichtstbijzijnde positie.
+    const snapBoundary = (value, minimum = 0, maximum = result.height - 1, edge = 'nearest') => {
       const y = Math.max(minimum, Math.min(maximum, Number(value) || 0));
-      if (!whiteRowRanges.length) return Math.round(y);
       let nearest = null;
       let distance = Infinity;
+
       for (const [rangeStart, rangeEnd] of whiteRowRanges) {
+        // Houd de kandidaat binnen de geldige ruimte tussen de andere grens
+        // en de rand van de afbeelding. Zo kunnen twee grenzen nooit kruisen.
         const start = Math.max(rangeStart, minimum);
         const end = Math.min(rangeEnd, maximum);
         if (start > end) continue;
-        const candidate = Math.max(start, Math.min(end, Math.round(y)));
+
+        // De bovenrand van een fragment hoort op de onderste rij van de
+        // witte strook te liggen; de onderrand op de bovenste rij. 'nearest'
+        // blijft beschikbaar voor het eerste klikpunt, dat nog geen rol heeft.
+        const candidate = edge === 'top'
+          ? end
+          : edge === 'bottom'
+            ? start
+            : Math.max(start, Math.min(end, Math.round(y)));
         const delta = Math.abs(candidate - y);
-        if (delta < distance) { nearest = candidate; distance = delta; }
+        if (delta < distance) {
+          nearest = candidate;
+          distance = delta;
+        }
       }
+
+      // Wanneer binnen de toegestane ruimte geen volledig witte rij ligt,
+      // blijft de bestaande grens staan. null is nooit een geldige pixelrij.
       return nearest;
     };
 
@@ -860,32 +1814,78 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // Synchroniseer de twee onafhankelijke scrollvakken op basis van hun
     // relatieve voortgang. Zo blijft de rechter fragmentlijst meelopen met de
     // lange examenstrook, en andersom. De guard voorkomt een scroll-lus.
-    const stitchedView = panel.querySelector('.stitched-view');
+    const stitchedView = imageScroll;
     const inspector = panel.querySelector('.stitched-inspector');
     let syncingScroll = false;
+    let suppressScrollSync = false;
+    let scrollSyncReleaseTimer = null;
+
+    // Bij een klik op een fragment moet alleen het andere paneel naar de
+    // bijbehorende regel springen. De automatische tweerichtingssynchronisatie
+    // mag die programmatische sprong niet terugkaatsen naar het paneel waarop
+    // de gebruiker zojuist heeft geklikt.
+    const pauseScrollSync = () => {
+      suppressScrollSync = true;
+      clearTimeout(scrollSyncReleaseTimer);
+      // scrollend wordt in moderne browsers gebruikt; de timer is de
+      // terugval voor browsers die dat event niet ondersteunen.
+      scrollSyncReleaseTimer = setTimeout(() => {
+        suppressScrollSync = false;
+      }, 1200);
+    };
+    const resumeScrollSync = () => {
+      clearTimeout(scrollSyncReleaseTimer);
+      suppressScrollSync = false;
+    };
+    imageScroll.addEventListener('scrollend', resumeScrollSync, {passive:true});
+    inspector.addEventListener('scrollend', resumeScrollSync, {passive:true});
+
     const syncScroll = (source, target) => {
-      if (syncingScroll) return;
+      if (syncingScroll || suppressScrollSync) return;
       syncingScroll = true;
       const sourceRange = Math.max(1, source.scrollHeight - source.clientHeight);
       const targetRange = Math.max(0, target.scrollHeight - target.clientHeight);
       target.scrollTop = source.scrollTop / sourceRange * targetRange;
       requestAnimationFrame(() => { syncingScroll = false; });
     };
-    stitchedView.addEventListener('scroll', () => syncScroll(stitchedView, inspector), {passive:true});
+    imageScroll.addEventListener('scroll', () => syncScroll(imageScroll, inspector), {passive:true});
     inspector.addEventListener('scroll', () => syncScroll(inspector, stitchedView), {passive:true});
 
     // Sla een momentopname van de selectie op. Een seriële promiseketen
     // voorkomt dat twee snelle wijzigingen elkaar op de server overschrijven.
-    const persistSelections = () => {
+    const persistSelections = (explicitRecoverySave = false) => {
+      // Zolang een oude selectie als herstelvoorstel wordt getoond, slaan we
+      // niets automatisch op. Anders zou alleen het openen/sluiten van de
+      // pagina de oude coördinaten aan de nieuwe afbeelding koppelen zonder
+      // dat de docent ze heeft bekeken.
+      if (recoveryNeedsExplicitSave && !explicitRecoverySave) {
+        saveStatus.textContent = 'Controleer de behouden grenzen en klik daarna op Nu opslaan';
+        return Promise.resolve(null);
+      }
       clearTimeout(saveTimer);
       const snapshot = JSON.parse(JSON.stringify(selections));
       saveStatus.textContent = 'Opslaan…';
       saveChain = saveChain.catch(() => {}).then(() => api(
-        `/api/exams/${state.examId}/stitched-opgaven/review`,
+        stitchedReviewUrl,
         {method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({selections:snapshot, reviewed:false})}
       )).then(response => {
+        // De server leest de eerste tekstregel opnieuw uit de PDF op basis
+        // van de actuele pixelgrenzen. Daardoor blijft de contextgroeptitel
+        // ook correct wanneer de docent de boven- of ondergrens verplaatst.
+        if (response.context_titles) {
+          selections.forEach(item => {
+            if (item.type === 'context' && Object.prototype.hasOwnProperty.call(response.context_titles, item.id)) {
+              item.context_title = response.context_titles[item.id];
+            }
+          });
+          render();
+        }
         saveStatus.textContent = 'Alle wijzigingen opgeslagen';
+        if (explicitRecoverySave && recoveryNeedsExplicitSave) {
+          recoveryNeedsExplicitSave = false;
+          $('#selectionRecoveryWarning')?.remove();
+        }
         return response;
       }).catch(error => {
         saveStatus.textContent = 'Opslaan mislukt — probeer opnieuw';
@@ -905,9 +1905,10 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // wisselen naar een andere applicatie op. keepalive laat de request lopen
     // wanneer de browser de pagina direct daarna inactief maakt.
     const saveOnHide = () => {
+      if (completingStep || recoveryNeedsExplicitSave) return;
       clearTimeout(saveTimer);
       const body = JSON.stringify({selections, reviewed:false});
-      fetch(`/api/exams/${state.examId}/stitched-opgaven/review`, {
+      fetch(stitchedReviewUrl, {
         method:'POST', keepalive:true,
         headers:{'Content-Type':'application/json'}, body
       }).catch(() => {});
@@ -933,7 +1934,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       handle.setPointerCapture?.(event.pointerId);
       overlay.querySelectorAll('[data-overlay-select]').forEach((element, elementIndex) => {
         element.classList.toggle('active', elementIndex === index);
-        element.style.zIndex = elementIndex === index ? '20' : '1';
+        // De actieve oranje selectie blijft als eigen laag herkenbaar, maar
+      // wordt niet meer boven alle blauwe fragmentvlakken gelegd.
+      element.style.zIndex = elementIndex === index ? '4' : '2';
       });
       list.querySelectorAll('[data-select-fragment]').forEach((button, buttonIndex) => {
         button.classList.toggle('active', buttonIndex === index);
@@ -943,11 +1946,16 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       if (!boundaryDrag) return;
       const item = selections[boundaryDrag.index];
       if (!item) return;
-      const y = snapBoundary(imageY(event));
+      const y = imageY(event);
+      if (y === null) return;
       if (boundaryDrag.edge === 'top') {
-        item.top = snapBoundary(y, 0, item.bottom - 12);
+        const snappedTop = snapBoundary(y, 0, item.bottom - 12, 'top');
+        if (snappedTop === null) return;
+        item.top = snappedTop;
       } else {
-        item.bottom = snapBoundary(y, item.top + 12, result.height - 1);
+        const snappedBottom = snapBoundary(y, item.top + 12, result.height - 1, 'bottom');
+        if (snappedBottom === null) return;
+        item.bottom = snappedBottom;
       }
       const element = overlay.querySelector(`[data-overlay-select="${boundaryDrag.index}"]`);
       if (element) {
@@ -971,10 +1979,56 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     overlay.addEventListener('pointerup', stopBoundaryDrag);
     overlay.addEventListener('pointercancel', stopBoundaryDrag);
 
+    // Maak vraagbereiken compact leesbaar in de inspector. Een reeks van
+    // zeven opeenvolgende vragen wordt bijvoorbeeld "1–7" in plaats van
+    // "1, 2, 3, 4, 5, 6, 7".
+    const formatQuestionRanges = values => {
+      const numbers = [...new Set((values || []).map(Number).filter(n => Number.isInteger(n) && n > 0))]
+        .sort((a, b) => a - b);
+      const ranges = [];
+      for (let index = 0; index < numbers.length;) {
+        const start = numbers[index];
+        let end = start;
+        while (index + 1 < numbers.length && numbers[index + 1] === end + 1) {
+          end = numbers[++index];
+        }
+        ranges.push(start === end ? String(start) : `${start}–${end}`);
+        index += 1;
+      }
+      return ranges.join(', ');
+    };
+
+    // Accepteer losse nummers én compacte bereiken zoals "1-7, 10, 12-14".
+    // De server ontvangt altijd de expliciete, unieke lijst met vraagnummers.
+    const parseQuestionRanges = value => {
+      const numbers = new Set();
+      const tokens = value.split(/[;,]/).map(token => token.trim()).filter(Boolean);
+      if (!tokens.length) return null;
+      for (const token of tokens) {
+        const range = token.match(/^(\d{1,2})\s*[-–]\s*(\d{1,2})$/);
+        if (range) {
+          let first = Number(range[1]);
+          let last = Number(range[2]);
+          if (first < 1 || last > 60) return null;
+          if (first > last) [first, last] = [last, first];
+          for (let number = first; number <= last; number += 1) numbers.add(number);
+          continue;
+        }
+        if (!/^\d{1,2}$/.test(token)) return null;
+        const number = Number(token);
+        if (number < 1 || number > 60) return null;
+        numbers.add(number);
+      }
+      return [...numbers].sort((a, b) => a - b);
+    };
+
+    // Toon geen technische fragmentnummers. De inhoudelijke naam volgt
+    // uit het fragmenttype en de gekoppelde vraag-/vraagnummers.
     const questionLabel = item => {
-      const numbers = item.question_numbers || [];
+      const numbers = [...(item.question_numbers || [])].sort((a, b) => a - b);
       if (!numbers.length) return 'Nog niet gekoppeld';
-      return numbers.length === 1 ? `Vraag ${numbers[0]}` : `Vragen ${numbers.join(', ')}`;
+      if (item.type === 'vraag') return numbers.length === 1 ? `Vraag ${numbers[0]}` : `Vragen ${formatQuestionRanges(numbers)}`;
+      return `Context bij vraag ${formatQuestionRanges(numbers)}`;
     };
 
     // Verplaats het middendeel naar het verticale midden van een fragment.
@@ -982,33 +2036,142 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const scrollImageToFragment = index => {
       const item = selections[index];
       if (!item) return;
-      const view = panel.querySelector('.stitched-view');
-      const imageHeight = img.offsetHeight;
-      const target = (item.top + (item.bottom - item.top) / 2) / result.height * imageHeight;
+      const view = imageScroll;
+      // Bereken de doelpositie ten opzichte van het scrollvak zelf. offsetTop
+      // hangt af van de offsetParent en gaf bij deze geneste layout soms een
+      // positie ten opzichte van de hele pagina in plaats van het werkpaneel.
+      const viewRect = view.getBoundingClientRect();
+      const imageRect = img.getBoundingClientRect();
+      const imageY = (item.top + (item.bottom - item.top) / 2) / result.height * imageRect.height;
+      const target = view.scrollTop + imageRect.top - viewRect.top + imageY;
+      pauseScrollSync();
       view.scrollTo({top: Math.max(0, target - view.clientHeight / 2), behavior:'smooth'});
     };
 
-    // Houd het rechterdeel bij het fragment dat in het middendeel zichtbaar is.
+    // Scroll de inspector naar het fragment binnen zijn eigen scrollvak.
+    // scrollIntoView() kan ook de hele pagina laten bewegen; dat is hier
+    // ongewenst omdat alleen de twee werkpanelen synchroon moeten blijven.
     const scrollInspectorToFragment = index => {
       const button = list.querySelector(`[data-select-fragment="${index}"]`);
-      if (button) button.scrollIntoView({block:'nearest', behavior:'smooth'});
+      if (!button) return;
+      const inspectorRect = inspector.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      const target = inspector.scrollTop + buttonRect.top - inspectorRect.top;
+      pauseScrollSync();
+      inspector.scrollTo({top:Math.max(0, target - 18), behavior:'smooth'});
     };
 
     const render = () => {
-      // De fragmentnummers zijn doorlopend en onafhankelijk van het type.
-      // De koppeling staat op een tweede regel en gebruikt enkelvoud/meervoud.
+      // Houd de actieve selectie vast op basis van haar stabiele ID terwijl
+      // de volledige lijst op de fysieke documentpositie wordt gesorteerd.
+      const activeId = selections[activeIndex]?.id;
+      selections.sort((a, b) => Number(a.top) - Number(b.top) || Number(a.bottom) - Number(b.bottom));
+      activeIndex = activeId ? selections.findIndex(item => item.id === activeId) : -1;
+
+      /*
+       * Contextstructuur voor de docent zichtbaar maken.
+       *
+       * Meerdere fysieke contextfragmenten kunnen samen één inhoudelijke
+       * context vormen. De expliciete koppeling staat in question_numbers.
+       * Fragmenten met overlappende vraagnummers worden daarom als één
+       * contextgroep gepresenteerd. De onderliggende losse fragmenten en
+       * hun coördinaten blijven afzonderlijk opgeslagen en bewerkbaar.
+       */
+      const contextSelections = selections
+        .map((item, index) => ({item, index}))
+        .filter(entry => entry.item.type === "context");
+      const parent = contextSelections.map((_, index) => index);
+      const findRoot = index => {
+        while (parent[index] !== index) {
+          parent[index] = parent[parent[index]];
+          index = parent[index];
+        }
+        return index;
+      };
+      const joinGroups = (left, right) => {
+        const a = findRoot(left), b = findRoot(right);
+        if (a !== b) parent[b] = a;
+      };
+      const questionSetsOverlap = (left, right) => {
+        // Een gedeeld vraagnummer is het expliciete bewijs dat twee fysieke
+        // contextdelen bij dezelfde inhoudelijke context kunnen horen.
+        // Lege vraagsets worden bewust niet gekoppeld: zonder nummer is er
+        // geen betrouwbare relatie waarmee een groep kan worden afgeleid.
+        const leftNumbers = new Set(
+          (left.question_numbers || []).map(Number).filter(Number.isInteger)
+        );
+        return (right.question_numbers || []).some(number => leftNumbers.has(Number(number)));
+      };
+      for (let left = 0; left < contextSelections.length; left++) {
+        for (let right = left + 1; right < contextSelections.length; right++) {
+          // Union-find maakt de relatie transitief. Als A overlapt met B en
+          // B overlapt met C, worden A, B en C één contextgroep, ook wanneer
+          // A en C zelf geen vraagnummers delen.
+          if (questionSetsOverlap(contextSelections[left].item, contextSelections[right].item)) {
+            joinGroups(left, right);
+          }
+        }
+      }
+      const contextGroups = new Map();
+      contextSelections.forEach((entry, index) => {
+        const root = findRoot(index);
+        if (!contextGroups.has(root)) contextGroups.set(root, {parts: [], questionNumbers: new Set()});
+        const group = contextGroups.get(root);
+        group.parts.push(entry);
+        (entry.item.question_numbers || []).forEach(number => group.questionNumbers.add(Number(number)));
+      });
+      // Sorteer de fysieke contextdelen altijd op hun positie in de
+      // doorlopende examenstrook. De bovenste context bepaalt de titel,
+      // ongeacht de volgorde waarin de docent de fragmenten heeft geselecteerd.
+      for (const group of contextGroups.values()) {
+        group.parts.sort((left, right) => Number(left.item.top) - Number(right.item.top));
+      }
+      const orderedContextGroups = [...contextGroups.values()].sort((left, right) =>
+        Number(left.parts[0]?.item.top || 0) - Number(right.parts[0]?.item.top || 0)
+      );
+      const questionSelections = selections.filter(item => item.type === "vraag");
+      const formatNumbers = numbers => {
+        const sorted = [...numbers].sort((a, b) => a - b);
+        return sorted.length ? formatQuestionRanges(sorted) : "nog niet gekoppeld";
+      };
+      const summary = $("#contextGroupSummary");
+      summary.innerHTML = contextGroups.size ? orderedContextGroups.map((group, groupIndex) => {
+        const numbers = [...group.questionNumbers].sort((a, b) => a - b);
+        const missingNumbers = numbers.filter(number =>
+          !questionSelections.some(item => (item.question_numbers || []).map(Number).includes(number))
+        );
+        // De fragmenten zijn hierboven op documentpositie gesorteerd.
+        // Het eerste fragment bepaalt daarom de titel van de hele groep.
+        const title = group.parts[0]?.item.context_title || "Titel niet beschikbaar in de PDF-tekstlaag";
+        return `<section class="context-group-card">
+          <div class="context-group-meta">
+            <span class="context-group-index">CONTEXT ${String(groupIndex + 1).padStart(2, "0")}</span>
+            <span class="context-group-count">${group.parts.length} fragment${group.parts.length === 1 ? "" : "en"}</span>
+          </div>
+          <h4 class="context-group-title">${escapeHtml(title)}</h4>
+          <p class="context-group-range">${numbers.length ? `Vragen ${escapeHtml(formatNumbers(numbers))}` : "Nog geen vragen gekoppeld"}</p>
+          ${missingNumbers.length ? `<p class="context-group-warning">Vraagfragment ontbreekt bij ${escapeHtml(formatNumbers(missingNumbers))}</p>` : ""}
+          <details class="context-group-details">
+            <summary>Contextdelen bekijken</summary>
+            <ul>${group.parts.map(entry => `<li>${escapeHtml(questionLabel(entry.item))}</li>`).join("")}</ul>
+          </details>
+        </section>`;
+      }).join("") : '<p class="muted">Selecteer op de examenstrook een fragment van het type Context en koppel het aan de bijbehorende vraagnummers. Contextdelen met overlappende vraagnummers vormen automatisch één groep.</p>';
+
+      // De inhoudelijke naam is voldoende; een los fragmentnummer voegt
+      // voor de docent niets toe en verandert bovendien bij hersorteren.
       list.innerHTML = selections.map((item, index) => {
         const selectedEditor = index === activeIndex ? `
           <div class="stitched-editor" id="stitchedEditor">
             <h3>Geselecteerd fragment</h3>
             <label>Type fragment
-              <select id="fragmentType">
-                <option value="context" ${item.type==='context'?'selected':''}>Context</option>
-                <option value="vraag" ${item.type==='vraag'?'selected':''}>Vraag</option>
+              <select id="fragmentType" ${isStitchedDocument?'disabled':''}>
+                ${isStitchedDocument ? `<option value="vraag" selected>Vraag uit het ${documentLabel}</option>` : `<option value="context" ${item.type==='context'?'selected':''}>Context</option><option value="vraag" ${item.type==='vraag'?'selected':''}>Vraag</option>`}
               </select>
             </label>
             <label>Bij welk(e) vraagnummer(s)?
-              <input id="fragmentQuestions" value="${item.question_numbers.join(', ')}" placeholder="bijvoorbeeld 1, 2, 3">
+              <input id="fragmentQuestions" value="${escapeHtml(formatQuestionRanges(item.question_numbers))}" placeholder="bijvoorbeeld 1–7, 9, 12–14" aria-describedby="fragmentQuestionsHelp">
+              <small id="fragmentQuestionsHelp" class="field-help">Gebruik bijvoorbeeld 1–7 of 1, 3, 5–8.</small>
             </label>
             <label>Omschrijving (optioneel)
               <input id="fragmentLabel" value="${escapeHtml(item.label||'')}" placeholder="Korte herkenbare omschrijving">
@@ -1022,17 +2185,17 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         return `
           <div class="stitched-list-entry">
             <button type="button" class="stitched-list-item ${index===activeIndex?'active':''}" data-select-fragment="${index}">
-              <strong>Fragment ${index+1} ${item.type==='context'?'context':'vraag'}</strong>
-              <small>${escapeHtml(questionLabel(item))} · ${Math.round(item.bottom-item.top)} px</small>
+              <strong>${escapeHtml(questionLabel(item))}</strong>
+              <small>${Math.round(item.bottom-item.top)} px</small>
             </button>
             ${selectedEditor}
           </div>`;
       }).join('') || '<p class="muted">Nog geen fragmenten geselecteerd.</p>';
 
       overlay.innerHTML = selections.map((item,index) =>
-        `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?20:1}" data-overlay-select="${index}">
+        `<div class="stitched-selection ${index===activeIndex?'active':''}" style="top:${item.top/result.height*100}%;height:${(item.bottom-item.top)/result.height*100}%;z-index:${index===activeIndex?4:2}" data-overlay-select="${index}">
           <button type="button" class="stitched-boundary stitched-boundary-top" data-boundary="top" data-boundary-index="${index}" aria-label="Bovengrens verslepen"></button>
-          <span>Fragment ${index+1} · ${item.type==='context'?'context':'vraag'}</span>
+          <span>${escapeHtml(questionLabel(item))}</span>
           <button type="button" class="stitched-boundary stitched-boundary-bottom" data-boundary="bottom" data-boundary-index="${index}" aria-label="Ondergrens verslepen"></button>
         </div>`
       ).join('') + (pendingTop!==null?`<div class="stitched-pending" style="top:${pendingTop/result.height*100}%"></div>`:'');
@@ -1049,10 +2212,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           scheduleSave();
         });
         $('#fragmentQuestions').addEventListener('change', event => {
-          const numbers = event.target.value.split(',')
-            .map(value => Number(value.trim()))
-            .filter(number => Number.isInteger(number) && number > 0 && number <= 60);
-          item.question_numbers = [...new Set(numbers)];
+          const numbers = parseQuestionRanges(event.target.value);
+          if (!numbers) {
+            event.target.setCustomValidity('Gebruik losse vraagnummers of bereiken, bijvoorbeeld 1–7, 9, 12–14.');
+            event.target.reportValidity();
+            return;
+          }
+          event.target.setCustomValidity('');
+          item.question_numbers = numbers;
+          event.target.value = formatQuestionRanges(numbers);
           render();
           scrollInspectorToFragment(activeIndex);
           scheduleSave();
@@ -1062,8 +2230,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           scheduleSave();
         });
         const updateBoundary = () => {
-          const top = snapBoundary(Number($('#fragmentTop').value), 0, item.bottom - 12);
-          const bottom = snapBoundary(Number($('#fragmentBottom').value), item.top + 12, result.height - 1);
+          const top = snapBoundary(Number($('#fragmentTop').value), 0, item.bottom - 12, 'top');
+          const bottom = snapBoundary(Number($('#fragmentBottom').value), item.top + 12, result.height - 1, 'bottom');
           if (Number.isFinite(top) && Number.isFinite(bottom) && top >= 0 && bottom <= result.height && bottom > top) {
             item.top = top;
             item.bottom = bottom;
@@ -1106,6 +2274,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     img.addEventListener('click',event=>{
       if(!wrap.classList.contains('selecting')) return;
       const y=imageY(event);
+      if(y===null) return;
       if(pendingTop===null){
         pendingTop=y;hint.textContent='Klik nu bij de onderrand van hetzelfde fragment.';render();return;
       }
@@ -1114,43 +2283,71 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         hint.textContent='Het fragment is te klein. Kies opnieuw.';
         pendingTop=null;render();return;
       }
-      selections.push({id:`fragment-${Date.now()}-${selections.length}`,type:'vraag',top:snapBoundary(top),bottom:snapBoundary(bottom),question_numbers:[],label:''});
+      const snappedTop=snapBoundary(top, 0, result.height - 1, 'top');
+      const snappedBottom=snapBoundary(bottom, 0, result.height - 1, 'bottom');
+      if(snappedTop===null || snappedBottom===null || snappedBottom-snappedTop<12){
+        hint.textContent='Tussen deze punten ligt geen bruikbare volledig witte grens. Kies opnieuw.';
+        pendingTop=null;render();return;
+      }
+      // Een handmatig nieuw fragment is standaard context. Dat sluit aan bij
+      // de gebruikelijke werkwijze: eerst contextblokken markeren en daarna
+      // de daadwerkelijke vraagfragmenten. De docent kan het type rechts
+      // altijd expliciet wijzigen naar 'Vraag'.
+      selections.push({id:`fragment-${Date.now()}-${selections.length}`,type:'context',top:snappedTop,bottom:snappedBottom,question_numbers:[],label:''});
       activeIndex=selections.length-1;pendingTop=null;wrap.classList.remove('selecting');
       hint.textContent='Fragment toegevoegd. Vul rechts type en vraagnummers in.';
       render();scheduleSave();
     });
 
-    $('#saveStitched').addEventListener('click',async()=>{
+    $('#saveStitched').addEventListener('click',async event=>{
+      const button = event.currentTarget;
+      const original = button.textContent;
+      button.disabled = true;
+      button.textContent = 'Opslaan…';
       try {
-        await persistSelections();
+        await persistSelections(true);
         $('#stitchedMessage').textContent=`${selections.length} fragmentselecties opgeslagen.`;
-      } catch(error) { $('#stitchedMessage').textContent=error.message; }
+      } catch(error) {
+        $('#stitchedMessage').textContent=error.message;
+      } finally {
+        if (button.isConnected) {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      }
     });
-    $('#completeStitched').addEventListener('click',async()=>{
+    $('#completeStitched').addEventListener('click', async () => {
+      const button = $('#completeStitched');
+      if (completingStep) return;
+      completingStep = true;
+      button.disabled = true;
+      button.textContent = 'Controleren en afronden…';
       try {
+        if (recoveryNeedsExplicitSave) {
+          throw new Error('Controleer eerst alle behouden fragmentgrenzen op de nieuwe afbeelding en klik op ‘Nu opslaan’. Pas daarna kun je de fragmentcontrole goedkeuren.');
+        }
         if(!selections.length) throw new Error('Selecteer eerst de contexten en vragen.');
         if(selections.some(item=>!item.question_numbers.length)) throw new Error('Elk fragment moet aan minimaal één vraagnummer gekoppeld zijn.');
         if(!selections.some(item=>item.type==='vraag')) throw new Error('Er moet minimaal één vraagfragment zijn.');
-        const starts=await api(`/api/exams/${state.examId}/question-starts`);
+        const starts=await api(startsUrl);
         const numbers=(starts.candidates||[]).filter(item=>item.accepted&&!item.removed).map(item=>item.question_number);
         const covered=new Set(selections.filter(item=>item.type==='vraag').flatMap(item=>item.question_numbers));
         const missing=numbers.filter(number=>!covered.has(number));
         if(missing.length) throw new Error(`Nog geen vraagfragment geselecteerd voor vraag/vraagvragen: ${missing.join(', ')}.`);
+        // Eerst alle bestaande autosaves afwachten; daarna worden selectie,
+        // inhoudelijke review en workflowstatus serieel opgeslagen.
         clearTimeout(saveTimer);
-        await api(`/api/exams/${state.examId}/stitched-opgaven/review`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({selections,reviewed:true})
-        });
-        await api(`/api/exams/${state.examId}/document-question-fragments/opgaven/review`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({reviewed_question_numbers:[...new Set(numbers)],reviewed_all_questions:true,boundary_overrides:[]})
-        });
-        await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)]})
-        });
+        await saveChain;
+        await api(stitchedReviewUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({selections,reviewed:true})});
+        await api(fragmentsReviewUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed_question_numbers:[...new Set(numbers)],reviewed_all_questions:true,boundary_overrides:[]})});
+        await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)]})});
         await openWorkspace(state.examId);
-      } catch(error) { $('#stitchedMessage').textContent=error.message; }
+      } catch(error) {
+        completingStep = false;
+        button.disabled = false;
+        button.textContent = 'Fragmentcontrole goedkeuren en doorgaan';
+        $('#stitchedMessage').textContent=error.message;
+      }
     });
     render();
   } catch(error) {
@@ -1212,6 +2409,7 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
       <p id="fragmentReviewMessage" class="form-error" role="status"></p>`;
 
     $('#adjustQuestionStarts').addEventListener('click', async () => {
+      prepareStageApproval(panel);
       try {
         // Bewaar de bestaande startcorrecties, maar maak deze stap opnieuw
         // actief en verwijder afgeleide goedkeuringen die nu verouderd zijn.
@@ -1340,9 +2538,17 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
         $('#fragmentReviewMessage').textContent = `${saved.reviewed_count} van ${saved.expected_count} vraagfragmenten gecontroleerd. Conceptreview opgeslagen.`;
       } catch (error) { $('#fragmentReviewMessage').textContent = error.message; }
     });
+    let completingFragmentReview=false;
     $('#completeFragmentReview').addEventListener('click', async () => {
+      const button=$('#completeFragmentReview');
+      if(completingFragmentReview) return;
+      completingFragmentReview=true;
+      button.disabled=true;
       try {
-        const {saved,changedNumbers} = await save();
+        // Flush de laatste grenswijziging voordat de stap wordt afgerond.
+        const {saved,changedNumbers} = panel._stageAutoSaveFlush
+          ? await panel._stageAutoSaveFlush()
+          : await save();
         if (changedNumbers.size) {
           $('#fragmentReviewMessage').textContent = 'De gewijzigde grenzen zijn opgeslagen. Controleer eerst de opnieuw gerenderde fragmenten.';
           await openWorkspace(state.examId);
@@ -1355,7 +2561,11 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
             reviewed_question_numbers:saved.reviewed_count})
         });
         await openWorkspace(state.examId);
-      } catch (error) { $('#fragmentReviewMessage').textContent = error.message; }
+      } catch (error) {
+        completingFragmentReview=false;
+        refreshComplete();
+        $('#fragmentReviewMessage').textContent = error.message;
+      }
     });
   } catch (error) {
     panel.innerHTML = `<h2>Vraagfragmenten controleren</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
@@ -1364,8 +2574,8 @@ async function renderQuestionFragmentsStage(stepKey, documentType, startsStepKey
 
 /* De analysefase gebruikt het volledige vraagfragment als visuele bron.
    Tekstlaagherkenning levert alleen voorlopige suggesties voor type, score en
-   antwoordopties; elk veld blijft door de docent aanpasbaar en moet per vraag
-   expliciet worden gecontroleerd voordat de fase kan worden afgerond. */
+   antwoordopties; elk veld blijft door de docent aanpasbaar. De afrondknop
+   bevestigt de complete analyse, zonder een vinkje per vraag te verlangen. */
 async function renderQuestionAnalysisStage() {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Vraagtypen en antwoordopties analyseren…</p>';
@@ -1396,6 +2606,7 @@ async function renderQuestionAnalysisStage() {
             <textarea rows="4" data-analysis-options="${question.question_number}">${escapeHtml(optionText)}</textarea>
           </label>
           <p class="analysis-reason">Type: ${escapeHtml(question.type_reason)} Score: ${escapeHtml(question.points_reason)}</p>
+          ${question.closed_answer_form ? `<p class="analysis-reason closed-answer-form"><strong>Gesloten antwoordvorm:</strong> ${escapeHtml(question.closed_answer_form)}</p>` : ''}
           <details class="analysis-text"><summary>Tekstlaag uit dit fragment (hulpmiddel, niet leidend)</summary><pre>${escapeHtml(question.extracted_text || 'Geen selecteerbare tekstlaag aangetroffen. Controleer de afbeelding.')}</pre></details>
           <label class="review-warning"><input type="checkbox" data-analysis-reviewed="${question.question_number}" ${question.reviewed ? 'checked' : ''}> Ik heb vraag ${question.question_number}, het vraagtype, de maximumscore en eventuele antwoordopties visueel gecontroleerd.</label>
         </article>`;
@@ -1411,6 +2622,7 @@ async function renderQuestionAnalysisStage() {
       <p id="questionAnalysisMessage" class="form-error" role="status"></p>`;
 
     const cards = [...document.querySelectorAll('[data-analysis-card]')];
+      prepareStageApproval(panel);
     const reviewedInputs = () => [...document.querySelectorAll('[data-analysis-reviewed]')];
     const refreshComplete = () => {
       $('#completeQuestionAnalysis').disabled = reviewedInputs().length !== result.question_count
@@ -1424,9 +2636,9 @@ async function renderQuestionAnalysisStage() {
       const rawPoints = card.querySelector(`[data-analysis-points="${number}"]`).value.trim();
       const optionsText = card.querySelector(`[data-analysis-options="${number}"]`).value;
       const options = optionsText.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map((line, index) => {
-        const match = line.match(/^([A-E])[.)]\s*(.*)$/i);
+        const match = line.match(/^([A-F])[.)]\s*(.*)$/i);
         return match ? {letter:match[1].toUpperCase(), text:match[2].trim()}
-          : {letter:'ABCDE'[index] || 'E', text:line};
+          : {letter:'ABCDEF'[index] || 'F', text:line};
       });
       return {
         question_number:number,
@@ -1447,16 +2659,25 @@ async function renderQuestionAnalysisStage() {
         $('#questionAnalysisMessage').textContent = `${saved.reviewed_count} van ${result.question_count} vragen gecontroleerd. Conceptreview opgeslagen.`;
       } catch (error) { $('#questionAnalysisMessage').textContent = error.message; }
     });
+    let completingQuestionAnalysis=false;
     $('#completeQuestionAnalysis').addEventListener('click', async () => {
+      const button=$('#completeQuestionAnalysis');
+      if(completingQuestionAnalysis) return;
+      completingQuestionAnalysis=true;
+      button.disabled=true;
       try {
-        const saved = await save();
+        const saved = panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
         if (!saved.complete) throw new Error('Controleer eerst alle vragen.');
         await api(`/api/exams/${state.examId}/steps/opgaven_analyse/complete`, {
           method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({reviewed:true, reviewed_all_questions:true, reviewed_count:saved.reviewed_count})
         });
         await openWorkspace(state.examId);
-      } catch (error) { $('#questionAnalysisMessage').textContent = error.message; }
+      } catch (error) {
+        completingQuestionAnalysis=false;
+        refreshComplete();
+        $('#questionAnalysisMessage').textContent = error.message;
+      }
     });
   } catch (error) {
     panel.innerHTML = `<h2>Vraagtype, punten en antwoordopties</h2><p class="form-error">${escapeHtml(error.message)}</p>`;

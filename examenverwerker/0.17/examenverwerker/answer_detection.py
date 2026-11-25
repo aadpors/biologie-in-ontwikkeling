@@ -22,7 +22,7 @@ MC_INLINE = re.compile(r"^\s*([A-E])\s{2,}([012])\s*$", re.IGNORECASE)
 # deze regex niet om te voorkomen dat een willekeurige tabelrij wordt gelezen.
 MC_TABLE_LINE = re.compile(r"^\s*(\d{1,2})\s+([A-E])\s+([012])\s*$", re.IGNORECASE)
 CLOSED_LINE = re.compile(r"^\s*(\d{1,2})\s+(juist|onjuist|wel|geen|niet|meer|minder|hoger|lager|ja|nee)\s*$", re.IGNORECASE)
-MAX_SCORE = re.compile(r"maximumscore\s*(\d{1,2})", re.IGNORECASE)
+MAX_SCORE = re.compile(r"maximum\s*score\s*[:：-]?\s*(\d{1,2})", re.IGNORECASE)
 
 
 def _lines(text: str) -> list[str]:
@@ -32,10 +32,31 @@ def _lines(text: str) -> list[str]:
 
 def detect_cv_max_points(text: str, question_number: int | None = None) -> int | None:
     """Lees de expliciete maximumscore uit rubric of MC-scorekolom."""
-    maximum = MAX_SCORE.search(text)
+    # PDF-tekstextractie plaatst het label en het puntengetal soms op
+    # afzonderlijke regels of kolommen. Doorloop daarom eerst de volledige
+    # tekst met whitespace-normalisatie; de reguliere expressie accepteert
+    # zowel "maximumscore 2" als "maximum score\\n2".
+    normalized_text = re.sub(r"\s+", " ", text).strip()
+    maximum = MAX_SCORE.search(normalized_text)
     if maximum:
         return int(maximum.group(1))
-    for line in _lines(text):
+
+    lines = _lines(text)
+    # Sommige CV-tabellen scheiden zelfs het woord "maximum" en "score".
+    # Zoek in dat geval naar het label en lees uitsluitend het eerstvolgende
+    # losse puntengetal uit de volgende regels. We gokken nooit op een
+    # getal dat pas na een nieuw vraagnummer of een ander rubriclabel staat.
+    for index, line in enumerate(lines):
+        if re.search(r"maximum\s*score|maximum\s*$", line, re.IGNORECASE):
+            for following in lines[index + 1:index + 4]:
+                if re.fullmatch(r"\d{1,2}", following):
+                    value = int(following)
+                    if 0 <= value <= 20:
+                        return value
+                if re.match(r"^\d{1,2}\.?\s+", following):
+                    break
+
+    for line in lines:
         match = MC_LINE.fullmatch(line) or MC_INLINE.fullmatch(line)
         if match:
             return int(match.group(2))

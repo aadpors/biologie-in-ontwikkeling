@@ -5,7 +5,7 @@ from pathlib import Path
 
 import fitz
 
-from examenverwerker.answer_detection import detect_cv_answer, validate_answer_review
+from examenverwerker.answer_detection import detect_cv_answer, detect_cv_max_points, validate_answer_review
 from examenverwerker.cv_supplement import analyse_supplement, validate_supplement_review
 
 
@@ -18,6 +18,12 @@ class AnswerAndSupplementTests(unittest.TestCase):
         table_result = detect_cv_answer("2 B 2\n", 2)
         self.assertEqual(table_result["answer_kind"], "meerkeuze")
         self.assertEqual(table_result["answer_text"], "B")
+
+    def test_cv_maximum_score_is_recognised_when_label_and_value_are_split(self):
+        self.assertEqual(detect_cv_max_points("Maximumscore 2", 1), 2)
+        self.assertEqual(detect_cv_max_points("Maximumscore\n2", 1), 2)
+        self.assertEqual(detect_cv_max_points("Maximum\nscore\n3", 1), 3)
+        self.assertEqual(detect_cv_max_points("maximum score: 4", 1), 4)
 
     def test_closed_answer_list_is_recognised_in_order(self):
         result = detect_cv_answer("9 maximumscore 2\n1 onjuist\n2 juist\n3 juist\n")

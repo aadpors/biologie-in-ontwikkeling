@@ -71,6 +71,10 @@ async function openWorkspace(examId) {
   $('#workspaceView').hidden = false;
   $('#backLibrary').hidden = false;
   renderWorkspace();
+
+  // Iedere nieuwe stap begint bovenaan, zodat de titel en instructie van
+  // het volgende scherm direct zichtbaar zijn na opslaan of doorgaan.
+  window.scrollTo(0, 0);
 }
 
 function renderWorkspace() {

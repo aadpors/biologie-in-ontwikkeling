@@ -1,0 +1,63 @@
+name: Examenverwerker 0.17
+
+on:
+  push:
+    branches:
+      - bouw/examenverwerker-0.17-afmaken
+    paths:
+      - "examenverwerker/0.17/**"
+      - ".github/workflows/examenverwerker-0.17.yml"
+  pull_request:
+    paths:
+      - "examenverwerker/0.17/**"
+      - ".github/workflows/examenverwerker-0.17.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Haal alleen de map van versie 0.17 op
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            examenverwerker/0.17
+            examens
+          sparse-checkout-cone-mode: true
+
+      - name: Stel Python in
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: examenverwerker/0.17/requirements*.txt
+
+      - name: Installeer applicatie- en testafhankelijkheden
+        working-directory: examenverwerker/0.17
+        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Controleer Python-syntaxis
+        working-directory: examenverwerker/0.17
+        run: python -m compileall -q examenverwerker tests
+
+      - name: Voer alle tests uit
+        working-directory: examenverwerker/0.17
+        run: python -m unittest discover -s tests -v
+
+      - name: Controleer automatische fragmenten op een echt examen
+        working-directory: examenverwerker/0.17
+        env:
+          EXAM_DIAGNOSTIC_OUTPUT: ${{ runner.temp }}/exam-diagnostic
+        run: python tools/diagnose_real_exam.py
+
+      - name: Bewaar het visuele diagnosepakket
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: examenverwerker-0.17-echt-examen-diagnose
+          path: ${{ runner.temp }}/exam-diagnostic
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Controleer JavaScript-syntaxis
+        working-directory: examenverwerker/0.17
+        run: node --check static/app.js
