@@ -1136,18 +1136,17 @@ def get_stitched_opgaven(exam_id: str):
     current_image_fingerprint = _stitched_image_fingerprint(target)
     selection_warning = None
     if saved_selections and not _stitched_selection_matches_image(previous, target):
-        # BELANGRIJK: bewaar bestaande docentgrenzen ook wanneer alleen de
-        # pixels van de lange afbeelding zijn opgeschoond. De recente cache-
-        # update wijzigt uitsluitend maskering van voettekst; pagina-indeling,
-        # renderfactor, uitsnedes en verticale stitchposities blijven gelijk.
-        # De oude coördinaten blijven daardoor op dezelfde inhoud wijzen.
-        # We tonen een waarschuwing en blokkeren definitieve verwerking totdat
-        # de docent de zichtbare grenzen opnieuw heeft opgeslagen. Zo raakt
-        # handmatig werk nooit meer stilzwijgend kwijt.
+        # BELANGRIJK: verwijder oude docentgrenzen nooit stilzwijgend.
+        # De nieuwe renderer kan per pagina een andere verticale witmarge
+        # wegsnijden. Daardoor kunnen de bewaarde pixelcoördinaten verschoven
+        # zijn. We tonen ze daarom als herstelvoorstel op de nieuwe afbeelding,
+        # met een duidelijke waarschuwing. De docent kan ze gericht corrigeren
+        # in plaats van alle fragmenten opnieuw vanaf nul te tekenen.
         selection_warning = (
-            "De afbeelding is opgeschoond. Je eerder opgeslagen fragmentgrenzen "
-            "zijn behouden. Controleer ze visueel en sla ze opnieuw op voordat "
-            "je verdergaat."
+            "Je eerder opgeslagen fragmentgrenzen zijn behouden als herstelvoorstel. "
+            "Door de vernieuwde uitsnedes kunnen sommige grenzen verticaal verschoven "
+            "zijn. Controleer alle fragmenten op de afbeelding, corrigeer waar nodig "
+            "en klik op ‘Nu opslaan’ voordat je de controle goedkeurt."
         )
     starts_evidence = exam["steps"].get("opgaven_starts", {}).get("evidence", {})
     accepted_starts = [
@@ -1243,14 +1242,15 @@ def get_stitched_document(exam_id: str, document_type: str):
     current_image_fingerprint = _stitched_image_fingerprint(target)
     selection_warning = None
     if saved and not _stitched_selection_matches_image(previous, target):
-        # Bewaar ook hier de bestaande coördinaten. De nieuwe cacheversie
-        # maskeert alleen voettekst en verandert de geometrie van de afbeelding
-        # niet. De waarschuwing voorkomt dat oude selecties ongemerkt worden
-        # gebruikt: na visuele controle slaat de docent ze opnieuw op.
+        # Bewaar oude docentgrenzen als herstelvoorstel. De nieuwe renderer
+        # kan verticale witmarges per pagina anders afsnijden; pixelcoördinaten
+        # kunnen daardoor verschoven zijn. De waarschuwing vraagt om visuele
+        # controle en expliciet opnieuw opslaan voordat de stap wordt afgerond.
         selection_warning = (
-            "De afbeelding is opgeschoond. Je eerder opgeslagen fragmentgrenzen "
-            "zijn behouden. Controleer ze visueel en sla ze opnieuw op voordat "
-            "je verdergaat."
+            "Je eerder opgeslagen fragmentgrenzen zijn behouden als herstelvoorstel. "
+            "Door de vernieuwde uitsnedes kunnen sommige grenzen verticaal verschoven "
+            "zijn. Controleer alle fragmenten op de afbeelding, corrigeer waar nodig "
+            "en klik op ‘Nu opslaan’ voordat je de controle goedkeurt."
         )
     starts = exam["steps"].get(starts_step_key, {}).get("evidence", {})
     accepted = [
