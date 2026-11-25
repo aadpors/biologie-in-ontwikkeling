@@ -772,7 +772,14 @@ async function renderSnippetsStage() {
     // De fragmenten zijn inhoudelijk al afgebakend in de eerdere stappen.
     // Hier worden alleen contextbereiken gecontroleerd en de volledige set
     // visueel beoordeeld. Er zijn daarom geen losse controlevinkjes nodig.
-    const contextCards = result.contexts.map(context => `
+    // Maak van contexten en vragen één chronologische lijst.
+    // Contexten worden vóór de eerste vraag geplaatst waarvoor ze gelden.
+    // Bij meerdere contexten die bij dezelfde vraag beginnen, tonen we eerst
+    // de breedste context (bijvoorbeeld 1–6), daarna de specifiekere (1–2).
+    // Vervolgens komt de vraag zelf; op de volgende vraagpositie kunnen weer
+    // nieuwe contextblokken volgen. Dit voorkomt dat contexten los bovenaan
+    // worden verzameld of telkens binnen iedere vraag worden herhaald.
+    const contextHtml = context => `
       <article class="analysis-card" data-context-card="${escapeHtml(context.id)}">
         <div class="card-heading">
           <h3>Context · pagina ${context.page_number}</h3>
@@ -792,8 +799,46 @@ async function renderSnippetsStage() {
           <summary>Tekstlaag (hulpmiddel)</summary>
           <pre>${escapeHtml(context.extracted_text || context.text || '')}</pre>
         </details>
-      </article>`).join('');
+      </article>`;
 
+    const renderQuestionCard = question => `
+      <article class="analysis-card">
+        <h3>Opgave · vraag ${question.question_number}</h3>
+        <div class="fragment-images">
+          ${question.segments.map(segment => `
+            <figure>
+              <figcaption>Pagina ${segment.page_number}</figcaption>
+              <img loading="lazy" src="${escapeHtml(segment.url)}" alt="Definitief vraagfragment ${question.question_number}">
+            </figure>`).join('')}
+        </div>
+      </article>`;
+
+    // Gebruik de daadwerkelijke, door de docent bevestigde contextbereiken.
+    // Als twee contexten dezelfde startvraag hebben, sorteer dan op eindvraag
+    // aflopend zodat de grotere gedeelde context eerst zichtbaar wordt.
+    const orderedItems = [
+      ...result.contexts.map(context => ({
+        kind: 'context',
+        start: Number(context.from_question ?? context.suggested_from_question),
+        end: Number(context.to_question),
+        context
+      })),
+      ...result.opgaven.questions.map(question => ({
+        kind: 'question',
+        start: Number(question.question_number),
+        end: Number(question.question_number),
+        question
+      }))
+    ].sort((a, b) =>
+      a.start - b.start ||
+      (a.kind === 'context' && b.kind === 'question' ? -1 :
+       a.kind === 'question' && b.kind === 'context' ? 1 : 0) ||
+      (a.kind === 'context' && b.kind === 'context' ? b.end - a.end : 0)
+    );
+
+    const orderedReviewCards = orderedItems.map(item =>
+      item.kind === 'context' ? contextHtml(item.context) : renderQuestionCard(item.question)
+    ).join('');
     const renderFragmentCards = (questions, heading, altPrefix) => questions.map(question => `
       <article class="analysis-card">
         <h3>${heading} · vraag ${question.question_number}</h3>
@@ -827,10 +872,8 @@ async function renderSnippetsStage() {
         ${result.uitwerkbijlage.question_count} uitwerkbijlagefragmenten ·
         ${result.correctievoorschrift.question_count} CV-fragmenten.
       </div>
-      <h3>Contexten</h3>
-      ${contextCards || '<p class="muted">Er zijn geen afzonderlijke contextvoorstellen gevonden. De afrondknop bevestigt dat dit bewust is gecontroleerd.</p>'}
-      <h3>Vraagfragmenten</h3>
-      ${questionCards}
+      <h3>Contexten en vraagfragmenten in documentvolgorde</h3>
+      ${orderedReviewCards || '<p class="muted">Er zijn geen context- of vraagfragmenten beschikbaar.</p>'}
       <h3>Uitwerkbijlagefragmenten</h3>
       ${renderFragmentCards(result.uitwerkbijlage.questions, 'Uitwerkbijlage', 'Uitwerkbijlage')}
       ${result.uitwerkbijlage.questions.length ? '' : '<p class="muted">Geen uitwerkbijlagefragmenten van toepassing.</p>'}
