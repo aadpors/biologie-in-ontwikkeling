@@ -140,18 +140,25 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
 
 
 def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
-    """Vind uitsluitend zelfstandige, herhaalde marge-elementen.
+    """Vind herhaalde marge-elementen zonder losse vraagnummers te wissen.
 
-    Een complete PDF-span kan meerdere tekstonderdelen bevatten. Daarom wordt
-    een span met inhoudelijke tekst nooit als geheel gemaskeerd. Alleen een
-    zelfstandige paginateller of een korte, herhaalde kop-/voettekst komt in
-    aanmerking. Dit voorkomt dat een vraagnummer in dezelfde span verdwijnt.
+    Een los getal in de boven- of ondermarge is niet automatisch een
+    paginanummer: examen-PDF's kunnen daar ook een vraagnummer plaatsen.
+    Daarom verwijderen we numerieke spans alleen als ze op meerdere pagina's
+    op vrijwel exact dezelfde relatieve positie terugkeren. Niet-numerieke
+    korte kop- en voetteksten worden alleen verwijderd als dezelfde tekst op
+    ten minste twee pagina's voorkomt.
     """
-    occurrences: dict[str, set[int]] = {}
-    spans_by_page: list[list[tuple[str, list[float]]]] = [[] for _ in pdf]
-    page_number_pattern = re.compile(r"^\d{1,3}$")
+    text_occurrences: dict[str, set[int]] = {}
+    numeric_positions: dict[tuple[float, float], list[tuple[int, list[float]]]] = {}
+    spans_by_page: list[list[tuple[str, list[float], tuple[float, float] | None]]] = [
+        [] for _ in pdf
+    ]
+    page_number_pattern = re.compile(r"^\\d{1,3}$")
+
     for page_index, page in enumerate(pdf):
-        height = page.rect.height
+        page_width = float(page.rect.width) or 1.0
+        page_height = float(page.rect.height) or 1.0
         for block in page.get_text("dict").get("blocks", []):
             if block.get("type") != 0:
                 continue
@@ -166,35 +173,55 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                     if not text or len(bbox) != 4:
                         continue
                     coordinates = [float(value) for value in bbox]
-                    in_margin = coordinates[1] <= height * 0.06 or coordinates[3] >= height * 0.88
+                    in_margin = (
+                        coordinates[1] <= page_height * 0.06
+                        or coordinates[3] >= page_height * 0.88
+                    )
                     if not in_margin:
                         continue
-                    key = text.casefold()
-                    # Een los getal is alleen een paginanummer wanneer het
-                    # werkelijk de enige tekst op die PDF-regel is. Een
-                    # vraagnummer als apart span naast een footer blijft dus
-                    # behouden, ook als het in de onderste marge staat.
-                    is_isolated_page_number = (
-                        len(line_spans) == 1 and bool(page_number_pattern.fullmatch(key))
-                    )
-                    # Een gemengde span (bijvoorbeeld "Vraag 30 2 / 19")
-                    # is nooit veilig als één geheel te verwijderen.
-                    is_repeated_short_margin_text = (
-                        len(key) <= 48
-                        and not page_number_pattern.fullmatch(key)
-                        and not re.search(r"\b(?:vraag|opgave|antwoord)\s*\d+", key)
-                    )
-                    if not (is_isolated_page_number or is_repeated_short_margin_text):
+
+                    if page_number_pattern.fullmatch(text):
+                        # Rond relatieve positie ruim genoeg af om kleine
+                        # verschillen in fontmetrics en paginagrootte op te
+                        # vangen. Een vraagnummer op een eenmalige positie
+                        # wordt hierdoor nooit als paginanummer verwijderd.
+                        center_x = ((coordinates[0] + coordinates[2]) / 2) / page_width
+                        center_y = ((coordinates[1] + coordinates[3]) / 2) / page_height
+                        position = (round(center_x, 1), round(center_y, 2))
+                        spans_by_page[page_index].append((text, coordinates, position))
+                        numeric_positions.setdefault(position, []).append((page_index, coordinates))
                         continue
-                    spans_by_page[page_index].append((key, coordinates))
-                    if not is_isolated_page_number:
-                        occurrences.setdefault(key, set()).add(page_index)
-    repeated = {key for key, pages in occurrences.items() if len(pages) >= 2}
-    return [
-        [bbox for key, bbox in page_spans
-         if key in repeated or page_number_pattern.fullmatch(key)]
-        for page_spans in spans_by_page
-    ]
+
+                    key = text.casefold()
+                    # Een gemengde span zoals 'Vraag 30 2 / 19' bevat
+                    # inhoudelijke tekst en mag nooit als geheel verdwijnen.
+                    if (
+                        len(key) <= 48
+                        and not re.search(r"\\b(?:vraag|opgave|antwoord)\\s*\\d+", key)
+                    ):
+                        spans_by_page[page_index].append((key, coordinates, None))
+                        text_occurrences.setdefault(key, set()).add(page_index)
+
+    repeated_text = {
+        key for key, pages in text_occurrences.items() if len(pages) >= 2
+    }
+    repeated_numeric_positions = {
+        position
+        for position, occurrences in numeric_positions.items()
+        if len({page_index for page_index, _ in occurrences}) >= 2
+    }
+
+    result: list[list[list[float]]] = []
+    for page_spans in spans_by_page:
+        page_boxes = []
+        for key, coordinates, position in page_spans:
+            if (
+                (position is not None and position in repeated_numeric_positions)
+                or (position is None and key in repeated_text)
+            ):
+                page_boxes.append(coordinates)
+        result.append(page_boxes)
+    return result
 
 def _mask_marginal_boxes(image_path: Path, boxes: list[list[float]], clip: fitz.Rect,
                          scale_x: float, scale_y: float) -> None:
@@ -315,12 +342,17 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                                     x1 = max(float(char["bbox"][2]) for char in matched_chars)
                                     y1 = max(float(char["bbox"][3]) for char in matched_chars)
                                     footer_boxes.append([x0, y0, x1, y1])
-                        # Een volledig zelfstandige documentcode of een los nummer
-                        # diep in de footer mag ook worden verwijderd.
+                        # Een zelfstandige documentcode mag worden verwijderd.
+                        # Een los getal wordt hier nadrukkelijk niet gemaskeerd:
+                        # het kan het vraagnummer 28/30 zijn. Echte losse
+                        # paginanummers worden herkend via herhaalde positie in
+                        # _repeated_marginal_boxes; samengestelde tellers zoals
+                        # '2 / 19' worden hierboven teken voor teken verwijderd.
                         stripped = line_text.strip()
-                        if re.fullmatch(r"(?:VW|VMBO|HAVO|VWO)[- ]?\\d{3,}(?:[- ][\\w-]+)*", stripped, re.IGNORECASE) or (
-                            re.fullmatch(r"[-–—]?\\s*\\d{1,3}\\s*[-–—]?", stripped)
-                            and float(line_bbox[1]) >= page.rect.height * 0.93
+                        if re.fullmatch(
+                            r"(?:VW|VMBO|HAVO|VWO)[- ]?\\d{3,}(?:[- ][\\w-]+)*",
+                            stripped,
+                            re.IGNORECASE,
                         ):
                             footer_boxes.extend([
                                 [float(value) for value in char["bbox"]]
