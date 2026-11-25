@@ -68,7 +68,7 @@ def _load_or_build_stitched_exam(
         try:
             cached = json.loads(cache_path.read_text(encoding="utf-8"))
             if (cached.get("source_sha256") == source_sha256
-                    and cached.get("cache_version") == 6
+                    and cached.get("cache_version") == 7
                     and cached.get("start_page") == start_page
                     and cached.get("end_page") == end_page
                     and cached.get("start_y") == start_y
@@ -89,7 +89,7 @@ def _load_or_build_stitched_exam(
     )
     white_rows = _white_row_ranges(output_path)
     cache_payload = {
-        "cache_version": 6,
+        "cache_version": 7,
         "source_sha256": source_sha256,
         "start_page": start_page,
         "end_page": end_page,
