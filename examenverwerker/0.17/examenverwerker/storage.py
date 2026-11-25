@@ -84,6 +84,13 @@ class Store:
                     metadata_json TEXT NOT NULL,
                     page_count INTEGER NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS publication_versions (
+                    exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
+                    version INTEGER NOT NULL,
+                    published_at TEXT NOT NULL,
+                    snapshot_json TEXT NOT NULL,
+                    PRIMARY KEY (exam_id, version)
+                );
                 CREATE TABLE IF NOT EXISTS steps (
                     exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,
                     step_key TEXT NOT NULL,
@@ -346,20 +353,56 @@ class Store:
             return True
 
     def publish_exam(self, exam_id: str):
-        """Publicatiestatus en workflowbewijs in één transactie vastleggen.
+        """Maak een onveranderbare publicatieversie en markeer deze actueel.
 
-        De API controleert vóór deze methode of de integrale eindcontrole is
-        afgerond. Door beide wijzigingen in dezelfde SQLite-transactie uit te
-        voeren kan een examen niet wel gepubliceerd zijn maar nog als
-        ongepubliceerd in de workflow staan (of andersom).
+        Elke publicatie krijgt een oplopend versienummer en een volledige
+        momentopname van metadata, bronbestanden (hashes) en workflowbewijs.
+        De vorige publicatie wordt nooit overschreven. Dit vormt later ook
+        een betrouwbare set referentievoorbeelden voor het leermechanisme.
         """
         with self.connection() as db:
+            exam = db.execute("SELECT * FROM exams WHERE id=?", (exam_id,)).fetchone()
+            if not exam:
+                raise ValueError("Examen niet gevonden.")
+            documents = [dict(row) for row in db.execute(
+                "SELECT * FROM documents WHERE exam_id=? ORDER BY id", (exam_id,)
+            ).fetchall()]
+            steps = [dict(row) for row in db.execute(
+                "SELECT * FROM steps WHERE exam_id=? ORDER BY step_key", (exam_id,)
+            ).fetchall()]
+            versions = db.execute(
+                "SELECT COALESCE(MAX(version),0) AS latest FROM publication_versions WHERE exam_id=?",
+                (exam_id,)
+            ).fetchone()
+            version = int(versions["latest"]) + 1
+            snapshot = {
+                "exam": dict(exam),
+                "documents": documents,
+                "steps": [{**step, "evidence": json.loads(step["evidence_json"])}
+                          for step in steps],
+                "version": version,
+            }
+            db.execute(
+                "INSERT INTO publication_versions(exam_id,version,published_at,snapshot_json) "
+                "VALUES (?,?,CURRENT_TIMESTAMP,?)",
+                (exam_id, version, json.dumps(snapshot, ensure_ascii=False)),
+            )
             db.execute("UPDATE exams SET published=1, published_at=CURRENT_TIMESTAMP WHERE id=?", (exam_id,))
             db.execute(
                 "INSERT OR REPLACE INTO steps(exam_id,step_key,status,evidence_json,updated_at) "
                 "VALUES (?,?,?,?,CURRENT_TIMESTAMP)",
-                (exam_id, "publicatie", "complete", json.dumps({"published": True})),
+                (exam_id, "publicatie", "complete", json.dumps({"published": True, "version": version})),
             )
+
+    def publication_versions(self, exam_id: str):
+        """Geef de metadata van eerdere publicaties terug, zonder de snapshots te wijzigen."""
+        with self.connection() as db:
+            rows = db.execute(
+                "SELECT version,published_at,snapshot_json FROM publication_versions "
+                "WHERE exam_id=? ORDER BY version DESC", (exam_id,)
+            ).fetchall()
+        return [{"version": row["version"], "published_at": row["published_at"],
+                 "snapshot": json.loads(row["snapshot_json"])} for row in rows]
 
     def invalidate_steps(self, exam_id: str, keys: list[str]):
         """Markeer afhankelijke stappen als opnieuw te controleren, maar bewaar hun werk.
