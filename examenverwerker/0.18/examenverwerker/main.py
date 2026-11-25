@@ -31,7 +31,7 @@ from .answer_detection import analyse_answers, detect_cv_max_points, validate_an
 from .cv_supplement import analyse_supplement, validate_supplement_review
 from .context_detection import generate_context_candidates, validate_context_review
 from .storage import Store, resolve_shared_data_root
-from .learning import question_start_features, build_learning_profile
+from .learning import question_start_features, build_learning_profile, learned_adjustment
 
 ROOT = Path(__file__).resolve().parent.parent
 # De opslag staat buiten de versie-map. Bij de eerste start van 0.17 wordt
@@ -571,6 +571,28 @@ def _load_document_question_starts(exam_id: str, document_type: str):
         for page in result["pages"]:
             page["candidate_count"] = len(page["candidates"])
         result["candidate_count"] = sum(not item.get("removed") for item in result["candidates"])
+    # Pas uitsluitend een uitlegbare rangschikkingshint toe op basis van
+    # eerdere, expliciet afgeronde reviews van hetzelfde documenttype.
+    # De bestaande acceptatiebeslissing, nummerreeksfilter en visuele review
+    # blijven volledig intact; leren kan dus geen kandidaat stilzwijgend
+    # goedkeuren of verwijderen.
+    training_examples = []
+    for record in STORE.list_fragment_feedback(f"question_starts:{document_type}"):
+        training_examples.extend(record["accepted"].get("examples", []))
+    learning_profile = build_learning_profile(training_examples)
+    for candidate in result["candidates"]:
+        page = result["pages"][candidate["page_index"]]
+        features = question_start_features(candidate, page)
+        adjustment = learned_adjustment(features, learning_profile)
+        candidate["learning_score_adjustment"] = adjustment["score_adjustment"]
+        candidate["learning_evidence"] = adjustment["evidence"]
+        candidate["learning_active"] = adjustment["learning_active"]
+
+    result["learning_profile"] = {
+        "examples": learning_profile["example_count"],
+        "active_features": learning_profile["active_feature_count"],
+        "minimum_examples_per_feature": learning_profile["minimum_examples"],
+    }
     result["document_type"] = document_type
     result["step_key"] = step_key
     return result
