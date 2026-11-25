@@ -149,7 +149,7 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
     """
     occurrences: dict[str, set[int]] = {}
     spans_by_page: list[list[tuple[str, list[float]]]] = [[] for _ in pdf]
-    page_number_pattern = re.compile(r"^\\d{1,3}$")
+    page_number_pattern = re.compile(r"^\d{1,3}$")
     for page_index, page in enumerate(pdf):
         height = page.rect.height
         for block in page.get_text("dict").get("blocks", []):
@@ -169,7 +169,7 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                     # Een gemengde span (bijvoorbeeld "Vraag 30 2 / 19")
                     # is nooit veilig als één geheel te verwijderen.
                     if not (page_number_pattern.fullmatch(key)
-                            or len(key) <= 48 and not re.search(r"\\b(?:vraag|opgave|antwoord)\\s*\\d+", key)):
+                            or len(key) <= 48 and not re.search(r"\b(?:vraag|opgave|antwoord)\s*\d+", key)):
                         continue
                     spans_by_page[page_index].append((key, coordinates))
                     if not page_number_pattern.fullmatch(key):
@@ -268,10 +268,10 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                 # de herkenbare footer-substrings en blijft de vraagtekst staan.
                 footer_boxes: list[list[float]] = []
                 footer_patterns = [
-                    re.compile(r"\\b\\d{1,3}\\s*/\\s*\\d{1,3}\\b"),
-                    re.compile(r"(?i)\\blees\\s+verder\\b"),
+                    re.compile(r"\b\d{1,3}\s*/\s*\d{1,3}\b"),
+                    re.compile(r"(?i)\blees\s+verder\b"),
                     re.compile(r"►{1,3}"),
-                    re.compile(r"(?i)\\b(?:VW|VMBO|HAVO|VWO)[- ]?\\d{3,}(?:[- ][\\w-]+)*\\b"),
+                    re.compile(r"(?i)\b(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*\b"),
                 ]
                 raw_page = page.get_text("rawdict")
                 for block in raw_page.get("blocks", []):
