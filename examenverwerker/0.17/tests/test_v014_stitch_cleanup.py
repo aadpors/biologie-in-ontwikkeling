@@ -150,6 +150,66 @@ class StitchedPageCleanupTests(unittest.TestCase):
                 )
                 self.assertGreater(dark_pixels, 0, "Vraag 30 is ten onrechte uit de examenstrook verwijderd.")
 
+    def test_standalone_question_numbers_28_and_30_survive_at_bottom_margin(self):
+        """Een los vraagnummer onderaan de pagina mag nooit als paginanummer verdwijnen."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "standalone-question-numbers.pdf"
+            output = root / "standalone-question-numbers-long.png"
+
+            pdf = fitz.open()
+            for question_number in (28, 30):
+                page = pdf.new_page(width=600, height=800)
+                page.insert_text((55, 150), "De inhoudelijke vraagtekst staat hierboven.", fontsize=12)
+                # Dit bootst een vraagkop na die door de PDF-export als een
+                # zelfstandige numerieke regel in de onderste marge is opgeslagen.
+                page.insert_text((55, 780), str(question_number), fontsize=12)
+            pdf.save(source)
+            pdf.close()
+
+            metadata = build_stitched_exam(source, output, start_page=0, render_scale=1.0)
+            self.assertEqual(len(metadata["pages"]), 2)
+            with Image.open(output) as stitched:
+                for page_meta in metadata["pages"]:
+                    # De vraagnummerregel hoort binnen de gerenderde paginacrop
+                    # te blijven. Controleer de daadwerkelijke pixelinhoud.
+                    crop_top = page_meta["crop_pixels"][1]
+                    number_y = 780 - crop_top
+                    number_area = stitched.crop(
+                        (45, max(0, number_y - 18), 90, number_y + 5)
+                    )
+                    dark_pixels = sum(
+                        1 for pixel in number_area.convert("L").getdata() if pixel < 180
+                    )
+                    self.assertGreater(
+                        dark_pixels, 0,
+                        "Een zelfstandig vraagnummer in de onderste marge is verwijderd.",
+                    )
+
+    def test_repeated_standalone_page_numbers_are_still_removed(self):
+        """Echte losse paginanummers worden herkend aan hun herhaalde positie."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "repeated-page-numbers.pdf"
+            output = root / "repeated-page-numbers-long.png"
+
+            pdf = fitz.open()
+            pdf.new_page(width=600, height=800)  # Omslag.
+            for page_number in (2, 3):
+                page = pdf.new_page(width=600, height=800)
+                page.insert_text((55, 150), "Inhoudelijke tekst blijft behouden.", fontsize=12)
+                page.insert_text((300, 780), str(page_number), fontsize=9)
+            pdf.save(source)
+            pdf.close()
+
+            metadata = build_stitched_exam(source, output, render_scale=1.0)
+            self.assertEqual(len(metadata["pages"]), 2)
+            for page_meta in metadata["pages"]:
+                self.assertLess(
+                    page_meta["crop_pixels"][3], 400,
+                    "Een herhaald paginanummer is ten onrechte als inhoud behouden.",
+                )
+
     def test_standalone_exam_code_in_footer_is_removed(self):
         """Ook een losse Cito-documentcode in de onderste marge wordt gemaskeerd."""
         with tempfile.TemporaryDirectory() as folder:
