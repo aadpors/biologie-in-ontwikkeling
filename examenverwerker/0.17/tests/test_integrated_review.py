@@ -175,6 +175,59 @@ class IntegratedReviewTests(unittest.TestCase):
         )
         self.assertEqual(invalid.status_code, 422)
 
+    def test_stitched_opgaven_preserves_saved_boundaries_when_image_fingerprint_is_stale(self):
+        """Een nieuwe stitchversie mag eerder handmatig werk niet vervangen."""
+        exam_id = self.create_exam()
+        starts = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/opgaven"
+        )
+        self.assertEqual(starts.status_code, 200, starts.text)
+        main.STORE.complete_step(exam_id, "opgaven_starts", {
+            "candidates": starts.json()["candidates"],
+            "reviewed_all_pages": True,
+            "document_sha256": starts.json()["document"]["sha256"],
+        })
+
+        first_open = self.client.get(f"/api/exams/{exam_id}/stitched-opgaven")
+        self.assertEqual(first_open.status_code, 200, first_open.text)
+        rows = first_open.json()["white_row_ranges"]
+        first_top = rows[0][0]
+        first_bottom = next(
+            start for start, end in rows if start > first_top
+        )
+        original_selection = {
+            "id": "manual-q1",
+            "type": "vraag",
+            "top": first_top,
+            "bottom": first_bottom,
+            "question_numbers": [1],
+            "label": "Handmatig gecontroleerde vraag 1",
+        }
+        saved = self.client.post(
+            f"/api/exams/{exam_id}/stitched-opgaven/review",
+            json={"selections": [original_selection], "reviewed": False},
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        # Simuleer een cachevernieuwing: de PDF is hetzelfde, maar de hash van
+        # de afgeleide afbeelding verschilt. De fragmentdata zelf blijft staan.
+        exam = main.STORE.get_exam(exam_id)
+        evidence = exam["steps"]["opgaven_fragments"]["evidence"]
+        evidence["stitched_image_sha256"] = "oude-afbeelding-hash"
+        main.STORE.save_step_draft(exam_id, "opgaven_fragments", evidence)
+
+        reopened = self.client.get(f"/api/exams/{exam_id}/stitched-opgaven")
+        self.assertEqual(reopened.status_code, 200, reopened.text)
+        self.assertIn("herstelvoorstel", reopened.json()["selection_warning"].lower())
+        self.assertEqual(reopened.json()["segmentation_mode"], "saved")
+        self.assertEqual(reopened.json()["selections"], [original_selection])
+
+        # Ook na het openen mag de server de oude grenzen niet stilzwijgend
+        # vervangen door automatisch gegenereerde voorstellen.
+        persisted = main.STORE.get_exam(exam_id)["steps"]["opgaven_fragments"]["evidence"]
+        self.assertEqual(persisted["stitched_selections"], [original_selection])
+        self.assertEqual(persisted["stitched_image_sha256"], "oude-afbeelding-hash")
+
     def test_no_supplement_requires_explicit_confirmation(self):
         exam_id = self.create_exam()
         result = self.client.get(f"/api/exams/{exam_id}/cv-supplement")
