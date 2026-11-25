@@ -117,3 +117,10 @@ op, zonder overlappende vraagfragmenten.
 - De lijst met afzonderlijke fragmenten is ondergebracht in een inklapbaar onderdeel. Zodra een fragment wordt geselecteerd, opent het onderdeel automatisch zodat de bewerkingsvelden direct beschikbaar zijn.
 - Contextgroepen en hun onderliggende fragmenten worden op documentpositie gesorteerd. De titel is daarmee altijd afkomstig van het bovenste contextfragment, onafhankelijk van de selectievolgorde.
 - De breedte en typografische hiërarchie van de inspector zijn aangepast om de contextstructuur sneller scanbaar te maken.
+
+
+## Herbouw van lange examenafbeeldingen
+
+- De cacheversie van de gestitchte examenafbeeldingen is verhoogd van 5 naar 6. Bestaande lange afbeeldingen worden daardoor na deze wijziging niet meer hergebruikt.
+- De nieuwe renderer bouwt de lange afbeelding opnieuw op uit de oorspronkelijke PDF, inclusief de veiligere opschoning van afzonderlijke footer-tekens.
+- Opgeslagen fragmentselecties met coördinaten uit de oude afbeelding worden via de bestaande afbeeldingsfingerprintcontrole als verouderd herkend. De docent moet de visuele fragmentgrenzen daarom opnieuw controleren en opslaan voordat die selecties voor verdere verwerking worden gebruikt.
