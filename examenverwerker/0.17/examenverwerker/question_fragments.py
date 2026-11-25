@@ -156,7 +156,11 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
             if block.get("type") != 0:
                 continue
             for line in block.get("lines", []):
-                for span in line.get("spans", []):
+                line_spans = [
+                    span for span in line.get("spans", [])
+                    if str(span.get("text", "")).strip()
+                ]
+                for span in line_spans:
                     text = " ".join(str(span.get("text", "")).split())
                     bbox = span.get("bbox", [])
                     if not text or len(bbox) != 4:
@@ -166,13 +170,24 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                     if not in_margin:
                         continue
                     key = text.casefold()
+                    # Een los getal is alleen een paginanummer wanneer het
+                    # werkelijk de enige tekst op die PDF-regel is. Een
+                    # vraagnummer als apart span naast een footer blijft dus
+                    # behouden, ook als het in de onderste marge staat.
+                    is_isolated_page_number = (
+                        len(line_spans) == 1 and bool(page_number_pattern.fullmatch(key))
+                    )
                     # Een gemengde span (bijvoorbeeld "Vraag 30 2 / 19")
                     # is nooit veilig als één geheel te verwijderen.
-                    if not (page_number_pattern.fullmatch(key)
-                            or len(key) <= 48 and not re.search(r"\b(?:vraag|opgave|antwoord)\s*\d+", key)):
+                    is_repeated_short_margin_text = (
+                        len(key) <= 48
+                        and not page_number_pattern.fullmatch(key)
+                        and not re.search(r"\b(?:vraag|opgave|antwoord)\s*\d+", key)
+                    )
+                    if not (is_isolated_page_number or is_repeated_short_margin_text):
                         continue
                     spans_by_page[page_index].append((key, coordinates))
-                    if not page_number_pattern.fullmatch(key):
+                    if not is_isolated_page_number:
                         occurrences.setdefault(key, set()).add(page_index)
     repeated = {key for key, pages in occurrences.items() if len(pages) >= 2}
     return [
