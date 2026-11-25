@@ -375,6 +375,39 @@ class Store:
                  json.dumps(accepted, ensure_ascii=False), json.dumps(summary, ensure_ascii=False)),
             )
 
+    def list_fragment_feedback(self, stage: str | None = None):
+        """Lees gecontroleerde leervoorbeelden voor profielberekening.
+
+        De feedbacktabel is append-only. Daardoor blijven eerdere correcties
+        beschikbaar en kan een later algoritme de ontwikkeling reproduceren.
+        """
+        query = "SELECT stage,automatic_json,accepted_json,correction_summary_json FROM fragment_learning_feedback"
+        parameters: tuple[Any, ...] = ()
+        if stage:
+            query += " WHERE stage=?"
+            parameters = (stage,)
+        query += " ORDER BY id"
+        with self.connection() as db:
+            rows = db.execute(query, parameters).fetchall()
+        return [{
+            "stage": row["stage"],
+            "automatic": json.loads(row["automatic_json"]),
+            "accepted": json.loads(row["accepted_json"]),
+            "summary": json.loads(row["correction_summary_json"]),
+        } for row in rows]
+
+    def record_detection_examples(self, exam_id: str, stage: str, source_hash: str,
+                                  examples: list[dict[str, Any]]):
+        """Bewaar gelabelde detectievoorbeelden in de bestaande feedbacktabel."""
+        if not examples:
+            return
+        self.record_fragment_feedback(
+            exam_id, stage, source_hash,
+            {"candidate_count": len(examples)},
+            {"examples": examples},
+            {"labelled_examples": len(examples), "reviewed_by_user": True},
+        )
+
     def fragment_feedback_count(self, stage: str | None = None):
         """Return aggregate count of validated feedback examples."""
         with self.connection() as db:
