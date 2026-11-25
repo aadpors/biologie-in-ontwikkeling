@@ -10,6 +10,7 @@ from examenverwerker.learning import (
     question_start_features,
     build_boundary_learning_profile,
     build_context_learning_profile,
+    apply_context_range_learning,
 )
 from examenverwerker.storage import Store
 
@@ -89,6 +90,34 @@ class LearningTests(unittest.TestCase):
         self.assertTrue(profile["active"])
         self.assertEqual(profile["median_start_shift"], -1)
         self.assertEqual(profile["median_end_shift"], 1)
+
+    def test_learned_context_range_adjustment_is_clamped_and_visible(self):
+        contexts = [{
+            "id": "context-1", "from_question": 2, "to_question": 4,
+            "reviewed": False,
+        }]
+        profile = {
+            "active": True, "examples": 6,
+            "median_start_shift": -1, "median_end_shift": 2,
+        }
+        adjusted = apply_context_range_learning(contexts, profile, {1, 2, 3, 4, 5})
+        self.assertEqual(adjusted[0]["from_question"], 1)
+        self.assertEqual(adjusted[0]["to_question"], 5)
+        self.assertTrue(adjusted[0]["learning_adjusted"])
+        self.assertEqual(adjusted[0]["learning_correction"]["examples"], 6)
+
+    def test_learned_context_ranges_never_change_reviewed_contexts(self):
+        contexts = [{
+            "id": "context-1", "from_question": 2, "to_question": 4,
+            "reviewed": True,
+        }]
+        profile = {
+            "active": True, "examples": 8,
+            "median_start_shift": -2, "median_end_shift": 3,
+        }
+        adjusted = apply_context_range_learning(contexts, profile, {1, 2, 3, 4, 5})
+        self.assertEqual(adjusted[0]["from_question"], 2)
+        self.assertEqual(adjusted[0]["to_question"], 4)
 
     def test_feedback_is_append_only_and_can_be_reloaded(self):
         with tempfile.TemporaryDirectory() as folder:
