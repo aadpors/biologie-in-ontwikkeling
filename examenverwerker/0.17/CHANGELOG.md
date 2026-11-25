@@ -102,3 +102,10 @@ op, zonder overlappende vraagfragmenten.
 - De contextgroeptitel wordt niet handmatig ingevoerd. De applicatie leest de eerste niet-lege tekstregel uit het bovenste contextfragment in de oorspronkelijke PDF-tekstlaag.
 - Na het aanpassen van een fragmentgrens wordt de titel opnieuw uit de actuele uitsnede bepaald. Als de PDF geen selecteerbare tekst bevat, wordt expliciet gemeld dat de titel niet uit de tekstlaag beschikbaar is; er wordt geen titel verzonnen.
 - De losse contextfragmenten blijven afzonderlijk selecteerbaar en bewerkbaar. Alleen de presentatie en groepsrelatie worden samengevoegd.
+
+
+## Opschonen van de gestitchte examenafbeelding
+
+- Kop- en voettekstopschoning werkt nu per afzonderlijk PDF-tekstspan in plaats van per volledige tekstregel. Een vraagnummer of inhoudelijke tekst op dezelfde regel als een paginateller of footerlabel wordt daardoor niet meer integraal afgedekt.
+- De herkenning van herhaalde marginaaltekst maskeert eveneens alleen het herhaalde span-element, niet de volledige regel.
+- Een regressietest controleert dat een vraagnummer behouden blijft wanneer het op dezelfde regel staat als een paginateller en 'lees verder'.
