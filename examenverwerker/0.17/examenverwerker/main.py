@@ -844,10 +844,22 @@ def _load_document_fragments(exam_id: str, document_type: str):
                 crop.save(output_dir / filename, format="PNG", optimize=True)
                 crop.close()
                 url = f"/api/question-fragment-images/{exam_id}/{document_type}/{filename}"
+                # Een selectie kan alleen een definitief vraagfragment opleveren
+                # wanneer het nummer ook voorkomt in de goedgekeurde vraagstarts.
+                # Sla een ontbrekende koppeling niet stilzwijgend over: dan lijkt
+                # de CV-verwerking compleet terwijl bijvoorbeeld vraag 28 of 30
+                # volledig uit de fragmenten verdwenen is.
                 for number in selection.get("question_numbers", []):
-                    start = question_map.get(int(number))
+                    normalised_number = int(number)
+                    start = question_map.get(normalised_number)
                     if not start:
-                        continue
+                        raise HTTPException(
+                            409,
+                            f"CV-fragment gekoppeld aan vraag {normalised_number}, "
+                            "maar voor dit nummer bestaat geen goedgekeurde vraagstart. "
+                            "Heropen stap 7 (Vraagstarts correctievoorschrift), "
+                            "controleer de detectie en sla de goedgekeurde vraagstarts opnieuw op."
+                        )
                     rebuilt_questions.append({
                         "question_number": int(number), "start_id": start["id"],
                         "first_page": next(
