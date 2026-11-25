@@ -324,8 +324,8 @@ function renderWorkspace() {
       const step = state.workflow.find(item => item.key === key);
       const confirmed = window.confirm(
         `Wil je "${step?.title || key}" opnieuw openen?\n\n` +
-        'De opgeslagen correcties blijven behouden. Goedgekeurde vervolgstappen ' +
-        'worden opnieuw ter controle aangeboden.'
+        'De opgeslagen correcties blijven behouden. Vervolgstappen worden alleen ' +
+        'opnieuw ter controle aangeboden als je de inhoud daadwerkelijk wijzigt.'
       );
       if (!confirmed) return;
       try {
