@@ -1380,19 +1380,9 @@ def save_stitched_document_review(exam_id: str, document_type: str, payload: dic
         exam_id, fragments_step_key, evidence,
         identity_fields=("stitched_selections", "document_sha256", "stitched_image_sha256"),
     )
-    # Geef de titels terug bij iedere opslag. Wanneer de docent een
-    # fragmentgrens verplaatst, wordt de titel dus opnieuw bepaald op basis
-    # van de tekst die nu werkelijk binnen de uitsnede valt.
-    context_titles = {
-        item["id"]: _context_title_for_selection(
-            source_path, stitched_metadata.get("pages", []), item
-        )
-        for item in clean if item["type"] == "context"
-    }
     return {"ok": True, "selection_count": len(clean),
             "reviewed": evidence["stitched_reviewed"],
-            "complete": not saved_as_draft,
-            "context_titles": context_titles}
+            "complete": not saved_as_draft}
 
 
 @app.get("/api/stitched-opgaven-images/{exam_id}/{filename}")
@@ -1480,9 +1470,19 @@ def save_stitched_opgaven_review(exam_id: str, payload: dict):
         evidence,
         identity_fields=("stitched_selections", "document_sha256", "stitched_image_sha256"),
     )
+    # Geef de titels terug bij iedere opslag. Wanneer de docent een
+    # fragmentgrens verplaatst, wordt de titel dus opnieuw bepaald op basis
+    # van de tekst die nu werkelijk binnen de uitsnede valt.
+    context_titles = {
+        item["id"]: _context_title_for_selection(
+            source_path, stitched_metadata.get("pages", []), item
+        )
+        for item in clean if item["type"] == "context"
+    }
     return {"ok": True, "selection_count": len(clean),
             "reviewed": evidence["stitched_reviewed"],
-            "complete": not saved_as_draft}
+            "complete": not saved_as_draft,
+            "context_titles": context_titles}
 
 
 @app.get("/api/exams/{exam_id}/document-question-fragments/{document_type}")
