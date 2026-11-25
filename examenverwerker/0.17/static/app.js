@@ -1219,12 +1219,12 @@ async function renderFinalReviewStage() {
       }
 
       // Beide navigatieparen bedienen dezelfde index en dezelfde save-route.
-      ['previousFinalQuestion', 'previousFinalQuestionBottom'].forEach(id =>
+      ['previousFinalQuestion', 'previousFinalQuestionBottom'].forEach(id => {
         panel.querySelector('#' + id)?.addEventListener('click', () => navigateTo(currentIndex - 1));
-      );
-      ['nextFinalQuestion', 'nextFinalQuestionBottom'].forEach(id =>
+      });
+      ['nextFinalQuestion', 'nextFinalQuestionBottom'].forEach(id => {
         panel.querySelector('#' + id)?.addEventListener('click', () => navigateTo(currentIndex + 1));
-      );
+      });
       panel.querySelectorAll('[data-final-jump]').forEach(button => {
         button.addEventListener('click', () => navigateTo(Number(button.dataset.finalJump)));
       });
