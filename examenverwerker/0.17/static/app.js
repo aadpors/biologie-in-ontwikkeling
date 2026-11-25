@@ -1723,6 +1723,12 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     let saveTimer = null;
     let saveChain = Promise.resolve();
     let completingStep = false;
+    // Bij een oude afbeelding zijn de behouden grenzen slechts een
+    // herstelvoorstel. Automatische saves en pagehide mogen de waarschuwing
+    // niet stilzwijgend wissen; alleen de expliciete knop 'Nu opslaan' geldt
+    // als bevestiging dat de docent de grenzen op de nieuwe afbeelding heeft
+    // gecontroleerd.
+    let recoveryNeedsExplicitSave = Boolean(result.selection_warning);
 
     panel.innerHTML = `
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
@@ -1730,7 +1736,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
         : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Selecteer elk afzonderlijk contextdeel als fragment van het type Context en koppel het aan de vragen waarop het betrekking heeft. Contextdelen met overlappende vraagnummers worden automatisch samengevoegd tot één contextgroep. De titel wordt afgeleid van de eerste tekstregel van het eerste contextdeel. Selecteer daarnaast iedere opgave als fragment van het type Vraag en koppel die aan het eigen vraagnummer.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
-      ${result.selection_warning ? `<p class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
+      ${result.selection_warning ? `<p id="selectionRecoveryWarning" class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
           <div class="stitched-image-scroll" id="stitchedImageScroll"><div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div></div>
@@ -1847,7 +1853,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
 
     // Sla een momentopname van de selectie op. Een seriële promiseketen
     // voorkomt dat twee snelle wijzigingen elkaar op de server overschrijven.
-    const persistSelections = () => {
+    const persistSelections = (explicitRecoverySave = false) => {
+      // Zolang een oude selectie als herstelvoorstel wordt getoond, slaan we
+      // niets automatisch op. Anders zou alleen het openen/sluiten van de
+      // pagina de oude coördinaten aan de nieuwe afbeelding koppelen zonder
+      // dat de docent ze heeft bekeken.
+      if (recoveryNeedsExplicitSave && !explicitRecoverySave) {
+        saveStatus.textContent = 'Controleer de behouden grenzen en klik daarna op Nu opslaan';
+        return Promise.resolve(null);
+      }
       clearTimeout(saveTimer);
       const snapshot = JSON.parse(JSON.stringify(selections));
       saveStatus.textContent = 'Opslaan…';
@@ -1868,6 +1882,10 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           render();
         }
         saveStatus.textContent = 'Alle wijzigingen opgeslagen';
+        if (explicitRecoverySave && recoveryNeedsExplicitSave) {
+          recoveryNeedsExplicitSave = false;
+          $('#selectionRecoveryWarning')?.remove();
+        }
         return response;
       }).catch(error => {
         saveStatus.textContent = 'Opslaan mislukt — probeer opnieuw';
@@ -1887,7 +1905,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     // wisselen naar een andere applicatie op. keepalive laat de request lopen
     // wanneer de browser de pagina direct daarna inactief maakt.
     const saveOnHide = () => {
-      if (completingStep) return;
+      if (completingStep || recoveryNeedsExplicitSave) return;
       clearTimeout(saveTimer);
       const body = JSON.stringify({selections, reviewed:false});
       fetch(stitchedReviewUrl, {
@@ -2287,7 +2305,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       button.disabled = true;
       button.textContent = 'Opslaan…';
       try {
-        await persistSelections();
+        await persistSelections(true);
         $('#stitchedMessage').textContent=`${selections.length} fragmentselecties opgeslagen.`;
       } catch(error) {
         $('#stitchedMessage').textContent=error.message;
@@ -2305,6 +2323,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       button.disabled = true;
       button.textContent = 'Controleren en afronden…';
       try {
+        if (recoveryNeedsExplicitSave) {
+          throw new Error('Controleer eerst alle behouden fragmentgrenzen op de nieuwe afbeelding en klik op ‘Nu opslaan’. Pas daarna kun je de fragmentcontrole goedkeuren.');
+        }
         if(!selections.length) throw new Error('Selecteer eerst de contexten en vragen.');
         if(selections.some(item=>!item.question_numbers.length)) throw new Error('Elk fragment moet aan minimaal één vraagnummer gekoppeld zijn.');
         if(!selections.some(item=>item.type==='vraag')) throw new Error('Er moet minimaal één vraagfragment zijn.');
