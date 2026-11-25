@@ -94,3 +94,11 @@ op, zonder overlappende vraagfragmenten.
 - Tests toegevoegd voor gesplitste antwoordopties, gesloten antwoordvormen, niet-contextinhoud tussen vragen en het hergebruiken van de stitchcache.
 - De volledige testset, de diagnose op het echte examen en de JavaScript-syntaxiscontrole zijn op de laatste branchversie geslaagd.
 - De diagnose op `vw-1018-a-26-2-o.pdf` vond 39 vraagfragmenten en 22 contextfragmenten; er waren geen overlappende vraagfragmenten en alle fragmentgrenzen lagen op volledig witte rijen.
+
+
+## Stap 3 — contextgroepen en titels
+
+- Contextdelen worden nu samengevoegd zodra hun gekoppelde vraagnummers ten minste één nummer gemeen hebben. De samenvoeging is transitief: overlappende reeksen vormen samen één groep.
+- De contextgroeptitel wordt niet handmatig ingevoerd. De applicatie leest de eerste niet-lege tekstregel uit het bovenste contextfragment in de oorspronkelijke PDF-tekstlaag.
+- Na het aanpassen van een fragmentgrens wordt de titel opnieuw uit de actuele uitsnede bepaald. Als de PDF geen selecteerbare tekst bevat, wordt expliciet gemeld dat de titel niet uit de tekstlaag beschikbaar is; er wordt geen titel verzonnen.
+- De losse contextfragmenten blijven afzonderlijk selecteerbaar en bewerkbaar. Alleen de presentatie en groepsrelatie worden samengevoegd.
