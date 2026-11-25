@@ -32,7 +32,8 @@ from .cv_supplement import analyse_supplement, validate_supplement_review
 from .context_detection import generate_context_candidates, validate_context_review
 from .storage import Store, resolve_shared_data_root
 from .learning import (question_start_features, build_learning_profile, learned_adjustment,
-                       build_boundary_learning_profile, build_context_learning_profile)
+                       build_boundary_learning_profile, build_context_learning_profile,
+                       apply_context_range_learning)
 
 ROOT = Path(__file__).resolve().parent.parent
 # De opslag staat buiten de versie-map. Bij de eerste start van 0.17 wordt
@@ -2025,6 +2026,15 @@ def get_snippets(exam_id: str):
                 })
         contexts = {"context_count": len(selected_items), "contexts": selected_items}
     previous = exam["steps"].get("snippets", {}).get("evidence", {})
+    # Pas correcties uit eerdere contextreviews alleen toe op nieuwe,
+    # tekstgebaseerde voorstellen. Handmatig op de stitch geselecteerde
+    # contexten en eerder opgeslagen docentbeslissingen blijven onaangeroerd.
+    if not selected_contexts:
+        context_learning = build_context_learning_profile(STORE.list_fragment_feedback())
+        contexts["contexts"] = apply_context_range_learning(
+            contexts["contexts"], context_learning,
+            {int(item["question_number"]) for item in accepted},
+        )
     saved = {item["id"]: item for item in previous.get("contexts", [])}
     for context in contexts["contexts"]:
         if context["id"] in saved:
