@@ -92,6 +92,36 @@ class StitchedPageCleanupTests(unittest.TestCase):
             question = next(item for item in result if item["type"] == "vraag")
             self.assertEqual(question["bottom"], 83)
 
+    def test_question_number_survives_when_footer_marker_shares_its_text_line(self):
+        """Een vraagnummer op dezelfde regel als een paginateller mag niet verdwijnen."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "mixed-footer-line.pdf"
+            output = root / "mixed-footer-line-long.png"
+
+            pdf = fitz.open()
+            page = pdf.new_page(width=600, height=800)
+            page.insert_text((55, 150), "Inhoudelijke tekst boven de vraag.", fontsize=12)
+            # Sommige PDF's leveren de vraag en footer als één tekstspan/regel.
+            # De volledige regel mag dan niet als voettekst worden gemaskeerd.
+            page.insert_text((55, 780), "Vraag 28   2 / 19   lees verder", fontsize=9)
+            pdf.save(source)
+            pdf.close()
+
+            metadata = build_stitched_exam(source, output, start_page=0, render_scale=1.0)
+            crop_top = metadata["pages"][0]["crop_pixels"][1]
+            with Image.open(output) as stitched:
+                # Zoek in het gebied waar 'Vraag 28' is afgedrukt naar niet-witte
+                # pixels. Daarmee testen we de uiteindelijke afbeelding, niet
+                # alleen de PDF-tekstlaag of de metadata.
+                question_y = 780 - crop_top
+                question_area = stitched.crop((45, max(0, question_y - 18), 180, question_y + 5))
+                self.assertLess(sum(1 for pixel in question_area.convert("L").getdata() if pixel < 180), 5000)
+                self.assertGreater(
+                    sum(1 for pixel in question_area.convert("L").getdata() if pixel < 180),
+                    0,
+                )
+
     def test_standalone_exam_code_in_footer_is_removed(self):
         """Ook een losse Cito-documentcode in de onderste marge wordt gemaskeerd."""
         with tempfile.TemporaryDirectory() as folder:
