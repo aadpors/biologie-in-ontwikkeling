@@ -186,6 +186,62 @@ class StitchedPageCleanupTests(unittest.TestCase):
                         "Een zelfstandig vraagnummer in de onderste marge is verwijderd.",
                     )
 
+    def test_question_number_is_not_removed_between_sequential_page_numbers(self):
+        """Een vraagnummer op de paginanummerpositie overrulet geen paginatellerreeks."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "question-between-page-numbers.pdf"
+            output = root / "question-between-page-numbers-long.png"
+
+            pdf = fitz.open()
+            # De drie getallen staan op exact dezelfde relatieve positie.
+            # Op pagina 1 en 3 is het een paginanummer (1 en 3); op pagina 2
+            # is het een vraagnummer (28). Alleen de twee waarden die de
+            # oplopende paginatellerreeks ondersteunen mogen worden gewist.
+            for printed_number in (1, 28, 3):
+                page = pdf.new_page(width=600, height=800)
+                page.insert_text((55, 150), "De inhoudelijke tekst staat hierboven.", fontsize=12)
+                page.insert_text((55, 780), str(printed_number), fontsize=12)
+            pdf.save(source)
+            pdf.close()
+
+            metadata = build_stitched_exam(
+                source, output, start_page=0, render_scale=1.0
+            )
+            self.assertEqual(len(metadata["pages"]), 3)
+
+            # De eerste en derde pagina bevatten echte paginanummers. Die
+            # mogen de verticale paginacrop niet langer maken.
+            for page_meta in (metadata["pages"][0], metadata["pages"][2]):
+                self.assertLess(
+                    page_meta["crop_pixels"][3], 400,
+                    "Een echt paginanummer is ten onrechte als inhoud behouden.",
+                )
+
+            # Het afwijkende nummer 28 is een vraagnummer. Het moet zowel in
+            # de cropmetadata als in de uiteindelijke gestitchte pixels staan.
+            question_page = metadata["pages"][1]
+            self.assertGreater(
+                question_page["crop_pixels"][3], 760,
+                "Vraagnummer 28 is ten onrechte als paginanummer verwijderd.",
+            )
+            question_y = (
+                float(question_page["top"])
+                + 780
+                - float(question_page["crop_pixels"][1])
+            )
+            with Image.open(output) as stitched:
+                number_area = stitched.crop(
+                    (45, max(0, int(question_y) - 18), 100, int(question_y) + 5)
+                )
+                dark_pixels = sum(
+                    1 for pixel in number_area.convert("L").getdata() if pixel < 180
+                )
+                self.assertGreater(
+                    dark_pixels, 0,
+                    "Vraagnummer 28 ontbreekt nog steeds in de uiteindelijke stitch.",
+                )
+
     def test_repeated_standalone_page_numbers_are_still_removed(self):
         """Echte losse paginanummers worden herkend aan hun herhaalde positie."""
         with tempfile.TemporaryDirectory() as folder:
