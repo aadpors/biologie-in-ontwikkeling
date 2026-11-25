@@ -1728,7 +1728,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       <p class="eyebrow">${stageLabel}</p><h2>${escapeHtml(stageTitle)}</h2>
       <p class="lead">${isStitchedDocument
         ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
-        : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Selecteer elk afzonderlijk contextdeel als fragment van het type Context en koppel alle delen van dezelfde context aan exact dezelfde vraagnummers. Die delen verschijnen rechts automatisch als één contextgroep. Selecteer daarnaast iedere opgave als fragment van het type Vraag en koppel die aan het eigen vraagnummer.'}</p>
+        : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Selecteer elk afzonderlijk contextdeel als fragment van het type Context en koppel het aan de vragen waarop het betrekking heeft. Contextdelen met overlappende vraagnummers worden automatisch samengevoegd tot één contextgroep. De titel wordt afgeleid van de eerste tekstregel van het eerste contextdeel. Selecteer daarnaast iedere opgave als fragment van het type Vraag en koppel die aan het eigen vraagnummer.'}</p>
       <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
       ${result.selection_warning ? `<p class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
       <div class="stitched-workspace">
@@ -1737,7 +1737,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         </section>
         <aside class="stitched-inspector">
             <h3>Contextgroepen en gekoppelde vragen</h3>
-            <p class="field-help">Contextfragmenten die aan dezelfde vragen zijn gekoppeld, worden hier als één contextgroep getoond. Zo blijft zichtbaar welke tekst- en afbeeldingsdelen samen bij welke opgaven horen.</p>
+            <p class="field-help">Contextfragmenten met ten minste één overlappend vraagnummer worden samengevoegd. Ook indirecte overlap telt mee. De titel is de eerste tekstregel van het bovenste contextfragment in de groep.</p>
             <div id="contextGroupSummary" class="context-group-summary"></div>
             <h3>Afzonderlijke fragmenten</h3>
             <div id="stitchedSelectionList"></div>
@@ -1852,6 +1852,17 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         {method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({selections:snapshot, reviewed:false})}
       )).then(response => {
+        // De server leest de eerste tekstregel opnieuw uit de PDF op basis
+        // van de actuele pixelgrenzen. Daardoor blijft de contextgroeptitel
+        // ook correct wanneer de docent de boven- of ondergrens verplaatst.
+        if (response.context_titles) {
+          selections.forEach(item => {
+            if (item.type === 'context' && Object.prototype.hasOwnProperty.call(response.context_titles, item.id)) {
+              item.context_title = response.context_titles[item.id];
+            }
+          });
+          render();
+        }
         saveStatus.textContent = 'Alle wijzigingen opgeslagen';
         return response;
       }).catch(error => {
@@ -2059,19 +2070,22 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         const a = findRoot(left), b = findRoot(right);
         if (a !== b) parent[b] = a;
       };
-      const hasSameQuestionSet = (left, right) => {
-        const leftNumbers = [...new Set((left.question_numbers || []).map(Number))].sort((a, b) => a - b);
-        const rightNumbers = [...new Set((right.question_numbers || []).map(Number))].sort((a, b) => a - b);
-        return leftNumbers.length > 0
-          && leftNumbers.length === rightNumbers.length
-          && leftNumbers.every((number, index) => number === rightNumbers[index]);
+      const questionSetsOverlap = (left, right) => {
+        // Een gedeeld vraagnummer is het expliciete bewijs dat twee fysieke
+        // contextdelen bij dezelfde inhoudelijke context kunnen horen.
+        // Lege vraagsets worden bewust niet gekoppeld: zonder nummer is er
+        // geen betrouwbare relatie waarmee een groep kan worden afgeleid.
+        const leftNumbers = new Set(
+          (left.question_numbers || []).map(Number).filter(Number.isInteger)
+        );
+        return (right.question_numbers || []).some(number => leftNumbers.has(Number(number)));
       };
       for (let left = 0; left < contextSelections.length; left++) {
         for (let right = left + 1; right < contextSelections.length; right++) {
-          // Alleen identieke vraagsets vormen automatisch één contextgroep.
-          // Gedeeltelijke overlap kan namelijk ook een zelfstandige,
-          // geneste context aanduiden en mag dus niet worden samengevoegd.
-          if (hasSameQuestionSet(contextSelections[left].item, contextSelections[right].item)) {
+          // Union-find maakt de relatie transitief. Als A overlapt met B en
+          // B overlapt met C, worden A, B en C één contextgroep, ook wanneer
+          // A en C zelf geen vraagnummers delen.
+          if (questionSetsOverlap(contextSelections[left].item, contextSelections[right].item)) {
             joinGroups(left, right);
           }
         }
@@ -2096,13 +2110,16 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           const hasQuestion = questionSelections.some(item => (item.question_numbers || []).map(Number).includes(number));
           return `<span class="context-question-chip ${hasQuestion ? "linked" : "missing"}">Vraag ${number}${hasQuestion ? "" : " · fragment ontbreekt"}</span>`;
         }).join("");
+        // De fragmenten zijn hierboven op documentpositie gesorteerd.
+        // Het eerste fragment bepaalt daarom de titel van de hele groep.
+        const title = group.parts[0]?.item.context_title || "Titel niet beschikbaar in de PDF-tekstlaag";
         return `<section class="context-group-card">
-          <div class="context-group-heading"><strong>Contextgroep ${groupIndex + 1}</strong><span>${group.parts.length} contextdeel${group.parts.length === 1 ? "" : "en"}</span></div>
+          <div class="context-group-heading"><strong>${escapeHtml(title)}</strong><span>${group.parts.length} contextdeel${group.parts.length === 1 ? "" : "en"}</span></div>
           <p><strong>Bijbehorende opgaven: ${escapeHtml(formatNumbers(numbers))}</strong></p>
           <div class="context-question-chips">${linked || '<span class="context-question-chip missing">Nog geen vragen gekoppeld</span>'}</div>
           <small>${group.parts.map(entry => escapeHtml(questionLabel(entry.item))).join(" · ")}</small>
         </section>`;
-      }).join("") : '<p class="muted">Selecteer op de examenstrook een fragment van het type Context en koppel het aan de bijbehorende vraagnummers. Meerdere contextdelen met dezelfde vragen vormen automatisch één groep.</p>';
+      }).join("") : '<p class="muted">Selecteer op de examenstrook een fragment van het type Context en koppel het aan de bijbehorende vraagnummers. Contextdelen met overlappende vraagnummers vormen automatisch één groep.</p>';
 
       // De inhoudelijke naam is voldoende; een los fragmentnummer voegt
       // voor de docent niets toe en verandert bovendien bij hersorteren.
