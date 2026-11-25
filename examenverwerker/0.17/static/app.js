@@ -1158,12 +1158,12 @@ async function renderFinalReviewStage() {
     };
 
     const refreshControls = () => {
-      const previous = $('#previousFinalQuestion');
-      const next = $('#nextFinalQuestion');
+      const previousButtons = [$('#previousFinalQuestion'), $('#previousFinalQuestionBottom')].filter(Boolean);
+      const nextButtons = [$('#nextFinalQuestion'), $('#nextFinalQuestionBottom')].filter(Boolean);
       const complete = $('#completeFinalReview');
       const progress = $('#finalReviewProgress');
-      if (previous) previous.disabled = currentIndex === 0;
-      if (next) next.disabled = currentIndex === result.questions.length - 1;
+      previousButtons.forEach(button => button.disabled = currentIndex === 0);
+      nextButtons.forEach(button => button.disabled = currentIndex === result.questions.length - 1);
       if (progress) {
         const remaining = result.questions.length - visited.size;
         progress.textContent = `Vraag ${currentIndex + 1} van ${result.questions.length} · ${remaining} nog te bekijken`;
@@ -1197,6 +1197,11 @@ async function renderFinalReviewStage() {
           <button class="quiet" id="nextFinalQuestion" type="button">Volgende vraag →</button>
         </div>
         ${questionCardHtml(question)}
+        <!-- Tweede navigatiepaar onder de vraagkaart: lange vragen kunnen scrollen. -->
+        <div class="review-actions" style="justify-content:space-between">
+          <button class="quiet" id="previousFinalQuestionBottom" type="button">← Vorige vraag</button>
+          <button class="quiet" id="nextFinalQuestionBottom" type="button">Volgende vraag →</button>
+        </div>
         <div class="review-actions">
           <button class="primary" id="saveFinalReview" type="button">Voortgang opslaan</button>
           <button class="primary" id="completeFinalReview" type="button">Eindcontrole afronden</button>
@@ -1213,8 +1218,13 @@ async function renderFinalReviewStage() {
         });
       }
 
-      $('#previousFinalQuestion').addEventListener('click', () => navigateTo(currentIndex - 1));
-      $('#nextFinalQuestion').addEventListener('click', () => navigateTo(currentIndex + 1));
+      // Beide navigatieparen bedienen dezelfde index en dezelfde save-route.
+      ['previousFinalQuestion', 'previousFinalQuestionBottom'].forEach(id =>
+        panel.querySelector('#' + id)?.addEventListener('click', () => navigateTo(currentIndex - 1));
+      );
+      ['nextFinalQuestion', 'nextFinalQuestionBottom'].forEach(id =>
+        panel.querySelector('#' + id)?.addEventListener('click', () => navigateTo(currentIndex + 1));
+      );
       panel.querySelectorAll('[data-final-jump]').forEach(button => {
         button.addEventListener('click', () => navigateTo(Number(button.dataset.finalJump)));
       });
@@ -1288,6 +1298,8 @@ async function renderFinalReviewStage() {
       const navigationButtons = [
         $('#previousFinalQuestion'),
         $('#nextFinalQuestion'),
+        $('#previousFinalQuestionBottom'),
+        $('#nextFinalQuestionBottom'),
         ...panel.querySelectorAll('[data-final-jump]')
       ].filter(Boolean);
       navigationButtons.forEach(button => { button.disabled = true; });
