@@ -11,6 +11,7 @@ from examenverwerker.learning import (
     build_boundary_learning_profile,
     build_context_learning_profile,
     apply_context_range_learning,
+    learned_boundary_overrides,
 )
 from examenverwerker.storage import Store
 
@@ -118,6 +119,29 @@ class LearningTests(unittest.TestCase):
         adjusted = apply_context_range_learning(contexts, profile, {1, 2, 3, 4, 5})
         self.assertEqual(adjusted[0]["from_question"], 2)
         self.assertEqual(adjusted[0]["to_question"], 4)
+
+    def test_learned_boundary_offsets_create_proposals_for_each_question(self):
+        starts = [
+            {"question_number": 1, "page_index": 0, "pdf_bbox": [50, 100, 60, 112]},
+            {"question_number": 2, "page_index": 0, "pdf_bbox": [50, 300, 60, 312]},
+            {"question_number": 3, "page_index": 1, "pdf_bbox": [50, 80, 60, 92]},
+        ]
+        profile = {
+            "active": True, "examples": 7,
+            "median_start_offset": -4, "median_end_offset": 6,
+        }
+        overrides = learned_boundary_overrides(starts, [800, 800], profile)
+        self.assertEqual(overrides[1]["start_y"], 96)
+        self.assertEqual(overrides[1]["end_y"], 296)
+        self.assertEqual(overrides[2]["start_y"], 296)
+        self.assertEqual(overrides[2]["end_y"], 806)
+        self.assertEqual(overrides[3]["start_y"], 76)
+        self.assertEqual(overrides[3]["end_y"], 806)
+
+    def test_boundary_learning_is_inactive_below_five_examples(self):
+        starts = [{"question_number": 1, "page_index": 0, "pdf_bbox": [50, 100, 60, 112]}]
+        profile = {"active": False, "examples": 4, "median_start_offset": -4, "median_end_offset": 6}
+        self.assertEqual(learned_boundary_overrides(starts, [800], profile), {})
 
     def test_feedback_is_append_only_and_can_be_reloaded(self):
         with tempfile.TemporaryDirectory() as folder:
