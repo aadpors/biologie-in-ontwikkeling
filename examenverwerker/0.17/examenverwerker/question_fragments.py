@@ -140,15 +140,16 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
 
 
 def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
-    """Vind herhaalde kop-/voettekst *span-elementen* in de paginamarges.
+    """Vind uitsluitend zelfstandige, herhaalde marge-elementen.
 
-    Maskeer nooit een volledige tekstregel: daarin kan ook een vraagnummer of
-    inhoudelijke tekst staan. Daarom wordt ieder afzonderlijk PDF-tekstspan
-    beoordeeld en uitsluitend het herhaalde span zelf als maskervak teruggegeven.
+    Een complete PDF-span kan meerdere tekstonderdelen bevatten. Daarom wordt
+    een span met inhoudelijke tekst nooit als geheel gemaskeerd. Alleen een
+    zelfstandige paginateller of een korte, herhaalde kop-/voettekst komt in
+    aanmerking. Dit voorkomt dat een vraagnummer in dezelfde span verdwijnt.
     """
     occurrences: dict[str, set[int]] = {}
     spans_by_page: list[list[tuple[str, list[float]]]] = [[] for _ in pdf]
-    page_number_pattern = re.compile(r"^\d{1,3}$")
+    page_number_pattern = re.compile(r"^\\d{1,3}$")
     for page_index, page in enumerate(pdf):
         height = page.rect.height
         for block in page.get_text("dict").get("blocks", []):
@@ -156,7 +157,7 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                 continue
             for line in block.get("lines", []):
                 for span in line.get("spans", []):
-                    text = str(span.get("text", "")).strip()
+                    text = " ".join(str(span.get("text", "")).split())
                     bbox = span.get("bbox", [])
                     if not text or len(bbox) != 4:
                         continue
@@ -164,7 +165,12 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
                     in_margin = coordinates[1] <= height * 0.06 or coordinates[3] >= height * 0.88
                     if not in_margin:
                         continue
-                    key = " ".join(text.casefold().split())
+                    key = text.casefold()
+                    # Een gemengde span (bijvoorbeeld "Vraag 30 2 / 19")
+                    # is nooit veilig als één geheel te verwijderen.
+                    if not (page_number_pattern.fullmatch(key)
+                            or len(key) <= 48 and not re.search(r"\\b(?:vraag|opgave|antwoord)\\s*\\d+", key)):
+                        continue
                     spans_by_page[page_index].append((key, coordinates))
                     if not page_number_pattern.fullmatch(key):
                         occurrences.setdefault(key, set()).add(page_index)
@@ -174,7 +180,6 @@ def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
          if key in repeated or page_number_pattern.fullmatch(key)]
         for page_spans in spans_by_page
     ]
-
 
 def _mask_marginal_boxes(image_path: Path, boxes: list[list[float]], clip: fitz.Rect,
                          scale_x: float, scale_y: float) -> None:
@@ -256,62 +261,68 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                 clip = fitz.Rect(0, 0, page.rect.width, page.rect.height)
                 _mask_marginal_boxes(page_path, marginal_boxes[page_index], clip,
                                      pix.width / clip.width, pix.height / clip.height)
-                # Beoordeel voettekst per afzonderlijk PDF-tekstspan, niet per
-                # complete regel. Een regel kan bijvoorbeeld zowel een
-                # vraagnummer als "2 / 19" of "lees verder" bevatten. Alleen
-                # het herkenbare footer-element mag dan worden afgedekt.
-                footer_spans: list[list[float]] = []
-                for block in page.get_text("dict").get("blocks", []):
+                # Gebruik de individuele glyph-coördinaten uit rawdict.
+                # Een PDF-export kan "Vraag 28  2 / 19  lees verder" als één
+                # tekstspan opslaan. De span-box omvat dan óók het vraagnummer.
+                # Door de tekst op tekenposities te mappen, maskeren we alleen
+                # de herkenbare footer-substrings en blijft de vraagtekst staan.
+                footer_boxes: list[list[float]] = []
+                footer_patterns = [
+                    re.compile(r"\\b\\d{1,3}\\s*/\\s*\\d{1,3}\\b"),
+                    re.compile(r"(?i)\\blees\\s+verder\\b"),
+                    re.compile(r"►{1,3}"),
+                    re.compile(r"(?i)\\b(?:VW|VMBO|HAVO|VWO)[- ]?\\d{3,}(?:[- ][\\w-]+)*\\b"),
+                ]
+                raw_page = page.get_text("rawdict")
+                for block in raw_page.get("blocks", []):
                     if block.get("type") != 0:
                         continue
                     for line in block.get("lines", []):
-                        line_spans = line.get("spans", [])
-                        line_text = " ".join(
-                            str(span.get("text", "")).strip() for span in line_spans
-                        ).strip()
+                        chars: list[dict[str, Any]] = []
+                        line_text_parts: list[str] = []
+                        for span in line.get("spans", []):
+                            for char in span.get("chars", []):
+                                value = str(char.get("c", ""))
+                                if value:
+                                    chars.append(char)
+                                    line_text_parts.append(value)
+                        line_text = "".join(line_text_parts)
                         line_bbox = line.get("bbox", [])
-                        if len(line_bbox) != 4:
+                        if len(line_bbox) != 4 or float(line_bbox[1]) < page.rect.height * 0.85:
                             continue
-                        line_is_low = float(line_bbox[1]) >= page.rect.height * 0.85
-                        if not line_is_low:
-                            continue
-                        for span in line_spans:
-                            span_text = str(span.get("text", "")).strip()
-                            span_bbox = span.get("bbox", [])
-                            if not span_text or len(span_bbox) != 4:
-                                continue
-                            lower_span = span_text.casefold()
-                            is_page_counter = bool(re.fullmatch(
-                                r"\d{1,3}\s*/\s*\d{1,3}", span_text
-                            ))
-                            is_read_on_footer = (
-                                lower_span in {"lees verder", "►", "►►", "►►►"}
-                            )
-                            is_isolated_number = (
-                                len(line_spans) == 1
-                                and bool(re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", span_text))
-                                and float(span_bbox[1]) >= page.rect.height * 0.93
-                            )
-                            is_exam_document_code = bool(re.fullmatch(
-                                r"(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*",
-                                span_text, re.IGNORECASE
-                            ))
-                            if (is_page_counter or is_read_on_footer
-                                    or is_exam_document_code or is_isolated_number):
-                                footer_spans.append([float(value) for value in span_bbox])
-                if footer_spans:
+                        # Markeer alleen de exacte tekens die bij een footerpatroon horen.
+                        for pattern in footer_patterns:
+                            for match in pattern.finditer(line_text):
+                                matched_chars = chars[match.start():match.end()]
+                                if matched_chars:
+                                    x0 = min(float(char["bbox"][0]) for char in matched_chars)
+                                    y0 = min(float(char["bbox"][1]) for char in matched_chars)
+                                    x1 = max(float(char["bbox"][2]) for char in matched_chars)
+                                    y1 = max(float(char["bbox"][3]) for char in matched_chars)
+                                    footer_boxes.append([x0, y0, x1, y1])
+                        # Een volledig zelfstandige documentcode of een los nummer
+                        # diep in de footer mag ook worden verwijderd.
+                        stripped = line_text.strip()
+                        if re.fullmatch(r"(?:VW|VMBO|HAVO|VWO)[- ]?\\d{3,}(?:[- ][\\w-]+)*", stripped, re.IGNORECASE) or (
+                            re.fullmatch(r"[-–—]?\\s*\\d{1,3}\\s*[-–—]?", stripped)
+                            and float(line_bbox[1]) >= page.rect.height * 0.93
+                        ):
+                            footer_boxes.extend([
+                                [float(value) for value in char["bbox"]]
+                                for char in chars if str(char.get("c", "")).strip()
+                            ])
+                if footer_boxes:
                     with Image.open(page_path) as rendered:
                         cleaned = rendered.convert("RGB")
                         draw = ImageDraw.Draw(cleaned)
                         scale_x = cleaned.width / page.rect.width
                         scale_y = cleaned.height / page.rect.height
-                        for x0, y0, x1, y1 in footer_spans:
-                            # Extra witruimte geldt nu alleen voor het footer-span.
+                        for x0, y0, x1, y1 in footer_boxes:
                             draw.rectangle((
-                                max(0, int(x0 * scale_x) - 3),
-                                max(0, int(y0 * scale_y) - 3),
-                                min(cleaned.width, int(x1 * scale_x) + 3),
-                                min(cleaned.height, int(y1 * scale_y) + 3),
+                                max(0, int(x0 * scale_x) - 2),
+                                max(0, int(y0 * scale_y) - 2),
+                                min(cleaned.width, int(x1 * scale_x) + 2),
+                                min(cleaned.height, int(y1 * scale_y) + 2),
                             ), fill="white")
                         cleaned.save(page_path, format="PNG", optimize=True)
                 with Image.open(page_path) as source:
