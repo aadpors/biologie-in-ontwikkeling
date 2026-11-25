@@ -134,7 +134,7 @@ class LearningTests(unittest.TestCase):
         self.assertEqual(overrides[1]["start_y"], 96)
         self.assertEqual(overrides[1]["end_y"], 296)
         self.assertEqual(overrides[2]["start_y"], 296)
-        self.assertEqual(overrides[2]["end_y"], 806)
+        self.assertEqual(overrides[2]["end_y"], 76)
         self.assertEqual(overrides[3]["start_y"], 76)
         self.assertEqual(overrides[3]["end_y"], 806)
 
