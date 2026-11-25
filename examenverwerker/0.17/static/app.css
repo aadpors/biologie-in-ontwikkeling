@@ -338,3 +338,111 @@
   background: #fff0e8;
   color: #9a3e16;
 }
+
+
+/* Rustige, compacte presentatie van contextgroepen in de rechter inspector.
+   De titel krijgt een eigen regel; het aantal fragmenten is ondersteunende
+   metadata en mag nooit direct tegen de titel aan komen te staan. */
+.stitched-inspector .context-group-summary {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 22px;
+}
+.stitched-inspector .context-group-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #dfe6ea;
+  border-left: 3px solid #527f91;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(20, 45, 58, .04);
+}
+.stitched-inspector .context-group-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 0 0 11px;
+}
+.stitched-inspector .context-group-heading strong {
+  display: block;
+  min-width: 0;
+  color: #183b4b;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.stitched-inspector .context-group-heading .context-group-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #eef3f5;
+  color: #526873;
+  font-size: 11px;
+  font-weight: 600;
+}
+.stitched-inspector .context-group-questions {
+  display: grid;
+  gap: 6px;
+}
+.stitched-inspector .context-group-label {
+  color: #637681;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+.stitched-inspector .context-question-chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+}
+.stitched-inspector .context-question-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #edf4f6;
+  color: #294f60;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.stitched-inspector .context-question-chip.missing {
+  background: #fff2e9;
+  color: #995027;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #edf0f2;
+  color: #5d707a;
+  font-size: 12px;
+}
+.stitched-inspector .context-group-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.stitched-inspector .context-group-details ul {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  line-height: 1.35;
+}
+.stitched-inspector .context-group-details li {
+  padding-left: 2px;
+  overflow-wrap: anywhere;
+}
+.stitched-inspector > h3 {
+  margin: 0 0 8px;
+  color: #263f4b;
+  font-size: 14px;
+}
+.stitched-inspector > .field-help {
+  margin: 0 0 10px;
+  line-height: 1.45;
+  font-size: 11px;
+}
