@@ -2059,13 +2059,19 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         const a = findRoot(left), b = findRoot(right);
         if (a !== b) parent[b] = a;
       };
-      const overlapsQuestions = (left, right) => {
-        const rightNumbers = new Set((right.question_numbers || []).map(Number));
-        return (left.question_numbers || []).some(number => rightNumbers.has(Number(number)));
+      const hasSameQuestionSet = (left, right) => {
+        const leftNumbers = [...new Set((left.question_numbers || []).map(Number))].sort((a, b) => a - b);
+        const rightNumbers = [...new Set((right.question_numbers || []).map(Number))].sort((a, b) => a - b);
+        return leftNumbers.length > 0
+          && leftNumbers.length === rightNumbers.length
+          && leftNumbers.every((number, index) => number === rightNumbers[index]);
       };
       for (let left = 0; left < contextSelections.length; left++) {
         for (let right = left + 1; right < contextSelections.length; right++) {
-          if (overlapsQuestions(contextSelections[left].item, contextSelections[right].item)) {
+          // Alleen identieke vraagsets vormen automatisch één contextgroep.
+          // Gedeeltelijke overlap kan namelijk ook een zelfstandige,
+          // geneste context aanduiden en mag dus niet worden samengevoegd.
+          if (hasSameQuestionSet(contextSelections[left].item, contextSelections[right].item)) {
             joinGroups(left, right);
           }
         }
