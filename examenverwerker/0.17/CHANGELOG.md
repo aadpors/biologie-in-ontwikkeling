@@ -1,3 +1,10 @@
+## Contextgroepen in stap 3 — context en opgaven expliciet verbinden
+
+- De werkruimte voor het opgavendocument toont nu boven de losse fragmentlijst een overzicht van contextgroepen en de bijbehorende vraagnummers.
+- Meerdere contextdelen met exact dezelfde gekoppelde vragen worden als één inhoudelijke contextgroep getoond; de fysieke fragmenten blijven afzonderlijk selecteerbaar en bewerkbaar.
+- Per groep zijn de gekoppelde opgaven zichtbaar. Als voor een gekoppeld vraagnummer nog geen vraagfragment bestaat, wordt dat expliciet gemarkeerd.
+- Contextgroepen worden alleen automatisch samengevoegd bij identieke vraagsets. Gedeeltelijk overlappende vraagsets blijven afzonderlijke contexten, zodat geneste contexten niet onbedoeld samenvallen.
+
 ## CV-vraagstartdetectie — herstel open vragen
 
 - De herkenning van CV-vraagstarts gebruikt niet langer uitsluitend de volgorde waarin PDF-tekstregels worden uitgelezen. Bij tabelopmaak kunnen vraagnummer en scorekolom immers in een andere leesvolgorde staan.
