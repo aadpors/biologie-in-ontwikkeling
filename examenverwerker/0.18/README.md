@@ -17,4 +17,4 @@ De leerprofielen zijn per documenttype gescheiden. Zo worden opgaven, uitwerkbij
 
 ## Uitbreiding
 
-De eerste leerkring betreft vraagstarts. Dezelfde feedbackopslag wordt in volgende iteraties aangesloten op fragmentgrenzen en contextgroepen. Daarbij worden voorgestelde en definitief gecorrigeerde grenzen afzonderlijk bewaard, zodat de leerfunctie alleen leert van expliciete menselijke correcties.
+De leerkring omvat vraagstarts, fragmentgrenzen en contextgroepen. Vraagstartkenmerken worden gebruikt als uitlegbare rangschikkingshint. Handmatig aangepaste fragmentgrenzen worden als offsets ten opzichte van de automatische referentie bewaard en per documenttype samengevat. Correcties op contextgroepen leveren mediane verschuivingen van het vraagbereik op; vanaf vijf voorbeelden worden die toegepast op nieuwe tekstgebaseerde contextvoorstellen. Handmatig geselecteerde contexten en eerder opgeslagen docentbeslissingen blijven onaangetast.
