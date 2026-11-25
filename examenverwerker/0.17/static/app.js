@@ -1290,32 +1290,19 @@ async function renderFinalReviewStage() {
       refreshControls();
     };
 
-    const navigateTo = async nextIndex => {
+    const navigateTo = nextIndex => {
       if (nextIndex < 0 || nextIndex >= result.questions.length || nextIndex === currentIndex) return;
 
-      // Laat zichtbaar zien dat de huidige vraag eerst wordt opgeslagen.
-      // Voorkom ook dubbele navigatieverzoeken zolang die opslag loopt.
-      const navigationButtons = [
-        $('#previousFinalQuestion'),
-        $('#nextFinalQuestion'),
-        $('#previousFinalQuestionBottom'),
-        $('#nextFinalQuestionBottom'),
-        ...panel.querySelectorAll('[data-final-jump]')
-      ].filter(Boolean);
-      navigationButtons.forEach(button => { button.disabled = true; });
-      const status = $('#finalReviewSaveStatus');
-      if (status) status.textContent = 'Vraag opslaan en volgende openen…';
-
-      try {
-        await saveDraft();
-        currentIndex = nextIndex;
-        renderQuestion();
-      } catch (error) {
-        const message = $('#finalReviewMessage');
-        if (message) message.textContent = `Opslaan is niet gelukt; de vraag is niet gewisseld. ${error.message}`;
-        navigationButtons.forEach(button => { if (button.isConnected) button.disabled = false; });
-        if (status) status.textContent = 'Niet opgeslagen';
-      }
+      /*
+       * Navigeren hoeft niet op de serverroundtrip te wachten: de bekeken-status
+       * en eventuele toelichting staan al in de lokale arrays (visited/notes).
+       * De debounced, seriële autosave schrijft die momentopname weg. Daardoor
+       * wordt het scherm direct opgebouwd, terwijl opslag op de achtergrond
+       * doorgaat. saveChain voorkomt dat overlappende saves elkaar overschrijven.
+       */
+      currentIndex = nextIndex;
+      renderQuestion();
+      scheduleSave();
     };
 
     // Expose one flush hook so any workflow navigation waits for the final
