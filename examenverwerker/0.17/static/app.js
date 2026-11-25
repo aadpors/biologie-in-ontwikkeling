@@ -1736,11 +1736,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           <div class="stitched-image-scroll" id="stitchedImageScroll"><div class="stitched-image-wrap" id="stitchedImageWrap"><img id="stitchedImage" src="${result.image_url}" alt="Samengevoegd examen"><div id="stitchedOverlay" class="stitched-overlay"></div></div></div>
         </section>
         <aside class="stitched-inspector">
-            <h3>Contextgroepen en gekoppelde vragen</h3>
-            <p class="field-help">Contextfragmenten met ten minste één overlappend vraagnummer worden samengevoegd. Ook indirecte overlap telt mee. De titel is de eerste tekstregel van het bovenste contextfragment in de groep.</p>
+            <div class="stitched-inspector-heading">
+              <h3>Contextoverzicht</h3>
+              <p class="field-help">Contextdelen worden op basis van overlappende vraagnummers gegroepeerd. De titel komt uit de eerste tekstregel van het eerste contextdeel.</p>
+            </div>
             <div id="contextGroupSummary" class="context-group-summary"></div>
-            <h3>Afzonderlijke fragmenten</h3>
-            <div id="stitchedSelectionList"></div>
+            <details class="stitched-fragments-panel" ${activeIndex >= 0 ? "open" : ""}>
+              <summary>Fragmenten bewerken <span>${selections.length}</span></summary>
+              <div id="stitchedSelectionList"></div>
+            </details>
           </aside>
       </div>
       <div class="review-actions"><button class="primary" id="saveStitched">Nu opslaan</button><button class="primary" id="completeStitched">Fragmentcontrole goedkeuren en doorgaan</button></div><p id="stitchedMessage" class="form-error" role="status"></p>`;
@@ -2113,14 +2117,15 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         // Het eerste fragment bepaalt daarom de titel van de hele groep.
         const title = group.parts[0]?.item.context_title || "Titel niet beschikbaar in de PDF-tekstlaag";
         return `<section class="context-group-card">
-          <div class="context-group-heading">
-            <strong>${escapeHtml(title)}</strong>
+          <div class="context-group-meta">
+            <span class="context-group-index">CONTEXT ${String(groupIndex + 1).padStart(2, "0")}</span>
             <span class="context-group-count">${group.parts.length} fragment${group.parts.length === 1 ? "" : "en"}</span>
           </div>
+          <h4 class="context-group-title">${escapeHtml(title)}</h4>
           <p class="context-group-range">${numbers.length ? `Vragen ${escapeHtml(formatNumbers(numbers))}` : "Nog geen vragen gekoppeld"}</p>
           ${missingNumbers.length ? `<p class="context-group-warning">Vraagfragment ontbreekt bij ${escapeHtml(formatNumbers(missingNumbers))}</p>` : ""}
           <details class="context-group-details">
-            <summary>Toon gekoppelde contextdelen</summary>
+            <summary>Contextdelen bekijken</summary>
             <ul>${group.parts.map(entry => `<li>${escapeHtml(questionLabel(entry.item))}</li>`).join("")}</ul>
           </details>
         </section>`;
