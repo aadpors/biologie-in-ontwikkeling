@@ -1862,8 +1862,27 @@ def skip_optional_workbook(exam_id: str):
     missing = unmet_requirements("uitwerk_starts", completed)
     if missing:
         raise HTTPException(409, {"message":"Eerdere stappen zijn nog niet afgerond.","missing":missing})
-    STORE.complete_step(exam_id, "uitwerk_starts", {"not_applicable": True, "reviewed": True})
-    STORE.complete_step(exam_id, "uitwerk_fragments", {"not_applicable": True, "reviewed": True})
+    changed_keys = []
+    if STORE.complete_step(
+        exam_id, "uitwerk_starts",
+        {"not_applicable": True, "reviewed": True},
+    ):
+        changed_keys.append("uitwerk_starts")
+    if STORE.complete_step(
+        exam_id, "uitwerk_fragments",
+        {"not_applicable": True, "reviewed": True},
+    ):
+        changed_keys.append("uitwerk_fragments")
+    if changed_keys:
+        dependents = {
+            dependent
+            for key in changed_keys
+            for dependent in invalidate_dependents(key)
+        }
+        STORE.invalidate_steps(
+            exam_id,
+            [step.key for step in WORKFLOW if step.key in dependents],
+        )
     return {"ok": True, "not_applicable": True}
 
 
@@ -2147,7 +2166,12 @@ def confirm_metadata(exam_id: str, payload: dict):
         if doc["filename"] not in types or not types[doc["filename"]]:
             raise HTTPException(422, f"Bevestig het documenttype van {doc['filename']}.")
     metadata = {**{k: payload[k] for k in required}, "document_types": types}
-    STORE.confirm_metadata(exam_id, metadata)
+    metadata_changed = STORE.confirm_metadata(exam_id, metadata)
+    # Alleen een daadwerkelijke wijziging maakt de vervolggoedkeuringen
+    # ongeldig. Het opnieuw openen en ongewijzigd bevestigen van metadata
+    # laat eerder gecontroleerde stappen dus intact.
+    if metadata_changed:
+        STORE.invalidate_steps(exam_id, invalidate_dependents("metadata"))
     # Het concept is niet meer nodig zodra de definitieve metadata is bevestigd.
     STORE.invalidate_steps(exam_id, ["metadata_draft"])
     return {"ok": True, "metadata": metadata}
@@ -2280,8 +2304,13 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
                       if item["question_number"] in mismatched and not item.get("resolution_note", "").strip()]
         if unresolved:
             raise HTTPException(422, "Leg het scoreverschil nog toe bij vraag/vraagvragen: " + ", ".join(map(str, unresolved)))
-    STORE.complete_step(exam_id, step_key, {**previous, **payload})
-    return {"ok": True, "step": step_key}
+    # Vergelijk de definitieve review met de goedgekeurde nulmeting die
+    # bij het heropenen is opgeslagen. Alleen een echte inhoudelijke wijziging
+    # maakt afhankelijke stappen opnieuw controleplichtig.
+    changed = STORE.complete_step(exam_id, step_key, {**previous, **payload})
+    if changed:
+        STORE.invalidate_steps(exam_id, invalidate_dependents(step_key))
+    return {"ok": True, "step": step_key, "changed": changed}
 
 
 @app.post("/api/exams/{exam_id}/steps/{step_key}/reopen")
@@ -2303,13 +2332,20 @@ def reopen_step(exam_id: str, step_key: str):
     evidence = exam["steps"].get(step_key, {}).get("evidence", {})
     if step_key == "metadata":
         # Metadata heeft daarnaast een bevestigingsvlag op de examenrij.
-        # Zet die terug zodat de bestaande invoer opnieuw bewerkbaar wordt.
+        # De goedgekeurde metadata wordt als nulmeting bewaard; vervolgstappen
+        # blijven geldig totdat de nieuwe metadata werkelijk anders blijkt.
         STORE.reopen_metadata(exam_id, exam.get("metadata", {}))
     else:
-        STORE.save_step_draft(exam_id, step_key, evidence)
-    dependents = invalidate_dependents(step_key)
-    STORE.invalidate_steps(exam_id, dependents)
-    return {"ok": True, "reopened": step_key, "invalidated": dependents}
+        # Bewaar zowel de conceptinvoer als de goedgekeurde nulmeting.
+        # Pas bij opnieuw afronden vergelijken we beide versies en invalidëren
+        # we uitsluitend de stappen die van een echte wijziging afhangen.
+        STORE.reopen_step(exam_id, step_key, evidence)
+    return {
+        "ok": True,
+        "reopened": step_key,
+        "invalidated": [],
+        "deferred_invalidation": True,
+    }
 
 
 @app.post("/api/exams/{exam_id}/steps/{step_key}/invalidate")
