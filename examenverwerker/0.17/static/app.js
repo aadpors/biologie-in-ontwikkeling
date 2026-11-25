@@ -2106,24 +2106,21 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       const summary = $("#contextGroupSummary");
       summary.innerHTML = contextGroups.size ? [...contextGroups.values()].map((group, groupIndex) => {
         const numbers = [...group.questionNumbers].sort((a, b) => a - b);
-        const linked = numbers.map(number => {
-          const hasQuestion = questionSelections.some(item => (item.question_numbers || []).map(Number).includes(number));
-          return `<span class="context-question-chip ${hasQuestion ? "linked" : "missing"}">Vraag ${number}${hasQuestion ? "" : " · fragment ontbreekt"}</span>`;
-        }).join("");
+        const missingNumbers = numbers.filter(number =>
+          !questionSelections.some(item => (item.question_numbers || []).map(Number).includes(number))
+        );
         // De fragmenten zijn hierboven op documentpositie gesorteerd.
         // Het eerste fragment bepaalt daarom de titel van de hele groep.
         const title = group.parts[0]?.item.context_title || "Titel niet beschikbaar in de PDF-tekstlaag";
         return `<section class="context-group-card">
           <div class="context-group-heading">
             <strong>${escapeHtml(title)}</strong>
-            <span class="context-group-count">${group.parts.length} deel${group.parts.length === 1 ? "" : "delen"}</span>
+            <span class="context-group-count">${group.parts.length} fragment${group.parts.length === 1 ? "" : "en"}</span>
           </div>
-          <div class="context-group-questions">
-            <span class="context-group-label">Gekoppelde vragen</span>
-            <div class="context-question-chips">${linked || '<span class="context-question-chip missing">Nog geen vragen gekoppeld</span>'}</div>
-          </div>
+          <p class="context-group-range">${numbers.length ? `Vragen ${escapeHtml(formatNumbers(numbers))}` : "Nog geen vragen gekoppeld"}</p>
+          ${missingNumbers.length ? `<p class="context-group-warning">Vraagfragment ontbreekt bij ${escapeHtml(formatNumbers(missingNumbers))}</p>` : ""}
           <details class="context-group-details">
-            <summary>Bekijk de ${group.parts.length} contextfragmenten</summary>
+            <summary>Toon gekoppelde contextdelen</summary>
             <ul>${group.parts.map(entry => `<li>${escapeHtml(questionLabel(entry.item))}</li>`).join("")}</ul>
           </details>
         </section>`;
