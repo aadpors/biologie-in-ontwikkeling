@@ -12,6 +12,7 @@ import re
 import sys
 
 import fitz
+from PIL import Image
 from pathlib import Path
 
 # Scriptbestanden worden door Python met hun eigen map als sys.path[0]
@@ -25,11 +26,78 @@ from examenverwerker.question_fragments import (
     build_stitched_exam,
     propose_stitched_question_selections,
     normalise_stitched_selections,
+    cv_model_start,
+    cv_content_end_page,
 )
 from examenverwerker.main import _nearest_white_row, _white_row_ranges
 from examenverwerker import main as exam_main
 from examenverwerker.storage import Store
 from fastapi.testclient import TestClient
+
+def assert_question_number_visible(
+    pdf_path: Path,
+    stitched_path: Path,
+    page_metadata: list[dict],
+    candidate: dict,
+    question_number: int,
+) -> dict:
+    """Controleer de daadwerkelijke pixels van een vraagnummer in de stitch.
+
+    De tekstlaag alleen is niet voldoende: de regressie die we willen vangen
+    ontstaat juist wanneer de footeropschoning pixels uit de afbeelding wist.
+    Daarom rekenen we de PDF-glyphbox terug naar de uiteindelijke lange PNG en
+    eisen we daar zichtbare donkere pixels.
+    """
+    page_number = int(candidate["page_index"]) + 1
+    page_info = next(
+        (item for item in page_metadata if int(item["page_number"]) == page_number),
+        None,
+    )
+    if page_info is None:
+        raise SystemExit(
+            f"Vraag {question_number} staat op PDF-pagina {page_number}, "
+            "maar die pagina ontbreekt in de lange afbeelding."
+        )
+
+    # De glyphbox komt uit PyMuPDF in PDF-punten. crop_pixels bevat de
+    # oorspronkelijke renderpixels die na het verticale bijsnijden overbleven.
+    bbox = [float(value) for value in candidate["pdf_bbox"]]
+    crop_pixels = page_info["crop_pixels"]
+    render_scale_x = float(page_info["render_width"]) / float(page_info["source_width"])
+    render_scale_y = float(page_info["render_width"]) / float(page_info["source_width"])
+    resize_x = float(page_info["stitched_width"]) / float(page_info["render_width"])
+    resize_y = float(page_info["stitched_height"]) / float(page_info["render_height"])
+
+    left = int(round((bbox[0] * render_scale_x - crop_pixels[0]) * resize_x)) - 8
+    right = int(round((bbox[2] * render_scale_x - crop_pixels[0]) * resize_x)) + 8
+    top = int(round(
+        page_info["top"]
+        + (bbox[1] * render_scale_y - crop_pixels[1]) * resize_y
+    )) - 8
+    bottom = int(round(
+        page_info["top"]
+        + (bbox[3] * render_scale_y - crop_pixels[1]) * resize_y
+    )) + 8
+
+    with Image.open(stitched_path) as stitched:
+        region = stitched.crop((
+            max(0, left), max(0, top),
+            min(stitched.width, right), min(stitched.height, bottom),
+        )).convert("L")
+        visible_pixels = sum(1 for value in region.getdata() if value < 180)
+
+    if visible_pixels < 2:
+        raise SystemExit(
+            f"Vraagnummer {question_number} is wel als PDF-tekst gevonden, "
+            "maar ontbreekt in de uiteindelijke lange afbeelding."
+        )
+    return {
+        "question_number": question_number,
+        "pdf_page": page_number,
+        "visible_dark_pixels": visible_pixels,
+        "stitched_region": [left, top, right, bottom],
+    }
+
 
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "examens" / "vw-1018-a-26-2-o.pdf"
@@ -57,6 +125,15 @@ proposals = propose_stitched_question_selections(
     pdf_path=SOURCE,
 )
 white_rows = _white_row_ranges(stitched_path)
+
+# Controleer vraag 30 op de uiteindelijke afbeelding. Dit is het
+# vraagnnummer dat eerder bij de footeropschoning uit de examenstrook verdween.
+question_30_candidate = next(
+    item for item in accepted if int(item["question_number"]) == 30
+)
+question_30_pixel_check = assert_question_number_visible(
+    SOURCE, stitched_path, metadata["pages"], question_30_candidate, 30
+)
 
 # Dezelfde witregeluitlijning als de API toepassen en alle broncoördinaten
 # bewaren, zodat een menselijke controle precies kan terugvinden wat is voorgesteld.
@@ -125,10 +202,33 @@ report = {
 # detector worden gevonden en welke inhoudsregels direct bij die regels staan.
 CV_SOURCE = ROOT / "examens" / "vw-1018-a-26-2-c.pdf"
 if CV_SOURCE.is_file():
+    # Bouw ook de echte CV-stitch met exact dezelfde functie als stap 8.
+    # Daarmee controleren we vraag 28 in de pixels, niet alleen als tekst.
+    with fitz.open(CV_SOURCE) as cv_pdf_for_stitch:
+        cv_start_page, cv_start_y = cv_model_start(cv_pdf_for_stitch)
+        cv_end_page = cv_content_end_page(cv_pdf_for_stitch)
+    cv_stitched_path = OUTPUT / "vw-1018-a-26-2-c-stitched.png"
+    cv_stitched_metadata = build_stitched_exam(
+        CV_SOURCE,
+        cv_stitched_path,
+        start_page=cv_start_page,
+        end_page=cv_end_page,
+        start_y=cv_start_y,
+    )
+
     cv_result = detect_question_starts(
         str(CV_SOURCE), enforce_sequence=False, allow_lowercase_text=True
     )
     cv_debug = []
+    # Zoek de echte CV-vraag 28 en controleer of de glyph na opschonen nog
+    # zichtbaar is in de uiteindelijke lange afbeelding.
+    cv_question_28 = next(
+        item for item in cv_result["candidates"]
+        if int(item["question_number"]) == 28
+    )
+    cv_question_28_pixel_check = assert_question_number_visible(
+        CV_SOURCE, cv_stitched_path, cv_stitched_metadata["pages"], cv_question_28, 28
+    )
     with fitz.open(CV_SOURCE) as cv_pdf:
         model_page = None
         for page_index, page in enumerate(cv_pdf):
@@ -384,6 +484,8 @@ if CV_SOURCE.is_file():
     )
 
 print(json.dumps({
+    "question_30_pixel_check": question_30_pixel_check,
+    "cv_question_28_pixel_check": cv_question_28_pixel_check,
     "source": SOURCE.name,
     "pages": report["page_count"],
     "detected_question_numbers": [item["question_number"] for item in accepted],
