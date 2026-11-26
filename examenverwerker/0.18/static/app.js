@@ -2634,7 +2634,10 @@ async function renderQuestionAnalysisStage() {
             ${option.image_data ? `<img class="analysis-option-preview" src="${option.image_data}" alt="Afbeelding bij antwoordoptie ${option.letter}">` : '<span class="analysis-option-no-image">Geen afbeelding toegevoegd</span>'}
             <small>${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
           </div>
-          <button type="button" class="quiet analysis-option-remove" data-option-remove="${questionNumber}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
+          <div class="analysis-option-actions">
+            <button type="button" class="quiet analysis-option-crop-existing" data-option-crop-existing="${questionNumber}" data-option-letter="${option.letter}">Afbeelding toevoegen / vervangen</button>
+            <button type="button" class="quiet analysis-option-remove" data-option-remove="${questionNumber}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
+          </div>
         </div>`).join('') || '<p class="muted">Nog geen antwoordopties vastgelegd. Voeg tekstopties toe of snijd de opties uit de afbeelding.</p>';
       const addTextButton = card.querySelector('[data-option-add-text]');
       if (addTextButton) addTextButton.disabled = options.length >= 6;
@@ -2742,22 +2745,27 @@ async function renderQuestionAnalysisStage() {
         return;
       }
 
-      const cropButton = event.target.closest('[data-option-crop]');
+      const cropButton = event.target.closest('[data-option-crop], [data-option-crop-existing]');
       if (cropButton) {
-        const number = Number(cropButton.dataset.optionCrop);
+        const number = Number(cropButton.dataset.optionCrop || cropButton.dataset.optionCropExisting);
         const options = optionState.get(number) || [];
-        if (options.length >= 6) {
+        const targetLetter = cropButton.dataset.optionLetter || null;
+        if (!targetLetter && options.length >= 6) {
           $('#questionAnalysisMessage').textContent = `Vraag ${number} heeft al zes antwoordopties. Verwijder eerst een optie als er een correctie nodig is.`;
           return;
         }
-        activeCrop = {questionNumber:number, segmentIndex:Number(cropButton.dataset.segmentIndex)};
+        activeCrop = {questionNumber:number, segmentIndex:Number(cropButton.dataset.segmentIndex), letter:targetLetter};
         panel.querySelectorAll('.analysis-source-image').forEach(source => {
           source.classList.toggle('is-cropping',
             Number(source.dataset.question) === number && Number(source.dataset.segmentIndex) === activeCrop.segmentIndex);
         });
         const help = panel.querySelector(`[data-crop-help="${number}"]`);
-        help.textContent = 'Selectiemodus actief: sleep op de afbeelding een kader om één antwoordoptie. Druk op Escape om te annuleren.';
-        $('#questionAnalysisMessage').textContent = `Selecteer nu met de muis één antwoordoptie uit vraag ${number}.`;
+        help.textContent = targetLetter
+          ? `Selectiemodus actief voor optie ${targetLetter}: sleep een kader om de afbeelding. Druk op Escape om te annuleren.`
+          : 'Selectiemodus actief: begin bij optie A en werk alfabetisch. Sleep een kader om één antwoordoptie. Druk op Escape om te annuleren.';
+        $('#questionAnalysisMessage').textContent = targetLetter
+          ? `Selecteer nu de afbeelding voor optie ${targetLetter} van vraag ${number}.`
+          : `Selecteer nu met de muis antwoordoptie ${'ABCDEF'[options.length] || ''} uit vraag ${number}.`;
       }
     });
 
@@ -2881,12 +2889,20 @@ async function renderQuestionAnalysisStage() {
         const number = activeCrop.questionNumber;
         const options = optionState.get(number) || [];
         const used = new Set(options.map(option => option.letter));
-        const letter = [...'ABCDEF'].find(candidate => !used.has(candidate));
+        const letter = activeCrop.letter || [...'ABCDEF'].find(candidate => !used.has(candidate));
         if (!letter) {
           $('#questionAnalysisMessage').textContent = 'Alle zes antwoordletters zijn al in gebruik.';
           return;
         }
-        options.push({letter, text:'', option_type:'afbeelding', image_data:imageData});
+        const existingOption = options.find(option => option.letter === letter);
+        if (existingOption) {
+          // Koppel de uitsnede aan de gekozen bestaande letter. Dit is nodig
+          // wanneer OCR de labels A-D al als tekstopties heeft voorgesteld.
+          existingOption.image_data = imageData;
+          existingOption.option_type = existingOption.text ? 'combinatie' : 'afbeelding';
+        } else {
+          options.push({letter, text:'', option_type:'afbeelding', image_data:imageData});
+        }
         optionState.set(number, options);
         activeCrop = null;
         source.classList.remove('is-cropping');
