@@ -2610,7 +2610,7 @@ async function renderQuestionAnalysisStage() {
     // tekstopties bestaan zonder OCR als verplichte tussenstap.
     const optionState = new Map(result.questions.map(question => [
       Number(question.question_number),
-      (question.options || []).map(option => ({...option}))
+      (question.options || []).map(option => ({...option})).sort((a, b) => a.letter.localeCompare(b.letter))
     ]));
     // Zodra de docent de antwoordoptielijst zelf wijzigt, bewaren we die
     // lijst als expliciete keuze. Anders kan een verwijderde OCR-optie bij
@@ -2636,7 +2636,7 @@ async function renderQuestionAnalysisStage() {
 
     const renderOptionRows = (card, questionNumber) => {
       const host = card.querySelector('[data-option-list]');
-      const options = optionState.get(questionNumber) || [];
+      const options = (optionState.get(questionNumber) || []).sort((a, b) => a.letter.localeCompare(b.letter));
       const sourceQuestion = result.questions.find(item => Number(item.question_number) === questionNumber);
       host.innerHTML = options.map(option => `
         <div class="analysis-option-row" data-option-row="${questionNumber}" data-option-letter="${option.letter}">
