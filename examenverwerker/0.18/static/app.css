@@ -827,3 +827,245 @@
   margin: 3px 0 !important;
   padding: 6px 7px !important;
 }
+
+
+/* Compacte contextgroepen: de inspector moet het middendeel ondersteunen,
+   niet met grote kaarten en losse vraagtegels de aandacht opeisen. De
+   contexttitel en gekoppelde vraagnummers blijven zichtbaar; detailinformatie
+   staat bewust achter een uitklapbaar onderdeel. */
+.stitched-inspector {
+  padding: 10px !important;
+  min-width: 0;
+}
+.stitched-inspector .context-group-summary {
+  display: grid;
+  gap: 6px !important;
+  margin: 0 0 10px !important;
+}
+.stitched-inspector .context-group-card {
+  padding: 7px 9px !important;
+  border-radius: 7px;
+  border-left-width: 2px;
+}
+.stitched-inspector .context-group-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 3px;
+  font-size: 9px;
+  line-height: 1.2;
+}
+.stitched-inspector .context-group-index {
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+.stitched-inspector .context-group-count {
+  padding: 2px 5px !important;
+  font-size: 9px !important;
+}
+.stitched-inspector .context-group-title {
+  margin: 0 0 3px !important;
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+}
+.stitched-inspector .context-group-range {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+}
+.stitched-inspector .context-group-warning {
+  margin-top: 3px !important;
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-questions {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 3px !important;
+  margin: 5px 0 0 !important;
+}
+.stitched-inspector .context-group-question-card {
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  min-width: 0;
+  padding: 2px 5px !important;
+  margin: 0 !important;
+  border: 1px solid #e3eaed !important;
+  border-radius: 5px !important;
+  background: #f7fafb !important;
+  box-shadow: none !important;
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+.stitched-inspector .context-group-question-card strong {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+.stitched-inspector .context-group-question-card small {
+  display: none !important;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 5px !important;
+  padding-top: 4px !important;
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-details summary {
+  font-size: 10px;
+}
+.stitched-inspector .stitched-fragments-panel {
+  margin-top: 8px;
+  padding-top: 7px;
+}
+
+/* Stap 4: de bronafbeelding blijft volledig zichtbaar en vormt het
+   selectievlak voor uitsneden van grafische antwoordopties. */
+.analysis-fragment-sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+.analysis-source-figure {
+  min-width: 0;
+  margin: 0;
+}
+.analysis-source-figure figcaption {
+  margin-bottom: 5px;
+  color: #687982;
+  font-size: 11px;
+}
+.analysis-source-image {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dfe6e9;
+  border-radius: 7px;
+  background: #fff;
+  touch-action: pan-y;
+}
+.analysis-source-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.analysis-source-image.is-cropping {
+  outline: 2px dashed #1874c8;
+  outline-offset: 2px;
+  cursor: crosshair;
+  touch-action: none;
+}
+.analysis-source-image.is-cropping img {
+  cursor: crosshair;
+}
+.analysis-crop-selection {
+  position: absolute;
+  z-index: 3;
+  border: 2px solid #0878d1;
+  background: #1688df33;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px #fff;
+}
+.analysis-crop-button {
+  margin-top: 6px;
+  padding: 6px 8px !important;
+  font-size: 10px !important;
+}
+.analysis-options-editor {
+  margin: 14px 0;
+  padding: 12px;
+  border: 1px solid #e0e7ea;
+  border-radius: 9px;
+  background: #f8fafb;
+}
+.analysis-options-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.analysis-options-heading h4 {
+  margin: 0;
+  color: #263f4b;
+  font-size: 13px;
+}
+.analysis-options-heading p,
+.analysis-crop-help {
+  margin: 3px 0 0;
+  color: #71818a;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.analysis-options-heading button {
+  flex: 0 0 auto;
+  padding: 6px 8px !important;
+  font-size: 10px !important;
+}
+.analysis-option-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid #e6ecef;
+}
+.analysis-option-letter {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 6px;
+  background: #e8f0f3;
+  color: #244b5a;
+  font-size: 11px;
+}
+.analysis-option-content {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+.analysis-option-content input {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid #d9e2e6;
+  border-radius: 6px;
+  background: #fff;
+  color: #202a35;
+  font: inherit;
+  font-size: 12px;
+}
+.analysis-option-preview {
+  display: block;
+  max-width: min(100%, 320px);
+  max-height: 160px;
+  object-fit: contain;
+  object-position: left center;
+  padding: 4px;
+  border: 1px solid #dfe6e9;
+  border-radius: 6px;
+  background: #fff;
+}
+.analysis-option-content small,
+.analysis-option-no-image {
+  color: #77868e;
+  font-size: 10px;
+}
+.analysis-option-remove {
+  padding: 5px 7px !important;
+  font-size: 10px !important;
+}
+@media (max-width: 700px) {
+  .analysis-options-heading {
+    flex-direction: column;
+  }
+  .analysis-option-row {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+  .analysis-option-remove {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
