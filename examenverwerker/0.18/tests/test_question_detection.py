@@ -1264,3 +1264,6 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         self.assertIn("data-option-revision", app_js)
         self.assertIn("analysis-crop-selection", app_css)
         self.assertIn("analysis-option-preview", app_css)
+        # Contextgroepkaarten in de rechter inspector moeten compact blijven.
+        self.assertIn(".stitched-inspector .context-group-card", app_css)
+        self.assertIn("padding: 7px 9px !important;", app_css)
