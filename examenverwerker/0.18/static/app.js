@@ -2698,8 +2698,8 @@ async function renderQuestionAnalysisStage() {
               <input type="number" min="0" max="20" step="1" value="${question.max_points ?? ''}" placeholder="Nog bepalen" data-analysis-points="${number}">
             </label>
           </div>
-          <section class="analysis-options-editor"
-            <input type="hidden" data-option-revision="${number}" value="0"> aria-label="Antwoordopties van vraag ${number}">
+          <section class="analysis-options-editor" aria-label="Antwoordopties van vraag ${number}">
+            <input type="hidden" data-option-revision="${number}" value="0">
             <div class="analysis-options-heading">
               <div><h4>Antwoordopties</h4><p>Een optie kan tekst, een afbeelding of beide bevatten.</p></div>
               <button type="button" class="quiet" data-option-add-text="${number}" ${(question.options || []).length >= 6 ? 'disabled' : ''}>Tekstantwoord toevoegen</button>
