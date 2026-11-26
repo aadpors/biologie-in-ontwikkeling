@@ -10,6 +10,19 @@ Een kenmerk wordt pas actief nadat er minimaal vijf gecontroleerde voorbeelden b
 
 De leerprofielen zijn per documenttype gescheiden. Zo worden opgaven, uitwerkbijlagen en correctievoorschriften niet zonder bewijs als dezelfde lay-out behandeld.
 
+## Visuele antwoordopties in stap 4
+
+Meerkeuzeopties worden als afzonderlijke records opgeslagen. Een optie kan tekst, een afbeelding of een combinatie bevatten. Wanneer een antwoordmogelijkheid uit een grafiek, schema, stamboom of respirogram bestaat, kan de docent de uitsnede rechtstreeks op de zichtbare vraagafbeelding selecteren.
+
+- Gebruik de knop onder een bronpagina om nieuwe afbeeldingsopties in lettervolgorde A–F toe te voegen.
+- Wanneer OCR de antwoordletters al heeft herkend, kan de docent via de betreffende optie een afbeelding toevoegen of vervangen.
+- Bij meerpagina-vragen kiest de docent eerst de bronpagina.
+- De selectie wordt uit de oorspronkelijke pixels van de gerenderde PDF-pagina gemaakt en als PNG opgeslagen; de bron-PDF verandert niet.
+- De uitsnede wordt samen met de overige vraaganalyse in de bestaande examenevidence bewaard en verschijnt opnieuw in de integrale eindcontrole.
+- Een vraag kan pas als gecontroleerde meerkeuzevraag worden goedgekeurd wanneer minimaal twee complete antwoordopties zijn vastgelegd.
+
+De afbeelding wordt niet door OCR geïnterpreteerd. De docent controleert de visuele inhoud en de koppeling met de antwoordletter.
+
 ## API
 
 - `GET /api/exams/{exam_id}/learning-profile`: transparant overzicht van beschikbare leervoorbeelden en actieve kenmerken.
