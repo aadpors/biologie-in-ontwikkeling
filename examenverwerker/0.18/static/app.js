@@ -2705,7 +2705,7 @@ async function renderQuestionAnalysisStage() {
               <button type="button" class="quiet" data-option-add-text="${number}" ${(question.options || []).length >= 6 ? 'disabled' : ''}>Tekstantwoord toevoegen</button>
             </div>
             <div data-option-list>${optionRows || '<p class="muted">Nog geen antwoordopties vastgelegd. Voeg tekstopties toe of snijd de opties uit de afbeelding.</p>'}</div>
-            <p class="analysis-crop-help" data-crop-help="${number}">Kies bij een afbeelding de knop onder de vraagafbeelding en sleep daarna een kader om precies één antwoordoptie. De uitsnede wordt bij de bijbehorende letter opgeslagen.</p>
+            <p class="analysis-crop-help" data-crop-help="${number}">Zijn de letters al herkend? Gebruik dan bij die letter de knop ‘Afbeelding toevoegen / vervangen’ en kies de bronpagina. Zijn er nog geen opties? Gebruik de knop onder de vraagafbeelding; nieuwe uitsneden krijgen A tot en met F in volgorde. Sleep daarna een kader om precies één antwoordoptie.</p>
           </section>
           <p class="analysis-reason">Type: ${escapeHtml(question.type_reason)} Score: ${escapeHtml(question.points_reason)}</p>
           ${question.closed_answer_form ? `<p class="analysis-reason closed-answer-form"><strong>Gesloten antwoordvorm:</strong> ${escapeHtml(question.closed_answer_form)}</p>` : ''}
