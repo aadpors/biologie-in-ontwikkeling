@@ -1262,6 +1262,8 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         app_css = (static_dir / "app.css").read_text(encoding="utf-8")
         self.assertIn("Afbeeldingsoptie uit deze pagina selecteren", app_js)
         self.assertIn("drawImage(img", app_js)
+        self.assertIn("data-option-crop-existing", app_js)
+        self.assertIn("data-option-crop-segment", app_js)
         self.assertIn("data-option-revision", app_js)
         self.assertIn("analysis-crop-selection", app_css)
         self.assertIn("analysis-option-preview", app_css)
