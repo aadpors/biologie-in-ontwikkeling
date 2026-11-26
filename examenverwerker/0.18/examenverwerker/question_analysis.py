@@ -443,9 +443,9 @@ def validate_question_analysis(payload: dict[str, Any], expected_numbers: set[in
             text_value = text_value.strip()
             if image_data is not None:
                 if (not isinstance(image_data, str)
-                        or not image_data.startswith("data:image/jpeg;base64,")
+                        or not image_data.startswith(("data:image/jpeg;base64,", "data:image/png;base64,"))
                         or len(image_data) > 2_000_000
-                        or not re.fullmatch(r"data:image/jpeg;base64,[A-Za-z0-9+/]+={0,2}", image_data)):
+                        or not re.fullmatch(r"data:image/(?:jpeg|png);base64,[A-Za-z0-9+/]+={0,2}", image_data)):
                     raise ValueError(f"De afbeelding van optie {letter} bij vraag {number} is ongeldig of te groot.")
             if not text_value and not image_data:
                 raise ValueError(f"Optie {letter} bij vraag {number} bevat geen tekst of afbeelding.")
