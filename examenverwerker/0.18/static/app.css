@@ -1069,3 +1069,28 @@
     justify-self: start;
   }
 }
+
+/* De docent kan een afbeelding aan een al herkende letter koppelen. Bij
+   vragen die over meerdere pagina's lopen, kiest de dropdown de bronpagina. */
+.analysis-option-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 118px;
+}
+.analysis-option-source {
+  max-width: 140px;
+  padding: 5px 6px;
+  border: 1px solid #d9e2e6;
+  border-radius: 6px;
+  background: #fff;
+  color: #52636e;
+  font: inherit;
+  font-size: 10px;
+}
+.analysis-option-crop-existing,
+.analysis-option-remove {
+  white-space: normal;
+  text-align: center;
+}
