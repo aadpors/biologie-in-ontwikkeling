@@ -462,7 +462,8 @@ def validate_question_analysis(payload: dict[str, Any], expected_numbers: set[in
         if reviewed and question_type == "meerkeuze" and len(cleaned_options) < 2:
             raise ValueError(f"Meerkeuzevraag {number} heeft minder dan twee vastgelegde antwoordopties.")
         cleaned.append({"question_number": number, "question_type": question_type,
-                        "max_points": points, "options": cleaned_options, "reviewed": reviewed})
+                        "max_points": points, "options": cleaned_options,
+                        "options_reviewed": bool(item.get("options_reviewed")), "reviewed": reviewed})
     if seen != expected_numbers:
         missing = sorted(expected_numbers - seen)
         raise ValueError(f"Niet alle vragen zijn opgenomen in de controle: {missing}.")
