@@ -417,14 +417,52 @@ def validate_question_analysis(payload: dict[str, Any], expected_numbers: set[in
         if points is not None and (not isinstance(points, int) or not 0 <= points <= 20):
             raise ValueError(f"Ongeldig maximumaantal punten bij vraag {number}.")
         options = item.get("options", [])
-        if (not isinstance(options, list) or len(options) > 6 or
-                any(not isinstance(option, dict) or option.get("letter") not in list("ABCDEF")
-                    or not isinstance(option.get("text"), str) or not option.get("text", "").strip()
-                    for option in options) or
-                len({option["letter"] for option in options if isinstance(option, dict) and "letter" in option}) != len(options)):
+        if not isinstance(options, list) or len(options) > 6:
             raise ValueError(f"Ongeldige of dubbel genummerde antwoordopties bij vraag {number}.")
+
+        # Een antwoordoptie kan uitsluitend uit een afbeelding bestaan
+        # (bijvoorbeeld vier grafieken of respirogrammen), uitsluitend uit
+        # tekst bestaan, of uit een combinatie van beide. Afbeeldingen worden
+        # als lokaal gemaakte, begrensde JPEG-data-URL opgeslagen in de
+        # bestaande JSON-evidence. Zo zijn geen tijdelijke browserbestanden
+        # of externe opslagdiensten nodig en blijven docentcorrecties bewaard.
+        cleaned_options: list[dict[str, Any]] = []
+        option_letters: set[str] = set()
+        for option in options:
+            if not isinstance(option, dict) or option.get("letter") not in list("ABCDEF"):
+                raise ValueError(f"Ongeldige antwoordoptie bij vraag {number}.")
+            letter = option["letter"]
+            if letter in option_letters:
+                raise ValueError(f"Dubbele antwoordletter {letter} bij vraag {number}.")
+            option_letters.add(letter)
+
+            text_value = option.get("text", "")
+            image_data = option.get("image_data")
+            if not isinstance(text_value, str):
+                raise ValueError(f"Ongeldige antwoordtekst bij optie {letter} van vraag {number}.")
+            text_value = text_value.strip()
+            if image_data is not None:
+                if (not isinstance(image_data, str)
+                        or not image_data.startswith("data:image/jpeg;base64,")
+                        or len(image_data) > 2_000_000
+                        or not re.fullmatch(r"data:image/jpeg;base64,[A-Za-z0-9+/]+={0,2}", image_data)):
+                    raise ValueError(f"De afbeelding van optie {letter} bij vraag {number} is ongeldig of te groot.")
+            if not text_value and not image_data:
+                raise ValueError(f"Optie {letter} bij vraag {number} bevat geen tekst of afbeelding.")
+
+            option_type = "combinatie" if text_value and image_data else "afbeelding" if image_data else "tekst"
+            cleaned_options.append({
+                "letter": letter,
+                "text": text_value,
+                "option_type": option_type,
+                **({"image_data": image_data} if image_data else {}),
+            })
+
+        reviewed = bool(item.get("reviewed"))
+        if reviewed and question_type == "meerkeuze" and len(cleaned_options) < 2:
+            raise ValueError(f"Meerkeuzevraag {number} heeft minder dan twee vastgelegde antwoordopties.")
         cleaned.append({"question_number": number, "question_type": question_type,
-                        "max_points": points, "options": options, "reviewed": bool(item.get("reviewed"))})
+                        "max_points": points, "options": cleaned_options, "reviewed": reviewed})
     if seen != expected_numbers:
         missing = sorted(expected_numbers - seen)
         raise ValueError(f"Niet alle vragen zijn opgenomen in de controle: {missing}.")
