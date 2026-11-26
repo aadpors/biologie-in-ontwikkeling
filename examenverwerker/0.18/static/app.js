@@ -2793,7 +2793,7 @@ async function renderQuestionAnalysisStage() {
         const help = panel.querySelector(`[data-crop-help="${number}"]`);
         help.textContent = targetLetter
           ? `Selectiemodus actief voor optie ${targetLetter}: sleep een kader om de afbeelding. Druk op Escape om te annuleren.`
-          : 'Selectiemodus actief: begin bij optie A en werk alfabetisch. Sleep een kader om één antwoordoptie. Druk op Escape om te annuleren.';
+          : `Selectiemodus actief voor de volgende vrije letter ${nextLetter}: sleep een kader om de antwoordoptie. Druk op Escape om te annuleren.`;
         $('#questionAnalysisMessage').textContent = targetLetter
           ? `Selecteer nu de afbeelding voor optie ${targetLetter} van vraag ${number}.`
           : `Selecteer nu met de muis antwoordoptie ${nextLetter || ''} uit vraag ${number}.`;
