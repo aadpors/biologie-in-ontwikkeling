@@ -2764,7 +2764,8 @@ async function renderQuestionAnalysisStage() {
         const number = Number(cropButton.dataset.optionCrop || cropButton.dataset.optionCropExisting);
         const options = optionState.get(number) || [];
         const targetLetter = cropButton.dataset.optionLetter || null;
-        if (!targetLetter && options.length >= 6) {
+        const nextLetter = [...'ABCDEF'].find(candidate => !options.some(option => option.letter === candidate));
+        if (!targetLetter && (!nextLetter || options.length >= 6)) {
           $('#questionAnalysisMessage').textContent = `Vraag ${number} heeft al zes antwoordopties. Verwijder eerst een optie als er een correctie nodig is.`;
           return;
         }
@@ -2773,7 +2774,7 @@ async function renderQuestionAnalysisStage() {
           ? card.querySelector(`[data-option-crop-segment="${number}"][data-option-letter="${targetLetter}"]`)
           : null;
         const segmentIndex = Number(cropButton.dataset.segmentIndex ?? sourceSelector?.value ?? 0);
-        activeCrop = {questionNumber:number, segmentIndex, letter:targetLetter};
+        activeCrop = {questionNumber:number, segmentIndex, letter:targetLetter || nextLetter};
         panel.querySelectorAll('.analysis-source-image').forEach(source => {
           source.classList.toggle('is-cropping',
             Number(source.dataset.question) === number && Number(source.dataset.segmentIndex) === activeCrop.segmentIndex);
@@ -2784,7 +2785,7 @@ async function renderQuestionAnalysisStage() {
           : 'Selectiemodus actief: begin bij optie A en werk alfabetisch. Sleep een kader om één antwoordoptie. Druk op Escape om te annuleren.';
         $('#questionAnalysisMessage').textContent = targetLetter
           ? `Selecteer nu de afbeelding voor optie ${targetLetter} van vraag ${number}.`
-          : `Selecteer nu met de muis antwoordoptie ${'ABCDEF'[options.length] || ''} uit vraag ${number}.`;
+          : `Selecteer nu met de muis antwoordoptie ${nextLetter || ''} uit vraag ${number}.`;
       }
     });
 
