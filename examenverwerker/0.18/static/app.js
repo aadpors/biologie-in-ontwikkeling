@@ -1087,7 +1087,11 @@ async function renderFinalReviewStage() {
 
         ${question.options?.length ? `
           <h4>Herkende antwoordopties</h4>
-          <ul>${question.options.map(option => `<li><strong>${escapeHtml(option.letter)}.</strong> ${escapeHtml(option.text)}</li>`).join('')}</ul>
+          <ul class="final-answer-options">${question.options.map(option => `
+            <li class="final-answer-option">
+              <div><strong>${escapeHtml(option.letter)}.</strong> ${escapeHtml(option.text || '')}</div>
+              ${option.image_data ? `<img class="final-answer-option-image" src="${option.image_data}" alt="Afbeelding bij antwoordoptie ${escapeHtml(option.letter)}">` : ''}
+            </li>`).join('')}</ul>
         ` : ''}
 
         <div class="relation-grid">
