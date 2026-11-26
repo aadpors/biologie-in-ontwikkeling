@@ -1272,3 +1272,24 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         # Contextgroepkaarten in de rechter inspector moeten compact blijven.
         self.assertIn(".stitched-inspector .context-group-card", app_css)
         self.assertIn("padding: 7px 9px !important;", app_css)
+
+    def test_image_option_data_round_trips_through_exam_storage(self):
+        # De uitsnede moet na een browservernieuwing of het opnieuw openen van
+        # de examenverwerker beschikbaar blijven. De bestaande JSON-evidence
+        # in SQLite bewaart de image-data zonder de bron-PDF te wijzigen.
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(Path(tmp))
+            store.create_exam("image-option-test", "Testexamen", [])
+            evidence = {"questions": [{
+                "question_number": 12,
+                "question_type": "meerkeuze",
+                "max_points": 1,
+                "options": [
+                    {"letter": "A", "text": "", "option_type": "afbeelding",
+                     "image_data": self.IMAGE},
+                ],
+                "reviewed": False,
+            }]}
+            store.save_step_draft("image-option-test", "opgaven_analyse", evidence)
+            restored = store.get_exam("image-option-test")["steps"]["opgaven_analyse"]["evidence"]
+        self.assertEqual(restored["questions"][0]["options"][0]["image_data"], self.IMAGE)
