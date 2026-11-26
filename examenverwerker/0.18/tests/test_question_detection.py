@@ -1203,7 +1203,7 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         # blijven, zonder dat er kunstmatig OCR-tekst wordt geëist.
         payload = self._payload([
             {"letter": "A", "text": "", "image_data": self.IMAGE},
-            {"letter": "B", "text": "De grafiek toont een stijging.", "image_data": self.IMAGE},
+            {"letter": "B", "text": "De grafiek toont een stijging.", "image_data": "data:image/png;base64,iVBORw0KGgo="},
         ])
         result = validate_question_analysis(payload, {12})
         options = result["questions"][0]["options"]
@@ -1211,6 +1211,7 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         self.assertEqual(options[0]["text"], "")
         self.assertEqual(options[0]["image_data"], self.IMAGE)
         self.assertEqual(options[1]["option_type"], "combinatie")
+        self.assertTrue(options[1]["image_data"].startswith("data:image/png;base64,"))
 
     def test_reviewed_multiple_choice_requires_at_least_two_complete_options(self):
         # Een vraag mag pas worden goedgekeurd als alle antwoordmogelijkheden
