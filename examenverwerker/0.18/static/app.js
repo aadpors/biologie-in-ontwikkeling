@@ -2859,11 +2859,20 @@ async function renderQuestionAnalysisStage() {
         canvas.height = Math.max(1, Math.round(sh * resize));
         const context = canvas.getContext('2d');
         context.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
-        let imageData = canvas.toDataURL('image/jpeg', 0.84);
-        // Houd de opgeslagen examenevidence compact. Bij een zeer gedetailleerd
-        // diagram verlagen we eerst de JPEG-kwaliteit; de bron-PDF blijft
-        // altijd beschikbaar voor een nieuwe uitsnede met hogere resolutie.
-        if (imageData.length > 1_800_000) imageData = canvas.toDataURL('image/jpeg', 0.68);
+        // Gebruik PNG in plaats van JPEG: dunne lijnen, stippellijnen en
+        // kleine labels in grafieken/respirogrammen blijven zo scherp. Alleen
+        // wanneer de PNG te groot wordt, verkleinen we de uitsnede proportioneel.
+        let imageData = canvas.toDataURL('image/png');
+        if (imageData.length > 1_800_000) {
+          const smallerCanvas = document.createElement('canvas');
+          smallerCanvas.width = Math.max(1, Math.round(canvas.width * 0.7));
+          smallerCanvas.height = Math.max(1, Math.round(canvas.height * 0.7));
+          smallerCanvas.getContext('2d').drawImage(
+            canvas, 0, 0, canvas.width, canvas.height,
+            0, 0, smallerCanvas.width, smallerCanvas.height
+          );
+          imageData = smallerCanvas.toDataURL('image/png');
+        }
         if (imageData.length > 2_000_000) {
           $('#questionAnalysisMessage').textContent = 'Deze uitsnede is te groot om veilig op te slaan. Maak een kleiner kader.';
           return;
