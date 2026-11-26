@@ -689,3 +689,10 @@
 @media (max-width: 900px) {
   .stitched-workspace { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Verticale indeling voorkomt verdringing van contextgroepen in stap 3. */
+.stitched-workspace { display:flex !important; flex-direction:column !important; align-items:stretch !important; }
+.stitched-inspector { width:100%; min-width:0; }
+.context-group-questions { display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+.context-group-question-card { border:1px solid #dfe6eb; border-radius:9px; background:#fff; padding:10px 12px; display:flex; flex-direction:column; gap:4px; }
+.context-group-question-card small { color:#71808a; font-size:12px; }

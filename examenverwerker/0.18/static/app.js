@@ -1267,6 +1267,7 @@ async function renderFinalReviewStage() {
         refreshControls();
         try {
           clearTimeout(saveTimer);
+          await saveChain;
           // De expliciete afrondactie bevestigt de volledige reeks. De server
           // krijgt alle vragen als gecontroleerd, zonder verborgen vinkjes.
           const saved = await save({draft: false, mark_all_reviewed: true});
@@ -2151,6 +2152,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           <h4 class="context-group-title">${escapeHtml(title)}</h4>
           <p class="context-group-range">${numbers.length ? `Vragen ${escapeHtml(formatNumbers(numbers))}` : "Nog geen vragen gekoppeld"}</p>
           ${missingNumbers.length ? `<p class="context-group-warning">Vraagfragment ontbreekt bij ${escapeHtml(formatNumbers(missingNumbers))}</p>` : ""}
+          <div class="context-group-questions">${questionSelections.filter(question => (question.question_numbers || []).some(number => numbers.includes(Number(number)))).map(question => `<div class="context-group-question-card"><strong>${escapeHtml(questionLabel(question))}</strong><small>Bij deze contextgroep</small></div>`).join("") || '<p class="muted">Nog geen vraagfragmenten aan deze groep gekoppeld.</p>'}</div>
           <details class="context-group-details">
             <summary>Contextdelen bekijken</summary>
             <ul>${group.parts.map(entry => `<li>${escapeHtml(questionLabel(entry.item))}</li>`).join("")}</ul>
@@ -2338,6 +2340,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
         // inhoudelijke review en workflowstatus serieel opgeslagen.
         clearTimeout(saveTimer);
         await saveChain;
+        // Doorgaan is tevens een expliciete opslagactie.
+        await persistSelections(true);
         await api(stitchedReviewUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({selections,reviewed:true})});
         await api(fragmentsReviewUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed_question_numbers:[...new Set(numbers)],reviewed_all_questions:true,boundary_overrides:[]})});
         await api(`/api/exams/${state.examId}/steps/${stepKey}/complete`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reviewed:true,reviewed_all_questions:true,reviewed_question_numbers:[...new Set(numbers)]})});
