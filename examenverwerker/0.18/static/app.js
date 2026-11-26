@@ -2624,6 +2624,9 @@ async function renderQuestionAnalysisStage() {
       // De bestaande autosave luistert naar change-events op formuliervelden.
       // Een verborgen revisieveld laat ook acties zonder tekstinvoer (zoals
       // het toevoegen of uitsnijden van een afbeelding) direct opslaan.
+      const questionNumber = Number(card.dataset.analysisCard);
+      const reviewed = card.querySelector(`[data-analysis-reviewed="${questionNumber}"]`);
+      if (reviewed) reviewed.checked = false;
       const revision = card.querySelector('[data-option-revision]');
       if (revision) {
         revision.value = String(Number(revision.value || 0) + 1);
@@ -2822,6 +2825,8 @@ async function renderQuestionAnalysisStage() {
       const option = (optionState.get(number) || []).find(item => item.letter === letter);
       if (option) option.text = field.value;
       optionReviewState.add(number);
+      const reviewed = panel.querySelector(`[data-analysis-reviewed="${number}"]`);
+      if (reviewed) reviewed.checked = false;
       refreshComplete();
     });
 
@@ -2982,7 +2987,16 @@ async function renderQuestionAnalysisStage() {
       }
     };
     reviewedInputs().forEach(input => input.addEventListener('change', refreshComplete));
-    panel.querySelectorAll('[data-analysis-type]').forEach(input => input.addEventListener('change', refreshComplete));
+    // Elke inhoudelijke wijziging na een eerdere review maakt die review
+    // ongeldig. De docent moet de aangepaste vraag opnieuw visueel afvinken.
+    panel.querySelectorAll('[data-analysis-type], [data-analysis-points]').forEach(input => {
+      input.addEventListener('change', () => {
+        const number = Number(input.dataset.analysisType ?? input.dataset.analysisPoints);
+        const reviewed = panel.querySelector(`[data-analysis-reviewed="${number}"]`);
+        if (reviewed) reviewed.checked = false;
+        refreshComplete();
+      });
+    });
     refreshComplete();
 
     const collect = () => cards.map(card => {
