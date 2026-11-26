@@ -1265,6 +1265,7 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         self.assertIn("data-option-crop-existing", app_js)
         self.assertIn("data-option-crop-segment", app_js)
         self.assertIn("data-option-revision", app_js)
+        self.assertIn('<section class="analysis-options-editor" aria-label="Antwoordopties van vraag ', app_js)
         self.assertIn("analysis-crop-selection", app_css)
         self.assertIn("analysis-option-preview", app_css)
         self.assertIn("final-answer-option-image", app_css)
