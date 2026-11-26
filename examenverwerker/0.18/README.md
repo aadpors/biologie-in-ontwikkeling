@@ -19,6 +19,7 @@ Meerkeuzeopties worden als afzonderlijke records opgeslagen. Een optie kan tekst
 - Bij meerpagina-vragen kiest de docent eerst de bronpagina.
 - De selectie wordt uit de oorspronkelijke pixels van de gerenderde PDF-pagina gemaakt en als PNG opgeslagen; de bron-PDF verandert niet.
 - De uitsnede wordt samen met de overige vraaganalyse in de bestaande examenevidence bewaard en verschijnt opnieuw in de integrale eindcontrole.
+- Zodra de docent de antwoordoptielijst zelf wijzigt, wordt die lijst expliciet leidend. Verwijderde OCR-opties keren daardoor niet terug bij het opnieuw openen.
 - Een vraag kan pas als gecontroleerde meerkeuzevraag worden goedgekeurd wanneer minimaal twee complete antwoordopties zijn vastgelegd.
 
 De afbeelding wordt niet door OCR geïnterpreteerd. De docent controleert de visuele inhoud en de koppeling met de antwoordletter.
