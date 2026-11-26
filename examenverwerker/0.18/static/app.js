@@ -2761,6 +2761,20 @@ async function renderQuestionAnalysisStage() {
       }
     });
 
+    panel.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !activeCrop) return;
+      const number = activeCrop.questionNumber;
+      activeCrop = null;
+      panel.querySelectorAll('.analysis-source-image').forEach(source => {
+        source.classList.remove('is-cropping');
+        const overlay = source.querySelector('.analysis-crop-selection');
+        if (overlay) overlay.hidden = true;
+      });
+      const help = panel.querySelector(`[data-crop-help="${number}"]`);
+      if (help) help.textContent = 'Selectie geannuleerd. Je kunt een andere afbeelding kiezen.';
+      $('#questionAnalysisMessage').textContent = 'Selectie van de afbeeldingsoptie geannuleerd.';
+    });
+
     panel.addEventListener('input', event => {
       const field = event.target.closest('[data-option-text]');
       if (!field) return;
