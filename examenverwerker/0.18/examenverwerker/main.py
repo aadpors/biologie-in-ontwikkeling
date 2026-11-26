@@ -1615,7 +1615,9 @@ def _merge_saved_question_analysis(question: dict[str, Any], saved: dict[str, An
     saved_options = {
         item.get("letter"): item
         for item in saved.get("options", [])
-        if item.get("letter") and item.get("text", "").strip()
+        # Een optie met alleen een afbeelding heeft bewust geen tekst.
+        # Behoud daarom ook zulke opties bij het opnieuw openen van stap 4.
+        if item.get("letter") and (item.get("text", "").strip() or item.get("image_data"))
     }
     if saved_options or current_options:
         question["options"] = [
