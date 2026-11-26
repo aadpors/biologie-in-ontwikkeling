@@ -2792,6 +2792,9 @@ async function renderQuestionAnalysisStage() {
       if (event.key !== 'Escape' || !activeCrop) return;
       const number = activeCrop.questionNumber;
       activeCrop = null;
+      // Een Escape tijdens het slepen beëindigt ook de lopende pointerselectie.
+      // Zo kan een later pointerup-event geen half afgebroken uitsnede opslaan.
+      dragSelection = null;
       panel.querySelectorAll('.analysis-source-image').forEach(source => {
         source.classList.remove('is-cropping');
         const overlay = source.querySelector('.analysis-crop-selection');
@@ -2855,6 +2858,11 @@ async function renderQuestionAnalysisStage() {
         overlay.style.top = `${Math.min(dragSelection.startY,p.y)}px`;
         overlay.style.width = `${Math.abs(p.x-dragSelection.startX)}px`;
         overlay.style.height = `${Math.abs(p.y-dragSelection.startY)}px`;
+      });
+      source.addEventListener('pointercancel', () => {
+        if (!dragSelection || dragSelection.source !== source) return;
+        dragSelection = null;
+        overlay.hidden = true;
       });
       source.addEventListener('pointerup', event => {
         if (!dragSelection || dragSelection.source !== source) return;
