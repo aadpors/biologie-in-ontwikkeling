@@ -2598,7 +2598,7 @@ async function renderQuestionAnalysisStage() {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Vraagtypen en antwoordopties analyseren…</p>';
   try {
-    const result = await api(\`/api/exams/\${state.examId}/question-analysis\`);
+    const result = await api(`/api/exams/${state.examId}/question-analysis`);
 
     // Houd de antwoordopties per vraag als gestructureerde gegevens bij.
     // Een optie heeft een letter, optionele tekst en optioneel een afbeelding.
@@ -2624,87 +2624,87 @@ async function renderQuestionAnalysisStage() {
     const renderOptionRows = (card, questionNumber) => {
       const host = card.querySelector('[data-option-list]');
       const options = optionState.get(questionNumber) || [];
-      host.innerHTML = options.map(option => \`
-        <div class="analysis-option-row" data-option-row="\${questionNumber}" data-option-letter="\${option.letter}">
-          <strong class="analysis-option-letter">\${option.letter}</strong>
+      host.innerHTML = options.map(option => `
+        <div class="analysis-option-row" data-option-row="${questionNumber}" data-option-letter="${option.letter}">
+          <strong class="analysis-option-letter">${option.letter}</strong>
           <div class="analysis-option-content">
-            <input type="text" data-option-text="\${questionNumber}" data-option-letter="\${option.letter}"
-              value="\${escapeHtml(option.text || '')}" placeholder="Tekst (optioneel bij een afbeelding)"
-              aria-label="Tekst van antwoordoptie \${option.letter}">
-            \${option.image_data ? \`<img class="analysis-option-preview" src="\${option.image_data}" alt="Afbeelding bij antwoordoptie \${option.letter}">\` : '<span class="analysis-option-no-image">Geen afbeelding toegevoegd</span>'}
-            <small>\${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
+            <input type="text" data-option-text="${questionNumber}" data-option-letter="${option.letter}"
+              value="${escapeHtml(option.text || '')}" placeholder="Tekst (optioneel bij een afbeelding)"
+              aria-label="Tekst van antwoordoptie ${option.letter}">
+            ${option.image_data ? `<img class="analysis-option-preview" src="${option.image_data}" alt="Afbeelding bij antwoordoptie ${option.letter}">` : '<span class="analysis-option-no-image">Geen afbeelding toegevoegd</span>'}
+            <small>${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
           </div>
-          <button type="button" class="quiet analysis-option-remove" data-option-remove="\${questionNumber}" data-option-letter="\${option.letter}" aria-label="Verwijder optie \${option.letter}">Verwijderen</button>
-        </div>\`).join('') || '<p class="muted">Nog geen antwoordopties vastgelegd. Voeg tekstopties toe of snijd de opties uit de afbeelding.</p>';
+          <button type="button" class="quiet analysis-option-remove" data-option-remove="${questionNumber}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
+        </div>`).join('') || '<p class="muted">Nog geen antwoordopties vastgelegd. Voeg tekstopties toe of snijd de opties uit de afbeelding.</p>';
       const addTextButton = card.querySelector('[data-option-add-text]');
       if (addTextButton) addTextButton.disabled = options.length >= 6;
     };
 
     const questionCards = result.questions.map(question => {
       const number = Number(question.question_number);
-      const optionRows = (question.options || []).map(option => \`
-        <div class="analysis-option-row" data-option-row="\${number}" data-option-letter="\${option.letter}">
-          <strong class="analysis-option-letter">\${option.letter}</strong>
+      const optionRows = (question.options || []).map(option => `
+        <div class="analysis-option-row" data-option-row="${number}" data-option-letter="${option.letter}">
+          <strong class="analysis-option-letter">${option.letter}</strong>
           <div class="analysis-option-content">
-            <input type="text" data-option-text="\${number}" data-option-letter="\${option.letter}"
-              value="\${escapeHtml(option.text || '')}" placeholder="Tekst (optioneel bij een afbeelding)"
-              aria-label="Tekst van antwoordoptie \${option.letter}">
-            \${option.image_data ? \`<img class="analysis-option-preview" src="\${option.image_data}" alt="Afbeelding bij antwoordoptie \${option.letter}">\` : '<span class="analysis-option-no-image">Geen afbeelding toegevoegd</span>'}
-            <small>\${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
+            <input type="text" data-option-text="${number}" data-option-letter="${option.letter}"
+              value="${escapeHtml(option.text || '')}" placeholder="Tekst (optioneel bij een afbeelding)"
+              aria-label="Tekst van antwoordoptie ${option.letter}">
+            ${option.image_data ? `<img class="analysis-option-preview" src="${option.image_data}" alt="Afbeelding bij antwoordoptie ${option.letter}">` : '<span class="analysis-option-no-image">Geen afbeelding toegevoegd</span>'}
+            <small>${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
           </div>
-          <button type="button" class="quiet analysis-option-remove" data-option-remove="\${number}" data-option-letter="\${option.letter}" aria-label="Verwijder optie \${option.letter}">Verwijderen</button>
-        </div>\`).join('');
-      return \`
-        <article class="analysis-card" data-analysis-card="\${number}">
-          <div class="fragment-heading"><h3>Vraag \${number}</h3><span class="muted">Voorstel: \${escapeHtml(question.question_type)}</span></div>
+          <button type="button" class="quiet analysis-option-remove" data-option-remove="${number}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
+        </div>`).join('');
+      return `
+        <article class="analysis-card" data-analysis-card="${number}">
+          <div class="fragment-heading"><h3>Vraag ${number}</h3><span class="muted">Voorstel: ${escapeHtml(question.question_type)}</span></div>
           <div class="analysis-fragment-sources">
-            \${question.segments.map((segment, segmentIndex) => \`
+            ${question.segments.map((segment, segmentIndex) => `
               <figure class="analysis-source-figure">
-                <figcaption>Pagina \${segment.page_number}</figcaption>
-                <div class="analysis-source-image" data-question="\${number}" data-segment-index="\${segmentIndex}">
-                  <img loading="eager" src="\${segment.url}" alt="Vraag \${number}, pagina \${segment.page_number}">
+                <figcaption>Pagina ${segment.page_number}</figcaption>
+                <div class="analysis-source-image" data-question="${number}" data-segment-index="${segmentIndex}">
+                  <img loading="eager" src="${segment.url}" alt="Vraag ${number}, pagina ${segment.page_number}">
                   <div class="analysis-crop-selection" hidden></div>
                 </div>
-                <button type="button" class="quiet analysis-crop-button" data-option-crop="\${number}" data-segment-index="\${segmentIndex}">Afbeeldingsoptie uit deze pagina selecteren</button>
-              </figure>\`).join('')}
+                <button type="button" class="quiet analysis-crop-button" data-option-crop="${number}" data-segment-index="${segmentIndex}">Afbeeldingsoptie uit deze pagina selecteren</button>
+              </figure>`).join('')}
           </div>
           <div class="analysis-fields">
             <label>Vraagtype
-              <select data-analysis-type="\${number}">
-                <option value="meerkeuze" \${question.question_type === 'meerkeuze' ? 'selected' : ''}>Meerkeuze</option>
-                <option value="gesloten" \${question.question_type === 'gesloten' ? 'selected' : ''}>Gesloten antwoord</option>
-                <option value="open" \${question.question_type === 'open' ? 'selected' : ''}>Open vraag</option>
-                <option value="onbekend" \${question.question_type === 'onbekend' ? 'selected' : ''}>Nog onbekend</option>
+              <select data-analysis-type="${number}">
+                <option value="meerkeuze" ${question.question_type === 'meerkeuze' ? 'selected' : ''}>Meerkeuze</option>
+                <option value="gesloten" ${question.question_type === 'gesloten' ? 'selected' : ''}>Gesloten antwoord</option>
+                <option value="open" ${question.question_type === 'open' ? 'selected' : ''}>Open vraag</option>
+                <option value="onbekend" ${question.question_type === 'onbekend' ? 'selected' : ''}>Nog onbekend</option>
               </select>
             </label>
             <label>Maximumscore (punten)
-              <input type="number" min="0" max="20" step="1" value="\${question.max_points ?? ''}" placeholder="Nog bepalen" data-analysis-points="\${number}">
+              <input type="number" min="0" max="20" step="1" value="${question.max_points ?? ''}" placeholder="Nog bepalen" data-analysis-points="${number}">
             </label>
           </div>
           <section class="analysis-options-editor"
-            <input type="hidden" data-option-revision="${number}" value="0"> aria-label="Antwoordopties van vraag \${number}">
+            <input type="hidden" data-option-revision="${number}" value="0"> aria-label="Antwoordopties van vraag ${number}">
             <div class="analysis-options-heading">
               <div><h4>Antwoordopties</h4><p>Een optie kan tekst, een afbeelding of beide bevatten.</p></div>
-              <button type="button" class="quiet" data-option-add-text="\${number}" \${(question.options || []).length >= 6 ? 'disabled' : ''}>Tekstantwoord toevoegen</button>
+              <button type="button" class="quiet" data-option-add-text="${number}" ${(question.options || []).length >= 6 ? 'disabled' : ''}>Tekstantwoord toevoegen</button>
             </div>
-            <div data-option-list>\${optionRows || '<p class="muted">Nog geen antwoordopties vastgelegd. Voeg tekstopties toe of snijd de opties uit de afbeelding.</p>'}</div>
-            <p class="analysis-crop-help" data-crop-help="\${number}">Kies bij een afbeelding de knop onder de vraagafbeelding en sleep daarna een kader om precies één antwoordoptie. De uitsnede wordt bij de bijbehorende letter opgeslagen.</p>
+            <div data-option-list>${optionRows || '<p class="muted">Nog geen antwoordopties vastgelegd. Voeg tekstopties toe of snijd de opties uit de afbeelding.</p>'}</div>
+            <p class="analysis-crop-help" data-crop-help="${number}">Kies bij een afbeelding de knop onder de vraagafbeelding en sleep daarna een kader om precies één antwoordoptie. De uitsnede wordt bij de bijbehorende letter opgeslagen.</p>
           </section>
-          <p class="analysis-reason">Type: \${escapeHtml(question.type_reason)} Score: \${escapeHtml(question.points_reason)}</p>
-          \${question.closed_answer_form ? \`<p class="analysis-reason closed-answer-form"><strong>Gesloten antwoordvorm:</strong> \${escapeHtml(question.closed_answer_form)}</p>\` : ''}
-          <details class="analysis-text"><summary>Tekstlaag uit dit fragment (hulpmiddel, niet leidend)</summary><pre>\${escapeHtml(question.extracted_text || 'Geen selecteerbare tekstlaag aangetroffen. Controleer de afbeelding.')}</pre></details>
-          <label class="review-warning"><input type="checkbox" data-analysis-reviewed="\${number}" \${question.reviewed ? 'checked' : ''}> Ik heb vraag \${number}, het vraagtype, de maximumscore en alle antwoordopties visueel gecontroleerd.</label>
-        </article>\`;
+          <p class="analysis-reason">Type: ${escapeHtml(question.type_reason)} Score: ${escapeHtml(question.points_reason)}</p>
+          ${question.closed_answer_form ? `<p class="analysis-reason closed-answer-form"><strong>Gesloten antwoordvorm:</strong> ${escapeHtml(question.closed_answer_form)}</p>` : ''}
+          <details class="analysis-text"><summary>Tekstlaag uit dit fragment (hulpmiddel, niet leidend)</summary><pre>${escapeHtml(question.extracted_text || 'Geen selecteerbare tekstlaag aangetroffen. Controleer de afbeelding.')}</pre></details>
+          <label class="review-warning"><input type="checkbox" data-analysis-reviewed="${number}" ${question.reviewed ? 'checked' : ''}> Ik heb vraag ${number}, het vraagtype, de maximumscore en alle antwoordopties visueel gecontroleerd.</label>
+        </article>`;
     }).join('');
 
-    panel.innerHTML = \`
+    panel.innerHTML = `
       <p class="eyebrow">FASE 2 · OPGAVENDOCUMENT</p>
       <h2>Vraagtype, punten en antwoordopties</h2>
       <p class="lead">Controleer het volledige vraagfragment. Antwoordopties mogen ook uitsluitend uit afbeeldingen bestaan. Snijd zulke opties rechtstreeks uit de zichtbare PDF-afbeelding; OCR is daarvoor niet nodig.</p>
-      <div class="notice"><strong>\${result.question_count} vragen</strong> klaar voor inhoudelijke controle. Als het puntenaantal niet expliciet uit de vraag blijkt, blijft het veld leeg in plaats van dat er een score wordt gegokt. Afbeeldingsuitsneden worden lokaal in de examenevidence bewaard.</div>
-      \${questionCards}
+      <div class="notice"><strong>${result.question_count} vragen</strong> klaar voor inhoudelijke controle. Als het puntenaantal niet expliciet uit de vraag blijkt, blijft het veld leeg in plaats van dat er een score wordt gegokt. Afbeeldingsuitsneden worden lokaal in de examenevidence bewaard.</div>
+      ${questionCards}
       <div class="review-actions"><button class="primary" id="saveQuestionAnalysis" type="button">Controle opslaan</button><button class="primary" id="completeQuestionAnalysis" type="button" disabled>Vraaganalyse goedkeuren en doorgaan</button></div>
-      <p id="questionAnalysisMessage" class="form-error" role="status"></p>\`;
+      <p id="questionAnalysisMessage" class="form-error" role="status"></p>`;
 
     const cards = [...panel.querySelectorAll('[data-analysis-card]')];
     // De docent beoordeelt iedere vraag bewust zelf; verberg deze controles
@@ -2747,7 +2747,7 @@ async function renderQuestionAnalysisStage() {
         const number = Number(cropButton.dataset.optionCrop);
         const options = optionState.get(number) || [];
         if (options.length >= 6) {
-          $('#questionAnalysisMessage').textContent = \`Vraag \${number} heeft al zes antwoordopties. Verwijder eerst een optie als er een correctie nodig is.\`;
+          $('#questionAnalysisMessage').textContent = `Vraag ${number} heeft al zes antwoordopties. Verwijder eerst een optie als er een correctie nodig is.`;
           return;
         }
         activeCrop = {questionNumber:number, segmentIndex:Number(cropButton.dataset.segmentIndex)};
@@ -2755,9 +2755,9 @@ async function renderQuestionAnalysisStage() {
           source.classList.toggle('is-cropping',
             Number(source.dataset.question) === number && Number(source.dataset.segmentIndex) === activeCrop.segmentIndex);
         });
-        const help = panel.querySelector(\`[data-crop-help="\${number}"]\`);
+        const help = panel.querySelector(`[data-crop-help="${number}"]`);
         help.textContent = 'Selectiemodus actief: sleep op de afbeelding een kader om één antwoordoptie. Druk op Escape om te annuleren.';
-        $('#questionAnalysisMessage').textContent = \`Selecteer nu met de muis één antwoordoptie uit vraag \${number}.\`;
+        $('#questionAnalysisMessage').textContent = `Selecteer nu met de muis één antwoordoptie uit vraag ${number}.`;
       }
     });
 
@@ -2813,8 +2813,8 @@ async function renderQuestionAnalysisStage() {
         const p = point(event);
         dragSelection = {source, img, overlay, startX:p.x, startY:p.y, currentX:p.x, currentY:p.y};
         overlay.hidden = false;
-        overlay.style.left = \`\${p.x}px\`;
-        overlay.style.top = \`\${p.y}px\`;
+        overlay.style.left = `${p.x}px`;
+        overlay.style.top = `${p.y}px`;
         overlay.style.width = '0';
         overlay.style.height = '0';
         source.setPointerCapture(event.pointerId);
@@ -2824,10 +2824,10 @@ async function renderQuestionAnalysisStage() {
         const p = point(event);
         dragSelection.currentX = p.x;
         dragSelection.currentY = p.y;
-        overlay.style.left = \`\${Math.min(dragSelection.startX,p.x)}px\`;
-        overlay.style.top = \`\${Math.min(dragSelection.startY,p.y)}px\`;
-        overlay.style.width = \`\${Math.abs(p.x-dragSelection.startX)}px\`;
-        overlay.style.height = \`\${Math.abs(p.y-dragSelection.startY)}px\`;
+        overlay.style.left = `${Math.min(dragSelection.startX,p.x)}px`;
+        overlay.style.top = `${Math.min(dragSelection.startY,p.y)}px`;
+        overlay.style.width = `${Math.abs(p.x-dragSelection.startX)}px`;
+        overlay.style.height = `${Math.abs(p.y-dragSelection.startY)}px`;
       });
       source.addEventListener('pointerup', event => {
         if (!dragSelection || dragSelection.source !== source) return;
@@ -2890,11 +2890,11 @@ async function renderQuestionAnalysisStage() {
         optionState.set(number, options);
         activeCrop = null;
         source.classList.remove('is-cropping');
-        const card = panel.querySelector(\`[data-analysis-card="\${number}"]\`);
+        const card = panel.querySelector(`[data-analysis-card="${number}"]`);
         renderOptionRows(card, number);
-        card.querySelector(\`[data-crop-help="\${number}"]\`).textContent =
-          \`Afbeeldingsoptie \${letter} toegevoegd. Je kunt eventueel nog tekst bij deze optie invullen.\`;
-        $('#questionAnalysisMessage').textContent = \`Afbeeldingsoptie \${letter} van vraag \${number} toegevoegd.\`;
+        card.querySelector(`[data-crop-help="${number}"]`).textContent =
+          `Afbeeldingsoptie ${letter} toegevoegd. Je kunt eventueel nog tekst bij deze optie invullen.`;
+        $('#questionAnalysisMessage').textContent = `Afbeeldingsoptie ${letter} van vraag ${number} toegevoegd.`;
         notifyOptionChange(card);
         refreshComplete();
       });
@@ -2905,15 +2905,15 @@ async function renderQuestionAnalysisStage() {
       const issues = [];
       for (const card of cards) {
         const number = Number(card.dataset.analysisCard);
-        const type = card.querySelector(\`[data-analysis-type="\${number}"]\`).value;
+        const type = card.querySelector(`[data-analysis-type="${number}"]`).value;
         const options = optionState.get(number) || [];
         if (type !== 'meerkeuze') continue;
         if (options.length < 2) {
-          issues.push(\`vraag \${number}: minder dan twee antwoordopties\`);
+          issues.push(`vraag ${number}: minder dan twee antwoordopties`);
           continue;
         }
         const incomplete = options.filter(option => !String(option.text || '').trim() && !option.image_data);
-        if (incomplete.length) issues.push(\`vraag \${number}: optie(s) \${incomplete.map(option=>option.letter).join(', ')} zijn leeg\`);
+        if (incomplete.length) issues.push(`vraag ${number}: optie(s) ${incomplete.map(option=>option.letter).join(', ')} zijn leeg`);
       }
       return issues;
     };
@@ -2933,21 +2933,21 @@ async function renderQuestionAnalysisStage() {
 
     const collect = () => cards.map(card => {
       const number = Number(card.dataset.analysisCard);
-      const rawPoints = card.querySelector(\`[data-analysis-points="\${number}"]\`).value.trim();
+      const rawPoints = card.querySelector(`[data-analysis-points="${number}"]`).value.trim();
       const options = (optionState.get(number) || []).map(option => ({
         letter:option.letter,
-        text:String(card.querySelector(\`[data-option-text="\${number}"][data-option-letter="\${option.letter}"]\`)?.value ?? option.text ?? '').trim(),
+        text:String(card.querySelector(`[data-option-text="${number}"][data-option-letter="${option.letter}"]`)?.value ?? option.text ?? '').trim(),
         ...(option.image_data ? {image_data:option.image_data} : {})
       }));
       return {
         question_number:number,
-        question_type:card.querySelector(\`[data-analysis-type="\${number}"]\`).value,
+        question_type:card.querySelector(`[data-analysis-type="${number}"]`).value,
         max_points:rawPoints === '' ? null : Number(rawPoints),
         options,
-        reviewed:card.querySelector(\`[data-analysis-reviewed="\${number}"]\`).checked
+        reviewed:card.querySelector(`[data-analysis-reviewed="${number}"]`).checked
       };
     });
-    const save = async () => api(\`/api/exams/\${state.examId}/question-analysis/review\`, {
+    const save = async () => api(`/api/exams/${state.examId}/question-analysis/review`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({questions:collect()})
     });
@@ -2955,7 +2955,7 @@ async function renderQuestionAnalysisStage() {
     $('#saveQuestionAnalysis').addEventListener('click', async () => {
       try {
         const saved = await save();
-        $('#questionAnalysisMessage').textContent = \`\${saved.reviewed_count} van \${result.question_count} vragen gecontroleerd. Conceptreview opgeslagen.\`;
+        $('#questionAnalysisMessage').textContent = `${saved.reviewed_count} van ${result.question_count} vragen gecontroleerd. Conceptreview opgeslagen.`;
       } catch (error) { $('#questionAnalysisMessage').textContent = error.message; }
     });
     let completingQuestionAnalysis=false;
@@ -2969,7 +2969,7 @@ async function renderQuestionAnalysisStage() {
         if (optionIssues.length) throw new Error('Controleer eerst de antwoordopties: ' + optionIssues.join('; ') + '.');
         const saved = panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
         if (!saved.complete) throw new Error('Controleer eerst alle vragen.');
-        await api(\`/api/exams/\${state.examId}/steps/opgaven_analyse/complete\`, {
+        await api(`/api/exams/${state.examId}/steps/opgaven_analyse/complete`, {
           method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({reviewed:true, reviewed_all_questions:true, reviewed_count:saved.reviewed_count})
         });
@@ -2981,6 +2981,6 @@ async function renderQuestionAnalysisStage() {
       }
     });
   } catch (error) {
-    panel.innerHTML = \`<h2>Vraagtype, punten en antwoordopties</h2><p class="form-error">\${escapeHtml(error.message)}</p>\`;
+    panel.innerHTML = `<h2>Vraagtype, punten en antwoordopties</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
   }
 }
