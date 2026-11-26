@@ -2624,6 +2624,7 @@ async function renderQuestionAnalysisStage() {
     const renderOptionRows = (card, questionNumber) => {
       const host = card.querySelector('[data-option-list]');
       const options = optionState.get(questionNumber) || [];
+      const sourceQuestion = result.questions.find(item => Number(item.question_number) === questionNumber);
       host.innerHTML = options.map(option => `
         <div class="analysis-option-row" data-option-row="${questionNumber}" data-option-letter="${option.letter}">
           <strong class="analysis-option-letter">${option.letter}</strong>
@@ -2635,6 +2636,9 @@ async function renderQuestionAnalysisStage() {
             <small>${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
           </div>
           <div class="analysis-option-actions">
+            <select class="analysis-option-source" data-option-crop-segment="${questionNumber}" data-option-letter="${option.letter}" aria-label="Bronpagina voor optie ${option.letter}">
+              ${(sourceQuestion?.segments || []).map((segment, index) => `<option value="${index}">Pagina ${segment.page_number}</option>`).join('')}
+            </select>
             <button type="button" class="quiet analysis-option-crop-existing" data-option-crop-existing="${questionNumber}" data-option-letter="${option.letter}">Afbeelding toevoegen / vervangen</button>
             <button type="button" class="quiet analysis-option-remove" data-option-remove="${questionNumber}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
           </div>
@@ -2655,7 +2659,13 @@ async function renderQuestionAnalysisStage() {
             ${option.image_data ? `<img class="analysis-option-preview" src="${option.image_data}" alt="Afbeelding bij antwoordoptie ${option.letter}">` : '<span class="analysis-option-no-image">Geen afbeelding toegevoegd</span>'}
             <small>${option.image_data ? (option.text ? 'Combinatie van tekst en afbeelding' : 'Afbeeldingsoptie') : 'Tekstoptie'}</small>
           </div>
-          <button type="button" class="quiet analysis-option-remove" data-option-remove="${number}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
+          <div class="analysis-option-actions">
+            <select class="analysis-option-source" data-option-crop-segment="${number}" data-option-letter="${option.letter}" aria-label="Bronpagina voor optie ${option.letter}">
+              ${question.segments.map((segment, index) => `<option value="${index}">Pagina ${segment.page_number}</option>`).join('')}
+            </select>
+            <button type="button" class="quiet analysis-option-crop-existing" data-option-crop-existing="${number}" data-option-letter="${option.letter}">Afbeelding toevoegen / vervangen</button>
+            <button type="button" class="quiet analysis-option-remove" data-option-remove="${number}" data-option-letter="${option.letter}" aria-label="Verwijder optie ${option.letter}">Verwijderen</button>
+          </div>
         </div>`).join('');
       return `
         <article class="analysis-card" data-analysis-card="${number}">
@@ -2754,7 +2764,12 @@ async function renderQuestionAnalysisStage() {
           $('#questionAnalysisMessage').textContent = `Vraag ${number} heeft al zes antwoordopties. Verwijder eerst een optie als er een correctie nodig is.`;
           return;
         }
-        activeCrop = {questionNumber:number, segmentIndex:Number(cropButton.dataset.segmentIndex), letter:targetLetter};
+        const card = cropButton.closest('[data-analysis-card]');
+        const sourceSelector = targetLetter
+          ? card.querySelector(`[data-option-crop-segment="${number}"][data-option-letter="${targetLetter}"]`)
+          : null;
+        const segmentIndex = Number(cropButton.dataset.segmentIndex ?? sourceSelector?.value ?? 0);
+        activeCrop = {questionNumber:number, segmentIndex, letter:targetLetter};
         panel.querySelectorAll('.analysis-source-image').forEach(source => {
           source.classList.toggle('is-cropping',
             Number(source.dataset.question) === number && Number(source.dataset.segmentIndex) === activeCrop.segmentIndex);
