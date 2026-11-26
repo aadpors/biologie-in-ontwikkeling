@@ -2610,6 +2610,17 @@ async function renderQuestionAnalysisStage() {
     ]));
     let activeCrop = null;
 
+    const notifyOptionChange = card => {
+      // De bestaande autosave luistert naar change-events op formuliervelden.
+      // Een verborgen revisieveld laat ook acties zonder tekstinvoer (zoals
+      // het toevoegen of uitsnijden van een afbeelding) direct opslaan.
+      const revision = card.querySelector('[data-option-revision]');
+      if (revision) {
+        revision.value = String(Number(revision.value || 0) + 1);
+        revision.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+    };
+
     const renderOptionRows = (card, questionNumber) => {
       const host = card.querySelector('[data-option-list]');
       const options = optionState.get(questionNumber) || [];
@@ -2670,7 +2681,8 @@ async function renderQuestionAnalysisStage() {
               <input type="number" min="0" max="20" step="1" value="\${question.max_points ?? ''}" placeholder="Nog bepalen" data-analysis-points="\${number}">
             </label>
           </div>
-          <section class="analysis-options-editor" aria-label="Antwoordopties van vraag \${number}">
+          <section class="analysis-options-editor"
+            <input type="hidden" data-option-revision="${number}" value="0"> aria-label="Antwoordopties van vraag \${number}">
             <div class="analysis-options-heading">
               <div><h4>Antwoordopties</h4><p>Een optie kan tekst, een afbeelding of beide bevatten.</p></div>
               <button type="button" class="quiet" data-option-add-text="\${number}" \${(question.options || []).length >= 6 ? 'disabled' : ''}>Tekstantwoord toevoegen</button>
@@ -2695,7 +2707,8 @@ async function renderQuestionAnalysisStage() {
       <p id="questionAnalysisMessage" class="form-error" role="status"></p>\`;
 
     const cards = [...panel.querySelectorAll('[data-analysis-card]')];
-    prepareStageApproval(panel);
+    // De docent beoordeelt iedere vraag bewust zelf; verberg deze controles
+    // niet via prepareStageApproval zoals bij administratieve reviewstappen.
 
     // Event delegation houdt de bediening intact wanneer een optiekaart
     // opnieuw wordt opgebouwd na toevoegen, uitsnijden of verwijderen.
@@ -2710,7 +2723,9 @@ async function renderQuestionAnalysisStage() {
         if (!letter) return;
         options.push({letter, text:''});
         optionState.set(number, options);
-        renderOptionRows(addButton.closest('[data-analysis-card]'), number);
+        const card = addButton.closest('[data-analysis-card]');
+        renderOptionRows(card, number);
+        notifyOptionChange(card);
         refreshComplete();
         return;
       }
@@ -2720,7 +2735,9 @@ async function renderQuestionAnalysisStage() {
         const number = Number(removeButton.dataset.optionRemove);
         const letter = removeButton.dataset.optionLetter;
         optionState.set(number, (optionState.get(number) || []).filter(option => option.letter !== letter));
-        renderOptionRows(removeButton.closest('[data-analysis-card]'), number);
+        const card = removeButton.closest('[data-analysis-card]');
+        renderOptionRows(card, number);
+        notifyOptionChange(card);
         refreshComplete();
         return;
       }
@@ -2855,6 +2872,7 @@ async function renderQuestionAnalysisStage() {
         card.querySelector(\`[data-crop-help="\${number}"]\`).textContent =
           \`Afbeeldingsoptie \${letter} toegevoegd. Je kunt eventueel nog tekst bij deze optie invullen.\`;
         $('#questionAnalysisMessage').textContent = \`Afbeeldingsoptie \${letter} van vraag \${number} toegevoegd.\`;
+        notifyOptionChange(card);
         refreshComplete();
       });
     });
