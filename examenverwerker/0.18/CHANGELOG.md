@@ -11,6 +11,7 @@
 - Behoud beeldopties bij heropenen en toon ze opnieuw in de integrale eindcontrole.
 - Vereis bij een expliciet goedgekeurde meerkeuzevraag minimaal twee complete antwoordopties.
 - Voeg regressietests toe voor beeldopties, PNG-validatie, heropenen, opslag en de compacte inspector.
+- Trek de vraagreview automatisch in wanneer vraagtype, maximumscore of antwoordopties na controle worden gewijzigd.
 
 
 ## Zelflerende detectie
