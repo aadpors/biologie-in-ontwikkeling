@@ -1585,7 +1585,7 @@ def _merge_saved_question_analysis(question: dict[str, Any], saved: dict[str, An
         # nooit door een nieuwe automatische analyse worden overschreven.
         question.update({
             key: saved[key]
-            for key in ("question_type", "max_points", "options", "reviewed")
+            for key in ("question_type", "max_points", "options", "options_reviewed", "reviewed")
             if key in saved
         })
         return
@@ -1607,24 +1607,35 @@ def _merge_saved_question_analysis(question: dict[str, Any], saved: dict[str, An
     # Voeg de actuele OCR-opties samen met bestaande docentcorrecties. Een
     # handmatig aangepaste tekst heeft voorrang; nieuwe letters die eerder
     # ontbraken worden vanuit de actuele herkenning toegevoegd.
-    current_options = {
-        item.get("letter"): item
-        for item in question.get("options", [])
-        if item.get("letter")
-    }
-    saved_options = {
-        item.get("letter"): item
-        for item in saved.get("options", [])
-        # Een optie met alleen een afbeelding heeft bewust geen tekst.
-        # Behoud daarom ook zulke opties bij het opnieuw openen van stap 4.
-        if item.get("letter") and (item.get("text", "").strip() or item.get("image_data"))
-    }
-    if saved_options or current_options:
-        question["options"] = [
-            saved_options.get(letter) or current_options[letter]
-            for letter in "ABCDEF"
-            if letter in saved_options or letter in current_options
-        ]
+    if saved.get("options_reviewed"):
+        # Zodra de docent de antwoordoptielijst zelf heeft aangepast, is die
+        # lijst expliciet leidend. Anders zou een verwijderde OCR-optie bij
+        # het opnieuw openen van stap 4 ongemerkt terug kunnen verschijnen.
+        question["options"] = saved.get("options", [])
+        question["options_reviewed"] = True
+    else:
+        # Zolang de docent de optielijst nog niet heeft aangepast, vullen we
+        # actuele OCR-herkenning aan met eerder opgeslagen handmatige teksten
+        # en beelduitsneden. Een opgeslagen beeldoptie krijgt voorrang.
+        current_options = {
+            item.get("letter"): item
+            for item in question.get("options", [])
+            if item.get("letter")
+        }
+        saved_options = {
+            item.get("letter"): item
+            for item in saved.get("options", [])
+            # Een optie met alleen een afbeelding heeft bewust geen tekst.
+            # Behoud daarom ook zulke opties bij het opnieuw openen van stap 4.
+            if item.get("letter") and (item.get("text", "").strip() or item.get("image_data"))
+        }
+        if saved_options or current_options:
+            question["options"] = [
+                saved_options.get(letter) or current_options[letter]
+                for letter in "ABCDEF"
+                if letter in saved_options or letter in current_options
+            ]
+        question["options_reviewed"] = False
 
     # Een concept blijft een concept totdat de docent de vraag expliciet
     # heeft gecontroleerd; alleen de voorstellen worden hier bijgewerkt.
