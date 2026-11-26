@@ -729,3 +729,17 @@
   width: 100%;
   min-width: 0;
 }
+
+
+/* Harde herstelregel voor de stitch in stap 3: voorkom dat grid/flex-items
+   of een intrinsieke afbeeldingsbreedte de rechterzijde buiten het zicht duwt.
+   De afbeelding schaalt binnen het viewport; horizontaal scrollen blijft als
+   vangnet beschikbaar en geen parent mag de inhoud afknippen. */
+.stitched-workspace, .stitched-view, .stitched-image-scroll, .stitched-image-wrap, .stitched-overlay { min-width: 0 !important; max-width: 100% !important; }
+.stitched-workspace { width: 100%; grid-template-columns: minmax(0, 1fr) minmax(280px, 350px) !important; }
+.stitched-view { width: 100%; overflow: visible !important; }
+.stitched-image-scroll { width: 100% !important; overflow-x: auto !important; overflow-y: auto !important; }
+.stitched-image-wrap { width: 100% !important; margin: 0 !important; overflow: visible !important; }
+.stitched-image-wrap img { width: 100% !important; max-width: none !important; height: auto !important; }
+.stitched-overlay { width: 100% !important; inset: 0 !important; }
+@media (max-width: 900px) { .stitched-workspace { grid-template-columns: minmax(0,1fr) !important; } }
