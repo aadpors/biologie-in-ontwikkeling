@@ -1344,11 +1344,25 @@ async function renderFinalReviewStage() {
   } catch (error) {
     panel.innerHTML = `<h2>Integrale eindcontrole</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
     if (/oudere versie van de lange afbeelding/i.test(error.message)) {
+      /*
+       * De eindcontrole kan worden geblokkeerd door verouderde fragment-
+       * coördinaten uit verschillende documenten. De herstelstap staat in
+       * het API-foutbericht zelf. Leid de knop daarom af van die aanwijzing,
+       * in plaats van altijd terug te sturen naar de opgaven (stap 3).
+       */
+      const recoveryMatch = error.message.match(/heropen stap\\s*(\\d+)/i);
+      const recoveryStep = recoveryMatch ? Number(recoveryMatch[1]) : 3;
+      const recoveryMap = {
+        3: {key: 'opgaven_fragments', label: 'stap 3 · opgavenfragmenten'},
+        6: {key: 'uitwerk_fragments', label: 'stap 6 · fragmenten uitwerkbijlage'},
+        8: {key: 'cv_fragments', label: 'stap 8 · CV-fragmenten'}
+      };
+      const target = recoveryMap[recoveryStep] || recoveryMap[3];
       panel.insertAdjacentHTML('beforeend',
-        '<button class="primary" id="reopenOpgavenFragments" type="button">Terug naar stap 3 · fragmenten opnieuw controleren</button>');
-      $('#reopenOpgavenFragments')?.addEventListener('click', async () => {
+        `<button class="primary" id="reopenStaleFragments" type="button">Terug naar ${escapeHtml(target.label)} · opnieuw controleren</button>`);
+      $('#reopenStaleFragments')?.addEventListener('click', async () => {
         try {
-          await api(`/api/exams/${state.examId}/steps/opgaven_fragments/reopen`, {method: 'POST'});
+          await api(`/api/exams/${state.examId}/steps/${target.key}/reopen`, {method: 'POST'});
           await openWorkspace(state.examId);
         } catch (reopenError) {
           panel.insertAdjacentHTML('beforeend', `<p class="form-error">${escapeHtml(reopenError.message)}</p>`);
