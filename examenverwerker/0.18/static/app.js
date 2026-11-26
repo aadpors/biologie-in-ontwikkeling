@@ -1018,7 +1018,7 @@ async function renderSnippetsStage() {
    worden niet verborgen: ontbrekende koppelingen en afwijkende scores blijven
    zichtbaar en vragen een toelichting voordat het examen kan worden afgerond.
    De afrondknop is de bevestiging; per vraag afvinken is overbodig. */
-async function renderFinalReviewStage() {
+async async function renderFinalReviewStage() {
   const panel = $('#stagePanel');
   panel.innerHTML = '<p class="muted">Integrale eindcontrole samenstellen…</p>';
 
