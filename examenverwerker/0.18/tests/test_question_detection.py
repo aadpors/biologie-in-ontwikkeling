@@ -1211,6 +1211,7 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         self.assertEqual(options[0]["text"], "")
         self.assertEqual(options[0]["image_data"], self.IMAGE)
         self.assertEqual(options[1]["option_type"], "combinatie")
+        self.assertTrue(result["questions"][0]["options_reviewed"] is False)
         self.assertTrue(options[1]["image_data"].startswith("data:image/png;base64,"))
 
     def test_reviewed_multiple_choice_requires_at_least_two_complete_options(self):
@@ -1295,3 +1296,19 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
             store.save_step_draft("image-option-test", "opgaven_analyse", evidence)
             restored = store.get_exam("image-option-test")["steps"]["opgaven_analyse"]["evidence"]
         self.assertEqual(restored["questions"][0]["options"][0]["image_data"], self.IMAGE)
+
+    def test_removed_ocr_option_does_not_reappear_after_reopening(self):
+        # Een expliciet aangepaste optielijst is leidend. Anders zou een
+        # handmatig verwijderde OCR-hallucinatie bij heropenen terugkomen.
+        question = {"question_number": 12, "question_type": "meerkeuze",
+                    "max_points": 1, "options": [
+                        {"letter": "A", "text": "OCR A"},
+                        {"letter": "B", "text": "OCR B"},
+                        {"letter": "C", "text": "OCR C"},
+                    ], "reviewed": False}
+        saved = {"question_type": "meerkeuze", "max_points": 1,
+                 "options": [{"letter": "A", "text": "Handmatig behouden"}],
+                 "options_reviewed": True, "reviewed": False}
+        main._merge_saved_question_analysis(question, saved)
+        self.assertEqual([item["letter"] for item in question["options"]], ["A"])
+        self.assertTrue(question["options_reviewed"])
