@@ -696,3 +696,36 @@
 .context-group-questions { display:flex; flex-direction:column; gap:8px; margin:12px 0; }
 .context-group-question-card { border:1px solid #dfe6eb; border-radius:9px; background:#fff; padding:10px 12px; display:flex; flex-direction:column; gap:4px; }
 .context-group-question-card small { color:#71808a; font-size:12px; }
+
+
+/* FIX 0.18 — stap 3: voorkom dat de rechterzijde van de lange stitch
+   wordt afgesneden door flex/grid-minimums of een begrensde afbeeldingsbreedte.
+   De scrollcontainer mag horizontaal scrollen als de beschikbare ruimte kleiner
+   is dan de afbeelding; de afbeelding zelf blijft altijd in haar geheel renderen.
+   Dit is bewust een override onderaan het stylesheet, zodat eerdere layoutregels
+   niet onverwacht de herstelregel overschrijven. */
+.stitched-view,
+.stitched-image-scroll {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+.stitched-image-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.stitched-image-wrap {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+.stitched-image-wrap img {
+  width: 100%;
+  max-width: none;
+  height: auto;
+}
+.stitched-overlay {
+  width: 100%;
+  min-width: 0;
+}
