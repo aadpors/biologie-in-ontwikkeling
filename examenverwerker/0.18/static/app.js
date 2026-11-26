@@ -2612,6 +2612,12 @@ async function renderQuestionAnalysisStage() {
       Number(question.question_number),
       (question.options || []).map(option => ({...option}))
     ]));
+    // Zodra de docent de antwoordoptielijst zelf wijzigt, bewaren we die
+    // lijst als expliciete keuze. Anders kan een verwijderde OCR-optie bij
+    // het heropenen ongemerkt opnieuw verschijnen.
+    const optionReviewState = new Set(
+      result.questions.filter(question => question.options_reviewed).map(question => Number(question.question_number))
+    );
     let activeCrop = null;
 
     const notifyOptionChange = card => {
@@ -2740,6 +2746,7 @@ async function renderQuestionAnalysisStage() {
         if (!letter) return;
         options.push({letter, text:''});
         optionState.set(number, options);
+        optionReviewState.add(number);
         const card = addButton.closest('[data-analysis-card]');
         renderOptionRows(card, number);
         notifyOptionChange(card);
@@ -2752,6 +2759,7 @@ async function renderQuestionAnalysisStage() {
         const number = Number(removeButton.dataset.optionRemove);
         const letter = removeButton.dataset.optionLetter;
         optionState.set(number, (optionState.get(number) || []).filter(option => option.letter !== letter));
+        optionReviewState.add(number);
         const card = removeButton.closest('[data-analysis-card]');
         renderOptionRows(card, number);
         notifyOptionChange(card);
@@ -2813,6 +2821,7 @@ async function renderQuestionAnalysisStage() {
       const letter = field.dataset.optionLetter;
       const option = (optionState.get(number) || []).find(item => item.letter === letter);
       if (option) option.text = field.value;
+      optionReviewState.add(number);
       refreshComplete();
     });
 
@@ -2932,6 +2941,7 @@ async function renderQuestionAnalysisStage() {
           options.push({letter, text:'', option_type:'afbeelding', image_data:imageData});
         }
         optionState.set(number, options);
+        optionReviewState.add(number);
         activeCrop = null;
         source.classList.remove('is-cropping');
         const card = panel.querySelector(`[data-analysis-card="${number}"]`);
@@ -2988,6 +2998,7 @@ async function renderQuestionAnalysisStage() {
         question_type:card.querySelector(`[data-analysis-type="${number}"]`).value,
         max_points:rawPoints === '' ? null : Number(rawPoints),
         options,
+        options_reviewed:optionReviewState.has(number),
         reviewed:card.querySelector(`[data-analysis-reviewed="${number}"]`).checked
       };
     });
