@@ -1,5 +1,18 @@
 # Wijzigingen Examenverwerker 0.18
 
+
+## Visuele antwoordopties en compacte stap-3-inspector
+
+- Maak contextgroepkaarten in de rechter inspector compacter, zodat de lange examenstrook in het middendeel visueel leidend blijft.
+- Ondersteun meerkeuzeopties als tekst, afbeelding of combinatie van beide.
+- Laat de docent grafische antwoordopties rechtstreeks uit een vraagfragment uitsnijden met een sleepkader; de crop gebruikt de originele afbeeldingspixels.
+- Sla uitsneden als begrensde lokale PNG/JPEG-data op in de bestaande vraaganalyse-evidence. De bron-PDF blijft ongewijzigd.
+- Laat bestaande automatisch herkende antwoordletters behouden en koppel er een afbeelding aan; de bronpagina is selecteerbaar bij meerpagina-vragen.
+- Behoud beeldopties bij heropenen en toon ze opnieuw in de integrale eindcontrole.
+- Vereis bij een expliciet goedgekeurde meerkeuzevraag minimaal twee complete antwoordopties.
+- Voeg regressietests toe voor beeldopties, PNG-validatie, heropenen, opslag en de compacte inspector.
+
+
 ## Zelflerende detectie
 
 - Voeg een uitlegbare leerlaag toe die expliciete docentcorrecties bewaart als gelabelde detectievoorbeelden.
