@@ -1181,3 +1181,86 @@ class QuestionDetectionTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ImageBasedAnswerOptionTests(unittest.TestCase):
+    """Regressietests voor antwoordopties die volledig uit beeld bestaan."""
+
+    IMAGE = "data:image/jpeg;base64,/9j/2Q=="
+
+    def _payload(self, options, *, reviewed=True, question_type="meerkeuze"):
+        return {"questions": [{
+            "question_number": 12,
+            "question_type": question_type,
+            "max_points": 1,
+            "options": options,
+            "reviewed": reviewed,
+        }]}
+
+    def test_image_only_and_mixed_options_are_accepted_and_normalised(self):
+        # Een respirogram of grafiek kan de volledige inhoud van een optie
+        # vormen. Een combinatie van tekst en beeld moet eveneens bewaard
+        # blijven, zonder dat er kunstmatig OCR-tekst wordt geëist.
+        payload = self._payload([
+            {"letter": "A", "text": "", "image_data": self.IMAGE},
+            {"letter": "B", "text": "De grafiek toont een stijging.", "image_data": self.IMAGE},
+        ])
+        result = validate_question_analysis(payload, {12})
+        options = result["questions"][0]["options"]
+        self.assertEqual(options[0]["option_type"], "afbeelding")
+        self.assertEqual(options[0]["text"], "")
+        self.assertEqual(options[0]["image_data"], self.IMAGE)
+        self.assertEqual(options[1]["option_type"], "combinatie")
+
+    def test_reviewed_multiple_choice_requires_at_least_two_complete_options(self):
+        # Een vraag mag pas worden goedgekeurd als alle antwoordmogelijkheden
+        # daadwerkelijk zijn vastgelegd; lege regels zijn geen antwoordopties.
+        with self.assertRaisesRegex(ValueError, "minder dan twee"):
+            validate_question_analysis(self._payload([
+                {"letter": "A", "text": "", "image_data": self.IMAGE},
+            ]), {12})
+        with self.assertRaisesRegex(ValueError, "bevat geen tekst of afbeelding"):
+            validate_question_analysis(self._payload([
+                {"letter": "A", "text": ""},
+                {"letter": "B", "text": "Antwoord B"},
+            ]), {12})
+
+    def test_image_option_data_is_strictly_validated(self):
+        # Alleen een lokale JPEG-data-URL is toegestaan. Onverwachte URL's,
+        # bestandspaden en extreem grote payloads worden geweigerd.
+        with self.assertRaisesRegex(ValueError, "ongeldig of te groot"):
+            validate_question_analysis(self._payload([
+                {"letter": "A", "text": "", "image_data": "https://example.com/image.png"},
+                {"letter": "B", "text": "Antwoord B"},
+            ]), {12})
+        with self.assertRaisesRegex(ValueError, "ongeldig of te groot"):
+            validate_question_analysis(self._payload([
+                {"letter": "A", "text": "", "image_data": "data:image/jpeg;base64," + ("A" * 2_000_001)},
+                {"letter": "B", "text": "Antwoord B"},
+            ]), {12})
+
+    def test_image_only_options_survive_reopening_analysis(self):
+        # Het opnieuw openen van stap 4 mag een afbeelding zonder begeleidende
+        # tekst niet wegfilteren uit de eerder opgeslagen docentcorrectie.
+        question = {"question_number": 12, "question_type": "meerkeuze",
+                    "max_points": 1, "options": [], "reviewed": False}
+        saved = {"question_type": "meerkeuze", "max_points": 1,
+                 "options": [
+                     {"letter": "A", "text": "", "image_data": self.IMAGE},
+                     {"letter": "B", "text": "Tekstoptie"},
+                 ], "reviewed": False}
+        main._merge_saved_question_analysis(question, saved)
+        self.assertEqual([item["letter"] for item in question["options"]], ["A", "B"])
+        self.assertEqual(question["options"][0]["image_data"], self.IMAGE)
+
+    def test_step_four_contains_real_image_crop_and_explicit_review_controls(self):
+        # Controleer dat de UI daadwerkelijk een selectiekader over de
+        # PDF-afbeelding gebruikt en de crop als antwoordoptie kan opslaan.
+        static_dir = Path(main.__file__).resolve().parents[1] / "static"
+        app_js = (static_dir / "app.js").read_text(encoding="utf-8")
+        app_css = (static_dir / "app.css").read_text(encoding="utf-8")
+        self.assertIn("Afbeeldingsoptie uit deze pagina selecteren", app_js)
+        self.assertIn("drawImage(img", app_js)
+        self.assertIn("data-option-revision", app_js)
+        self.assertIn("analysis-crop-selection", app_css)
+        self.assertIn("analysis-option-preview", app_css)
