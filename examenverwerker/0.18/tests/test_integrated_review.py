@@ -358,6 +358,8 @@ class IntegratedReviewTests(unittest.TestCase):
     def test_reviewed_supplement_replaces_answer_proposal_and_stays_visible(self):
         """Antwoordherkenning ontvangt alleen het gecontroleerde supplementfragment."""
         exam_id = self.create_exam()
+        main.STORE.complete_step(exam_id, "supplement_starts", {"reviewed": True})
+        main.STORE.complete_step(exam_id, "supplement_fragments", {"reviewed_all_questions": True})
         main.STORE.complete_step(exam_id, "cv_aanvulling", {
             "fragments": [{
                 "selection_id": "supplement-fragment-1",
