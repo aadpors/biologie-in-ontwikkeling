@@ -5,6 +5,10 @@
  * verdwijnen metadata of voortgang niet wanneer de browser wordt vernieuwd.
  */
 const state = { examId: null, exam: null, workflow: [] };
+// Houd de gekozen PDF-bestanden los van de native file-input bij; zo kan de gebruiker
+// meerdere selectierondes combineren en afzonderlijke bestanden weer verwijderen.
+let selectedImportFiles = [];
+
 const $ = (selector) => document.querySelector(selector);
 
 async function api(url, options = {}) {
@@ -195,84 +199,141 @@ function showImportDialog({title, message, actions}) {
   });
 }
 
+// Bepaal de bundelsleutel op basis van de documentcode aan het einde van de
+// bestandsnaam. Opgaven, CV, uitwerkbijlage en aanvulling met dezelfde basis
+// horen bij één examen; verschillende bases worden aparte examenimports.
+function importBundleKey(file) {
+  let stem = file.name.replace(/\\.pdf$/i, '').trim();
+  stem = stem.replace(/-c-a[\\w.-]*$/i, '');
+  stem = stem.replace(/-(?:o|u|c|a)$/i, '');
+  return stem.toLocaleLowerCase('nl');
+}
+
+// Toon de selectie vóór importeren. Verwijderen raakt alleen de browserselectie;
+// er is nog niets naar de examenbibliotheek geüpload.
+function renderImportSelection() {
+  const target = $('#selectedImportFiles');
+  if (!target) return;
+  if (!selectedImportFiles.length) {
+    target.innerHTML = '<p class="muted">Nog geen PDF-bestanden geselecteerd.</p>';
+    $('#importSubmit').disabled = true;
+    return;
+  }
+  const groups = new Map();
+  selectedImportFiles.forEach((file, index) => {
+    const key = importBundleKey(file);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({file, index});
+  });
+  target.innerHTML = [...groups.entries()].map(([key, entries], groupIndex) => `
+    <section class="import-bundle">
+      <div class="section-heading"><strong>Examenbundel ${groupIndex + 1}</strong><span class="muted">${entries.length} bestand(en)</span></div>
+      <ul class="selected-file-list">${entries.map(({file,index}) => `
+        <li><span>${escapeHtml(file.name)} <small>(${(file.size / 1024 / 1024).toFixed(1)} MB)</small></span>
+          <button type="button" class="quiet" data-remove-import-file="${index}" aria-label="Verwijder ${escapeHtml(file.name)}">Verwijderen</button>
+        </li>`).join('')}</ul>
+    </section>`).join('');
+  target.querySelectorAll('[data-remove-import-file]').forEach(button => {
+    button.addEventListener('click', () => {
+      selectedImportFiles.splice(Number(button.dataset.removeImportFile), 1);
+      renderImportSelection();
+    });
+  });
+  $('#importSubmit').disabled = false;
+}
+
+// Selecteer in meerdere rondes: nieuwe bestanden worden toegevoegd in plaats
+// van de vorige selectie te vervangen. Dubbelen worden op naam en bestandsgrootte
+// tegengehouden; de inhoudelijke SHA-controle blijft op de server plaatsvinden.
+$('#pdfFiles').addEventListener('change', event => {
+  const incoming = [...event.target.files];
+  incoming.forEach(file => {
+    const duplicate = selectedImportFiles.some(existing =>
+      existing.name === file.name && existing.size === file.size && existing.lastModified === file.lastModified
+    );
+    if (!duplicate) selectedImportFiles.push(file);
+  });
+  event.target.value = '';
+  renderImportSelection();
+});
+
+async function uploadImportBundle(files) {
+  const form = new FormData();
+  files.forEach(file => form.append('files', file));
+  try {
+    return await api('/api/exams/import', {method:'POST', body:form});
+  } catch (error) {
+    // De bestaande importbeslissing blijft per examenbundel afzonderlijk:
+    // nooit wordt een tweede examen stilzwijgend als vervanging behandeld.
+    const detail = error.detail || null;
+    if (detail?.code !== 'duplicate_exam') throw error;
+    const action = await showImportDialog({
+      title: 'Dit examen is al geïmporteerd',
+      message: `"${detail.title}" staat al in de examenbibliotheek. Open de bestaande verwerking of start deze bundel opnieuw.`,
+      actions: [
+        {value:'continue', label:'Bestaande verwerking openen', primary:true},
+        {value:'restart', label:'Opnieuw importeren'},
+        {value:'cancel', label:'Deze bundel overslaan'}
+      ]
+    });
+    if (action === 'continue') return {existing_exam_id: detail.exam_id};
+    if (action !== 'restart') return {skipped:true};
+    const confirmation = await showImportDialog({
+      title:'Bestaande verwerking vervangen?',
+      message:'De bestaande verwerking en alle bijbehorende correcties worden definitief verwijderd. Alleen deze examenbundel wordt opnieuw geïmporteerd.',
+      actions:[
+        {value:'replace',label:'Deze import vervangen',danger:true},
+        {value:'back',label:'Terug'}
+      ]
+    });
+    if (confirmation !== 'replace') return {skipped:true};
+    form.append('replace_exam_id', detail.exam_id);
+    return await api('/api/exams/import', {method:'POST', body:form});
+  }
+}
+
 $('#importForm').addEventListener('submit', async event => {
   event.preventDefault();
   $('#importError').textContent = '';
-  const files = $('#pdfFiles').files;
-  if (!files.length) return;
-
-  // Bewaar de geselecteerde bestanden in één FormData-object. Bij een
-  // dubbele import wordt hetzelfde uploadpakket nogmaals verstuurd, nu met
-  // de expliciete opdracht om de oude verwerking te vervangen.
-  const form = new FormData();
-  [...files].forEach(file => form.append('files', file));
-  const button = event.submitter;
-  button.disabled = true;
-  button.textContent = 'PDF-bestanden controleren…';
+  if (!selectedImportFiles.length) return;
+  const submit = $('#importSubmit');
+  submit.disabled = true;
+  submit.textContent = 'Examenbundels importeren…';
   try {
-    let result;
-    try {
-      result = await api('/api/exams/import', { method: 'POST', body: form });
-    } catch (error) {
-      // api() bewaart de oorspronkelijke FastAPI-detailpayload op
-      // error.detail. Gebruik die gestructureerde payload rechtstreeks:
-      // error.message bevat alleen de leesbare melding en kan dus niet als
-      // JSON worden geparseerd. De fallback ondersteunt oudere API-fouten.
-      let detail = error.detail || null;
-      if (!detail) {
-        try { detail = JSON.parse(error.message); } catch (_) {}
-      }
-      if (detail?.code !== 'duplicate_exam') throw error;
-
-      // Gebruik een eigen dialoog met benoemde acties. Een browservenster met
-      // alleen 'OK' en 'Annuleren' maakt niet duidelijk welke handeling achter
-      // Annuleren zit en past niet bij de vormgeving van de werkruimte.
-      const duplicateAction = await showImportDialog({
-        title: 'Dit examen is al geïmporteerd',
-        message: `"${detail.title}" staat al in de examenbibliotheek. Je kunt de bestaande verwerking openen en verdergaan waar je gebleven was, of een volledig nieuwe verwerking starten.`,
-        actions: [
-          {value: 'continue', label: 'Verdergaan met bestaande import', primary: true},
-          {value: 'restart', label: 'Opnieuw importeren'},
-          {value: 'cancel', label: 'Annuleren'}
-        ]
-      });
-      if (duplicateAction === 'continue') {
-        $('#pdfFiles').value = '';
-        button.textContent = 'Bestaande verwerking openen…';
-        await openWorkspace(detail.exam_id);
-        return;
-      }
-      if (duplicateAction !== 'restart') {
-        $('#importError').textContent = 'Importeren geannuleerd. De bestaande verwerking is behouden.';
-        return;
-      }
-
-      // De tweede dialoog benoemt expliciet wat verloren gaat. Alleen de
-      // nadrukkelijke knop 'Import opnieuw starten' voert de vervanging uit.
-      const replaceExisting = await showImportDialog({
-        title: 'Bestaande verwerking vervangen?',
-        message: 'Opnieuw importeren verwijdert de bestaande import en alle bijbehorende verwerking definitief. De geselecteerde PDF-bestanden worden daarna opnieuw geïmporteerd. Deze handeling kan niet ongedaan worden gemaakt.',
-        actions: [
-          {value: 'replace', label: 'Import opnieuw starten', danger: true},
-          {value: 'back', label: 'Terug'}
-        ]
-      });
-      if (replaceExisting !== 'replace') {
-        $('#importError').textContent = 'Opnieuw importeren geannuleerd. De bestaande verwerking is behouden.';
-        return;
-      }
-
-      form.append('replace_exam_id', detail.exam_id);
-      button.textContent = 'Bestaande import vervangen…';
-      result = await api('/api/exams/import', { method: 'POST', body: form });
+    const groups = new Map();
+    selectedImportFiles.forEach(file => {
+      const key = importBundleKey(file);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(file);
+    });
+    const completed = [];
+    const skipped = [];
+    // Bundels worden sequentieel aangemaakt om piekgeheugen te beperken en
+    // om elke upload als zelfstandige, herstelbare examenimport af te handelen.
+    for (const [key, files] of groups) {
+      submit.textContent = `Importeren: ${completed.length + skipped.length + 1} van ${groups.size}…`;
+      const result = await uploadImportBundle(files);
+      if (result?.existing_exam_id) completed.push(result.existing_exam_id);
+      else if (result?.exam_id) completed.push(result.exam_id);
+      else skipped.push(files.map(file => file.name).join(', '));
     }
-    $('#pdfFiles').value = '';
-    await openWorkspace(result.exam_id);
+    selectedImportFiles = [];
+    renderImportSelection();
+    if (completed.length === 1 && groups.size === 1) {
+      await openWorkspace(completed[0]);
+    } else {
+      await showLibrary();
+      const summary = `${completed.length} examen(s) toegevoegd aan de bibliotheek.` +
+        (skipped.length ? ` Overgeslagen bundels: ${skipped.join(' | ')}.` : '');
+      $('#importError').textContent = summary;
+    }
   } catch (error) {
     $('#importError').textContent = error.message;
+    // De selectie blijft staan, zodat een mislukte import eenvoudig opnieuw
+    // kan worden geprobeerd zonder alle PDF's opnieuw te selecteren.
   } finally {
-    button.disabled = false;
-    button.textContent = 'Importeren en verwerken';
+    submit.disabled = selectedImportFiles.length === 0;
+    submit.textContent = 'Importeren en verwerken';
   }
 });
 
