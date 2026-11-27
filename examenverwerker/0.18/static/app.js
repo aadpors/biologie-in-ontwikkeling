@@ -320,7 +320,7 @@ function renderWorkspace() {
   // Een eerdere documentstap mag de extra leesruimte van de CV-aanvulling
   // niet onbedoeld meenemen. De betreffende klasse wordt hieronder alleen
   // opnieuw aangezet wanneer juist die fragmentstap wordt geopend.
-  stagePanel?.classList.remove('supplement-fragments-stage');
+  stagePanel?.classList.remove('supplement-fragments-stage', 'supplement-merge-stage');
   const exam = state.exam;
   $('#examTitle').textContent = exam.title;
   const metadata = exam.metadata;
@@ -501,6 +501,10 @@ async function renderSkipWorkbookStage() {
 
 async function renderCvSupplementStage() {
   const panel = $('#stagePanel');
+  // Dit is de stap waarin de docent de herkende tekst uit ieder CV-fragment
+  // leest. Geef juist dit leesvenster extra hoogte; de eerdere aanpassing aan
+  // de afbeeldingviewport raakte niet het tekstvenster waar het om gaat.
+  panel.classList.add('supplement-merge-stage');
   panel.innerHTML = '<p class="muted">Goedgekeurde fragmenten van de CV-aanvulling laden…</p>';
   try {
     const result = await api(`/api/exams/${state.examId}/cv-supplement`);
@@ -1775,10 +1779,6 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
   const isWorkbook = documentType === 'uitwerkbijlage';
   const isCv = documentType === 'correctievoorschrift';
   const isSupplement = documentType === 'aanvulling_correctievoorschrift';
-  // De aanvulling bevat vaak korte, opeenvolgende correctieregels. Geef deze
-  // review daarom een hoog leesvenster, zonder de andere documentstappen te
-  // veranderen. De CSS-klasse wordt bij iedere nieuwe werkruimte gereset.
-  panel.classList.toggle('supplement-fragments-stage', isSupplement);
   const isStitchedDocument = isWorkbook || isCv || isSupplement;
   const documentLabel = isWorkbook ? 'uitwerkbijlage' : isCv ? 'correctievoorschrift' : isSupplement ? 'aanvulling op het correctievoorschrift' : 'opgavenboekje';
   const stitchedReviewUrl = isStitchedDocument
