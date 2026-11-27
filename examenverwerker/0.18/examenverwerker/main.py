@@ -1763,6 +1763,14 @@ def save_cv_supplement_review(exam_id: str, payload: dict):
     if not isinstance(submitted, list):
         raise HTTPException(422, "De beoordeelde CV-aanvullingsfragmenten ontbreken.")
     expected_by_id = {item.get("selection_id"): item for item in expected_fragments}
+    # Een supplementfragment mag alleen worden gekoppeld aan een vraag die
+    # daadwerkelijk in het opgavendocument is goedgekeurd. Zo voorkomen we
+    # dat een tikfout later als een ontbrekend antwoord wordt geïnterpreteerd.
+    opgaven_numbers = {
+        item["question_number"]
+        for item in exam["steps"].get("opgaven_starts", {}).get("evidence", {}).get("candidates", [])
+        if item.get("accepted") and not item.get("removed")
+    }
     clean = []
     for item in submitted:
         if not isinstance(item, dict) or item.get("selection_id") not in expected_by_id:
@@ -1772,6 +1780,9 @@ def save_cv_supplement_review(exam_id: str, payload: dict):
         if action not in {"toevoegen", "vervangen", "handmatig", "negeren"}:
             raise HTTPException(422, "Kies per fragment een geldige verwerkingsactie.")
         numbers = source.get("question_numbers", [])
+        unknown_numbers = set(numbers) - opgaven_numbers
+        if unknown_numbers:
+            raise HTTPException(422, "CV-aanvullingsfragment verwijst naar onbekende examenvragen: " + str(sorted(unknown_numbers)))
         clean.append({
             "selection_id": item["selection_id"],
             "question_numbers": numbers,
