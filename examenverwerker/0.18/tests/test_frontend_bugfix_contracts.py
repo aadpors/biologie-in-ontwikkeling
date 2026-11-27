@@ -51,6 +51,12 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn(".stage-panel.supplement-fragments-stage .stitched-image-wrap img", css)
         self.assertIn("height: auto !important;", css)
 
+    def test_answer_review_restore_tolerates_older_saved_records_without_supplement_field(self):
+        backend = (ROOT / "examenverwerker" / "examenverwerker" / "main.py").read_text(encoding="utf-8")
+        # Oude reviews kunnen het supplementveld missen; herstel moet .get() gebruiken.
+        self.assertIn('saved[question["question_number"]].get(k, question.get(k))', backend)
+        self.assertIn('Oudere opgeslagen antwoordreviews bevatten nog niet altijd', backend)
+
     def test_context_group_cards_wrap_inside_inspector(self):
         css = APP_CSS.read_text(encoding="utf-8")
         for rule in [
