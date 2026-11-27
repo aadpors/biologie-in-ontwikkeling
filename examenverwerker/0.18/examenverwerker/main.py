@@ -291,7 +291,7 @@ def preview_page(exam_id: str, document_id: int, page_number: int):
 
 def _document_for_type(exam: dict, document_type: str):
     """Vind precies één bevestigd document van het gevraagde type."""
-    if document_type not in {"opgaven", "uitwerkbijlage", "correctievoorschrift"}:
+    if document_type not in {"opgaven", "uitwerkbijlage", "correctievoorschrift", "aanvulling_correctievoorschrift"}:
         raise HTTPException(404, "Dit documenttype heeft geen vraagstartreview.")
     matches = [doc for doc in exam["documents"]
                if exam["metadata"].get("document_types", {}).get(doc["filename"]) == document_type]
@@ -538,7 +538,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
     result["document"] = {"id": document["id"], "filename": document["filename"],
                           "sha256": document["sha256"]}
     step_key = {"opgaven":"opgaven_starts", "uitwerkbijlage":"uitwerk_starts",
-                "correctievoorschrift":"cv_starts"}[document_type]
+                "correctievoorschrift":"cv_starts", "aanvulling_correctievoorschrift":"supplement_starts"}[document_type]
     previous = exam["steps"].get(step_key, {}).get("evidence", {})
     if previous.get("candidates"):
         # Hergebruik menselijke beslissingen zolang de bronhash gelijk blijft.
@@ -816,6 +816,7 @@ def _fragment_step_keys(document_type: str) -> tuple[str, str]:
         "opgaven": ("opgaven_starts", "opgaven_fragments"),
         "uitwerkbijlage": ("uitwerk_starts", "uitwerk_fragments"),
         "correctievoorschrift": ("cv_starts", "cv_fragments"),
+        "aanvulling_correctievoorschrift": ("supplement_starts", "supplement_fragments"),
     }
     if document_type not in mapping:
         raise HTTPException(404, "Dit documenttype heeft geen fragmentreview.")
@@ -869,7 +870,7 @@ def _load_document_fragments(exam_id: str, document_type: str):
     # examenstrook leidend. Zo gebruikt de analyse exact dezelfde grenzen als
     # de docent in stap 3 heeft vastgesteld; de oude automatische voorstellen
     # blijven alleen als terugval beschikbaar voor oudere examendossiers.
-    if document_type in {"opgaven", "uitwerkbijlage", "correctievoorschrift"} and previous.get("stitched_selections"):
+    if document_type in {"opgaven", "uitwerkbijlage", "correctievoorschrift", "aanvulling_correctievoorschrift"} and previous.get("stitched_selections"):
         # Zowel de opgaven als de uitwerkbijlage gebruiken nu de visueel
         # goedgekeurde lange afbeelding als bron voor definitieve vraag-PNG's.
         # De selectiecoördinaten zijn daardoor exact gelijk aan de grenzen die
@@ -1266,7 +1267,7 @@ def get_stitched_document(exam_id: str, document_type: str):
     niet van toepassing. Bij CV's eindigt de afbeelding vóór de administratieve
     slotsectie, zodat die nooit in het laatste vraagfragment terechtkomt.
     """
-    if document_type not in {"uitwerkbijlage", "correctievoorschrift"}:
+    if document_type not in {"uitwerkbijlage", "correctievoorschrift", "aanvulling_correctievoorschrift"}:
         raise HTTPException(404, "Deze doorlopende fragmentreview is niet beschikbaar voor dit documenttype.")
     exam = STORE.get_exam(exam_id)
     if not exam:
@@ -2494,7 +2495,7 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
     if not payload or not payload.get("reviewed"):
         raise HTTPException(422, "Een stap kan alleen worden afgerond met expliciet controlebewijs.")
     previous = exam["steps"].get(step_key, {}).get("evidence", {})
-    if step_key in {"opgaven_starts", "uitwerk_starts", "cv_starts"}:
+    if step_key in {"opgaven_starts", "uitwerk_starts", "cv_starts", "supplement_starts"}:
         if not payload.get("reviewed_all_pages") or not previous.get("candidates"):
             raise HTTPException(422, "Controleer alle pagina's en sla de vraagstarts eerst op.")
         accepted_numbers = [item["question_number"] for item in previous["candidates"]
@@ -2516,7 +2517,7 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
     # De visuele fragmentset wordt als één geheel goedgekeurd. De browser zet
     # de interne reviewed-markeringen bij de expliciete afrondactie; de gebruiker
     # hoeft niet ieder fragment afzonderlijk af te vinken.
-    if step_key in {"opgaven_fragments", "uitwerk_fragments", "cv_fragments"}:
+    if step_key in {"opgaven_fragments", "uitwerk_fragments", "cv_fragments", "supplement_fragments"}:
         expected = set(previous.get("expected_question_numbers", []))
         reviewed_numbers = set(previous.get("reviewed_question_numbers", []))
         if (not previous.get("reviewed_all_questions") or not expected
@@ -2527,9 +2528,9 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
         # aanwezige aanvulling moet per pagina zijn beoordeeld.
         has_supplement = any(exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"
                              for doc in exam["documents"])
-        if has_supplement and (not previous.get("reviewed_all_pages") or
-                               any(not item.get("reviewed") for item in previous.get("items", []))):
-            raise HTTPException(422, "Controleer iedere pagina van de CV-aanvulling.")
+        if has_supplement and (not previous.get("reviewed_all_fragments") or
+                               not previous.get("fragments")):
+            raise HTTPException(422, "Beoordeel ieder fragment van de CV-aanvulling.")
         if not has_supplement and not payload.get("not_required"):
             raise HTTPException(422, "Bevestig dat er geen CV-aanvulling bij dit examen hoort.")
     if step_key == "antwoorden":
