@@ -2,6 +2,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import fitz
 from fastapi.testclient import TestClient
@@ -310,6 +311,27 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertEqual(published.status_code, 200, published.text)
         listed = self.client.get("/api/exams").json()
         self.assertTrue(next(item for item in listed if item["id"] == exam_id)["published"])
+
+
+    def test_final_review_autosave_does_not_rebuild_snippet_images(self):
+        """POST autosaves validate from stored evidence, not expensive snippet generation."""
+        exam_id = self.create_exam()
+        main.STORE.complete_step(exam_id, "opgaven_analyse", {"questions":[
+            {"question_number":1,"question_type":"meerkeuze","max_points":1}
+        ]})
+        main.STORE.complete_step(exam_id, "antwoorden", {"questions":[
+            {"question_number":1,"answer_kind":"meerkeuze","answer_text":"B","cv_max_points":1}
+        ]})
+        main.STORE.complete_step(exam_id, "snippets", {"expected_question_numbers":[1]})
+
+        # If the POST route still calls get_final_review(), this test fails.
+        with patch.object(main, "get_final_review", side_effect=AssertionError("snippet images rebuilt")):
+            saved = self.client.post(f"/api/exams/{exam_id}/final-review/review", json={
+                "draft":True,
+                "questions":[{"question_number":1,"reviewed":True,"resolution_note":""}]
+            })
+        self.assertEqual(saved.status_code, 200, saved.text)
+        self.assertTrue(saved.json()["complete"])
 
     def test_optional_workbook_can_be_skipped_only_when_absent(self):
         opgaven = self.pdf([["1p 1 Geef een verklaring."]])
