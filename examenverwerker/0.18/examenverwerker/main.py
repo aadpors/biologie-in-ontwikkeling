@@ -1722,6 +1722,17 @@ def get_cv_supplement(exam_id: str):
     for item in result["items"]:
         if item["page_number"] in saved:
             item.update({k: saved[item["page_number"]][k] for k in ("action", "question_numbers", "reviewed") if k in saved[item["page_number"]]})
+    # De pagina-analyse blijft beschikbaar als broninformatie, maar de
+    # inhoudelijke beoordeling gebruikt uitsluitend de goedgekeurde uitsneden.
+    if exam["steps"].get("supplement_starts", {}).get("status") == "complete":
+        result["fragments"] = _load_document_fragments(exam_id, "aanvulling_correctievoorschrift")["questions"]
+        decisions = previous.get("fragments", [])
+        by_id = {item.get("selection_id"): item for item in decisions}
+        for fragment in result["fragments"]:
+            decision = by_id.get(fragment.get("selection_id"), {})
+            fragment.update({key: decision[key] for key in ("action", "reviewed") if key in decision})
+    else:
+        result["fragments"] = []
     return result
 
 
@@ -1734,24 +1745,41 @@ def save_cv_supplement_review(exam_id: str, payload: dict):
     result = get_cv_supplement(exam_id)
     if result.get("not_required"):
         raise HTTPException(409, "Dit examen heeft geen aanvulling op het correctievoorschrift.")
-    expected = {item["page_number"] for item in result["items"]}
-    try:
-        review = validate_supplement_review(payload, expected)
-    except (ValueError, TypeError) as exc:
-        raise HTTPException(422, str(exc)) from exc
-    opgaven_numbers = {item["question_number"] for item in
-                       exam["steps"].get("opgaven_starts", {}).get("evidence", {}).get("candidates", [])
-                       if item.get("accepted") and not item.get("removed")}
-    for item in review["items"]:
-        unknown = set(item["question_numbers"]) - opgaven_numbers
-        if unknown:
-            raise HTTPException(422, f"Supplementpagina {item['page_number']} verwijst naar onbekende examenvragen: {sorted(unknown)}.")
-    review["document_sha256"] = result["document"]["sha256"]
-    # Een identieke autosave na afronden behoudt de bestaande goedkeuring.
+    # Elke beslissing hoort bij een werkelijk gegenereerd, visueel gecontroleerd
+    # vraagfragment. Pagina's als geheel worden niet langer in stap 10 ingevoerd.
+    expected_fragments = result.get("fragments", [])
+    submitted = payload.get("fragments")
+    if not isinstance(submitted, list):
+        raise HTTPException(422, "De beoordeelde CV-aanvullingsfragmenten ontbreken.")
+    expected_by_id = {item.get("selection_id"): item for item in expected_fragments}
+    clean = []
+    for item in submitted:
+        if not isinstance(item, dict) or item.get("selection_id") not in expected_by_id:
+            raise HTTPException(422, "Een beslissing verwijst naar een onbekend aanvullingsfragment.")
+        source = expected_by_id[item["selection_id"]]
+        action = item.get("action")
+        if action not in {"toevoegen", "vervangen", "handmatig", "negeren"}:
+            raise HTTPException(422, "Kies per fragment een geldige verwerkingsactie.")
+        numbers = source.get("question_numbers", [])
+        clean.append({
+            "selection_id": item["selection_id"],
+            "question_numbers": numbers,
+            "action": action,
+            "reviewed": bool(item.get("reviewed")),
+        })
+    if len(clean) != len(expected_by_id) or {item["selection_id"] for item in clean} != set(expected_by_id):
+        raise HTTPException(422, "Beoordeel ieder aanvullingsfragment precies één keer.")
+    review = {
+        "document_sha256": result["document"]["sha256"],
+        "fragments": clean,
+        "reviewed_count": sum(1 for item in clean if item["reviewed"]),
+        "fragment_count": len(clean),
+        "reviewed_all_fragments": bool(clean) and all(item["reviewed"] for item in clean),
+    }
     STORE.save_step_draft_preserving_identical_complete(
         exam_id, "cv_aanvulling", review, identity_fields=tuple(review.keys())
     )
-    return {"ok": True, **review, "complete": review["reviewed_all_pages"]}
+    return {"ok": True, **review, "complete": review["reviewed_all_fragments"]}
 
 
 @app.get("/api/exams/{exam_id}/answers")
