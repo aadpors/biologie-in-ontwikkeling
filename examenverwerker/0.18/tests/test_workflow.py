@@ -718,5 +718,58 @@ class WorkflowApplicationTests(unittest.TestCase):
         ))
 
 
+    def test_cv_supplement_has_its_own_question_start_and_fragment_stages(self):
+        """De aanvulling wordt vóór antwoordherkenning als document verwerkt."""
+        from examenverwerker.domain import STEP_BY_KEY
+
+        self.assertEqual(
+            main._fragment_step_keys("aanvulling_correctievoorschrift"),
+            ("supplement_starts", "supplement_fragments"),
+        )
+        self.assertEqual(
+            STEP_BY_KEY["supplement_starts"].requires,
+            ("metadata", "cv_fragments"),
+        )
+        self.assertEqual(
+            STEP_BY_KEY["supplement_fragments"].requires,
+            ("supplement_starts",),
+        )
+        self.assertEqual(
+            STEP_BY_KEY["cv_aanvulling"].requires,
+            ("supplement_fragments",),
+        )
+        self.assertIn("cv_aanvulling", STEP_BY_KEY["antwoorden"].requires)
+
+    def test_cv_supplement_document_type_uses_full_document_stitch(self):
+        """De aanvulling gebruikt dezelfde paginabrede stitchbasis als CV-fragmenten."""
+        document = fitz.open()
+        page = document.new_page(width=600, height=800)
+        page.insert_text((72, 100), "Aanvulling correctievoorschrift")
+        root = Path(self.temp.name)
+        pdf_path = root / "supplement.pdf"
+        document.save(pdf_path)
+        document.close()
+
+        first_page, end_page, start_y = main._stitched_page_selection(
+            pdf_path, "aanvulling_correctievoorschrift"
+        )
+        self.assertEqual(first_page, 0)
+        self.assertIsNone(end_page)
+        self.assertEqual(start_y, 0.0)
+
+        fake_exam = {
+            "documents": [{
+                "filename": "supplement.pdf",
+                "relative_path": str(pdf_path.relative_to(root)),
+                "metadata": {"document_type": "aanvulling_correctievoorschrift"},
+            }],
+            "metadata": {"document_types": {"supplement.pdf": "aanvulling_correctievoorschrift"}},
+        }
+        self.assertEqual(
+            main._document_for_type(fake_exam, "aanvulling_correctievoorschrift")["filename"],
+            "supplement.pdf",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
