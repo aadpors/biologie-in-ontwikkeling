@@ -835,6 +835,9 @@ class QuestionDetectionTests(unittest.TestCase):
             ("files", ("biologie-vwo-2026-tv2-o.pdf", sample, "application/pdf")),
             ("files", ("biologie-vwo-2026-tv2-u.pdf", sample, "application/pdf")),
             ("files", ("biologie-vwo-2026-tv2-c.pdf", sample, "application/pdf")),
+            # De CV-aanvulling gebruikt dezelfde vraagstartreview als de andere
+            # documentsoorten, maar bewaart de controle onder supplement_starts.
+            ("files", ("biologie-vwo-2026-tv2-a.pdf", sample, "application/pdf")),
         ])
         self.assertEqual(response.status_code, 200, response.text)
         exam_id = response.json()["exam_id"]
@@ -844,10 +847,15 @@ class QuestionDetectionTests(unittest.TestCase):
                 "biologie-vwo-2026-tv2-o.pdf":"opgaven",
                 "biologie-vwo-2026-tv2-u.pdf":"uitwerkbijlage",
                 "biologie-vwo-2026-tv2-c.pdf":"correctievoorschrift",
+                "biologie-vwo-2026-tv2-a.pdf":"aanvulling_correctievoorschrift",
             }
         })
         self.assertEqual(confirmed.status_code, 200, confirmed.text)
-        for document_type, step_key in [("uitwerkbijlage", "uitwerk_starts"), ("correctievoorschrift", "cv_starts")]:
+        for document_type, step_key in [
+            ("uitwerkbijlage", "uitwerk_starts"),
+            ("correctievoorschrift", "cv_starts"),
+            ("aanvulling_correctievoorschrift", "supplement_starts"),
+        ]:
             detected = self.client.get(f"/api/exams/{exam_id}/document-question-starts/{document_type}")
             self.assertEqual(detected.status_code, 200, detected.text)
             candidates = detected.json()["candidates"]
@@ -867,7 +875,11 @@ class QuestionDetectionTests(unittest.TestCase):
                 "reviewed_question_numbers":reviewed_numbers, "reviewed_all_questions":True
             })
             self.assertEqual(saved_fragments.status_code, 200, saved_fragments.text)
-            fragment_step = "uitwerk_fragments" if document_type == "uitwerkbijlage" else "cv_fragments"
+            fragment_step = {
+                "uitwerkbijlage": "uitwerk_fragments",
+                "correctievoorschrift": "cv_fragments",
+                "aanvulling_correctievoorschrift": "supplement_fragments",
+            }[document_type]
             completed_fragments = self.client.post(f"/api/exams/{exam_id}/steps/{fragment_step}/complete", json={"reviewed":True})
             self.assertEqual(completed_fragments.status_code, 200, completed_fragments.text)
 
