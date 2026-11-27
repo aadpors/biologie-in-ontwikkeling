@@ -40,3 +40,11 @@ De leerkring omvat vraagstarts, fragmentgrenzen en contextgroepen. Vraagstartken
 - `start-test.bat` start dezelfde applicatie met een **afzonderlijke** gegevensmap (`test-data/` in deze versie-map). Daarmee kunnen nieuwe imports en bugtests worden uitgevoerd zonder de bestaande examendatabase te wijzigen. Stop een eventueel draaiende server eerst met `Ctrl+C`; de testlauncher gebruikt eveneens poort 8000.
 - De testbibliotheek is bewust leeg. Importeer er een kopie of nieuw testexamen; de bestaande tweede examenimport staat niet in deze testbibliotheek.
 - `test-data/` is uitgesloten van Git.
+
+
+## Lokale start en versies herkennen
+
+- Start de applicatie vanuit deze map met `start.bat` of `start.ps1`. De scripts tonen bij het starten de versie en de lokale URL.
+- De startprocedure zoekt een vrije poort vanaf 8000 tot en met 8010. Als bijvoorbeeld een oudere instantie nog op poort 8000 draait, wordt deze niet afgesloten; de nieuwe instantie start op 8001. De browser wordt naar de nieuwe instantie geleid.
+- Controleer na het starten de versievermelding rechts naast de applicatienaam. Voor deze iteratie moet daar **0.18.4** staan.
+- Als geen vrije poort wordt gevonden, sluit dan een oude lokale examenverwerker en start opnieuw. Er worden nooit automatisch bestaande processen beëindigd.
