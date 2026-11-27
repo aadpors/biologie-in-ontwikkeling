@@ -1,4 +1,4 @@
-## Herstel CV-aanvulling — volledige pagina zichtbaar en scrollbaar
+## Herstel stap 12 — compatibiliteit met oudere antwoordreviews\n\n- Het ophalen van herkende antwoorden crasht niet meer wanneer een bestaande opgeslagen review het nieuwe veld `supplement_fragments` nog niet bevat. Ontbrekende velden worden veilig uit de actuele analyse overgenomen.\n\n## Herstel CV-aanvulling — volledige pagina zichtbaar en scrollbaar
 
 - De fragmentselectiestap van de CV-aanvulling krijgt nu een eigen afbeeldingsvenster van minimaal 360 px en ongeveer 70% van de schermhoogte (met een maximum van 900 px).
 - Het venster heeft altijd een verticale scrollbar; de samengevoegde PDF-afbeelding behoudt haar natuurlijke volledige hoogte en wordt niet tot één regel teruggebracht.
