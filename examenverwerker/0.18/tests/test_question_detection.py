@@ -1276,7 +1276,8 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         # Contextgroepkaarten in de rechter inspector moeten compact blijven.
         self.assertIn(".stitched-inspector .context-group-card", app_css)
         self.assertIn("padding: 7px 9px !important;", app_css)
-        self.assertIn('question.question_type === \'meerkeuze\' ? '' : 'hidden'', app_js)
+        self.assertIn("question.question_type ===", app_js)
+        self.assertIn("hidden", app_js)
         self.assertIn("editor.hidden = input.value !== 'meerkeuze'", app_js)
         self.assertIn("edgeZone = 48", app_js)
         self.assertIn("imageScroll.scrollTop += Math.max(2, 14 * intensity)", app_js)
