@@ -1726,10 +1726,20 @@ def get_cv_supplement(exam_id: str):
     # De pagina-analyse blijft beschikbaar als broninformatie, maar de
     # inhoudelijke beoordeling gebruikt uitsluitend de goedgekeurde uitsneden.
     if exam["steps"].get("supplement_starts", {}).get("status") == "complete":
-        result["fragments"] = _load_document_fragments(exam_id, "aanvulling_correctievoorschrift")["questions"]
+        raw_fragments = _load_document_fragments(exam_id, "aanvulling_correctievoorschrift")["questions"]
+        # Eén visuele uitsnede kan bij meerdere vraagnummers horen. Toon die
+        # uitsnede één keer in stap 9 en bewaar alle gekoppelde nummers samen.
+        grouped = {}
+        for fragment in raw_fragments:
+            key = fragment.get("selection_id")
+            if key not in grouped:
+                grouped[key] = {**fragment, "question_numbers": [], "segments": list(fragment.get("segments", []))}
+            grouped[key]["question_numbers"].append(fragment["question_number"])
+        result["fragments"] = list(grouped.values())
         decisions = previous.get("fragments", [])
         by_id = {item.get("selection_id"): item for item in decisions}
         for fragment in result["fragments"]:
+            fragment["question_numbers"] = sorted(set(fragment["question_numbers"]))
             decision = by_id.get(fragment.get("selection_id"), {})
             fragment.update({key: decision[key] for key in ("action", "reviewed") if key in decision})
     else:
@@ -2150,9 +2160,9 @@ def get_snippets(exam_id: str):
                else {"question_count": 0, "questions": [], "document": None})
     cv = _load_document_fragments(exam_id, "correctievoorschrift")
 
-    # De pagina's uit de CV-aanvulling zijn zelfstandige snippetbronnen.
-    # Gebruik alleen pagina's die tijdens stap 9 expliciet zijn beoordeeld,
-    # zodat een genegeerde pagina niet ongemerkt in de snippetset belandt.
+    # Definitieve aanvullingssnippets komen uitsluitend uit de goedgekeurde
+    # fragmentselecties. Een pagina als geheel wordt nooit meer als snippet
+    # opgenomen: de crop is dezelfde gecontroleerde uitsnede als in stap 9/10.
     supplement_snippets = []
     has_supplement = any(
         exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"
@@ -2161,21 +2171,19 @@ def get_snippets(exam_id: str):
     )
     if has_supplement:
         supplement = get_cv_supplement(exam_id)
-        supplement_review = exam["steps"].get("cv_aanvulling", {}).get("evidence", {})
-        reviewed_pages = {
-            item["page_number"]: item
-            for item in supplement_review.get("items", [])
-            if item.get("reviewed")
+        decisions = {
+            item["selection_id"]: item
+            for item in exam["steps"].get("cv_aanvulling", {}).get("evidence", {}).get("fragments", [])
         }
-        for item in supplement.get("items", []):
-            decision = reviewed_pages.get(item["page_number"])
-            if not decision or decision.get("action") == "negeren":
+        for fragment in supplement.get("fragments", []):
+            decision = decisions.get(fragment.get("selection_id"), {})
+            if not decision.get("reviewed") or decision.get("action") == "negeren":
                 continue
             supplement_snippets.append({
-                "page_number": item["page_number"],
-                "action": decision.get("action", item.get("action", "handmatig")),
-                "question_numbers": decision.get("question_numbers", item.get("question_numbers", [])),
-                "url": f"/api/exams/{exam_id}/documents/{supplement['document']['id']}/preview/{item['page_index']}",
+                "selection_id": fragment.get("selection_id"),
+                "action": decision["action"],
+                "question_numbers": fragment.get("question_numbers", []),
+                "urls": [segment["url"] for segment in fragment.get("segments", []) if segment.get("url")],
             })
 
     reviewed_uitwerk = set(previous.get("reviewed_uitwerk_numbers", []))
