@@ -1,3 +1,7 @@
+# CV-tekstextractie: regressietest op afwijkende renderfactor
+
+- Een regressietest controleert nu dat selectiecoördinaten uit een stitch met renderfactor 2.0 correct teruggezet worden naar PDF-coördinaten, zodat tekstlabels zoals `maximumscore 2` binnen de clip blijven.
+
 # Reparatie CV-tekstextractie — renderfactor
 
 - De omzetting van stitchpixel naar PDF-coördinaten gebruikt voortaan de werkelijke renderfactor uit paginametadata, in plaats van een vaste factor 1.25.
