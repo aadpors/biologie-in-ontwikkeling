@@ -1,5 +1,14 @@
 # Wijzigingen Examenverwerker 0.18
 
+## Nieuwe correcties na praktijktest
+
+- Stap 4 toont de antwoordoptie-editor alleen bij vragen die meerkeuze zijn; bij het wijzigen van het vraagtype schakelt de editor direct mee.
+- Bij het goedkeuren van de vraaganalyse geeft de knop onmiddellijk feedback dat de opslag en afronding bezig zijn.
+- Bij het verslepen van fragmentgrenzen scrollt het documentleesvenster geleidelijk wanneer de cursor dicht bij de boven- of onderrand komt.
+- Stap 9 (CV-aanvulling) haalt het examenrecord eerst op voordat de controle op gekoppelde vraagnummering plaatsvindt; dit voorkwam de Internal Server Error.
+- Regressietests toegevoegd voor de zichtbaarheid van de optie-editor, rand-scroll en het ontbrekende examenrecord.
+
+
 
 ## Visuele antwoordopties en compacte stap-3-inspector
 
