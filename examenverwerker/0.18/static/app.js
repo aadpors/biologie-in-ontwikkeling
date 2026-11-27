@@ -622,7 +622,7 @@ async function renderAnswersStage() {
     const checks=()=>[...document.querySelectorAll('[data-answer-reviewed]')];
     const refresh=()=>{$('#completeAnswers').disabled=checks().some(input=>!input.checked);};
     checks().forEach(input=>input.addEventListener('change',refresh)); refresh();
-    const collect=()=>cards.map(card=>{const n=Number(card.dataset.answerCard);return {question_number:n,answer_kind:card.querySelector(`[data-answer-kind="${n}"]`).value,answer_text:card.querySelector(`[data-answer-text="${n}"]`).value,reviewed:card.querySelector(`[data-answer-reviewed="${n}"]`).checked};});
+    const collect=()=>cards.map(card=>{const n=Number(card.dataset.answerCard);const detected=result.questions.find(question=>question.question_number===n)||{};return {question_number:n,answer_kind:card.querySelector(`[data-answer-kind="${n}"]`).value,answer_text:card.querySelector(`[data-answer-text="${n}"]`).value,cv_max_points:detected.cv_max_points,opgaven_max_points:detected.opgaven_max_points,reviewed:card.querySelector(`[data-answer-reviewed="${n}"]`).checked};});
     const save=()=>api(`/api/exams/${state.examId}/answers/review`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({questions:collect()})});
     bindStageAutoSave(panel, save, '#answersMessage');
     $('#saveAnswers').addEventListener('click',async()=>{try{const r=await save();$('#answersMessage').textContent=`${r.reviewed_count} van ${result.question_count} antwoorden gecontroleerd. Concept opgeslagen.`;}catch(error){$('#answersMessage').textContent=error.message;}});
