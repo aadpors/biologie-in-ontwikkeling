@@ -667,7 +667,8 @@ def _save_document_question_start_review(exam_id: str, document_type: str, paylo
     review["document_sha256"] = document["sha256"]
     review["detector_version"] = "0.18"
     step_key = {"opgaven":"opgaven_starts", "uitwerkbijlage":"uitwerk_starts",
-                "correctievoorschrift":"cv_starts"}[document_type]
+                "correctievoorschrift":"cv_starts",
+                "aanvulling_correctievoorschrift":"supplement_starts"}[document_type]
 
     # Een autosave kan pas aankomen nadat de gebruiker de stap al heeft
     # goedgekeurd. De opslaglaag vergelijkt de inhoud daarom binnen één
