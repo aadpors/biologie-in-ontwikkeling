@@ -73,6 +73,32 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn('"opgaven_max_points": (', backend)
         self.assertIn('else detected_by_number.get(item.get("question_number"), {}).get("cv_max_points")', backend)
 
+    def test_multi_exam_import_keeps_only_unprocessed_bundles_after_failure(self):
+        # Elke afgeronde of bewust overgeslagen bundel verdwijnt meteen uit
+        # de selectie. Een fout bij een volgende bundel mag geen reeds
+        # geïmporteerde bundel opnieuw aanbieden bij een retry.
+        js = APP_JS.read_text(encoding="utf-8")
+        start = js.index("for (const [key, files] of groups)")
+        end = js.index("if (completed.length === 1", start)
+        loop = js[start:end]
+        self.assertIn("const processedFiles = new Set(files);", loop)
+        self.assertIn("selectedImportFiles = selectedImportFiles.filter(file => !processedFiles.has(file));", loop)
+        self.assertIn("renderImportSelection();", loop)
+        self.assertNotIn("selectedImportFiles = [];", loop)
+
+    def test_launcher_avoids_an_already_running_old_server_and_marks_version(self):
+        root = Path(__file__).parents[1]
+        batch = (root / "start.bat").read_text(encoding="utf-8")
+        powershell = (root / "start.ps1").read_text(encoding="utf-8")
+        html = (root / "templates" / "index.html").read_text(encoding="utf-8")
+        backend = (root / "examenverwerker" / "main.py").read_text(encoding="utf-8")
+        self.assertIn("APP_PORT", batch)
+        self.assertIn("TcpListener", batch)
+        self.assertIn("CandidatePort", powershell)
+        self.assertIn("versie 0.18.3", html)
+        self.assertIn("app.js?v=0.18.3", html)
+        self.assertIn("Cache-Control", backend)
+
     def test_context_group_cards_wrap_inside_inspector(self):
         css = APP_CSS.read_text(encoding="utf-8")
         for rule in [
