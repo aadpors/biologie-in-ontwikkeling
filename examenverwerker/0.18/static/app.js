@@ -317,6 +317,10 @@ async function openWorkspace(examId) {
 function renderWorkspace() {
   const stagePanel = $('#stagePanel');
   if (stagePanel?._stageAutoSaveCleanup) stagePanel._stageAutoSaveCleanup();
+  // Een eerdere documentstap mag de extra leesruimte van de CV-aanvulling
+  // niet onbedoeld meenemen. De betreffende klasse wordt hieronder alleen
+  // opnieuw aangezet wanneer juist die fragmentstap wordt geopend.
+  stagePanel?.classList.remove('supplement-fragments-stage');
   const exam = state.exam;
   $('#examTitle').textContent = exam.title;
   const metadata = exam.metadata;
@@ -1771,6 +1775,10 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
   const isWorkbook = documentType === 'uitwerkbijlage';
   const isCv = documentType === 'correctievoorschrift';
   const isSupplement = documentType === 'aanvulling_correctievoorschrift';
+  // De aanvulling bevat vaak korte, opeenvolgende correctieregels. Geef deze
+  // review daarom een hoog leesvenster, zonder de andere documentstappen te
+  // veranderen. De CSS-klasse wordt bij iedere nieuwe werkruimte gereset.
+  panel.classList.toggle('supplement-fragments-stage', isSupplement);
   const isStitchedDocument = isWorkbook || isCv || isSupplement;
   const documentLabel = isWorkbook ? 'uitwerkbijlage' : isCv ? 'correctievoorschrift' : isSupplement ? 'aanvulling op het correctievoorschrift' : 'opgavenboekje';
   const stitchedReviewUrl = isStitchedDocument
