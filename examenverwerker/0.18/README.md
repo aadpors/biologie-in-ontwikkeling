@@ -32,3 +32,11 @@ De afbeelding wordt niet door OCR geïnterpreteerd. De docent controleert de vis
 ## Uitbreiding
 
 De leerkring omvat vraagstarts, fragmentgrenzen en contextgroepen. Vraagstartkenmerken worden gebruikt als uitlegbare rangschikkingshint. Handmatig aangepaste fragmentgrenzen worden als offsets ten opzichte van de automatische referentie bewaard en per documenttype samengevat. Correcties op contextgroepen leveren mediane verschuivingen van het vraagbereik op; vanaf vijf voorbeelden worden die toegepast op nieuwe tekstgebaseerde contextvoorstellen. Handmatig geselecteerde contexten en eerder opgeslagen docentbeslissingen blijven onaangetast.
+
+ 
+## Veilige testomgeving
+
+- `start.bat` gebruikt de gedeelde gegevensmap van de examenverwerker. Bestaande examens blijven daarin beschikbaar.
+- `start-test.bat` start dezelfde applicatie met een **afzonderlijke** gegevensmap (`test-data/` in deze versie-map). Daarmee kunnen nieuwe imports en bugtests worden uitgevoerd zonder de bestaande examendatabase te wijzigen.
+- De testbibliotheek is bewust leeg. Importeer er een kopie of nieuw testexamen; de bestaande tweede examenimport staat niet in deze testbibliotheek.
+- `test-data/` is uitgesloten van Git.
