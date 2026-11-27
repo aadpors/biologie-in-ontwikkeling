@@ -47,7 +47,7 @@ def detect_cv_max_points(text: str, question_number: int | None = None) -> int |
     # losse puntengetal uit de volgende regels. We gokken nooit op een
     # getal dat pas na een nieuw vraagnummer of een ander rubriclabel staat.
     for index, line in enumerate(lines):
-        if re.search(r"maximum\s*score|maximum\s*$", line, re.IGNORECASE):
+        if re.search(r"(?:maximum\s*score|max\.?\s*score|maxscore|score\s*(?:maximum|max\.?))|maximum\s*$|max\.?\s*$", line, re.IGNORECASE):
             for following in lines[index + 1:index + 4]:
                 if re.fullmatch(r"\d{1,2}", following):
                     value = int(following)
