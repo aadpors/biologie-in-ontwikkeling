@@ -1399,7 +1399,11 @@ def get_stitched_document(exam_id: str, document_type: str):
 @app.get("/api/stitched-document-images/{exam_id}/{document_type}/{filename}")
 def stitched_document_image(exam_id: str, document_type: str, filename: str):
     """Serveer de afgeleide lange afbeelding voor de geselecteerde documentsoort."""
-    if document_type not in {"uitwerkbijlage", "correctievoorschrift"} or filename != "exam-long.png":
+    # De CV-aanvulling gebruikt dezelfde lange, gerenderde afbeelding als
+    # de uitwerkbijlage en het reguliere CV. Deze route-whitelist moet dus
+    # ook het supplement toelaten; anders wordt de afbeelding wel opgebouwd
+    # en in de reviewdata opgenomen, maar kan de browser haar niet ophalen.
+    if document_type not in {"uitwerkbijlage", "correctievoorschrift", "aanvulling_correctievoorschrift"} or filename != "exam-long.png":
         raise HTTPException(404, "Afbeelding niet gevonden.")
     if not re.fullmatch(r"[a-f0-9]{12}", exam_id) or not STORE.get_exam(exam_id):
         raise HTTPException(404, "Examen niet gevonden.")
