@@ -1965,6 +1965,20 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       if (!boundaryDrag) return;
       const item = selections[boundaryDrag.index];
       if (!item) return;
+      // Wanneer de cursor tijdens het grensslepen de rand van het
+      // leesvenster nadert, scrollen we het lange document geleidelijk mee.
+      // Omdat de scrollcontainer en afbeelding verschuiven, berekenen we de
+      // beeldcoördinaat pas na de scrollbeweging opnieuw.
+      const scrollRect = imageScroll.getBoundingClientRect();
+      const edgeZone = 48;
+      if (event.clientY < scrollRect.top + edgeZone && imageScroll.scrollTop > 0) {
+        const intensity = Math.min(1, (scrollRect.top + edgeZone - event.clientY) / edgeZone);
+        imageScroll.scrollTop -= Math.max(2, 14 * intensity);
+      } else if (event.clientY > scrollRect.bottom - edgeZone
+          && imageScroll.scrollTop < imageScroll.scrollHeight - imageScroll.clientHeight) {
+        const intensity = Math.min(1, (event.clientY - (scrollRect.bottom - edgeZone)) / edgeZone);
+        imageScroll.scrollTop += Math.max(2, 14 * intensity);
+      }
       const y = imageY(event);
       if (y === null) return;
       if (boundaryDrag.edge === 'top') {
@@ -2707,7 +2721,7 @@ async function renderQuestionAnalysisStage() {
               <input type="number" min="0" max="20" step="1" value="${question.max_points ?? ''}" placeholder="Nog bepalen" data-analysis-points="${number}">
             </label>
           </div>
-          <section class="analysis-options-editor" aria-label="Antwoordopties van vraag ${number}">
+          <section class="analysis-options-editor" aria-label="Antwoordopties van vraag ${number}" ${question.question_type === 'meerkeuze' ? '' : 'hidden'}>
             <input type="hidden" data-option-revision="${number}" value="0">
             <div class="analysis-options-heading">
               <div><h4>Antwoordopties</h4><p>Een optie kan tekst, een afbeelding of beide bevatten.</p></div>
@@ -2994,6 +3008,10 @@ async function renderQuestionAnalysisStage() {
         const number = Number(input.dataset.analysisType ?? input.dataset.analysisPoints);
         const reviewed = panel.querySelector(`[data-analysis-reviewed="${number}"]`);
         if (reviewed) reviewed.checked = false;
+        if (input.dataset.analysisType) {
+          const editor = panel.querySelector(`[data-analysis-card="${number}"] .analysis-options-editor`);
+          if (editor) editor.hidden = input.value !== 'meerkeuze';
+        }
         refreshComplete();
       });
     });
@@ -3033,6 +3051,8 @@ async function renderQuestionAnalysisStage() {
       if(completingQuestionAnalysis) return;
       completingQuestionAnalysis=true;
       button.disabled=true;
+      button.textContent='Review opslaan en stap afronden…';
+      $('#questionAnalysisMessage').textContent='De gecontroleerde vragen worden opgeslagen. Dit kan even duren…';
       try {
         const optionIssues = getOptionIssues();
         if (optionIssues.length) throw new Error('Controleer eerst de antwoordopties: ' + optionIssues.join('; ') + '.');
@@ -3042,9 +3062,11 @@ async function renderQuestionAnalysisStage() {
           method:'POST', headers:{'Content-Type':'application/json'},
           body:JSON.stringify({reviewed:true, reviewed_all_questions:true, reviewed_count:saved.reviewed_count})
         });
+        $('#questionAnalysisMessage').textContent='Vraaganalyse afgerond. Workflow wordt bijgewerkt…';
         await openWorkspace(state.examId);
       } catch (error) {
         completingQuestionAnalysis=false;
+        button.textContent='Vraaganalyse goedkeuren en doorgaan';
         refreshComplete();
         $('#questionAnalysisMessage').textContent = error.message;
       }
