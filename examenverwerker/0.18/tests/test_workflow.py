@@ -793,5 +793,41 @@ class WorkflowApplicationTests(unittest.TestCase):
         self.assertTrue(steps["supplement_starts"]["evidence"]["not_applicable"])
 
 
+    def test_cv_supplement_detects_explicit_vraag_headings(self):
+        """Supplementen met 'Vraag 22:' gebruiken dezelfde visuele reviewlaag."""
+        supplement_pdf = fitz.open()
+        page = supplement_pdf.new_page()
+        page.insert_text((60, 90), "Aanvulling op het correctievoorschrift")
+        page.insert_text((60, 150), "Vraag 22: de eerdere beoordelingsregel wordt vervangen.")
+        page.insert_text((60, 220), "Vraag 23: voeg een extra antwoordmogelijkheid toe.")
+        supplement_bytes = supplement_pdf.tobytes()
+        supplement_pdf.close()
+
+        imported = self.client.post("/api/exams/import", files=[
+            ("files", ("biologie-vwo-2026-tv2-o.pdf", self.pdf_bytes(), "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-c.pdf", self.pdf_bytes("Correctievoorschrift"), "application/pdf")),
+            ("files", ("biologie-vwo-2026-tv2-a.pdf", supplement_bytes, "application/pdf")),
+        ])
+        self.assertEqual(imported.status_code, 200, imported.text)
+        exam_id = imported.json()["exam_id"]
+        confirmed = self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
+            "subject": "biologie", "level": "vwo", "year": 2026, "period": 2,
+            "document_types": {
+                "biologie-vwo-2026-tv2-o.pdf": "opgaven",
+                "biologie-vwo-2026-tv2-c.pdf": "correctievoorschrift",
+                "biologie-vwo-2026-tv2-a.pdf": "aanvulling_correctievoorschrift",
+            },
+        })
+        self.assertEqual(confirmed.status_code, 200, confirmed.text)
+        starts = self.client.get(
+            f"/api/exams/{exam_id}/document-question-starts/aanvulling_correctievoorschrift"
+        )
+        self.assertEqual(starts.status_code, 200, starts.text)
+        self.assertEqual(
+            [item["question_number"] for item in starts.json()["candidates"]],
+            [22, 23],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
