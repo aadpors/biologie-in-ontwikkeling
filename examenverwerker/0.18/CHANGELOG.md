@@ -109,3 +109,9 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 
 
 - **Maximumscores uit CV herkennen:** herkenning uitgebreid met varianten zoals `max. score`, `maxscore` en labels die over meerdere regels zijn verdeeld; regressietests toegevoegd.
+
+### Herstel: maximumscores van stap 12 naar stap 15
+- Oorzaak: de browser stuurde bij het opslaan van stap 12 alleen antwoordvorm, antwoordtekst en reviewstatus mee. De herkende CV- en opgavenscores stonden daardoor wel op het scherm, maar ontbraken in de opgeslagen `antwoorden`-evidence die stap 15 uitleest.
+- De browser stuurt de herkende scores nu expliciet mee. De API vult ontbrekende scorevelden bovendien zelf aan vanuit de actuele serveranalyse, zodat ook oudere browserclients geen scores meer verliezen.
+- Bestaande niet-lege opgeslagen scorecorrecties blijven behouden. De integrale eindcontrole leest vervolgens de opgeslagen scores zoals bedoeld.
+- Er is een regressietest toegevoegd voor de overdracht en opslag van beide scorevelden.
