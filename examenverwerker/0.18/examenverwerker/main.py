@@ -893,6 +893,7 @@ def _load_document_fragments(exam_id: str, document_type: str):
                 "opgaven": "stap 3 (Vraagfragmenten opgaven)",
                 "uitwerkbijlage": "stap 6 (Fragmenten uitwerkbijlage)",
                 "correctievoorschrift": "stap 8 (Correctievoorschrift verwerken)",
+                "aanvulling_correctievoorschrift": "stap 9 (CV-aanvulling verwerken)",
             }[document_type]
             raise HTTPException(
                 409,
@@ -1363,7 +1364,7 @@ def stitched_document_image(exam_id: str, document_type: str, filename: str):
 @app.post("/api/exams/{exam_id}/stitched-document/{document_type}/review")
 def save_stitched_document_review(exam_id: str, document_type: str, payload: dict):
     """Bewaar vraagfragmenten van de doorlopende uitwerkbijlage of het CV."""
-    if document_type not in {"uitwerkbijlage", "correctievoorschrift"}:
+    if document_type not in {"uitwerkbijlage", "correctievoorschrift", "aanvulling_correctievoorschrift"}:
         raise HTTPException(404, "Deze fragmentreview is niet beschikbaar voor dit documenttype.")
     exam = STORE.get_exam(exam_id)
     if not exam:
@@ -2665,7 +2666,7 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
     # Vraagstartreviews worden pas als leervoorbeeld vastgelegd wanneer de
     # docent de volledige detectiestap expliciet afrondt. Autosaves leveren
     # dus geen dubbele of onvolledige trainingsvoorbeelden op.
-    if step_key in {"opgaven_starts", "uitwerk_starts", "cv_starts"}:
+    if step_key in {"opgaven_starts", "uitwerk_starts", "cv_starts", "supplement_starts"}:
         prior_status = exam["steps"].get(step_key, {}).get("status")
         reviewed_evidence = {**previous, **payload}
         if prior_status != "complete" and reviewed_evidence.get("reviewed"):
@@ -2673,6 +2674,7 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
                 "opgaven_starts": "opgaven",
                 "uitwerk_starts": "uitwerkbijlage",
                 "cv_starts": "correctievoorschrift",
+                "supplement_starts": "aanvulling_correctievoorschrift",
             }[step_key]
             document = _document_for_type(exam, document_type)
             source_path = DATA / document["relative_path"]
