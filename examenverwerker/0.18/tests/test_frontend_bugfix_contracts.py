@@ -60,6 +60,19 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn('saved_value = saved_question.get(key)', backend)
         self.assertIn('if saved_value is not None or current_value is None:', backend)
 
+    def test_answer_review_sends_server_detected_scores_to_persistent_evidence(self):
+        # Stap 12 toont de herkende scores, maar de antwoordvelden zelf zijn
+        # niet bewerkbaar. De browser moet ze meesturen; de backend vult ze
+        # bovendien server-side aan zodat een oudere client ze niet verliest.
+        js = APP_JS.read_text(encoding="utf-8")
+        backend = (ROOT / "examenverwerker" / "main.py").read_text(encoding="utf-8")
+        self.assertIn("cv_max_points:detected.cv_max_points", js)
+        self.assertIn("opgaven_max_points:detected.opgaven_max_points", js)
+        self.assertIn('detected_by_number = {', backend)
+        self.assertIn('"cv_max_points": (', backend)
+        self.assertIn('"opgaven_max_points": (', backend)
+        self.assertIn('else detected_by_number.get(item.get("question_number"), {}).get("cv_max_points")', backend)
+
     def test_context_group_cards_wrap_inside_inspector(self):
         css = APP_CSS.read_text(encoding="utf-8")
         for rule in [
