@@ -133,3 +133,8 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 
 - Bij een gedeeltelijk mislukte batchimport blijven alleen nog niet verwerkte examenbundels in de selectie staan. Eerder geslaagde of bewust overgeslagen bundels worden direct verwijderd, zodat opnieuw proberen geen dubbele import veroorzaakt.
 - Regressietests toegevoegd voor de importretry, poortkeuze en versie-/cacheherkenning.
+
+## 0.18.4 — afronding importpresentatie
+
+- De opmaak van de geselecteerde bestanden sluit nu aan op de daadwerkelijke lijststructuur van de interface.
+- Versie- en cacheaanduidingen verhoogd naar 0.18.4, zodat ook deze laatste presentatiecorrectie gegarandeerd als nieuwe browserasset wordt geladen.
