@@ -2547,9 +2547,18 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
             raise HTTPException(422, "Controleer alle vragen in de integrale eindcontrole.")
         # Conceptopslag mag een nog ontbrekende toelichting bewaren; definitief
         # afronden mag niet zolang een scoreverschil onverklaard blijft.
-        final_data = get_final_review(exam_id)
-        mismatched = {item["question_number"] for item in final_data["questions"]
-                      if item["points_match"] is False}
+        # Gebruik de opgeslagen score-evidence: ook deze laatste knop hoeft
+        # geen context-/vraag-/CV-afbeeldingen opnieuw te genereren.
+        analysis = exam["steps"].get("opgaven_analyse", {}).get("evidence", {}).get("questions", [])
+        answers = exam["steps"].get("antwoorden", {}).get("evidence", {}).get("questions", [])
+        analysis_by = {item.get("question_number"): item for item in analysis if isinstance(item, dict)}
+        answers_by = {item.get("question_number"): item for item in answers if isinstance(item, dict)}
+        mismatched = {
+            number for number in analysis_by.keys() & answers_by.keys()
+            if analysis_by[number].get("max_points") is not None
+            and answers_by[number].get("cv_max_points") is not None
+            and analysis_by[number].get("max_points") != answers_by[number].get("cv_max_points")
+        }
         unresolved = [item["question_number"] for item in questions
                       if item["question_number"] in mismatched and not item.get("resolution_note", "").strip()]
         if unresolved:
