@@ -1943,6 +1943,11 @@ def get_answers(exam_id: str):
             # veld in de opgeslagen review ontbreekt. Dit voorkomt een KeyError
             # bij het openen van stap 12 na een upgrade.
             saved_question = saved[question["question_number"]]
+            # Zodra een maximumscore eerder is opgeslagen, is die waarde
+            # mogelijk door de docent aangepast. Toon dan niet ten onrechte
+            # de herkomst van de actuele automatische herkenning.
+            if saved_question.get("cv_max_points") is not None:
+                question["points_reason"] = "Score uit eerder opgeslagen controle."
             # Een eerder opgeslagen review kan een None bevatten omdat de
             # scoreherkenning in een vorige versie nog niet werkte. Laat zo'n
             # lege oude waarde een nieuw automatisch herkend maximum niet
