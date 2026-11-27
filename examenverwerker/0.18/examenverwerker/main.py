@@ -329,7 +329,7 @@ def _load_document_question_starts(exam_id: str, document_type: str):
                             continue
                         for line in block.get("lines", []):
                             line_text = " ".join(span.get("text", "") for span in line.get("spans", [])).strip()
-                            match = re.match(r"^vraag\\s+(?P<number>\\d{1,2})\\s*[:.)]?\\s*(?P<rest>.*)$", line_text, re.IGNORECASE)
+                            match = re.match(r"^vraag\s+(?P<number>\d{1,2})\s*[:.)]?\s*(?P<rest>.*)$", line_text, re.IGNORECASE)
                             if not match:
                                 continue
                             number = int(match.group("number"))
