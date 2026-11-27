@@ -122,3 +122,11 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 - De selectie wordt vóór upload getoond, inclusief bundelindeling en bestandsgrootte. Een afzonderlijk bestand kan met één actie uit de selectie worden verwijderd.
 - Dubbelen binnen de selectie worden tegengehouden. Bij een importfout blijft de selectie beschikbaar om opnieuw te proberen.
 - Reeds bestaande examens worden per bundel afzonderlijk afgehandeld; een bestaande verwerking wordt nooit automatisch vervangen.
+
+
+## 0.18.3 — betrouwbare lokale start en versieherkenning
+
+- De startbestanden zoeken nu eerst een vrije lokale poort vanaf 8000. Als een oude Examenverwerker nog actief is, wordt die niet afgesloten en wordt de nieuwe versie op de eerstvolgende vrije poort gestart.
+- De browser wordt geopend op exact de poort waarop de nieuwe server start; een oude server kan daardoor niet ongemerkt als de nieuwe versie worden getoond.
+- De startpagina toont zichtbaar versienummer 0.18.3. De HTML krijgt no-cache-headers en de CSS- en JavaScript-verwijzingen gebruiken een nieuwe cacheversie.
+- De selectie van meerdere importbestanden heeft nu expliciete opmaak voor examenbundels en individuele verwijderknoppen.
