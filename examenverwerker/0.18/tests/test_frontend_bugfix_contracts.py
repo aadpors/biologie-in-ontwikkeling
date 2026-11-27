@@ -95,8 +95,8 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn("APP_PORT", batch)
         self.assertIn("TcpListener", batch)
         self.assertIn("CandidatePort", powershell)
-        self.assertIn("versie 0.18.3", html)
-        self.assertIn("app.js?v=0.18.3", html)
+        self.assertIn("versie 0.18.4", html)
+        self.assertIn("app.js?v=0.18.4", html)
         self.assertIn("Cache-Control", backend)
 
     def test_context_group_cards_wrap_inside_inspector(self):
