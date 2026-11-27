@@ -41,7 +41,11 @@ def detect_cv_max_points(text: str, question_number: int | None = None) -> int |
     # afzonderlijke regels of kolommen. Doorloop daarom eerst de volledige
     # tekst met whitespace-normalisatie; de reguliere expressie accepteert
     # zowel "maximumscore 2" als "maximum score\\n2".
-    normalized_text = re.sub(r"\s+", " ", text).strip()
+    # Sommige OCR-/PDF-exportlagen serialiseren regeleinden letterlijk als
+    # de twee tekens \\ en n (of r). Zet die representaties eerst om; daarna
+    # kunnen dezelfde robuuste patronen zowel echte als ge-escapete regeleinden lezen.
+    prepared_text = re.sub(r"\\[rn]", " ", text)
+    normalized_text = re.sub(r"\s+", " ", prepared_text).strip()
     maximum = MAX_SCORE.search(normalized_text)
     if maximum:
         return int(maximum.group(1))
