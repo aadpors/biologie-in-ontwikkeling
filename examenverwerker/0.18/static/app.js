@@ -294,6 +294,11 @@ async function openWorkspace(examId) {
       state.exam = await api(`/api/exams/${examId}`);
       next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
     }
+    if (['supplement_starts', 'supplement_fragments'].includes(next?.key) && !examHasDocumentType('aanvulling_correctievoorschrift')) {
+      await api(`/api/exams/${examId}/skip-optional-supplement`, {method:'POST'});
+      state.exam = await api(`/api/exams/${examId}`);
+      next = state.workflow.find(step => state.exam.steps[step.key]?.status !== 'complete');
+    }
     if (next?.key === 'cv_aanvulling' && !examHasDocumentType('aanvulling_correctievoorschrift')) {
       await api(`/api/exams/${examId}/steps/cv_aanvulling/complete`, {
         method:'POST', headers:{'Content-Type':'application/json'},
