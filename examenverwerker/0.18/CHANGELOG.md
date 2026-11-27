@@ -1,3 +1,9 @@
+## Herstel CV-aanvulling — volledige pagina zichtbaar en scrollbaar
+
+- De fragmentselectiestap van de CV-aanvulling krijgt nu een eigen afbeeldingsvenster van minimaal 360 px en ongeveer 70% van de schermhoogte (met een maximum van 900 px).
+- Het venster heeft altijd een verticale scrollbar; de samengevoegde PDF-afbeelding behoudt haar natuurlijke volledige hoogte en wordt niet tot één regel teruggebracht.
+- De wijziging is beperkt tot de CV-aanvulling en lekt niet door naar de andere documentstappen.
+
 ## CV-aanvulling als volwaardig fragmentdocument
 
 - Voeg afzonderlijke vraagstartdetectie en visuele vraagstartcontrole toe voor het aanvullingsdocument.
