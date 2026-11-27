@@ -330,8 +330,12 @@ class IntegratedReviewTests(unittest.TestCase):
                 "draft":True,
                 "questions":[{"question_number":1,"reviewed":True,"resolution_note":""}]
             })
-        self.assertEqual(saved.status_code, 200, saved.text)
-        self.assertTrue(saved.json()["complete"])
+            self.assertEqual(saved.status_code, 200, saved.text)
+            self.assertTrue(saved.json()["complete"])
+            completed = self.client.post(f"/api/exams/{exam_id}/steps/eindcontrole/complete", json={
+                "reviewed":True,"reviewed_all_questions":True
+            })
+        self.assertEqual(completed.status_code, 200, completed.text)
 
     def test_optional_workbook_can_be_skipped_only_when_absent(self):
         opgaven = self.pdf([["1p 1 Geef een verklaring."]])
