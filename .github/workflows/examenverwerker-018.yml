@@ -1,4 +1,5 @@
 name: Examenverwerker 0.18
+# Deze workflow valideert ook de documentstappen van de CV-aanvulling.
 on:
   push:
     paths:
