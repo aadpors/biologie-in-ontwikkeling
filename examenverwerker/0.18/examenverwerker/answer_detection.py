@@ -22,7 +22,7 @@ MC_INLINE = re.compile(r"^\s*([A-E])\s{2,}([012])\s*$", re.IGNORECASE)
 # deze regex niet om te voorkomen dat een willekeurige tabelrij wordt gelezen.
 MC_TABLE_LINE = re.compile(r"^\s*(\d{1,2})\s+([A-E])\s+([012])\s*$", re.IGNORECASE)
 CLOSED_LINE = re.compile(r"^\s*(\d{1,2})\s+(juist|onjuist|wel|geen|niet|meer|minder|hoger|lager|ja|nee)\s*$", re.IGNORECASE)
-MAX_SCORE = re.compile(r"maximum\s*score\s*[:：-]?\s*(\d{1,2})", re.IGNORECASE)
+MAX_SCORE = re.compile(r"(?:maximum\s*score|max\.?\s*score|maxscore|score\s*(?:maximum|max\.?))\s*[:：=–-]?\s*(\d{1,2})", re.IGNORECASE)
 
 
 def _lines(text: str) -> list[str]:
