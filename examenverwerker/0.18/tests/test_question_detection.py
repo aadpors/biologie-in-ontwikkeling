@@ -826,7 +826,7 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertFalse(result["reviewed_all_questions"])
         payload["questions"][1]["reviewed"] = True
         self.assertTrue(validate_question_analysis(payload, {1,2})["reviewed_all_questions"])
-        with self.assertRaisesRegex(ValueError, "dubbel genummerde"):
+        with self.assertRaisesRegex(ValueError, "Dubbele antwoordletter"):
             validate_question_analysis({"questions":[{"question_number":1,"question_type":"meerkeuze",                "max_points":2,"options":[{"letter":"A","text":"x"},{"letter":"A","text":"y"}],"reviewed":True}]}, {1})
 
     def test_question_start_review_is_reused_for_answer_sheet_and_marking_scheme(self):
