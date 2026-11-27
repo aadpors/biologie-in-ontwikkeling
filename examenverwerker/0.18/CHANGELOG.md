@@ -1,6 +1,7 @@
 ## CV-aanvulling als volwaardig fragmentdocument
 
 - Voeg afzonderlijke vraagstartdetectie en visuele vraagstartcontrole toe voor het aanvullingsdocument.
+- Herken ook expliciete koppen als `Vraag 22:` in aanvullings-PDF's; deze worden als controleerbare kandidaten aan de bestaande visuele vraagstartreview toegevoegd.
 - Gebruik voor de aanvulling dezelfde paginabrede stitchwerkruimte en versleepbare fragmentgrenzen als voor de uitwerkbijlage en het correctievoorschrift.
 - Laat de docent per uitgesneden fragment kiezen voor toevoegen, vervangen, handmatig beoordelen of negeren.
 - Stap 10 ontvangt uitsluitend de goedgekeurde fragmentuitsneden; volledige pagina-afbeeldingen worden niet meer aan antwoordvoorstellen toegevoegd.
