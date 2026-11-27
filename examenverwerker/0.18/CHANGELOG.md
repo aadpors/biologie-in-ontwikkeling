@@ -130,3 +130,6 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 - De browser wordt geopend op exact de poort waarop de nieuwe server start; een oude server kan daardoor niet ongemerkt als de nieuwe versie worden getoond.
 - De startpagina toont zichtbaar versienummer 0.18.3. De HTML krijgt no-cache-headers en de CSS- en JavaScript-verwijzingen gebruiken een nieuwe cacheversie.
 - De selectie van meerdere importbestanden heeft nu expliciete opmaak voor examenbundels en individuele verwijderknoppen.
+
+- Bij een gedeeltelijk mislukte batchimport blijven alleen nog niet verwerkte examenbundels in de selectie staan. Eerder geslaagde of bewust overgeslagen bundels worden direct verwijderd, zodat opnieuw proberen geen dubbele import veroorzaakt.
+- Regressietests toegevoegd voor de importretry, poortkeuze en versie-/cacheherkenning.
