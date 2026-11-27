@@ -38,6 +38,30 @@ class QuestionDetectionTests(unittest.TestCase):
         doc.close()
         return data
 
+    def test_stitched_text_extraction_uses_metadata_render_scale(self):
+        # De lange afbeelding kan op een schaal van 2.0 zijn gerenderd.
+        # Een oude vaste schaal van 1.25 zou bij deze selectie het tekstblok
+        # missen. De metadata moet de selectie terugzetten naar PDF-y 200-300.
+        pdf = fitz.open()
+        page = pdf.new_page(width=595, height=842)
+        page.insert_text((60, 240), "maximumscore 2", fontsize=11)
+        path = self.root / "scale-two.pdf"
+        pdf.save(path)
+        pdf.close()
+
+        metadata = [{
+            "page_number": 1,
+            "top": 0,
+            "bottom": 1684,
+            "crop_pixels": [0, 0, 1190, 1684],
+            "render_width": 1190,
+            "stitched_width": 1190,
+            "source_width": 595,
+            "source_height": 842,
+        }]
+        extracted = main._extract_stitched_selection_text(path, metadata, 400, 600)
+        self.assertIn("maximumscore 2", extracted)
+
     def test_multiple_choice_options_support_separate_letter_lines_and_two_options(self):
         # PDF-tekstextractie kan de antwoordletter en antwoordtekst splitsen.
         extracted = "Kies het juiste antwoord.\nA.\nDe celkern bevat DNA.\nB.\nHet celmembraan bevat cellulose."
