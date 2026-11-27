@@ -80,3 +80,8 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 - Pas de hoogtevergroting toe op het uitklapbare tekstleesvenster in de stap waarin CV-aanvullingsfragmenten worden beoordeeld. De eerdere wijziging vergrootte ten onrechte de afbeeldingviewport van de voorafgaande fragmentstap.
 - Toon minimaal 12 rem teksthoogte en maximaal 32 rem, met regelafbreking en een eigen scrollbar voor lange fragmentteksten.
 - Reset de tijdelijke layoutklasse bij het wisselen van workflowstap en dek de juiste koppeling af met een frontend-regressietest.
+
+
+### Herstel afbeelding CV-aanvulling in fragmentreview
+- De afbeeldingsserverroute accepteert nu ook `aanvulling_correctievoorschrift`. De lange afbeelding werd wel opgebouwd, maar de whitelist van de afbeeldingsroute sloot dit documenttype uit, waardoor de browser de PNG niet kon ophalen.
+- Regressiecontract toegevoegd om deze route-toegang te bewaken.
