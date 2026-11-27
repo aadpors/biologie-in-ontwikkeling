@@ -492,11 +492,11 @@ async function renderSkipWorkbookStage() {
 
 async function renderCvSupplementStage() {
   const panel = $('#stagePanel');
-  panel.innerHTML = '<p class="muted">Aanvulling op het correctievoorschrift controleren…</p>';
+  panel.innerHTML = '<p class="muted">Goedgekeurde fragmenten van de CV-aanvulling laden…</p>';
   try {
     const result = await api(`/api/exams/${state.examId}/cv-supplement`);
     if (result.not_required) {
-      panel.innerHTML = `<p class="eyebrow">FASE 5 · AANVULLING CORRECTIEVOORSCHRIFT</p><h2>Geen aanvulling aanwezig</h2><p class="lead">Er is geen document als aanvulling op het correctievoorschrift geïmporteerd. Het oorspronkelijke CV blijft ongewijzigd.</p><button class="primary" id="confirmNoSupplement">Geen aanvulling bevestigen en doorgaan</button><p id="supplementMessage" class="form-error" role="status"></p>`;
+      panel.innerHTML = `<p class="eyebrow">FASE 5 · AANVULLING CORRECTIEVOORSCHRIFT</p><h2>Geen aanvulling aanwezig</h2><p class="lead">Er is geen aanvullingsdocument geïmporteerd. Het oorspronkelijke correctievoorschrift blijft ongewijzigd.</p><button class="primary" id="confirmNoSupplement">Geen aanvulling bevestigen en doorgaan</button><p id="supplementMessage" class="form-error" role="status"></p>`;
       $('#confirmNoSupplement').addEventListener('click', async () => {
         try {
           await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`, {
@@ -508,48 +508,77 @@ async function renderCvSupplementStage() {
       });
       return;
     }
-    const doc = result.document;
-    panel.innerHTML = `<p class="eyebrow">FASE 5 · AANVULLING CORRECTIEVOORSCHRIFT</p><h2>Aanvulling per pagina beoordelen</h2><p class="lead">Het oorspronkelijke correctievoorschrift blijft intact. Kies per pagina of inhoud wordt toegevoegd, vervangen, genegeerd of handmatig beoordeeld. De app voert geen inhoudelijke vervanging automatisch uit.</p><div class="notice">${result.page_count} pagina's · ${escapeHtml(doc.filename)} · elke pagina moet afzonderlijk worden bekeken.</div>
-      ${result.items.map(item => `<article class="analysis-card" data-supplement-page="${item.page_number}"><h3>Pagina ${item.page_number}${item.question_numbers.length ? ` · vraag ${item.question_numbers.join(', ')}` : ''}</h3><img class="fragment-image" loading="lazy" alt="Pagina ${item.page_number} van de CV-aanvulling" src="/api/exams/${state.examId}/documents/${doc.id}/preview/${item.page_index}"><p class="analysis-reason">${escapeHtml(item.reason)}</p><label>Verwerking<select data-supplement-action="${item.page_number}"><option value="toevoegen" ${item.action==='toevoegen'?'selected':''}>Toevoegen</option><option value="vervangen" ${item.action==='vervangen'?'selected':''}>Vervangen</option><option value="handmatig" ${item.action==='handmatig'?'selected':''}>Handmatig beoordelen</option><option value="negeren" ${item.action==='negeren'?'selected':''}>Geen inhoudelijke wijziging</option></select></label><label>Betrokken vraagnummers (komma's scheiden)<input type="text" data-supplement-questions="${item.page_number}" value="${item.question_numbers.join(', ')}" placeholder="bijvoorbeeld 12, 22"></label><details class="analysis-text"><summary>Tekst uit deze pagina</summary><pre>${escapeHtml(item.text || 'Geen selecteerbare tekstlaag; beoordeel de pagina-afbeelding.')}</pre></details><label class="review-warning"><input type="checkbox" data-supplement-reviewed="${item.page_number}" ${item.reviewed?'checked':''}> Ik heb deze pagina en de voorgestelde verwerking gecontroleerd.</label></article>`).join('')}
+    const fragments = result.fragments || [];
+    const saved = new Map((result.fragments || []).map(item => [item.selection_id, item]));
+    if (!fragments.length) {
+      panel.innerHTML = '<h2>Geen vraagfragmenten beschikbaar</h2><p class="form-error">Controleer eerst de vraagstarts en fragmentgrenzen van de aanvulling.</p>';
+      return;
+    }
+    panel.innerHTML = `<p class="eyebrow">FASE 5 · AANVULLING CORRECTIEVOORSCHRIFT</p>
+      <h2>Aanvulling per fragment samenvoegen</h2>
+      <p class="lead">De pagina’s zijn in de vorige stappen verdeeld in afzonderlijke vraagfragmenten. Beoordeel ieder fragment. Alleen de hier goedgekeurde uitsneden worden straks bij de antwoordherkenning getoond; de volledige PDF-pagina wordt niet meer ingevoegd.</p>
+      <div class="notice">${fragments.length} fragmenten · ${escapeHtml(result.document.filename)} · bron-PDF blijft ongewijzigd.</div>
+      ${fragments.map((fragment, index) => {
+        const decision = saved.get(fragment.selection_id) || {};
+        const number = (fragment.question_numbers || [fragment.question_number]).filter(Boolean);
+        const urls = (fragment.segments || []).map(segment => segment.url).filter(Boolean);
+        return `<article class="analysis-card" data-supplement-fragment="${escapeHtml(fragment.selection_id)}">
+          <h3>Fragment ${index + 1} · vraag ${number.join(', ')}</h3>
+          ${urls.map(url => `<img class="fragment-image" loading="lazy" alt="Uitgesneden CV-aanvulling voor vraag ${number.join(', ')}" src="${escapeHtml(url)}">`).join('')}
+          <label>Verwerking<select data-supplement-action="${escapeHtml(fragment.selection_id)}">
+            <option value="toevoegen" ${decision.action==='toevoegen'?'selected':''}>Toevoegen aan het bestaande CV</option>
+            <option value="vervangen" ${decision.action==='vervangen'?'selected':''}>Bestaand onderdeel vervangen</option>
+            <option value="handmatig" ${decision.action==='handmatig'?'selected':''}>Handmatig beoordelen in stap 10</option>
+            <option value="negeren" ${decision.action==='negeren'?'selected':''}>Niet verwerken</option>
+          </select></label>
+          <details class="analysis-text"><summary>Herkenbare tekst uit dit fragment</summary><pre>${escapeHtml(fragment.extracted_text || 'Geen selecteerbare tekstlaag; beoordeel de afbeelding.')}</pre></details>
+          <label class="review-warning"><input type="checkbox" data-supplement-reviewed="${escapeHtml(fragment.selection_id)}" ${decision.reviewed?'checked':''}> Ik heb dit fragment en de verwerkingskeuze gecontroleerd.</label>
+        </article>`;
+      }).join('')}
       <div class="review-actions"><button class="primary" id="saveSupplement" type="button">Controle opslaan</button><button class="primary" id="completeSupplement" type="button" disabled>Aanvulling beoordelen en doorgaan</button></div><p id="supplementMessage" class="form-error" role="status"></p>`;
-    const cards = [...document.querySelectorAll('[data-supplement-page]')];
-      prepareStageApproval(panel);
-    const checks = () => [...document.querySelectorAll('[data-supplement-reviewed]')];
-    const refresh = () => { $('#completeSupplement').disabled = checks().some(input => !input.checked); };
-    checks().forEach(input => input.addEventListener('change', refresh)); refresh();
-    const collect = () => cards.map(card => {
-      const page = Number(card.dataset.supplementPage);
-      const item = result.items.find(entry => entry.page_number === page);
-      const numbersText=card.querySelector(`[data-supplement-questions="${page}"]`).value;
-      const numbers=numbersText.split(',').map(value=>value.trim()).filter(Boolean).map(Number);
-      return {page_number:page, action:card.querySelector(`[data-supplement-action="${page}"]`).value,
-        question_numbers:numbers, reviewed:card.querySelector(`[data-supplement-reviewed="${page}"]`).checked};
+    prepareStageApproval(panel);
+    const cards = [...panel.querySelectorAll('[data-supplement-fragment]')];
+    const checks = [...panel.querySelectorAll('[data-supplement-reviewed]')];
+    const refresh = () => { $('#completeSupplement').disabled = checks.some(input => !input.checked); };
+    checks.forEach(input => input.addEventListener('change', refresh));
+    refresh();
+    const collect = () => cards.map(card => ({
+      selection_id: card.dataset.supplementFragment,
+      action: card.querySelector('[data-supplement-action]').value,
+      reviewed: card.querySelector('[data-supplement-reviewed]').checked
+    }));
+    const save = () => api(`/api/exams/${state.examId}/cv-supplement/review`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({fragments:collect()})
     });
-    const save = () => api(`/api/exams/${state.examId}/cv-supplement/review`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:collect()})});
     bindStageAutoSave(panel, save, '#supplementMessage');
-    $('#saveSupplement').addEventListener('click', async () => { try { const r=await save(); $('#supplementMessage').textContent=`${r.reviewed_count} van ${r.page_count} pagina's gecontroleerd. Concept opgeslagen.`; } catch(error) { $('#supplementMessage').textContent=error.message; } });
-    let completingSupplement=false;
+    $('#saveSupplement').addEventListener('click', async () => {
+      try { const savedResult = await save(); $('#supplementMessage').textContent = `${savedResult.reviewed_count} van ${savedResult.fragment_count} fragmenten gecontroleerd. Concept opgeslagen.`; }
+      catch(error) { $('#supplementMessage').textContent = error.message; }
+    });
+    let completing = false;
     $('#completeSupplement').addEventListener('click', async () => {
-      const button=$('#completeSupplement');
-      if(completingSupplement) return;
-      completingSupplement=true;
-      button.disabled=true;
+      if (completing) return;
+      completing = true;
+      const button = $('#completeSupplement');
+      button.disabled = true;
       try {
-        // Wacht op de laatste paginakeuze voordat de stapstatus definitief wordt.
-        const saved=panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
-        if(!saved.complete) throw new Error('Controleer eerst alle pagina’s.');
-        await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`,{
-          method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({reviewed:true,reviewed_all_pages:true})
+        const savedResult = panel._stageAutoSaveFlush ? await panel._stageAutoSaveFlush() : await save();
+        if (!savedResult.complete) throw new Error('Controleer eerst alle aanvullingsfragmenten.');
+        await api(`/api/exams/${state.examId}/steps/cv_aanvulling/complete`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({reviewed:true, reviewed_all_fragments:true})
         });
         await openWorkspace(state.examId);
       } catch(error) {
-        completingSupplement=false;
+        completing = false;
         refresh();
-        $('#supplementMessage').textContent=error.message;
+        $('#supplementMessage').textContent = error.message;
       }
     });
-  } catch (error) { panel.innerHTML = `<h2>Aanvulling correctievoorschrift</h2><p class="form-error">${escapeHtml(error.message)}</p>`; }
+  } catch (error) {
+    panel.innerHTML = `<h2>Aanvulling correctievoorschrift</h2><p class="form-error">${escapeHtml(error.message)}</p>`;
+  }
 }
 
 /* Antwoordvoorstellen komen uit de bijbehorende CV-fragmenten. De gebruiker
@@ -562,7 +591,7 @@ async function renderAnswersStage() {
   try {
     const result = await api(`/api/exams/${state.examId}/answers`);
     panel.innerHTML = `<p class="eyebrow">FASE 6 · ANTWOORDEN HERKENNEN</p><h2>Antwoorden controleren</h2><p class="lead">Per vraag staat het bijbehorende fragment uit het correctievoorschrift. Herkende meerkeuzeletters en gesloten antwoorden zijn voorstellen. Controleer de bronafbeelding en corrigeer de antwoordtekst waar nodig.</p><div class="notice">${result.question_count} CV-fragmenten · lage zekerheid betekent dat de tekst handmatig moet worden nagekeken.</div>
-      ${result.questions.map(q => `<article class="analysis-card" data-answer-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${escapeHtml(q.confidence)} zekerheid</span></div><p class="analysis-reason">${escapeHtml(q.reason)} · Maximumscore CV: ${q.cv_max_points ?? 'onbekend'} · Opgaven: ${q.opgaven_max_points ?? 'onbekend'}${q.points_match===false?' · SCORES VERSCHILLEN':''}</p>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" alt="Correctievoorschrift vraag ${q.question_number}" src="${escapeHtml(seg.url)}">`).join('')}${(q.supplement_pages||[]).map(page=>`<div class="notice">CV-aanvulling · pagina ${page.page_number} · ${escapeHtml(page.action)}</div><img class="fragment-image" loading="lazy" alt="CV-aanvulling bij vraag ${q.question_number}" src="${escapeHtml(page.url)}">`).join('')}<div class="analysis-fields"><label>Antwoordvorm<select data-answer-kind="${q.question_number}"><option value="meerkeuze" ${q.answer_kind==='meerkeuze'?'selected':''}>Meerkeuze</option><option value="gesloten" ${q.answer_kind==='gesloten'?'selected':''}>Gesloten antwoord</option><option value="open" ${q.answer_kind==='open'?'selected':''}>Open antwoord / beoordelingscriteria</option><option value="handmatig" ${q.answer_kind==='handmatig'?'selected':''}>Handmatig bepalen</option></select></label></div><label class="answer-text-field">Antwoord of beoordelingscriteria<textarea class="answer-textarea" rows="2" data-answer-text="${q.question_number}">${escapeHtml(q.answer_text)}</textarea></label><label class="review-warning"><input type="checkbox" data-answer-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het antwoord van vraag ${q.question_number} aan de hand van het CV-fragment gecontroleerd.</label></article>`).join('')}
+      ${result.questions.map(q => `<article class="analysis-card" data-answer-card="${q.question_number}"><div class="card-heading"><h3>Vraag ${q.question_number}</h3><span class="status-pill">${escapeHtml(q.confidence)} zekerheid</span></div><p class="analysis-reason">${escapeHtml(q.reason)} · Maximumscore CV: ${q.cv_max_points ?? 'onbekend'} · Opgaven: ${q.opgaven_max_points ?? 'onbekend'}${q.points_match===false?' · SCORES VERSCHILLEN':''}</p>${q.segments.map(seg=>`<img class="fragment-image" loading="lazy" alt="Correctievoorschrift vraag ${q.question_number}" src="${escapeHtml(seg.url)}">`).join('')}${(q.supplement_fragments||[]).map(fragment=>`<div class="notice">CV-aanvulling · ${escapeHtml(fragment.action)}</div>${(fragment.urls||[]).map(url=>`<img class="fragment-image" loading="lazy" alt="CV-aanvulling bij vraag ${q.question_number}" src="${escapeHtml(url)}">`).join('')}`).join('')}<div class="analysis-fields"><label>Antwoordvorm<select data-answer-kind="${q.question_number}"><option value="meerkeuze" ${q.answer_kind==='meerkeuze'?'selected':''}>Meerkeuze</option><option value="gesloten" ${q.answer_kind==='gesloten'?'selected':''}>Gesloten antwoord</option><option value="open" ${q.answer_kind==='open'?'selected':''}>Open antwoord / beoordelingscriteria</option><option value="handmatig" ${q.answer_kind==='handmatig'?'selected':''}>Handmatig bepalen</option></select></label></div><label class="answer-text-field">Antwoord of beoordelingscriteria<textarea class="answer-textarea" rows="2" data-answer-text="${q.question_number}">${escapeHtml(q.answer_text)}</textarea></label><label class="review-warning"><input type="checkbox" data-answer-reviewed="${q.question_number}" ${q.reviewed?'checked':''}> Ik heb het antwoord van vraag ${q.question_number} aan de hand van het CV-fragment gecontroleerd.</label></article>`).join('')}
       <div class="review-actions"><button class="primary" id="saveAnswers" type="button">Controle opslaan</button><button class="primary" id="completeAnswers" type="button" disabled>Antwoorden goedkeuren en doorgaan</button></div><p id="answersMessage" class="form-error" role="status"></p>`;
     const cards=[...document.querySelectorAll('[data-answer-card]')];
       prepareStageApproval(panel);
