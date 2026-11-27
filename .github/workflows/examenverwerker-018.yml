@@ -1,6 +1,7 @@
 name: Examenverwerker 0.18
 # Deze workflow valideert ook de documentstappen van de CV-aanvulling.
 # De 0.18-testset dekt fragmentselecties en verwerking per vraag.
+# Controle na reparatie van de regressietest.
 on:
   push:
     paths:
