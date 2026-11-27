@@ -2037,6 +2037,32 @@ def skip_optional_workbook(exam_id: str):
     return {"ok": True, "not_applicable": True}
 
 
+@app.post("/api/exams/{exam_id}/skip-optional-supplement")
+def skip_optional_supplement(exam_id: str):
+    """Markeer de aanvullingsverwerking als niet van toepassing als er geen PDF is."""
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    has_supplement = any(
+        exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"
+        or doc.get("metadata", {}).get("document_type") == "aanvulling_correctievoorschrift"
+        for doc in exam["documents"]
+    )
+    if has_supplement:
+        raise HTTPException(409, "Er is wel een CV-aanvulling toegewezen; verwerk die normaal.")
+    if not exam["confirmed"]:
+        raise HTTPException(409, "Bevestig eerst de documenteigenschappen.")
+    completed = [key for key, value in exam["steps"].items() if value["status"] == "complete"]
+    missing = unmet_requirements("supplement_starts", completed)
+    if missing:
+        raise HTTPException(409, {"message": "Eerdere stappen zijn nog niet afgerond.", "missing": missing})
+    changed = []
+    for key in ("supplement_starts", "supplement_fragments"):
+        if STORE.complete_step(exam_id, key, {"not_applicable": True, "reviewed": True}):
+            changed.append(key)
+    return {"ok": True, "not_applicable": True, "completed": changed}
+
+
 @app.get("/api/exams/{exam_id}/snippets")
 def get_snippets(exam_id: str):
     """Maak de definitieve snippetset en contextvoorstellen voor eindcontrole."""
