@@ -2302,8 +2302,36 @@ def get_final_review(exam_id: str):
 @app.post("/api/exams/{exam_id}/final-review/review")
 def save_final_review(exam_id: str, payload: dict):
     """Bewaar de integrale controle; scoreverschillen vragen een toelichting."""
-    result = get_final_review(exam_id)
-    expected = {item["question_number"] for item in result["questions"]}
+    # Autosaves from the final-review screen must be cheap. Calling
+    # get_final_review() here used to rebuild every context/question/CV image
+    # on each POST, making ordinary note edits and navigation unnecessarily
+    # slow. Validate against the already-persisted snippet review and the
+    # lightweight score evidence instead.
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    snippet_evidence = exam["steps"].get("snippets", {}).get("evidence", {})
+    expected_values = snippet_evidence.get("expected_question_numbers")
+    if not isinstance(expected_values, list) or not expected_values:
+        expected_values = exam["steps"].get("opgaven_fragments", {}).get("evidence", {}).get("expected_question_numbers", [])
+    if not isinstance(expected_values, list) or not expected_values:
+        previous_review = exam["steps"].get("eindcontrole", {}).get("evidence", {}).get("questions", [])
+        expected_values = [item.get("question_number") for item in previous_review if isinstance(item, dict)]
+    expected = {number for number in expected_values if isinstance(number, int) and number > 0}
+    if not expected:
+        raise HTTPException(409, "De vraaglijst voor de integrale eindcontrole ontbreekt. Rond eerst de snippetcontrole af.")
+
+    analysis = exam["steps"].get("opgaven_analyse", {}).get("evidence", {}).get("questions", [])
+    answers = exam["steps"].get("antwoorden", {}).get("evidence", {}).get("questions", [])
+    analysis_by = {item.get("question_number"): item for item in analysis if isinstance(item, dict)}
+    answers_by = {item.get("question_number"): item for item in answers if isinstance(item, dict)}
+    mismatched_numbers = set()
+    for number in expected:
+        points = analysis_by.get(number, {}).get("max_points")
+        cv_points = answers_by.get(number, {}).get("cv_max_points")
+        if points is not None and cv_points is not None and points != cv_points:
+            mismatched_numbers.add(number)
+
     questions = payload.get("questions")
     if not isinstance(questions, list):
         raise HTTPException(422, "De integrale vraagcontrole ontbreekt.")
@@ -2314,12 +2342,12 @@ def save_final_review(exam_id: str, payload: dict):
         if not isinstance(number, int) or number not in expected or number in seen:
             raise HTTPException(422, "Een vraagnummer in de eindcontrole is ongeldig of dubbel.")
         seen.add(number)
-        source = next(question for question in result["questions"] if question["question_number"] == number)
         note = str(item.get("resolution_note", ""))[:2000]
         # Een lege toelichting is alleen toegestaan bij een automatische
         # conceptopslag. Een handmatige opslag of afronding moet de afwijking
-        # inhoudelijk toelichten.
-        if source["points_match"] is False and not note.strip() and not payload.get("draft"):
+        # inhoudelijk toelichten. De afwijking wordt uit de bewaarde score-
+        # gegevens afgeleid; er hoeft geen afbeelding opnieuw te worden gebouwd.
+        if number in mismatched_numbers and not note.strip() and not payload.get("draft"):
             raise HTTPException(422, f"Leg het verschil tussen de opgave- en CV-score bij vraag {number} vast.")
         cleaned.append({"question_number": number, "reviewed": bool(item.get("reviewed")),
                         "resolution_note": note})
@@ -2335,9 +2363,9 @@ def save_final_review(exam_id: str, payload: dict):
         exam_id, "eindcontrole", evidence, identity_fields=tuple(evidence.keys())
     )
     unresolved = any(
-        question["points_match"] is False and
-        not next(item for item in cleaned if item["question_number"] == question["question_number"])["resolution_note"].strip()
-        for question in result["questions"]
+        number in mismatched_numbers and
+        not next(item for item in cleaned if item["question_number"] == number)["resolution_note"].strip()
+        for number in expected
     )
     return {"ok": True, **evidence,
             "complete": evidence["reviewed_all_questions"] and not unresolved}
