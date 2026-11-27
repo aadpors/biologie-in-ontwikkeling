@@ -37,17 +37,18 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn(r"error.message.match(/heropen stap\s*(\d+)/i)", js)
         self.assertIn("6: {key: 'uitwerk_fragments', label: 'stap 6 · fragmenten uitwerkbijlage'}", js)
 
-    def test_cv_supplement_fragment_reader_uses_a_tall_dedicated_viewport(self):
+    def test_cv_supplement_text_reader_is_tall_and_targets_the_correct_step(self):
         js = APP_JS.read_text(encoding="utf-8")
         css = APP_CSS.read_text(encoding="utf-8")
-        # Alleen de CV-aanvulling krijgt de grotere leesruimte; bij het openen
-        # van een andere stap wordt de tijdelijke klasse weer verwijderd.
-        self.assertIn("panel.classList.toggle('supplement-fragments-stage', isSupplement);", js)
-        self.assertIn("stagePanel?.classList.remove('supplement-fragments-stage');", js)
-        self.assertIn(".stage-panel.supplement-fragments-stage .stitched-image-scroll", css)
-        self.assertIn("height: 78vh;", css)
-        self.assertIn("min-height: 520px;", css)
-        self.assertIn("max-height: 900px;", css)
+        # De tekstweergave staat in renderCvSupplementStage (niet in de
+        # afbeeldingselectiestap). De tijdelijke klasse wordt bij wisselen
+        # van workflowstap verwijderd om CSS-lekkage te voorkomen.
+        self.assertIn("panel.classList.add('supplement-merge-stage');", js)
+        self.assertIn("stagePanel?.classList.remove('supplement-fragments-stage', 'supplement-merge-stage');", js)
+        self.assertIn(".stage-panel.supplement-merge-stage .analysis-text pre", css)
+        self.assertIn("min-height: 12rem;", css)
+        self.assertIn("max-height: 32rem;", css)
+        self.assertIn("overflow-wrap: anywhere;", css)
 
     def test_context_group_cards_wrap_inside_inspector(self):
         css = APP_CSS.read_text(encoding="utf-8")
