@@ -60,3 +60,10 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 
 - De opslagroute voor vraagstartcorrecties ondersteunt nu ook `aanvulling_correctievoorschrift` en bewaart de controle onder workflowstap `supplement_starts`.
 - Een regressietest doorloopt voor de CV-aanvulling dezelfde volledige API-keten als voor de uitwerkbijlage en het correctievoorschrift: detecteren, review opslaan, stap afronden, fragmenten ophalen en fragmentreview opslaan.
+
+
+### Leesvenster CV-aanvulling
+
+- Vergroot het leesvenster in de stap met fragmenten van de CV-aanvulling tot een groot deel van de beschikbare schermhoogte (met een bruikbare minimumhoogte).
+- De extra leesruimte geldt uitsluitend voor deze stap; de weergave van opgaven, uitwerkbijlage en regulier correctievoorschrift blijft ongewijzigd.
+- Voeg een frontend-regressietest toe voor de stapgebonden hoogte-instelling en het resetten van de layoutklasse.
