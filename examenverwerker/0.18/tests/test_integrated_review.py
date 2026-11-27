@@ -356,36 +356,52 @@ class IntegratedReviewTests(unittest.TestCase):
         self.assertEqual(exam["steps"]["uitwerk_fragments"]["evidence"]["not_applicable"], True)
 
     def test_reviewed_supplement_replaces_answer_proposal_and_stays_visible(self):
-        opgaven = self.pdf([["1p 1 Geef het juiste antwoord."]])
-        cv = self.pdf([["4 Beoordelingsmodel", "1 maximumscore 1", "A 1"]])
-        workbook = self.pdf([["4", "schema"]])
-        supplement = self.pdf([["Aanvulling op het correctievoorschrift", "Vraag 1: in plaats van het eerdere antwoord geldt: B. maximumscore 2."]])
-        imported = self.client.post("/api/exams/import", files=[
-            ("files", ("vw-1018-a-26-2-o.pdf", opgaven, "application/pdf")),
-            ("files", ("vw-1018-a-26-2-u.pdf", workbook, "application/pdf")),
-            ("files", ("vw-1018-a-26-2-c.pdf", cv, "application/pdf")),
-            ("files", ("vw-1018-a-26-2-a.pdf", supplement, "application/pdf")),
-        ])
-        exam_id = imported.json()["exam_id"]
-        self.client.post(f"/api/exams/{exam_id}/metadata/confirm", json={
-            "subject":"biologie", "level":"vwo", "year":2026, "period":2,
-            "document_types":{"vw-1018-a-26-2-o.pdf":"opgaven","vw-1018-a-26-2-u.pdf":"uitwerkbijlage",
-                              "vw-1018-a-26-2-c.pdf":"correctievoorschrift","vw-1018-a-26-2-a.pdf":"aanvulling_correctievoorschrift"}
+        """Antwoordherkenning ontvangt alleen het gecontroleerde supplementfragment."""
+        exam_id = self.create_exam()
+        main.STORE.complete_step(exam_id, "cv_aanvulling", {
+            "fragments": [{
+                "selection_id": "supplement-fragment-1",
+                "question_numbers": [1],
+                "action": "vervangen",
+                "reviewed": True,
+            }],
+            "reviewed_all_fragments": True,
         })
-        for doc_type, step in [("opgaven", "opgaven_starts"), ("correctievoorschrift", "cv_starts")]:
-            starts = self.client.get(f"/api/exams/{exam_id}/document-question-starts/{doc_type}").json()
-            main.STORE.complete_step(exam_id, step, {"candidates":starts["candidates"],"reviewed_all_pages":True,
-                                                       "document_sha256":starts["document"]["sha256"]})
-        main.STORE.complete_step(exam_id, "cv_aanvulling", {"items":[
-            {"page_number":1,"action":"vervangen","question_numbers":[1],"reviewed":True}
-        ],"reviewed_all_pages":True})
-        answers = self.client.get(f"/api/exams/{exam_id}/answers")
+
+        # Isoleer de integratieregel: het CV levert het oorspronkelijke antwoord,
+        # de aanvulling levert een eerder uitgesneden fragment met dezelfde vraag.
+        base_answer = {
+            "question_number": 1,
+            "answer_kind": "meerkeuze",
+            "answer_text": "A",
+            "confidence": "hoog",
+            "reason": "Oorspronkelijk CV-antwoord",
+            "cv_max_points": 1,
+            "opgaven_max_points": 1,
+            "points_match": True,
+        }
+        supplement = {
+            "fragments": [{
+                "selection_id": "supplement-fragment-1",
+                "question_numbers": [1],
+                "extracted_text": "Vraag 1: in plaats van het eerdere antwoord geldt: B. maximumscore 2.",
+                "segments": [{"url": "/api/question-fragment-images/example/aanvulling_correctievoorschrift/selected-question-01.png"}],
+            }],
+            "document": {"id": "supplement-document"},
+        }
+        with patch.object(main, "get_document_question_fragments", return_value={"questions": []}), \\
+             patch.object(main, "get_question_analysis", return_value={"questions": []}), \\
+             patch.object(main, "analyse_answers", return_value={"questions": [dict(base_answer)]}), \\
+             patch.object(main, "get_cv_supplement", return_value=supplement):
+            answers = self.client.get(f"/api/exams/{exam_id}/answers")
+
         self.assertEqual(answers.status_code, 200, answers.text)
         question = answers.json()["questions"][0]
         self.assertEqual(question["answer_kind"], "handmatig")
         self.assertIn("Vraag 1", question["answer_text"])
         self.assertEqual(question["cv_max_points"], 2)
-        self.assertEqual(question["supplement_pages"][0]["action"], "vervangen")
+        self.assertEqual(question["supplement_fragments"][0]["action"], "vervangen")
+        self.assertTrue(question["supplement_fragments"][0]["urls"][0].endswith("selected-question-01.png"))
 
     def test_cv_fragment_review_uses_the_same_stitched_pagewide_workspace(self):
         """Stap 8 gebruikt dezelfde lange, paginabrede selectie als stap 3 en 6."""
