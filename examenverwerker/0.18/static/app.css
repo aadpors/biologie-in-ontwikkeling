@@ -1117,3 +1117,7 @@
   border-radius: 6px;
   background: #fff;
 }
+
+/* Stap 4: de antwoordoptie-editor is alleen relevant bij meerkeuzevragen.
+   Forceer hidden ook wanneer andere componentregels display instellen. */
+.analysis-options-editor[hidden] { display:none !important; }
