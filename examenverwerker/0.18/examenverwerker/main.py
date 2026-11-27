@@ -1912,7 +1912,12 @@ def get_answers(exam_id: str):
     saved = {item["question_number"]: item for item in previous.get("questions", [])}
     for question in result["questions"]:
         if question["question_number"] in saved:
-            question.update({k: saved[question["question_number"]][k]
+            # Oudere opgeslagen antwoordreviews bevatten nog niet altijd het
+            # veld supplement_fragments. Gebruik daarom alleen aanwezige velden
+            # en behoud de actuele (automatisch samengestelde) waarde als een
+            # veld in de opgeslagen review ontbreekt. Dit voorkomt een KeyError
+            # bij het openen van stap 12 na een upgrade.
+            question.update({k: saved[question["question_number"]].get(k, question.get(k))
                              for k in ("answer_kind", "answer_text", "cv_max_points", "opgaven_max_points", "points_match", "supplement_fragments", "reviewed")})
     return result
 
