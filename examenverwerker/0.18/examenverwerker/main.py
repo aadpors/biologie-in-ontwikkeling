@@ -297,7 +297,7 @@ def _document_for_type(exam: dict, document_type: str):
                if exam["metadata"].get("document_types", {}).get(doc["filename"]) == document_type]
     if len(matches) != 1:
         label = {"opgaven":"opgavendocument", "uitwerkbijlage":"uitwerkbijlage",
-                 "correctievoorschrift":"correctievoorschrift"}[document_type]
+                 "correctievoorschrift":"correctievoorschrift", "aanvulling_correctievoorschrift":"aanvulling correctievoorschrift"}[document_type]
         raise HTTPException(422, f"Er moet precies één {label} zijn toegewezen.")
     return matches[0]
 
@@ -1561,7 +1561,7 @@ def question_fragment_image(exam_id: str, document_type: str, filename: str):
     """Serveer alleen PNG-bestanden uit de juiste afgeleide fragmentwerkmap."""
     if not re.fullmatch(r"[A-Za-z0-9_.-]+\.png", filename):
         raise HTTPException(400, "Ongeldige bestandsnaam.")
-    if document_type not in {"opgaven", "uitwerkbijlage", "correctievoorschrift"}:
+    if document_type not in {"opgaven", "uitwerkbijlage", "correctievoorschrift", "aanvulling_correctievoorschrift"}:
         raise HTTPException(404, "Documenttype niet gevonden.")
     if not re.fullmatch(r"[a-f0-9]{12}", exam_id) or not STORE.get_exam(exam_id):
         raise HTTPException(404, "Examen niet gevonden.")
@@ -2500,6 +2500,15 @@ def complete_step(exam_id: str, step_key: str, payload: dict):
         raise HTTPException(409, "Gebruik de afzonderlijke publicatieactie nadat de eindcontrole is afgerond.")
     completed = [key for key, value in exam["steps"].items() if value["status"] == "complete"]
     missing = unmet_requirements(step_key, completed)
+    # Zonder aanvullingsdocument zijn de twee documentverwerkingsstappen
+    # expliciet niet van toepassing. De overige afhankelijkheden blijven gelden.
+    if step_key == "cv_aanvulling":
+        has_supplement_document = any(
+            exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"
+            for doc in exam["documents"]
+        )
+        if not has_supplement_document:
+            missing = [key for key in missing if key not in {"supplement_starts", "supplement_fragments"}]
     if step_key == "relaties":
         # Een document dat niet is geïmporteerd, kan geen openstaande
         # verwerkingsstap opleveren. Dit blijft ook gelden voor oudere examens
