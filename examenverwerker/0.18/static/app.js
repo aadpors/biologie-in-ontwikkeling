@@ -308,17 +308,24 @@ $('#importForm').addEventListener('submit', async event => {
     });
     const completed = [];
     const skipped = [];
+    let processed = 0;
     // Bundels worden sequentieel aangemaakt om piekgeheugen te beperken en
     // om elke upload als zelfstandige, herstelbare examenimport af te handelen.
+    // Verwijder een bundel direct uit de selectie zodra deze is geïmporteerd
+    // of bewust overgeslagen. Als een latere bundel faalt, kan de gebruiker
+    // daardoor veilig opnieuw proberen zonder eerdere examens dubbel te doen.
     for (const [key, files] of groups) {
-      submit.textContent = `Importeren: ${completed.length + skipped.length + 1} van ${groups.size}…`;
+      submit.textContent = `Importeren: ${processed + 1} van ${groups.size}…`;
       const result = await uploadImportBundle(files);
       if (result?.existing_exam_id) completed.push(result.existing_exam_id);
       else if (result?.exam_id) completed.push(result.exam_id);
       else skipped.push(files.map(file => file.name).join(', '));
+
+      const processedFiles = new Set(files);
+      selectedImportFiles = selectedImportFiles.filter(file => !processedFiles.has(file));
+      processed += 1;
+      renderImportSelection();
     }
-    selectedImportFiles = [];
-    renderImportSelection();
     if (completed.length === 1 && groups.size === 1) {
       await openWorkspace(completed[0]);
     } else {
