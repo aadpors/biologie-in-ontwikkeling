@@ -1974,10 +1974,31 @@ def save_answers_review(exam_id: str, payload: dict):
     # Supplementpagina's worden door de server gekoppeld aan de goedgekeurde
     # pagina-/vraagbeslissingen. Neem die herkomstinformatie niet over uit een
     # browserpayload die de gebruiker zelf kan aanpassen.
-    supplement_by_number = {item["question_number"]: item.get("supplement_pages", [])
-                            for item in result["questions"]}
+    # De browserinterface bewerkt alleen antwoordvorm en antwoordtekst.
+    # Maximumscores zijn server-side herkend en horen daarom niet afhankelijk
+    # te zijn van verborgen browservelden. Vul ze hier vanuit de actuele
+    # analyse aan voordat de review wordt gevalideerd en opgeslagen.
+    detected_by_number = {
+        item["question_number"]: item for item in result["questions"]
+    }
     payload = {**payload, "questions": [
-        {**item, "supplement_pages": supplement_by_number.get(item.get("question_number"), [])}
+        {
+            **item,
+            # Bewaar een expliciete niet-lege score uit een oudere review
+            # (bijvoorbeeld een docentcorrectie); anders geldt de actuele
+            # herkenning uit het CV en de opgave als bron.
+            "cv_max_points": (
+                item.get("cv_max_points")
+                if item.get("cv_max_points") is not None
+                else detected_by_number.get(item.get("question_number"), {}).get("cv_max_points")
+            ),
+            "opgaven_max_points": (
+                item.get("opgaven_max_points")
+                if item.get("opgaven_max_points") is not None
+                else detected_by_number.get(item.get("question_number"), {}).get("opgaven_max_points")
+            ),
+            "supplement_pages": detected_by_number.get(item.get("question_number"), {}).get("supplement_pages", []),
+        }
         for item in payload.get("questions", []) if isinstance(item, dict)
     ]}
     try:
