@@ -13,6 +13,7 @@ from examenverwerker.storage import Store
 from examenverwerker.question_detection import detect_question_starts, validate_review
 from examenverwerker.question_fragments import generate_question_fragments, build_stitched_exam, normalise_stitched_selections
 from examenverwerker.question_analysis import analyse_questions, detect_options, detect_question_type, detect_max_points, detect_closed_answer_form, validate_question_analysis
+from examenverwerker.answer_detection import analyse_answers, detect_cv_max_points
 
 
 class QuestionDetectionTests(unittest.TestCase):
@@ -1363,3 +1364,60 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         main._merge_saved_question_analysis(question, saved)
         self.assertEqual([item["letter"] for item in question["options"]], ["A"])
         self.assertTrue(question["options_reviewed"])
+
+
+class CvMaximumScoreOcrFallbackTests(unittest.TestCase):
+    """Regressietests voor CV-scores die alleen visueel in het fragment staan."""
+
+    def test_cv_score_is_read_from_text_layer_without_running_ocr(self):
+        # De selecteerbare PDF-tekstlaag blijft de eerste en snelste bron.
+        # Als daarin al een expliciete maximumscore staat, is OCR overbodig.
+        fragment = {
+            "question_number": 2,
+            "extracted_text": "Maximumscore 2\nVoor het antwoord: ...",
+            "image_paths": ["/niet/gebruikt.png"],
+            "segments": [],
+        }
+        with patch("examenverwerker.answer_detection._ocr_image_text") as ocr:
+            result = analyse_answers({"questions": [fragment]}, None)
+        self.assertEqual(result["questions"][0]["cv_max_points"], 2)
+        ocr.assert_not_called()
+
+    def test_cv_score_uses_local_ocr_only_when_text_layer_has_no_score(self):
+        # Sommige CV's bevatten een gescande beoordelingsregel. OCR wordt dan
+        # uitsluitend op de reeds goedgekeurde vraaguitsnede uitgevoerd.
+        fragment = {
+            "question_number": 2,
+            "extracted_text": "Voor het antwoord: ...",
+            "image_paths": ["/tijdelijk/cv-vraag-2.png"],
+            "segments": [],
+        }
+        with patch(
+            "examenverwerker.answer_detection._ocr_image_text",
+            return_value="Maximumscore 2",
+        ) as ocr:
+            result = analyse_answers({"questions": [fragment]}, None)
+        self.assertEqual(result["questions"][0]["cv_max_points"], 2)
+        self.assertIn("lokale OCR", result["questions"][0]["points_reason"])
+        ocr.assert_called_once_with(["/tijdelijk/cv-vraag-2.png"])
+
+    def test_cv_score_ocr_is_not_used_when_fragment_has_no_image(self):
+        # Zonder goedgekeurde afbeelding blijft de score leeg; er wordt niet
+        # stilzwijgend een volledige bronpagina of ander document gerenderd.
+        fragment = {
+            "question_number": 2,
+            "extracted_text": "Voor het antwoord: ...",
+            "segments": [],
+        }
+        with patch("examenverwerker.answer_detection._ocr_image_text") as ocr:
+            result = analyse_answers({"questions": [fragment]}, None)
+        self.assertIsNone(result["questions"][0]["cv_max_points"])
+        ocr.assert_not_called()
+
+    def test_maximumscore_variants_are_recognised(self):
+        # Bewaak de gangbare schrijfwijzen die in Cito-correctievoorschriften
+        # voorkomen, inclusief het label met een dubbele punt.
+        for text in ("maximumscore 2", "Maximumscore: 2", "maximum score 2",
+                     "max. score: 2", "maxscore 2"):
+            with self.subTest(text=text):
+                self.assertEqual(detect_cv_max_points(text, 2), 2)
