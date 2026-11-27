@@ -72,6 +72,10 @@ function bindStageAutoSave(panel, save, statusSelector) {
 
   // change wordt afgevuurd bij checkbox/select-wijzigingen en wanneer een
   // tekstveld focus verliest, dus ook bij wegklikken naar een ander tabblad.
+  // 'input' saves while a field is still focused; 'change' remains the fallback
+  // for controls whose final value is committed on blur. The completion hook
+  // below cancels either pending debounce and flushes the latest snapshot.
+  panel.addEventListener('input', schedule);
   panel.addEventListener('change', schedule);
 
   // Forceer een laatste opslag wanneer de gebruiker naar een ander tabblad
@@ -88,6 +92,7 @@ function bindStageAutoSave(panel, save, statusSelector) {
   panel._stageAutoSaveCleanup = () => {
     clearTimeout(timer);
     panel._stageAutoSaveFlush = null;
+    panel.removeEventListener('input', schedule);
     panel.removeEventListener('change', schedule);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('pagehide', flushOnHide);
@@ -1354,7 +1359,7 @@ async function renderFinalReviewStage() {
        * het API-foutbericht zelf. Leid de knop daarom af van die aanwijzing,
        * in plaats van altijd terug te sturen naar de opgaven (stap 3).
        */
-      const recoveryMatch = error.message.match(/heropen stap\\s*(\\d+)/i);
+      const recoveryMatch = error.message.match(/heropen stap\s*(\d+)/i);
       const recoveryStep = recoveryMatch ? Number(recoveryMatch[1]) : 3;
       const recoveryMap = {
         3: {key: 'opgaven_fragments', label: 'stap 3 · opgavenfragmenten'},
