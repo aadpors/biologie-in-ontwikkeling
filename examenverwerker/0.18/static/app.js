@@ -1773,6 +1773,10 @@ async function renderQuestionStartsStage(stepKey, documentType, stageLabel, stag
    meer vraagnummers; de selectiecoördinaten blijven in pixels van de stitchbron. */
 async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, stageTitle, documentType = 'opgaven') {
   const panel = $('#stagePanel');
+  // De CV-aanvulling gebruikt dezelfde lange, samengevoegde PDF-afbeelding
+  // als de andere documenten. Geef deze stap een eigen klasse zodat het
+  // afbeeldingsvenster hoog genoeg blijft en zelfstandig verticaal kan scrollen.
+  panel.classList.toggle('supplement-fragments-stage', documentType === 'aanvulling_correctievoorschrift');
   panel.innerHTML = '<p class="muted">Het document wordt samengevoegd tot één lange afbeelding…</p>';
   // Dezelfde werkruimte wordt gebruikt voor opgaven en uitwerkbijlage.
   // Alleen de API-route en toegestane fragmentsoort verschillen.
