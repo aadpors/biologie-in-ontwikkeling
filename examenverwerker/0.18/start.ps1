@@ -112,7 +112,7 @@ if (-not $Port) {
 }
 
 Write-Host ''
-Write-Host "Examenverwerker 0.18.3 starten op http://127.0.0.1:$Port"
+Write-Host "Examenverwerker 0.18.4 starten op http://127.0.0.1:$Port"
 Write-Host 'Laat dit venster open zolang de applicatie wordt gebruikt.'
 Start-Process "http://127.0.0.1:$Port/"
 & $Python -m uvicorn examenverwerker.main:app --host 127.0.0.1 --port $Port
