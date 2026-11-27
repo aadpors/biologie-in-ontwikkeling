@@ -1791,53 +1791,55 @@ def get_answers(exam_id: str):
     cv_fragments = get_document_question_fragments(exam_id, "correctievoorschrift")
     analysis = get_question_analysis(exam_id)
     result = analyse_answers(cv_fragments, analysis)
-    # Verwerk eerst de expliciet beoordeelde aanvulling. Een vervanging wordt
-    # als vervangend antwoordvoorstel getoond; een toevoeging blijft naast het
-    # oorspronkelijke CV-antwoord zichtbaar. Geen enkele pagina wordt zonder
-    # de eerdere docentreview toegepast.
-    supplement = get_cv_supplement(exam_id)
+    # Alleen fragmenten die in stap 9 expliciet zijn beoordeeld, worden
+    # hier betrokken. De bron is de uitsnede uit de lange documentafbeelding,
+    # nooit meer de volledige PDF-pagina.
     supplement_evidence = exam["steps"].get("cv_aanvulling", {}).get("evidence", {})
-    supplement_items = {item["page_number"]: item for item in supplement_evidence.get("items", [])}
-    supplement_pages = {item["page_number"]: item for item in supplement.get("items", [])}
+    supplement_decisions = {
+        item["selection_id"]: item
+        for item in supplement_evidence.get("fragments", [])
+    }
+    supplement_fragments = get_document_question_fragments(
+        exam_id, "aanvulling_correctievoorschrift"
+    )["questions"] if exam["steps"].get("supplement_fragments", {}).get("status") == "complete" else []
     for question in result["questions"]:
-        matched_pages = []
-        for page_number, decision in supplement_items.items():
-            if question["question_number"] not in decision.get("question_numbers", []):
+        matched_fragments = []
+        for fragment in supplement_fragments:
+            if question["question_number"] not in fragment.get("question_numbers", [fragment.get("question_number")]):
                 continue
+            decision = supplement_decisions.get(fragment.get("selection_id"), {})
             action = decision.get("action")
-            if action == "negeren":
+            if not decision.get("reviewed") or action == "negeren":
                 continue
-            page = supplement_pages.get(page_number, {})
-            page_text = page.get("question_texts", {}).get(str(question["question_number"]), page.get("text", ""))
-            matched_pages.append({"page_number": page_number, "action": action,
-                                  "text": page_text,
-                                  "url": (f"/api/exams/{exam_id}/documents/{supplement['document']['id']}/preview/{page_number - 1}")
-                                         if supplement.get("document") else None})
+            fragment_text = fragment.get("extracted_text", "")
+            image_urls = [segment["url"] for segment in fragment.get("segments", []) if segment.get("url")]
+            matched_fragments.append({
+                "selection_id": fragment.get("selection_id"),
+                "action": action,
+                "text": fragment_text,
+                "urls": image_urls,
+            })
             if action == "vervangen":
-                question["answer_text"] = page_text
-                # Als de aanvulling zelf een nieuwe maximumscore vermeldt,
-                # gebruik die als effectieve CV-score. Zonder expliciete score
-                # blijft de oorspronkelijke score staan; de app gokt niet.
-                replacement_score = detect_cv_max_points(page_text, question["question_number"])
+                question["answer_text"] = fragment_text
+                replacement_score = detect_cv_max_points(fragment_text, question["question_number"])
                 if replacement_score is not None:
                     question["cv_max_points"] = replacement_score
                     question["points_match"] = (replacement_score == question.get("opgaven_max_points")) if question.get("opgaven_max_points") is not None else None
                 question["answer_kind"] = "handmatig"
                 question["confidence"] = "laag"
-                question["reason"] = "De aanvulling is als vervanging gemarkeerd; controleer de volledige vervangende tekst."
+                question["reason"] = "De aanvulling is als vervanging gemarkeerd; controleer de vervangende tekst."
             elif action in {"toevoegen", "handmatig"}:
-                question["answer_text"] = (question["answer_text"] + "\n\nAanvulling (pagina " +
-                                            str(page_number) + "): \n" + page_text).strip()
+                question["answer_text"] = (question["answer_text"] + "\n\nAanvulling: \n" + fragment_text).strip()
                 if action == "handmatig":
                     question["answer_kind"] = "handmatig"
                     question["confidence"] = "laag"
-        question["supplement_pages"] = matched_pages
+        question["supplement_fragments"] = matched_fragments
     previous = exam["steps"].get("antwoorden", {}).get("evidence", {})
     saved = {item["question_number"]: item for item in previous.get("questions", [])}
     for question in result["questions"]:
         if question["question_number"] in saved:
             question.update({k: saved[question["question_number"]][k]
-                             for k in ("answer_kind", "answer_text", "cv_max_points", "opgaven_max_points", "points_match", "supplement_pages", "reviewed")})
+                             for k in ("answer_kind", "answer_text", "cv_max_points", "opgaven_max_points", "points_match", "supplement_fragments", "reviewed")})
     return result
 
 
