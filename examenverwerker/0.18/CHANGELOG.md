@@ -1,3 +1,9 @@
+# CV-maximumscores: gerichte OCR-terugval
+- De herkenning leest maximumscores eerst uit de selecteerbare tekstlaag van het goedgekeurde CV-fragment.
+- Alleen wanneer daar geen score wordt gevonden, wordt de lokale RapidOCR-engine op de exacte fragmentafbeelding gestart. Volledige pagina's en niet-goedgekeurde fragmenten worden niet verwerkt.
+- De API geeft bij de score aan of deze uit de PDF-tekstlaag of via OCR is herkend, zodat de herkomst zichtbaar blijft in de analysegegevens.
+- Regressietests toegevoegd voor beide routes, voor het overslaan van OCR wanneer die niet nodig is en voor schrijfvarianten als `Maximumscore: 2`.
+
 # CV-tekstextractie: regressietest op afwijkende renderfactor
 
 - Een regressietest controleert nu dat selectiecoördinaten uit een stitch met renderfactor 2.0 correct teruggezet worden naar PDF-coördinaten, zodat tekstlabels zoals `maximumscore 2` binnen de clip blijven.
