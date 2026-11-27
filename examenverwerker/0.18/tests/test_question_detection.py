@@ -1284,6 +1284,11 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         # De aanvullingreview gebruikte exam zonder het eerst op te halen.
         main_py = Path(main.__file__).read_text(encoding="utf-8")
         self.assertIn('exam = STORE.get_exam(exam_id)\n    if not exam:', main_py)
+        # De gecontroleerde CV-aanvulling moet als losse pagina-snippets
+        # beschikbaar worden in de definitieve snippetcontrole.
+        self.assertIn('"cv_aanvulling": {"snippets": supplement_snippets}', main_py)
+        self.assertIn("Snippets uit de CV-aanvulling", app_js)
+        self.assertIn("result.cv_aanvulling?.snippets", app_js)
 
 
     def test_image_option_data_round_trips_through_exam_storage(self):
