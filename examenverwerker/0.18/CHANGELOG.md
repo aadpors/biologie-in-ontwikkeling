@@ -115,3 +115,10 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 - De browser stuurt de herkende scores nu expliciet mee. De API vult ontbrekende scorevelden bovendien zelf aan vanuit de actuele serveranalyse, zodat ook oudere browserclients geen scores meer verliezen.
 - Bestaande niet-lege opgeslagen scorecorrecties blijven behouden. De integrale eindcontrole leest vervolgens de opgeslagen scores zoals bedoeld.
 - Er is een regressietest toegevoegd voor de overdracht en opslag van beide scorevelden.
+
+### Meerdere examenbundels tegelijk importeren
+- De bibliotheek accepteert nu bestanden van meerdere examens in één selectieronde of in meerdere rondes.
+- PDF's worden op basis van de bestandsnaam-basis en documentcode (-o, -u, -c, -a en CV-aanvullingen) in afzonderlijke examenbundels gegroepeerd. Elke bundel wordt als eigen examenwerkruimte geïmporteerd.
+- De selectie wordt vóór upload getoond, inclusief bundelindeling en bestandsgrootte. Een afzonderlijk bestand kan met één actie uit de selectie worden verwijderd.
+- Dubbelen binnen de selectie worden tegengehouden. Bij een importfout blijft de selectie beschikbaar om opnieuw te proberen.
+- Reeds bestaande examens worden per bundel afzonderlijk afgehandeld; een bestaande verwerking wordt nooit automatisch vervangen.
