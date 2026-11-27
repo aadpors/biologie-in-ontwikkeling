@@ -1917,8 +1917,22 @@ def get_answers(exam_id: str):
             # en behoud de actuele (automatisch samengestelde) waarde als een
             # veld in de opgeslagen review ontbreekt. Dit voorkomt een KeyError
             # bij het openen van stap 12 na een upgrade.
-            question.update({k: saved[question["question_number"]].get(k, question.get(k))
-                             for k in ("answer_kind", "answer_text", "cv_max_points", "opgaven_max_points", "points_match", "supplement_fragments", "reviewed")})
+            saved_question = saved[question["question_number"]]
+            # Een eerder opgeslagen review kan een None bevatten omdat de
+            # scoreherkenning in een vorige versie nog niet werkte. Laat zo'n
+            # lege oude waarde een nieuw automatisch herkend maximum niet
+            # overschrijven. Niet-lege docentcorrecties blijven wel leidend.
+            for key in ("answer_kind", "answer_text", "cv_max_points",
+                        "opgaven_max_points", "points_match",
+                        "supplement_fragments", "reviewed"):
+                saved_value = saved_question.get(key)
+                current_value = question.get(key)
+                if saved_value is not None or current_value is None:
+                    question[key] = saved_value
+            # Herbereken de vergelijking wanneer een oude review de score
+            # niet bevatte, maar de actuele CV-analyse inmiddels wel.
+            if question.get("cv_max_points") is not None and question.get("opgaven_max_points") is not None:
+                question["points_match"] = question["cv_max_points"] == question["opgaven_max_points"]
     return result
 
 
