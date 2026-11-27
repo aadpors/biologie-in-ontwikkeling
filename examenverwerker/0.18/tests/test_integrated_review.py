@@ -389,7 +389,7 @@ class IntegratedReviewTests(unittest.TestCase):
             }],
             "document": {"id": "supplement-document"},
         }
-        with patch.object(main, "get_document_question_fragments", return_value={"questions": []}), \\
+        with patch.object(main, "get_document_question_fragments", side_effect=lambda _exam_id, kind: {"questions": ([{"question_number": 1, "selection_id": "supplement-fragment-1", "extracted_text": supplement["fragments"][0]["extracted_text"], "segments": supplement["fragments"][0]["segments"]}] if kind == "aanvulling_correctievoorschrift" else [])}), \\
              patch.object(main, "get_question_analysis", return_value={"questions": []}), \\
              patch.object(main, "analyse_answers", return_value={"questions": [dict(base_answer)]}), \\
              patch.object(main, "get_cv_supplement", return_value=supplement):
