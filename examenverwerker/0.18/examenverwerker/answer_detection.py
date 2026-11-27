@@ -11,6 +11,11 @@ from __future__ import annotations
 import re
 from typing import Any
 
+# Hergebruik dezelfde lokale OCR-engine als de vraaganalyse. OCR wordt hier
+# uitsluitend gestart wanneer de selecteerbare tekstlaag geen maximumscore
+# oplevert; gewone CV-fragmenten blijven dus snel en tekstgebaseerd verwerkt.
+from .question_analysis import _ocr_image_text
+
 # Veel Cito-correctievoorschriften plaatsen het antwoord en de score naast
 # elkaar. Deze patronen zijn bewust strikt: een losse letter midden in tekst
 # is geen bewijs voor een meerkeuzeantwoord.
@@ -130,13 +135,31 @@ def analyse_answers(cv_fragments: dict[str, Any], question_analysis: dict[str, A
         if expected == "meerkeuze" and detected["answer_kind"] != "meerkeuze":
             detected = {**detected, "confidence": "laag",
                         "reason": detected["reason"] + " De opgave is als meerkeuze herkend; controleer het CV."}
-        cv_max_points = detect_cv_max_points(fragment.get("extracted_text", ""), number)
+        cv_text = fragment.get("extracted_text", "")
+        cv_max_points = detect_cv_max_points(cv_text, number)
+        score_reason = (
+            "Maximumscore gevonden in de selecteerbare CV-tekstlaag."
+            if cv_max_points is not None else
+            "Geen maximumscore gevonden in de selecteerbare CV-tekstlaag."
+        )
+        # Sommige correctievoorschriften zijn (deels) als afbeelding opgeslagen.
+        # De visuele fragmentuitsnede is dan wel beschikbaar, maar de PDF levert
+        # geen tekst op. Start daarom alleen voor een nog ontbrekende score OCR
+        # op precies het goedgekeurde CV-fragment. De docent blijft de score
+        # controleren; OCR is uitsluitend een aanvullend voorstel.
+        if cv_max_points is None and fragment.get("image_paths"):
+            ocr_text = _ocr_image_text(fragment["image_paths"])
+            if ocr_text:
+                cv_max_points = detect_cv_max_points(ocr_text, number)
+                if cv_max_points is not None:
+                    score_reason = "Maximumscore aanvullend herkend vanuit de CV-fragmentafbeelding via lokale OCR."
         opgaven_question = next((item for item in (question_analysis or {}).get("questions", [])
                                  if item.get("question_number") == number), {})
         opgaven_points = opgaven_question.get("max_points")
         results.append({
             "question_number": number,
             "cv_max_points": cv_max_points,
+            "points_reason": score_reason,
             "opgaven_max_points": opgaven_points,
             "points_match": (cv_max_points == opgaven_points) if cv_max_points is not None and opgaven_points is not None else None,
             "answer_kind": detected["answer_kind"],
