@@ -1216,10 +1216,6 @@ class QuestionDetectionTests(unittest.TestCase):
         self.assertNotIn("Tekst van een latere pagina", extracted)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class ImageBasedAnswerOptionTests(unittest.TestCase):
     """Regressietests voor antwoordopties die volledig uit beeld bestaan."""
 
@@ -1421,3 +1417,6 @@ class CvMaximumScoreOcrFallbackTests(unittest.TestCase):
                      "max. score: 2", "maxscore 2"):
             with self.subTest(text=text):
                 self.assertEqual(detect_cv_max_points(text, 2), 2)
+
+if __name__ == "__main__":
+    unittest.main()
