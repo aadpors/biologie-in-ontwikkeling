@@ -1,3 +1,14 @@
+## CV-aanvulling als volwaardig fragmentdocument
+
+- Voeg afzonderlijke vraagstartdetectie en visuele vraagstartcontrole toe voor het aanvullingsdocument.
+- Gebruik voor de aanvulling dezelfde paginabrede stitchwerkruimte en versleepbare fragmentgrenzen als voor de uitwerkbijlage en het correctievoorschrift.
+- Laat de docent per uitgesneden fragment kiezen voor toevoegen, vervangen, handmatig beoordelen of negeren.
+- Stap 10 ontvangt uitsluitend de goedgekeurde fragmentuitsneden; volledige pagina-afbeeldingen worden niet meer aan antwoordvoorstellen toegevoegd.
+- Neem in de definitieve snippetcontrole alleen goedgekeurde, niet-genegeerde fragmenten op.
+- Sla bronhashes, pixelgrenzen, fragmentkoppelingen en verwerkingsbeslissingen afzonderlijk op. Een wijziging in eerdere stappen maakt afhankelijke goedkeuringen opnieuw controleplichtig.
+- Sla de twee verwerkingsstappen automatisch over wanneer geen aanvullings-PDF is geïmporteerd.
+- Voeg regressietests toe voor workflowafhankelijkheden, optionele afhandeling en de fragmentbron bij antwoordherkenning.
+
 # Wijzigingen Examenverwerker 0.18
 
 ## Snippets uit CV-aanvullingen
