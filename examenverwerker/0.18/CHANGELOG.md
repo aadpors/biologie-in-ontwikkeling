@@ -54,3 +54,9 @@
 ## Reikwijdte van deze eerste iteratie
 
 De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur is voorbereid op uitbreiding naar fragmentgrenzen en contextgroepen. Die twee detectietypen worden in volgende iteraties aangesloten, met aparte labels voor verplaatste boven- en ondergrenzen en gewijzigde contextbereiken.
+
+
+### Reparatie CV-aanvulling – vraagstartreview
+
+- De opslagroute voor vraagstartcorrecties ondersteunt nu ook `aanvulling_correctievoorschrift` en bewaart de controle onder workflowstap `supplement_starts`.
+- Een regressietest doorloopt voor de CV-aanvulling dezelfde volledige API-keten als voor de uitwerkbijlage en het correctievoorschrift: detecteren, review opslaan, stap afronden, fragmenten ophalen en fragmentreview opslaan.
