@@ -174,7 +174,17 @@ def _safe_filename(filename: str) -> str:
 
 @app.get("/", response_class=HTMLResponse)
 def home():
-    return (ROOT / "templates" / "index.html").read_text(encoding="utf-8")
+    # De startpagina bevat de versieverwijzingen naar app.js en app.css.
+    # Geef de browser expliciet opdracht deze HTML niet uit een oude cache
+    # te hergebruiken; zo hoort de zichtbare versie bij de gestarte server.
+    html = (ROOT / "templates" / "index.html").read_text(encoding="utf-8")
+    return HTMLResponse(
+        content=html,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+        },
+    )
 
 
 @app.get("/api/exams")
