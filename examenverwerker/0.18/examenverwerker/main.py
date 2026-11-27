@@ -1727,6 +1727,9 @@ def get_cv_supplement(exam_id: str):
 @app.post("/api/exams/{exam_id}/cv-supplement/review")
 def save_cv_supplement_review(exam_id: str, payload: dict):
     """Bewaar keuzes per supplementpagina; voeg niets stilzwijgend samen."""
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
     result = get_cv_supplement(exam_id)
     if result.get("not_required"):
         raise HTTPException(409, "Dit examen heeft geen aanvulling op het correctievoorschrift.")
