@@ -362,6 +362,8 @@ function renderWorkspace() {
   else if (next?.key === 'uitwerk_fragments') renderStitchedOpgavenStage('uitwerk_fragments', 'uitwerk_starts', 'FASE 3 · UITWERKBIJLAGE', 'Fragmenten uitwerkbijlage', 'uitwerkbijlage');
   else if (next?.key === 'cv_starts') renderQuestionStartsStage('cv_starts', 'correctievoorschrift', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Vraagstarts correctievoorschrift');
   else if (next?.key === 'cv_fragments') renderStitchedOpgavenStage('cv_fragments', 'cv_starts', 'FASE 4 · CORRECTIEVOORSCHRIFT', 'Fragmenten correctievoorschrift', 'correctievoorschrift');
+  else if (next?.key === 'supplement_starts') renderQuestionStartsStage('supplement_starts', 'aanvulling_correctievoorschrift', 'FASE 5 · AANVULLING CORRECTIEVOORSCHRIFT', 'Vraagstarts CV-aanvulling');
+  else if (next?.key === 'supplement_fragments') renderStitchedOpgavenStage('supplement_fragments', 'supplement_starts', 'FASE 5 · AANVULLING CORRECTIEVOORSCHRIFT', 'Fragmenten CV-aanvulling', 'aanvulling_correctievoorschrift');
   else if (next?.key === 'cv_aanvulling') renderCvSupplementStage();
   else if (next?.key === 'antwoorden') renderAnswersStage();
   else if (next?.key === 'relaties') renderRelationsStage();
@@ -1734,8 +1736,9 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
   // Alleen de API-route en toegestane fragmentsoort verschillen.
   const isWorkbook = documentType === 'uitwerkbijlage';
   const isCv = documentType === 'correctievoorschrift';
-  const isStitchedDocument = isWorkbook || isCv;
-  const documentLabel = isWorkbook ? 'uitwerkbijlage' : isCv ? 'correctievoorschrift' : 'opgavenboekje';
+  const isSupplement = documentType === 'aanvulling_correctievoorschrift';
+  const isStitchedDocument = isWorkbook || isCv || isSupplement;
+  const documentLabel = isWorkbook ? 'uitwerkbijlage' : isCv ? 'correctievoorschrift' : isSupplement ? 'aanvulling op het correctievoorschrift' : 'opgavenboekje';
   const stitchedReviewUrl = isStitchedDocument
     ? `/api/exams/${state.examId}/stitched-document/${documentType}/review`
     : `/api/exams/${state.examId}/stitched-opgaven/review`;
