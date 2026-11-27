@@ -64,6 +64,15 @@ class FrontendBugfixContractTests(unittest.TestCase):
         ]:
             self.assertIn(rule, css)
 
+    def test_supplement_stitched_image_route_allows_fetching_png(self):
+        # De review-API kan een afbeelding genereren, maar een aparte route-
+        # whitelist moet diezelfde afbeelding ook aan de browser kunnen leveren.
+        # Dit beschermt tegen het geval waarin een URL 404 geeft terwijl de
+        # fragmentreview verder wel metadata voor die afbeelding ontvangt.
+        backend = (ROOT / "examenverwerker" / "main.py").read_text(encoding="utf-8")
+        self.assertIn('"aanvulling_correctievoorschrift"} or filename != "exam-long.png"', backend)
+        self.assertIn('/api/stitched-document-images/{exam_id}/{document_type}/{filename}', backend)
+
 
 if __name__ == "__main__":
     unittest.main()
