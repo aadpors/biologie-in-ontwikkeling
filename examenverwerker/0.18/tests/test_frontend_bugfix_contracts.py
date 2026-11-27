@@ -37,18 +37,19 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn(r"error.message.match(/heropen stap\s*(\d+)/i)", js)
         self.assertIn("6: {key: 'uitwerk_fragments', label: 'stap 6 · fragmenten uitwerkbijlage'}", js)
 
-    def test_cv_supplement_text_reader_is_tall_and_targets_the_correct_step(self):
+    def test_cv_supplement_stitched_page_has_a_tall_scrollable_viewport(self):
         js = APP_JS.read_text(encoding="utf-8")
         css = APP_CSS.read_text(encoding="utf-8")
-        # De tekstweergave staat in renderCvSupplementStage (niet in de
-        # afbeeldingselectiestap). De tijdelijke klasse wordt bij wisselen
-        # van workflowstap verwijderd om CSS-lekkage te voorkomen.
-        self.assertIn("panel.classList.add('supplement-merge-stage');", js)
+        # De CV-aanvulling gebruikt de lange samengevoegde pagina in de
+        # fragmentselectiestap. De klasse moet daar worden gezet en bij het
+        # openen van een volgende stap weer worden verwijderd.
+        self.assertIn("panel.classList.toggle('supplement-fragments-stage', documentType === 'aanvulling_correctievoorschrift');", js)
         self.assertIn("stagePanel?.classList.remove('supplement-fragments-stage', 'supplement-merge-stage');", js)
-        self.assertIn(".stage-panel.supplement-merge-stage .analysis-text pre", css)
-        self.assertIn("min-height: 12rem;", css)
-        self.assertIn("max-height: 32rem;", css)
-        self.assertIn("overflow-wrap: anywhere;", css)
+        self.assertIn(".stage-panel.supplement-fragments-stage .stitched-image-scroll", css)
+        self.assertIn("height: clamp(360px, 70vh, 900px) !important;", css)
+        self.assertIn("overflow-y: scroll !important;", css)
+        self.assertIn(".stage-panel.supplement-fragments-stage .stitched-image-wrap img", css)
+        self.assertIn("height: auto !important;", css)
 
     def test_context_group_cards_wrap_inside_inspector(self):
         css = APP_CSS.read_text(encoding="utf-8")
