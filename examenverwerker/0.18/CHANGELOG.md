@@ -67,3 +67,10 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 - Vergroot het leesvenster in de stap met fragmenten van de CV-aanvulling tot een groot deel van de beschikbare schermhoogte (met een bruikbare minimumhoogte).
 - De extra leesruimte geldt uitsluitend voor deze stap; de weergave van opgaven, uitwerkbijlage en regulier correctievoorschrift blijft ongewijzigd.
 - Voeg een frontend-regressietest toe voor de stapgebonden hoogte-instelling en het resetten van de layoutklasse.
+
+
+### Leesvenster tekst CV-aanvulling gecorrigeerd
+
+- Pas de hoogtevergroting toe op het uitklapbare tekstleesvenster in de stap waarin CV-aanvullingsfragmenten worden beoordeeld. De eerdere wijziging vergrootte ten onrechte de afbeeldingviewport van de voorafgaande fragmentstap.
+- Toon minimaal 12 rem teksthoogte en maximaal 32 rem, met regelafbreking en een eigen scrollbar voor lange fragmentteksten.
+- Reset de tijdelijke layoutklasse bij het wisselen van workflowstap en dek de juiste koppeling af met een frontend-regressietest.
