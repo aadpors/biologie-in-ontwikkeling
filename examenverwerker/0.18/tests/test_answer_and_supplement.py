@@ -24,6 +24,10 @@ class AnswerAndSupplementTests(unittest.TestCase):
         self.assertEqual(detect_cv_max_points("Maximumscore\n2", 1), 2)
         self.assertEqual(detect_cv_max_points("Maximum\nscore\n3", 1), 3)
         self.assertEqual(detect_cv_max_points("maximum score: 4", 1), 4)
+        self.assertEqual(detect_cv_max_points("max. score 5", 1), 5)
+        self.assertEqual(detect_cv_max_points("maxscore 6", 1), 6)
+        self.assertEqual(detect_cv_max_points("Maximum\\nscore\\n7", 1), 7)
+        self.assertEqual(detect_cv_max_points("Max.\\nscore\\n8", 1), 8)
 
     def test_closed_answer_list_is_recognised_in_order(self):
         result = detect_cv_answer("9 maximumscore 2\n1 onjuist\n2 juist\n3 juist\n")
