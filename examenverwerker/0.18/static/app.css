@@ -1176,23 +1176,21 @@
 }
 
 
-/* CV-aanvulling: maak het bron-/leesvenster duidelijk hoger. Deze documenten
-   bevatten vaak meerdere korte correctieregels onder elkaar; met het algemene
-   viewport bleef slechts een smalle strook zichtbaar. De extra hoogte geldt
-   uitsluitend voor de fragmentreview van de aanvulling en laat de andere
-   documentstappen ongemoeid. Het venster blijft zelfstandig scrollbaar. */
-.stage-panel.supplement-fragments-stage .stitched-view {
-  min-height: 0;
-}
-.stage-panel.supplement-fragments-stage .stitched-image-scroll {
-  flex: 1 1 auto;
-  height: 78vh;
-  min-height: 520px;
-  max-height: 900px;
-}
-@media (max-height: 720px) {
-  .stage-panel.supplement-fragments-stage .stitched-image-scroll {
-    height: 72vh;
-    min-height: 420px;
-  }
+
+/* Stap CV-aanvulling samenvoegen: het uitklapbare tekstleesvenster toont de
+   OCR-/PDF-tekst van één geselecteerd fragment. Dit is geen invoerveld maar
+   een pre-element binnen details. Geef het voldoende hoogte om meerdere regels
+   tegelijk te kunnen beoordelen, met een ruime bovengrens en eigen scrollbalk
+   voor uitzonderlijk lange correctieteksten. Andere analysekaarten blijven
+   bewust compact. */
+.stage-panel.supplement-merge-stage .analysis-text pre {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 12rem;
+  max-height: 32rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
 }
