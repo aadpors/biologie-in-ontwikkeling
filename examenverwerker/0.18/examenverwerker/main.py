@@ -1876,6 +1876,18 @@ def get_answers(exam_id: str):
     if not exam:
         raise HTTPException(404, "Examen niet gevonden.")
     cv_fragments = get_document_question_fragments(exam_id, "correctievoorschrift")
+    # Koppel de exacte, visueel goedgekeurde CV-fragmentafbeeldingen aan de
+    # analyse. De antwoordherkenning gebruikt de PDF-tekstlaag als eerste bron
+    # en schakelt alleen voor ontbrekende maximumscores over op lokale OCR.
+    # Daardoor worden geen volledige pagina's of niet-goedgekeurde fragmenten
+    # naar de OCR-engine gestuurd.
+    cv_image_dir = DATA / "exams" / exam_id / "derived" / "correctievoorschrift_fragments"
+    for fragment in cv_fragments.get("questions", []):
+        fragment["image_paths"] = [
+            str(cv_image_dir / segment["filename"])
+            for segment in fragment.get("segments", [])
+            if segment.get("filename") and (cv_image_dir / segment["filename"]).is_file()
+        ]
     analysis = get_question_analysis(exam_id)
     result = analyse_answers(cv_fragments, analysis)
     # Alleen fragmenten die in stap 9 expliciet zijn beoordeeld, worden
