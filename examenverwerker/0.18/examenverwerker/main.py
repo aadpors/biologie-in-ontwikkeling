@@ -316,6 +316,53 @@ def _load_document_question_starts(exam_id: str, document_type: str):
         raise HTTPException(409, "Het bronbestand is gewijzigd sinds import.")
     try:
         result = detect_question_starts(str(path), enforce_sequence=(document_type != "correctievoorschrift"), allow_lowercase_text=(document_type == "correctievoorschrift"))
+        if document_type == "aanvulling_correctievoorschrift":
+            # Aanvullingen gebruiken vaak expliciete koppen als "Vraag 22:" in
+            # plaats van het kale nummer dat de generieke examendetector zoekt.
+            # Voeg die regels als kandidaten toe met dezelfde coördinaten en
+            # previewstructuur, zodat de bestaande visuele review herbruikbaar is.
+            with fitz.open(path) as supplement_pdf:
+                for page_index, source_page in enumerate(supplement_pdf):
+                    page_result = result["pages"][page_index]
+                    for block in source_page.get_text("dict").get("blocks", []):
+                        if block.get("type") != 0:
+                            continue
+                        for line in block.get("lines", []):
+                            line_text = " ".join(span.get("text", "") for span in line.get("spans", [])).strip()
+                            match = re.match(r"^vraag\\s+(?P<number>\\d{1,2})\\s*[:.)]?\\s*(?P<rest>.*)$", line_text, re.IGNORECASE)
+                            if not match:
+                                continue
+                            number = int(match.group("number"))
+                            if not 1 <= number <= 60:
+                                continue
+                            bbox = line.get("bbox", [])
+                            if len(bbox) != 4:
+                                continue
+                            x0, y0, x1, y1 = map(float, bbox)
+                            candidate = {
+                                "id": f"p{page_index + 1}-supp-q{number}-{len(page_result['candidates']) + 1}",
+                                "question_number": number,
+                                "page_index": page_index,
+                                "text": line_text,
+                                "pdf_bbox": [round(x0, 2), round(y0, 2), round(x1, 2), round(y1, 2)],
+                                "preview_bbox": [
+                                    round(x0 * page_result["scale_x"], 2),
+                                    round(y0 * page_result["scale_y"], 2),
+                                    round(x1 * page_result["scale_x"], 2),
+                                    round(y1 * page_result["scale_y"], 2),
+                                ],
+                                "font_size": max((float(span.get("size", 0)) for span in line.get("spans", [])), default=0.0),
+                                "accepted": True,
+                                "source": "automatic",
+                            }
+                            if not any(item["question_number"] == number and item["page_index"] == page_index
+                                       and abs(float(item["pdf_bbox"][1]) - y0) < 3 for item in result["candidates"]):
+                                result["candidates"].append(candidate)
+                                page_result["candidates"].append(candidate)
+                result["candidates"].sort(key=lambda item: (item["page_index"], item["pdf_bbox"][1]))
+                result["candidate_count"] = len(result["candidates"])
+                for page_result in result["pages"]:
+                    page_result["candidate_count"] = len(page_result["candidates"])
         if document_type == "correctievoorschrift":
             # Het CV bevat vóór het beoordelingsmodel genummerde juridische
             # voorschriften. Die nummers zijn geen examenvragen. Start daarom
