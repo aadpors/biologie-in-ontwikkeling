@@ -2091,6 +2091,35 @@ def get_snippets(exam_id: str):
     uitwerk = (_load_document_fragments(exam_id, "uitwerkbijlage") if has_uitwerk
                else {"question_count": 0, "questions": [], "document": None})
     cv = _load_document_fragments(exam_id, "correctievoorschrift")
+
+    # De pagina's uit de CV-aanvulling zijn zelfstandige snippetbronnen.
+    # Gebruik alleen pagina's die tijdens stap 9 expliciet zijn beoordeeld,
+    # zodat een genegeerde pagina niet ongemerkt in de snippetset belandt.
+    supplement_snippets = []
+    has_supplement = any(
+        exam["metadata"].get("document_types", {}).get(doc["filename"]) == "aanvulling_correctievoorschrift"
+        or doc.get("metadata", {}).get("document_type") == "aanvulling_correctievoorschrift"
+        for doc in exam["documents"]
+    )
+    if has_supplement:
+        supplement = get_cv_supplement(exam_id)
+        supplement_review = exam["steps"].get("cv_aanvulling", {}).get("evidence", {})
+        reviewed_pages = {
+            item["page_number"]: item
+            for item in supplement_review.get("items", [])
+            if item.get("reviewed")
+        }
+        for item in supplement.get("items", []):
+            decision = reviewed_pages.get(item["page_number"])
+            if not decision or decision.get("action") == "negeren":
+                continue
+            supplement_snippets.append({
+                "page_number": item["page_number"],
+                "action": decision.get("action", item.get("action", "handmatig")),
+                "question_numbers": decision.get("question_numbers", item.get("question_numbers", [])),
+                "url": f"/api/exams/{exam_id}/documents/{supplement['document']['id']}/preview/{item['page_index']}",
+            })
+
     reviewed_uitwerk = set(previous.get("reviewed_uitwerk_numbers", []))
     reviewed_cv = set(previous.get("reviewed_cv_numbers", []))
     for question in uitwerk["questions"]:
@@ -2099,6 +2128,7 @@ def get_snippets(exam_id: str):
         question["reviewed"] = question["question_number"] in reviewed_cv
     return {"contexts": contexts["contexts"], "context_count": contexts["context_count"],
             "opgaven": opgaven, "uitwerkbijlage": uitwerk, "correctievoorschrift": cv,
+            "cv_aanvulling": {"snippets": supplement_snippets},
             "question_count": opgaven["question_count"]}
 
 
