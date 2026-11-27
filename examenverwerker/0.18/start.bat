@@ -180,7 +180,7 @@ if not defined APP_PORT (
 REM Open pas de gekozen poort. De browser kan hierdoor niet stilzwijgend
 REM een reeds draaiende, oudere instantie op poort 8000 tonen.
 echo.
-echo Examenverwerker 0.18.3 wordt gestart op http://127.0.0.1:%APP_PORT%
+echo Examenverwerker 0.18.4 wordt gestart op http://127.0.0.1:%APP_PORT%
 echo Laat dit venster open zolang de applicatie wordt gebruikt.
 echo Sluit de applicatie met Ctrl+C.
 echo.
