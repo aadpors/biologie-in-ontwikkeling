@@ -771,5 +771,27 @@ class WorkflowApplicationTests(unittest.TestCase):
         )
 
 
+    def test_optional_supplement_stages_are_skipped_without_a_supplement_pdf(self):
+        """Een ontbrekende aanvulling blokkeert de workflow niet en krijgt bewijs."""
+        exam_id = self.import_sample()["exam_id"]
+        main.STORE.confirm_metadata(exam_id, {
+            "subject": "biologie", "level": "vwo", "year": 2026, "period": 2,
+            "document_types": {
+                "biologie-vwo-2026-tv2-o.pdf": "opgaven",
+                "biologie-vwo-2026-tv2-c.pdf": "correctievoorschrift",
+            },
+        })
+        main.STORE.complete_step(exam_id, "metadata", {"reviewed": True})
+        main.STORE.complete_step(exam_id, "cv_starts", {"reviewed": True})
+        main.STORE.complete_step(exam_id, "cv_fragments", {"reviewed": True})
+
+        response = self.client.post(f"/api/exams/{exam_id}/skip-optional-supplement")
+        self.assertEqual(response.status_code, 200, response.text)
+        steps = self.client.get(f"/api/exams/{exam_id}").json()["steps"]
+        self.assertEqual(steps["supplement_starts"]["status"], "complete")
+        self.assertEqual(steps["supplement_fragments"]["status"], "complete")
+        self.assertTrue(steps["supplement_starts"]["evidence"]["not_applicable"])
+
+
 if __name__ == "__main__":
     unittest.main()
