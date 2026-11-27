@@ -819,7 +819,7 @@ class QuestionDetectionTests(unittest.TestCase):
     def test_question_analysis_validation_requires_every_question_reviewed(self):
         payload = {"questions":[
             {"question_number":1,"question_type":"meerkeuze","max_points":2,
-             "options":[{"letter":"A","text":"optie"}],"reviewed":True},
+             "options":[{"letter":"A","text":"optie"},{"letter":"B","text":"tweede optie"}],"reviewed":True},
             {"question_number":2,"question_type":"open","max_points":None,"options":[],"reviewed":False},
         ]}
         result = validate_question_analysis(payload, {1,2})
@@ -1283,7 +1283,7 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         self.assertIn("imageScroll.scrollTop += Math.max(2, 14 * intensity)", app_js)
         # De aanvullingreview gebruikte exam zonder het eerst op te halen.
         main_py = Path(main.__file__).read_text(encoding="utf-8")
-        self.assertIn('exam = STORE.get_exam(exam_id)\\n    if not exam:', main_py)
+        self.assertIn('exam = STORE.get_exam(exam_id)\n    if not exam:', main_py)
 
 
     def test_image_option_data_round_trips_through_exam_storage(self):
