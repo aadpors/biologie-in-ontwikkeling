@@ -9,6 +9,14 @@ on:
       - "examenverwerker/0.18/**"
       - ".github/workflows/examenverwerker-018.yml"
       - "examens/vw-1018-a-26-2-o.pdf"
+  # Valideer ook iedere pull request die de 0.18-verwerker wijzigt.
+  # Zonder deze trigger konden regressies in de ontwikkelbranch onopgemerkt
+  # blijven totdat de branch rechtstreeks naar main werd gepusht.
+  pull_request:
+    paths:
+      - "examenverwerker/0.18/**"
+      - ".github/workflows/examenverwerker-018.yml"
+      - "examens/vw-1018-a-26-2-o.pdf"
   workflow_dispatch:
 jobs:
   test:
