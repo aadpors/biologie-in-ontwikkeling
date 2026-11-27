@@ -85,3 +85,6 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 ### Herstel afbeelding CV-aanvulling in fragmentreview
 - De afbeeldingsserverroute accepteert nu ook `aanvulling_correctievoorschrift`. De lange afbeelding werd wel opgebouwd, maar de whitelist van de afbeeldingsroute sloot dit documenttype uit, waardoor de browser de PNG niet kon ophalen.
 - Regressiecontract toegevoegd om deze route-toegang te bewaken.
+
+
+- **Maximumscores uit CV herkennen:** herkenning uitgebreid met varianten zoals `max. score`, `maxscore` en labels die over meerdere regels zijn verdeeld; regressietests toegevoegd.
