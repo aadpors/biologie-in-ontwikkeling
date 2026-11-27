@@ -37,6 +37,6 @@ De leerkring omvat vraagstarts, fragmentgrenzen en contextgroepen. Vraagstartken
 ## Veilige testomgeving
 
 - `start.bat` gebruikt de gedeelde gegevensmap van de examenverwerker. Bestaande examens blijven daarin beschikbaar.
-- `start-test.bat` start dezelfde applicatie met een **afzonderlijke** gegevensmap (`test-data/` in deze versie-map). Daarmee kunnen nieuwe imports en bugtests worden uitgevoerd zonder de bestaande examendatabase te wijzigen.
+- `start-test.bat` start dezelfde applicatie met een **afzonderlijke** gegevensmap (`test-data/` in deze versie-map). Daarmee kunnen nieuwe imports en bugtests worden uitgevoerd zonder de bestaande examendatabase te wijzigen. Stop een eventueel draaiende server eerst met `Ctrl+C`; de testlauncher gebruikt eveneens poort 8000.
 - De testbibliotheek is bewust leeg. Importeer er een kopie of nieuw testexamen; de bestaande tweede examenimport staat niet in deze testbibliotheek.
 - `test-data/` is uitgesloten van Git.
