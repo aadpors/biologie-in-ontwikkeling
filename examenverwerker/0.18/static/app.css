@@ -1194,3 +1194,33 @@
   overflow-wrap: anywhere;
   line-height: 1.5;
 }
+
+
+/* Stap CV-aanvulling: de volledige samengevoegde pagina moet in een eigen
+   leesvenster zichtbaar zijn. Zonder deze expliciete hoogte kan de flex-layout
+   het venster tot een smalle strook terugbrengen; dan lijkt het alsof de PDF
+   maar één regel bevat en is er geen bruikbare ruimte om te scrollen. Houd het
+   venster daarom op een groot deel van de schermhoogte en laat de afbeelding
+   zelf haar natuurlijke (volledige) hoogte behouden. De scrollbalk hoort bij
+   het venster, niet bij een afgesneden afbeelding of een losse fragmentkaart. */
+.stage-panel.supplement-fragments-stage .stitched-view {
+  min-height: 0;
+  height: auto;
+}
+.stage-panel.supplement-fragments-stage .stitched-image-scroll {
+  display: block;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  height: clamp(360px, 70vh, 900px) !important;
+  min-height: 360px !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: scroll !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.stage-panel.supplement-fragments-stage .stitched-image-wrap,
+.stage-panel.supplement-fragments-stage .stitched-image-wrap img {
+  height: auto !important;
+  max-height: none !important;
+}
