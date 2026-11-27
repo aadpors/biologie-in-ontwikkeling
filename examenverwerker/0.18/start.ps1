@@ -89,7 +89,30 @@ if ($LASTEXITCODE -ne 0) {
     throw 'De benodigde Python-pakketten konden niet worden geïnstalleerd.'
 }
 
+# Kies dezelfde vrije-poortstrategie als start.bat. We beëindigen nooit
+# automatisch een bestaand proces: dat kan een andere examenverwerker zijn.
+$Port = $null
+for ($CandidatePort = 8000; $CandidatePort -le 8010; $CandidatePort++) {
+    $Listener = $null
+    try {
+        $Listener = [System.Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, $CandidatePort)
+        $Listener.Start()
+        $Port = $CandidatePort
+        break
+    }
+    catch {
+        # De poort is bezet; probeer de volgende zonder het proces te storen.
+    }
+    finally {
+        if ($Listener) { $Listener.Stop() }
+    }
+}
+if (-not $Port) {
+    throw 'Geen vrije lokale poort gevonden tussen 8000 en 8010. Sluit een oude lokale Examenverwerker of kies een andere poort.'
+}
+
 Write-Host ''
-Write-Host 'Examenverwerker starten op http://127.0.0.1:8000'
+Write-Host "Examenverwerker 0.18.3 starten op http://127.0.0.1:$Port"
 Write-Host 'Laat dit venster open zolang de applicatie wordt gebruikt.'
-& $Python -m uvicorn examenverwerker.main:app --host 127.0.0.1 --port 8000
+Start-Process "http://127.0.0.1:$Port/"
+& $Python -m uvicorn examenverwerker.main:app --host 127.0.0.1 --port $Port
