@@ -1276,6 +1276,14 @@ class ImageBasedAnswerOptionTests(unittest.TestCase):
         # Contextgroepkaarten in de rechter inspector moeten compact blijven.
         self.assertIn(".stitched-inspector .context-group-card", app_css)
         self.assertIn("padding: 7px 9px !important;", app_css)
+        self.assertIn('question.question_type === \'meerkeuze\' ? '' : 'hidden'', app_js)
+        self.assertIn("editor.hidden = input.value !== 'meerkeuze'", app_js)
+        self.assertIn("edgeZone = 48", app_js)
+        self.assertIn("imageScroll.scrollTop += Math.max(2, 14 * intensity)", app_js)
+        # De aanvullingreview gebruikte exam zonder het eerst op te halen.
+        main_py = Path(main.__file__).read_text(encoding="utf-8")
+        self.assertIn('exam = STORE.get_exam(exam_id)\\n    if not exam:', main_py)
+
 
     def test_image_option_data_round_trips_through_exam_storage(self):
         # De uitsnede moet na een browservernieuwing of het opnieuw openen van
