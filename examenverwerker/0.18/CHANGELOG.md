@@ -1,3 +1,8 @@
+# Reparatie na eerste CI-controle
+- De eerste volledige CI-run vond twee testproblemen: een foutief pad in een bestaande frontend-contracttest en een CV-regel waarin regeleinden als de letterlijke tekens `\\n` waren opgeslagen.
+- Beide zijn hersteld; de CV-scoreherkenning normaliseert nu zowel echte regeleinden als ge-escapete regeleinden voordat het scorelabel wordt gelezen.
+- De CI-run voerde 153 tests uit; de overige tests slaagden, maar door deze twee bevindingen was de totale run niet geslaagd. De nieuwe testuitvoering moet de reparaties bevestigen.
+
 # CV-maximumscores: gerichte OCR-terugval
 - De herkenning leest maximumscores eerst uit de selecteerbare tekstlaag van het goedgekeurde CV-fragment.
 - Alleen wanneer daar geen score wordt gevonden, wordt de lokale RapidOCR-engine op de exacte fragmentafbeelding gestart. Volledige pagina's en niet-goedgekeurde fragmenten worden niet verwerkt.
