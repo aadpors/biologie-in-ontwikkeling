@@ -1,5 +1,11 @@
 # Wijzigingen Examenverwerker 0.18
 
+## Snippets uit CV-aanvullingen
+
+- De snippetfase toont nu ook afzonderlijke pagina-snippets uit de gecontroleerde CV-aanvulling. Pagina’s die als negeren zijn beoordeeld, worden niet meegenomen.
+- De gekozen verwerking (toevoegen/vervangen/handmatig) en vraagkoppeling worden zichtbaar bij ieder snippet.
+- Regressietest toegevoegd voor de aanwezigheid van de aanvulling-snippets in API en interface.
+
 ## Nieuwe correcties na praktijktest
 
 - Stap 4 toont de antwoordoptie-editor alleen bij vragen die meerkeuze zijn; bij het wijzigen van het vraagtype schakelt de editor direct mee.
