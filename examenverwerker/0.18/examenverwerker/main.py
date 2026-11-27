@@ -787,12 +787,25 @@ def _extract_stitched_selection_text(
             crop_top = float(crop_pixels[1])
             rendered_width = max(1.0, float(page_info.get("render_width", 1)))
             stitched_width = max(1.0, float(page_info.get("stitched_width", rendered_width)))
+            source_width = max(1.0, float(page_info.get("source_width", 1)))
             resize_factor = stitched_width / rendered_width
 
             render_y0 = (overlap_top - page_top) / resize_factor + crop_top
             render_y1 = (overlap_bottom - page_top) / resize_factor + crop_top
-            pdf_y0 = max(0.0, render_y0 / render_scale)
-            pdf_y1 = min(float(page_info["source_height"]), render_y1 / render_scale)
+
+            # Gebruik de feitelijke renderfactor uit de paginametadata, in
+            # plaats van een vaste 1.25. Dat is belangrijk bij PDF's met
+            # afwijkende paginagrootte, rendererinstellingen of toekomstige
+            # wijzigingen aan de stitch. render_width/source_width is de
+            # schaal van de oorspronkelijke pagina naar renderpixels; crop- en
+            # stitch-resizing worden hierboven al in omgekeerde volgorde
+            # teruggedraaid. De parameter render_scale blijft als fallback
+            # voor oude metadata die geen bronbreedte bevatten.
+            actual_render_scale = rendered_width / source_width
+            if actual_render_scale <= 0:
+                actual_render_scale = render_scale
+            pdf_y0 = max(0.0, render_y0 / actual_render_scale)
+            pdf_y1 = min(float(page_info["source_height"]), render_y1 / actual_render_scale)
             if pdf_y1 <= pdf_y0:
                 continue
 
