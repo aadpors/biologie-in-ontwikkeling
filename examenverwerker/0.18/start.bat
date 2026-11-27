@@ -163,14 +163,29 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Open de webinterface nadat de afhankelijkheden zijn geinstalleerd.
+REM Kies een vrije lokale poort. Een oudere Examenverwerker kan nog draaien
+REM op poort 8000; die mag niet worden aangezien voor deze nieuwe versie.
+REM We laten bestaande processen bewust ongemoeid en starten op 8001, 8002,
+REM enzovoort. Zo wordt nooit onbedoeld een oude server geopend of afgesloten.
+set "APP_PORT="
+for /f %%P in ('powershell -NoProfile -Command "$p=8000; while($p -le 8010){try{$l=[System.Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$p);$l.Start();$l.Stop();Write-Output $p;exit 0}catch{$p++}};exit 1"') do set "APP_PORT=%%P"
+if not defined APP_PORT (
+    echo.
+    echo FOUT: Geen vrije poort gevonden tussen 8000 en 8010.
+    echo Sluit een oude lokale Examenverwerker of kies een andere poort.
+    pause
+    exit /b 1
+)
+
+REM Open pas de gekozen poort. De browser kan hierdoor niet stilzwijgend
+REM een reeds draaiende, oudere instantie op poort 8000 tonen.
 echo.
-echo Examenverwerker wordt gestart op http://127.0.0.1:8000
-echo Laat dit venster open zolang je de applicatie gebruikt.
+echo Examenverwerker 0.18.3 wordt gestart op http://127.0.0.1:%APP_PORT%
+echo Laat dit venster open zolang de applicatie wordt gebruikt.
 echo Sluit de applicatie met Ctrl+C.
 echo.
-start "" "http://127.0.0.1:8000"
-"%PYTHON_EXE%" -m uvicorn examenverwerker.main:app --host 127.0.0.1 --port 8000
+start "" "http://127.0.0.1:%APP_PORT%/"
+"%PYTHON_EXE%" -m uvicorn examenverwerker.main:app --host 127.0.0.1 --port %APP_PORT%
 
 REM Als de server stopt door een fout, blijft de melding zichtbaar.
 echo.
