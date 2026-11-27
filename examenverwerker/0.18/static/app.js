@@ -899,6 +899,14 @@ async function renderSnippetsStage() {
       ${result.uitwerkbijlage.questions.length ? '' : '<p class="muted">Geen uitwerkbijlagefragmenten van toepassing.</p>'}
       <h3>Correctievoorschriftfragmenten</h3>
       ${renderFragmentCards(result.correctievoorschrift.questions, 'Correctievoorschrift', 'Correctievoorschrift')}
+      <h3>Snippets uit de CV-aanvulling</h3>
+      ${(result.cv_aanvulling?.snippets || []).map(page => `
+        <article class="analysis-card">
+          <h3>CV-aanvulling · pagina ${page.page_number}</h3>
+          <p class="analysis-reason">${escapeHtml(page.action)} · gekoppeld aan vraag ${page.question_numbers.join(', ') || 'niet gekoppeld'}</p>
+          <img class="fragment-image" loading="lazy" src="${escapeHtml(page.url)}" alt="Snippet van pagina ${page.page_number} uit de CV-aanvulling">
+        </article>`).join('')}
+      ${(result.cv_aanvulling?.snippets || []).length ? '' : '<p class="muted">Geen beoordeelde pagina-snippets uit een CV-aanvulling.</p>'}
       <div class="review-actions">
         <button class="primary" id="saveSnippets" type="button">Controle opslaan</button>
         <button class="primary" id="completeSnippets" type="button">Snippets goedkeuren en doorgaan</button>
