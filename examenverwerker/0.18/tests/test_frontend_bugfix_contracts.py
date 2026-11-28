@@ -95,8 +95,8 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn("APP_PORT", batch)
         self.assertIn("TcpListener", batch)
         self.assertIn("CandidatePort", powershell)
-        self.assertIn("versie 0.18.5", html)
-        self.assertIn("app.js?v=0.18.5", html)
+        self.assertIn("versie 0.18.6", html)
+        self.assertIn("app.js?v=0.18.6", html)
         self.assertIn("Cache-Control", backend)
 
 
@@ -140,3 +140,16 @@ class FrontendBugfixContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_fragment_review_hides_question_cards_and_preserves_scroll(self):
+        js = APP_JS.read_text(encoding="utf-8")
+        self.assertNotIn('class="context-group-questions"', js)
+        self.assertIn("preservedImageScrollTop = imageScroll.scrollTop", js)
+        self.assertIn("imageScroll.scrollTop = preservedImageScrollTop", js)
+        self.assertIn("saveTimer = setTimeout(() => persistSelections().catch(() => {}), 90);")
+
+    def test_fragment_review_displays_learning_counts(self):
+        js = APP_JS.read_text(encoding="utf-8")
+        self.assertIn("/fragment-learning-status", js)
+        self.assertIn("fragmentLearningStatus", js)
+        self.assertIn("minimaal 5 voorbeelden per kenmerk", js)
