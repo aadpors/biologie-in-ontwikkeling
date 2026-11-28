@@ -7,17 +7,20 @@ worden beheerd door één FastAPI-app en één SQLite-opslag.
 
 ## Starten
 
-Vereist Python 3.10 of hoger.
+Vereist Python 3.12 (de Windows-startscripts selecteren deze versie expliciet vanwege de lokale OCR-engine en ONNX Runtime). Op Windows proberen `start.bat` en `start.ps1` Python 3.12 automatisch te installeren met `py install 3.12` als de runtime nog ontbreekt.
 
 ```powershell
-python -m venv .venv
+py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m uvicorn examenverwerker.main:app --reload
 ```
 
-Op Windows kan dit ook met `start.ps1`; het script maakt de virtuele omgeving
-aan, installeert de benodigde pakketten en start de server. Open daarna
+Op Windows kan dit ook met `start.bat` of `start.ps1`; beide scripts selecteren
+Python 3.12 expliciet en proberen de runtime zo nodig via de Python Launcher te
+installeren. Als `.venv` eerder met een incompatibele Python-versie is
+aangemaakt, wordt alleen die virtuele omgeving opnieuw opgebouwd. De
+examendatabase en bronbestanden blijven behouden. Open daarna
 `http://127.0.0.1:8000`.
 
 ## Geïntegreerde verwerkingsstappen
@@ -125,6 +128,13 @@ aan, installeert de benodigde pakketten en start de server. Open daarna
   De bibliotheek bewaart een expliciete publicatiestatus en publicatiedatum.
 
 ## Wijzigingen in 0.17.0
+
+- Fragmentgrenzen worden uitsluitend geaccepteerd op een volledige horizontale rij waarvan iedere pixel exact RGB(255, 255, 255) is. Ook de server valideert gehele pixelrijen; een bijna-witte rij of decimale coördinaat wordt niet afgerond tot een geldige grens.
+- De automatische fragmentindeling vertrouwt niet langer op de eerste witregel na een vraagstart. Een vraagfragment loopt conservatief door tot de witte grens vóór de volgende goedgekeurde hoofdvraagstart. Zo wordt een interne witregel in een meerregelige vraag niet als afkapgrens gebruikt. Context die tussen vragen staat kan de docent daarna als afzonderlijk fragment afsplitsen.
+- Vraagtype-, punten- en antwoordoptievoorstellen gebruiken de tekst die hoort bij exact de geselecteerde beeldstrook. De pixelcoördinaten worden via de crop-, render- en stitchmetadata terugvertaald naar de oorspronkelijke PDF-pagina('s); een omschrijving of volledige pagina wordt niet als vervangende vraagtekst gebruikt.
+- De browser plaatst de fragmenteditor direct onder het geselecteerde fragment. Navigatie naar een fragment wordt berekend ten opzichte van het eigen scrollpaneel, zodat de hele pagina niet onbedoeld verspringt.
+- Regressietests toegevoegd voor zuiver witte RGB-grensrijen, integergrensvalidatie, het behouden van vraaginhoud bij een interne witregel en de volledige API-overgang van fragmentreview naar vraaganalyse.
+- De ontwikkeltestdependency gebruikt httpx2, de door de huidige Starlette-versie aanbevolen client voor FastAPI TestClient.
 
 - Vraagfragmenten worden begrensd door de dichtstbijzijnde visuele witregel of brede kadergrens boven en onder de herkende vraagstart. Een vraag die over een paginaovergang doorloopt, blijft één fragment tot de eerstvolgende visuele scheiding.
 - De ruimte tussen opeenvolgende vraagfragmenten wordt als contextfragment voorgesteld en aan de daaropvolgende vraag gekoppeld. De oude beperking waarbij contexten alleen boven de eerste vraagstart op een pagina werden gezocht, is voor deze stap vervallen.

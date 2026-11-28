@@ -1,0 +1,63 @@
+name: Examenverwerker 0.18
+# Deze workflow valideert ook de documentstappen van de CV-aanvulling.
+# De 0.18-testset dekt fragmentselecties en verwerking per vraag.
+# Controle na reparatie van de regressietest.
+# Herhaal de volledige suite na het bijwerken van de testfixtures.
+on:
+  push:
+    paths:
+      - "examenverwerker/0.18/**"
+      - ".github/workflows/examenverwerker-018.yml"
+      - "examens/vw-1018-a-26-2-o.pdf"
+  # Valideer ook iedere pull request die de 0.18-verwerker wijzigt.
+  # Zonder deze trigger konden regressies in de ontwikkelbranch onopgemerkt
+  # blijven totdat de branch rechtstreeks naar main werd gepusht.
+  pull_request:
+    paths:
+      - "examenverwerker/0.18/**"
+      - ".github/workflows/examenverwerker-018.yml"
+      - "examens/vw-1018-a-26-2-o.pdf"
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examenverwerker/0.18
+    steps:
+      - name: Haal repository op
+        uses: actions/checkout@v4
+      - name: Stel Python in
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: examenverwerker/0.18/requirements.txt
+      - name: Installeer afhankelijkheden
+        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+      - name: Controleer Python-syntaxis
+        run: python -m compileall -q examenverwerker tests
+      - name: Voer tests uit
+        run: python -m unittest discover -s tests -v
+      - name: Controleer Python-syntaxis opnieuw
+        run: python -m compileall -q examenverwerker tests
+      - name: Controleer JavaScript
+        run: node --check static/app.js
+      - name: Test expliciete correctieprofielen
+        run: python -m unittest tests.test_learning -v
+      - name: Controleer JavaScript-syntaxis opnieuw
+        run: node --check static/app.js
+      - name: Voer alle nieuwe leerlaagtests uit
+        run: python -m unittest tests.test_learning -v
+      - name: Test leerstatus voor alle detectietypen
+        run: python -m unittest tests.test_learning -v
+      - name: Analyseer echt vwo-examen voor fragmentdiagnose
+        run: python tools/diagnose_real_exam.py
+        env:
+          EXAM_DIAGNOSTIC_OUTPUT: ${{ runner.temp }}/exam-diagnostic
+      - name: Bewaar diagnosebeeld en detectierapport
+        uses: actions/upload-artifact@v4
+        with:
+          name: exam-fragment-diagnostics-018
+          path: ${{ runner.temp }}/exam-diagnostic/
+          retention-days: 7

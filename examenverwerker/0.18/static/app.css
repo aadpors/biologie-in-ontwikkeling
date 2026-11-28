@@ -1,0 +1,1244 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#202a35;background:#f4f6f8;font-synthesis:none}*{box-sizing:border-box}body{margin:0}.topbar{height:72px;background:#fff;border-bottom:1px solid #e5e9ed;display:flex;align-items:center;gap:13px;padding:0 max(24px,calc((100vw - 1600px)/2));position:sticky;top:0;z-index:5}.brand-mark{width:38px;height:38px;border-radius:11px;background:#173f50;color:white;display:grid;place-items:center;font-weight:800;font-size:20px}.topbar strong,.topbar span{display:block}.topbar strong{font-size:14px}.topbar span{font-size:12px;color:#7b8791;margin-top:2px}.topbar button{margin-left:auto}.shell{max-width:1600px;margin:42px auto;padding:0 24px}.intro{max-width:690px;margin-bottom:28px}.eyebrow{font-size:10px;letter-spacing:.14em;font-weight:800;color:#54717e;margin:0 0 9px}.intro h1,.workspace-head h1{font-size:32px;letter-spacing:-.04em;margin:0 0 8px}.intro p:not(.eyebrow){color:#66727d;line-height:1.55;margin:0}.panel{background:#fff;border:1px solid #e4e9ed;border-radius:15px;box-shadow:0 5px 20px #1e354008}.import-panel{padding:26px;display:grid;grid-template-columns:1fr 1.1fr;gap:36px}.panel h2{font-size:16px;margin:0 0 8px}.panel p{color:#697680;font-size:13px;line-height:1.55}.dropzone{border:1.5px dashed #c5d1d8;border-radius:12px;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#344854;cursor:pointer}.dropzone input{max-width:220px;font-size:11px;margin-top:7px}.dropzone span:not(.upload-icon){font-size:12px;color:#87939b}.upload-icon{font-size:25px;color:#547b8b}.primary{background:#17495b;color:#fff;border:0;border-radius:9px;padding:12px 17px;font-weight:650;margin-top:13px;cursor:pointer}.primary:hover{background:#103a49}.form-error{color:#a22!important;min-height:18px}.library-list{margin-top:38px}.section-heading{display:flex;justify-content:space-between;align-items:center}.section-heading h2{font-size:17px}.muted{color:#7c8992;font-size:12px}.exam-list{display:grid;gap:9px}.exam-row{background:white;border:1px solid #e4e9ed;border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:15px}.doc-icon{width:38px;height:42px;border-radius:8px;background:#edf2f4;color:#426170;display:grid;place-items:center;font-weight:800}.exam-row strong{font-size:14px}.exam-row p{font-size:12px;color:#849099;margin:4px 0 0}.exam-row button{margin-left:auto}.quiet{background:transparent;border:1px solid #dce3e7;border-radius:8px;padding:8px 12px;color:#52636e;cursor:pointer}.workspace-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}.workspace-head h1{font-size:29px}.status-pill{font-size:11px;padding:7px 11px;border-radius:20px;background:#f4efe3;color:#87642c}.workspace-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;align-items:start}.step-panel,.stage-panel{padding:22px}.step-list{display:grid;gap:4px;margin-top:16px}.step-item{display:flex;align-items:flex-start;gap:11px;padding:10px 8px;border-radius:9px}.step-item.current{background:#eef4f6}.step-number{flex:0 0 24px;height:24px;border-radius:50%;background:#eef1f3;color:#66747d;display:grid;place-items:center;font-size:11px;font-weight:700}.step-item.complete .step-number{background:#e5f2eb;color:#26744b}.step-item strong{font-size:12px;display:block;line-height:1.4}.step-item small{font-size:10px;color:#87939b;display:block;margin-top:3px}.stage-panel h2{font-size:20px;margin:0 0 7px}.stage-panel .lead{margin-top:0}.document-card{border:1px solid #e6ebee;border-radius:11px;padding:14px;margin-top:10px;display:grid;grid-template-columns:1fr auto;gap:5px 12px}.document-card strong{font-size:13px}.document-card small{font-size:11px;color:#839099}.document-card button{grid-column:2;grid-row:1/3;align-self:center}.metadata-form{margin-top:20px;border-top:1px solid #edf0f2;padding-top:18px}.fields{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.field label{font-size:11px;color:#66747d;display:block;margin-bottom:5px}.field input,.field select{width:100%;border:1px solid #d9e0e4;border-radius:8px;padding:10px;font:inherit;font-size:13px;background:white}.type-list{display:grid;gap:8px;margin-top:14px}.type-row{display:grid;grid-template-columns:1fr 220px;gap:12px;align-items:center;font-size:12px}.type-row select{width:100%;padding:9px;border:1px solid #d9e0e4;border-radius:8px;background:white}.preview-wrap{margin-top:16px;background:#f0f3f5;border-radius:10px;padding:12px}.preview-wrap img{display:block;max-width:100%;max-height:720px;margin:auto;box-shadow:0 2px 12px #0002}.preview-wrap .muted{text-align:center;margin:8px}.notice{background:#f3f6f7;border-left:3px solid #8ba5b0;padding:12px 14px;border-radius:4px;font-size:12px;color:#596a73;line-height:1.5;margin-top:15px}.locked{opacity:.65}.locked-note{font-size:12px;color:#78858e;background:#f5f6f7;border-radius:8px;padding:12px}.success-note{color:#246a45;background:#eaf5ee;padding:10px;border-radius:8px;font-size:12px}@media(max-width:800px){.shell{margin:24px auto}.import-panel,.workspace-grid{grid-template-columns:1fr}.fields{grid-template-columns:repeat(2,1fr)}.workspace-head{align-items:flex-start;gap:12px;flex-direction:column}.type-row{grid-template-columns:1fr 150px}}
+
+/* Visuele vraagstartreview: de SVG gebruikt dezelfde render-schaal als de
+   API-preview, zodat markeringen exact over de oorspronkelijke pagina vallen. */
+.question-page { margin: 1.25rem 0; padding: 1rem; border: 1px solid var(--line, #dfe3e8); border-radius: 14px; background: #f7f8fa; }
+.question-page h4 { margin: 0 0 .75rem; }
+.page-canvas { position: relative; width: min(100%, 980px); margin: 0 auto; box-shadow: 0 3px 16px #15223820; background: white; }
+.page-canvas img { display: block; width: 100%; height: auto; }
+.page-canvas svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.page-canvas rect { fill: #f59e0b22; stroke: #d97706; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.candidate-list { display: grid; gap: .5rem; margin: 1rem 0; }
+.candidate-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .75rem; padding: .7rem .85rem; border: 1px solid var(--line, #dfe3e8); border-radius: 10px; background: white; }
+.candidate-row small { display: block; color: #667085; }
+.review-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.2rem; }
+.review-warning { color: #92400e; background: #fffbeb; border: 1px solid #fcd34d; padding: .8rem 1rem; border-radius: 10px; }
+
+/* De vraagfragmentreview toont ieder vraagdeel als een afzonderlijke
+   oorspronkelijke PDF-uitsnede. Op smalle schermen stapelen de pagina's. */
+.fragment-card { border: 1px solid var(--line, #dedede); border-radius: 12px; padding: 1rem; margin: 1rem 0; background: var(--panel, #fff); }
+.fragment-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.fragment-heading h3 { margin: 0; }
+.fragment-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1rem; margin: 1rem 0; }
+.fragment-images figure { margin: 0; min-width: 0; }
+.fragment-images figcaption { color: var(--muted, #666); font-size: .82rem; margin-bottom: .4rem; }
+.fragment-images img { display: block; width: 100%; height: auto; border: 1px solid var(--line, #dedede); border-radius: 6px; background: white; }
+.candidate-row { grid-template-columns: auto minmax(10rem, 1fr) 5rem minmax(4.5rem, 5rem) auto; }
+.candidate-row .small { padding: .35rem .5rem; font-size: .78rem; }
+.page-canvas.placing-question-start { outline: 3px dashed var(--accent, #d97706); outline-offset: 4px; cursor: crosshair; }
+.page-canvas.placing-question-start img { cursor: crosshair; }
+@media (max-width: 700px) {
+  .candidate-row { grid-template-columns: auto minmax(7rem, 1fr) 4rem; }
+  .candidate-row select, .candidate-row button { grid-column: 2 / -1; }
+}
+@media (min-width: 701px) {
+  .candidate-row { grid-template-columns: auto minmax(10rem, 1fr) 5rem 5rem auto auto; }
+}
+
+/* Vraaganalyse: de visuele PDF-fragmenten blijven prominent; de velden ernaast
+   zijn uitsluitend correcties op de automatische voorstellen. */
+.analysis-card { border: 1px solid var(--line, #dedede); border-radius: 12px; padding: 1rem; margin: 1rem 0; background: #fff; }
+.analysis-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; margin: 1rem 0; }
+.analysis-fields label, .analysis-options-label { display: grid; gap: .4rem; color: #596a73; font-size: .82rem; }
+.analysis-fields select, .analysis-fields input, .analysis-options-label textarea { width: 100%; padding: .65rem .75rem; border: 1px solid #d9e0e4; border-radius: 8px; background: #fff; font: inherit; color: #202a35; }
+.analysis-options-label textarea { resize: vertical; min-height: 5rem; }
+.analysis-reason { font-size: .78rem !important; color: #687984 !important; }
+.analysis-text { margin: .75rem 0; color: #63717b; font-size: .8rem; }
+.analysis-text pre { max-height: 14rem; overflow: auto; white-space: pre-wrap; background: #f4f6f8; padding: .8rem; border-radius: 8px; color: #34434c; }
+@media (max-width: 700px) { .analysis-fields { grid-template-columns: 1fr; } }
+
+/* Aanvullende presentatie voor antwoord- en koppelingreview. De fragmenten
+   krijgen een begrensde breedte zodat lange CV-pagina's leesbaar blijven. */
+.fragment-image { display:block; width:100%; max-width:1100px; height:auto; margin:14px auto; border:1px solid var(--line, #d8dce2); border-radius:8px; background:#fff; }
+.card-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.status-pill { display:inline-flex; padding:4px 9px; border-radius:999px; background:#f1f3f5; color:#475467; font-size:12px; }
+.relation-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px; margin:12px 0; color:var(--muted,#667085); font-size:13px; }
+
+/* De aparte grenseditor gebruikt numerieke PDF-puntcoördinaten. De invoervelden
+   blijven compact, zodat de lange lijst met vraagfragmenten overzichtelijk is. */
+.boundary-editor { margin:14px 0; padding:12px; border:1px solid var(--line,#d8dce2); border-radius:8px; }
+.boundary-editor summary { cursor:pointer; font-weight:600; }
+.boundary-editor .analysis-fields { max-width:520px; }
+
+/* De eindcontrole is bewust één vraag per kaart: alle bronfragmenten zijn
+   direct vergelijkbaar en de herstelacties blijven bij de betreffende vraag. */
+.final-review-card h4 { margin:18px 0 6px; font-size:14px; color:var(--muted,#667085); }
+.final-review-card figure { margin:8px 0 16px; }
+.final-review-card details pre { max-height:280px; overflow:auto; white-space:pre-wrap; }
+
+/* Sleepbare grenslijnen liggen boven op de echte PDF-rendering. De ruime
+   hitbox maakt ze ook op touchscreens eenvoudig vast te pakken. */
+.boundary-image-wrap { position:relative; display:block; width:100%; }
+.boundary-image-wrap img { display:block; width:100%; height:auto; border:1px solid var(--line,#dedede); border-radius:6px; background:#fff; }
+.drag-boundary { position:absolute; left:0; right:0; height:22px; z-index:3; cursor:ns-resize; touch-action:none; outline:none; }
+.drag-boundary::before { content:""; position:absolute; left:0; right:0; top:10px; border-top:3px solid #2674d9; box-shadow:0 1px 2px #fff; }
+.drag-boundary span { position:absolute; left:8px; top:-1px; padding:2px 7px; border-radius:4px; background:#2674d9; color:#fff; font-size:11px; font-weight:600; }
+.drag-boundary-start { top:0; }
+.drag-boundary-end { bottom:0; }
+.drag-boundary:focus-visible { outline:2px solid #2674d9; outline-offset:2px; }
+
+/* Nieuwe stap 3: één lange examenstrook met een vaste metadata-inspector.
+   De afbeelding blijft in het middendeel scrollbaar; selectiegrenzen worden
+   in dezelfde pixelcoördinaten opgeslagen als de gegenereerde stitchbron. */
+.stitched-workspace{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start;margin:18px 0}
+.stitched-view{min-width:0;background:#f3f5f6;border:1px solid var(--line,#dce2e6);border-radius:12px;padding:12px;display:flex;flex-direction:column;min-height:0}
+/* De bedieningsbalk blijft in de normale documentstroom staan.
+   Sticky positionering liet de lange examenafbeelding er bij scrollen
+   visueel achterdoor lopen, waardoor knoppen en fragmentranden over elkaar
+   heen leken te schuiven. De balk reserveert nu gewoon zijn eigen hoogte. */
+.stitched-toolbar{position:relative;flex:0 0 auto;top:auto;z-index:1;display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:#f3f5f6;padding:4px 0 10px;min-height:44px}
+.stitched-image-scroll{min-height:0;max-height:calc(100vh - 245px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.stitched-image-wrap{position:relative;max-width:1200px;margin:0 auto;background:#fff;box-shadow:0 2px 12px #172b3a20}
+.stitched-image-wrap.selecting{cursor:crosshair}
+.stitched-image-wrap img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.stitched-overlay{position:absolute;inset:0;pointer-events:none}
+.stitched-selection{position:absolute;left:0;right:0;z-index:3;border-top:2px solid #1874c8;border-bottom:2px solid #1874c8;background:#1874c81a;pointer-events:auto;cursor:pointer;touch-action:pan-y}
+.stitched-selection.active{z-index:4!important;background:#f59e0b24;border-color:#c77700}
+.stitched-boundary{position:absolute;left:0;right:0;height:14px;padding:0;border:0;background:transparent;cursor:ns-resize;z-index:3;touch-action:none}
+.stitched-boundary::after{content:"";position:absolute;left:0;right:0;top:6px;border-top:3px solid #1874c8}
+.stitched-boundary-top{top:-7px}
+.stitched-boundary-bottom{bottom:-7px}
+.stitched-selection.active .stitched-boundary::after{border-color:#c77700}
+.stitched-selection span{position:sticky;top:4px;display:inline-block;margin:3px 5px;padding:3px 7px;background:#1874c8;color:#fff;border-radius:4px;font-size:11px}
+.stitched-selection.active span{background:#a45c00}
+.stitched-pending{position:absolute;left:0;right:0;border-top:3px dashed #d97706}
+.stitched-inspector{position:sticky;top:16px;border:1px solid var(--line,#dce2e6);border-radius:12px;background:#fff;padding:14px;max-height:calc(100vh - 40px);overflow:auto}
+.stitched-inspector h3{margin:0 0 12px;font-size:15px}
+.stitched-inspector label{display:grid;gap:5px;margin:12px 0;font-size:12px;color:#596a73}
+.stitched-inspector input,.stitched-inspector select{width:100%;padding:9px;border:1px solid #d9e0e4;border-radius:7px;background:#fff;font:inherit}
+.stitched-list-item{display:grid;width:100%;gap:3px;text-align:left;padding:9px;margin:5px 0;border:1px solid #e1e6e9;border-radius:8px;background:#fff;cursor:pointer}
+.stitched-list-item.active{border-color:#1874c8;background:#f0f7fc}
+.stitched-list-item small{color:#75838c;font-size:11px}
+@media(max-width:900px){.stitched-workspace{grid-template-columns:1fr}.stitched-inspector{position:static;max-height:none}}
+
+
+/* Verdachte nummerherkenningen blijven zichtbaar, maar worden duidelijk als
+   mogelijke stelling- of subvraagnummering onderscheiden van hoofdvragen. */
+.candidate-row.candidate-suspect{background:#fff8e8;border-left:3px solid #d58b19;padding-left:9px}
+.candidate-row.candidate-suspect strong{color:#80510b}
+
+/* Afgeronde workflowstappen zijn herstelknoppen; de vormgeving blijft gelijk aan de bestaande staplijst. */
+.step-item-button{width:100%;border:0;background:transparent;text-align:left;font:inherit;cursor:pointer}
+.step-item-button:hover{background:#f2f6f7}
+.step-item-button:focus-visible{outline:2px solid #477b91;outline-offset:2px}
+
+
+/* De lange PDF en de fragmentlijst zijn afzonderlijke scrollvakken.
+   De JavaScript-laag synchroniseert hun relatieve scrollpositie. */
+.stitched-image-scroll,
+.stitched-inspector {
+  max-height: calc(100vh - 190px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.stitched-inspector {
+  position: relative;
+  top: auto;
+}
+.stitched-list-entry { margin: 7px 0 12px; }
+.stitched-list-entry .stitched-list-item { margin: 0; }
+.stitched-editor {
+  margin: 8px 0 16px;
+  padding: 12px;
+  border: 1px solid #b9cbd4;
+  border-radius: 9px;
+  background: #f7fafb;
+}
+.stitched-editor h3 { margin: 0 0 10px; }
+.stitched-editor .analysis-fields { grid-template-columns: 1fr; gap: 8px; }
+.stitched-editor .review-actions { margin-top: 8px; }
+@media(max-width:900px) {
+  .stitched-image-scroll, .stitched-inspector { max-height: 65vh; }
+}
+
+
+/* Contextvraagbereiken mogen compact worden ingevoerd, bijvoorbeeld 1–7. */
+.field-help { display:block; margin-top:.25rem; color:var(--muted,#667085); font-size:.72rem; }
+
+/* De verplichte visuele bevestiging blijft duidelijk zichtbaar, maar neemt
+   minder ruimte in dan de vraagafbeelding en de inhoudelijke invoervelden. */
+.analysis-card .review-warning {
+  display:flex;
+  align-items:flex-start;
+  gap:.45rem;
+  padding:.45rem .65rem;
+  margin-top:.55rem;
+  font-size:.72rem;
+  line-height:1.35;
+}
+.analysis-card .review-warning input { flex:0 0 auto; width:auto; margin:.1rem 0 0; }
+.closed-answer-form { margin-top:.25rem; }
+
+
+/* De actieve oranje fragmentselectie moet altijd boven blauwe selecties
+   zichtbaar blijven; de bedieningselementen volgen dezelfde stapellaag. */
+.stitched-selection.active { z-index: 4 !important; }
+.stitched-selection.active .stitched-boundary { z-index: 5; }
+
+/* Het antwoord of de beoordelingscriteria horen onder hun eigen kop en
+   gebruiken de volledige kaartbreedte. De hoogte wordt door app.js aan de
+   werkelijke tekstinhoud aangepast; verticaal handmatig vergroten blijft
+   daarnaast mogelijk. */
+.answer-text-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+}
+.answer-textarea {
+  display: block;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  min-height: 72px;
+  box-sizing: border-box;
+  padding: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+
+
+/* Reviewbevestigingen zijn vervangen door de expliciete afrondactie onderaan
+   iedere stap. De onderliggende velden blijven tijdelijk in de DOM voor
+   compatibiliteit met de opgeslagen reviewgegevens, maar worden niet getoond. */
+.review-warning[hidden] {
+  display: none !important;
+}
+.stage-approval-note {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.9rem;
+}
+.relation-audit-list {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+.relation-audit-row {
+  display: grid;
+  grid-template-columns: 0.6fr 1fr 1.4fr 1.2fr;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border, #ddd);
+  font-size: 0.9rem;
+}
+@media (max-width: 720px) {
+  .relation-audit-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* De dubbele-importkeuze gebruikt een eigen dialoog in plaats van de
+   browserdialoog met de nietszeggende knoppen 'OK' en 'Annuleren'. */
+.import-decision-dialog {
+  width: min(540px, calc(100vw - 32px));
+  max-width: 540px;
+  padding: 0;
+  border: 1px solid #dce4e8;
+  border-radius: 16px;
+  color: #202a35;
+  background: #fff;
+  box-shadow: 0 24px 80px #102b3a35;
+}
+.import-decision-dialog::backdrop {
+  background: #172b3a80;
+  backdrop-filter: blur(2px);
+}
+.import-dialog-content { padding: 26px; }
+.import-dialog-content h2 { margin: 0 0 10px; font-size: 21px; letter-spacing: -.02em; }
+.import-dialog-content p:not(.eyebrow) { margin: 0; color: #5e6c75; font-size: 14px; line-height: 1.6; }
+.import-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 24px;
+}
+.import-dialog-actions button { margin: 0; }
+.import-dialog-actions .primary { order: -1; }
+.import-dialog-actions .danger {
+  border: 1px solid #a83232;
+  border-radius: 9px;
+  padding: 12px 17px;
+  color: #fff;
+  background: #a83232;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+.import-dialog-actions .danger:hover { background: #872727; }
+.import-decision-dialog button:focus-visible {
+  outline: 3px solid #7aa9c0;
+  outline-offset: 3px;
+}
+@media (max-width: 520px) {
+  .import-dialog-content { padding: 21px; }
+  .import-dialog-actions { flex-direction: column; }
+  .import-dialog-actions button { width: 100%; }
+  .import-dialog-actions .primary { order: 0; }
+}
+
+
+/* Meer leesruimte voor PDF's, lange stitchafbeeldingen en uitsneden.
+   De werkruimte groeit mee op brede schermen; de inspector blijft compact
+   zodat de bronafbeelding het grootste deel van de beschikbare breedte krijgt. */
+@media (min-width: 901px) {
+  .stitched-workspace { grid-template-columns: minmax(0, 1fr) 310px; }
+  .stitched-image-wrap { max-width: 1200px; }
+  .fragment-images { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+/* Visuele groepering van contextdelen en de opgaven die erop steunen.
+   De groepen zijn een samenvatting van de expliciete vraagnummervelden;
+   de losse fragmenten blijven afzonderlijk selecteerbaar op de examenstrook. */
+.context-group-summary {
+  display: grid;
+  gap: .75rem;
+  margin: .75rem 0 1.25rem;
+}
+.context-group-card {
+  border: 1px solid var(--line, #d9dee7);
+  border-left: 4px solid var(--accent, #4b78a8);
+  border-radius: .65rem;
+  padding: .8rem;
+  background: var(--surface, #fff);
+}
+.context-group-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .5rem;
+  margin-bottom: .45rem;
+}
+.context-group-heading span,
+.context-group-card small {
+  color: var(--muted, #667085);
+  font-size: .8rem;
+}
+.context-group-card p { margin: .35rem 0 .55rem; }
+.context-question-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin-bottom: .55rem;
+}
+.context-question-chip {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: .2rem .55rem;
+  font-size: .78rem;
+  background: #e8f1eb;
+  color: #245b37;
+}
+.context-question-chip.missing {
+  background: #fff0e8;
+  color: #9a3e16;
+}
+
+
+/* Rustige, compacte presentatie van contextgroepen in de rechter inspector.
+   De titel krijgt een eigen regel; het aantal fragmenten is ondersteunende
+   metadata en mag nooit direct tegen de titel aan komen te staan. */
+.stitched-inspector .context-group-summary {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 22px;
+}
+.stitched-inspector .context-group-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #dfe6ea;
+  border-left: 3px solid #527f91;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(20, 45, 58, .04);
+}
+.stitched-inspector .context-group-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 0 0 11px;
+}
+.stitched-inspector .context-group-heading strong {
+  display: block;
+  min-width: 0;
+  color: #183b4b;
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.stitched-inspector .context-group-heading .context-group-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #eef3f5;
+  color: #526873;
+  font-size: 11px;
+  font-weight: 600;
+}
+.stitched-inspector .context-group-questions {
+  display: grid;
+  gap: 6px;
+}
+.stitched-inspector .context-group-label {
+  color: #637681;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+.stitched-inspector .context-question-chips {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+}
+.stitched-inspector .context-question-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #edf4f6;
+  color: #294f60;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.stitched-inspector .context-question-chip.missing {
+  background: #fff2e9;
+  color: #995027;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #edf0f2;
+  color: #5d707a;
+  font-size: 12px;
+}
+.stitched-inspector .context-group-details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.stitched-inspector .context-group-details ul {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  line-height: 1.35;
+}
+.stitched-inspector .context-group-details li {
+  padding-left: 2px;
+  overflow-wrap: anywhere;
+}
+.stitched-inspector > h3 {
+  margin: 0 0 8px;
+  color: #263f4b;
+  font-size: 14px;
+}
+.stitched-inspector > .field-help {
+  margin: 0 0 10px;
+  line-height: 1.45;
+  font-size: 11px;
+}
+
+
+/* Definitieve, rustige hiërarchie voor het contextoverzicht rechts.
+   De vraagkoppeling staat als één leesbare regel in plaats van een rij losse
+   badges. Daardoor blijft de informatie ook bij een smalle inspector scanbaar. */
+.stitched-inspector {
+  padding: 16px;
+}
+.stitched-inspector > h3 {
+  margin: 0 0 6px;
+  color: #203d4a;
+  font-size: 15px;
+  line-height: 1.3;
+}
+.stitched-inspector > .field-help {
+  margin: 0 0 14px;
+  color: #687982;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.stitched-inspector .context-group-summary {
+  gap: 9px;
+  margin: 0 0 22px;
+}
+.stitched-inspector .context-group-card {
+  padding: 13px 14px 11px;
+  border: 1px solid #e0e7e9;
+  border-left: 3px solid #6b929f;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+}
+.stitched-inspector .context-group-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.stitched-inspector .context-group-heading strong {
+  color: #203d4a;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.stitched-inspector .context-group-heading .context-group-count {
+  margin-top: 1px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: #f0f4f5;
+  color: #61747d;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.stitched-inspector .context-group-range {
+  margin: 0;
+  color: #365b6a;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.stitched-inspector .context-group-warning {
+  margin: 6px 0 0;
+  color: #9b4c25;
+  font-size: 11px;
+  line-height: 1.35;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid #edf0f1;
+  color: #647780;
+  font-size: 11px;
+}
+.stitched-inspector .context-group-details summary {
+  cursor: pointer;
+  color: #58717d;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.stitched-inspector .context-group-details ul {
+  gap: 5px;
+  margin-top: 8px;
+  line-height: 1.35;
+}
+.stitched-inspector > h3:not(:first-child) {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e8edef;
+}
+@media (max-width: 1200px) and (min-width: 901px) {
+  .stitched-workspace { grid-template-columns: minmax(0, 1fr) 285px; }
+}
+
+
+/* Contextoverzicht: de groepen zijn het primaire overzicht; bewerken is
+   een secundaire taak en staat daarom in een apart, inklapbaar paneel. */
+.stitched-workspace {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 350px);
+  gap: 16px;
+}
+.stitched-inspector {
+  padding: 17px;
+  border-color: #d9e2e6;
+  box-shadow: 0 3px 14px rgba(22, 48, 61, .06);
+}
+.stitched-inspector-heading {
+  padding-bottom: 13px;
+  border-bottom: 1px solid #e8edef;
+}
+.stitched-inspector-heading h3 {
+  margin: 0 0 5px;
+  color: #1e3d4b;
+  font-size: 17px;
+  line-height: 1.25;
+}
+.stitched-inspector-heading .field-help {
+  margin: 0;
+  color: #71818a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.stitched-inspector .context-group-summary {
+  display: grid;
+  gap: 10px;
+  margin: 13px 0 16px;
+}
+.stitched-inspector .context-group-card {
+  padding: 13px 14px 12px;
+  border: 1px solid #dfe7ea;
+  border-radius: 10px;
+  border-left: 3px solid #527f91;
+  background: linear-gradient(135deg, #ffffff 0%, #fbfcfd 100%);
+}
+.stitched-inspector .context-group-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.stitched-inspector .context-group-index {
+  color: #71838c;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .09em;
+}
+.stitched-inspector .context-group-count {
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #eff3f5;
+  color: #60737d;
+  font-size: 10px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.stitched-inspector .context-group-title {
+  margin: 0 0 8px;
+  color: #193b4a;
+  font-size: 15px;
+  font-weight: 680;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+.stitched-inspector .context-group-range {
+  display: inline-flex;
+  margin: 0;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #edf4f6;
+  color: #2e596a;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.stitched-inspector .context-group-warning {
+  margin: 8px 0 0;
+  color: #9b4c25;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #edf0f2;
+  color: #657780;
+  font-size: 11px;
+}
+.stitched-inspector .context-group-details summary,
+.stitched-inspector .stitched-fragments-panel > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #526a75;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.4;
+  list-style-position: inside;
+}
+.stitched-inspector .context-group-details ul {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  line-height: 1.4;
+}
+.stitched-inspector .stitched-fragments-panel {
+  padding-top: 12px;
+  border-top: 1px solid #e6ecef;
+}
+.stitched-inspector .stitched-fragments-panel > summary {
+  padding: 3px 0 5px;
+  font-size: 12px;
+}
+.stitched-inspector .stitched-fragments-panel > summary span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #eef3f5;
+  color: #536a75;
+  font-size: 10px;
+}
+.stitched-inspector .stitched-fragments-panel .stitched-list-item {
+  margin: 5px 0;
+  padding: 9px 10px;
+}
+.stitched-inspector .stitched-fragments-panel .stitched-editor {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f5f8f9;
+}
+@media (max-width: 1200px) and (min-width: 901px) {
+  .stitched-workspace { grid-template-columns: minmax(0, 1fr) 320px; }
+}
+@media (max-width: 900px) {
+  .stitched-workspace { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Desktop: stitch links en inspector rechts. Alleen op smalle schermen
+   schakelen we bewust naar één kolom (zie media-query hieronder). */
+.stitched-workspace { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(280px,350px) !important; gap:16px !important; align-items:start !important; }
+.stitched-inspector { width:auto; min-width:0; }
+.context-group-questions { display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+.context-group-question-card { border:1px solid #dfe6eb; border-radius:9px; background:#fff; padding:10px 12px; display:flex; flex-direction:column; gap:4px; }
+.context-group-question-card small { color:#71808a; font-size:12px; }
+
+
+/* FIX 0.18 — stap 3: voorkom dat de rechterzijde van de lange stitch
+   wordt afgesneden door flex/grid-minimums of een begrensde afbeeldingsbreedte.
+   De scrollcontainer mag horizontaal scrollen als de beschikbare ruimte kleiner
+   is dan de afbeelding; de afbeelding zelf blijft altijd in haar geheel renderen.
+   Dit is bewust een override onderaan het stylesheet, zodat eerdere layoutregels
+   niet onverwacht de herstelregel overschrijven. */
+.stitched-view,
+.stitched-image-scroll {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+.stitched-image-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.stitched-image-wrap {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+.stitched-image-wrap img {
+  width: 100%;
+  max-width: none;
+  height: auto;
+}
+.stitched-overlay {
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* Harde herstelregel voor de stitch in stap 3: voorkom dat grid/flex-items
+   of een intrinsieke afbeeldingsbreedte de rechterzijde buiten het zicht duwt.
+   De afbeelding schaalt binnen het viewport; horizontaal scrollen blijft als
+   vangnet beschikbaar en geen parent mag de inhoud afknippen. */
+.stitched-workspace, .stitched-view, .stitched-image-scroll, .stitched-image-wrap, .stitched-overlay { min-width: 0 !important; max-width: 100% !important; }
+.stitched-workspace { width: 100%; grid-template-columns: minmax(0, 1fr) minmax(280px, 350px) !important; }
+.stitched-view { width: 100%; overflow: visible !important; }
+.stitched-image-scroll { width: 100% !important; overflow-x: auto !important; overflow-y: auto !important; }
+.stitched-image-wrap { width: 100% !important; margin: 0 !important; overflow: visible !important; }
+.stitched-image-wrap img { width: 100% !important; max-width: none !important; height: auto !important; }
+.stitched-overlay { width: 100% !important; inset: 0 !important; }
+@media (max-width: 900px) { .stitched-workspace { grid-template-columns: minmax(0,1fr) !important; } }
+
+/* Stap 3 — compacte contextgroepkaarten.
+   De inspector is een ondersteunend paneel naast de grote bronafbeelding.
+   Daarom tonen we contextgroepen als compacte samenvattingen: titel en
+   vraagbereik blijven direct zichtbaar, terwijl details pas op verzoek
+   worden uitgeklapt. Dit voorkomt dat de kaarten de beschikbare hoogte en
+   aandacht van het middendeel onnodig domineren. */
+.stitched-inspector {
+  padding: 10px !important;
+}
+.stitched-inspector-heading {
+  padding-bottom: 8px !important;
+}
+.stitched-inspector-heading h3 {
+  font-size: 14px !important;
+  margin-bottom: 3px !important;
+}
+.stitched-inspector-heading .field-help {
+  font-size: 10px !important;
+  line-height: 1.3 !important;
+}
+.stitched-inspector .context-group-summary {
+  gap: 5px !important;
+  margin: 7px 0 10px !important;
+}
+.stitched-inspector .context-group-card {
+  padding: 7px 9px !important;
+  border-radius: 7px !important;
+  border-left-width: 2px !important;
+}
+.stitched-inspector .context-group-meta {
+  margin-bottom: 3px !important;
+  gap: 5px !important;
+}
+.stitched-inspector .context-group-index {
+  font-size: 8px !important;
+  letter-spacing: .06em !important;
+}
+.stitched-inspector .context-group-count {
+  padding: 2px 5px !important;
+  font-size: 9px !important;
+}
+.stitched-inspector .context-group-title {
+  margin: 0 0 3px !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+}
+.stitched-inspector .context-group-range {
+  padding: 2px 6px !important;
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+}
+.stitched-inspector .context-group-warning {
+  margin-top: 3px !important;
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 5px !important;
+  padding-top: 4px !important;
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-details summary {
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-details ul {
+  gap: 3px !important;
+  margin-top: 5px !important;
+  line-height: 1.25 !important;
+}
+.stitched-inspector > h3:not(:first-child) {
+  margin-top: 10px !important;
+  padding-top: 8px !important;
+}
+.stitched-inspector .stitched-fragments-panel {
+  padding-top: 8px !important;
+}
+.stitched-inspector .stitched-fragments-panel > summary {
+  font-size: 11px !important;
+}
+.stitched-inspector .stitched-fragments-panel .stitched-list-item {
+  margin: 3px 0 !important;
+  padding: 6px 7px !important;
+}
+
+
+/* Compacte contextgroepen: de inspector moet het middendeel ondersteunen,
+   niet met grote kaarten en losse vraagtegels de aandacht opeisen. De
+   contexttitel en gekoppelde vraagnummers blijven zichtbaar; detailinformatie
+   staat bewust achter een uitklapbaar onderdeel. */
+.stitched-inspector {
+  padding: 10px !important;
+  min-width: 0;
+}
+.stitched-inspector .context-group-summary {
+  display: grid;
+  gap: 6px !important;
+  margin: 0 0 10px !important;
+}
+.stitched-inspector .context-group-card {
+  padding: 7px 9px !important;
+  border-radius: 7px;
+  border-left-width: 2px;
+}
+.stitched-inspector .context-group-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 3px;
+  font-size: 9px;
+  line-height: 1.2;
+}
+.stitched-inspector .context-group-index {
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+.stitched-inspector .context-group-count {
+  padding: 2px 5px !important;
+  font-size: 9px !important;
+}
+.stitched-inspector .context-group-title {
+  margin: 0 0 3px !important;
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+}
+.stitched-inspector .context-group-range {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+}
+.stitched-inspector .context-group-warning {
+  margin-top: 3px !important;
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-questions {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 3px !important;
+  margin: 5px 0 0 !important;
+}
+.stitched-inspector .context-group-question-card {
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  min-width: 0;
+  padding: 2px 5px !important;
+  margin: 0 !important;
+  border: 1px solid #e3eaed !important;
+  border-radius: 5px !important;
+  background: #f7fafb !important;
+  box-shadow: none !important;
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+.stitched-inspector .context-group-question-card strong {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+.stitched-inspector .context-group-question-card small {
+  display: none !important;
+}
+.stitched-inspector .context-group-details {
+  margin-top: 5px !important;
+  padding-top: 4px !important;
+  font-size: 10px !important;
+}
+.stitched-inspector .context-group-details summary {
+  font-size: 10px;
+}
+.stitched-inspector .stitched-fragments-panel {
+  margin-top: 8px;
+  padding-top: 7px;
+}
+
+/* Stap 4: de bronafbeelding blijft volledig zichtbaar en vormt het
+   selectievlak voor uitsneden van grafische antwoordopties. */
+.analysis-fragment-sources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 12px;
+  margin: 12px 0 16px;
+}
+.analysis-source-figure {
+  min-width: 0;
+  margin: 0;
+}
+.analysis-source-figure figcaption {
+  margin-bottom: 5px;
+  color: #687982;
+  font-size: 11px;
+}
+.analysis-source-image {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dfe6e9;
+  border-radius: 7px;
+  background: #fff;
+  touch-action: pan-y;
+}
+.analysis-source-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.analysis-source-image.is-cropping {
+  outline: 2px dashed #1874c8;
+  outline-offset: 2px;
+  cursor: crosshair;
+  touch-action: none;
+}
+.analysis-source-image.is-cropping img {
+  cursor: crosshair;
+}
+.analysis-crop-selection {
+  position: absolute;
+  z-index: 3;
+  border: 2px solid #0878d1;
+  background: #1688df33;
+  pointer-events: none;
+  box-shadow: 0 0 0 1px #fff;
+}
+.analysis-crop-button {
+  margin-top: 6px;
+  padding: 6px 8px !important;
+  font-size: 10px !important;
+}
+.analysis-options-editor {
+  margin: 14px 0;
+  padding: 12px;
+  border: 1px solid #e0e7ea;
+  border-radius: 9px;
+  background: #f8fafb;
+}
+.analysis-options-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.analysis-options-heading h4 {
+  margin: 0;
+  color: #263f4b;
+  font-size: 13px;
+}
+.analysis-options-heading p,
+.analysis-crop-help {
+  margin: 3px 0 0;
+  color: #71818a;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.analysis-options-heading button {
+  flex: 0 0 auto;
+  padding: 6px 8px !important;
+  font-size: 10px !important;
+}
+.analysis-option-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid #e6ecef;
+}
+.analysis-option-letter {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 6px;
+  background: #e8f0f3;
+  color: #244b5a;
+  font-size: 11px;
+}
+.analysis-option-content {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+.analysis-option-content input {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid #d9e2e6;
+  border-radius: 6px;
+  background: #fff;
+  color: #202a35;
+  font: inherit;
+  font-size: 12px;
+}
+.analysis-option-preview {
+  display: block;
+  max-width: min(100%, 320px);
+  max-height: 160px;
+  object-fit: contain;
+  object-position: left center;
+  padding: 4px;
+  border: 1px solid #dfe6e9;
+  border-radius: 6px;
+  background: #fff;
+}
+.analysis-option-content small,
+.analysis-option-no-image {
+  color: #77868e;
+  font-size: 10px;
+}
+.analysis-option-remove {
+  padding: 5px 7px !important;
+  font-size: 10px !important;
+}
+@media (max-width: 700px) {
+  .analysis-options-heading {
+    flex-direction: column;
+  }
+  .analysis-option-row {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+  .analysis-option-remove {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+/* De docent kan een afbeelding aan een al herkende letter koppelen. Bij
+   vragen die over meerdere pagina's lopen, kiest de dropdown de bronpagina. */
+.analysis-option-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 118px;
+}
+.analysis-option-source {
+  max-width: 140px;
+  padding: 5px 6px;
+  border: 1px solid #d9e2e6;
+  border-radius: 6px;
+  background: #fff;
+  color: #52636e;
+  font: inherit;
+  font-size: 10px;
+}
+.analysis-option-crop-existing,
+.analysis-option-remove {
+  white-space: normal;
+  text-align: center;
+}
+
+/* De integrale eindcontrole toont dezelfde opgeslagen antwoordopties als stap
+   4. Grafische opties blijven als afzonderlijke, leesbare afbeeldingen zichtbaar. */
+.final-answer-options {
+  display: grid;
+  gap: 8px;
+  padding-left: 22px;
+}
+.final-answer-option {
+  padding: 6px 0;
+}
+.final-answer-option-image {
+  display: block;
+  max-width: min(100%, 360px);
+  max-height: 180px;
+  object-fit: contain;
+  object-position: left center;
+  margin: 6px 0 2px;
+  padding: 5px;
+  border: 1px solid #dfe6e9;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* Stap 4: de antwoordoptie-editor is alleen relevant bij meerkeuzevragen.
+   Forceer hidden ook wanneer andere componentregels display instellen. */
+.analysis-options-editor[hidden] { display:none !important; }
+
+ 
+/* FIX 0.18 — contextgroep-layout: contexttitels en gekoppelde vraagtegels
+   blijven binnen de rechter inspector. Lange titels/nummers mogen de grid niet
+   breder maken; de vraagtegels breken op kleine inspectorbreedtes om. */
+.stitched-inspector,
+#contextGroupSummary {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+#contextGroupSummary .context-group-card {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+#contextGroupSummary .context-group-title {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#contextGroupSummary .context-group-range,
+#contextGroupSummary .context-group-details {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+#contextGroupSummary .context-group-questions {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  min-width: 0;
+  gap: 5px;
+}
+#contextGroupSummary .context-group-question-card {
+  flex: 0 1 auto;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 900px) {
+  .stitched-workspace {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .stitched-inspector,
+  #contextGroupSummary {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+
+
+/* Stap CV-aanvulling samenvoegen: het uitklapbare tekstleesvenster toont de
+   OCR-/PDF-tekst van één geselecteerd fragment. Dit is geen invoerveld maar
+   een pre-element binnen details. Geef het voldoende hoogte om meerdere regels
+   tegelijk te kunnen beoordelen, met een ruime bovengrens en eigen scrollbalk
+   voor uitzonderlijk lange correctieteksten. Andere analysekaarten blijven
+   bewust compact. */
+.stage-panel.supplement-merge-stage .analysis-text pre {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 12rem;
+  max-height: 32rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+
+/* Stap CV-aanvulling: de volledige samengevoegde pagina moet in een eigen
+   leesvenster zichtbaar zijn. Zonder deze expliciete hoogte kan de flex-layout
+   het venster tot een smalle strook terugbrengen; dan lijkt het alsof de PDF
+   maar één regel bevat en is er geen bruikbare ruimte om te scrollen. Houd het
+   venster daarom op een groot deel van de schermhoogte en laat de afbeelding
+   zelf haar natuurlijke (volledige) hoogte behouden. De scrollbalk hoort bij
+   het venster, niet bij een afgesneden afbeelding of een losse fragmentkaart. */
+.stage-panel.supplement-fragments-stage .stitched-view {
+  min-height: 0;
+  height: auto;
+}
+.stage-panel.supplement-fragments-stage .stitched-image-scroll {
+  display: block;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  height: clamp(360px, 70vh, 900px) !important;
+  min-height: 360px !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: scroll !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.stage-panel.supplement-fragments-stage .stitched-image-wrap,
+.stage-panel.supplement-fragments-stage .stitched-image-wrap img {
+  height: auto !important;
+  max-height: none !important;
+}
+
+
+/* De importselectie groepeert documenten per examen. De verwijderknop
+   verwijdert alleen het gekozen bestand uit de nog niet verzonden selectie.
+   De selectors sluiten aan op de echte UL/LI-structuur die app.js opbouwt. */
+.selected-import-files { display:grid; gap:10px; margin-top:14px; }
+.import-bundle { border:1px solid #e1e7eb; border-radius:10px; padding:12px 14px; background:#fbfcfd; }
+.import-bundle .section-heading { margin-bottom:7px; }
+.import-bundle .section-heading strong { font-size:13px; color:#344854; }
+.selected-file-list { list-style:none; margin:0; padding:0; }
+.selected-file-list li { display:flex; align-items:center; gap:10px; padding:7px 0; border-top:1px solid #edf0f2; font-size:12px; }
+.selected-file-list li:first-child { border-top:0; }
+.selected-file-list li > span { min-width:0; flex:1; overflow-wrap:anywhere; color:#596a73; }
+.selected-file-list small { color:#87939b; white-space:nowrap; }
+.selected-file-list button { flex:0 0 auto; padding:5px 8px; font-size:11px; }
+
+/* Align the preview and removal controls in phase 1. */
+.document-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.5rem}.document-actions button{margin:0}.document-actions button:disabled{opacity:.45;cursor:not-allowed}

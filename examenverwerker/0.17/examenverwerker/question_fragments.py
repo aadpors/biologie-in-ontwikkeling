@@ -16,13 +16,102 @@ import fitz
 from PIL import Image, ImageDraw
 
 
-def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
-    """Snijd uitsluitend buitenste witte randen weg, met behoud van marge.
+def cv_content_end_page(pdf: fitz.Document) -> int:
+    """Bepaal de laatste inhoudspagina vóór de echte CV-slotsectie.
 
-    De renderclip bepaalt de inhoudelijke bovengrens en ondergrens. Deze
-    tweede stap verwijdert alleen overbodige witte ruimte binnen die clip.
-    Een lichte drempel voorkomt dat anti-aliasing of een vrijwel witte
-    achtergrond als harde inhoudsgrens wordt behandeld.
+    Een inhoudsopgave kan de regel '5 Aanleveren scores' letterlijk noemen.
+    De oude tekstzoekactie behandelde zo'n vermelding als het begin van de
+    administratieve slotpagina en verwijderde daardoor alle vraagstarts uit
+    het beoordelingsmodel. We accepteren de grens daarom alleen wanneer de
+    volledige regel als zelfstandige kop in het bovenste deel van de pagina
+    staat. De originele PDF blijft uiteraard ongewijzigd.
+    """
+    for page_index, page in enumerate(pdf):
+        page_dict = page.get_text("dict")
+        for block in page_dict.get("blocks", []):
+            if block.get("type") != 0:
+                continue
+            for line in block.get("lines", []):
+                # Maak de regel op dezelfde manier als de overige CV-koppen:
+                # spans worden samengevoegd, waarna alleen de volledige kop
+                # mag matchen. Een verwijzing met extra tekst telt niet mee.
+                line_text = " ".join(
+                    span.get("text", "") for span in line.get("spans", [])
+                ).strip()
+                bbox = line.get("bbox", [])
+                if len(bbox) != 4:
+                    continue
+                heading_top = float(bbox[1])
+                if (
+                    heading_top <= page.rect.height * 0.20
+                    and re.fullmatch(
+                        r"5\s+aanleveren scores",
+                        line_text,
+                        re.IGNORECASE,
+                    )
+                ):
+                    # De slotsectie begint op deze pagina; de laatste
+                    # inhoudspagina is dus de voorgaande pagina.
+                    return max(0, page_index - 1)
+    # Sommige correctievoorschriften hebben geen afzonderlijke slotsectie.
+    # In dat geval blijft het volledige document beschikbaar.
+    return max(0, len(pdf) - 1)
+
+
+
+def cv_model_start(pdf: fitz.Document) -> tuple[int, float]:
+    """Vind de echte start van hoofdstuk 4, het beoordelingsmodel.
+
+    De eerdere pagina's van een correctievoorschrift bevatten onder meer
+    toelichting, correctieregels en soms een inhoudsopgave. Die horen niet in
+    de fragmentwerkruimte van stap 8. Herken daarom de zelfstandige kop
+    '4 Beoordelingsmodel' als volledige tekstregel in het bovenste kwart van
+    de pagina. De functie retourneert de nulgebaseerde pagina-index en de
+    verticale PDF-coördinaat van de kop.
+    """
+    candidates: list[tuple[float, int, float]] = []
+    for page_index, page in enumerate(pdf):
+        for block in page.get_text("dict").get("blocks", []):
+            if block.get("type") != 0:
+                continue
+            for line in block.get("lines", []):
+                text = " ".join(
+                    span.get("text", "") for span in line.get("spans", [])
+                ).strip()
+                bbox = line.get("bbox", [])
+                if len(bbox) != 4:
+                    continue
+                top = float(bbox[1])
+                if (top <= page.rect.height * 0.25
+                        and re.fullmatch(r"4\s+beoordelingsmodel", text, re.IGNORECASE)):
+                    # Een inhoudsopgave kan dezelfde regel bevatten. De echte
+                    # hoofdstukkop heeft doorgaans een grotere lettergrootte;
+                    # bewaar daarom de maximale span-grootte als extra signaal.
+                    font_size = max(
+                        (float(span.get("size", 0)) for span in line.get("spans", [])),
+                        default=0.0,
+                    )
+                    candidates.append((font_size, page_index, top))
+    if candidates:
+        # Kies de meest opvallende zelfstandige kop, niet de kleinere
+        # verwijzing in de inhoudsopgave.
+        _, page_index, top = max(candidates, key=lambda item: (item[0], item[1]))
+        return page_index, top
+    # Niet ieder correctievoorschrift gebruikt exact deze hoofdstuknummering.
+    # Als de kop ontbreekt, laat de volledige PDF beschikbaar in plaats van
+    # mogelijk inhoudelijke beoordelingsregels stilzwijgend weg te laten.
+    return 0, 0.0
+
+
+def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
+    """Verklein alleen verticale witmarges en behoud de volledige paginabreedte.
+
+    De renderclip bepaalt al de inhoudelijke bovengrens en ondergrens. Deze
+    tweede stap verwijdert alleen extra witruimte boven en onder de fragment-
+    afbeelding. De linker- en rechterrand blijven altijd gelijk aan de
+    oorspronkelijke pagina, zodat geen kolommen, figuren of bijschriften
+    buiten beeld raken. Een lichte drempel voorkomt dat anti-aliasing of een
+    vrijwel witte achtergrond als harde inhoudsgrens wordt behandeld.
     """
     with Image.open(image_path) as source:
         image = source.convert("RGB")
@@ -37,51 +126,124 @@ def _trim_whitespace(image_path: Path, *, padding: int = 18) -> None:
         bbox = mask.getbbox()
         if not bbox:
             return
-        left, top, right, bottom = bbox
-        left = max(0, left - padding)
+        # Fragmenten blijven altijd paginabreed. Alleen de verticale
+        # witruimte binnen de al bepaalde fragmentclip wordt verkleind.
+        # Horizontaal bijsnijden kan anders kolommen, figuren, bijschriften of
+        # uitwerkingen aan de linker- of rechterzijde onzichtbaar maken.
+        _, top, _, bottom = bbox
         top = max(0, top - padding)
-        right = min(image.width, right + padding)
         bottom = min(image.height, bottom + padding)
-        image.crop((left, top, right, bottom)).save(image_path, format="PNG", optimize=True)
+        image.crop((0, top, image.width, bottom)).save(
+            image_path, format="PNG", optimize=True
+        )
 
 
 
 def _repeated_marginal_boxes(pdf: fitz.Document) -> list[list[list[float]]]:
-    """Vind herhaalde kop-/voettekstregels in de buitenste paginamarges.
+    """Vind herhaalde marge-elementen zonder losse vraagnummers te wissen.
 
-    Alleen regels die in de bovenste 6% of onderste 6% van een pagina staan
-    worden onderzocht. Een identieke regel moet op ten minste twee pagina's
-    voorkomen voordat deze als niet-inhoudelijke herhaling wordt gemaskeerd.
-    Losse paginanummers in de marge worden eveneens herkend.
+    Een los getal in de boven- of ondermarge is niet automatisch een
+    paginanummer: examen-PDF's kunnen daar ook een vraagnummer plaatsen.
+    Daarom verwijderen we numerieke spans alleen als ze op vrijwel exact
+    dezelfde relatieve positie én in een doorlopende paginanummerreeks staan.
+    Een afwijkend vraagnummer op die positie blijft behouden. Niet-numerieke
+    korte kop- en voetteksten worden alleen verwijderd als dezelfde tekst op
+    ten minste twee pagina's voorkomt.
     """
-    occurrences: dict[str, set[int]] = {}
-    boxes_by_page: list[list[tuple[str, list[float]]]] = [[] for _ in pdf]
+    text_occurrences: dict[str, set[int]] = {}
+    # Bewaar bij losse getallen óók de waarde en de bronpaginapositie.
+    # Alleen dezelfde plaats op meerdere pagina's is onvoldoende bewijs:
+    # een vraagnummer kan toevallig op de plaats van een paginanummer staan.
+    numeric_positions: dict[
+        tuple[float, float], list[tuple[int, int, list[float]]]
+    ] = {}
+    spans_by_page: list[
+        list[tuple[str, list[float], tuple[float, float] | None]]
+    ] = [[] for _ in pdf]
     page_number_pattern = re.compile(r"^\d{1,3}$")
+
     for page_index, page in enumerate(pdf):
-        height = page.rect.height
+        page_width = float(page.rect.width) or 1.0
+        page_height = float(page.rect.height) or 1.0
         for block in page.get_text("dict").get("blocks", []):
             if block.get("type") != 0:
                 continue
             for line in block.get("lines", []):
-                text = "".join(span.get("text", "") for span in line.get("spans", [])).strip()
-                if not text:
-                    continue
-                bbox = [float(value) for value in line.get("bbox", [])]
-                if len(bbox) != 4:
-                    continue
-                in_margin = bbox[1] <= height * 0.06 or bbox[3] >= height * 0.94
-                if not in_margin:
-                    continue
-                key = " ".join(text.casefold().split())
-                boxes_by_page[page_index].append((key, bbox))
-                if not page_number_pattern.fullmatch(text):
-                    occurrences.setdefault(key, set()).add(page_index)
-    repeated = {key for key, pages in occurrences.items() if len(pages) >= 2}
-    result: list[list[list[float]]] = []
-    for page_lines in boxes_by_page:
-        result.append([bbox for key, bbox in page_lines if key in repeated or page_number_pattern.fullmatch(key)])
-    return result
+                line_spans = [
+                    span for span in line.get("spans", [])
+                    if str(span.get("text", "")).strip()
+                ]
+                for span in line_spans:
+                    text = " ".join(str(span.get("text", "")).split())
+                    bbox = span.get("bbox", [])
+                    if not text or len(bbox) != 4:
+                        continue
+                    coordinates = [float(value) for value in bbox]
+                    in_margin = (
+                        coordinates[1] <= page_height * 0.06
+                        or coordinates[3] >= page_height * 0.88
+                    )
+                    if not in_margin:
+                        continue
 
+                    if page_number_pattern.fullmatch(text):
+                        # De relatieve positie vangt kleine verschillen in
+                        # fontmetrics en paginagrootte op. De waarde blijft
+                        # apart bewaard om een echte paginatellerrij te kunnen
+                        # onderscheiden van een vraagnummer op diezelfde plek.
+                        center_x = ((coordinates[0] + coordinates[2]) / 2) / page_width
+                        center_y = ((coordinates[1] + coordinates[3]) / 2) / page_height
+                        position = (round(center_x, 1), round(center_y, 2))
+                        spans_by_page[page_index].append((text, coordinates, position))
+                        numeric_positions.setdefault(position, []).append(
+                            (page_index, int(text), coordinates)
+                        )
+                        continue
+
+                    key = text.casefold()
+                    # Een gemengde span zoals 'Vraag 30 2 / 19' bevat
+                    # inhoudelijke tekst en mag nooit als geheel verdwijnen.
+                    if (
+                        len(key) <= 48
+                        and not re.search(r"\b(?:vraag|opgave|antwoord)\s*\d+", key)
+                    ):
+                        spans_by_page[page_index].append((key, coordinates, None))
+                        text_occurrences.setdefault(key, set()).add(page_index)
+
+    repeated_text = {
+        key for key, pages in text_occurrences.items() if len(pages) >= 2
+    }
+
+    # Een echt paginanummer loopt mee met de bronpaginavolgorde: het verschil
+    # tussen het afgedrukte nummer en de nulgebaseerde PDF-pagina-index blijft
+    # gelijk (bijvoorbeeld PDF-pagina 1 -> nummer 1, pagina 2 -> nummer 2).
+    # We markeren alleen de concrete getallen die zo'n reeks ondersteunen.
+    # Een afwijkend getal op dezelfde plek, zoals een vraagnummer 28, blijft
+    # daardoor staan en bepaalt ook de ondergrens van de paginacrop.
+    repeated_numeric_entries: set[tuple[int, tuple[float, float], int]] = set()
+    for position, occurrences in numeric_positions.items():
+        offsets: dict[int, set[int]] = {}
+        for page_index, number, _coordinates in occurrences:
+            offsets.setdefault(number - page_index, set()).add(page_index)
+        valid_offsets = {
+            offset for offset, pages in offsets.items() if len(pages) >= 2
+        }
+        for page_index, number, _coordinates in occurrences:
+            if number - page_index in valid_offsets:
+                repeated_numeric_entries.add((page_index, position, number))
+
+    result: list[list[list[float]]] = []
+    for page_index, page_spans in enumerate(spans_by_page):
+        page_boxes = []
+        for key, coordinates, position in page_spans:
+            is_repeated_page_number = (
+                position is not None
+                and (page_index, position, int(key)) in repeated_numeric_entries
+            )
+            if is_repeated_page_number or (position is None and key in repeated_text):
+                page_boxes.append(coordinates)
+        result.append(page_boxes)
+    return result
 
 def _mask_marginal_boxes(image_path: Path, boxes: list[list[float]], clip: fitz.Rect,
                          scale_x: float, scale_y: float) -> None:
@@ -127,14 +289,18 @@ def _stitch_vertical(segment_paths: list[Path], output_path: Path, *, gap: int =
 
 def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                         render_scale: float = 1.25, page_gap: int = 32,
-                        start_page: int = 1) -> dict[str, Any]:
+                        start_page: int = 1,
+                        end_page: int | None = None,
+                        start_y: float = 0.0) -> dict[str, Any]:
     """Maak één lange, opgeschoonde werkafbeelding van het examen.
 
-    Pagina 1 wordt standaard overgeslagen omdat dit de omslag/instructiepagina
-    is. Elke volgende pagina wordt eerst gerenderd, herhaalde kop- en
-    voetteksten worden gemaskeerd en vervolgens wordt alleen de inhoudelijke
-    bounding box met een kleine marge behouden. De pagina's worden daarna
-    op gelijke breedte verticaal gestitcht. De oorspronkelijke PDF blijft
+    Pagina 1 wordt standaard overgeslagen omdat dit bij opgaven vaak de
+    omslag/instructiepagina is. Voor documenten die op pagina 1 beginnen,
+    wordt start_page=0 meegegeven. end_page is optioneel en inclusief; hiermee
+    kan een CV-strook eindigen vóór de administratieve slotsectie.
+    Elke pagina wordt gerenderd en de herhaalde kop-/voettekst wordt gemaskeerd.
+    Alleen verticale witmarges worden verkleind: de volledige paginabreedte
+    blijft behouden. De pagina's worden daarna verticaal gestitcht. De oorspronkelijke PDF blijft
     volledig onaangeraakt; deze PNG is uitsluitend een selectiewerkvlak.
 
     De metadata bevat per bronpagina de positie in de lange afbeelding.
@@ -147,10 +313,11 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
     page_meta: list[dict[str, Any]] = []
     try:
         with fitz.open(pdf_path) as pdf:
-            if len(pdf) <= start_page:
-                raise ValueError("Het opgavenboekje bevat na de eerste pagina geen inhoudspagina's.")
+            last_page = len(pdf) - 1 if end_page is None else min(int(end_page), len(pdf) - 1)
+            if start_page < 0 or start_page > last_page:
+                raise ValueError("De gekozen paginagrens bevat geen renderbare inhoudspagina's.")
             marginal_boxes = _repeated_marginal_boxes(pdf)
-            for page_index in range(start_page, len(pdf)):
+            for page_index in range(start_page, last_page + 1):
                 page = pdf[page_index]
                 pix = page.get_pixmap(matrix=fitz.Matrix(render_scale, render_scale), alpha=False)
                 page_path = destination.parent / f"_stitch-page-{page_index + 1:03d}.png"
@@ -158,65 +325,110 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
                 clip = fitz.Rect(0, 0, page.rect.width, page.rect.height)
                 _mask_marginal_boxes(page_path, marginal_boxes[page_index], clip,
                                      pix.width / clip.width, pix.height / clip.height)
-                # Paginanummers zijn losse tekstelementen in de onderste
-                # paginamarge. Maskeer alleen een geïsoleerde numerieke regel
-                # onderaan; getallen in de inhoud blijven daardoor behouden.
-                footer_numbers = []
-                for block in page.get_text("dict").get("blocks", []):
+                # Gebruik de individuele glyph-coördinaten uit rawdict.
+                # Een PDF-export kan "Vraag 28  2 / 19  lees verder" als één
+                # tekstspan opslaan. De span-box omvat dan óók het vraagnummer.
+                # Door de tekst op tekenposities te mappen, maskeren we alleen
+                # de herkenbare footer-substrings en blijft de vraagtekst staan.
+                footer_boxes: list[list[float]] = []
+                footer_patterns = [
+                    re.compile(r"\b\d{1,3}\s*/\s*\d{1,3}\b"),
+                    re.compile(r"(?i)\blees\s+verder\b"),
+                    re.compile(r"(?:►|·){1,3}"),  # PyMuPDF kan de pijl als middot extraheren.
+                    re.compile(r"(?i)\b(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*\b"),
+                ]
+                raw_page = page.get_text("rawdict")
+                for block in raw_page.get("blocks", []):
                     if block.get("type") != 0:
                         continue
                     for line in block.get("lines", []):
-                        line_text = " ".join(
-                            span.get("text", "") for span in line.get("spans", [])
-                        ).strip()
-                        line_bbox = line.get("bbox")
-                        if not line_bbox:
+                        chars: list[dict[str, Any]] = []
+                        line_text_parts: list[str] = []
+                        for span in line.get("spans", []):
+                            for char in span.get("chars", []):
+                                value = str(char.get("c", ""))
+                                if value:
+                                    chars.append(char)
+                                    line_text_parts.append(value)
+                        line_text = "".join(line_text_parts)
+                        line_bbox = line.get("bbox", [])
+                        if len(line_bbox) != 4 or float(line_bbox[1]) < page.rect.height * 0.85:
                             continue
-                        lower_text = line_text.casefold()
-                        # Veel examen-PDF's combineren de documentcode,
-                        # paginering ("2 / 19") en "lees verder" in één regel.
-                        # Dat is geen geïsoleerd getal, maar wel een footer.
-                        is_page_counter = bool(re.search(r"\b\d{1,3}\s*/\s*\d{1,3}\b", line_text))
-                        is_read_on_footer = "lees verder" in lower_text or "►" in line_text
-                        is_isolated_number = bool(re.fullmatch(r"[-–—]?\s*\d{1,3}\s*[-–—]?", line_text))
-                        if (float(line_bbox[1]) >= page.rect.height * 0.90
-                                and (is_page_counter or is_read_on_footer or
-                                     (is_isolated_number and float(line_bbox[1]) >= page.rect.height * 0.93))):
-                            footer_numbers.append(line_bbox)
-                if footer_numbers:
+                        # Markeer alleen de exacte tekens die bij een footerpatroon horen.
+                        for pattern in footer_patterns:
+                            for match in pattern.finditer(line_text):
+                                matched_chars = chars[match.start():match.end()]
+                                if matched_chars:
+                                    x0 = min(float(char["bbox"][0]) for char in matched_chars)
+                                    y0 = min(float(char["bbox"][1]) for char in matched_chars)
+                                    x1 = max(float(char["bbox"][2]) for char in matched_chars)
+                                    y1 = max(float(char["bbox"][3]) for char in matched_chars)
+                                    footer_boxes.append([x0, y0, x1, y1])
+                        # Een zelfstandige documentcode mag worden verwijderd.
+                        # Een los getal wordt hier nadrukkelijk niet gemaskeerd:
+                        # het kan het vraagnummer 28/30 zijn. Echte losse
+                        # paginanummers worden herkend via herhaalde positie in
+                        # _repeated_marginal_boxes; samengestelde tellers zoals
+                        # '2 / 19' worden hierboven teken voor teken verwijderd.
+                        stripped = line_text.strip()
+                        if re.fullmatch(
+                            r"(?:VW|VMBO|HAVO|VWO)[- ]?\d{3,}(?:[- ][\w-]+)*",
+                            stripped,
+                            re.IGNORECASE,
+                        ):
+                            footer_boxes.extend([
+                                [float(value) for value in char["bbox"]]
+                                for char in chars if str(char.get("c", "")).strip()
+                            ])
+                if footer_boxes:
                     with Image.open(page_path) as rendered:
                         cleaned = rendered.convert("RGB")
                         draw = ImageDraw.Draw(cleaned)
                         scale_x = cleaned.width / page.rect.width
                         scale_y = cleaned.height / page.rect.height
-                        for x0, y0, x1, y1 in footer_numbers:
-                            # Extra witruimte voorkomt restpixels door antialiasing.
+                        for x0, y0, x1, y1 in footer_boxes:
                             draw.rectangle((
-                                max(0, int(x0 * scale_x) - 5),
-                                max(0, int(y0 * scale_y) - 5),
-                                min(cleaned.width, int(x1 * scale_x) + 5),
-                                min(cleaned.height, int(y1 * scale_y) + 5),
+                                max(0, int(x0 * scale_x) - 2),
+                                max(0, int(y0 * scale_y) - 2),
+                                min(cleaned.width, int(x1 * scale_x) + 2),
+                                min(cleaned.height, int(y1 * scale_y) + 2),
                             ), fill="white")
                         cleaned.save(page_path, format="PNG", optimize=True)
                 with Image.open(page_path) as source:
                     image = source.convert("RGB")
-                    # Snij grote lege boven-, onder- en zijmarges weg. De
-                    # drempel behoudt ook lichte lijnen, kleine labels en
-                    # dunne illustraties die inhoudelijk bij de pagina horen.
+                    # Bij het CV begint de werkstrook midden in het document:
+                    # snij op de eerste pagina alles boven de echte kop
+                    # '4 Beoordelingsmodel' weg. De offset blijft bewaard in
+                    # crop_pixels zodat latere fragmenten exact naar de
+                    # oorspronkelijke PDF-coördinaten terug te rekenen zijn.
+                    crop_origin_y = (
+                        max(0, min(image.height, round(float(start_y) * render_scale)))
+                        if page_index == start_page else 0
+                    )
+                    if crop_origin_y:
+                        image = image.crop((0, crop_origin_y, image.width, image.height))
+
+                    # Verwijder daarna alleen de lege verticale marges. De
+                    # volledige paginabreedte blijft bewust behouden.
                     mask = Image.eval(image.convert("L"), lambda value: 255 if value < 246 else 0)
                     bbox = mask.getbbox()
                     if bbox:
-                        left, top, right, bottom = bbox
+                        _, top, _, bottom = bbox
                         pad = max(12, int(render_scale * 8))
-                        bbox = (max(0, left-pad), max(0, top-pad),
-                                min(image.width, right+pad), min(image.height, bottom+pad))
+                        bbox = (0, max(0, top-pad), image.width,
+                                min(image.height, bottom+pad))
                         image = image.crop(bbox)
+                    else:
+                        bbox = (0, 0, image.width, image.height)
                     page_images.append(image.copy())
                     page_meta.append({
                         "page_number": page_index + 1,
                         "source_width": page.rect.width,
                         "source_height": page.rect.height,
-                        "crop_pixels": list(bbox) if bbox else [0, 0, image.width, image.height],
+                        "crop_pixels": [
+                            0, crop_origin_y + bbox[1],
+                            image.width, crop_origin_y + bbox[3]
+                        ],
                         "render_width": image.width,
                         "render_height": image.height,
                     })
@@ -257,6 +469,78 @@ def build_stitched_exam(pdf_path: str | Path, output_path: str | Path, *,
         for image in page_images:
             image.close()
 
+
+
+def _looks_like_context_region(
+    pdf: fitz.Document,
+    page_metadata: list[dict[str, Any]],
+    top: float,
+    bottom: float,
+    *,
+    render_scale: float,
+) -> bool:
+    """Herken een context aan inhoudelijke tekst- of afbeeldingssignalen.
+
+    Een willekeurige zichtbare tussenruimte is niet automatisch context: het
+    kan ook het vervolg of slot van de voorafgaande vraag zijn. Daarom worden
+    contexten alleen voorgesteld wanneer de strook expliciete verwijzingen
+    naar gedeelde informatie bevat, een zelfstandig tekstblok vormt of een
+    substantieel figuurblok met een tekstanker bevat. Bij twijfel blijft de
+    inhoud bij de vraag en kan de docent haar handmatig als context markeren.
+    """
+    cues = re.compile(
+        r"\b(?:gebruik de informatie|gebruik de gegevens|gebruik onderstaande|gebruik de tekst|"
+        r"lees de tekst|bekijk de afbeelding|onderstaande afbeelding|"
+        r"de volgende informatie|de volgende tekst|in de tekst hieronder|"
+        r"bij de volgende vragen|voor de volgende vragen|"
+        r"een onderzoek naar|bij dit onderzoek|de onderzoekers|"
+        r"een experiment|de proefpersonen|in deze situatie|"
+        r"de afbeelding hieronder|de tabel hieronder|context)\b",
+        re.IGNORECASE,
+    )
+    for info in page_metadata:
+        page_top = float(info.get("top", 0))
+        page_bottom = float(info.get("bottom", 0))
+        overlap_top = max(float(top), page_top)
+        overlap_bottom = min(float(bottom), page_bottom)
+        if overlap_bottom - overlap_top < 18:
+            continue
+        page_number = int(info["page_number"])
+        if not 1 <= page_number <= pdf.page_count:
+            continue
+        page = pdf[page_number - 1]
+        crop = info.get("crop_pixels", [0, 0, 0, 0])
+        resize_factor = float(info.get("stitched_width", info.get("render_width", 1))) / max(
+            1.0, float(info.get("render_width", 1))
+        )
+        # Zet de strook uit de lange afbeelding terug naar PDF-coördinaten.
+        local_top = (overlap_top - page_top) / resize_factor + float(crop[1])
+        local_bottom = (overlap_bottom - page_top) / resize_factor + float(crop[1])
+        pdf_top = max(0.0, local_top / render_scale)
+        pdf_bottom = min(page.rect.height, local_bottom / render_scale)
+        if pdf_bottom <= pdf_top:
+            continue
+        clip = fitz.Rect(0, pdf_top, page.rect.width, pdf_bottom)
+        text = page.get_text("text", clip=clip).strip()
+        words = re.findall(r"\w+", text, flags=re.UNICODE)
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        if len(words) >= 6 and cues.search(text):
+            return True
+        sentence_count = len(re.findall(r"[.!?](?:\s|$)", text))
+        if len(words) >= 8 and len(lines) >= 2 and sentence_count >= 2:
+            return True
+        # Een figuur kan zelfstandig context zijn; een klein icoon of
+        # decoratief plaatje is daarvoor niet voldoende.
+        for image_info in page.get_image_info():
+            bbox = image_info.get("bbox")
+            if not bbox:
+                continue
+            image_rect = fitz.Rect(bbox)
+            overlaps = image_rect.y1 > pdf_top and image_rect.y0 < pdf_bottom
+            if (overlaps and image_rect.width >= page.rect.width * 0.22
+                    and image_rect.height >= 36 and len(words) >= 5):
+                return True
+    return False
 
 
 def propose_stitched_question_selections(
@@ -404,20 +688,20 @@ def propose_stitched_question_selections(
         # De bovengrens hoort op dezelfde pagina te liggen als de vraagstart.
         # De ondergrens mag op een volgende pagina liggen: zo blijft een vraag
         # die over een paginaovergang doorloopt één doorlopend vraagfragment.
-        local_before = [value for value in separators
-                        if page_top <= value < start_y]
-        global_after = [value for value in separators if value > start_y]
-        # Als er vóór de vraagstart geen expliciete witregel/kader is,
-        # gebruik dan de vraagstart zelf als scheiding. Zo blijft tekst die
-        # aantoonbaar vóór de eerste vraag staat als context beschikbaar.
-        # De vraag begint bij het goedgekeurde vraagstartanker, niet bij de
-        # dichtstbijzijnde eerdere witregel. Die witregel kan midden in de
-        # context of in de vorige vraag liggen. Door het anker te gebruiken
-        # blijft alle inhoud tussen het vorige fragment en dit vraagnummer
-        # beschikbaar als contextkandidaat.
+        # De vraagstart is het vaste beginanker. Voor de ondergrens zoeken
+        # we de eerste duidelijke visuele scheiding vóór de volgende
+        # hoofdvraag. De normalisatiestap controleert vervolgens of ná die
+        # scheiding nog zichtbare inhoud staat: zo wordt een lege interne
+        # witregel genegeerd, maar een werkelijk contextblok afgesplitst.
+        next_start_y = mapped[index + 1][0] if index + 1 < len(mapped) else float(image_height)
+        separators_before_next = [
+            value for value in separators
+            if start_y < value < next_start_y
+        ]
         top_boundary = start_y - 8.0
         top = max(page_top, top_boundary)
-        bottom = min(float(image_height), global_after[0] if global_after else float(image_height))
+        bottom_boundary = separators_before_next[0] if separators_before_next else next_start_y
+        bottom = min(float(image_height), bottom_boundary)
 
         # De boven- en ondergrens vallen net buiten de witregel/kaderlijn.
         # De marge voorkomt dat antialiasing of de lijn zelf wordt afgesneden.
@@ -438,12 +722,12 @@ def propose_stitched_question_selections(
             "source": "automatic_visual_boundaries",
         })
 
-    # Context vóór de eerste vraag en de niet-geselecteerde ruimte tussen
-    # opeenvolgende vraagfragmenten vormen contextfragmenten. Koppel ieder
-    # contextfragment aan de eerstvolgende vraag, zodat de leesvolgorde
-    # context → vraag → context → vraag ontstaat.
+    # Contextfragmenten staan vóór de vragen waarop ze betrekking hebben.
+    # Verzamel eerst alle zichtbare tussenruimtes; daarna kan ieder contextblok
+    # worden gekoppeld aan de daaropvolgende vraaggroep tot het volgende blok.
     context_selections: list[dict[str, Any]] = []
     ordered_questions = sorted(question_selections, key=lambda item: item["top"])
+    context_gaps: list[dict[str, Any]] = []
 
     if ordered_questions:
         first_question = ordered_questions[0]
@@ -461,13 +745,18 @@ def propose_stitched_question_selections(
                 float(first_question["top"]),
             )
             # Een kaderlijn kan samenvallen met de bovenrand van de crop.
-            # Gebruik dan de herkende vraagstart als scheiding tussen de
+            # Gebruik de herkende vraagstart als scheiding tussen de
             # voorafgaande context en het eerste vraagfragment.
             leading_bottom = max(
                 float(first_question["top"]),
                 first_start_y - 8.0,
             )
-            if leading_bottom - leading_top >= 24:
+            with fitz.open(pdf_path) as source_pdf:
+                leading_is_context = _looks_like_context_region(
+                    source_pdf, page_metadata, leading_top, leading_bottom,
+                    render_scale=render_scale,
+                )
+            if leading_bottom - leading_top >= 24 and leading_is_context:
                 first_question["top"] = round(leading_bottom, 2)
                 context_selections.append({
                     "id": f"auto-context-before-{first_number}",
@@ -475,24 +764,51 @@ def propose_stitched_question_selections(
                     "top": round(leading_top, 2),
                     "bottom": round(leading_bottom, 2),
                     "question_numbers": [first_number],
-                    "label": "Automatisch contextvoorstel — inhoud vóór de eerste vraag",
+                    "label": "Automatisch contextvoorstel — inhoud vóór de eerste vragen",
                     "source": "automatic_leading_context",
                 })
 
-    for index, question in enumerate(ordered_questions[:-1]):
-        following = ordered_questions[index + 1]
-        gap_top = float(question["bottom"])
-        gap_bottom = float(following["top"])
-        if gap_bottom - gap_top < 24:
-            continue
-        following_number = int(following["question_numbers"][0])
+    with fitz.open(pdf_path) as source_pdf:
+        for question_index, question in enumerate(ordered_questions[:-1]):
+            following = ordered_questions[question_index + 1]
+            gap_top = float(question["bottom"])
+            gap_bottom = float(following["top"])
+            if gap_bottom - gap_top < 24:
+                continue
+            # Classificeer een tussenblok pas als context wanneer de oorspronkelijke
+            # PDF concrete aanwijzingen voor gedeelde achtergrondinformatie bevat.
+            # Anders blijft de inhoud bij de voorafgaande vraag horen.
+            is_context = _looks_like_context_region(
+                source_pdf, page_metadata, gap_top, gap_bottom,
+                render_scale=render_scale,
+            )
+            if not is_context:
+                continue
+            context_gaps.append({
+                "question_index": question_index,
+                "top": round(gap_top, 2),
+                "bottom": round(gap_bottom, 2),
+                "previous_number": int(question["question_numbers"][0]),
+                "following_number": int(following["question_numbers"][0]),
+            })
+
+    for gap_index, gap in enumerate(context_gaps):
+        next_context_question_index = (
+            context_gaps[gap_index + 1]["question_index"]
+            if gap_index + 1 < len(context_gaps)
+            else len(ordered_questions) - 1
+        )
+        group = ordered_questions[
+            gap["question_index"] + 1 : next_context_question_index + 1
+        ]
+        numbers = [int(item["question_numbers"][0]) for item in group]
         context_selections.append({
-            "id": f"auto-context-between-{question['question_numbers'][0]}-{following_number}",
+            "id": f"auto-context-between-{gap['previous_number']}-{gap['following_number']}",
             "type": "context",
-            "top": round(gap_top, 2),
-            "bottom": round(gap_bottom, 2),
-            "question_numbers": [following_number],
-            "label": "Automatisch contextvoorstel — ruimte tussen vraagfragmenten",
+            "top": gap["top"],
+            "bottom": gap["bottom"],
+            "question_numbers": numbers or [gap["following_number"]],
+            "label": "Automatisch contextvoorstel — inhoud vóór de bijbehorende vragen",
             "source": "automatic_inter_question_gap",
         })
 
@@ -508,6 +824,7 @@ def normalise_stitched_selections(
     *,
     image_height: int,
     leading_top: float = 0.0,
+    context_candidates_only: bool = False,
 ) -> list[dict[str, Any]]:
     """Maak automatische vraag/contextvoorstellen visueel sluitend.
 
@@ -516,22 +833,66 @@ def normalise_stitched_selections(
     alleen witruimte. Deze normalisatie gebruikt de goedgekeurde vraagstarts
     als vaste volgorde en de volledige witte beeldrijen als enige grenslijnen.
 
-    De ondergrens van een vraag wordt nooit voorbij de bovengrens van de
-    volgende vraag geplaatst. Als de eerste heuristische ondergrens vóór die
-    grens valt (bijvoorbeeld midden in een meerregelige vraag), loopt het
-    vraagfragment door tot de eerstvolgende vraaggrens. Tussen twee vragen
-    wordt alleen een context voorgesteld wanneer daar daadwerkelijk tekst,
-    een afbeelding of een ander niet-wit element zichtbaar is.
+    De goedgekeurde vraagstarts bepalen de leesvolgorde; voorgestelde
+    visuele scheidingen worden op volledige witte pixelrijen geplaatst. Een
+    zichtbaar contextblok tussen twee vraagfragmenten blijft een zelfstandig
+    fragment en wordt gekoppeld aan de daaropvolgende vragen tot aan het
+    volgende contextblok. Daardoor komt de context niet in de afbeelding van
+    de eerste vraag terecht en kan hij wel met meerdere vragen worden gedeeld.
     """
-    if not selections or not white_row_ranges:
+    if not selections:
         return []
+    if not white_row_ranges:
+        # Zonder ook maar één volledig witte beeldrij bestaat geen veilige
+        # fragmentgrens. Stop daarom met een duidelijke fout in plaats van
+        # stilzwijgend een tekstregel of willekeurige pixel als grens te kiezen.
+        raise ValueError(
+            "De examenafbeelding bevat geen volledig zuiver witte horizontale rij. "
+            "De fragmentgrenzen kunnen daarom niet veilig automatisch worden bepaald."
+        )
 
-    def snap(y: float) -> int:
-        target = float(y)
-        return int(min(
-            (max(start, min(end, round(target))) for start, end in white_row_ranges),
-            key=lambda candidate: abs(candidate - target),
-        ))
+    def snap_before(y: float) -> int:
+        """Kies de onderste rij van de dichtstbijzijnde witte strook vóór inhoud.
+
+        De bovengrens van een fragment moet op de onderste volledig witte
+        pixelrij vallen. Ligt het doelpunt midden in een witte strook, dan
+        gebruiken we dus de onderkant van die strook en niet een willekeurige
+        rij in het midden ervan. Ligt het doelpunt tussen stroken, dan nemen
+        we de onderste rij van de dichtstbijzijnde strook erboven.
+        """
+        target = max(0, int(round(y)))
+        preceding = [end for start, end in white_row_ranges if start <= target]
+        if preceding:
+            containing = [
+                end for start, end in white_row_ranges
+                if start <= target <= end
+            ]
+            return int(containing[0] if containing else max(preceding))
+        # Aan het begin van de afbeelding kan het doelpunt vóór de eerste
+        # bruikbare strook liggen. Gebruik dan de eerste veilige grensrij.
+        return int(white_row_ranges[0][1])
+
+    def snap_after(y: float) -> int:
+        """Kies de bovenste rij van de dichtstbijzijnde witte strook na inhoud.
+
+        De ondergrens van een fragment moet op de bovenste volledig witte
+        pixelrij vallen. Daarmee blijft de volledige laatste inhoudsregel
+        behouden, zonder de rest van de witte tussenruimte mee te nemen.
+        """
+        target = max(0, int(round(y)))
+        following = [
+            start for start, end in white_row_ranges
+            if end >= target
+        ]
+        if following:
+            containing = [
+                start for start, end in white_row_ranges
+                if start <= target <= end
+            ]
+            return int(containing[0] if containing else min(following))
+        # Aan het einde van de afbeelding gebruiken we de bovenrand van de
+        # laatste beschikbare witte strook als veilige terugvalgrens.
+        return int(white_row_ranges[-1][0])
 
     # De afbeeldingsbron wordt één keer geopend; alle pixelcontroles gebeuren
     # op uitsneden daarvan en niet op opnieuw gerenderde PDF-pagina's.
@@ -546,18 +907,46 @@ def normalise_stitched_selections(
             if y1 <= y0:
                 return False
             crop = image.crop((0, y0, width, y1))
-            grayscale = crop.convert("L")
-            visible = grayscale.point(lambda pixel: 255 if pixel != 255 else 0)
-            has_content = visible.getbbox() is not None
+            rgb_crop = crop.convert("RGB")
+            # Ook een bijna-witte gekleurde pixel is beeldinhoud. Gebruik
+            # daarom dezelfde exacte RGB-definitie als bij de grenscontrole
+            # en niet grijswaarden, die subtiele kleurverschillen afronden.
+            has_content = any(value != 255 for value in rgb_crop.tobytes())
             crop.close()
-            grayscale.close()
-            visible.close()
+            rgb_crop.close()
             return has_content
 
+        def last_content_boundary(top: int, bottom: int) -> int:
+            """Plaats de ondergrens direct na de laatste niet-witte beeldrij.
+
+            Zoek binnen het vraagbereik van onder naar boven naar de laatste
+            zichtbare pixel. De grens wordt de eerste volledig witte rij
+            erna. Zo blijft de laatste tekstregel behouden, maar verdwijnt
+            overtollige witruimte onder het antwoordfragment.
+            """
+            y0 = max(0, min(height, int(top)))
+            y1 = max(y0, min(height, int(bottom)))
+            if y1 <= y0:
+                return int(bottom)
+            gray = image.crop((0, y0, width, y1)).convert("L")
+            # Laat Pillow de pixelmaskering uitvoeren in plaats van per pixel
+            # door Python te itereren; dit blijft efficiënt bij lange examens.
+            mask = Image.eval(gray, lambda value: 255 if value < 252 else 0)
+            bbox = mask.getbbox()
+            gray.close()
+            mask.close()
+            if not bbox:
+                return int(bottom)
+            last_content_y = y0 + bbox[3] - 1
+            next_white = next(
+                (start for start, end in white_row_ranges if start > last_content_y),
+                None,
+            )
+            return int(next_white if next_white is not None else last_content_y + 1)
         # Vraagfragmenten zijn de ankers. Sorteer ze op hun visuele positie,
         # zodat ook meerdere vragen op dezelfde pagina in leesvolgorde staan.
         questions = [
-            {**item, "top": snap(item["top"]), "bottom": snap(item["bottom"])}
+            {**item, "top": snap_before(item["top"]), "bottom": snap_after(item["bottom"])}
             for item in selections if item.get("type") == "vraag"
         ]
         questions.sort(key=lambda item: (item["top"], item["bottom"]))
@@ -566,33 +955,52 @@ def normalise_stitched_selections(
         for index, question in enumerate(questions):
             next_top = questions[index + 1]["top"] if index + 1 < len(questions) else None
 
-            # Een vraag mag niet over de volgende vraag heen lopen. Als de
-            # heuristische grens te vroeg lag, laat de vraag doorlopen tot
-            # de witregel vóór de volgende goedgekeurde vraagstart.
+            # Gebruik de voorgestelde ondergrens zodra deze na de
+            # bovengrens en vóór de volgende vraag ligt. Ook wanneer er geen
+            # contextinhoud achter staat, blijft de lijn op de eerste witte
+            # rij na de vraag staan; een lege witte strook wordt niet in het
+            # vraagfragment opgenomen.
             if next_top is not None:
-                question["bottom"] = min(question["bottom"], next_top)
-                if question["bottom"] <= question["top"]:
-                    question["bottom"] = next_top
-            elif question["bottom"] <= question["top"]:
-                # Voor de laatste vraag zoeken we de eerstvolgende geldige
-                # witte rij na het vraaganker. Er wordt nooit een tekstregel
-                # als noodgrens gebruikt.
-                later_rows = [
-                    max(start, question["top"] + 1)
-                    for start, end in white_row_ranges
-                    if end > question["top"] and max(start, question["top"] + 1) <= end
-                ]
-                if later_rows:
-                    question["bottom"] = min(later_rows)
+                proposed_bottom = int(question["bottom"])
+                if question["top"] < proposed_bottom < next_top:
+                    question["bottom"] = proposed_bottom
                 else:
-                    question["bottom"] = height
+                    # Een overlappende of onbruikbare voorstelgrens mag nooit
+                    # over de volgende vraag heen lopen.
+                    question["bottom"] = next_top
+            else:
+                # De laatste vraag eindigt op de bovenste rij van de laatste
+                # volledig witte strook na de laatste inhoudsregel.
+                question["bottom"] = snap_after(height - 1)
+
+            # Scherp de automatische voorstelgrens aan tot de eerste volledig
+            # witte rij na de laatste niet-witte pixel. De volledige breedte
+            # wordt onderzocht, zodat ook figuren en rechterkolommen meetellen.
+            question["bottom"] = min(
+                int(question["bottom"]),
+                last_content_boundary(int(question["top"]), int(question["bottom"])),
+            )
 
             if question["bottom"] <= question["top"]:
-                continue
+                number = question.get("question_numbers", ["?"])[0]
+                following_number = (
+                    questions[index + 1].get("question_numbers", ["?"])[0]
+                    if index + 1 < len(questions) else "het einde van het document"
+                )
+                raise ValueError(
+                    f"Tussen vraag {number} en {following_number} is geen "
+                    "volledig zuiver witte horizontale grensrij gevonden. "
+                    "De fragmenten zijn niet veilig automatisch te scheiden."
+                )
             if not has_visible_content(question["top"], question["bottom"]):
-                # Een leeg voorstel is schadelijker dan een ontbrekend voorstel:
-                # de docent kan een ontbrekend fragment handmatig toevoegen.
-                continue
+                # Een geaccepteerde vraagstart zonder zichtbare inhoud mag
+                # niet ongemerkt uit de resultaten verdwijnen. Dat zou een
+                # onvolledig examen kunnen opleveren zonder waarschuwing.
+                number = question.get("question_numbers", ["?"])[0]
+                raise ValueError(
+                    f"Voor vraag {number} is in het voorgestelde fragment "
+                    "geen zichtbare inhoud gevonden. Controleer de vraagstart."
+                )
             cleaned_questions.append(question)
 
         if not cleaned_questions:
@@ -601,35 +1009,114 @@ def normalise_stitched_selections(
         # Contexten worden opnieuw opgebouwd uit de zichtbare ruimte tussen
         # de nu niet-overlappende vraagfragmenten. De oude contextvoorstellen
         # worden bewust niet hergebruikt: die konden lege witstroken bevatten.
+        #
+        # Een context staat vóór de vragen waarop hij betrekking heeft. Daarom
+        # koppelen we een context aan de daaropvolgende vragen, tot aan het
+        # volgende contextblok. Zo kan één context bijvoorbeeld bij vraag 38
+        # én 39 horen, zonder dat de contextafbeelding onderdeel wordt van
+        # vraag 38 zelf.
         contexts: list[dict[str, Any]] = []
-        first_question = cleaned_questions[0]
-        first_top = snap(leading_top)
-        first_bottom = first_question["top"]
-        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
-            first_number = int(first_question["question_numbers"][0])
-            contexts.append({
-                "id": f"auto-context-before-{first_number}",
-                "type": "context",
-                "top": first_top,
-                "bottom": first_bottom,
-                "question_numbers": [first_number],
-                "label": "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vraag",
-                "source": "automatic_leading_context",
-            })
+        context_gaps: list[dict[str, Any]] = []
+        # Wanneer de PDF-analyse contextkandidaten heeft aangeleverd, zijn die
+        # kandidaten leidend. Zonder zo'n kandidaat wordt de ruimte aan de
+        # vorige vraag toegevoegd in plaats van automatisch context te worden.
+        proposed_contexts = [
+            item for item in selections if item.get("type") == "context"
+        ]
 
-        for previous, following in zip(cleaned_questions, cleaned_questions[1:]):
+        for question_index, (previous, following) in enumerate(
+            zip(cleaned_questions, cleaned_questions[1:])
+        ):
             gap_top = int(previous["bottom"])
             gap_bottom = int(following["top"])
             if gap_bottom - gap_top < 12 or not has_visible_content(gap_top, gap_bottom):
                 continue
-            following_number = int(following["question_numbers"][0])
-            contexts.append({
-                "id": f"auto-context-between-{previous['question_numbers'][0]}-{following_number}",
-                "type": "context",
+            if context_candidates_only:
+                has_candidate = any(
+                    min(gap_bottom, float(candidate.get("bottom", 0)))
+                    - max(gap_top, float(candidate.get("top", 0))) >= 12
+                    for candidate in proposed_contexts
+                )
+                if not has_candidate:
+                    # Dit is geen betrouwbaar herkend contextblok. Neem de
+                    # tussenliggende inhoud op in de voorafgaande vraag zodat
+                    # vraagtekst nooit ongemerkt uit de fragmenten verdwijnt.
+                    previous["bottom"] = gap_bottom
+                    continue
+
+            # Leg eerst alleen de fysieke positie van het contextblok vast.
+            # De vraagkoppeling wordt pas bepaald nadat alle contextblokken
+            # bekend zijn, zodat de volgende contextgrens de gedeelde groep
+            # vragen betrouwbaar kan afbakenen.
+            context_gaps.append({
+                "question_index": question_index,
                 "top": gap_top,
                 "bottom": gap_bottom,
-                "question_numbers": [following_number],
-                "label": "Automatisch contextvoorstel — zichtbare inhoud tussen vraagfragmenten",
+                "previous_number": int(previous["question_numbers"][0]),
+                "following_number": int(following["question_numbers"][0]),
+            })
+
+        # Context vóór de eerste vraag hoort bij de eerste reeks vragen tot
+        # aan het eerstvolgende contextblok. Daardoor kan ook een voorblad-
+        # of inleidend contextfragment aan meerdere vragen gekoppeld worden.
+        first_question = cleaned_questions[0]
+        first_top = snap_before(leading_top)
+        first_bottom = first_question["top"]
+        leading_context_detected = (
+            not context_candidates_only or any(
+                min(first_bottom, float(candidate.get("bottom", 0)))
+                - max(first_top, float(candidate.get("top", 0))) >= 12
+                for candidate in proposed_contexts
+            )
+        )
+        if first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom) and leading_context_detected:
+            first_group_end = (
+                context_gaps[0]["question_index"] + 1
+                if context_gaps else len(cleaned_questions)
+            )
+            first_group_numbers = [
+                int(item["question_numbers"][0])
+                for item in cleaned_questions[:first_group_end]
+            ]
+            contexts.append({
+                "id": f"auto-context-before-{first_group_numbers[0]}",
+                "type": "context",
+                "top": first_top,
+                "bottom": first_bottom,
+                "question_numbers": first_group_numbers,
+                "label": "Automatisch contextvoorstel — zichtbare inhoud vóór de eerste vragen",
+                "source": "automatic_leading_context",
+            })
+        elif first_bottom - first_top >= 12 and has_visible_content(first_top, first_bottom):
+            # De ruimte vóór de eerste vraag bevat geen contextsignalen; houd
+            # deze inhoud daarom bij de eerste vraag in plaats van haar weg te laten.
+            first_question["top"] = first_top
+
+        # Een context tussen vraag A en vraag B hoort bij B en de vragen
+        # daarna, zolang er geen nieuw contextblok verschijnt. De volgende
+        # contextgrens bepaalt dus het einde van de gedeelde contextgroep.
+        for gap_index, gap in enumerate(context_gaps):
+            next_context_question_index = (
+                context_gaps[gap_index + 1]["question_index"]
+                if gap_index + 1 < len(context_gaps)
+                else len(cleaned_questions) - 1
+            )
+            group = cleaned_questions[
+                gap["question_index"] + 1 : next_context_question_index + 1
+            ]
+            question_numbers = [
+                int(item["question_numbers"][0]) for item in group
+            ]
+            if not question_numbers:
+                question_numbers = [gap["following_number"]]
+
+            contexts.append({
+                "id": f"auto-context-between-{gap['previous_number']}-{gap['following_number']}",
+                "type": "context",
+                "top": gap["top"],
+                "bottom": gap["bottom"],
+                "question_numbers": question_numbers,
+                "label": "Automatisch contextvoorstel — inhoud vóór de bijbehorende vragen",
                 "source": "automatic_inter_question_gap",
             })
 
@@ -719,13 +1206,15 @@ def generate_question_fragments(
         # administratieve instructies en bronvermeldingen. Die horen niet bij
         # het antwoord van de laatste examenvraag. Als zo'n afsluitende sectie
         # herkenbaar is, eindigt het laatste CV-fragment op de pagina ervoor.
-        cv_content_end_page = pdf.page_count - 1
-        if document_type == "correctievoorschrift":
-            for page_index, page in enumerate(pdf):
-                page_text = page.get_text("text").casefold()
-                if re.search(r"(?m)^\s*5\s+aanleveren scores\b", page_text):
-                    cv_content_end_page = max(0, page_index - 1)
-                    break
+        # Gebruik exact dezelfde herkenning als de API voor de vraagstarts.
+        # Zo kan stap 8 geen andere paginagrens hanteren dan stap 7 en wordt
+        # een verwijzing in de inhoudsopgave niet aangezien voor de echte
+        # administratieve slotsectie.
+        cv_last_content_page = (
+            cv_content_end_page(pdf)
+            if document_type == "correctievoorschrift"
+            else pdf.page_count - 1
+        )
         # Verwijder alleen oude gegenereerde PNG's in deze eigen werkmap.
         # Bronbestanden staan elders en worden nooit gewijzigd of verwijderd.
         for old_file in destination.glob("question-*.png"):
@@ -735,10 +1224,22 @@ def generate_question_fragments(
             next_start = starts[index + 1] if index + 1 < len(starts) else None
             first_page = int(start["page_index"])
             last_page = int(next_start["page_index"]) if next_start else (
-                cv_content_end_page if document_type == "correctievoorschrift" else pdf.page_count - 1
+                cv_last_content_page
             )
             segments = []
             extracted_text_parts: list[str] = []
+
+            # Een CV-vraagstart mag nooit buiten het afgebakende
+            # beoordelingsmodel vallen. Als een start door een verouderde
+            # review of een afwijkende slotsectie toch ná de laatste
+            # inhoudspagina staat, stop dan met een gerichte validatiefout.
+            # Zo bereikt een lege lijst nooit de afbeeldingsstitcher.
+            if first_page > last_page:
+                raise ValueError(
+                    f"CV-vraag {start['question_number']} begint na de laatste "
+                    "pagina van het beoordelingsmodel. Controleer de vraagstart "
+                    "en de grens van de administratieve slotsectie."
+                )
 
             for page_index in range(first_page, last_page + 1):
                 page = pdf[page_index]
@@ -747,16 +1248,15 @@ def generate_question_fragments(
                 y0 = float(start["pdf_bbox"][1]) - margin_points if page_index == first_page else 0.0
                 y1 = (float(next_start["pdf_bbox"][1]) - margin_points
                       if next_start and page_index == last_page else page_rect.height)
-                # Als de volgende vraag op dezelfde pagina staat, zoeken we
-                # binnen de ruimte tussen beide vraagstarts naar de eerste
-                # duidelijke witregel of de onderrand van een kader. Dat is
-                # een betere beginuitsnede dan standaard alles tot de volgende
-                # vraag meenemen. Bij een vraag die doorloopt naar een volgende
-                # pagina blijft de hele pagina behouden.
-                if page_index == first_page and next_start and first_page == last_page:
-                    visual_break = _first_visual_break(page, float(start["pdf_bbox"][1]), y1)
-                    if visual_break is not None:
-                        y1 = min(y1, visual_break)
+                # Neem de volledige ruimte tussen twee goedgekeurde
+                # hoofdvraagstarts op. Een tweede automatische witregel- of
+                # kaderheuristiek mag de vraag hier niet alsnog afkappen:
+                # zulke witregels kunnen midden in een meerregelige vraag,
+                # antwoordoptie of afbeelding voorkomen. Voor de opgaven is
+                # de visueel gecontroleerde selectie uit stap 3 leidend; voor
+                # andere documenten blijft de volgende goedgekeurde vraagstart
+                # de veilige bovengrens. De docent kan die grens daarna zelf
+                # verfijnen in de documentgerichte fragmentreview.
                 if page_index == first_page and override.get("start_y") is not None:
                     y0 = float(override["start_y"])
                 if page_index == last_page and override.get("end_y") is not None:

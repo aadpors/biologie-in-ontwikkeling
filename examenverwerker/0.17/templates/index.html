@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Examenverwerker</title>
-  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/app.css?v=0.17.3">
 </head>
 <body>
   <header class="topbar">
@@ -12,6 +12,10 @@
     <div><strong>Examenverwerker</strong><span>Biologie · examenbeheer</span></div>
     <button class="quiet" id="backLibrary" hidden>← Examenbibliotheek</button>
   </header>
+
+  <!-- Eigen dialoogvenster voor dubbele imports; de acties worden door app.js
+       gevuld en hebben altijd een expliciete, beschrijvende knoptekst. -->
+  <dialog id="importDecisionDialog" class="import-decision-dialog" aria-labelledby="importDialogTitle"></dialog>
   <main id="app" class="shell">
     <section id="libraryView">
       <div class="intro"><p class="eyebrow">EXAMENBIBLIOTHEEK</p><h1>Examenbibliotheek</h1><p>Beheer examens en start een nieuwe verwerking. Elk examen krijgt een eigen werkruimte.</p></div>
@@ -34,6 +38,6 @@
       </div>
     </section>
   </main>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=0.17.5"></script>
 </body>
 </html>
