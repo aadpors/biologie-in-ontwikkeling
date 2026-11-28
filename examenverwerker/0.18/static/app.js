@@ -2047,7 +2047,8 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
               item.context_title = response.context_titles[item.id];
             }
           });
-          render();
+          // De titelwijziging hoeft de DOM/overlay niet opnieuw te bouwen.
+          // Contexttitels worden in de volgende normale render meegenomen.
         }
         saveStatus.textContent = 'Alle wijzigingen opgeslagen';
         if (explicitRecoverySave && recoveryNeedsExplicitSave) {
@@ -2067,7 +2068,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const scheduleSave = () => {
       clearTimeout(saveTimer);
       saveStatus.textContent = 'Wijziging nog niet opgeslagen…';
-      saveTimer = setTimeout(() => persistSelections().catch(() => {}), 250);
+      saveTimer = setTimeout(() => persistSelections().catch(() => {}), 90);
     };
     // pagehide/visibilitychange vangt ook het sluiten van het tabblad en het
     // wisselen naar een andere applicatie op. keepalive laat de request lopen
@@ -2153,6 +2154,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     const stopBoundaryDrag = () => {
       if (!boundaryDrag) return;
       boundaryDrag = null;
+      // Render behoudt de positie van het lange beeld; vermijd smooth scroll.
       render();
       // Een grens wordt direct bij het loslaten opgeslagen, niet pas wanneer
       // de docent op ‘Nu opslaan’ of ‘Doorgaan’ klikt.
@@ -2244,6 +2246,10 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
     };
 
     const render = () => {
+      // Bewaar scrollposities bij het heropbouwen van de inspector en overlay.
+      // Zo springt de examenstrook niet na iedere grenswijziging.
+      const preservedImageScrollTop = imageScroll.scrollTop;
+      const preservedInspectorScrollTop = inspector.scrollTop;
       // Houd de actieve selectie vast op basis van haar stabiele ID terwijl
       // de volledige lijst op de fysieke documentpositie wordt gesorteerd.
       const activeId = selections[activeIndex]?.id;
@@ -2333,7 +2339,6 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           <h4 class="context-group-title">${escapeHtml(title)}</h4>
           <p class="context-group-range">${numbers.length ? `Vragen ${escapeHtml(formatNumbers(numbers))}` : "Nog geen vragen gekoppeld"}</p>
           ${missingNumbers.length ? `<p class="context-group-warning">Vraagfragment ontbreekt bij ${escapeHtml(formatNumbers(missingNumbers))}</p>` : ""}
-          <div class="context-group-questions">${questionSelections.filter(question => (question.question_numbers || []).some(number => numbers.includes(Number(number)))).map(question => `<div class="context-group-question-card"><strong>${escapeHtml(questionLabel(question))}</strong><small>Bij deze contextgroep</small></div>`).join("") || '<p class="muted">Nog geen vraagfragmenten aan deze groep gekoppeld.</p>'}</div>
           <details class="context-group-details">
             <summary>Contextdelen bekijken</summary>
             <ul>${group.parts.map(entry => `<li>${escapeHtml(questionLabel(entry.item))}</li>`).join("")}</ul>
