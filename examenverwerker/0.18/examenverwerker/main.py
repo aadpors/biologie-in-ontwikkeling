@@ -2623,6 +2623,32 @@ def context_image(exam_id: str, filename: str):
     return FileResponse(path, media_type="image/png", headers={"Cache-Control":"no-store"})
 
 
+
+@app.delete("/api/exams/{exam_id}/documents/{document_id}")
+def remove_imported_document(exam_id: str, document_id: int):
+    """Remove a source PDF from phase 1; never permit unsafe workflow mutation."""
+    exam = STORE.get_exam(exam_id)
+    if not exam:
+        raise HTTPException(404, "Examen niet gevonden.")
+    if exam.get("confirmed"):
+        raise HTTPException(409, "Open eerst de documentmetadata opnieuw voordat u een bronbestand verwijdert.")
+    if len(exam.get("documents", [])) <= 1:
+        raise HTTPException(409, "Het laatste bronbestand kan niet worden verwijderd.")
+    try:
+        relative_path = STORE.remove_document(exam_id, document_id)
+    except ValueError as error:
+        raise HTTPException(409, str(error)) from error
+    source_path = (DATA / relative_path).resolve()
+    exams_root = (DATA / "exams").resolve()
+    # Resolve and validate the DB path before deleting, to prevent path traversal.
+    if exams_root not in source_path.parents:
+        raise HTTPException(500, "Bronpad valt buiten de examenopslag.")
+    try:
+        source_path.unlink(missing_ok=True)
+    except OSError as error:
+        raise HTTPException(500, "Documentrij verwijderd, maar bronbestand kon niet worden opgeruimd.") from error
+    return {"ok": True, "removed_document_id": document_id}
+
 @app.post("/api/exams/{exam_id}/metadata/draft")
 def save_metadata_draft(exam_id: str, payload: dict):
     """Bewaar onvolledige metadata als concept zonder het examen te bevestigen.
