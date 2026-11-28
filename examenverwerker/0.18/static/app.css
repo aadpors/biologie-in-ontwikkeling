@@ -1239,3 +1239,6 @@
 .selected-file-list li > span { min-width:0; flex:1; overflow-wrap:anywhere; color:#596a73; }
 .selected-file-list small { color:#87939b; white-space:nowrap; }
 .selected-file-list button { flex:0 0 auto; padding:5px 8px; font-size:11px; }
+
+/* Align the preview and removal controls in phase 1. */
+.document-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:.5rem}.document-actions button{margin:0}.document-actions button:disabled{opacity:.45;cursor:not-allowed}
