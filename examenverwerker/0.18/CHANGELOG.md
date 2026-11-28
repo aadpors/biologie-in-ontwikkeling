@@ -1,3 +1,12 @@
+# Versie 0.18.6 — stap 3 fragmentreview
+
+- Contextgroepoverzicht is compacter: de losse vraagfragmentkaartjes worden niet langer onder iedere contextgroep herhaald; de details blijven beschikbaar via Contextdelen bekijken.
+- Scrollposities van de examenstrook en inspector worden bij het opnieuw renderen behouden, zodat het beeld niet springt na het verschuiven van fragmentgrenzen.
+- De automatische opslagdebounce na veldwijzigingen is verkort tot 90 ms om sneller door te kunnen werken.
+- De titelrespons bij autosave triggert geen volledige DOM-herbouw meer, die onnodig scrollverschuiving veroorzaakte.
+- In stap 3 is een zichtbare leerstatus toegevoegd met het aantal opgeslagen vraagstart-, grens- en contextcorrectievoorbeelden. De minimumdrempel voor activering blijft expliciet.
+- Regressietests toegevoegd voor de compacte inspector, scrollbehoud, snelle autosave en zichtbare leerstatus.
+
 # Reparatie na eerste CI-controle
 - De eerste volledige CI-run vond twee testproblemen: een foutief pad in een bestaande frontend-contracttest en een CV-regel waarin regeleinden als de letterlijke tekens `\\n` waren opgeslagen.
 - Beide zijn hersteld; de CV-scoreherkenning normaliseert nu zowel echte regeleinden als ge-escapete regeleinden voordat het scorelabel wordt gelezen.
