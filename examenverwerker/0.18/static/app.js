@@ -1903,7 +1903,7 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       <p class="lead">${isStitchedDocument
         ? `De volledige pagina’s van het ${documentLabel} zijn samengevoegd tot één doorlopende afbeelding. Controleer de vraagfragmenten, verplaats zo nodig de grenzen en koppel elk fragment aan de juiste vraag.`
         : 'De volledige pagina’s zijn samengevoegd tot één doorlopende afbeelding. Selecteer elk afzonderlijk contextdeel als fragment van het type Context en koppel het aan de vragen waarop het betrekking heeft. Contextdelen met overlappende vraagnummers worden automatisch samengevoegd tot één contextgroep. De titel wordt afgeleid van de eerste tekstregel van het eerste contextdeel. Selecteer daarnaast iedere opgave als fragment van het type Vraag en koppel die aan het eigen vraagnummer.'}</p>
-      <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div>
+      <div class="notice">${result.pages.length} pagina's verwerkt · paginanummers en grote buitenmarges verwijderd vóór het samenvoegen. Wijzigingen worden automatisch opgeslagen; de bron-PDF blijft ongewijzigd.</div><div id="fragmentLearningStatus" class="notice" style="margin-top:8px">Leerstatus ophalen…</div>
       ${result.selection_warning ? `<p id="selectionRecoveryWarning" class="form-error">${escapeHtml(result.selection_warning)}</p>` : ''}
       <div class="stitched-workspace">
         <section class="stitched-view"><div class="stitched-toolbar"><button class="quiet" id="beginFragment">Nieuw fragment selecteren</button><span id="selectionHint" class="muted">Kies ‘Nieuw fragment selecteren’.</span><span id="stitchedSaveStatus" class="muted" role="status">Opgeslagen versie geladen</span></div>
@@ -1923,6 +1923,16 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
       </div>
       <div class="review-actions"><button class="primary" id="saveStitched">Nu opslaan</button><button class="primary" id="completeStitched">Fragmentcontrole goedkeuren en doorgaan</button></div><p id="stitchedMessage" class="form-error" role="status"></p>`;
 
+    // Toon de opgebouwde leerstatus zichtbaar in deze werkstap. De teller is
+    // transparant: twee examens leveren voorbeelden op, maar activering van
+    // een algemene regel vereist de ingestelde minimale voorbeeldtelling.
+    api(`/api/exams/${state.examId}/fragment-learning-status`).then(learning => {
+      const badge = $('#fragmentLearningStatus');
+      if (!badge) return;
+      badge.textContent = learning.learning_active
+        ? `Detectie heeft ${learning.question_start_examples} vraagstartvoorbeelden, ${learning.fragment_boundary_examples} grenscorrecties en ${learning.context_group_examples} contextcorrecties geleerd. Automatische goedkeuring blijft uit.`
+        : `Leerlaag: ${learning.question_start_examples} vraagstartvoorbeelden, ${learning.fragment_boundary_examples} grenscorrecties en ${learning.context_group_examples} contextcorrecties opgeslagen. Nog geen leerregel actief (minimaal 5 voorbeelden per kenmerk).`;
+    }).catch(() => { const badge = $('#fragmentLearningStatus'); if (badge) badge.textContent = 'Leerstatus tijdelijk niet beschikbaar.'; });
     const img = $('#stitchedImage');
     const wrap = $('#stitchedImageWrap');
     const imageScroll = $('#stitchedImageScroll');
