@@ -471,7 +471,7 @@ function renderMetadataStage() {
   $('#stagePanel').innerHTML = `
     <p class="eyebrow">FASE 1 · IMPORT EN DOCUMENTHERKENNING</p><h2>Documenteigenschappen bevestigen</h2>
     <p class="lead">Controleer de voorstellen en bevestig de eigenschappen in één keer. Daarna wordt deze stap niet opnieuw gevraagd.</p>
-    <div class="document-list">${exam.documents.map(doc => `<div class="document-card"><strong>${escapeHtml(doc.filename)}</strong><small>${doc.page_count} pagina's · ${doc.sha256.slice(0,12)}…</small><button class="quiet" data-preview="${doc.id}">Eerste pagina bekijken</button></div>`).join('')}</div>
+    <div class="document-list">${exam.documents.map(doc => `<div class="document-card"><strong>${escapeHtml(doc.filename)}</strong><small>${doc.page_count} pagina's · ${doc.sha256.slice(0,12)}…</small><div class="document-actions"><button class="quiet" data-preview="${doc.id}">Eerste pagina bekijken</button><button class="quiet danger" data-remove-document="${doc.id}" ${exam.documents.length <= 1 ? 'disabled title="Het laatste bestand kan niet worden verwijderd"' : ''}>Verwijderen</button></div></div>`).join('')}</div>
     <form id="metadataForm" class="metadata-form">
       <div class="fields">
         <div class="field"><label for="subject">Vak</label><input id="subject" value="${escapeHtml(common('subject') || 'biologie')}" required></div>
