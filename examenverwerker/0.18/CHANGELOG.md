@@ -138,3 +138,10 @@ De eerste werkende leerkring betreft vraagstarts. De opslag en feedbackstructuur
 
 - De opmaak van de geselecteerde bestanden sluit nu aan op de daadwerkelijke lijststructuur van de interface.
 - Versie- en cacheaanduidingen verhoogd naar 0.18.4, zodat ook deze laatste presentatiecorrectie gegarandeerd als nieuwe browserasset wordt geladen.
+
+
+## 0.18.5 — documenten beheren in bestaande werkruimte
+
+- Een afzonderlijke PDF kan in fase 1 uit een bestaande, nog niet bevestigde werkruimte worden verwijderd; herimport is niet nodig.
+- Na verwijderen wordt de werkruimte direct opnieuw geladen. Het laatste bestand en bestanden in bevestigde examens zijn beschermd.
+- Metadata-concepten worden bijgewerkt zodat verwijderde bestandsnamen niet blijven hangen.
