@@ -17,6 +17,11 @@ from typing import Any
 
 
 MIN_EXAMPLES_PER_FEATURE = 5
+# Fragmentgrenzen leveren per examen meerdere concrete, handmatig gecorrigeerde
+# voorbeelden op. Voor offsets is daarom een kleinere, aparte drempel logisch:
+# drie vraagfragmenten zijn al drie observaties (geen drie examens). De offset
+# wordt bovendien beperkt tot een robuuste mediaan en blijft een voorstel.
+MIN_BOUNDARY_EXAMPLES = 3
 
 
 def _band(value: float, width: float = 0.05) -> str:
@@ -163,7 +168,7 @@ def build_boundary_learning_profile(records: list[dict[str, Any]]) -> dict[str, 
         ends = [float(item["end_offset"]) for item in examples if isinstance(item.get("end_offset"), (int, float))]
         result[document_type] = {
             "examples": len(examples),
-            "active": len(examples) >= MIN_EXAMPLES_PER_FEATURE,
+            "active": len(examples) >= MIN_BOUNDARY_EXAMPLES,
             "median_start_offset": _median(starts),
             "median_end_offset": _median(ends),
         }
