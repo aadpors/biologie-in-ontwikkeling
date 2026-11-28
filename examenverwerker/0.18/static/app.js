@@ -484,6 +484,25 @@ function renderMetadataStage() {
       <button class="primary" type="submit">Metadata bevestigen en doorgaan</button><p id="metadataDraftStatus" class="muted" role="status">Wijzigingen worden automatisch opgeslagen.</p><p id="metadataError" class="form-error" role="alert"></p>
     </form><div id="pagePreview"></div>`;
   document.querySelectorAll('[data-preview]').forEach(button => button.addEventListener('click', () => showPreview(button.dataset.preview)));
+
+  // Verwijder een PDF rechtstreeks uit deze importwerkruimte. Na succesvolle
+  // verwijdering wordt fase 1 opnieuw geladen met de bijgewerkte documentlijst.
+  document.querySelectorAll('[data-remove-document]').forEach(button => button.addEventListener('click', async () => {
+    const documentId = Number(button.dataset.removeDocument);
+    const doc = state.exam.documents.find(item => Number(item.id) === documentId);
+    if (!doc || state.exam.documents.length <= 1) return;
+    if (!confirm('Bronbestand "' + doc.filename + '" uit deze werkruimte verwijderen?')) return;
+    button.disabled = true;
+    try {
+      await api('/api/exams/' + state.examId + '/documents/' + documentId, {method: 'DELETE'});
+      await openWorkspace(state.examId);
+    } catch (error) {
+      const errorBox = $('#metadataError');
+      if (errorBox) errorBox.textContent = error.message;
+      button.disabled = false;
+    }
+  }));
+
   // Sla metadata als concept op zodra een veld wordt verlaten of een
   // documenttype wordt gewijzigd. Definitief bevestigen blijft een aparte stap.
   let metadataDraftTimer = null;
