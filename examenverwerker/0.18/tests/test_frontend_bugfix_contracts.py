@@ -95,9 +95,25 @@ class FrontendBugfixContractTests(unittest.TestCase):
         self.assertIn("APP_PORT", batch)
         self.assertIn("TcpListener", batch)
         self.assertIn("CandidatePort", powershell)
-        self.assertIn("versie 0.18.4", html)
-        self.assertIn("app.js?v=0.18.4", html)
+        self.assertIn("versie 0.18.5", html)
+        self.assertIn("app.js?v=0.18.5", html)
         self.assertIn("Cache-Control", backend)
+
+
+    def test_metadata_stage_offers_document_removal_and_refreshes_workspace(self):
+        js = APP_JS.read_text(encoding="utf-8")
+        self.assertIn('data-remove-document', js)
+        self.assertIn("method:'DELETE'", js)
+        self.assertIn("await openWorkspace(state.examId);", js)
+        self.assertIn("exam.documents.length <= 1", js)
+
+    def test_backend_document_removal_endpoint_has_safety_guards(self):
+        backend = (ROOT / "examenverwerker" / "main.py").read_text(encoding="utf-8")
+        storage = (ROOT / "examenverwerker" / "storage.py").read_text(encoding="utf-8")
+        self.assertIn('@app.delete("/api/exams/{exam_id}/documents/{document_id}")', backend)
+        self.assertIn('if exam.get("confirmed")', backend)
+        self.assertIn('len(exam.get("documents", [])) <= 1', backend)
+        self.assertIn('def remove_document(self, exam_id: str, document_id: int)', storage)
 
     def test_context_group_cards_wrap_inside_inspector(self):
         css = APP_CSS.read_text(encoding="utf-8")
