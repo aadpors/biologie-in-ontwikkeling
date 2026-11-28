@@ -1302,6 +1302,50 @@ def get_stitched_opgaven(exam_id: str):
             context_candidates_only=True,
         )
 
+    # Pas het leerprofiel voor fragmentgrenzen direct toe op de voorstellen
+    # in stap 3. De eerder opgeslagen feedback is in PDF-punten uitgedrukt;
+    # de lange afbeelding gebruikt render_scale (1,25) en dus pixels.
+    # Dit gebeurt uitsluitend bij nieuwe voorstellen: opgeslagen docentselecties
+    # worden nooit verschoven. De mediaan beperkt de invloed van uitschieters.
+    if proposed:
+        boundary_profile = build_boundary_learning_profile(
+            STORE.list_fragment_feedback()
+        ).get("opgaven", {})
+        if boundary_profile.get("active"):
+            learned_start_px = float(boundary_profile.get("median_start_offset") or 0) * 1.25
+            learned_end_px = float(boundary_profile.get("median_end_offset") or 0) * 1.25
+            question_proposals = sorted(
+                (item for item in proposed if item.get("type") == "vraag"),
+                key=lambda item: float(item.get("top", 0)),
+            )
+            for index, selection in enumerate(question_proposals):
+                # De ondergrens mag nooit door de bovenkant van het volgende
+                # fragment heen schuiven. De vraagstrook blijft minimaal 12 px.
+                next_top = (
+                    float(question_proposals[index + 1]["top"])
+                    if index + 1 < len(question_proposals)
+                    else float(metadata["height"])
+                )
+                original_top = float(selection["top"])
+                original_bottom = float(selection["bottom"])
+                shifted_top = max(0.0, original_top + learned_start_px)
+                shifted_bottom = min(
+                    next_top - 1.0,
+                    float(metadata["height"]),
+                    original_bottom + learned_end_px,
+                )
+                if shifted_bottom - shifted_top >= 12.0:
+                    selection["top"] = round(shifted_top, 2)
+                    selection["bottom"] = round(shifted_bottom, 2)
+                    selection["learning_adjusted"] = bool(
+                        learned_start_px or learned_end_px
+                    )
+                    selection["learning_offsets_pixels"] = {
+                        "start": round(learned_start_px, 2),
+                        "end": round(learned_end_px, 2),
+                    }
+                    selection["learning_examples"] = boundary_profile.get("examples", 0)
+
     # De titel van ieder contextdeel wordt uit de oorspronkelijke PDF gelezen.
     # De afbeelding blijft leidend voor de grenzen; de tekstlaag levert alleen
     # de eerste tekstregel die als titel in de contextgroep wordt getoond.
