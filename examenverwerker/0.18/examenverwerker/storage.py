@@ -179,6 +179,33 @@ class Store:
         with self.connection() as db:
             db.execute("DELETE FROM exams WHERE id=?", (exam_id,))
 
+
+    def remove_document(self, exam_id: str, document_id: int):
+        """Remove one source document from an unconfirmed import transactionally."""
+        with self.connection() as db:
+            db.execute("BEGIN IMMEDIATE")
+            exam = db.execute("SELECT confirmed FROM exams WHERE id=?", (exam_id,)).fetchone()
+            if not exam:
+                raise ValueError("Examen niet gevonden.")
+            if exam["confirmed"]:
+                raise ValueError("Open eerst de documentmetadata opnieuw.")
+            rows = db.execute("SELECT id,relative_path,filename FROM documents WHERE exam_id=? ORDER BY id", (exam_id,)).fetchall()
+            if len(rows) <= 1:
+                raise ValueError("Het laatste bronbestand kan niet worden verwijderd.")
+            doc = next((row for row in rows if row["id"] == document_id), None)
+            if doc is None:
+                raise ValueError("Document niet gevonden in deze examenwerkruimte.")
+            db.execute("DELETE FROM documents WHERE exam_id=? AND id=?", (exam_id, document_id))
+            # Haal de verwijderde bestandsnaam ook uit het concept-typeoverzicht.
+            draft = db.execute("SELECT evidence_json FROM steps WHERE exam_id=? AND step_key='metadata_draft'", (exam_id,)).fetchone()
+            if draft:
+                evidence = json.loads(draft["evidence_json"])
+                types = evidence.get("document_types")
+                if isinstance(types, dict):
+                    types.pop(doc["filename"], None)
+                db.execute("UPDATE steps SET evidence_json=?,updated_at=CURRENT_TIMESTAMP WHERE exam_id=? AND step_key='metadata_draft'", (json.dumps(evidence, ensure_ascii=False), exam_id))
+            return doc["relative_path"]
+
     def reopen_metadata(self, exam_id: str, metadata: dict[str, Any]):
         """Open metadata als concept en bewaar de goedgekeurde nulmeting.
 
