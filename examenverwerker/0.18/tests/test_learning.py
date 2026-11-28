@@ -138,7 +138,18 @@ class LearningTests(unittest.TestCase):
         self.assertEqual(overrides[3]["start_y"], 76)
         self.assertEqual(overrides[3]["end_y"], 806)
 
-    def test_boundary_learning_is_inactive_below_five_examples(self):
+    def test_boundary_learning_activates_from_three_reviewed_examples(self):
+        records = [{"stage": "fragment_boundaries:opgaven", "accepted": {"examples": [
+            {"start_offset": -4, "end_offset": 6},
+            {"start_offset": -2, "end_offset": 4},
+            {"start_offset": -3, "end_offset": 5},
+        ]}}]
+        profile = build_boundary_learning_profile(records)["opgaven"]
+        self.assertTrue(profile["active"])
+        self.assertEqual(profile["median_start_offset"], -3)
+        self.assertEqual(profile["median_end_offset"], 5)
+
+    def test_boundary_learning_is_inactive_below_three_examples(self):
         starts = [{"question_number": 1, "page_index": 0, "pdf_bbox": [50, 100, 60, 112]}]
         profile = {"active": False, "examples": 4, "median_start_offset": -4, "median_end_offset": 6}
         self.assertEqual(learned_boundary_overrides(starts, [800], profile), {})
