@@ -2452,9 +2452,10 @@ async function renderStitchedOpgavenStage(stepKey, startsStepKey, stageLabel, st
           scrollInspectorToFragment(activeIndex);
         })
       );
-    };
-
-    $('#beginFragment').addEventListener('click',()=>{
+      // Restore scroll positions after the DOM is rebuilt.
+      imageScroll.scrollTop = preservedImageScrollTop;
+      inspector.scrollTop = preservedInspectorScrollTop;
+    };    $('#beginFragment').addEventListener('click',()=>{
       pendingTop=null;pointerStart=null;
       hint.textContent='Klik op de afbeelding bij de bovenrand van het fragment.';
       wrap.classList.add('selecting');render();
