@@ -48,3 +48,8 @@ De leerkring omvat vraagstarts, fragmentgrenzen en contextgroepen. Vraagstartken
 - De startprocedure zoekt een vrije poort vanaf 8000 tot en met 8010. Als bijvoorbeeld een oudere instantie nog op poort 8000 draait, wordt deze niet afgesloten; de nieuwe instantie start op 8001. De browser wordt naar de nieuwe instantie geleid.
 - Controleer na het starten de versievermelding rechts naast de applicatienaam. Voor deze iteratie moet daar **0.18.4** staan.
 - Als geen vrije poort wordt gevonden, sluit dan een oude lokale examenverwerker en start opnieuw. Er worden nooit automatisch bestaande processen beëindigd.
+
+
+### Bestanden verwijderen in fase 1
+
+In een nog niet bevestigde werkruimte kan een bron-PDF met **Verwijderen** worden verwijderd. De werkruimte wordt direct bijgewerkt. Het laatste bestand en bestanden in een bevestigde verwerking zijn beschermd.
