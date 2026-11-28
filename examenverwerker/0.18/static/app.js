@@ -494,7 +494,7 @@ function renderMetadataStage() {
     if (!confirm('Bronbestand "' + doc.filename + '" uit deze werkruimte verwijderen?')) return;
     button.disabled = true;
     try {
-      await api('/api/exams/' + state.examId + '/documents/' + documentId, {method: 'DELETE'});
+      await api('/api/exams/' + state.examId + '/documents/' + documentId, {method:'DELETE'});
       await openWorkspace(state.examId);
     } catch (error) {
       const errorBox = $('#metadataError');
