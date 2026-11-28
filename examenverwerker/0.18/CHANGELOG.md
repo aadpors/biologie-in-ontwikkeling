@@ -1,3 +1,9 @@
+# Versie 0.18.7 — daadwerkelijke adaptieve fragmentgrenzen
+
+- Grenscorrecties bij vraagfragmenten worden nu actief vanaf drie expliciet gecontroleerde fragmenten per documenttype (in plaats van vijf).
+- De geleerde mediaan-offset voor boven- en ondergrens wordt bij een nieuw examen als voorstel toegepast op de automatisch bepaalde vraagstarts. Individuele handmatige overrides blijven leidend.
+- Regressietest toegevoegd die controleert dat drie grenscorrecties de leer-offset activeren.
+
 # Versie 0.18.6 — stap 3 fragmentreview
 
 - Contextgroepoverzicht is compacter: de losse vraagfragmentkaartjes worden niet langer onder iedere contextgroep herhaald; de details blijven beschikbaar via Contextdelen bekijken.
